@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,40 +13,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Unit tests for the `gcloud compute instances get-iam-policy`."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_resources
 
 
-messages = core_apis.GetMessagesModule('compute', 'alpha')
+@parameterized.parameters(
+    (base.ReleaseTrack.ALPHA, 'alpha'),
+    (base.ReleaseTrack.BETA, 'beta'))
+class GetIamPolicyTest(sdk_test_base.WithFakeAuth,
+                       cli_test_base.CliTestBase,
+                       parameterized.TestCase):
 
-
-class GetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
-
-  def SetUp(self):
+  def _SetUp(self, track, api_version):
+    self.messages = core_apis.GetMessagesModule('compute', api_version)
     self.mock_client = mock.Client(
-        core_apis.GetClientClass('compute', 'alpha'),
-        real_client=core_apis.GetClientInstance('compute', 'alpha',
-                                                no_http=True))
+        core_apis.GetClientClass('compute', api_version),
+        real_client=core_apis.GetClientInstance(
+            'compute', api_version, no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
+    self.track = track
 
-    self.track = base.ReleaseTrack.ALPHA
-
-  def testSimpleEmptyResponseCase(self):
+  def testSimpleEmptyResponseCase(self, track, api_version):
+    self._SetUp(track, api_version)
     self.mock_client.instances.GetIamPolicy.Expect(
-        messages.ComputeInstancesGetIamPolicyRequest(resource='my-resource',
-                                                     zone='my-zone',
-                                                     project='fake-project'),
-        response=test_resources.EmptyAlphaIamPolicy())
+        self.messages.ComputeInstancesGetIamPolicyRequest(
+            resource='my-resource', zone='my-zone', project='fake-project'),
+        response=test_resources.EmptyIamPolicy(self.messages))
 
     self.Run("""
         compute instances get-iam-policy --zone=my-zone my-resource
@@ -57,12 +64,13 @@ class GetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             etag: dGVzdA==
             """))
 
-  def testSimpleResponseCase(self):
+  def testSimpleResponseCase(self, track, api_version):
+    self._SetUp(track, api_version)
     self.mock_client.instances.GetIamPolicy.Expect(
-        messages.ComputeInstancesGetIamPolicyRequest(resource='my-resource',
-                                                     zone='my-zone',
-                                                     project='fake-project'),
-        response=test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag())
+        self.messages.ComputeInstancesGetIamPolicyRequest(
+            resource='my-resource', zone='my-zone', project='fake-project'),
+        response=test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+            self.messages))
 
     self.Run("""
         compute instances get-iam-policy --zone=my-zone my-resource
@@ -78,12 +86,13 @@ class GetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             etag: ZXRhZ1R3bw==
             """))
 
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track, api_version):
+    self._SetUp(track, api_version)
     self.mock_client.instances.GetIamPolicy.Expect(
-        messages.ComputeInstancesGetIamPolicyRequest(resource='my-resource',
-                                                     zone='my-zone',
-                                                     project='fake-project'),
-        response=test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag())
+        self.messages.ComputeInstancesGetIamPolicyRequest(
+            resource='my-resource', zone='my-zone', project='fake-project'),
+        response=test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+            self.messages))
 
     self.Run("""
         compute instances get-iam-policy --zone=my-zone my-resource

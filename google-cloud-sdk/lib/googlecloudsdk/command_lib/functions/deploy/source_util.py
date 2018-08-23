@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """'functions deploy' utilities for function source code."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import random
 import re
@@ -133,7 +137,7 @@ def _GetUploadUrl(messages, service, function_ref):
 
 def _CheckUploadStatus(status_code):
   """Validates that HTTP status for upload is 2xx."""
-  return status_code / 100 == 2
+  return status_code // 100 == 2
 
 
 def _UploadFileToGeneratedUrl(source, messages, service, function_ref):

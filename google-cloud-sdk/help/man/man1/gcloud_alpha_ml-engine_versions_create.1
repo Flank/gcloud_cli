@@ -11,7 +11,7 @@ gcloud alpha ml\-engine versions create \- create a new Cloud ML Engine version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-model\-class\fR=\fIMODEL_CLASS\fR\ \fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -96,7 +96,7 @@ defaults to \f5tensorflow\fR. \fIFRAMEWORK\fR must be one of:
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -105,18 +105,20 @@ numbers.
 
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
-The type of machine on which to serve the model. Currently only applies to
-online prediction. Currently supported machine_types are:
+Type of machine on which to serve the model. Currently only applies to online
+prediction. Currently supported machine_types are:
 
 .RS 2m
 .IP "\(em" 2m
-\f5mls1\-highmem\-1\fR \- A virtual machine with 1 core and 2 Gb RAM.
+\f5mls1\-c1\-m2\fR \- A virtual machine with 1 core and 2 Gb RAM (default).
 .IP "\(em" 2m
-\f5mls1\-highcpu\-4\fR \- A virtual machine with 4 core and 2 Gb RAM.
-
-.RS 2m
-If not provided defaults to `mls1\-highmem\-1`.
-.RE
+\f5mls1\-c4\-m2\fR \- A virtual machine with 4 core and 2 Gb RAM.
+.IP "\(em" 2m
+\f5mls1\-highmem\-1\fR \- A virtual machine with 1 core and 2 Gb RAM (will be
+deprecated soon).
+.IP "\(em" 2m
+\f5mls1\-highcpu\-4\fR \- A virtual machine with 4 core and 2 Gb RAM (will be
+deprecated soon).
 .RE
 .RE
 .sp
@@ -137,14 +139,14 @@ In the latter case the files will be uploaded to Google Cloud Storage and a
 
 .TP 2m
 \fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
-The version of Python used when creating the version. If not set, the default
+Version of Python used when creating the version. If not set, the default
 version is 2.7. Python 3.5 is available when \f5runtime_version\fR is set to 1.4
 and above. Python 2.7 works with all supported runtime versions.
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-The Google Cloud ML Engine runtime version for this job. Defaults to a stable
-version, which is defined in the documentation along with the list of supported
+Google Cloud ML Engine runtime version for this job. Defaults to a stable
+version, which is defined in documentation along with the list of supported
 versions:
 https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
 
@@ -155,7 +157,28 @@ Bucket in which to stage training archives.
 Required only if a file upload is necessary (that is, other flags include local
 paths) and no other flags implicitly specify an upload path.
 
+.TP 2m
 
+Configure user code in prediction. Cloud ML Engine allows a model to have
+user\-provided prediction code; these options configure that code.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-model\-class\fR=\fIMODEL_CLASS\fR
+The fully\-qualified name of the custom Model class in the package provided for
+custom prediction.
+
+For example, \f5\-\-model\-class my_package.SequenceModel\fR.
+
+.TP 2m
+\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]
+Comma\-separated list of Google Cloud Storage URIs (\f5gs://...\fR) for
+user\-supplied Python packages to use.
+
+
+.RE
 .RE
 .sp
 
@@ -170,11 +193,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud ml\-engine versions create

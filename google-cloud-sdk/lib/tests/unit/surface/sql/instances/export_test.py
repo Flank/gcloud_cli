@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -24,7 +27,7 @@ from tests.lib.surface.sql import base
 
 
 # TODO(b/73653605): Remove after `sql instances export` deprecation period.
-class InstancesExportTest(base.SqlMockTestBeta):
+class _BaseInstancesExportTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def _ExpectExport(self):
@@ -157,6 +160,18 @@ class InstancesExportTest(base.SqlMockTestBeta):
     self._ExpectExport()
     self.Run('sql instances export testinstance --async '
              'gs://speckletest/testinstance.gz')
+
+
+class InstancesExportGATest(_BaseInstancesExportTest, base.SqlMockTestGA):
+  pass
+
+
+class InstancesExportBetaTest(_BaseInstancesExportTest, base.SqlMockTestBeta):
+  pass
+
+
+class InstancesExportAlphaTest(_BaseInstancesExportTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

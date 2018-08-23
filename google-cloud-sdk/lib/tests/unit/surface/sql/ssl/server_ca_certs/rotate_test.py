@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for rotating Server CA Certs."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -25,7 +28,7 @@ from tests.lib.surface.sql import base
 from tests.lib.surface.sql import data
 
 
-class ServerCaCertsRotateTest(base.SqlMockTestBeta):
+class _BaseServerCaCertsRotateTest(object):
 
   def testRotateWithUpcomingCert(self):
     # The upcoming cert has fingerprint 'two'.
@@ -129,6 +132,16 @@ two              2024-04-04T21:10:29.402000+00:00
         r'No upcoming Server CA Certificate exists.'):
       self.Run(
           'sql ssl server-ca-certs rotate --instance={}'.format(instance_name))
+
+
+class ServerCaCertsRotateBetaTest(_BaseServerCaCertsRotateTest,
+                                  base.SqlMockTestBeta):
+  pass
+
+
+class ServerCaCertsRotateAlphaTest(_BaseServerCaCertsRotateTest,
+                                   base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

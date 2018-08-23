@@ -1,0 +1,58 @@
+NAME
+    gcloud compute sole-tenancy node-groups create - creates a Google Compute
+        Engine node group
+
+SYNOPSIS
+    gcloud compute sole-tenancy node-groups create NAME
+        --node-template=NODE_TEMPLATE --target-size=TARGET_SIZE
+        [--description=DESCRIPTION] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Creates a Google Compute Engine node group.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the node group to operate on.
+
+REQUIRED FLAGS
+     --node-template=NODE_TEMPLATE
+        The name of the node template resource to be set for this node group.
+
+     --target-size=TARGET_SIZE
+        The target initial number of nodes in the node group.
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional description of this resource.
+
+     --zone=ZONE
+        Zone of the node group to operate on. If not specified and the
+        compute/zone property isn't set, you may be prompted to select a zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute sole-tenancy node-groups create
+        $ gcloud beta compute sole-tenancy node-groups create
+

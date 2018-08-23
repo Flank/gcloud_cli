@@ -7,11 +7,10 @@ SYNOPSIS
         [--check-interval=CHECK_INTERVAL; default="5s"]
         [--description=DESCRIPTION]
         [--healthy-threshold=HEALTHY_THRESHOLD; default=2]
-        [--port=PORT; default=80] [--port-name=PORT_NAME]
         [--proxy-header=PROXY_HEADER; default="NONE"] [--request=REQUEST]
         [--response=RESPONSE] [--timeout=TIMEOUT; default="5s"]
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2]
-        [GCLOUD_WIDE_FLAG ...]
+        [--port=PORT; default=80 --port-name=PORT_NAME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute health-checks create ssl is used to create a SSL health
@@ -37,14 +36,6 @@ FLAGS
      --healthy-threshold=HEALTHY_THRESHOLD; default=2
         The number of consecutive successful health checks before an unhealthy
         instance is marked as healthy. The default is 2.
-
-     --port=PORT; default=80
-        The TCP port number that this health check monitors. The default value
-        is 80.
-
-     --port-name=PORT_NAME
-        The port name that this health check monitors. By default, this is
-        empty.
 
      --proxy-header=PROXY_HEADER; default="NONE"
         The type of proxy protocol header to be sent to the backend.
@@ -84,6 +75,17 @@ FLAGS
      --unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2
         The number of consecutive health check failures before a healthy
         instance is marked as unhealthy. The default is 2.
+
+     These flags configure the port that the health check monitors. If none is
+     specified, the default port of 80 is used; if both --port and --port-name
+     are specified, --port takes precedence.
+
+       --port=PORT; default=80
+          The TCP port number that this health check monitors.
+
+       --port-name=PORT_NAME
+          The port name that this health check monitors. By default, this is
+          empty.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

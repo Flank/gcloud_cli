@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Functions for creating a client to talk to the App Engine Admin API."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import itertools
 import json
 import operator
@@ -637,6 +640,18 @@ class AppengineApiClient(appengine_api_client_base.AppengineApiClientBase):
               f=service_config.file, msg=e.message))
     log.debug('Converted YAML to JSON: "{0}"'.format(
         json.dumps(json_version_resource, indent=2, sort_keys=True)))
+
+    entrypoint = service_config.parsed.entrypoint
+    if entrypoint:
+      json_version_resource['entrypoint'] = {}
+      # hack: this undoes the effect of the appinfo validation library
+      # which prepends `exec ` to the entrypoint. ideally, we would instead find
+      # a way to relax the validation requirement so it only prepends 'exec '
+      # for flex deployments.
+      if entrypoint.startswith('exec '):
+        entrypoint = entrypoint[len('exec '):]
+      json_version_resource['entrypoint'][
+          'shell'] = entrypoint
 
     json_version_resource['deployment'] = {}
     # Add the deployment manifest information.

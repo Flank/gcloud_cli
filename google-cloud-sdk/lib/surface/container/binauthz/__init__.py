@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,14 @@
 """The base surface for Binary Authorization signatures."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 
 
-@base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Binauthz(base.Group):
   r"""Manage attestations for Binary Authorization on Google Cloud Platform.
 
@@ -33,7 +34,7 @@ class Binauthz(base.Group):
 
     This example assumes that you have created a keypair using gpg, usually
     by running `gpg --gen-key ...`, with `Name-Email` set to
-    `attesting_user@example.com` for your attesting authority.
+    `attesting_user@example.com` for your attestor.
 
     First, some convenience variables for brevity:
 
@@ -41,7 +42,7 @@ class Binauthz(base.Group):
     ATTESTING_USER="attesting_user@example.com"
     DIGEST="000000000000000000000000000000000000000000000000000000000000abcd"
     ARTIFACT_URL="gcr.io/example-project/example-image@sha256:${DIGEST}"
-    AUTHORITY_NAME="projects/example-project/attestationAuthorities/canary"
+    ATTESTOR_NAME="projects/example-project/attestors/canary"
     ```
 
     Export your key's fingerprint (note this may differ based on version and
@@ -86,7 +87,7 @@ class Binauthz(base.Group):
           --pgp-key-fingerprint=${KEY_FINGERPRINT} \
           --signature-file=example_signature.pgp \
           --artifact-url="${ARTIFACT_URL}" \
-          --attestation-authority=${AUTHORITY_NAME}
+          --attestor=${ATTESTOR_NAME}
         ```
 
     List the attestation by artifact URL.  `--format` can be passed to
@@ -126,12 +127,12 @@ class Binauthz(base.Group):
         ```
 
     Listing also works for kind=ATTESTATION_AUTHORITY attestations, just pass
-    the attestation authority note:
+    the attestor:
 
         ```sh
         {command} attestations list \
           --artifact-url="${ARTIFACT_URL}" \
-          --attestation-authority=${AUTHORITY_NAME} \
+          --attestor=${ATTESTOR_NAME} \
           --format=yaml
 
           ...

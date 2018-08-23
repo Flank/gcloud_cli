@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Utilities for dealing with service resources."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.app import operations_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.util import text
@@ -199,4 +202,3 @@ def DeleteServices(api_client, services):
             text.Pluralize(len(printable_errors), 'service'),
             ', '.join(list(printable_errors.keys()))) +
         '\n\n'.join(list(printable_errors.values())))
-

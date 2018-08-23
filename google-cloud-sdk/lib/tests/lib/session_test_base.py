@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,15 +19,16 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import io
 import json
 import os
-import StringIO
 import sys
 import time
 import traceback
 import urlparse
 
+from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
@@ -39,6 +41,7 @@ import httplib2
 import six
 from six.moves import BaseHTTPServer
 from six.moves import map  # pylint: disable=redefined-builtin
+from six.moves import StringIO
 from six.moves import zip  # pylint: disable=redefined-builtin
 
 
@@ -95,7 +98,7 @@ class SessionHttpMock(object):
 
     # pylint: disable=super-init-not-called
     def __init__(self, request_text):
-      self.rfile = StringIO.StringIO(request_text)
+      self.rfile = StringIO(request_text)
       self.raw_requestline = self.rfile.readline()
       self.error_code = self.error_message = None
       self.parse_request()
@@ -166,7 +169,8 @@ class SessionInputMock(io.IOBase):
   """Class to mock stdin to one captured in session."""
 
   def __init__(self, value):
-    self._stream = StringIO.StringIO(value)
+    super(SessionInputMock, self).__init__()
+    self._stream = StringIO(value)
 
   def read(self, *args, **kwargs):
     return self._stream.read(*args, **kwargs)
@@ -185,7 +189,7 @@ class SessionInputMock(io.IOBase):
     return not self._stream.read()
 
 
-class SessionOutputMock(StringIO.StringIO):
+class SessionOutputMock(StringIO):
 
   def __enter__(self):
     return self
@@ -354,7 +358,8 @@ class SessionTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                         'A False argument should start with --no-')
         specified_args.append(k)
       else:
-        specified_args.append('{}=\'{}\''.format(k, str(v).replace("'", r"\'")))
+        specified_args.append('{}=\'{}\''.format(
+            k, six.text_type(v).replace("'", r"\'")))
     self.command = '{} {}'.format(args['command'], ' '.join(specified_args))
     self._state = _State(self.GetNextSessionEntry('state'))
     self._properties = self.GetNextSessionEntry('properties')
@@ -394,17 +399,18 @@ class SessionTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       pass
     except Exception as e:  # pylint: disable=broad-except
       # Check if it's the exception captured in session
+      context = exceptions.ExceptionContext(e)
       if not self.failureException.errors:  # No assertion errors happened
         try:
           self.AssertNextSessionEntryMatches(
               'exception',
               message=e.message,
-              type=str(type(e)))
+              type=six.text_type(type(e)))
         except (StopIteration, self.failureException):  # pylint: disable=catching-non-exception
-          # Not the same: save and rerase original error
+          # Not the same: save and reraise original error
           self.failureException.errors = []
           self.failureException(e)
-          raise e
+          context.Reraise()
 
   @NoExceptions
   def AssertSessionOutputMatches(self):

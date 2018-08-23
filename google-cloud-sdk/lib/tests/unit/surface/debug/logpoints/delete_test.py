@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for the 'debug logpoints delete' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.debug import debug
 from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
@@ -107,7 +110,7 @@ class DeleteTest(base.DebugSdkTest, sdk_test_base.WithOutputCapture):
     self.StartObjectPatch(
         debug.Debuggee, 'ListBreakpoints', return_value=logpoints)
     delete_mock = self.StartObjectPatch(debug.Debuggee, 'DeleteBreakpoint')
-    self.StartObjectPatch(console_io, '_RawInput', return_value='n')
+    self.WriteInput('n')
     with self.assertRaises(console_io.OperationCancelledError):
       self.RunDebug(['logpoints', 'delete', '--location', 'myfile'])
     self.assertEqual(delete_mock.call_count, 0)

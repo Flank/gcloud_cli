@@ -11,7 +11,7 @@ gcloud dataproc clusters create \- create a cluster
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud dataproc clusters create\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-image\-version\fR=\fIVERSION\fR] [\fB\-\-initialization\-action\-timeout\fR=\fITIMEOUT\fR;\ default="10m"] [\fB\-\-initialization\-actions\fR=\fICLOUD_STORAGE_URI\fR,[...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-boot\-disk\-size\fR=\fIMASTER_BOOT_DISK_SIZE\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-master\-local\-ssds\fR=\fINUM_MASTER_LOCAL_SSDS\fR] [\fB\-\-num\-masters\fR=\fINUM_MASTERS\fR] [\fB\-\-num\-worker\-local\-ssds\fR=\fINUM_WORKER_LOCAL_SSDS\fR] [\fB\-\-preemptible\-worker\-boot\-disk\-size\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_SIZE\fR] [\fB\-\-properties\fR=[\fIPREFIX\fR:\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-scopes\fR=\fISCOPE\fR,[\fISCOPE\fR,...]] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-worker\-boot\-disk\-size\fR=\fIWORKER_BOOT_DISK_SIZE\fR] [\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-network\fR=\fINETWORK\fR\ |\ \fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-single\-node\fR\ |\ \fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR\ \fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud dataproc clusters create\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-initialization\-action\-timeout\fR=\fITIMEOUT\fR;\ default="10m"] [\fB\-\-initialization\-actions\fR=\fICLOUD_STORAGE_URI\fR,[...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-boot\-disk\-size\fR=\fIMASTER_BOOT_DISK_SIZE\fR] [\fB\-\-master\-boot\-disk\-type\fR=\fIMASTER_BOOT_DISK_TYPE\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-master\-local\-ssds\fR=\fINUM_MASTER_LOCAL_SSDS\fR] [\fB\-\-num\-masters\fR=\fINUM_MASTERS\fR] [\fB\-\-num\-worker\-local\-ssds\fR=\fINUM_WORKER_LOCAL_SSDS\fR] [\fB\-\-preemptible\-worker\-boot\-disk\-size\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_SIZE\fR] [\fB\-\-preemptible\-worker\-boot\-disk\-type\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_TYPE\fR] [\fB\-\-properties\fR=[\fIPREFIX\fR:\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-scopes\fR=\fISCOPE\fR,[\fISCOPE\fR,...]] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-worker\-boot\-disk\-size\fR=\fIWORKER_BOOT_DISK_SIZE\fR] [\fB\-\-worker\-boot\-disk\-type\fR=\fIWORKER_BOOT_DISK_TYPE\fR] [\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-version\fR=\fIVERSION\fR] [\fB\-\-network\fR=\fINETWORK\fR\ |\ \fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-single\-node\fR\ |\ \fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR\ \fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -46,10 +46,6 @@ The Google Cloud Storage bucket to use with the Google Cloud Storage connector.
 A bucket is auto created when this parameter is not specified.
 
 .TP 2m
-\fB\-\-image\-version\fR=\fIVERSION\fR
-The image version to use for the cluster. Defaults to the latest version.
-
-.TP 2m
 \fB\-\-initialization\-action\-timeout\fR=\fITIMEOUT\fR; default="10m"
 The maximum duration of each initialization action. See $ gcloud topic datetimes
 for information on duration formats.
@@ -61,7 +57,7 @@ cluster.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -75,6 +71,11 @@ unit of \f5\fIKB\fR\fR for kilobyte, \f5\fIMB\fR\fR for megabyte, \f5\fIGB\fR\fR
 for gigabyte, or \f5\fITB\fR\fR for terabyte. For example, \f5\fI10GB\fR\fR will
 produce a 10 gigabyte disk. The minimum size a boot disk can have is 10 GB. Disk
 size must be a multiple of 1 GB.
+
+.TP 2m
+\fB\-\-master\-boot\-disk\-type\fR=\fIMASTER_BOOT_DISK_TYPE\fR
+The type of the boot disk. The value must be \f5\fIpd\-standard\fR\fR or
+\f5\fIpd\-ssd\fR\fR.
 
 .TP 2m
 \fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR
@@ -114,6 +115,11 @@ unit of \f5\fIKB\fR\fR for kilobyte, \f5\fIMB\fR\fR for megabyte, \f5\fIGB\fR\fR
 for gigabyte, or \f5\fITB\fR\fR for terabyte. For example, \f5\fI10GB\fR\fR will
 produce a 10 gigabyte disk. The minimum size a boot disk can have is 10 GB. Disk
 size must be a multiple of 1 GB.
+
+.TP 2m
+\fB\-\-preemptible\-worker\-boot\-disk\-type\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_TYPE\fR
+The type of the boot disk. The value must be \f5\fIpd\-standard\fR\fR or
+\f5\fIpd\-ssd\fR\fR.
 
 .TP 2m
 \fB\-\-properties\fR=[\fIPREFIX\fR:\fIPROPERTY\fR=\fIVALUE\fR,...]
@@ -287,6 +293,11 @@ produce a 10 gigabyte disk. The minimum size a boot disk can have is 10 GB. Disk
 size must be a multiple of 1 GB.
 
 .TP 2m
+\fB\-\-worker\-boot\-disk\-type\fR=\fIWORKER_BOOT_DISK_TYPE\fR
+The type of the boot disk. The value must be \f5\fIpd\-standard\fR\fR or
+\f5\fIpd\-ssd\fR\fR.
+
+.TP 2m
 \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR
 The type of machine to use for workers. Defaults to server\-specified.
 
@@ -297,6 +308,22 @@ The compute zone (e.g. us\-central1\-a) for the cluster. If empty, and
 the region. Overrides the default \fBcompute/zone\fR property value for this
 command invocation.
 
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-image\fR=\fIIMAGE\fR
+The full custom image URI or the custom image name that will be used to create a
+cluster.
+
+.TP 2m
+\fB\-\-image\-version\fR=\fIVERSION\fR
+The image version to use for the cluster. Defaults to the latest version.
+
+.RE
+.sp
 .TP 2m
 
 At most one of these may be specified:

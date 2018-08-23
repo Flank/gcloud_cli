@@ -1,0 +1,196 @@
+title: Create and delete a registry and device
+release_tracks: [GA]
+actions:
+
+- generate_resource_id:
+    reference: my-registry
+    prefix: iot-registry
+
+- execute_command:
+    command: iot registries create $$my-registry$$ --region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries?alt=json
+          method: POST
+          body:
+            json:
+              httpConfig.httpEnabledState: HTTP_ENABLED
+              id: $$my-registry$$
+              mqttConfig:
+                mqttEnabledState: MQTT_ENABLED
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private
+            content-length: '324'
+            content-type: application/json; charset=UTF-8
+            date: Thu, 26 Jul 2018 19:02:41 GMT
+            server: ESF
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin, Referer
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            id: $$my-registry$$
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$
+            mqttConfig:
+              mqttEnabledState: MQTT_ENABLED
+            stateNotificationConfig: {}
+            httpConfig:
+              httpEnabledState: HTTP_ENABLED
+    - expect_stderr: |
+        Created registry [$$my-registry$$].
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: my-device
+    prefix: iot-device
+
+- execute_command:
+    command: iot devices create $$my-device$$ --region us-central1 --registry $$my-registry$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              blocked: false
+              id: $$my-device$$
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private
+            content-length: '313'
+            content-type: application/json; charset=UTF-8
+            date: Thu, 26 Jul 2018 19:02:41 GMT
+            server: ESF
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin, Referer
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            id: $$my-device$$
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/2710741824004704
+            numId: '2710741824004704'
+            config:
+              version: '1'
+              cloudUpdateTime: '2018-07-26T19:02:41.899118Z'
+    - expect_stderr: |
+        Created device [$$my-device$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: iot devices describe $$my-device$$ --region us-central1 --registry $$my-registry$$
+      --format 'yaml(id)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/$$my-device$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private
+            content-length: '313'
+            content-location: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/$$my-device$$?alt=json
+            content-type: application/json; charset=UTF-8
+            date: Thu, 26 Jul 2018 19:02:42 GMT
+            server: ESF
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin, Referer
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            id: $$my-device$$
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/2710741824004704
+            numId: '2710741824004704'
+            config:
+              version: '1'
+              cloudUpdateTime: '2018-07-26T19:02:41.899118Z'
+    - expect_stdout: |
+        id: $$my-device$$
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: iot devices delete $$my-device$$ --region us-central1 --registry $$my-registry$$
+    cleanup_for: my-device
+    events:
+    - expect_prompt_continue:
+        user_input: y
+        message: 'You are about to delete device: [$$my-device$$]'
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/$$my-device$$?alt=json
+          method: DELETE
+          headers: {}
+          body:
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            date: Thu, 26 Jul 2018 19:02:42 GMT
+            server: ESF
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin, Referer
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body: {}
+    - expect_stderr: |
+        Deleted device [$$my-device$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: iot registries delete $$my-registry$$ --region us-central1
+    cleanup_for: my-registry
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete registry [$$my-registry$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$?alt=json
+          method: DELETE
+          body:
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            date: Thu, 26 Jul 2018 19:02:43 GMT
+            server: ESF
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin, Referer
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body: {}
+    - expect_stderr: |
+        Deleted registry [$$my-registry$$].
+    - expect_exit:
+        code: 0

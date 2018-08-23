@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the resource policies create-vm-maintenance command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import exceptions
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -98,108 +102,6 @@ class CreateVmMaintenanceTest(resource_policies_base.TestBase,
     self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
     self.assertEqual(result, policy)
 
-  def testCreate_WeeklyWindow(self):
-    window = self.messages.ResourcePolicyVmMaintenancePolicyMaintenanceWindow(
-        weeklyMaintenanceWindow=self.messages.ResourcePolicyWeeklyCycle(
-            dayOfWeeks=[
-                self.messages.ResourcePolicyWeeklyCycleDayOfWeek(
-                    day=self.day_enum.MONDAY,
-                    startTime='04:00')]))
-    policy = self.messages.ResourcePolicy(
-        name='pol1',
-        region=self.region,
-        vmMaintenancePolicy=self.messages.ResourcePolicyVmMaintenancePolicy(
-            maintenanceWindow=window))
-    request = self._ExpectCreate(policy)
-
-    result = self.Run(
-        'compute resource-policies create-vm-maintenance pol1 --region {} '
-        ' --start-time 04:00Z --weekly-window monday '
-        .format(self.region))
-
-    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
-    self.assertEqual(result, policy)
-
-  def testCreate_WeeklyWindowFromFile(self):
-    window = self.messages.ResourcePolicyVmMaintenancePolicyMaintenanceWindow(
-        weeklyMaintenanceWindow=self.messages.ResourcePolicyWeeklyCycle(
-            dayOfWeeks=[
-                self.messages.ResourcePolicyWeeklyCycleDayOfWeek(
-                    day=self.day_enum.MONDAY,
-                    startTime='04:00'),
-                self.messages.ResourcePolicyWeeklyCycleDayOfWeek(
-                    day=self.day_enum.WEDNESDAY,
-                    startTime='10:00')]))
-    policy = self.messages.ResourcePolicy(
-        name='pol1',
-        region=self.region,
-        vmMaintenancePolicy=self.messages.ResourcePolicyVmMaintenancePolicy(
-            maintenanceWindow=window))
-    request = self._ExpectCreate(policy)
-
-    contents = ('[{"day": "MONDAY", "startTime": "04:00Z"}, '
-                '{"day": "WEDNESDAY", "startTime": "02:00-8:00"}]')
-    window_file = self.Touch(self.temp_path, 'my-window.json',
-                             contents=contents)
-    result = self.Run(
-        'compute resource-policies create-vm-maintenance pol1 --region {0} '
-        '--weekly-window-from-file {1}'
-        .format(self.region, window_file))
-
-    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
-    self.assertEqual(result, policy)
-
-  def testCreate_WeeklyWindowDayIsConverted(self):
-    window = self.messages.ResourcePolicyVmMaintenancePolicyMaintenanceWindow(
-        weeklyMaintenanceWindow=self.messages.ResourcePolicyWeeklyCycle(
-            dayOfWeeks=[
-                self.messages.ResourcePolicyWeeklyCycleDayOfWeek(
-                    day=self.day_enum.THURSDAY,
-                    startTime='00:00')]))
-    policy = self.messages.ResourcePolicy(
-        name='pol1',
-        region=self.region,
-        vmMaintenancePolicy=self.messages.ResourcePolicyVmMaintenancePolicy(
-            maintenanceWindow=window))
-    request = self._ExpectCreate(policy)
-
-    result = self.Run(
-        'compute resource-policies create-vm-maintenance pol1 --region {} '
-        ' --start-time 17:00-07 --weekly-window wednesday '
-        .format(self.region))
-
-    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
-    self.assertEqual(result, policy)
-
-  def testCreate_WeeklyWindowFromFileDayIsConverted(self):
-    window = self.messages.ResourcePolicyVmMaintenancePolicyMaintenanceWindow(
-        weeklyMaintenanceWindow=self.messages.ResourcePolicyWeeklyCycle(
-            dayOfWeeks=[
-                self.messages.ResourcePolicyWeeklyCycleDayOfWeek(
-                    day=self.day_enum.SUNDAY,
-                    startTime='23:00'),
-                self.messages.ResourcePolicyWeeklyCycleDayOfWeek(
-                    day=self.day_enum.THURSDAY,
-                    startTime='00:00')]))
-    policy = self.messages.ResourcePolicy(
-        name='pol1',
-        region=self.region,
-        vmMaintenancePolicy=self.messages.ResourcePolicyVmMaintenancePolicy(
-            maintenanceWindow=window))
-    request = self._ExpectCreate(policy)
-
-    contents = ('[{"day": "MONDAY", "startTime": "04:00+05"}, '
-                '{"day": "WEDNESDAY", "startTime": "16:00-8:00"}]')
-    window_file = self.Touch(self.temp_path, 'my-window.json',
-                             contents=contents)
-    result = self.Run(
-        'compute resource-policies create-vm-maintenance pol1 --region {0} '
-        '--weekly-window-from-file {1}'
-        .format(self.region, window_file))
-
-    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
-    self.assertEqual(result, policy)
-
   def testCreate_NoDailyCycleShouldFail(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
@@ -209,38 +111,11 @@ class CreateVmMaintenanceTest(resource_policies_base.TestBase,
           '--no-daily-window  --start-time 04:00Z'
           .format(self.region))
 
-  @parameterized.parameters(
-      ('--start-time 04:00Z --weekly-window-from-file myfile.txt'),
-      ('--weekly-window'),
-      ('--daily-window'))
-  def testCreate_FreqGroupValidation(self, flags):
+  def testCreate_StartTimeIsRequired(self):
     with self.AssertRaisesArgumentError():
       self.Run(
           'compute resource-policies create-vm-maintenance pol1 --region {0} '
-          '{1}'.format(self.region, flags))
-
-  @parameterized.parameters(
-      ('[{"day": "MONDAY"}]',
-       'Each JSON/YAML object in the list must have the following keys: '
-       '[day, startTime].'),
-      ('[{"startTime": "04:00Z"}]',
-       'Each JSON/YAML object in the list must have the following keys: '
-       '[day, startTime].'),
-      ('[{}]',
-       'Each JSON/YAML object in the list must have the following keys: '
-       '[day, startTime].'),
-      ('[{"day": "CATURDAY", "startTime": "04:00Z"}]',
-       'Invalid value for `day`: [CATURDAY]'),
-      ('', 'File cannot be empty.'))
-  def testCreate_InvalidWeeklyFileError(self, contents, message):
-    window_file = self.Touch(self.temp_path, 'my-window.json',
-                             contents=contents)
-    with self.AssertRaisesExceptionMatches(
-        exceptions.InvalidArgumentException, message):
-      self.Run(
-          'compute resource-policies create-vm-maintenance pol1 --region {0} '
-          '--weekly-window-from-file {1}'
-          .format(self.region, window_file))
+          '--daily-window'.format(self.region))
 
 
 if __name__ == '__main__':

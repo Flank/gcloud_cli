@@ -80,13 +80,14 @@ A list of \f5\fIDIMENSION=VALUE\fR\fR pairs which specify a target device to
 test against. This flag may be repeated to specify multiple devices. The four
 device dimensions are: \fBmodel\fR, \fBversion\fR, \fBlocale\fR, and
 \fBorientation\fR. If any dimensions are omitted, they will use a default value.
-The default value for each dimension can be found with the \f5\fIlist\fR\fR
-command for that dimension, such as \f5$ gcloud firebase test android models
-list\fR. \fB\-\-device\fR is now the preferred way to specify test devices and
-may not be used in conjunction with \fB\-\-devices\-ids\fR,
-\fB\-\-os\-version\-ids\fR, \fB\-\-locales\fR, or \fB\-\-orientations\fR.
-Omitting all of the preceding dimension\-related flags will run tests against a
-single device using defaults for all four device dimensions.
+The default value, and all possible values, for each dimension can be found with
+the \f5\fIlist\fR\fR command for that dimension, such as \f5$ gcloud firebase
+test android models list\fR. \fB\-\-device\fR is now the preferred way to
+specify test devices and may not be used in conjunction with
+\fB\-\-devices\-ids\fR, \fB\-\-os\-version\-ids\fR, \fB\-\-locales\fR, or
+\fB\-\-orientations\fR. Omitting all of the preceding dimension\-related flags
+will run tests against a single device using defaults for all four device
+dimensions.
 
 Examples:
 
@@ -379,16 +380,16 @@ the Firebase Test Lab device catalog).
 .TP 2m
 \fB\-\-filter\fR=\fIEXPRESSION\fR
 Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
-the expression evaluates True then that item is listed. For more details and
-examples of filter expressions run $ gcloud topic filters. This flag interacts
-with other flags that are applied in this order: \fB\-\-flatten\fR,
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-limit\fR=\fILIMIT\fR
-The maximum number of resources to list. The default is \fBunlimited\fR. This
-flag interacts with other flags that are applied in this order:
-\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
@@ -400,9 +401,9 @@ service.
 
 .TP 2m
 \fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
-A comma\-separated list of resource field key names to sort by. The default
-order is ascending. Prefix a field with ``~'' for descending order on that
-field. This flag interacts with other flags that are applied in this order:
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 

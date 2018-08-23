@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Library for obtaining API clients and messages."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import re
 from apitools.base.py import exceptions as apitools_exceptions
 from apitools.base.py import http_wrapper
@@ -224,7 +227,8 @@ def PromptToEnableApi(project, service_token, exception,
   if console_io.PromptContinue(
       default=False,
       prompt_string=('API [{}] not enabled on project [{}]. '
-                     'Would you like to enable and retry? ')
+                     'Would you like to enable and retry (this will take a '
+                     'few minutes)?')
       .format(service_token, project)):
     enable_api.EnableServiceIfDisabled(project, service_token)
     # In the case of a batch request, as long as the error's retryable code

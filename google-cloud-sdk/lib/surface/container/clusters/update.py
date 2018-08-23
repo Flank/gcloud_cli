@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Update cluster command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.container import api_adapter
@@ -66,12 +69,6 @@ def _AddCommonArgs(parser):
 
 def _AddMutuallyExclusiveArgs(mutex_group, release_track):
   """Add all arguments that need to be mutually exclusive from each other."""
-  mutex_group.add_argument(
-      '--monitoring-service',
-      help='The monitoring service to use for the cluster. Options '
-      'are: "monitoring.googleapis.com" (the Google Cloud Monitoring '
-      'service),  "none" (no metrics will be exported from the cluster)')
-
   if release_track in [base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA]:
     mutex_group.add_argument(
         '--update-addons',
@@ -80,7 +77,6 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
             api_adapter.HPA: _ParseAddonDisabled,
             api_adapter.DASHBOARD: _ParseAddonDisabled,
             api_adapter.NETWORK_POLICY: _ParseAddonDisabled,
-            api_adapter.ISTIO: _ParseAddonDisabled,
         }),
         dest='disable_addons',
         metavar='ADDON=ENABLED|DISABLED',
@@ -88,13 +84,11 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
 {hpa}=ENABLED|DISABLED
 {ingress}=ENABLED|DISABLED
 {dashboard}=ENABLED|DISABLED
-{istio}=ENABLED|DISABLED
 {network_policy}=ENABLED|DISABLED""".format(
     hpa=api_adapter.HPA,
     ingress=api_adapter.INGRESS,
     dashboard=api_adapter.DASHBOARD,
-    network_policy=api_adapter.NETWORK_POLICY,
-    istio=api_adapter.ISTIO,))
+    network_policy=api_adapter.NETWORK_POLICY))
 
   else:
     mutex_group.add_argument(
@@ -192,7 +186,8 @@ class Update(base.UpdateCommand):
     flags.AddUpdateLabelsFlag(group)
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)
-    flags.AddLoggingServiceFlag(group)
+    flags.AddLoggingServiceFlag(group, enable_kubernetes=False)
+    flags.AddMonitoringServiceFlag(group, enable_kubernetes=False)
     flags.AddMaintenanceWindowFlag(group, add_unset_text=True)
 
   def ParseUpdateOptions(self, args, locations):
@@ -356,7 +351,7 @@ to completion."""
         op_ref = adapter.RemoveLabels(cluster_ref, args.remove_labels)
       except apitools_exceptions.HttpError as error:
         raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
-    elif args.logging_service is not None:
+    elif args.logging_service is not None and args.monitoring_service is None:
       try:
         op_ref = adapter.SetLoggingService(cluster_ref, args.logging_service)
       except apitools_exceptions.HttpError as error:
@@ -406,6 +401,11 @@ class UpdateBeta(Update):
     group_locations = group.add_mutually_exclusive_group()
     _AddAdditionalZonesArg(group_locations, deprecated=True)
     flags.AddNodeLocationsFlag(group_locations)
+    group_logging_monitoring = group.add_group()
+    flags.AddLoggingServiceFlag(group_logging_monitoring,
+                                enable_kubernetes=True)
+    flags.AddMonitoringServiceFlag(group_logging_monitoring,
+                                   enable_kubernetes=True)
     flags.AddMasterAuthorizedNetworksFlags(parser,
                                            enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
@@ -416,15 +416,24 @@ class UpdateBeta(Update):
     flags.AddUpdateLabelsFlag(group)
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)
-    flags.AddLoggingServiceFlag(group)
     flags.AddMaintenanceWindowFlag(group, add_unset_text=True)
     flags.AddPodSecurityPolicyFlag(group)
     flags.AddEnableBinAuthzFlag(group, hidden=True)
+    flags.AddAutoprovisioningFlags(group, hidden=True)
+    flags.AddVerticalPodAutoscalingFlag(group, hidden=True)
 
   def ParseUpdateOptions(self, args, locations):
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
     opts.enable_pod_security_policy = args.enable_pod_security_policy
     opts.enable_binauthz = args.enable_binauthz
+    opts.enable_autoprovisioning = args.enable_autoprovisioning
+    opts.min_cpu = args.min_cpu
+    opts.max_cpu = args.max_cpu
+    opts.min_memory = args.min_memory
+    opts.max_memory = args.max_memory
+    opts.min_accelerator = args.min_accelerator
+    opts.max_accelerator = args.max_accelerator
+    opts.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
     return opts
 
 
@@ -441,6 +450,11 @@ class UpdateAlpha(Update):
     group_locations = group.add_mutually_exclusive_group()
     _AddAdditionalZonesArg(group_locations, deprecated=True)
     flags.AddNodeLocationsFlag(group_locations)
+    group_logging_monitoring = group.add_group()
+    flags.AddLoggingServiceFlag(group_logging_monitoring,
+                                enable_kubernetes=True)
+    flags.AddMonitoringServiceFlag(group_logging_monitoring,
+                                   enable_kubernetes=True)
     flags.AddMasterAuthorizedNetworksFlags(parser,
                                            enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
@@ -451,12 +465,12 @@ class UpdateAlpha(Update):
     flags.AddUpdateLabelsFlag(group)
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)
-    flags.AddLoggingServiceFlag(group)
     flags.AddAutoprovisioningFlags(group, hidden=False)
     flags.AddMaintenanceWindowFlag(group, add_unset_text=True)
     flags.AddPodSecurityPolicyFlag(group)
     flags.AddEnableBinAuthzFlag(group, hidden=True)
-    flags.AddIstioConfigFlag(parser)
+    flags.AddResourceUsageBigqueryDatasetFlag(group, add_clear_flag=True)
+    flags.AddVerticalPodAutoscalingFlag(group, hidden=True)
 
   def ParseUpdateOptions(self, args, locations):
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
@@ -469,6 +483,8 @@ class UpdateAlpha(Update):
     opts.max_accelerator = args.max_accelerator
     opts.enable_pod_security_policy = args.enable_pod_security_policy
     opts.enable_binauthz = args.enable_binauthz
-    opts.istio_config = args.istio_config
-    flags.ValidateIstioConfigUpdateArgs(args.istio_config, args.disable_addons)
+    opts.resource_usage_bigquery_dataset = args.resource_usage_bigquery_dataset
+    opts.clear_resource_usage_bigquery_dataset = \
+        args.clear_resource_usage_bigquery_dataset
+    opts.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
     return opts

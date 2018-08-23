@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 import os
 import re
@@ -26,7 +29,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class SslCertsCreateTest(base.SqlMockTestBeta):
+class _BaseSslCertsCreateTest(object):
 
   def testSslCertsCreate(self):
     self.mocked_client.sslCerts.Insert.Expect(
@@ -111,6 +114,18 @@ newcert  d926e1fb26e4dba2f73a14bea4ee9554577deda9  -
       self.Run('sql ssl-certs create newcert {file} --instance=integration-test'
                .format(file=path))
     self.AssertFileExistsWithContents(file_contents, path)
+
+
+class SslCertsCreateGATest(_BaseSslCertsCreateTest, base.SqlMockTestGA):
+  pass
+
+
+class SslCertsCreateBetaTest(_BaseSslCertsCreateTest, base.SqlMockTestBeta):
+  pass
+
+
+class SslCertsCreateAlphaTest(_BaseSslCertsCreateTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

@@ -3,15 +3,24 @@ NAME
         policy binding from a Cloud Spanner instance
 
 SYNOPSIS
-    gcloud alpha spanner instances remove-iam-policy-binding INSTANCE
+    gcloud alpha spanner instances remove-iam-policy-binding [INSTANCE]
         --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Remove an IAM policy binding from a Cloud Spanner instance.
 
 POSITIONAL ARGUMENTS
-     INSTANCE
-        Cloud Spanner instance ID.
+     Instance resource - The Cloud Spanner instance to remove the IAM policy
+     binding from. This represents a Cloud resource. (NOTE) Some attributes are
+     not given arguments in this group but can be set in other ways. To set the
+     [project] attribute: provide the flag [instance] on the command line with
+     a fully specified name; set the property [spanner/instance] with a fully
+     specified name; provide the flag [--project] on the command line; set the
+     property [core/project].
+
+       [INSTANCE]
+          The ID of the instance or a fully qualified identifier for the
+          instance.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -36,12 +45,16 @@ GCLOUD WIDE FLAGS
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
+API REFERENCE
+    This command uses the spanner/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/spanner/
+
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud spanner instances remove-iam-policy-binding
         $ gcloud beta spanner instances remove-iam-policy-binding

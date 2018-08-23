@@ -9,9 +9,8 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute backend-buckets create is used to create backend
-    buckets. Backend buckets define a Google Cloud Storage bucket that can
-    serve content. URL maps define which requests are sent to which backend
-    buckets.
+    buckets. Backend buckets define Google Cloud Storage buckets that can serve
+    content. URL maps define which requests are sent to which backend buckets.
 
 POSITIONAL ARGUMENTS
      BACKEND_BUCKET_NAME

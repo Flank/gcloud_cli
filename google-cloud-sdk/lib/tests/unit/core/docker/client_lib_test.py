@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the docker client lib command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import errno
 import json
 import os
@@ -83,7 +87,7 @@ class ClientLibTest(sdk_test_base.WithFakeAuth):
 
     # The user's 'home directory' should be the temp folder that our mocks
     # return.
-    self.assertTrue(dockercfg_path.startswith(self.temp_path))
+    self.assertTrue(dockercfg_path.startswith(self.home_path))
 
     if self.IsOnWindows():
       self.assertTrue(self.mock_expandvars.called)

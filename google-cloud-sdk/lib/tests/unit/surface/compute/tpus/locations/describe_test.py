@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """tpus locations describe tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
@@ -23,7 +26,8 @@ from tests.lib.surface.compute.tpus import base
 
 
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA])
+                           calliope_base.ReleaseTrack.BETA,
+                           calliope_base.ReleaseTrack.GA])
 class DescribeTest(base.TpuUnitTestBase):
 
   def SetUp(self):

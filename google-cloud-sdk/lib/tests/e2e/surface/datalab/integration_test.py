@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,9 @@
 # TODO(b/64032647): Move this under //cloud/sdk/component_build/bundle_tests/
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import logging
 
 from tests.lib import e2e_utils
@@ -25,9 +28,6 @@ from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 
 
-@test_case.Filters.SkipOnWindows(
-    'DatalabIntegrationTest.testCreateConnectDelete frequently timing out on '
-    'windows', 'b/76138853')
 @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/91357877')
 class DatalabIntegrationTest(sdk_test_base.BundledBase,
                              e2e_instances_test_base.InstancesTestBase):
@@ -118,7 +118,9 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
     return
 
   @sdk_test_base.Filters.RunOnlyInBundle  # Requires datalab component
-  @test_case.Filters.skip('Failing.', 'b/78629132')
+  @sdk_test_base.Filters.SkipOnWindows(
+      'DatalabIntegrationTest.testCreateConnectDelete frequently timing out on '
+      'windows', 'b/76138853')
   def testCreateConnectDelete(self):
     self._TestInstanceCreation(machine_type='n1-highmem-2')
     try:
@@ -141,6 +143,7 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
     self.GetInstanceName()
     create_cmd = ['create', '--zone', self.zone,
                   '--network-name', self.network_name,
+                  '--image', 'gcr.io/cloud-datalab/mock-datalab',
                   '--quiet', '--no-connect']
     if not create_repo:
       create_cmd += ['--no-create-repository']

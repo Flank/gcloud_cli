@@ -121,7 +121,7 @@ AVAILABLE PROPERTIES
      app
          cloud_build_timeout
             Timeout, in seconds, to wait for Docker builds to complete during
-            deployments. All Docker builds now use the Container Builder API.
+            deployments. All Docker builds now use the Cloud Build API.
 
          promote_by_default
             If True, when deploying a new version of a service, that version
@@ -158,6 +158,10 @@ AVAILABLE PROPERTIES
             If you need to operate on one project, but need quota against a
             different project, you can use this property to specify the
             alternate project.
+
+     builds
+         timeout
+            Timeout, in seconds, to wait for builds to complete.
 
      component_manager
          additional_repositories
@@ -221,24 +225,6 @@ AVAILABLE PROPERTIES
             If True, use the cluster's client certificate to authenticate to
             the cluster API server.
 
-         use_v1_api
-            This property is DEPRECATED. If True, all gcloud Kubernetes Engine
-            commands (regardless of release track) will use the v1 API;
-            otherwise, gcloud beta track commands will use v1beta1 API and
-            gcloud alpha track commands will use v1alpha1 API. By default, this
-            property is set to false. The Kubernetes Engine v1alpha1 API is
-            whitelist-only at this time. Note: use_v1_api is an alias of
-            use_v1_api_client.
-
-         use_v1_api_client
-            This property is DEPRECATED. If True, all gcloud Kubernetes Engine
-            commands (regardless of release track) will use the v1 API;
-            otherwise, gcloud beta track commands will use v1beta1 API and
-            gcloud alpha track commands will use v1alpha1 API. By default, this
-            property is set to false. The Kubernetes Engine v1alpha1 API is
-            whitelist-only at this time. Note: use_v1_api_client is an alias of
-            use_v1_api.
-
      dataproc
          region
             Cloud Dataproc region to use. Each Cloud Dataproc region
@@ -247,6 +233,17 @@ AVAILABLE PROPERTIES
             The default value of global is a special multi-region namespace
             which is capable of deploying instances into all Compute Engine
             zones globally, and is disjoint from other Cloud Dataproc regions.
+
+     deployment_manager
+         glob_imports
+            Enable import path globbing. Uses glob patterns to match multiple
+            imports in a config file.
+
+     filestore
+         location
+            Default location to use when working with Cloud Filestore
+            locations. When a --location flag is required but not provided, the
+            command will fall back to this value, if set.
 
      functions
          region
@@ -338,9 +335,9 @@ AVAILABLE PROPERTIES
 
      redis
          region
-            The default region to use when working with Cloud Memorystore for
-            Redis resources. When a region is required but not provided by a
-            flag, the command will fall back to this value, if set.
+            Default region to use when working with Cloud Memorystore for Redis
+            resources. When a region is required but not provided by a flag,
+            the command will fall back to this value, if set.
 
      spanner
          instance
@@ -372,11 +369,11 @@ EXAMPLES
     https://cloud.google.com/sdk/docs/properties
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud config set
         $ gcloud beta config set

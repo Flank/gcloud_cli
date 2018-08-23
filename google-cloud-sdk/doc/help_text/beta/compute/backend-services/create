@@ -128,8 +128,13 @@ FLAGS
         set-named-ports --help.
 
      --protocol=PROTOCOL
-        The protocol for incoming requests. PROTOCOL must be one of: HTTP,
-        HTTPS, SSL, TCP, UDP.
+        Protocol for incoming requests.
+
+        If the load-balancing-scheme is INTERNAL, the protocol must be one of:
+        TCP, UDP.
+
+        If the load-balancing-scheme is EXTERNAL, the protocol must be one of:
+        HTTP, HTTPS, HTTP2, SSL, TCP, UDP.
 
      --session-affinity=SESSION_AFFINITY
         The type of session affinity to use for this backend service.
@@ -201,10 +206,10 @@ FLAGS
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the backend service is global.
+          If set, the backend service is global.
 
        --region=REGION
-          The region of the backend service to create. Overrides the default
+          Region of the backend service to create. Overrides the default
           compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS

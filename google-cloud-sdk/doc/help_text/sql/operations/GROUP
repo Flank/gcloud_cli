@@ -28,7 +28,8 @@ COMMANDS
         Waits for one or more operations to complete.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql operations
         $ gcloud beta sql operations
 

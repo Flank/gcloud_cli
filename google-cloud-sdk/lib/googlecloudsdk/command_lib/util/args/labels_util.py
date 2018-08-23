@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,6 +36,7 @@ Typical usage (update command):
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import arg_parsers
@@ -116,7 +118,7 @@ def GetCreateLabelsFlag(extra_message='', labels_name='labels',
   format_help = [KEY_FORMAT_HELP]
   if validate_values:
     format_help.append(VALUE_FORMAT_HELP)
-  help_parts = ['A list of label KEY=VALUE pairs to add.',
+  help_parts = ['List of label KEY=VALUE pairs to add.',
                 ' '.join(format_help)]
   if extra_message:
     help_parts.append(extra_message)

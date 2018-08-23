@@ -39,7 +39,7 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --module-name=MODULE_NAME
-        Name of the module to run
+        Name of the module to run.
 
 OPTIONAL FLAGS
      --distributed
@@ -47,10 +47,10 @@ OPTIONAL FLAGS
         configurations as environment variables to subprocesses
 
      --job-dir=JOB_DIR
-        A Google Cloud Storage path or local_directory in which to store
-        training outputs and other data needed for training.
+        Google Cloud Storage path or local_directory in which to store training
+        outputs and other data needed for training.
 
-        This path will be passed to your TensorFlow program as --job_dir
+        This path will be passed to your TensorFlow program as the --job_dir
         command-line arg. The benefit of specifying this field is that Cloud ML
         Engine will validate the path for use in training.
 

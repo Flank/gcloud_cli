@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,16 @@
 """List the keys within a keyring."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.cloudkms import base as cloudkms_base
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.kms import flags
 
 
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class List(base.ListCommand):
   """List the keys within a keyring.
 
@@ -65,3 +69,36 @@ class List(base.ListCommand):
         field='cryptoKeys',
         limit=args.limit,
         batch_size_attribute='pageSize')
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ListALPHA(List):
+  """List the keys within a keyring.
+
+  Lists all keys within the given keyring.
+
+  ## EXAMPLES
+
+  The following command lists all keys within the
+  keyring `fellowship` and location `global`:
+
+    $ {command} --keyring fellowship --location global
+  """
+
+  @staticmethod
+  def Args(parser):
+    flags.AddLocationFlag(parser)
+    flags.AddKeyRingFlag(parser)
+    # The format of a CryptoKeyVersion name is:
+    # 'projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*'
+    # The CryptoKeyVersionId is captured by segment(9).
+    parser.display_info.AddFormat("""
+        table(
+          name,
+          purpose,
+          version_template.algorithm,
+          version_template.protection_level,
+          labels.list(),
+          primary.name.segment(9):label=PRIMARY_ID,
+          primary.state:label=PRIMARY_STATE)
+    """)

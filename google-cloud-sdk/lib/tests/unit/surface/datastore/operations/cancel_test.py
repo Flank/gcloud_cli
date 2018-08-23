@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +15,24 @@
 """Test of the 'operations cancel' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.datastore import operations
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.datastore import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.GA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.ALPHA)
 class CancelTest(base.DatastoreCommandUnitTest):
   """Tests the datastore operations cancel command."""
 
-  def testCancelRelativeResourcePath(self):
+  def testCancelRelativeResourcePath(self, track):
+    self.track = track
     operation_name_relative = 'doomed'
     operation_name_full = 'projects/my-test-project/operations/doomed'
 
@@ -36,7 +45,8 @@ class CancelTest(base.DatastoreCommandUnitTest):
     self.RunDatastoreTest(
         'operations cancel {}'.format(operation_name_relative))
 
-  def testCancelAbsoluteResourcePath(self):
+  def testCancelAbsoluteResourcePath(self, track):
+    self.track = track
     operation_name_full = 'projects/my-test-project/operations/doomed'
 
     request = self._GetMockCancelRequest(operation_name_full)

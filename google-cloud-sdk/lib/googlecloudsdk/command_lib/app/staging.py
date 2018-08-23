@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,8 +31,11 @@ The interface is defined as follows:
   STDOUT and STDERR of the staging command (which are surfaced to the user as an
   ERROR message).
 """
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import abc
 import cStringIO
 import os
@@ -325,8 +329,15 @@ _APPENGINE_TOOLS_JAR = os.path.join(
 _STAGING_REGISTRY = {
     runtime_registry.RegistryEntry(
         re.compile(r'(go|go1\..+)$'), {
-            env.FLEX, env.STANDARD,
-            env.MANAGED_VMS
+            env.FLEX, env.MANAGED_VMS
+        }):
+        _BundledCommand(
+            os.path.join(_GO_APP_STAGER_DIR, 'go-app-stager'),
+            os.path.join(_GO_APP_STAGER_DIR, 'go-app-stager.exe'),
+            component='app-engine-go'),
+    runtime_registry.RegistryEntry(
+        re.compile(r'(go|go1\..+|%s)$' % env.GO_TI_RUNTIME_EXPR.pattern), {
+            env.STANDARD,
         }):
         _BundledCommand(
             os.path.join(_GO_APP_STAGER_DIR, 'go-app-stager'),

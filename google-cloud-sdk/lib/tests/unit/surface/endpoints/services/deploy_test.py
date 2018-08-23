@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +14,11 @@
 # limitations under the License.
 
 """Unit tests for endpoints services deploy command."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from apitools.base.py.extra_types import JsonObject
@@ -26,6 +29,7 @@ from googlecloudsdk.api_lib.endpoints import exceptions
 from googlecloudsdk.api_lib.endpoints import services_util
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
+from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import http_encoding
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -103,7 +107,7 @@ SUBMIT_REQUEST = (services_util.GetMessagesModule().
                   ServicemanagementServicesConfigsSubmitRequest)
 
 
-class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
+class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
   """Unit tests for endpoints services deploy command."""
 
   def SetUp(self):
@@ -1252,6 +1256,132 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
         'Operation finished successfully. '
         'The following command can describe '
         'the Operation details:\n {0}'.format(expected_cmd))
+
+  def testServicesDeployValidateOnlyNewServiceNonInteractive(self):
+    # The Endpoints service is already enabled, so no further action is taken
+    # to enable it.
+    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
+
+    # The service does not exist yet, so it is created first.
+    self.mocked_client.services.Get.Expect(
+        request=self.services_messages.ServicemanagementServicesGetRequest(
+            serviceName=SERVICE_NAME,
+        ),
+        exception=http_error.MakeHttpError(code=403)
+    )
+
+    self.Run('{0} {1} --validate-only'.format(
+        self.base_cmd, self._swagger_file_path))
+
+    # Make sure the uploaded status message does not print out, since this is
+    # a validate-only run.
+    self.AssertErrNotContains(
+        ('Service Configuration [{0}] uploaded for service [{1}]').format(
+            SERVICE_VERSION, SERVICE_NAME))
+
+    # Assert that we did not print out the Endpoints Management UI link,
+    # since this is a validate-only run
+    self.AssertErrNotContains('To manage your API, go to:')
+
+    self.AssertErrContains('must exist in order to validate')
+    self.AssertErrContains('To create the service')
+    self.AssertErrContains(SERVICE_NAME)
+    self.AssertErrContains(self.PROJECT_NAME)
+
+  def testServicesDeployValidateOnlyNewServiceInteractiveYes(self):
+    self.StartObjectPatch(console_io, 'CanPrompt', return_value=True)
+    # The Endpoints service is already enabled, so no further action is taken
+    # to enable it.
+    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
+
+    # The service does not exist yet, so it is created first.
+    self.mocked_client.services.Get.Expect(
+        request=self.services_messages.ServicemanagementServicesGetRequest(
+            serviceName=SERVICE_NAME,
+        ),
+        exception=http_error.MakeHttpError(code=403)
+    )
+    managed_service = self.services_messages.ManagedService(
+        serviceName=SERVICE_NAME,
+        producerProjectId=self.PROJECT_NAME,
+    )
+    self.mocked_client.services.Create.Expect(
+        request=managed_service,
+        response=managed_service
+    )
+    # Mock the SubmitSourceConfig API call.
+    self.mocked_client.services_configs.Submit.Expect(
+        request=(SUBMIT_REQUEST(
+            serviceName=SERVICE_NAME,
+            submitConfigSourceRequest=(
+                self.services_messages.SubmitConfigSourceRequest(
+                    configSource=self.services_messages.ConfigSource(
+                        files=[self.services_messages.ConfigFile(
+                            fileContents=six.binary_type(TEST_SWAGGER),
+                            filePath=os.path.basename(
+                                self._swagger_file_path),
+                            fileType=FILE_TYPES.OPEN_API_YAML)]),
+                    validateOnly=True)))),
+        response=self.operation
+    )
+    submit_response = {'serviceConfig': {
+        'id': SERVICE_VERSION, 'name': SERVICE_NAME}}
+    self.MockOperationWait(self.operation_name, submit_response)
+
+    # Wait for Push Advisor report (no warnings)
+    self._WaitForBlankPushAdvisorReport(SERVICE_NAME, SERVICE_VERSION)
+    self.WriteInput('yes')
+
+    self.Run('{0} {1} --validate-only'.format(
+        self.base_cmd, self._swagger_file_path))
+
+    # Make sure the uploaded status message does not print out, since this is
+    # a validate-only run.
+    self.AssertErrNotContains(
+        ('Service Configuration [{0}] uploaded for service [{1}]').format(
+            SERVICE_VERSION, SERVICE_NAME))
+
+    # Assert that we did not print out the Endpoints Management UI link,
+    # since this is a validate-only run
+    self.AssertErrNotContains('To manage your API, go to:')
+
+    self.AssertErrContains('must exist')
+    self.AssertErrContains('Do you want to create the service')
+    self.AssertErrContains(SERVICE_NAME)
+    self.AssertErrContains(self.PROJECT_NAME)
+
+  def testServicesDeployValidateOnlyNewServiceInteractiveNo(self):
+    self.StartObjectPatch(console_io, 'CanPrompt', return_value=True)
+    # The Endpoints service is already enabled, so no further action is taken
+    # to enable it.
+    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
+
+    # The service does not exist yet, so it is created first.
+    self.mocked_client.services.Get.Expect(
+        request=self.services_messages.ServicemanagementServicesGetRequest(
+            serviceName=SERVICE_NAME,
+        ),
+        exception=http_error.MakeHttpError(code=403)
+    )
+    self.WriteInput('no')
+
+    self.Run('{0} {1} --validate-only'.format(
+        self.base_cmd, self._swagger_file_path))
+
+    # Make sure the uploaded status message does not print out, since this is
+    # a validate-only run.
+    self.AssertErrNotContains(
+        ('Service Configuration [{0}] uploaded for service [{1}]').format(
+            SERVICE_VERSION, SERVICE_NAME))
+
+    # Assert that we did not print out the Endpoints Management UI link,
+    # since this is a validate-only run
+    self.AssertErrNotContains('To manage your API, go to:')
+
+    self.AssertErrContains('must exist')
+    self.AssertErrContains('Do you want to create the service')
+    self.AssertErrContains(SERVICE_NAME)
+    self.AssertErrContains(self.PROJECT_NAME)
 
   def testServicesDeployYamlSwaggerConfigValidateOnly(self):
     self._WaitForEnabledCheck(DISABLED, ENDPOINTS_SERVICE)

@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud meta cli-trees update [--commands=[COMMAND,...]]
-        [--directory=DIRECTORY] [--force] [GCLOUD_WIDE_FLAG ...]
+        [--directory=DIRECTORY] [--force] [--tarball=TARBALL]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     A CLI tree is a module or JSON file that describes a command and its
@@ -28,6 +29,12 @@ FLAGS
      --force
         Force existing CLI trees to be out of date. This causes them to be
         regenerated.
+
+     --tarball=TARBALL
+        For packaging CLI trees. --commands specifies one command that is a
+        relative path in this tarball. The tarball is extracted to a temporary
+        directory and the command path is adjusted to point to the temporary
+        directory.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

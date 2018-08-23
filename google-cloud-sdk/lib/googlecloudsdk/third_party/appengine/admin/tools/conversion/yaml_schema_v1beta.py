@@ -84,6 +84,7 @@ SCHEMA = s.Message(
         rollout_strategy=s.Value(
             converter=c.ConvertEndpointsRolloutStrategyToEnum),
         config_id=s.Value(),
+        trace_sampling=s.Value('disable_trace_sampling', converter=c.Not),
     ),
     env=s.Value(),
     env_variables=s.Map(),
@@ -156,6 +157,9 @@ SCHEMA = s.Message(
         forwarded_ports=s.RepeatedField(element=s.Value(converter=
                                                         c.ToJsonString)),
         session_affinity=s.Value()
+    ),
+    vpc_access_connector=s.Message(
+        name=s.Value(converter=c.ToJsonString),
     ),
     zones=s.RepeatedField(element=s.Value(converter=c.ToJsonString)),
     nobuild_files=s.Value('nobuild_files_regex', converter=c.ToJsonString),

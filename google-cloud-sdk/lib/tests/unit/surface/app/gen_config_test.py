@@ -16,7 +16,9 @@
 """Small test to verify that the gen-config command works as advertised."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import textwrap
 
@@ -145,7 +147,8 @@ class GenConfigTest(cli_test_base.CliTestBase, util.WithAppData,
       self.AssertErrContains("You've generated a Dockerfile that may be "
                              'customized for your application.  To use this '
                              'Dockerfile, the runtime field in [{0}] must be '
-                             'set to custom.'.format(appyaml_path))
+                             'set to custom.'
+                             .format(appyaml_path.replace('\\', '\\\\')))
       self.AssertErrContains('Please update [{0}] manually by changing the '
                              'runtime field to custom.'.format(appyaml_path))
 

@@ -11,7 +11,7 @@ gcloud alpha interactive \- start the gcloud interactive shell
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha interactive\fR [\fB\-\-context\fR=\fICONTEXT\fR] [\fB\-\-update\-cli\-trees\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha interactive\fR [\fB\-\-context\fR=\fICONTEXT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -22,9 +22,7 @@ command line with features that include:
 
 .RS 2m
 .IP "\(bu" 2m
-auto\-completion for \fBgcloud\fR commands, flags and resource arguments
-.IP "\(bu" 2m
-support for other CLIs including \fBbq\fR, \fBgsutil\fR and \fBkubectl\fR
+auto\-completion and active help for all commands
 .IP "\(bu" 2m
 state preservation across commands: \fBcd\fR, local/environment variables
 .RE
@@ -65,11 +63,6 @@ mode/state settings or run specific actions.
 Toggles the active help section, \fBON\fR when enabled, \fBOFF\fR when disabled.
 
 .TP 2m
-\fBF3:\fR\fIEDIT\-MODE\fR
-Toggles the command line edit mode, either \fBemacs\fR or \fBvi\fR. The default
-is determined by the \fBbash\fR(1) set \-o vi|emacs setting.
-
-.TP 2m
 \fBF7:context\fR
 Sets the context for command input, so you won't have to re\-type common command
 prefixes at every prompt. The context is the command line from just after the
@@ -83,7 +76,7 @@ Hit ^C and \fBF7\fR to clear the context, or edit a command line and/or move the
 cursor and hit \fBF7\fR to set a different context.
 
 .TP 2m
-\fBF8:browse\fR
+\fBF8:web\-help\fR
 Opens a web browser tab/window to display the complete man page help for the
 current command. If there is no active web browser (running in \fBssh\fR(1) for
 example), then command specific help or \fBman\fR(1) help is attempted.
@@ -96,17 +89,18 @@ Exit.
 .RE
 .sp
 
-.SH "Auto and TAB Completion"
+.SH "Auto and Tab Completion"
 
-Command completions are displayed in a scrolling pop\-up window. Use TAB and
-up/down keys to navigate the completions, and ENTER/RETURN to select the
-highlighted completion. Completions for \fIknown\fR commands, flags and static
-flag values are displayed automatically. Positional and dynamic flag value
-completions for \fIknown\fR commands are displayed after TAB is entered. TAB
-completion for unknown commands defers to \fBbash\fR(1), but using the
-\fBinteractive\fR user interface. Absent specific command information, a
-file/path completer is used when TAB is entered for unknown positionals
-(arguments that do not start with '\-').
+Command completions are displayed in a scrolling pop\-up menu. Use \f5tab\fR and
+up/down keys to navigate the completions, and \f5space\fR or \f5/\fR to select
+the highlighted completion. Completions for \fIknown\fR commands (\f5gcloud\fR,
+\f5bq\fR, \f5gsutil\fR, \f5kubectl\fR, or any command with a man page), flags
+and static flag values are displayed automatically. Positional and dynamic flag
+value completions for \fIknown\fR commands are displayed after \f5tab\fR is
+entered. \f5tab\fR completion for unknown commands defers to \fBbash\fR(1),
+while still using the \fBinteractive\fR user interface. Absent specific command
+information, a file/path completer is used when \f5tab\fR is entered for unknown
+positionals (arguments that do not start with '\-').
 
 
 .SH "Control Characters"
@@ -215,6 +209,10 @@ Number of lines in the completion menu. The default value is \fB4\fR.
 Command context string. The default value is "".
 
 .TP 2m
+\fBdebug\fR
+If True, enable the debugging display. The default value is \fBfalse\fR.
+
+.TP 2m
 \fBfixed_prompt_position\fR
 If True, display the prompt at the same position. The default value is
 \fBfalse\fR.
@@ -243,6 +241,10 @@ If True, display the completions as a multi\-column menu. The default value is
 \fBfalse\fR.
 
 .TP 2m
+\fBobfuscate\fR
+If True, obfuscate status PII. The default value is \fBfalse\fR.
+
+.TP 2m
 \fBprompt\fR
 Command prompt string. The default value is "$ ".
 
@@ -264,8 +266,8 @@ If True, add command line suggestions based on history. The default value is
 \fBgcloud alpha interactive\fR uses CLI tree data files for typeahead, command
 line completion and help snippet generation. A few CLI trees are installed with
 their respective Cloud SDK components: \fBgcloud\fR (core component), \fBbq\fR,
-\fBgsutil\fR, and \fBkubectl\fR. See \f5$ gcloud topic cli\-trees\fR for
-details.
+\fBgsutil\fR, and \fBkubectl\fR. Trees for commands that have man(1) pages are
+generated on the fly. See \f5$ gcloud topic cli\-trees\fR for details.
 
 
 
@@ -277,14 +279,6 @@ details.
 The default command context. This is a string containing a command name, flags
 and arguments. The context is prepopulated in each command line. You can inline
 edit any part of the context, or ^C to eliminate it.
-
-.TP 2m
-\fB\-\-update\-cli\-trees\fR
-Update the \fBbq\fR, \fBgsutil\fR and \fBkubectl\fR CLI trees, if the
-corresponding command components have been installed. Run with this flag
-\fBonce\fR to enable completion and active help for these commands. NOTICE: it
-may take a few minutes to complete. This is a workaround that will be automatic
-(and \fIfaster\fR) in a future release.
 
 
 .RE
@@ -317,9 +311,9 @@ interactive\fR will then use the \fBgit\fR (MinGW) \fBbash\fR instead of
 
 Please run \fB$ gcloud feedback\fR to report bugs or request new features.
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
 

@@ -17,11 +17,11 @@ FLAGS
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the forwarding rules are global.
+          If set, the forwarding rules are global.
 
        --region=REGION
-          The region of the forwarding rules to delete. If not specified, you
-          may be prompted to select a region.
+          Region of the forwarding rules to delete. If not specified, you may
+          be prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:

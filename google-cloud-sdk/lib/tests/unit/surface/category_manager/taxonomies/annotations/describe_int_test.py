@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for 'gcloud category-manager annotations describe'."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class AnnotationsDescribeIntTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
@@ -55,8 +61,6 @@ class AnnotationsDescribeIntTest(base.CategoryManagerUnitTestBase):
         childAnnotationIds=['444', '555', '666'],
         parentAnnotationId='777')
 
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def _ExpectGetTaxonomyStoreAnnotation(self, expected_annotation):
     m = self.messages
     self.mock_client.taxonomyStores_taxonomies_annotations.Get.Expect(
@@ -71,14 +75,16 @@ class AnnotationsDescribeIntTest(base.CategoryManagerUnitTestBase):
             name=expected_annotation.name),
         copy.deepcopy(expected_annotation))
 
-  def testDescribeProjectAnnotationUsingName(self):
+  def testDescribeProjectAnnotationUsingName(self, track):
+    self.track = track
     self._ExpectGetProjectAnnotation(self.expected_project_annotation)
     actual_annotation = self.Run(
         'category-manager taxonomies annotations describe ' +
         self.project_annotation.RelativeName())
     self.assertEqual(actual_annotation, self.expected_project_annotation)
 
-  def testDescribeProjectAnnotationWithPositionalAndFlag(self):
+  def testDescribeProjectAnnotationWithPositionalAndFlag(self, track):
+    self.track = track
     self._ExpectGetProjectAnnotation(self.expected_project_annotation)
     args = '{} --taxonomy {}'.format(self.annotation_id, self.taxonomy_id)
     actual_annotation = self.Run(
@@ -86,7 +92,8 @@ class AnnotationsDescribeIntTest(base.CategoryManagerUnitTestBase):
     self.assertEqual(actual_annotation, self.expected_project_annotation)
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
-  def testDescribeTaxonomyStoreAnnotationUsingName(self):
+  def testDescribeTaxonomyStoreAnnotationUsingName(self, track):
+    self.track = track
     self._ExpectGetTaxonomyStoreAnnotation(
         self.expected_taxonomy_store_annotation)
     actual_annotation = self.Run(
@@ -96,7 +103,8 @@ class AnnotationsDescribeIntTest(base.CategoryManagerUnitTestBase):
                      self.expected_taxonomy_store_annotation)
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
-  def testDescribeTaxonomyStoreAnnotationWithPositionalAndFlag(self):
+  def testDescribeTaxonomyStoreAnnotationWithPositionalAndFlag(self, track):
+    self.track = track
     self._ExpectGetTaxonomyStoreAnnotation(
         self.expected_taxonomy_store_annotation)
     args = '{} --taxonomy {} --store {}'.format(

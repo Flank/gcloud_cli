@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import io
 import os
 import platform
@@ -966,7 +968,7 @@ project = cloudsdktest
     manager = update_manager.UpdateManager(self.sdk_root_path, url)
 
     freq = update_check.UpdateCheckData.UPDATE_CHECK_FREQUENCY_IN_SECONDS
-    half_freq = freq / 2
+    half_freq = freq // 2
 
     t = self.StartObjectPatch(time, 'time', return_value=freq)
     # Has never checked for updates before
@@ -1080,7 +1082,7 @@ project = cloudsdktest
     # Still updates but no nag, don't update last nag time.
     t.return_value = base_time + freq * 1.5
     manager._PerformUpdateCheck(command_path='gcloud.foo')
-    self.assertEqual(freq / 2, SecondsSinceLastNag())
+    self.assertEqual(freq // 2, SecondsSinceLastNag())
     self.AssertErrNotContains(
         'Updates are available for some Cloud SDK components')
     self.ClearErr()

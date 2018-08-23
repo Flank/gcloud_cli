@@ -11,7 +11,7 @@ gcloud alpha compute resource\-policies create\-vm\-maintenance \- create a Goog
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute resource\-policies create\-vm\-maintenance\fR \fINAME\fR (\fB\-\-weekly\-window\-from\-file\fR=\fIWEEKLY_CYCLE_FROM_FILE\fR\ |\ \fB\-\-start\-time\fR=\fISTART_TIME\fR\ (\fB\-\-daily\-window\fR\ |\ \fB\-\-weekly\-window\fR=\fIWEEKLY_CYCLE\fR)) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute resource\-policies create\-vm\-maintenance\fR \fINAME\fR (\fB\-\-daily\-window\fR\ \fB\-\-start\-time\fR=\fISTART_TIME\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -40,30 +40,14 @@ Name of the resource policy to operate on.
 .RS 2m
 .TP 2m
 
-Cycle Frequency Group. Exactly one of these must be specified:
+Cycle Frequency Group. This must be specified.
 
 .RS 2m
 .TP 2m
+\fB\-\-daily\-window\fR
+Maintenance activity window occurs daily at START_TIME. This flag must be
+specified if any of the other arguments in this group are specified.
 
-From file
-
-.RS 2m
-.TP 2m
-\fB\-\-weekly\-window\-from\-file\fR=\fIWEEKLY_CYCLE_FROM_FILE\fR
-A file which defines a weekly cadence with multiple days and start times. The
-format is a JSON/YAML file containing a list of objects with the following
-fields:
-
-day: Day of the week with the same choices as \-\-weekly\-window. startTime:
-Start time of the snapshot schedule with the same format as \-\-start\-time.
-
-.RE
-.sp
-.TP 2m
-
-From flags
-
-.RS 2m
 .TP 2m
 \fB\-\-start\-time\fR=\fISTART_TIME\fR
 Start time of a four\-hour window in which maintenance activity should start in
@@ -72,24 +56,7 @@ See $ gcloud topic datetimes for information on time formats. For example,
 \f5\-\-start\-time="03:00\-05"\fR (which gets converted to 08:00 UTC). This flag
 must be specified if any of the other arguments in this group are specified.
 
-.TP 2m
 
-Exactly one of these must be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-daily\-window\fR
-Maintenance activity window occurs daily at START_TIME.
-
-.TP 2m
-\fB\-\-weekly\-window\fR=\fIWEEKLY_CYCLE\fR
-Maintenance activity window occurs weekly on WEEKLY_WINDOW at START_TIME.
-\fIWEEKLY_CYCLE\fR must be one of: \fBmonday\fR, \fBtuesday\fR, \fBwednesday\fR,
-\fBthursday\fR, \fBfriday\fR, \fBsaturday\fR, \fBsunday\fR.
-
-
-.RE
-.RE
 .RE
 .RE
 .sp
@@ -103,7 +70,7 @@ An optional, textual description for the backend.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the resource policy to operate on. If not specified, you may be
+Region of the resource policy to operate on. If not specified, you may be
 prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
@@ -143,9 +110,9 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
 

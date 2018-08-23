@@ -20,8 +20,7 @@ COMMANDS
         List types of events that can be a trigger for a Google Cloud Function.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. These variants are also available:
+    These variants are also available:
 
         $ gcloud alpha functions event-types
         $ gcloud beta functions event-types

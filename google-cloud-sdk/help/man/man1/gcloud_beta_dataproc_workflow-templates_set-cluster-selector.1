@@ -11,7 +11,7 @@ gcloud beta dataproc workflow\-templates set\-cluster\-selector \- set cluster s
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dataproc workflow\-templates set\-cluster\-selector\fR (\fITEMPLATE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-cluster\-labels\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dataproc workflow\-templates set\-cluster\-selector\fR (\fITEMPLATE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-cluster\-labels\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -62,13 +62,6 @@ property value for this command invocation.
 .TP 2m
 \fB\-\-cluster\-labels\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
-
-.TP 2m
-\fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
-The compute zone (e.g. us\-central1\-a) for the cluster. If empty, and
-\-\-region is set to a value other than 'global', the server will pick a zone in
-the region. Overrides the default \fBcompute/zone\fR property value for this
-command invocation.
 
 
 .RE

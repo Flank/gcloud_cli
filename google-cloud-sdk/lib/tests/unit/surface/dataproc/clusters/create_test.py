@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Test of the 'clusters create' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 import textwrap
 
@@ -117,16 +120,12 @@ class ClustersCreateUnitTest(
     result = self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
     self.AssertMessagesEqual(response_cluster, result)
 
-    self.AssertErrEquals(
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains(
+        '"choices": ["europe-west1-a", "europe-west1-b (DELETED)", '
+        '"us-central1-a (DEPRECATED)", "us-central1-b"]')
+    self.AssertErrContains(
         textwrap.dedent("""\
-        For the following cluster:
-         - [test-cluster]
-        choose a zone:
-         [1] europe-west1-a
-         [2] europe-west1-b (DELETED)
-         [3] us-central1-a (DEPRECATED)
-         [4] us-central1-b
-        Please enter your numeric choice:  \n\
         Waiting on operation [{operation}].
         {{"ux": "PROGRESS_TRACKER", "message": "Waiting for cluster creation operation", "status": "SUCCESS"}}
         Created [{cluster_uri}] Cluster placed in zone [{zone}].
@@ -160,10 +159,7 @@ class ClustersCreateUnitTest(
     num_masters = 3
     num_workers = 7
     num_preemptible_workers = 5
-    image = 'test-image'
     image_version = '1.7'
-    image_uri = ('https://www.googleapis.com/compute/v1/projects/'
-                 'foo-project/global/images/test-image')
     network = 'foo-network'
     network_uri = ('https://www.googleapis.com/compute/v1/projects/'
                    'foo-project/global/networks/foo-network')
@@ -192,7 +188,6 @@ class ClustersCreateUnitTest(
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         configBucket=bucket,
-        imageUri=image_uri,
         imageVersion=image_version,
         masterMachineTypeUri=master_machine_type,
         workerMachineTypeUri=worker_machine_type,
@@ -224,7 +219,6 @@ class ClustersCreateUnitTest(
         '--master-machine-type {master_machine_type} '
         '--worker-machine-type {worker_machine_type} '
         '--network {network} '
-        '--image {image} '
         '--image-version {image_version} '
         '--initialization-action-timeout 2m '
         '--initialization-actions {actions} '
@@ -244,7 +238,6 @@ class ClustersCreateUnitTest(
         master_machine_type=master_machine_type,
         worker_machine_type=worker_machine_type,
         network=network,
-        image=image,
         image_version=image_version,
         actions=','.join(action_uris),
         num_preemptible=num_preemptible_workers,
@@ -495,6 +488,88 @@ class ClustersCreateUnitTest(
         'Permission denied API reason: Permission denied.'):
       self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
 
+  def testCreateClusterWithImagesFlags(self):
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    image = 'test-image'
+    image_uri = ('https://www.googleapis.com/compute/v1/projects/'
+                 'foo-project/global/images/test-image')
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name,
+        imageUri=image_uri,
+        projectId=project,
+        zoneUri=zone)
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = ('clusters --project {project} create {cluster} '
+               '--zone {zone} '
+               '--image {image} ').format(
+                   project=project,
+                   cluster=cluster_name,
+                   zone=zone,
+                   image=image)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateClusterWithImageVersionFlags(self):
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    image_version = '1.7'
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name,
+        imageVersion=image_version,
+        projectId=project,
+        zoneUri=zone)
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = ('clusters --project {project} create {cluster} '
+               '--zone {zone} '
+               '--image-version {imageVersion} ').format(
+                   project=project,
+                   cluster=cluster_name,
+                   zone=zone,
+                   imageVersion=image_version)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateClusterWithImagesFlags_mutualExclusion(self):
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    image_version = '1.7'
+    image = 'test-image'
+
+    command = ('clusters --project {project} create {cluster} '
+               '--zone {zone} '
+               '--image {image} '
+               '--image-version {imageVersion} ').format(
+                   project=project,
+                   cluster=cluster_name,
+                   zone=zone,
+                   image=image,
+                   imageVersion=image_version)
+
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --image: At most one of --image | '
+        '--image-version may be specified.'):
+      self.RunDataproc(command)
+
 
 class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                                  base.DataprocTestBaseBeta):
@@ -692,7 +767,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
             name=self.CLUSTER_NAME, zone=self.ZONE))
     self.AssertMessagesEqual(expected_response_cluster, result)
 
-  def testCreateClusterWithImagesFlagsBeta(self):
+  def testCreateClusterWithImagesFlags(self):
     project = 'foo-project'
     cluster_name = 'foo-cluster'
     zone = 'foo-zone'
@@ -722,73 +797,6 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         response_cluster=expected_response_cluster)
     result = self.RunDataproc(command)
     self.AssertMessagesEqual(expected_response_cluster, result)
-
-  def testCreateClusterWithImageVersionFlagsBeta(self):
-    project = 'foo-project'
-    cluster_name = 'foo-cluster'
-    zone = 'foo-zone'
-    image_version = '1.7'
-    expected_request_cluster = self.MakeCluster(
-        clusterName=cluster_name,
-        imageVersion=image_version,
-        projectId=project,
-        zoneUri=zone)
-
-    expected_response_cluster = copy.deepcopy(expected_request_cluster)
-    expected_response_cluster.status = self.messages.ClusterStatus(
-        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
-
-    command = ('clusters --project {project} create {cluster} '
-               '--zone {zone} '
-               '--image-version {imageVersion} ').format(
-                   project=project,
-                   cluster=cluster_name,
-                   zone=zone,
-                   imageVersion=image_version)
-
-    self.ExpectCreateCalls(
-        request_cluster=expected_request_cluster,
-        response_cluster=expected_response_cluster)
-    result = self.RunDataproc(command)
-    self.AssertMessagesEqual(expected_response_cluster, result)
-
-  def testCreateClusterWithImagesFlagsBeta_mutualExclusion(self):
-    project = 'foo-project'
-    cluster_name = 'foo-cluster'
-    zone = 'foo-zone'
-    image_version = '1.7'
-    image = 'test-image'
-
-    command = ('clusters --project {project} create {cluster} '
-               '--zone {zone} '
-               '--image {image} '
-               '--image-version {imageVersion} ').format(
-                   project=project,
-                   cluster=cluster_name,
-                   zone=zone,
-                   image=image,
-                   imageVersion=image_version)
-
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --image: At most one of --image | '
-        '--image-version may be specified.'):
-      self.RunDataproc(command)
-
-  def testCreateClusterWithIncompleteGcePdKmsKeyFlags(self):
-    """Test command partially specified gce-pd-kms-key flags fail."""
-    # No Location
-    with self.AssertRaisesExceptionMatches(
-        exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
-      self.RunDataproc(
-          ('clusters create {cluster} --zone={zone} '
-           '--gce-pd-kms-key-project={keyProject} '
-           '--gce-pd-kms-key-keyring={keyRing} '
-           '--gce-pd-kms-key={key}').format(
-               cluster='test-cluster',
-               zone='test-zone',
-               keyProject='test-project',
-               keyRing='test-keyring',
-               key='test-key'))
 
     # No KeyRing
     with self.AssertRaisesExceptionMatches(

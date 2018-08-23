@@ -46,6 +46,10 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBindexes\fR
+Manage Cloud Datastore indexes.
+
+.TP 2m
 \fBoperations\fR
 Manage Long Running Operations for Cloud Datastore.
 
@@ -60,11 +64,13 @@ Manage Long Running Operations for Cloud Datastore.
 .RS 2m
 .TP 2m
 \fBcleanup\-indexes\fR
-Remove unused datastore indexes based on your local index configuration.
+\fB(DEPRECATED)\fR Remove unused datastore indexes based on your local index
+configuration.
 
 .TP 2m
 \fBcreate\-indexes\fR
-Create new datastore indexes based on your local index configuration.
+\fB(DEPRECATED)\fR Create new datastore indexes based on your local index
+configuration.
 
 .TP 2m
 \fBexport\fR
@@ -96,9 +102,10 @@ $ gcloud datastore cleanup\-indexes index.yaml
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
+$ gcloud alpha datastore
 $ gcloud beta datastore
 .RE
 

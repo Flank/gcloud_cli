@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,72 @@
 """Tests for the project-info update command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
 class ProjectInfoUpdateTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testSetDefaultNetworkTier_noParameterSpecified(self):
+    with self.AssertRaisesArgumentErrorRegexp(
+        'argument --default-network-tier: expected one argument'):
+      self.Run("""
+          compute project-info update --default-network-tier
+          """)
+
+  def testSetDefaultNetworkTier_updateToPremiumNetworkTier(self):
+    self.Run("""
+        compute project-info update --default-network-tier PREMIUM
+        """)
+
+    self.CheckRequests([
+        (self.compute.projects, 'SetDefaultNetworkTier',
+         self.messages.ComputeProjectsSetDefaultNetworkTierRequest(
+             project='my-project',
+             projectsSetDefaultNetworkTierRequest=self.messages.
+             ProjectsSetDefaultNetworkTierRequest(
+                 networkTier=self.messages.ProjectsSetDefaultNetworkTierRequest.
+                 NetworkTierValueValuesEnum.PREMIUM)))
+    ],)
+
+  def testSetDefaultNetworkTier_updateToStandardNetworkTier(self):
+    self.Run("""
+        compute project-info update --default-network-tier standard
+        """)
+
+    self.CheckRequests([
+        (self.compute.projects, 'SetDefaultNetworkTier',
+         self.messages.ComputeProjectsSetDefaultNetworkTierRequest(
+             project='my-project',
+             projectsSetDefaultNetworkTierRequest=self.messages.
+             ProjectsSetDefaultNetworkTierRequest(
+                 networkTier=self.messages.ProjectsSetDefaultNetworkTierRequest.
+                 NetworkTierValueValuesEnum.STANDARD)))
+    ],)
+
+  def testSetDefaultNetworkTier_updateToInvalidNetworkTier(self):
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --default-network-tier: Invalid choice: \'SELECT\''):
+      self.Run("""
+          compute project-info update --default-network-tier SELECT
+          """)
+
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --default-network-tier: Invalid choice: \'INVALID-TIER\''):
+      self.Run("""
+          compute project-info update --default-network-tier invalid-tier
+          """)
+
+
+class ProjectInfoUpdateBetaTest(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('beta')

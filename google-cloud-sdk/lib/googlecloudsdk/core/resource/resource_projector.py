@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +26,7 @@ Example usage:
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 import json
 
@@ -64,8 +66,8 @@ class Projector(object):
 
   Attributes:
     _projection: The projection object.
-    _been_here_done_that: A LIFO of the current objects being projected. Used
-      to catch recursive objects like datetime.datetime.max.
+    _been_here_done_that: A set of the current object id()'s being projected.
+      Used to catch recursive objects like datetime.datetime.max.
     _by_columns: True if Projector projects to a list of columns.
     _columns: self._projection.Columns() column attributes.
     _ignore_default_transforms: Ignore default projection transforms if True.
@@ -91,7 +93,7 @@ class Projector(object):
     self._columns = self._projection.Columns()
     self._ignore_default_transforms = ignore_default_transforms
     self._retain_none_values = retain_none_values
-    self._been_here_done_that = []
+    self._been_here_done_that = set()
     attributes = projection.Attributes()
     if 'transforms' in attributes:
       self._transforms_enabled_attribute = True
@@ -158,6 +160,12 @@ class Projector(object):
       # Exclude tzinfo and the default recursive attributes that really should
       # be external constants anyway.
       exclude.update(('max', 'min', 'resolution', 'tzinfo'))
+    else:
+      try:
+        # Exclude static isupper class attributes.
+        exclude.update([a for a in dir(obj.__class__) if a.isupper()])
+      except AttributeError:
+        pass
     for attr in dir(obj):
       if attr.startswith('_'):
         # Omit private attributes.
@@ -364,10 +372,8 @@ class Projector(object):
       An object containing only the key:values selected by projection, or obj if
       the projection is None or empty.
     """
-    # ``obj in self._been_here_done_that'' does not work here because __eq__
-    # for some types raises exceptions on type mismatch. == or != raising
-    # exceptions is not a good plan. `is' avoids __eq__.
-    if any([obj is x for x in self._been_here_done_that]):
+    objid = id(obj)
+    if objid in self._been_here_done_that:
       return None
     elif obj is None:
       pass
@@ -397,7 +403,7 @@ class Projector(object):
       # protorpc enum
       obj = obj.name
     else:
-      self._been_here_done_that.append(obj)
+      self._been_here_done_that.add(objid)
       if isinstance(obj, protorpc_message.Message):
         # protorpc message
         obj = protorpc_encoding.MessageToDict(obj)
@@ -424,7 +430,7 @@ class Projector(object):
             obj = self._ProjectList(obj, projection, flag)
           except (IOError, TypeError):
             obj = None
-      self._been_here_done_that.pop()
+      self._been_here_done_that.discard(objid)
       return obj
     # _ProjectAttribute() may apply transforms functions on obj, even if it is
     # None. For example, a tranform that returns 'FAILED' for None values.
@@ -475,6 +481,8 @@ class Projector(object):
         flag = self._projection.DEFAULT
       else:
         flag = self._projection.PROJECT
+      if hasattr(obj, 'MakeSerializable'):
+        obj = obj.MakeSerializable()
       return self._Project(obj, self._projection.Tree(), flag)
     obj = self._Project(obj, self._projection.GetEmpty(),
                         self._projection.PROJECT)

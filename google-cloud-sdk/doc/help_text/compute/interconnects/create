@@ -26,11 +26,12 @@ REQUIRED FLAGS
         authorized to request an interconnect.
 
      --interconnect-type=INTERCONNECT_TYPE
-        Type of the interconnect. INTERCONNECT_TYPE must be (currently only one
-        value is supported):
+        Type of the interconnect. INTERCONNECT_TYPE must be one of:
 
          DEDICATED
             Dedicated private interconnect.
+         PARTNER
+            Partner interconnect. Only available to approved partners.
 
      --link-type=LINK_TYPE
         Type of the link for the interconnect. LINK_TYPE must be (currently

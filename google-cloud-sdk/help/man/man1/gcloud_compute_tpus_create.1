@@ -1,0 +1,162 @@
+
+.TH "GCLOUD_COMPUTE_TPUS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute tpus create \- create a new Cloud TPU
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-preemptible\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create a new Cloud TPU.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Tpu resource \- The Cloud TPU you want to create. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the flag [tpu] on the command line with a fully
+specified name; provide the flag [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fITPU\fR
+The ID of the tpu or a fully qualified identifier for the tpu. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The compute/zone of the Cloud TPU.
+
+If not specified, will use \f5default\fR compute/zone.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+Specifies the network that this TPU will be a part of.
+
+.TP 2m
+\fB\-\-range\fR=\fIRANGE\fR
+CIDR Range for the TPU.
+
+The IP range that the TPU will select an IP address from. Must be in CIDR
+notation and a \f5/29\fR range, for example \f5192.168.0.0/29\fR. Errors will
+occur if the CIDR range has already been used for a currently existing TPU, the
+CIDR range conflicts with any networks in the user's provided network, or the
+provided network is peered with another network that is using that CIDR range.
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+TensorFlow version for the TPU, such as \f51.6\fR. For a list of available
+TensorFlow versions please see https://www.tensorflow.org/versions/.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR; default="v2\-8"
+TPU accelerator type for the TPU. If not specified, this defaults to
+\f5v2\-8\fR.
+
+For a list of available accelerator types run:
+
+\f5gcloud compute tpus accelerator\-types list\fR
+
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Specifies a text description of the TPU.
+
+.TP 2m
+\fB\-\-preemptible\fR
+If provided, the TPU will be preemptible and time\-limited. It may be preempted
+to free up resources for standard TPUs, and will only be able to run for a
+limited amount of time.
+
+Preemptible TPUs cannot be restarted.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBtpu/v1\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/tpu/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a TPU with ID \f5my\-tpu\fR and CIDR range
+\f510.240.0.0/29\fR in the default user project, network and compute/region
+(with other defaults supplied by API):
+
+.RS 2m
+$ gcloud compute tpus create  my\-tpu \-\-range 10.240.0.0/29
+.RE
+
+
+The following command creates a TPU with ID \f5my\-tpu\fR with explicit values
+for all required and optional parameters:
+
+.RS 2m
+$ gcloud compute tpus create my\-tpu \e
+    \-\-zone us\-central1\-a \e
+    \-\-range '10.240.0.0/29' \e
+    \-\-accelerator\-type 'v2\-8' \e
+    \-\-network my\-tf\-network \e
+    \-\-description 'My TF Node' \e
+    \-\-version '1.1'
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute tpus create
+$ gcloud beta compute tpus create
+.RE
+

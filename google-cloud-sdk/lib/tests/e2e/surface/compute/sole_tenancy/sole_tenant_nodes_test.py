@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for using node based sole tenancy."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util import retry
 from tests.lib import e2e_utils
 from tests.lib import test_case
@@ -24,11 +27,9 @@ from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
-@test_case.Filters.skip('Flaky', 'b/80548799')
 class NodeSoleTenantTest(e2e_instances_test_base.InstancesTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.retryer = retry.Retryer(max_wait_ms=60000)
 
     # We have the most CPU quota in us-central1
@@ -44,8 +45,9 @@ class NodeSoleTenantTest(e2e_instances_test_base.InstancesTestBase):
   def _CreateInstance(self, node_group_name):
     instance_name = self._GetResourceName()
     try:
-      self.Run('compute instances create {0} --zone {1} --node-group {2}'
-               .format(instance_name, self.zone, node_group_name))
+      self.Run(('compute instances create {0} --zone {1} --node-group {2} '
+                '--machine-type n1-standard-2').format(instance_name, self.zone,
+                                                       node_group_name))
       yield instance_name
     finally:
       self.Run('compute instances delete {0} --zone {1} --quiet'.format(
@@ -85,13 +87,14 @@ class NodeSoleTenantTest(e2e_instances_test_base.InstancesTestBase):
       self.Run('compute sole-tenancy node-groups delete {0} --zone {1} '
                '--quiet'.format(node_group_name, self.zone))
 
+  @test_case.Filters.skip('Failing', 'b/112334537')
   def testNodeBasedSoleTenancy(self):
     node_template_name = self._GetResourceName()
     node_group_name = self._GetResourceName()
     with self._CreateNodeTemplate(node_template_name), \
          self._CreateNodeGroup(node_group_name, node_template_name), \
          self._CreateInstance(node_group_name) as instance_name:
-      self.Run('compute sole-tenancy node-groups describe {0} --zone {1}'
+      self.Run('compute sole-tenancy node-groups list-nodes {0} --zone {1}'
                .format(node_group_name, self.zone))
       self.AssertNewOutputContains(instance_name)
 

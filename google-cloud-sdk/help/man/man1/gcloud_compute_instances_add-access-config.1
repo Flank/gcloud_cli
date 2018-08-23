@@ -11,7 +11,7 @@ gcloud compute instances add\-access\-config \- create a Google Compute Engine v
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instances add\-access\-config\fR \fIINSTANCE_NAME\fR [\fB\-\-access\-config\-name\fR=\fIACCESS_CONFIG_NAME\fR;\ default="external\-nat"] [\fB\-\-address\fR=\fIADDRESS\fR] [\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR;\ default="nic0"] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instances add\-access\-config\fR \fIINSTANCE_NAME\fR [\fB\-\-access\-config\-name\fR=\fIACCESS_CONFIG_NAME\fR;\ default="external\-nat"] [\fB\-\-address\fR=\fIADDRESS\fR] [\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR;\ default="nic0"] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -57,8 +57,14 @@ Specifies the name of the network interface which contains the access
 configuration. If this is not provided, then "nic0" is used as the default.
 
 .TP 2m
+\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR
+Specifies the network tier of the access configuration. \f5\fINETWORK_TIER\fR\fR
+must be one of: \f5PREMIUM\fR, \f5STANDARD\fR. The default value is
+\f5PREMIUM\fR.
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-The zone of the instance to operate on. If not specified, you may be prompted to
+Zone of the instance to operate on. If not specified, you may be prompted to
 select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
 resources in your project. If the zone cannot be determined, you will then be
 prompted with all Google Cloud Platform zones.

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the url-maps delete subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
@@ -28,78 +31,57 @@ MESSAGES = apis.GetMessagesModule('compute', 'v1')
 
 class UrlMapsDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
+  def SetUp(self):
+    self.SelectApi('v1')
+    self._api = 'v1'
+    self._url_maps_api = self.compute_v1.urlMaps
+
+  def RunDelete(self, command):
+    self.Run('compute url-maps delete ' + command)
+
+  def ExpectCompletion(self, expected_completion):
+    self.RunCompletion('compute url-maps delete ', expected_completion)
+
   def testWithSingleUrlMap(self):
     properties.VALUES.core.disable_prompts.Set(True)
-    self.Run("""
-        compute url-maps delete map-1
-        """)
+    self.RunDelete('map-1')
 
-    self.CheckRequests(
-        [(self.compute_v1.urlMaps,
-          'Delete',
-          MESSAGES.ComputeUrlMapsDeleteRequest(
-              urlMap='map-1',
-              project='my-project'))],
-    )
+    self.CheckRequests([(self._url_maps_api, 'Delete',
+                         self.messages.ComputeUrlMapsDeleteRequest(
+                             urlMap='map-1', project='my-project'))],)
 
   def testWithManyUrlMaps(self):
     properties.VALUES.core.disable_prompts.Set(True)
-    self.Run("""
-        compute url-maps delete map-1 map-2 map-3
-        """)
+    self.RunDelete('map-1 map-2 map-3')
 
-    self.CheckRequests(
-        [(self.compute_v1.urlMaps,
-          'Delete',
-          MESSAGES.ComputeUrlMapsDeleteRequest(
-              urlMap='map-1',
-              project='my-project')),
-
-         (self.compute_v1.urlMaps,
-          'Delete',
-          MESSAGES.ComputeUrlMapsDeleteRequest(
-              urlMap='map-2',
-              project='my-project')),
-
-         (self.compute_v1.urlMaps,
-          'Delete',
-          MESSAGES.ComputeUrlMapsDeleteRequest(
-              urlMap='map-3',
-              project='my-project'))],
-    )
+    self.CheckRequests([(self._url_maps_api, 'Delete',
+                         self.messages.ComputeUrlMapsDeleteRequest(
+                             urlMap='map-1', project='my-project')),
+                        (self._url_maps_api, 'Delete',
+                         self.messages.ComputeUrlMapsDeleteRequest(
+                             urlMap='map-2', project='my-project')),
+                        (self._url_maps_api, 'Delete',
+                         self.messages.ComputeUrlMapsDeleteRequest(
+                             urlMap='map-3', project='my-project'))],)
 
   def testPromptingWithYes(self):
     self.WriteInput('y\n')
-    self.Run("""
-        compute url-maps delete map-1 map-2 map-3
-        """)
+    self.RunDelete('map-1 map-2 map-3')
 
-    self.CheckRequests(
-        [(self.compute_v1.urlMaps,
-          'Delete',
-          MESSAGES.ComputeUrlMapsDeleteRequest(
-              urlMap='map-1',
-              project='my-project')),
-
-         (self.compute_v1.urlMaps,
-          'Delete',
-          MESSAGES.ComputeUrlMapsDeleteRequest(
-              urlMap='map-2',
-              project='my-project')),
-
-         (self.compute_v1.urlMaps,
-          'Delete',
-          MESSAGES.ComputeUrlMapsDeleteRequest(
-              urlMap='map-3',
-              project='my-project'))],
-    )
+    self.CheckRequests([(self._url_maps_api, 'Delete',
+                         self.messages.ComputeUrlMapsDeleteRequest(
+                             urlMap='map-1', project='my-project')),
+                        (self._url_maps_api, 'Delete',
+                         self.messages.ComputeUrlMapsDeleteRequest(
+                             urlMap='map-2', project='my-project')),
+                        (self._url_maps_api, 'Delete',
+                         self.messages.ComputeUrlMapsDeleteRequest(
+                             urlMap='map-3', project='my-project'))],)
 
   def testPromptingWithNo(self):
     self.WriteInput('n\n')
     with self.AssertRaisesToolExceptionRegexp('Deletion aborted by user.'):
-      self.Run("""
-          compute url-maps delete map-1 map-2 map-3
-          """)
+      self.RunDelete('map-1 map-2 map-3')
 
     self.CheckRequests()
 
@@ -109,14 +91,28 @@ class UrlMapsDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
         autospec=True)
     lister_mock.return_value = resource_projector.MakeSerializable(
         test_resources.URL_MAPS)
-    self.RunCompletion(
-        'compute url-maps delete ',
-        [
-            'url-map-3',
-            'url-map-4',
-            'url-map-1',
-            'url-map-2',
-        ])
+    self.ExpectCompletion([
+        'url-map-3',
+        'url-map-4',
+        'url-map-1',
+        'url-map-2',
+    ])
+
+
+class UrlMapsDeleteTestAlpha(UrlMapsDeleteTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._api = 'alpha'
+    self._url_maps_api = self.compute_alpha.urlMaps
+
+  def RunDelete(self, command):
+    self.Run('alpha compute url-maps delete --global ' + command)
+
+  def testDeleteCompletion(self):
+    # Completion test handled in misc_completion_test.py
+    pass
+
 
 if __name__ == '__main__':
   test_case.main()

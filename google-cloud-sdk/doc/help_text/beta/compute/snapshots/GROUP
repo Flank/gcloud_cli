@@ -16,6 +16,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding to a Google Compute Engine snapshot.
+
      add-labels
         (BETA) Add labels to Google Compute Engine snapshots.
 
@@ -25,11 +28,20 @@ COMMANDS
      describe
         (BETA) Describe a Google Compute Engine snapshot.
 
+     get-iam-policy
+        (BETA) Get the IAM policy for a Google Compute Engine snapshot.
+
      list
         (BETA) List Google Compute Engine snapshots.
 
+     remove-iam-policy-binding
+        (BETA) Remove a policy binding from a Google Compute Engine snapshot.
+
      remove-labels
         (BETA) Remove labels from Google Compute Engine snapshots.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for a Google Compute Engine snapshot.
 
      update
         (BETA) Update a Google Compute Engine snapshot.

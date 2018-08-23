@@ -18,12 +18,12 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The region of the disk type to describe. Overrides the default
+          Region of the disk type to describe. Overrides the default
           compute/region property value for this command invocation.
 
        --zone=ZONE
-          The zone of the disk type to describe. Overrides the default
-          compute/zone property value for this command invocation.
+          Zone of the disk type to describe. Overrides the default compute/zone
+          property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

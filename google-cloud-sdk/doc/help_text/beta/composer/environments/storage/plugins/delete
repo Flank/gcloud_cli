@@ -32,7 +32,7 @@ REQUIRED FLAGS
           arguments in this group are specified.
 
        --location=LOCATION
-          Compute Engine zone in which to create the environment.
+          Compute Engine region in which to create the environment.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -40,5 +40,8 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud composer environments storage plugins delete
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,11 @@
 # limitations under the License.
 
 """Tests for the vpn-tunnels list subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.command_lib.compute.vpn_tunnels import flags

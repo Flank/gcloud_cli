@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -1103,10 +1104,10 @@ class DisplayInfoTest(util.WithTestTool, sdk_test_base.WithOutputCapture):
     self.cli.Execute(['sdk2', 'lotsofargs', '--group-required-test=1',
                       'test', 'foo', '--command-required-test=3'])
     self.assertEqual('table(bot)', self.display_info.format)
-    self.assertEqual('bot', self.display_info.aliases['ALL'])
-    self.assertEqual('Top', self.display_info.aliases['TOP'])
-    self.assertEqual('Mid', self.display_info.aliases['MID'])
-    self.assertEqual('Bot', self.display_info.aliases['BOT'])
+    self.assertEqual(['bot'], self.display_info.aliases['ALL'])
+    self.assertEqual(['Top'], self.display_info.aliases['TOP'])
+    self.assertEqual(['Mid'], self.display_info.aliases['MID'])
+    self.assertEqual(['Bot'], self.display_info.aliases['BOT'])
 
   def testDisplayInfoFlags(self):
     """Test with _Flags() and no Args()."""
@@ -1114,10 +1115,10 @@ class DisplayInfoTest(util.WithTestTool, sdk_test_base.WithOutputCapture):
     self.cli.Execute(['sdk2', 'lotsofargs', '--group-required-test=1',
                       'test-flags'])
     self.assertEqual('table(flags)', self.display_info.format)
-    self.assertEqual('Flags', self.display_info.aliases['FLAGS'])
-    self.assertEqual('flags', self.display_info.aliases['ALL'])
-    self.assertEqual('Top', self.display_info.aliases['TOP'])
-    self.assertEqual('Mid', self.display_info.aliases['MID'])
+    self.assertEqual(['Flags'], self.display_info.aliases['FLAGS'])
+    self.assertEqual(['flags'], self.display_info.aliases['ALL'])
+    self.assertEqual(['Top'], self.display_info.aliases['TOP'])
+    self.assertEqual(['Mid'], self.display_info.aliases['MID'])
 
   def testDisplayInfoFlagsArgs(self):
     """Test with _Flags() and Args()."""
@@ -1125,11 +1126,11 @@ class DisplayInfoTest(util.WithTestTool, sdk_test_base.WithOutputCapture):
     self.cli.Execute(['sdk2', 'lotsofargs', '--group-required-test=1',
                       'test-flags-args'])
     self.assertEqual('table(bot)', self.display_info.format)
-    self.assertEqual('Flags', self.display_info.aliases['FLAGS'])
-    self.assertEqual('bot', self.display_info.aliases['ALL'])
-    self.assertEqual('Top', self.display_info.aliases['TOP'])
-    self.assertEqual('Mid', self.display_info.aliases['MID'])
-    self.assertEqual('Bot', self.display_info.aliases['BOT'])
+    self.assertEqual(['Flags'], self.display_info.aliases['FLAGS'])
+    self.assertEqual(['bot'], self.display_info.aliases['ALL'])
+    self.assertEqual(['Top'], self.display_info.aliases['TOP'])
+    self.assertEqual(['Mid'], self.display_info.aliases['MID'])
+    self.assertEqual(['Bot'], self.display_info.aliases['BOT'])
 
   def testSpecifiedArgs(self):
     self.cli.Execute(['sdk2', 'lotsofargs', '--group-required-test=1', 'test',
@@ -1816,11 +1817,11 @@ TEST WIDE FLAGS
     test help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
 
 """)
 
@@ -1852,11 +1853,11 @@ TEST WIDE FLAGS
     test help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. This variant is also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
 
         $ test deprecation-warning-command-shared-description
 

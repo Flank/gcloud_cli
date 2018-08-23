@@ -82,7 +82,7 @@ FLAGS
     UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -112,10 +112,13 @@ FLAGS
         to disable.
 
      --size=SIZE
-        Indicates the size of the disks. The value must be a whole number
-        followed by a size unit of GB for gigabyte, or TB for terabyte. If no
-        size unit is specified, GB is assumed. For example, 10GB will produce
-        10 gigabyte disks. Disk size must be a multiple of 1 GB.
+        Size of the disks. The value must be a whole number followed by a size
+        unit of GB for gigabyte, or TB for terabyte. If no size unit is
+        specified, GB is assumed. For example, 10GB will produce 10 gigabyte
+        disks. Disk size must be a multiple of 1 GB. Limit your boot disk size
+        to 2TB to account for MBR partition table limitations. If disk size is
+        not specified, the default size of 500GB for standard disks and 100GB
+        for pd-ssd disks will be used.
 
      --type=TYPE
         Specifies the type of disk to create. To get a list of available disk
@@ -149,7 +152,7 @@ FLAGS
           image associated with that family is used.
 
        --source-snapshot=SOURCE_SNAPSHOT
-          A source snapshot used to create the disks. It is safe to delete a
+          Source snapshot used to create the disks. It is safe to delete a
           snapshot after a disk has been created from the snapshot. In such
           cases, the disks will no longer reference the deleted snapshot. To
           get a list of snapshots in your current project, run gcloud compute
@@ -182,8 +185,8 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The region of the disks to create. If not specified, you may be
-          prompted to select a region.
+          Region of the disks to create. If not specified, you may be prompted
+          to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -202,9 +205,8 @@ FLAGS
           CLOUDSDK_COMPUTE_REGION.
 
        --zone=ZONE
-          The zone of the disks to create. If not specified and the
-          compute/zone property isn't set, you may be prompted to select a
-          zone.
+          Zone of the disks to create. If not specified and the compute/zone
+          property isn't set, you may be prompted to select a zone.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/zone property:

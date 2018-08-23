@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +22,7 @@ from __future__ import unicode_literals
 import os
 import enum
 
+from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import encoding
 
 
@@ -44,20 +46,21 @@ class Mode(enum.Enum):
       that an update should never trigger.
     RESULT: Update programmatically usable command outputs.
     UX: Update stderr and other UX for the command.
-    API_REQUESTS: Update api request assertions to match actual requests.
-    API_RESPONSES: Make real api calls and update canned response data.
+    API_REQUESTS: Update api request and response assertions to match actual
+      requests.
+    API_RESPONSE_PAYLOADS: Make real api calls and update canned response data.
   """
   NONE = 0
   RESULT = 1
   UX = 2
   API_REQUESTS = 3
-  API_RESPONSES = 4
+  API_RESPONSE_PAYLOADS = 4
 
   @classmethod
-  def Current(cls):
+  def FromEnv(cls):
     """Gets the current set of update modes."""
     modes = [m for m in encoding.GetEncodedValue(
-        os.environ, UPDATE_MODES_ENV_VAR, '').upper().split(',') if m]
+        os.environ, UPDATE_MODES_ENV_VAR, '').upper().split(' ') if m]
     # TODO(b/79161265): This should not be a pytype error.
     members = set(cls.__members__)
     unknown = set(modes) - members
@@ -68,11 +71,6 @@ class Mode(enum.Enum):
           .format(', '.join(unknown), ', '.join(m.name for m in cls._All())))
     # pytype: disable=not-indexable
     return [cls[m] for m in modes]
-
-  @classmethod
-  def MakesApiCalls(cls):
-    """True if the update mode requires actually making real API calls."""
-    return Mode.API_RESPONSES in Mode.Current()
 
   @classmethod
   def _All(cls):
@@ -160,7 +158,7 @@ class Context(object):
       for attr in parts[:-1]:
         if attr:
           last_section = attr
-          data = data[attr]
+          data = data.get(attr)
       new_field = parts[-1]
     else:
       new_field = key
@@ -213,9 +211,17 @@ class Context(object):
       return False
     if self._custom_update_hook:
       return self._custom_update_hook(self, actual)
+    return self.StandardUpdateHook(actual)
 
+  def StandardUpdateHook(self, actual):
+    """Updates the backing data based on the correct actual value."""
     if actual is None and isinstance(self._data_dict, dict):
-      del self._data_dict[self._field]
+      if self._field in self._data_dict:
+        del self._data_dict[self._field]
     else:
       self._data_dict[self._field] = actual
+      # This conversion operates on either a dict or a list. We want to change
+      # as little of the formatting as possible, so we convert the immediately
+      # enclosing dict of the field that is being changed.
+      yaml.convert_to_block_text(self._data_dict)
     return True

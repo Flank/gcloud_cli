@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -132,7 +133,7 @@ class _BaseInstancesImportSqlTest(object):
     self.Run('sql import sql testinstance '
              'gs://speckletest/testinstance.gz')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains(
         'Imported data from '
         '[gs://speckletest/testinstance.gz] into '
@@ -146,7 +147,7 @@ class _BaseInstancesImportSqlTest(object):
     self.Run('sql import sql testinstance '
              'gs://speckletest/testinstance.gz --async')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrNotContains(
         'Imported data from '
         '[gs://speckletest/testinstance.gz] into '
@@ -270,7 +271,7 @@ class _BaseInstancesImportSqlTest(object):
     self.AssertErrContains(
         'Data from [gs://nosuchbucket/testinstance.gz] will be imported to '
         '[testinstance].')
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDatabaseImport(self):
     self._ExpectImport(database='somedb')
@@ -279,7 +280,7 @@ class _BaseInstancesImportSqlTest(object):
     self.Run('sql import sql testinstance '
              'gs://speckletest/testinstance.gz --database=somedb')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains('Imported data from '
                            '[gs://speckletest/testinstance.gz] into '
                            '[https://www.googleapis.com/sql/v1beta4'
@@ -293,7 +294,7 @@ class _BaseInstancesImportSqlTest(object):
     self.Run('sql import sql testinstance '
              'gs://speckletest/testinstance.gz --user=someuser')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains(
         'Imported data from '
         '[gs://speckletest/testinstance.gz] into '
@@ -301,14 +302,18 @@ class _BaseInstancesImportSqlTest(object):
         '/projects/{0}/instances/testinstance].'.format(self.Project()))
 
 
+class InstancesImportSqlGATest(_BaseInstancesImportSqlTest, base.SqlMockTestGA):
+  pass
+
+
 class InstancesImportSqlBetaTest(_BaseInstancesImportSqlTest,
                                  base.SqlMockTestBeta):
   pass
 
 
-class InstancesImportSqlGATest(_BaseInstancesImportSqlTest, base.SqlMockTestGA):
+class InstancesImportSqlAlphaTest(_BaseInstancesImportSqlTest,
+                                  base.SqlMockTestAlpha):
   pass
-
 
 if __name__ == '__main__':
   test_case.main()

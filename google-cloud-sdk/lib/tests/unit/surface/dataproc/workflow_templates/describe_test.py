@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Test of the 'workflow template describe' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk import calliope
 
 from tests.lib import sdk_test_base
@@ -35,14 +38,20 @@ class WorkflowTemplateDescribeUnitTestBeta(WorkflowTemplateDescribeUnitTest):
 
   def testDescribeWorkflowTemplates(self):
     workflow_template = self.MakeWorkflowTemplate()
-    self.ExpectGetWorkflowTemplate(workflow_template=workflow_template)
+    self.ExpectGetWorkflowTemplate(
+        name=workflow_template.name,
+        version=workflow_template.version,
+        response=workflow_template)
     result = self.RunDataproc(
         'workflow-templates describe {0}'.format(self.WORKFLOW_TEMPLATE))
     self.AssertMessagesEqual(workflow_template, result)
 
   def testCreateWorkflowTemplatesWithVersion(self):
     workflow_template = self.MakeWorkflowTemplate(version=2)
-    self.ExpectGetWorkflowTemplate(workflow_template=workflow_template)
+    self.ExpectGetWorkflowTemplate(
+        name=workflow_template.name,
+        version=workflow_template.version,
+        response=workflow_template)
     result = self.RunDataproc('workflow-templates describe {0} --version 2'.
                               format(self.WORKFLOW_TEMPLATE))
     self.AssertMessagesEqual(workflow_template, result)

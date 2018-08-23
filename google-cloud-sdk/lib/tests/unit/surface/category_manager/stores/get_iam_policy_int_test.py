@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +15,16 @@
 """Tests for 'category-manager taxonomies get-iam-policy' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class GetIamPolicyIntegrationTest(base.CategoryManagerUnitTestBase):
   """Tests for category-manager stores get-iam-policy."""
 
@@ -35,18 +41,20 @@ class GetIamPolicyIntegrationTest(base.CategoryManagerUnitTestBase):
             members=['user:user1@gmail.com', 'user:user2@gmail.com'])
     ])
 
-  def testAddIamPolicyBindingWithOrganizationResource(self):
+  def testAddIamPolicyBindingWithOrganizationResource(self, track):
+    self.track = track
     self.ExpectGetTaxonomyStore(org_id='1', taxonomy_store_id='2')
     self.mock_client.taxonomyStores.GetIamPolicy.Expect(
         self.messages.CategorymanagerTaxonomyStoresGetIamPolicyRequest(
             resource='taxonomyStores/2',
             getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
         self.policy)
-    result = self.Run('alpha category-manager stores get-iam-policy '
+    result = self.Run('category-manager stores get-iam-policy '
                       '--organization organizations/1')
     self.assertEqual(self.policy, result)
 
-  def testAddIamPolicyBindingWithOrganizationId(self):
+  def testAddIamPolicyBindingWithOrganizationId(self, track):
+    self.track = track
     self.ExpectGetTaxonomyStore(org_id='3', taxonomy_store_id='4')
     self.mock_client.taxonomyStores.GetIamPolicy.Expect(
         self.messages.CategorymanagerTaxonomyStoresGetIamPolicyRequest(
@@ -54,7 +62,7 @@ class GetIamPolicyIntegrationTest(base.CategoryManagerUnitTestBase):
             getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
         self.policy)
 
-    result = self.Run('alpha category-manager stores get-iam-policy '
+    result = self.Run('category-manager stores get-iam-policy '
                       '--organization=3')
     self.assertEqual(self.policy, result)
 

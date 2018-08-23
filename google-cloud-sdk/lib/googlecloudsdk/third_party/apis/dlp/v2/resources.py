@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,6 +56,17 @@ class Collections(enum.Enum):
           '':
               'organizations/{organizationsId}/inspectTemplates/'
               '{inspectTemplatesId}',
+      },
+      [u'name'],
+      True
+  )
+  ORGANIZATIONS_STOREDINFOTYPES = (
+      'organizations.storedInfoTypes',
+      '{+name}',
+      {
+          '':
+              'organizations/{organizationsId}/storedInfoTypes/'
+              '{storedInfoTypesId}',
       },
       [u'name'],
       True
@@ -117,6 +129,16 @@ class Collections(enum.Enum):
       {
           '':
               'projects/{projectsId}/jobTriggers/{jobTriggersId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_STOREDINFOTYPES = (
+      'projects.storedInfoTypes',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/storedInfoTypes/{storedInfoTypesId}',
       },
       [u'name'],
       True

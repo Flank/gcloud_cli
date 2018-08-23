@@ -11,7 +11,7 @@ gcloud alpha dlp images redact \- redact potentially sensitive data from image c
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dlp images redact\fR \fIIMAGE\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] [\fB\-\-include\-quote\fR] [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-redact\-all\-text\fR] [\fB\-\-redact\-color\fR=\fIREDACT_COLOR\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dlp images redact\fR \fIIMAGE\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] [\fB\-\-include\-quote\fR] [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR] [\fB\-\-redact\-all\-text\fR] [\fB\-\-redact\-color\fR=\fIREDACT_COLOR\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -61,6 +61,10 @@ be one of: \fRlikely\fB, \fRpossible\fB, \fRunlikely\fB, \fRvery\-likely\fB,
 \fRvery\-unlikely\fB.
 
 .TP 2m
+\fR\-\-output\-file\fB=\fIOUTPUT_FILE\fR
+Path to the file to write redacted contents to.
+
+.TP 2m
 \fR\-\-redact\-all\-text\fB
 If specified, all text info in the image will be removed, whether it is detected
 as sensitive or not.
@@ -94,11 +98,24 @@ be found at: https://cloud.google.com/dlp/docs/
 
 
 
+.SH "EXAMPLES"
+
+To redact phone numbers from an image named my\-image.jpg and write the redacted
+image to my\-redacted\-image.jpg, run:
+
+.RS 2m
+$ gcloud alpha dlp images redact my\-image.jpg \e
+    \-\-info\-types PHONE_NUMBER \e
+    \-\-output\-file my\-redacted\-image.jpg
+.RE
+
+
+
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
 

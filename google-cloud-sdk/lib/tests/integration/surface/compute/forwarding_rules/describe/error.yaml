@@ -179,8 +179,9 @@ exception:
   type: <class 'googlecloudsdk.calliope.exceptions.ToolException'>
 ---
 output:
-  stderr: "For the following forwarding rule:\n - [rule1]\nchoose a region or global:\n\
-    \ [1] global\n [2] region: europe-west2\n [3] region: us-central1\nPlease enter\
-    \ your numeric choice:  \nERROR: (gcloud.compute.forwarding-rules.describe)\
+  stderr: "{\"ux\": \"PROMPT_CHOICE\", \"message\": \"For the following \
+    forwarding rule:\\n - [rule1]\\nchoose a region or global:\", \"choices\": \
+    [\"global\", \"region: europe-west2\", \"region: us-central1\"]}\n\
+    ERROR: (gcloud.compute.forwarding-rules.describe)\
     \ Could not fetch resource:\n - The resource 'projects/fake-project/global/forwardingRules/rule1'\
     \ was not found\n\n"

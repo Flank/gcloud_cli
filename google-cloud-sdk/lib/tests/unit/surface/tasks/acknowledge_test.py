@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
@@ -15,7 +16,9 @@
 """Tests for `gcloud tasks acknowledge`."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import parsers

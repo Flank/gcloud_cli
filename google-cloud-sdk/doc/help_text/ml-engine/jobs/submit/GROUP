@@ -19,7 +19,7 @@ COMMANDS
         Start a Cloud ML Engine batch prediction job.
 
      training
-        Submits a Cloud Machine Learning training job.
+        Submit a Cloud Machine Learning training job.
 
 NOTES
     These variants are also available:

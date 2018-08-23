@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Flags for the `compute network-endpoint-groups` commands."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import flags as compute_flags
@@ -26,15 +30,16 @@ def MakeNetworkEndpointGroupsArg():
       zone_explanation=compute_flags.ZONE_PROPERTY_EXPLANATION)
 
 
-def AddCreateNegArgsToParser(parser):
+def AddCreateNegArgsToParser(parser, support_neg_type):
   """Adds flags for creating a network endpoint group to the parser."""
-  base.ChoiceArgument(
-      '--neg-type',
-      hidden=True,
-      choices=['load-balancing'],
-      default='load-balancing',
-      help_str='The type of network endpoint group to create.'
-  ).AddToParser(parser)
+  if support_neg_type:
+    base.ChoiceArgument(
+        '--neg-type',
+        hidden=True,
+        choices=['load-balancing'],
+        default='load-balancing',
+        help_str='The type of network endpoint group to create.'
+    ).AddToParser(parser)
   base.ChoiceArgument(
       '--network-endpoint-type',
       hidden=True,

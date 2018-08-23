@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Engine Jobs library."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.ml_engine import jobs
 from googlecloudsdk.core import resources
 from tests.lib import test_case
@@ -262,6 +266,30 @@ class JobsClientTest(base.MlGaPlatformTestBase):
                 outputPath='gs://bucket/output',
                 region='us-central1',
                 batchSize=128)))
+
+  def testBuildBatchPredictionSignatureName(self):
+    result = self.jobs_client.BuildBatchPredictionJob(
+        job_name='my_job',
+        model_dir='gs://some_bucket/models',
+        input_paths=['gs://bucket0/instance'],
+        data_format='TF_RECORD',
+        output_path='gs://bucket/output',
+        region='us-central1',
+        signature_name='my-custom-signature')
+
+    prediction_input_class = self.short_msgs.PredictionInput
+    data_formats = prediction_input_class.DataFormatValueValuesEnum
+    self.assertEqual(
+        result,
+        self.short_msgs.Job(
+            jobId='my_job',
+            predictionInput=self.short_msgs.PredictionInput(
+                uri='gs://some_bucket/models',
+                inputPaths=['gs://bucket0/instance'],
+                dataFormat=data_formats.TF_RECORD,
+                outputPath='gs://bucket/output',
+                region='us-central1',
+                signatureName='my-custom-signature')))
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +18,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 import sys
 
@@ -194,14 +196,15 @@ class ProjectionSpec(object):
     if name in self.attributes:
       del self.attributes[name]
 
-  def AddAlias(self, name, key):
-    """Adds name as an alias for key to the projection.
+  def AddAlias(self, name, key, attribute):
+    """Adds name as an alias for key and attribute to the projection.
 
     Args:
       name: The short (no dots) alias name for key.
       key: The parsed key to add.
+      attribute: The attribute for key.
     """
-    self.aliases[name] = key
+    self.aliases[name] = (key, attribute)
 
   def AddKey(self, key, attribute):
     """Adds key and attribute to the projection.

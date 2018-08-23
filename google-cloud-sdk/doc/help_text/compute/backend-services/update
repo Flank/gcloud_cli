@@ -13,6 +13,7 @@ SYNOPSIS
         [--iap=disabled|enabled,[oauth2-client-id=OAUTH2-CLIENT-ID,
           oauth2-client-secret=OAUTH2-CLIENT-SECRET]] [--port-name=PORT_NAME]
         [--protocol=PROTOCOL] [--session-affinity=SESSION_AFFINITY]
+        [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
         [--timeout=TIMEOUT]
         [--cache-key-query-string-blacklist=[QUERY_STRING,...]
           | --cache-key-query-string-whitelist=QUERY_STRING,[...]]
@@ -104,8 +105,13 @@ FLAGS
         set-named-ports --help.
 
      --protocol=PROTOCOL
-        The protocol for incoming requests. PROTOCOL must be one of: HTTP,
-        HTTPS, SSL, TCP, UDP.
+        Protocol for incoming requests.
+
+        If the load-balancing-scheme is INTERNAL, the protocol must be one of:
+        TCP, UDP.
+
+        If the load-balancing-scheme is EXTERNAL, the protocol must be one of:
+        HTTP, HTTPS, HTTP2, SSL, TCP, UDP.
 
      --session-affinity=SESSION_AFFINITY
         The type of session affinity to use for this backend service.
@@ -127,6 +133,20 @@ FLAGS
             cookie set by the load balancer.
          NONE
             Session affinity is disabled.
+
+     --signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE
+        The amount of time up to which the response to a signed URL request
+        will be cached in the CDN. After this time period, the Signed URL will
+        be revalidated before being served. Cloud CDN will internally act as
+        though all responses from this backend had a Cache-Control: public,
+        max-age=[TTL] header, regardless of any existing Cache-Control header.
+        The actual headers served in responses will not be altered.
+
+        For example, specifying 12h will cause the responses to signed URL
+        requests to be cached in the CDN up to 12 hours. See $ gcloud topic
+        datetimes for information on duration formats.
+
+        This flag only affects signed URL requests.
 
      --timeout=TIMEOUT
         The amount of time to wait for a backend to return a full response for
@@ -162,10 +182,10 @@ FLAGS
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the backend service is global.
+          If set, the backend service is global.
 
        --region=REGION
-          The region of the backend service to update. Overrides the default
+          Region of the backend service to update. Overrides the default
           compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS

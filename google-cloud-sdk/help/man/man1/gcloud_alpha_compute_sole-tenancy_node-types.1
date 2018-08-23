@@ -1,0 +1,64 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SOLE\-TENANCY_NODE\-TYPES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute sole\-tenancy node\-types \- read Google Compute Engine sole\-tenancy node types
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute sole\-tenancy node\-types\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Node types are the types of dedicated Compute Engine servers that
+are used for nodes in node groups. Node types will differ in the amount of vCPU,
+Memory, and local SSD space.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Describes a Google Compute Engine node type.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List Google Compute Engine node types.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud compute sole\-tenancy node\-types
+$ gcloud beta compute sole\-tenancy node\-types
+.RE
+

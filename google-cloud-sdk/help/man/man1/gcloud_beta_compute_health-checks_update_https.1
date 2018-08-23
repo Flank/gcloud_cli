@@ -11,7 +11,7 @@ gcloud beta compute health\-checks update https \- update a HTTPS health check
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute health\-checks update https\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute health\-checks update https\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR] [\fB\-\-port\fR=\fIPORT\fR\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -62,15 +62,6 @@ associated with the target pool. Setting this to an empty string will clear any
 existing host value.
 
 .TP 2m
-\fB\-\-port\fR=\fIPORT\fR
-The TCP port number that this health check monitors.
-
-.TP 2m
-\fB\-\-port\-name\fR=\fIPORT_NAME\fR
-The port name that this health check monitors. By default, this is empty.
-Setting this to an empty string will clear any existing port\-name value.
-
-.TP 2m
 \fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR
 The type of proxy protocol header to be sent to the backend. \fIPROXY_HEADER\fR
 must be one of:
@@ -109,7 +100,24 @@ gcloud topic datetimes for information on duration formats.
 The number of consecutive health check failures before a healthy instance is
 marked as unhealthy.
 
+.TP 2m
 
+These flags configure the port that the health check monitors. If both
+\f5\-\-port\fR and \f5\-\-port\-name\fR are specified, \f5\-\-port\fR takes
+precedence.
+
+.RS 2m
+.TP 2m
+\fB\-\-port\fR=\fIPORT\fR
+The TCP port number that this health check monitors.
+
+.TP 2m
+\fB\-\-port\-name\fR=\fIPORT_NAME\fR
+The port name that this health check monitors. By default, this is empty.
+Setting this to an empty string will clear any existing port\-name value.
+
+
+.RE
 .RE
 .sp
 

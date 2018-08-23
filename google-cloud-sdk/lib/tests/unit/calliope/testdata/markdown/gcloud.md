@@ -39,7 +39,7 @@ with other flags that are applied in this order: *--flatten*,
 
 *--format*=_FORMAT_::
 
-Sets the format for printing command output resources. The default is a
+Set the format for printing command output resources. The default is a
 command-specific human-friendly output format. The supported formats
 are: `config`, `csv`, `default`, `diff`, `disable`, `flattened`, `get`, `json`, `list`, `multi`, `none`, `object`, `table`, `text`, `value`, `yaml`. For more details run $ link:gcloud[gcloud] topic formats.
 
@@ -49,7 +49,7 @@ Display detailed help.
 
 *--verbosity*=_VERBOSITY_; default="warning"::
 
-Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, and `none`. Overrides the default *core/verbosity* property value for this command invocation.
+Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.
 
 *-h*::
 

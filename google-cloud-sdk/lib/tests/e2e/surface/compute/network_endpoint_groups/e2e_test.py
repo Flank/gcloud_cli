@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for network endpoint groups."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 
 from googlecloudsdk.calliope import base
@@ -26,9 +30,9 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
   """Network endpoint groups tests."""
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.registry = resources.REGISTRY.Clone()
-    self.registry.RegisterApiByName('compute', 'alpha')
+    self.registry.RegisterApiByName('compute', 'beta')
 
     # Currently only us-east2-a is supported.
     self.region = 'us-east2'
@@ -53,8 +57,8 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
   def _CreateHealthCheck(self, health_check_name):
     try:
       self.Run(
-          'compute health-checks create tcp {} '
-          '--port-specification USE_SERVING_PORT'.format(
+          'compute health-checks create http {} '
+          '--use-serving-port'.format(
               health_check_name))
       yield health_check_name
     finally:
@@ -117,3 +121,43 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
       self.Run('compute backend-services describe {0} --global'.format(
           backend_name))
       self.AssertNewOutputNotContains(neg_name)
+
+
+class NetworkEndpointGroupsAlphaTest(NetworkEndpointGroupsTest):
+  """Network endpoint groups alpha tests."""
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.ALPHA
+    self.registry = resources.REGISTRY.Clone()
+    self.registry.RegisterApiByName('compute', 'alpha')
+
+    # Currently only us-east2-a is supported.
+    self.region = 'us-east2'
+    self.zone = 'us-east2-a'
+
+  @contextlib.contextmanager
+  def _CreateHealthCheck(self, health_check_name):
+    try:
+      self.Run('compute health-checks create http {} '
+               '--use-serving-port --global'.format(health_check_name))
+      yield health_check_name
+    finally:
+      self.Run('compute health-checks delete {0} --quiet --global'.format(
+          health_check_name))
+
+  @contextlib.contextmanager
+  def _CreateBackendService(self, health_check_name):
+    backend_name = self._GetResourceName()
+    try:
+      self.Run('compute backend-services create {0} --global '
+               '--load-balancing-scheme=external '
+               '--health-checks {1} --global-health-checks --protocol tcp'
+               .format(backend_name, health_check_name))
+      yield backend_name
+    finally:
+      self.Run('compute backend-services delete {0} --global '
+               '--quiet'.format(backend_name))
+
+
+if __name__ == '__main__':
+  e2e_test_base.main()

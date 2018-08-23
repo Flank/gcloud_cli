@@ -31,8 +31,8 @@ OPTIONAL FLAGS
         The mask for network used for the server IP address.
 
      --region=REGION
-        The region of the router to update. If not specified, you may be
-        prompted to select a region.
+        Region of the router to update. If not specified, you may be prompted
+        to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:
@@ -56,17 +56,17 @@ OPTIONAL FLAGS
           The interconnect attachment of the interface being updated.
 
        --interconnect-attachment-region=INTERCONNECT_ATTACHMENT_REGION
-          The region of the interconnectAttachment to operate on. If not
-          specified it will be set to the region of the router. Overrides the
-          default compute/region property value for this command invocation.
+          Region of the interconnectAttachment to operate on. If not specified
+          it will be set to the region of the router. Overrides the default
+          compute/region property value for this command invocation.
 
        --vpn-tunnel=VPN_TUNNEL
           The tunnel of the interface being updated.
 
        --vpn-tunnel-region=VPN_TUNNEL_REGION
-          The region of the vpn tunnel to operate on. If not specified it will
-          be set to the region of the router. Overrides the default
-          compute/region property value for this command invocation.
+          Region of the vpn tunnel to operate on. If not specified it will be
+          set to the region of the router. Overrides the default compute/region
+          property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -74,11 +74,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute routers update-interface
         $ gcloud beta compute routers update-interface

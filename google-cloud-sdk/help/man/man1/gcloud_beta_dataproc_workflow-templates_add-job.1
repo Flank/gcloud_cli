@@ -80,23 +80,24 @@ To add a Hadoop MapReduce job, run:
 
 .RS 2m
 $ gcloud beta dataproc workflow\-templates add\-job hadoop \e
-    \-\-workflow\-template my_template \-\-jar my_jar.jar arg1
-arg2
+    \-\-workflow\-template my_template \-\-jar my_jar.jar \e
+    \-\- arg1 arg2
 .RE
 
 To add a Spark Scala or Java job, run:
 
 .RS 2m
 $ gcloud beta dataproc workflow\-templates add\-job spark \e
-    \-\-workflow\-template my_template \-\-jar my_jar.jar arg1
-arg2
+    \-\-workflow\-template my_template \-\-jar my_jar.jar \e
+    \-\- arg1 arg2
 .RE
 
 To add a PySpark job, run:
 
 .RS 2m
 $ gcloud beta dataproc workflow\-templates add\-job pyspark \e
-    \-\-workflow\-template my_template my_script.py arg1 arg2
+    \-\-workflow\-template my_template my_script.py \e
+    \-\- arg1 arg2
 .RE
 
 To add a Spark SQL job, run:

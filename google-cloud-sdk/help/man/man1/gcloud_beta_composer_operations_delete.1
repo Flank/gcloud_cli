@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta composer operations delete \- deletes one or more completed Cloud Composer operations
+gcloud beta composer operations delete \- delete one or more completed Cloud Composer operations
 
 
 
@@ -17,7 +17,7 @@ gcloud beta composer operations delete \- deletes one or more completed Cloud Co
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Deletes operations that are done. If more than one operation is
+\fB(BETA)\fR Delete operations that are done. If more than one operation is
 specified, all deletes will be attempted. If any of the deletes fail, those
 operations and their failure messages will be listed on the standard error, and
 the command will exit with a non\-zero status.
@@ -45,7 +45,7 @@ specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the operations.
+Compute Engine region in which to create the operations.
 
 
 .RE
@@ -63,5 +63,10 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud composer operations delete
+.RE
 

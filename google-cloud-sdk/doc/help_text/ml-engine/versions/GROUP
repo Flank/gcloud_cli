@@ -36,7 +36,7 @@ COMMANDS
         Sets an existing Cloud ML Engine version as the default for its model.
 
      update
-        Update a Cloud ML Engine model.
+        Update a Cloud ML Engine version.
 
 NOTES
     These variants are also available:

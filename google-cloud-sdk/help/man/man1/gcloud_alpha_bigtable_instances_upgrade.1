@@ -1,0 +1,67 @@
+
+.TH "GCLOUD_ALPHA_BIGTABLE_INSTANCES_UPGRADE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha bigtable instances upgrade \- upgrade an existing instance's type from development to production
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha bigtable instances upgrade\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Upgrade an existing instance's type from development to
+production.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for operation to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta bigtable instances upgrade
+.RE
+

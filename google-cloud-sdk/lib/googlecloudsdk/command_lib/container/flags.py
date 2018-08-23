@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Flags and helpers for the container related commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import constants as compute_constants
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util
@@ -305,7 +308,7 @@ def AddAutoprovisioningFlags(parser, hidden=False):
     hidden: If true, suppress help text for added options.
   """
 
-  group = parser.add_argument_group('Node autoprovisioning')
+  group = parser.add_argument_group('Node autoprovisioning', hidden=hidden)
   group.add_argument(
       '--enable-autoprovisioning',
       required=True,
@@ -412,11 +415,11 @@ def AddZoneAndRegionFlags(parser):
   group.add_argument(
       '--zone',
       '-z',
-      help='The compute zone (e.g. us-central1-a) for the cluster',
+      help='Compute zone (e.g. us-central1-a) for the cluster',
       action=actions.StoreProperty(properties.VALUES.compute.zone))
   group.add_argument(
       '--region',
-      help='The compute region (e.g. us-central1) for the cluster.')
+      help='Compute region (e.g. us-central1) for the cluster.')
 
 
 def AddAsyncFlag(parser):
@@ -613,32 +616,35 @@ def AddNodePoolClusterFlag(parser, help_text):
       action=actions.StoreProperty(properties.VALUES.container.cluster))
 
 
-# TODO(b/33344111): Add test coverage. This flag was added preemptively, but it
-# currently has inadequate testing.
-def AddEnableAutoRepairFlag(parser, for_node_pool=False, suppressed=False):
+def AddEnableAutoRepairFlag(parser, for_node_pool=False, for_create=False):
   """Adds a --enable-autorepair flag to parser."""
   if for_node_pool:
     help_text = """\
-Sets autorepair feature for a node-pool.
+Enable node autorepair feature for a node-pool.
 
   $ {command} node-pool-1 --cluster=example-cluster --enable-autorepair
 """
+    if for_create:
+      help_text += """
+Node autorepair is enabled by default for node pools using COS as a base image.
+"""
   else:
     help_text = """\
-Sets autorepair feature for a cluster's default node-pool(s).
+Enable node autorepair feature for a cluster's default node-pool(s).
 
   $ {command} example-cluster --enable-autorepair
 """
+    if for_create:
+      help_text += """
+Node autorepair is enabled by default for clusters using COS as a base image.
+"""
   help_text += """
-See https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for \
+See https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair for \
 more info."""
 
   parser.add_argument(
-      '--enable-autorepair',
-      action='store_true',
-      default=None,
-      help=help_text,
-      hidden=suppressed)
+      '--enable-autorepair', action='store_true', default=None,
+      help=help_text)
 
 
 def AddEnableAutoUpgradeFlag(parser, for_node_pool=False, suppressed=False):
@@ -656,7 +662,7 @@ Sets autoupgrade feature for a cluster's default node-pool(s).
   $ {command} example-cluster --enable-autoupgrade
 """
   help_text += """
-See https://cloud.google.com/kubernetes-engine/docs/node-managament for more \
+See https://cloud.google.com/kubernetes-engine/docs/node-management for more \
 info."""
 
   parser.add_argument(
@@ -763,27 +769,6 @@ def AddPrivateClusterFlags(parser, hidden=False):
       hidden=hidden)
 
 
-def AddEnableSharedNetworkFlag(parser, hidden=False):
-  """Adds a --enable-shared-network flag to parser."""
-  help_text = """\
-Temporary flag allowing the cluster to be created with a shared network and
-subnetwork. This requires using alias IPs with a pre-existing subnetwork and
-secondary ranges. At a later release, this flag will not be necessary.
-
-The following flags must also be provided: '--enable-kubernetes-alpha',
-'--enable-ip-alias', '--subnetwork', '--services-secondary-range-name', and
-'--cluster-secondary-range-name'.
-
-The flag '--create-subnetwork' cannot be specified.
-"""
-  parser.add_argument(
-      '--enable-shared-network',
-      action='store_true',
-      default=None,
-      hidden=hidden,
-      help=help_text)
-
-
 def AddEnableLegacyAuthorizationFlag(parser, hidden=False):
   """Adds a --enable-legacy-authorization flag to parser."""
   help_text = """\
@@ -800,6 +785,25 @@ instead, create or update your cluster with the option
       default=None,
       hidden=hidden,
       help=help_text)
+
+
+def AddAuthenticatorSecurityGroupFlags(parser, hidden=True):
+  """Adds --security-group to parser."""
+  help_text = """\
+The name of the RBAC security group for use with Google security groups
+in Kubernetes RBAC
+(https://kubernetes.io/docs/reference/access-authn-authz/rbac/).
+
+To include group membership as part of the claims issued by Google
+during authentication, a group must be designated as a security group by
+including it as a direct member of this group.
+
+If unspecified, no groups will be returned for use with RBAC."""
+  parser.add_argument(
+      '--security-group',
+      help=help_text,
+      default=None,
+      hidden=hidden)
 
 
 def AddStartIpRotationFlag(parser, hidden=False):
@@ -966,12 +970,11 @@ Example:
       help=help_text)
 
 
-def AddDiskTypeFlag(parser, suppressed=False):
+def AddDiskTypeFlag(parser):
   """Adds a --disk-type flag to the given parser.
 
   Args:
     parser: A given parser.
-    suppressed: Whether or not to suppress help text.
   """
   help_text = """\
 Type of the node VM boot disk. Defaults to pd-standard.
@@ -979,7 +982,6 @@ Type of the node VM boot disk. Defaults to pd-standard.
   parser.add_argument(
       '--disk-type',
       help=help_text,
-      hidden=suppressed,
       choices=['pd-standard', 'pd-ssd'])
 
 
@@ -1242,18 +1244,55 @@ Multiple locations can be specified, separated by commas. For example:
 """)
 
 
-def AddLoggingServiceFlag(parser):
+def AddLoggingServiceFlag(parser, enable_kubernetes):
   """Adds a --logging-service flag to the parser.
 
   Args:
     parser: A given parser.
+    enable_kubernetes: Mention Kubernetes-native resource model in help string
+  """
+  help_str = """\
+Logging service to use for the cluster. Options are:
+"logging.googleapis.com" (the Google Cloud Logging service),
+"none" (logs will not be exported from the cluster)
+"""
+
+  if enable_kubernetes:
+    help_str = """\
+Logging service to use for the cluster. Options are:
+"logging.googleapis.com/kubernetes" (the Google Cloud Logging
+service with Kubernetes-native resource model enabled),
+"logging.googleapis.com" (the Google Cloud Logging service),
+"none" (logs will not be exported from the cluster)
+"""
+
+  parser.add_argument('--logging-service', help=help_str)
+
+
+def AddMonitoringServiceFlag(parser, enable_kubernetes):
+  """Adds a --monitoring-service flag to the parser.
+
+  Args:
+    parser: A given parser.
+    enable_kubernetes: Mention Kubernetes-native resource model in help string
   """
 
-  parser.add_argument(
-      '--logging-service',
-      help='The logging service to use for the cluster. Options are: '
-      '"logging.googleapis.com" (the Google Cloud Logging service), '
-      '"none" (logs will not be exported from the cluster)')
+  help_str = """\
+Monitoring service to use for the cluster. Options are:
+"monitoring.googleapis.com" (the Google Cloud Monitoring service),
+"none" (no metrics will be exported from the cluster)
+"""
+
+  if enable_kubernetes:
+    help_str = """\
+Monitoring service to use for the cluster. Options are:
+"monitoring.googleapis.com/kubernetes" (the Google Cloud
+Monitoring service with Kubernetes-native resource model enabled),
+"monitoring.googleapis.com" (the Google Cloud Monitoring service),
+"none" (no metrics will be exported from the cluster)
+"""
+
+  parser.add_argument('--monitoring-service', help=help_str)
 
 
 def AddNodeIdentityFlags(parser, example_target, new_behavior=True):
@@ -1408,11 +1447,11 @@ def AddDeprecatedNodePoolNodeIdentityFlags(parser):
       new_behavior=False)
 
 
-def AddAddonsFlags(parser):
-  """Adds the --addons flag to the parser."""
+def AddAddonsFlagsWithOptions(parser, addon_options):
+  """Adds the --addons flag to the parser with the given addon options."""
   parser.add_argument(
       '--addons',
-      type=arg_parsers.ArgList(choices=api_adapter.ADDONS_OPTIONS),
+      type=arg_parsers.ArgList(choices=addon_options),
       metavar='ADDON',
       # TODO(b/65264376): Replace the doc link when a better doc is ready.
       help="""\
@@ -1421,6 +1460,16 @@ Default set of addons includes {0}. Addons
 are additional Kubernetes cluster components. Addons specified by this flag will
 be enabled. The others will be disabled.
 """.format(', '.join(api_adapter.DEFAULT_ADDONS)))
+
+
+def AddAddonsFlags(parser):
+  """Adds the --addons flag to the parser for the beta and GA tracks."""
+  AddAddonsFlagsWithOptions(parser, api_adapter.ADDONS_OPTIONS)
+
+
+def AddAlphaAddonsFlags(parser):
+  """Adds the --addons flag to the parser for the alpha track."""
+  AddAddonsFlagsWithOptions(parser, api_adapter.ALPHA_ADDONS_OPTIONS)
 
 
 def AddPodSecurityPolicyFlag(parser, hidden=False):
@@ -1520,13 +1569,12 @@ def AddIstioConfigFlag(parser, suppressed=False):
   """
 
   help_text = """\
-Configurations for Istio addon, requires --addons contains Istio for create,
-or --update-addons Istio=ENABLED for update.
+Configurations for Istio addon, requires --addons contains Istio.
 
 *auth*:::Optional Type of auth NONE or MUTUAL_TLS
 Example:
 
-  $ {command} example-cluster --istio-config=auth=NONE
+  $ {command} example-cluster --addons=Istio --istio-config=auth=NONE
 """
   parser.add_argument(
       '--istio-config',
@@ -1539,8 +1587,8 @@ Example:
       hidden=suppressed)
 
 
-def ValidateIstioConfigCreateArgs(istio_config_args, addons_args):
-  """Validates flags specifying Istio config for create.
+def ValidateIstioConfigArgs(istio_config_args, addons_args):
+  """Validates flags specifying Istio config.
 
   Args:
     istio_config_args: parsed comandline arguments for --istio_config.
@@ -1561,29 +1609,6 @@ def ValidateIstioConfigCreateArgs(istio_config_args, addons_args):
           '--istio-config is given')
 
 
-def ValidateIstioConfigUpdateArgs(istio_config_args, disable_addons_args):
-  """Validates flags specifying Istio config for update.
-
-  Args:
-    istio_config_args: parsed comandline arguments for --istio_config.
-    disable_addons_args: parsed comandline arguments for --update-addons.
-  Raises:
-    InvalidArgumentException: when auth is not NONE nor MUTUAL_TLS, or
-    --update-addons=Istio=ENABLED is not specified
-  """
-  if istio_config_args:
-    auth = istio_config_args.get('auth', '')
-    if auth not in ['NONE', 'MUTUAL_TLS']:
-      raise exceptions.InvalidArgumentException(
-          '--istio-config', 'auth must be one of NONE or MUTUAL_TLS '
-          'e.g. --istio-config auth=NONE')
-    disable_istio = disable_addons_args.get('Istio')
-    if disable_istio is None or disable_istio:
-      raise exceptions.InvalidArgumentException(
-          '--istio-config', '--update-addons=Istio=ENABLED must be specified '
-          'when --istio-config is given')
-
-
 def AddConcurrentNodeCountFlag(parser):
   help_text = """\
 The number of nodes to upgrade concurrently. Valid values are [1, {max}].
@@ -1597,14 +1622,15 @@ your cluster size.'
       help=help_text)
 
 
-# TODO(b/76157677): Drop this warning when changing the default value of the
+# TODO(b/110368338): Drop this warning when changing the default value of the
 # flag.
-def WarnForUnspecifiedAutorepair(args):
-  if not args.IsSpecified('enable_autorepair'):
+def WarnForUnspecifiedIpAllocationPolicy(args):
+  if not args.IsSpecified('enable_ip_alias'):
     log.warning(
-        'Currently node auto repairs are disabled by default. In the future '
-        'this will change and they will be enabled by default. Use '
-        '`--[no-]enable-autorepair` flag  to suppress this warning.')
+        'Currently VPC-native is not the default mode during cluster creation. '
+        'In the future, this will become the default mode and can be disabled '
+        'using `--no-enable-ip-alias` flag. Use `--[no-]enable-ip-alias` flag '
+        'to suppress this warning.')
 
 
 def AddMachineTypeFlag(parser):
@@ -1651,3 +1677,76 @@ specified in the annotation.
       # TODO(b/109942548): unhide this flag for Beta
       hidden=True,
       help=help_text)
+
+
+def AddResourceUsageBigqueryDatasetFlag(parser, add_clear_flag=False):
+  """Adds flags about exporting cluster resource usage to BigQuery."""
+
+  group = parser.add_mutually_exclusive_group(
+      "Exports cluster's usage of cloud resources")
+
+  dataset_help_text = """\
+The name of the BigQuery dataset to which the cluster's usage of cloud
+resources is exported. A table will be created in the specified dataset to
+store cluster resource usage. The resulting table can be joined with BigQuery
+Billing Export to produce a fine-grained cost breakdown.
+
+Example:
+
+  $ {command} example-cluster --resource-usage-bigquery-dataset=example_bigquery_dataset_name
+"""
+
+  group.add_argument(
+      '--resource-usage-bigquery-dataset',
+      help=dataset_help_text)
+
+  if add_clear_flag:
+    group.add_argument(
+        '--clear-resource-usage-bigquery-dataset',
+        action='store_true',
+        help='Disables exporting cluster resource usage to BigQuery.')
+
+
+def AddVerticalPodAutoscalingFlag(parser, hidden=False):
+  """Adds vertical pod autoscaling related flag to the parser.
+
+  VerticalPodAutoscaling related flag is: --enable-vertical-pod-autoscaling
+
+  Args:
+    parser: A given parser.
+    hidden: If true, suppress help text for added options.
+  """
+
+  parser.add_argument(
+      '--enable-vertical-pod-autoscaling',
+      default=None,
+      help='Enables vertical pod autoscaling for a cluster.',
+      hidden=hidden,
+      action='store_true')
+
+
+# TODO(b/112194849): Explain limitation to the sandbox pods and the nodes.
+def AddSandboxFlag(parser, hidden=False):
+  """Adds a --sandbox flag to the given parser.
+
+  Args:
+    parser: A given parser.
+    hidden: Whether or not to hide the help text.
+  """
+  type_validator = arg_parsers.RegexpValidator(
+      r'^gvisor$', 'Type must be "gvisor"')
+  parser.add_argument(
+      '--sandbox',
+      type=arg_parsers.ArgDict(
+          spec={'type': type_validator},
+          required_keys=['type'],
+          max_length=1),
+      metavar='type=TYPE',
+      hidden=hidden,
+      help="""\
+Enables the requested sandbox on all nodes in the node-pool. Example:
+
+  $ {command} node-pool-1 --cluster=example-cluster --sandbox type=gvisor
+
+The only supported type is 'gvisor'.
+      """)

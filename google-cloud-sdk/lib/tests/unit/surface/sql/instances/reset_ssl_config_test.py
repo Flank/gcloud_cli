@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -24,7 +27,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class InstancesResetSSLConfigTest(base.SqlMockTestBeta):
+class _BaseInstancesResetSSLConfigTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def _ExpectResetSSLConfig(self):
@@ -152,6 +155,21 @@ class InstancesResetSSLConfigTest(base.SqlMockTestBeta):
     self.WriteInput('n\n')
     with self.assertRaises(console_io.OperationCancelledError):
       self.Run('sql instances reset-ssl-config reset-test')
+
+
+class InstancesResetSSLConfigGATest(_BaseInstancesResetSSLConfigTest,
+                                    base.SqlMockTestGA):
+  pass
+
+
+class InstancesResetSSLConfigBetaTest(_BaseInstancesResetSSLConfigTest,
+                                      base.SqlMockTestBeta):
+  pass
+
+
+class InstancesResetSSLConfigAlphaTest(_BaseInstancesResetSSLConfigTest,
+                                       base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

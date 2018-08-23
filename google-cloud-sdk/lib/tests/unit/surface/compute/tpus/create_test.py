@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """tpus Create tests."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
@@ -25,7 +29,8 @@ from tests.lib.surface.compute.tpus import base
 
 
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA])
+                           calliope_base.ReleaseTrack.BETA,
+                           calliope_base.ReleaseTrack.GA])
 class CreateTest(base.TpuUnitTestBase):
 
   def _GetNodeResponseValue(self, node):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,9 +26,19 @@ class Collections(enum.Enum):
 
   PROJECTS = (
       'projects',
-      'projects/{projectsId}',
+      'projects/{projectId}',
       {},
-      [u'projectsId'],
+      [u'projectId'],
+      True
+  )
+  PROJECTS_INDEXES = (
+      'projects.indexes',
+      'projects/{projectId}/indexes/{indexId}',
+      {
+          '':
+              'projects/{projectId}/indexes/{indexId}',
+      },
+      [u'projectId', u'indexId'],
       True
   )
   PROJECTS_OPERATIONS = (

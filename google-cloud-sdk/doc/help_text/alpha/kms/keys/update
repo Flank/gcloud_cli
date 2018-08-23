@@ -2,7 +2,8 @@ NAME
     gcloud alpha kms keys update - update a key
 
 SYNOPSIS
-    gcloud alpha kms keys update KEY [--keyring=KEYRING] [--location=LOCATION]
+    gcloud alpha kms keys update KEY [--default-algorithm=DEFAULT_ALGORITHM]
+        [--keyring=KEYRING] [--location=LOCATION]
         [--next-rotation-time=NEXT_ROTATION_TIME]
         [--primary-version=PRIMARY_VERSION] [--remove-rotation-schedule]
         [--rotation-period=ROTATION_PERIOD] [--update-labels=[KEY=VALUE,...]]
@@ -13,28 +14,44 @@ DESCRIPTION
 
     Updates the rotation schedule for the given key. The schedule automatically
     creates a new primary version for the key according to the
-    --next-rotation-time and --rotation-period flags.
+    next-rotation-time and rotation-period flags.
 
-    The flag --next-rotation-time must be in ISO or RFC3339 format, and
-    --rotation-period must be in the form INTEGER[UNIT], where units can be one
+    The flag next-rotation-time must be in ISO 8601 or RFC3339 format, and
+    rotation-period must be in the form INTEGER[UNIT], where units can be one
     of seconds (s), minutes (m), hours (h) or days (d).
 
     Key rotations performed manually via update-primary-version and the version
-    create do not affect the stored --next-rotation-time.
+    create do not affect the stored next-rotation-time.
 
     2. Remove the rotation schedule for the given key with
-    --remove-rotation-schedule.
+    remove-rotation-schedule flag.
 
-    3. Update/Remove the labels for the given key with --update-labels and/or
-    --remove-labels.
+    3. Update/Remove the labels for the given key with update-labels and/or
+    remove-labels flags.
 
-    4. Update the primary version for the given key with --primary-version.
+    4. Update the primary version for the given key with primary-version flag.
+
+    5. Update the default algorithm for the given key with default-algorithm
+    flag. The set of possible algorithms is constrained by the given key's
+    purpose, which is not mutable. For example, if you have an
+    "asymmetric-encryption" key, you can only pick an "rsa-decrypt-" algorithm;
+    "google-symmetric-encryption", "ec-sign-" and "rsa-sign-" algorithms are
+    not allowed.
 
 POSITIONAL ARGUMENTS
      KEY
         Name of the key to update.
 
 FLAGS
+     --default-algorithm=DEFAULT_ALGORITHM
+        The default algorithm for the crypto key. DEFAULT_ALGORITHM must be one
+        of: crypto-key-version-algorithm-unspecified, ec-sign-p256-sha256,
+        ec-sign-p384-sha384, google-symmetric-encryption,
+        rsa-decrypt-oaep-2048-sha256, rsa-decrypt-oaep-3072-sha256,
+        rsa-sign-pkcs1-2048-sha256, rsa-sign-pkcs1-3072-sha256,
+        rsa-sign-pkcs1-4096-sha256, rsa-sign-pss-2048-sha256,
+        rsa-sign-pss-3072-sha256, rsa-sign-pss-4096-sha256.
+
      --keyring=KEYRING
         Key ring of the key.
 
@@ -132,12 +149,22 @@ EXAMPLES
             --keyring fellowship \
             --primary-version 1
 
+    The following command updates the default algorithm for the key named frodo
+    within the keyring fellowship and location global, assuming the key
+    originally has purpose 'asymmetric-encryption' and algorithm
+    'rsa-decrypt-oaep-2048-sha256':
+
+        $ gcloud alpha kms keys update frodo \
+            --location global \
+            --keyring fellowship \
+            --default-algorithm rsa-decrypt-oaep-4096-sha256
+
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud kms keys update
         $ gcloud beta kms keys update

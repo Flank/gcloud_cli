@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +16,14 @@
 """Unit tests for service-management operations describe command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 
+from googlecloudsdk.api_lib.services import exceptions
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
 
 
@@ -53,6 +58,25 @@ class ServicesOperationsDescribeTest(unit_test_base.SV1UnitTestBase):
     response = self.Run('services operations describe operations/%s' %
                         self.op_name)
     self.assertEqual(response, self.op_dict)
+
+
+class DescribeTest(unit_test_base.SUUnitTestBase):
+  """Unit tests for services operations describe command."""
+  OPERATION_NAME = 'operations/abc.0000000000'
+
+  def testDescribe(self):
+    self.ExpectOperation(self.OPERATION_NAME, 0)
+
+    self.Run('alpha services operations describe %s' % self.OPERATION_NAME)
+    self.AssertErrContains(self.OPERATION_NAME)
+    self.AssertErrContains('finished successfully')
+
+  def testDescribePermissionDenied(self):
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
+    self.ExpectOperation(self.OPERATION_NAME, 0, server_error)
+
+    with self.assertRaisesRegex(exceptions.OperationErrorException, r'Error.'):
+      self.Run('alpha services operations describe %s' % self.OPERATION_NAME)
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,39 +20,47 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import abc
-import json
 import re
 import sys
 
 from googlecloudsdk.core.resource import resource_transform
-from googlecloudsdk.core.util import http_encoding
 from tests.lib.scenario import updates
 
-import httplib2
 import six
+
+
+# A placeholder value for missing assertions that will never match anything.
+MISSING_VALUE = object()
 
 
 class Error(Exception):
 
   def __init__(self, failures):
     # TODO(b/78588819): better error message
-    super(Error, self).__init__('\n\n'.join(six.text_type(f) for f in failures))
+    super(Error, self).__init__(
+        '\n\nThe following assertions failed and could not be updated:' +
+        ''.join('\n\n    ' + six.text_type(f) for f in failures))
     self.failures = failures
+
+
+def _FormatLocation(location):
+  line, col = location
+  return '[Line: {line}, Col: {col}]'.format(line=line, col=col)
 
 
 class Failure(object):
   """Encapsulates the error information about a specific assertion failure."""
 
   @classmethod
-  def ForGeneric(cls, update_context, title):
+  def ForGeneric(cls, update_context, title, actual=None):
     msg = cls._TitleLine(update_context, title=title)
-    return cls(update_context, None, msg)
+    return cls(update_context, actual, msg, None)
 
   @classmethod
   def ForExtraAssertion(cls, update_context):
     """A failure for when you gave an assertion that didn't match anything."""
     msg = cls._TitleLine(update_context, 'Extra Assertion')
-    return cls(update_context, None, msg)
+    return cls(update_context, None, msg, None)
 
   @classmethod
   def ForScalar(cls, update_context, expected, actual, msg=None, e=None):
@@ -74,25 +83,25 @@ class Failure(object):
     # TODO(b/78588819): Need much better error messages.
     title = ('Missing Assertion' if update_context.WasMissing()
              else 'Assertion Error')
+    expected_line = '        Expected: {expected}\n'.format(
+        expected=cls._FormatValue(expected))
     message = (
         '{title}\n'
-        '\tExpected: {expected}\n'
-        '\tActual:   {actual}\n'
-        '\tDetails: {e}'.format(
+        '{expected_line}'
+        '        Actual:   {actual}'.format(
             title=cls._TitleLine(update_context, title, msg=msg),
-            expected=cls._FormatValue(expected),
-            actual=cls._FormatValue(actual), e=e))
-    return cls(update_context, actual, message)
+            expected_line='' if update_context.WasMissing() else expected_line,
+            actual=cls._FormatValue(actual)))
+    return cls(update_context, actual, message, e)
 
   @classmethod
   def _TitleLine(cls, update_context, title, msg=None):
-    line, col = update_context.Location()
     section = update_context.Section()
     return (
-        '{title} - [Line: {line}, Col: {col}] - [Field: {section}{field}]{msg}'
+        '{title} - {location} - [Field: {section}{field}]{msg}'
         .format(
             title=title,
-            line=line, col=col,
+            location=_FormatLocation(update_context.Location()),
             section=(section + '.') if section else '',
             field=update_context.Field(),
             msg=(' - ' + msg) if msg else ''))
@@ -103,16 +112,20 @@ class Failure(object):
       return 'None'
     return '<<<{}>>>'.format(value)
 
-  def __init__(self, update_context, actual, msg=''):
+  def __init__(self, update_context, actual, msg='', details=None):
     self._update_context = update_context
     self._actual = actual
     self._message = msg
+    self._details = details
 
   def Update(self, update_modes):
     return self._update_context.Update(self._actual, update_modes)
 
   def __str__(self):
-    return self._message
+    if self._details:
+      return self._message + '\n        Details: {}'.format(self._details)
+    else:
+      return self._message
 
 
 class FailureCollector(object):
@@ -124,13 +137,14 @@ class FailureCollector(object):
   raised with all the failure messages.
   """
 
-  def __init__(self, update_modes=None):
+  def __init__(self, update_modes, spec_name=None, action_location=None):
     self._failures = []
-    self._update_modes = (
-        updates.Mode.Current() if update_modes is None else update_modes)
+    self._update_modes = update_modes
+    self._spec_name = spec_name
+    self._action_location = action_location
 
-  def ShouldMakeRequests(self):
-    return updates.Mode.API_RESPONSES in self._update_modes
+  def ShouldUpdateResponsePayloads(self):
+    return updates.Mode.API_RESPONSE_PAYLOADS in self._update_modes
 
   def Add(self, failure):
     self._failures.append(failure)
@@ -146,17 +160,29 @@ class FailureCollector(object):
       return
 
     # Try to do updates instead of failing.
+    if self._spec_name or self._action_location:
+      self._Write(
+          '\n\n▶▶ Processing updates for spec: {}\n'
+          '  ▶▶ For action: {}\n\n'.format(
+              self._spec_name,
+              _FormatLocation(self._action_location)))
     unhandled = []
     for f in self._failures:
       if f.Update(self._update_modes):
-        sys.__stderr__.write('Updating assertion error: {}\n\n'.format(f))
+        self._Write('    🗸 Updated: {}\n\n'.format(f))
       else:
+        self._Write('    ✘ Not Updated: {}\n\n'.format(f))
         unhandled.append(f)
 
     # If there are things that could not be updated, error.
     if unhandled:
       # TODO(b/78588819): better error message
       raise Error(unhandled)
+
+  def _Write(self, msg):
+    if six.PY2:
+      msg = msg.encode('utf-8')
+    sys.__stderr__.write(msg)
 
 
 class Assertion(six.with_metaclass(abc.ABCMeta, object)):
@@ -256,6 +282,9 @@ class DictAssertion(Assertion):
     self._assertions[key] = InAssertion(items)
     return self
 
+  def AddAssertion(self, key, assertion):
+    self._assertions[key] = assertion
+
   def Check(self, context, d):
     failures = []
     for header, assertion in six.iteritems(self._assertions):
@@ -280,18 +309,17 @@ class JsonAssertion(Assertion):
 
   def Check(self, context, value):
     failures = []
-    json_body = json.loads(value) if value else None
     for field, expected_sub_structure in six.iteritems(self._field_structures):
       if expected_sub_structure is Assertion.ABSENT:
         try:
-          actual = self._GetJsonValueForKey(json_body, field)
+          actual = self._GetJsonValueForKey(value, field)
           failures.append(Failure.ForDict(context, field, None, actual))
         except AttributeError:
           # TODO(b/78588819): Actually handle this correctly.
           pass
       else:
         try:
-          node = self._GetJsonValueForKey(json_body, field)
+          node = self._GetJsonValueForKey(value, field)
           failures.extend(
               self._CheckNode(context, field, node, expected_sub_structure))
         except AttributeError as e:
@@ -380,26 +408,3 @@ class JsonAssertion(Assertion):
                                                               json_object))
 
     return value
-
-
-class ResponsePayloadAssertion(Assertion):
-  """Asserts that the response payload equals reality."""
-
-  def __init__(self, headers=None, payload=None):
-    self._headers = {h: http_encoding.Encode(v)
-                     for h, v in six.iteritems(headers)} if headers else {}
-    if payload is None:
-      payload = ''
-    if isinstance(payload, dict):
-      payload = json.dumps(payload)
-    self._payload = http_encoding.Encode(payload)
-
-  def Check(self, context, value):
-    response, payload = value
-    # TODO(b/78588819): This is not actually asserting anything, it just always
-    # updates.
-    return [Failure.ForScalar(
-        context, (self._headers, self._payload), (response, payload))]
-
-  def Respond(self):
-    return (httplib2.Response(self._headers), self._payload)

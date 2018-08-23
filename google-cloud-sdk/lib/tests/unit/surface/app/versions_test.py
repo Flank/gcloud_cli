@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for `gcloud app versions` commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.app import appengine_api_client
 from googlecloudsdk.api_lib.app import operations_util
 from googlecloudsdk.api_lib.app import service_util
@@ -511,7 +514,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
   def AssertVersionMessages(self, versions):
     """Check error output for deleted versions."""
     if versions:
-      self.AssertErrContains('Do you want to continue (Y/n)?')
+      self.AssertErrContains('PROMPT_CONTINUE')
     else:
       self.AssertErrContains('No matching versions found.')
     for version in versions:

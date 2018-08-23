@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the connect-to-serial-port subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.compute import ssh_utils
 from googlecloudsdk.command_lib.util.ssh import ssh
@@ -21,6 +25,7 @@ from googlecloudsdk.core import properties
 from tests.lib import mock_matchers
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
+from tests.lib.surface.compute import test_resources
 import mock
 
 messages = apis.GetMessagesModule('compute', 'v1')
@@ -49,6 +54,32 @@ INSTANCE_WITH_NO_EXTERNAL_ADDRESS = messages.Instance(
               'zones/zone-1/instances/instance-1'),
     zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-1'))
+
+INSTANCE_WITH_OSLOGIN_ENABLED = messages.Instance(
+    id=44444,
+    name='instance-4',
+    metadata=messages.Metadata(
+        items=[
+            messages.Metadata.ItemsValueListEntry(
+                key='enable-oslogin',
+                value='TruE'),
+        ]
+    ),
+    networkInterfaces=[
+        messages.NetworkInterface(
+            accessConfigs=[
+                messages.AccessConfig(
+                    name='external-nat',
+                    natIP='23.251.133.75'),
+            ],
+        ),
+    ],
+    status=messages.Instance.StatusValueValuesEnum.RUNNING,
+    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+              'zones/zone-1/instances/instance-1'),
+    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+          'zones/zone-1'))
+
 
 PUBLIC_KEY = ('ssh-rsa '
               'AAAAB3NzaC1yc2EAAAADAQABAAABAQDkOOCaBZVTxzvjJ7+7YonnZOwIZ2Z7azwP'
@@ -400,6 +431,60 @@ class SerialPortTest(test_base.BaseSSHTest):
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
         ssh.Remote(self.gateway, user='my-project.zone-1.instance-2.me.port=1'),
+        identity_file=self.private_key_file,
+        options=self.options,
+        port='9600')
+
+    self.ssh_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        self.env, force_connect=True)
+
+    # Known Hosts
+    self.known_hosts_add.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.KnownHosts),
+        '[ssh-serialport.googleapis.com]:9600', PUBLIC_KEY, overwrite=True)
+    self.known_hosts_write.assert_called_once()
+    self.make_requests.assert_not_called()
+
+  @mock.patch(
+      'googlecloudsdk.api_lib.oslogin.client._GetClient')
+  def testInstanceWithOsloginEnabled(self, oslogin_mock):
+    properties.VALUES.core.account.Set('user@google.com')
+    oslogin_mock.return_value = test_resources.MakeOsloginClient('v1')
+    self.mock_http_request.request.return_value = PUBLIC_KEY_RESPONSE
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITH_OSLOGIN_ENABLED],
+        [self.project_resource],
+    ])
+
+    self.Run("""
+        compute connect-to-serial-port instance-4 --zone zone-1
+        """)
+    self.CheckRequests(
+        [(self.GetCompute().instances,
+          'Get',
+          self.GetMessages().ComputeInstancesGetRequest(
+              instance='instance-4',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.GetCompute().projects,
+          'Get',
+          self.GetMessages().ComputeProjectsGetRequest(
+              project='my-project'))],
+    )
+
+    # Require SSH keys
+    self.ensure_keys.assert_called_once_with(
+        self.keys, None, allow_passphrase=True)
+
+    # No polling
+    self.poller_poll.assert_not_called()
+
+    # SSH Command
+    self.ssh_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        ssh.Remote(self.gateway,
+                   user='my-project.zone-1.instance-4.user_google_com.port=1'),
         identity_file=self.private_key_file,
         options=self.options,
         port='9600')

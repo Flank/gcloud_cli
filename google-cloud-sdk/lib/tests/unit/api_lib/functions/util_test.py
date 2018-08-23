@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,9 @@
 """Unit tests for the util module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.functions import util
 from tests.lib import test_case
 
@@ -66,6 +68,28 @@ class FunctionsUtilTest(test_case.TestCase):
     error = _MockHttpException(400, content=message.encode('utf8'))
     actual = util.GetHttpErrorMessage(error)
     self.assertTrue(message in actual)
+
+  def testGetHttpErrorMessage403(self):
+    message = """\
+    {
+      "error": {
+      "code": 403,
+      "message": "The caller does not have permission",
+      "status": "PERMISSION_DENIED",
+      "details": [
+        {
+          "@type": "type.googleapis.com/google.rpc.DebugInfo",
+          "detail": "[ORIGINAL ERROR] generic::permission_denied: More Details"
+        }
+      ]
+    }
+   }
+  """
+    error = _MockHttpException(403, content=message)
+    actual = util.GetHttpErrorMessage(error)
+    expected = ('The caller does not have permission\nPermission Details:'
+                '\n[ORIGINAL ERROR] generic::permission_denied: More Details')
+    self.assertTrue(expected in actual)
 
 
 if __name__ == '__main__':

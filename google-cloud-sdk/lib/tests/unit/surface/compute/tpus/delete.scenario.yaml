@@ -4,10 +4,9 @@ actions:
 - execute_command:
     command: compute tpus delete dec-tpu-3 --zone us-central1-b
     events:
-    - expect_stderr: "You are about to delete tpu [dec-tpu-3]\n\nDo you want to continue\
-        \ (Y/n)?  "
-    - user_input: Y
-    - expect_stderr: "\n"
+    - expect_prompt_continue:
+        message: You are about to delete tpu [dec-tpu-3]
+        user_input: y
     - api_call:
         return_response:
           headers:
@@ -53,7 +52,9 @@ actions:
           headers: {}
           body:
     - expect_progress_tracker:
-        message: "Waiting for operation [operation-1526938596956-56cbe18aa599e-9abc1be8-69f6664d] to complete"
-        status: "SUCCESS"
+        message: Waiting for operation [operation-1526938596956-56cbe18aa599e-9abc1be8-69f6664d]
+          to complete
+        status: SUCCESS
     - expect_stderr: "Deleted tpu [dec-tpu-3].\n"
-    - expect_exit_code: 0
+    - expect_exit:
+        code: 0

@@ -1,0 +1,24 @@
+NAME
+    gcloud beta tasks queues delete - delete a queue
+
+SYNOPSIS
+    gcloud beta tasks queues delete QUEUE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Delete a queue.
+
+POSITIONAL ARGUMENTS
+     QUEUE
+        The queue to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha tasks queues delete
+

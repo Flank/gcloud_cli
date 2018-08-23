@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the network-endpoint-groups list subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base
@@ -28,9 +31,9 @@ class NetworkEndpointGroupsListEndpointsTest(sdk_test_base.WithFakeAuth,
                                              cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.client = mock.Client(
-        core_apis.GetClientClass('compute', 'alpha'))
+        core_apis.GetClientClass('compute', 'beta'))
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE

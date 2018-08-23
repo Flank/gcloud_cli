@@ -3,15 +3,24 @@ NAME
         binding to a Cloud Spanner instance
 
 SYNOPSIS
-    gcloud beta spanner instances add-iam-policy-binding INSTANCE
+    gcloud beta spanner instances add-iam-policy-binding [INSTANCE]
         --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Add an IAM policy binding to a Cloud Spanner instance.
 
 POSITIONAL ARGUMENTS
-     INSTANCE
-        Cloud Spanner instance ID.
+     Instance resource - The Cloud Spanner instance to which to add the IAM
+     policy binding. This represents a Cloud resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: provide the flag [instance] on the command line
+     with a fully specified name; set the property [spanner/instance] with a
+     fully specified name; provide the flag [--project] on the command line;
+     set the property [core/project].
+
+       [INSTANCE]
+          The ID of the instance or a fully qualified identifier for the
+          instance.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -35,6 +44,10 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the spanner/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/spanner/
 
 NOTES
     This command is currently in BETA and may change without notice. These

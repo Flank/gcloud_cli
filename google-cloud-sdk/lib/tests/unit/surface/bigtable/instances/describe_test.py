@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,18 @@
 """Test of the 'describe' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class DescribeCommandTest(base.BigtableV2TestBase,
                           sdk_test_base.WithOutputCapture):
 
@@ -29,7 +36,8 @@ class DescribeCommandTest(base.BigtableV2TestBase,
     self.msg = self.msgs.BigtableadminProjectsInstancesGetRequest(
         name='projects/{0}/instances/theinstance'.format(self.Project()))
 
-  def _RunSuccessTest(self):
+  def _RunSuccessTest(self, track):
+    self.track = track
     self.svc.Expect(request=self.msg,
                     response=self.msgs.Instance(
                         name='projects/theprojects/instances/theinstance',
@@ -38,16 +46,17 @@ class DescribeCommandTest(base.BigtableV2TestBase,
     self.AssertOutputContains('theinstance')
     self.AssertOutputContains('thedisplayname')
 
-  def testDescribe(self):
-    self._RunSuccessTest()
+  def testDescribe(self, track):
+    self._RunSuccessTest(track)
 
-  def testDescribeByUri(self):
+  def testDescribeByUri(self, track):
     self.cmd = (
         'bigtable instances describe https://bigtableadmin.googleapis.com/v2/'
         'projects/{0}/instances/theinstance'.format(self.Project()))
-    self._RunSuccessTest()
+    self._RunSuccessTest(track)
 
-  def testErrorResponse(self):
+  def testErrorResponse(self, track):
+    self.track = track
     with self.AssertHttpResponseError(self.svc, self.msg):
       self.Run(self.cmd)
 

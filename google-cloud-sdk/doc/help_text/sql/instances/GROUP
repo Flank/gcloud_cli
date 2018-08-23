@@ -57,7 +57,8 @@ COMMANDS
         Restores a backup of a Cloud SQL instance.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql instances
         $ gcloud beta sql instances
 

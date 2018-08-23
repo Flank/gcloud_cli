@@ -90,7 +90,7 @@ class AndroidInstrumentationTest(_messages.Message):
       run without the orchestrator.
 
   Fields:
-    appApk: The APK for the application under test. Required
+    appApk: The APK for the application under test.
     appPackageId: The java package for the application under test. Optional,
       default is determined by examining the application's manifest.
     orchestratorOption: The option of whether running each test within its own
@@ -243,7 +243,7 @@ class AndroidRoboTest(_messages.Message):
   virtual or physical Android Device, finding culprits and crashes as it goes.
 
   Fields:
-    appApk: The APK for the application under test. Required
+    appApk: The APK for the application under test.
     appInitialActivity: The initial activity that should be used to start the
       app. Optional
     appPackageId: The java package for the application under test. Optional,
@@ -275,7 +275,7 @@ class AndroidRoboTest(_messages.Message):
 
 
 class AndroidRuntimeConfiguration(_messages.Message):
-  r"""Configuration that can be selected at the time a test is run.
+  r"""Android configuration that can be selected at the time a test is run.
 
   Fields:
     locales: The set of available locales. @OutputOnly
@@ -292,7 +292,7 @@ class AndroidTestLoop(_messages.Message):
   for the time being.
 
   Fields:
-    appApk: The APK for the application under test. Required
+    appApk: The APK for the application under test.
     appPackageId: The java package for the application under test. Optional,
       default is determined by examining the application's manifest.
     scenarioLabels: The list of scenario labels that should be run during the
@@ -649,11 +649,14 @@ class IosDeviceCatalog(_messages.Message):
 
   Fields:
     models: The set of supported iOS device models. @OutputOnly
+    runtimeConfiguration: The set of supported runtime configurations.
+      @OutputOnly
     versions: The set of supported iOS software versions. @OutputOnly
   """
 
   models = _messages.MessageField('IosModel', 1, repeated=True)
-  versions = _messages.MessageField('IosVersion', 2, repeated=True)
+  runtimeConfiguration = _messages.MessageField('IosRuntimeConfiguration', 2)
+  versions = _messages.MessageField('IosVersion', 3, repeated=True)
 
 
 class IosDeviceList(_messages.Message):
@@ -684,6 +687,18 @@ class IosModel(_messages.Message):
   name = _messages.StringField(2)
   supportedVersionIds = _messages.StringField(3, repeated=True)
   tags = _messages.StringField(4, repeated=True)
+
+
+class IosRuntimeConfiguration(_messages.Message):
+  r"""iOS configuration that can be selected at the time a test is run.
+
+  Fields:
+    locales: The set of available locales. @OutputOnly
+    orientations: The set of available orientations. @OutputOnly
+  """
+
+  locales = _messages.MessageField('Locale', 1, repeated=True)
+  orientations = _messages.MessageField('Orientation', 2, repeated=True)
 
 
 class IosTestSetup(_messages.Message):
@@ -1195,6 +1210,8 @@ class TestMatrix(_messages.Message):
       USE_DESTINATION_ARTIFACTS: One or more of the test targets defined in
         the .xctestrun file specifies "UseDestinationArtifacts", which is
         disallowed.
+      TEST_NOT_APP_HOSTED: XC tests which run on physical devices must have
+        "IsAppHostedTestBundle" == "true" in the xctestrun file.
       TEST_ONLY_APK: The APK is marked as "testOnly". NOT USED
       MALFORMED_IPA: The input IPA could not be parsed. NOT USED
       NO_CODE_APK: APK contains no code. See also
@@ -1227,10 +1244,11 @@ class TestMatrix(_messages.Message):
     BUILT_FOR_IOS_SIMULATOR = 20
     NO_TESTS_IN_XC_TEST_ZIP = 21
     USE_DESTINATION_ARTIFACTS = 22
-    TEST_ONLY_APK = 23
-    MALFORMED_IPA = 24
-    NO_CODE_APK = 25
-    INVALID_INPUT_APK = 26
+    TEST_NOT_APP_HOSTED = 23
+    TEST_ONLY_APK = 24
+    MALFORMED_IPA = 25
+    NO_CODE_APK = 26
+    INVALID_INPUT_APK = 27
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Indicates the current progress of the test matrix (e.g., FINISHED)

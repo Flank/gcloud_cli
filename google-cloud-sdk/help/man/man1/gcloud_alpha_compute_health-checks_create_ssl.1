@@ -11,7 +11,7 @@ gcloud alpha compute health\-checks create ssl \- create a SSL health check to m
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute health\-checks create ssl\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-port\fR=\fIPORT\fR;\ default=80] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-port\-specification\fR=\fIPORT_SPECIFICATION\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\fR=\fIREQUEST\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute health\-checks create ssl\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\fR=\fIREQUEST\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-port\fR=\fIPORT\fR;\ default=80\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR\ \fB\-\-port\-specification\fR=\fIPORT_SPECIFICATION\fR\ \fB\-\-use\-serving\-port\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -55,36 +55,6 @@ An optional string description for the SSL health check.
 The number of consecutive successful health checks before an unhealthy instance
 is marked as healthy. The default is 2.
 
-.TP 2m
-\fB\-\-port\fR=\fIPORT\fR; default=80
-The TCP port number that this health check monitors. The default value is 80.
-
-.TP 2m
-\fB\-\-port\-name\fR=\fIPORT_NAME\fR
-The port name that this health check monitors. By default, this is empty.
-
-.TP 2m
-\fB\-\-port\-specification\fR=\fIPORT_SPECIFICATION\fR
-Specifies how port is selected for health checking. If not specified, HTTP2
-health check follows behavior specified in \-\-port and \-port\-name fields.
-\fIPORT_SPECIFICATION\fR must be one of:
-
-.RS 2m
-.TP 2m
-\fBuse\-fixed\-port\fR
-\-\-port is used for health checking.
-.TP 2m
-\fBuse\-named\-port\fR
-\-\-port\-name is used for health checking.
-.TP 2m
-\fBuse\-serving\-port\fR
-For NetworkEndpointGroup, the port specified for each network endpoint is used
-for health checking. For other backends, the port or named port specified in the
-Backend Service is used for health checking.
-
-
-.RE
-.sp
 .TP 2m
 \fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR; default="NONE"
 The type of proxy protocol header to be sent to the backend. \fIPROXY_HEADER\fR
@@ -134,9 +104,95 @@ duration formats.
 The number of consecutive health check failures before a healthy instance is
 marked as unhealthy. The default is 2.
 
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the SSL health check is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the SSL health check to create. If not specified, you may be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
 .RE
 .sp
+.TP 2m
+
+These flags configure the port that the health check monitors. If none is
+specified, the default port of 80 is used; if both \f5\-\-port\fR and
+\f5\-\-port\-name\fR are specified, \f5\-\-port\fR takes precedence.
+
+.RS 2m
+.TP 2m
+\fB\-\-port\fR=\fIPORT\fR; default=80
+The TCP port number that this health check monitors.
+
+.TP 2m
+\fB\-\-port\-name\fR=\fIPORT_NAME\fR
+The port name that this health check monitors. By default, this is empty.
+
+.TP 2m
+\fB\-\-port\-specification\fR=\fIPORT_SPECIFICATION\fR
+Specifies how port is selected for health checking. If not specified, HTTP2
+health check follows behavior specified in \-\-port and \-port\-name fields.
+\fIPORT_SPECIFICATION\fR must be one of:
+
+.TP 2m
+\fBuse\-fixed\-port\fR
+\-\-port is used for health checking.
+.TP 2m
+\fBuse\-named\-port\fR
+\-\-port\-name is used for health checking.
+.TP 2m
+\fBuse\-serving\-port\fR
+For NetworkEndpointGroup, the port specified for each network endpoint is used
+for health checking. For other backends, the port or named port specified in the
+Backend Service is used for health checking.
+
+
+.TP 2m
+\fB\-\-use\-serving\-port\fR
+If given, use the "serving port" for health checks:
+
+.RS 2m
+.IP "\(bu" 2m
+When health checking network endpoints in a Network Endpoint Group, use the port
+specified with each endpoint.
+.IP "\(bu" 2m
+When health checking other backends, use the port or named port of the backend
+service.
+.RE
+.RE
+.RE
+.sp
+
+
 
 .SH "GCLOUD WIDE FLAGS"
 
@@ -149,11 +205,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute health\-checks create ssl

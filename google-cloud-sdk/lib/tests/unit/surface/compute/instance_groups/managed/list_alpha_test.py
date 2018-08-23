@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for features of list subcommand available only in alpha."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -106,8 +109,8 @@ class InstanceGroupManagersListAlphaTest(test_base.BaseTest):
         group-3 zone-1   zone   test-instance-name-3 10   1           template-2        no
         """), normalize_space=True)
     self.AssertErrEquals("""\
-    WARNING: Flag --zones is deprecated. Use --filter="zone:( ZONE ... )" instead.
-    For example --filter="zone:( europe-west1-b europe-west1-c )".
+    WARNING: Flag `--zones` is deprecated. Use `--filter="zone:( ZONE ... )"` instead.
+    For example `--filter="zone:( europe-west1-b europe-west1-c )"`.
     (*) - there are errors in your autoscaling setup, please describe the resource to see details
     """, normalize_space=True)
 
@@ -132,8 +135,8 @@ class InstanceGroupManagersListAlphaTest(test_base.BaseTest):
         group-3 zone-1   zone  test-instance-name-3 10   1           template-2        no
         """), normalize_space=True)
     self.AssertErrEquals("""\
-    WARNING: Flag --zones is deprecated. Use --filter="zone:( ZONE ... )" instead.
-    For example --filter="zone:( europe-west1-b europe-west1-c )".
+    WARNING: Flag `--zones` is deprecated. Use `--filter="zone:( ZONE ... )"` instead.
+    For example `--filter="zone:( europe-west1-b europe-west1-c )"`.
     """, normalize_space=True)
 
   def testRegionalTableOutputWithNoErrors(self):
@@ -159,8 +162,8 @@ class InstanceGroupManagersListAlphaTest(test_base.BaseTest):
         group-3 region-1 region test-instance-name-3 10   1           template-2        no
         """), normalize_space=True)
     self.AssertErrEquals("""\
-    WARNING: Flag --regions is deprecated. Use --filter="region:( REGION ... )" instead.
-    For example --filter="region:( europe-west1 europe-west2 )".
+    WARNING: Flag `--regions` is deprecated. Use `--filter="region:( REGION ... )"` instead.
+    For example `--filter="region:( europe-west1 europe-west2 )"`.
     """, normalize_space=True)
 
   def testAggregatedTableOutputWithNoErrors(self):

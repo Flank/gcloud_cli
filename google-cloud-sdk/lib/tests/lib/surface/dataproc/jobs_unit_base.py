@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Test of the 'jobs' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 
 from apitools.base.py import encoding
@@ -287,14 +290,18 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
                                             exception=None):
     if not workflow_template:
       workflow_template = self.MakeWorkflowTemplate()
-    self.ExpectGetWorkflowTemplate(workflow_template=workflow_template)
+    self.ExpectGetWorkflowTemplate(
+        name=workflow_template.name,
+        version=workflow_template.version,
+        response=workflow_template)
     if ordered_jobs is None:
       ordered_jobs = [self.MakeOrderedJob()]
-    workflow_template.jobs = ordered_jobs
+    new_template = copy.deepcopy(workflow_template)
+    new_template.jobs = ordered_jobs
     if not (response or exception):
-      response = copy.deepcopy(workflow_template)
+      response = copy.deepcopy(new_template)
     self.mock_client.projects_regions_workflowTemplates.Update.Expect(
-        workflow_template, response=response, exception=exception)
+        new_template, response=response, exception=exception)
     return response
 
   def ConvertLabels(self, labels):

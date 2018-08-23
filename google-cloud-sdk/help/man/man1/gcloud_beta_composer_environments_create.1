@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta composer environments create \- creates and initializes a Cloud Composer environment
+gcloud beta composer environments create \- create and initialize a Cloud Composer environment
 
 
 
@@ -47,7 +47,7 @@ are specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the environment.
+Compute Engine region in which to create the environment.
 
 
 .RE
@@ -85,7 +85,7 @@ topics escaping\fR for information about overriding the delimiter.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -159,5 +159,10 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud composer environments create
+.RE
 

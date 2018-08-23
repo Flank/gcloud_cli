@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,12 +14,18 @@
 # limitations under the License.
 """Tests of the 'deploy' command."""
 
+# TODO(b/74342501) Move this file to parent folder once old deploy tests are
+# retired
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import zipfile
 
 from apitools.base.py import http_wrapper
+from googlecloudsdk.api_lib.functions import env_vars as env_vars_api_util
 from googlecloudsdk.api_lib.functions import exceptions
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import base as calliope_base
@@ -33,6 +40,8 @@ from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.functions import base
 from tests.lib.surface.functions import util as testutil
+
+import mock
 from six.moves import range
 
 
@@ -280,7 +289,8 @@ class DeployTestBase(base.FunctionsTestBase):
                          source_repository_url=None,
                          source_upload_url=None,
                          timeout=None,
-                         labels=None):
+                         labels=None,
+                         env_vars=None):
     if labels is None:
       labels = self.GetLabelsMessage()
     if source_repository_url:
@@ -299,7 +309,8 @@ class DeployTestBase(base.FunctionsTestBase):
         entryPoint=entry_point,
         timeout=timeout,
         labels=labels,
-        availableMemoryMb=memory)
+        availableMemoryMb=memory,
+        environmentVariables=env_vars)
 
   def ExpectFunctionPatch(
       self, function_name, original_function, updated_function,
@@ -1464,6 +1475,246 @@ class DeployAlphaTests(DeployTestBase):
         '--runtime python37 --quiet'.format(_DEFAULT_REGION))
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
+
+
+class EnvVarsTests(DeployTestBase):
+  """Test various scenarios of setting and updating environment variables.
+
+  Scenario:
+    New function
+    Existing function with no environment variables
+    Existing function with environment variables
+
+  Flag:
+    --set-env-vars
+    --update-env-vars
+    --add-env-vars
+    --remove-env-vars
+    --clear-env-vars
+    --env-vars-file
+  """
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  @parameterized.named_parameters(
+      (
+          'Set env vars new function',
+          {'FOO': 'bar', 'BAZ': 'boo'},
+          '--set-env-vars FOO=bar,BAZ=boo'
+      ),
+      (
+          'Update env vars new function',
+          {'FOO': 'bar', 'BAZ': 'boo'},
+          '--update-env-vars FOO=bar,BAZ=boo'
+      )
+  )
+  def testEnvVarsFlagsNewFunction(self, env_vars, flags):
+    """Test adding env vars to functions with no env vars with different flags.
+
+    Args:
+      env_vars: A dict of environment variables.
+      flags: A string containing the flags for setting environment variables.
+    """
+    self.MockGetExistingFunction(response=None)
+
+    source_archive_url = 'gs://bucket'
+    location = self.GetLocationResource()
+
+    env_vars_message = env_vars_api_util.DictToEnvVarsProperty(env_vars)
+    function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        https_trigger=self.messages.HttpsTrigger(),
+        source_archive=source_archive_url,
+        env_vars=env_vars_message
+    )
+
+    create_request = self.GetFunctionsCreateRequest(function, location)
+    operation = self._GenerateActiveOperation('operations/operation')
+    self.mock_client.projects_locations_functions.Create.Expect(
+        create_request, operation)
+
+    self.MockLongRunningOpResult('operations/operation')
+    self.MockUploadToSignedUrl()
+    self.MockGetExistingFunction(response=function)
+
+    self.Run('functions deploy my-test --trigger-http --source gs://bucket '
+             '{}'.format(flags))
+
+  @parameterized.named_parameters(
+      (
+          'Set env vars existing function with no env vars',
+          None,
+          {'FOO': 'bar', 'BAZ': 'boo'},
+          '--set-env-vars FOO=bar,BAZ=boo'
+      ),
+      (
+          'Set env vars existing function with env vars',
+          {'FOO': 'old bar', 'OLD_BAZ': 'old boo'},
+          {'FOO': 'new bar', 'NEW_BAZ': 'new boo'},
+          '--set-env-vars "FOO=new bar,NEW_BAZ=new boo"'
+      ),
+      (
+          'Clear env vars',
+          {'FOO': 'bar', 'BAZ': 'boo'},
+          None,
+          '--clear-env-vars'
+      ),
+      (
+          'Update env vars',
+          {'FOO': 'bar', 'BAZ': 'boo'},
+          {'FOO': 'bar', 'BAZ': 'bam', 'BAR': 'baa'},
+          '--update-env-vars BAZ=bam,BAR=baa'
+      ),
+      (
+          'Remove env vars',
+          {'FOO': 'bar', 'BAZ': 'boo'},
+          {'FOO': 'bar'},
+          '--remove-env-vars BAZ,BAR'
+      ),
+  )
+  def testEnvVarsFlagsExistingFunction(self, old_env_vars, new_env_vars, flags):
+    """Test adding env vars to function with no env vars."""
+    function_name = self.GetFunctionResource(self.GetRegion(), 'my-test')
+    source_archive_url = 'gs://bucket'
+    trigger = self.GetPubSubTrigger(self.Project(), 'topic')
+    original_env_vars = env_vars_api_util.DictToEnvVarsProperty(old_env_vars)
+    original_function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        event_trigger=trigger,
+        source_archive=source_archive_url,
+        env_vars=original_env_vars
+    )
+
+    updated_env_vars = env_vars_api_util.DictToEnvVarsProperty(new_env_vars)
+    updated_function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        event_trigger=trigger,
+        source_archive=source_archive_url,
+        env_vars=updated_env_vars
+    )
+
+    self.ExpectFunctionPatch(
+        function_name=function_name,
+        original_function=original_function,
+        updated_function=updated_function,
+        update_mask='environmentVariables',
+    )
+    self.Run('functions deploy my-test {}'.format(flags))
+
+  def testEnvVarsFileNewFunction(self):
+    """Test adding env vars to function with no env vars."""
+    self.MockGetExistingFunction(response=None)
+
+    source_archive_url = 'gs://bucket'
+    location = self.GetLocationResource()
+
+    env_vars = env_vars_api_util.DictToEnvVarsProperty({
+        'BAZ': 'boo',
+        'BAR': 'baa',
+    })
+    function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        https_trigger=self.messages.HttpsTrigger(),
+        source_archive=source_archive_url,
+        env_vars=env_vars
+    )
+
+    create_request = self.GetFunctionsCreateRequest(function, location)
+    operation = self._GenerateActiveOperation('operations/operation')
+    self.mock_client.projects_locations_functions.Create.Expect(
+        create_request, operation)
+
+    self.MockLongRunningOpResult('operations/operation')
+    self.MockUploadToSignedUrl()
+    self.MockGetExistingFunction(response=function)
+
+    with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
+      yaml_load_path.return_value = {
+          'BAZ': 'boo',
+          'BAR': 'baa',
+      }
+      self.Run('functions deploy my-test --trigger-http --source gs://bucket '
+               '--env-vars-file env.yaml')
+
+  def testEnvVarsFileExistingFunction(self):
+    """Test adding env vars to function with no env vars."""
+    function_name = self.GetFunctionResource(self.GetRegion(), 'my-test')
+    source_archive_url = 'gs://bucket'
+    trigger = self.GetPubSubTrigger(self.Project(), 'topic')
+
+    original_env_vars = env_vars_api_util.DictToEnvVarsProperty({
+        'FOO': 'bar',
+        'BAZ': 'bee',
+    })
+    original_function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        event_trigger=trigger,
+        source_archive=source_archive_url,
+        env_vars=original_env_vars
+    )
+
+    updated_env_vars = env_vars_api_util.DictToEnvVarsProperty({
+        'BAZ': 'boo',
+        'BAR': 'baa',
+    })
+    updated_function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        event_trigger=trigger,
+        source_archive=source_archive_url,
+        env_vars=updated_env_vars
+    )
+
+    self.ExpectFunctionPatch(
+        function_name=function_name,
+        original_function=original_function,
+        updated_function=updated_function,
+        update_mask='environmentVariables',
+    )
+
+    with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
+      yaml_load_path.return_value = {
+          'BAZ': 'boo',
+          'BAR': 'baa',
+      }
+      self.Run('functions deploy my-test --env-vars-file env.yaml')
+
+  @parameterized.parameters(
+      '--set-env-vars X_GOOGLE_FOO=bar',
+      '--update-env-vars X_GOOGLE_FOO=bar',
+      '--remove-env-vars X_GOOGLE_FOO',
+  )
+  def testEnvVarsFlagsFailWithInvalidKeys(self, flags):
+    """Test adding env vars to function with no env vars."""
+
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        'Environment variable keys that start with `X_GOOGLE_` are reserved '
+        'for use by deployment tools and cannot be specified manually.'):
+      self.Run('functions deploy my-test {}'.format(flags))
+
+  @parameterized.parameters(
+      ({'': 'boo'}, 'Environment variable keys cannot be empty.'),
+      ({'X_GOOGLE_FOO': 'boo'}, 'Environment variable keys that start with '
+                                '`X_GOOGLE_` are reserved for use by deployment'
+                                ' tools and cannot be specified manually.'),
+      ({'FOO=BAR': 'boo'}, 'Environment variable keys cannot contain `=`.'),
+  )
+  def testEnvVarsFileFailsWithInvalidKeys(self, file_env_vars,
+                                          expected_error_message):
+    """Test adding env vars to function with no env vars."""
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError, expected_error_message):
+      with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
+        yaml_load_path.return_value = file_env_vars
+
+        self.Run('functions deploy my-test --env-vars-file env.yaml')
 
 if __name__ == '__main__':
   test_case.main()

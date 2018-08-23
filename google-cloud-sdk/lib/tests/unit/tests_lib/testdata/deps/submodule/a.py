@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 """Submodule A."""
 
 from submodule import b

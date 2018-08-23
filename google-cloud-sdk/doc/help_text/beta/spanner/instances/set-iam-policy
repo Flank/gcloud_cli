@@ -3,23 +3,51 @@ NAME
         Cloud Spanner instance
 
 SYNOPSIS
-    gcloud beta spanner instances set-iam-policy INSTANCE POLICY_FILE
+    gcloud beta spanner instances set-iam-policy [INSTANCE] POLICY_FILE
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Set the IAM policy for a Cloud Spanner instance.
+    (BETA) Set the IAM policy for a Cloud Spanner instance given a instance ID
+    and a file encoded in JSON or YAML that contains the IAM policy.
 
 POSITIONAL ARGUMENTS
-     INSTANCE
-        Cloud Spanner instance ID.
+     Instance resource - The Spanner instance to set the IAM policy for. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the flag [instance] on the command line with a fully
+     specified name; set the property [spanner/instance] with a fully specified
+     name; provide the flag [--project] on the command line; set the property
+     [core/project].
+
+       [INSTANCE]
+          The ID of the instance or a fully qualified identifier for the
+          instance.
 
      POLICY_FILE
-        Name of JSON or YAML file with the IAM policy.
+        Path to a local JSON or YAML formatted file containing a valid policy.
+
+        The output of the get-iam-policy command is a valid file, as is any
+        JSON or YAML file conforming to the structure of a Policy
+        (https://cloud.google.com/iam/reference/rest/v1/Policy).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the spanner/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/spanner/
+
+EXAMPLES
+    The following command reads an IAM policy defined in a JSON file
+    policy.json and sets it for a spanner instance with the ID
+    example-instance:
+
+    $ gcloud beta spanner instances set-iam-policy example-instance \        policy.json
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
 
 NOTES
     This command is currently in BETA and may change without notice. These

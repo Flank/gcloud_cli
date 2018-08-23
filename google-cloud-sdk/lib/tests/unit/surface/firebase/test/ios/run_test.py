@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 import os
 import uuid
@@ -44,20 +47,11 @@ RUNNING = TESTING_MESSAGES.TestExecution.StateValueValuesEnum.RUNNING
 VALIDATING = TESTING_MESSAGES.TestExecution.StateValueValuesEnum.VALIDATING
 
 DEFAULT_DEVICE = TESTING_MESSAGES.IosDevice(
-    iosModelId='iPen2',
-    iosVersionId='6.0',
-    locale='en_US',
-    orientation='portrait')
+    iosModelId='iPen2', iosVersionId='6.0', locale='ro', orientation='askew')
 DEVICE_1 = TESTING_MESSAGES.IosDevice(
-    iosModelId='iPencil1',
-    iosVersionId='6.0',
-    locale='en_US',
-    orientation='portrait')
+    iosModelId='iPencil1', iosVersionId='6.0', locale='ro', orientation='askew')
 DEVICE_2 = TESTING_MESSAGES.IosDevice(
-    iosModelId='iPen3',
-    iosVersionId='7.2',
-    locale='en_US',
-    orientation='portrait')
+    iosModelId='iPen3', iosVersionId='7.2', locale='kl', orientation='askew')
 
 GOOD_ARGS = os.path.join(unit_base.TEST_DATA_PATH, 'good_args')
 
@@ -245,7 +239,8 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
     self.ExpectMatrixCreate([DEVICE_1, DEVICE_2], timeout='300s')
 
     self.Run('{run} --type xctest --test {test} --timeout 5m --async '
-             '--device model=iPencil1 --device model=iPen3,version=7.2'.format(
+             '--device model=iPencil1 '
+             '--device model=iPen3,version=7.2,locale=kl'.format(
                  run=commands.IOS_TEST_RUN, test=TEST_PATH))
     self.AssertErrContains('[matrix-ios1] has been created')
     self.AssertErrContains('test on 2 device(s)')

@@ -5,8 +5,8 @@ SYNOPSIS
     gcloud meta test [NAME ...]
         [--argumenterror-outside-argparse | --core-exception
           | --exec-file=SCRIPT_FILE | --interrupt | --is-interactive
-          | --prompt-completer=MODULE_PATH | --sleep=SECONDS
-          | --uncaught-exception] [GCLOUD_WIDE_FLAG ...]
+          | --progress-tracker=SECONDS | --prompt-completer=MODULE_PATH
+          | --sleep=SECONDS | --uncaught-exception] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     This command sets up scenarios for testing the gcloud command and CLI.
@@ -34,6 +34,9 @@ FLAGS
        --is-interactive
           Call console_io.IsInteractive(heuristic=True) and exit 0 if the
           return value is True, 1 if False.
+
+       --progress-tracker=SECONDS
+          Run the progress tracker for SECONDS seconds and exit.
 
        --prompt-completer=MODULE_PATH
           Call console_io.PromptResponse() with a MODULE_PATH completer and

@@ -4,9 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute resource-policies create-vm-maintenance NAME
-        (--weekly-window-from-file=WEEKLY_CYCLE_FROM_FILE
-          | --start-time=START_TIME (--daily-window
-          | --weekly-window=WEEKLY_CYCLE)) [--description=DESCRIPTION]
+        (--daily-window --start-time=START_TIME) [--description=DESCRIPTION]
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -20,46 +18,28 @@ POSITIONAL ARGUMENTS
         Name of the resource policy to operate on.
 
 REQUIRED FLAGS
-     Cycle Frequency Group. Exactly one of these must be specified:
+     Cycle Frequency Group. This must be specified.
 
-       From file
+       --daily-window
+          Maintenance activity window occurs daily at START_TIME. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
 
-         --weekly-window-from-file=WEEKLY_CYCLE_FROM_FILE
-            A file which defines a weekly cadence with multiple days and start
-            times. The format is a JSON/YAML file containing a list of objects
-            with the following fields:
-
-            day: Day of the week with the same choices as --weekly-window.
-            startTime: Start time of the snapshot schedule with the same format
-            as --start-time.
-
-       From flags
-
-         --start-time=START_TIME
-            Start time of a four-hour window in which maintenance activity
-            should start in given cadence. Valid choices are 00:00, 04:00,
-            08:00,12:00, 16:00 and 20:00 UTC. See $ gcloud topic datetimes for
-            information on time formats. For example, --start-time="03:00-05"
-            (which gets converted to 08:00 UTC). This flag must be specified if
-            any of the other arguments in this group are specified.
-
-         Exactly one of these must be specified:
-
-           --daily-window
-              Maintenance activity window occurs daily at START_TIME.
-
-           --weekly-window=WEEKLY_CYCLE
-              Maintenance activity window occurs weekly on WEEKLY_WINDOW at
-              START_TIME. WEEKLY_CYCLE must be one of: monday, tuesday,
-              wednesday, thursday, friday, saturday, sunday.
+       --start-time=START_TIME
+          Start time of a four-hour window in which maintenance activity should
+          start in given cadence. Valid choices are 00:00, 04:00, 08:00,12:00,
+          16:00 and 20:00 UTC. See $ gcloud topic datetimes for information on
+          time formats. For example, --start-time="03:00-05" (which gets
+          converted to 08:00 UTC). This flag must be specified if any of the
+          other arguments in this group are specified.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the backend.
 
      --region=REGION
-        The region of the resource policy to operate on. If not specified, you
-        may be prompted to select a region.
+        Region of the resource policy to operate on. If not specified, you may
+        be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:
@@ -83,9 +63,9 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
 

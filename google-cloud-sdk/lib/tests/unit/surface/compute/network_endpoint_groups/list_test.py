@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the network-endpoint-groups list subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 from tests.lib import test_case
@@ -26,7 +29,7 @@ import mock
 class NetworkEndpointGroupsListTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
@@ -47,9 +50,9 @@ class NetworkEndpointGroupsListTest(test_base.BaseTest):
         errors=[])
 
     self.AssertOutputEquals("""\
-NAME     LOCATION  TYPE            ENDPOINT_TYPE   SIZE
-my-neg1  zone-1    LOAD_BALANCING  GCE_VM_IP_PORT  5
-my-neg2  zone-2    LOAD_BALANCING  GCE_VM_IP_PORT  2
+NAME     LOCATION  ENDPOINT_TYPE   SIZE
+my-neg1  zone-1    GCE_VM_IP_PORT  5
+my-neg2  zone-2    GCE_VM_IP_PORT  2
 """, normalize_space=True)
 
   def testCommandOuput(self):

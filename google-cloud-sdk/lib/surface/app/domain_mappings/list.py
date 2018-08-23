@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Surface for listing all domain mapping for an app."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.app.api import appengine_domains_api_client as api_client
 from googlecloudsdk.calliope import base
 
@@ -44,6 +47,6 @@ class List(base.ListCommand):
         table(
           id:sort=1,
           ssl_settings.certificate_id:label=SSL_CERTIFICATE_ID,
-          ssl_settings.sslManagementType.yesno(no='AUTOMATIC'):label=SSL_MANAGEMENT_TYPE,
+          ssl_settings.sslManagementType.yesno(no='MANUAL'):label=SSL_MANAGEMENT_TYPE,
           ssl_settings.pending_managed_certificate_id:label=PENDING_AUTO_CERT)
         """)

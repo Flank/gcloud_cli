@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +15,13 @@
 """Integration tests for the emulators datastore commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.emulators import datastore_util
 from googlecloudsdk.command_lib.emulators import util
 from googlecloudsdk.command_lib.util import java
+from googlecloudsdk.core.util import encoding
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -93,7 +96,9 @@ class DatastoreTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
         match_strings=[match_text],
         timeout=60):
 
-      data = six.moves.urllib.request.urlopen('http://localhost:' + port).read()
+      data = encoding.Decode(
+          six.moves.urllib.request.urlopen('http://localhost:' + port).read(),
+          'utf-8')
       if legacy:
         self.assertTrue('Cloud Datastore service' in data,
                         'Datastore was not started')
@@ -140,4 +145,3 @@ class DatastoreTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
 
 if __name__ == '__main__':
   test_case.main()
-

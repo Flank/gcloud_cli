@@ -50,7 +50,7 @@ flags that are applied in this order: \fB\-\-flatten\fR, \fB\-\-sort\-by\fR,
 
 .TP 2m
 \fB\-\-format\fR=\fIFORMAT\fR
-Sets the format for printing command output resources. The default is a
+Set the format for printing command output resources. The default is a
 command\-specific human\-friendly output format. The supported formats are:
 \f5config\fR, \f5csv\fR, \f5default\fR, \f5diff\fR, \f5disable\fR,
 \f5flattened\fR, \f5get\fR, \f5json\fR, \f5list\fR, \f5multi\fR, \f5none\fR,
@@ -81,8 +81,8 @@ variable \f5CLOUDSDK_CORE_DISABLE_PROMPTS\fR to 1.
 \fB\-\-verbosity\fR=\fIVERBOSITY\fR; default="warning"
 Override the default verbosity for this command with any of the supported
 standard verbosity levels: \f5debug\fR, \f5info\fR, \f5warning\fR, \f5error\fR,
-and \f5none\fR. Overrides the default \fBcore/verbosity\fR property value for
-this command invocation.
+\f5critical\fR, \f5none\fR. Overrides the default \fBcore/verbosity\fR property
+value for this command invocation.
 
 .TP 2m
 \fB\-\-version\fR, \fB\-v\fR
@@ -143,8 +143,16 @@ Manage oauth2 credentials for the Google Cloud SDK.
 \fB(BETA)\fR Beta versions of gcloud commands.
 
 .TP 2m
+\fBbuilds\fR
+Create and manage builds for Google Cloud Build.
+
+.TP 2m
 \fBcomponents\fR
 List, install, update, or remove Google Cloud SDK components.
+
+.TP 2m
+\fBcomposer\fR
+Create and manage Cloud Composer Environments.
 
 .TP 2m
 \fBcompute\fR
@@ -193,6 +201,10 @@ Create, enable and manage API services.
 .TP 2m
 \fBfirebase\fR
 Work with Google Firebase.
+
+.TP 2m
+\fBfunctions\fR
+Manage Google Cloud Functions.
 
 .TP 2m
 \fBiam\fR

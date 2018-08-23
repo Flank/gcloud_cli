@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,10 @@
 # limitations under the License.
 """Test of the 'workflow-template run' command."""
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+import os
 import textwrap
 import uuid
 
@@ -21,6 +25,7 @@ from googlecloudsdk import calliope
 
 from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import files
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
 
@@ -67,12 +72,10 @@ class WorkflowTemplatesInstantiateFromFileUnitTest(
         response=response,
         exception=exception)
     # Initial get operation returns pending
-    self.ExpectGetOperation(
-        self.MakeOperation(template=workflow_template.name, state='RUNNING'))
+    self.ExpectGetOperation(self.MakeOperation(state='RUNNING'))
     # Second get operation returns done
     self.ExpectGetOperation(
-        operation=self.MakeCompletedOperation(
-            error=error, template=workflow_template.name, state='DONE'))
+        operation=self.MakeCompletedOperation(error=error, state='DONE'))
 
 
 class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
@@ -83,12 +86,12 @@ class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
 
   def testInstantiateFromFileWorkflowTemplates(self):
     workflow_template = self.MakeWorkflowTemplate()
-    file_name = '{0}/{1}'.format(self.temp_path, 'template.yaml')
-    util.WriteYaml(file_path=file_name, message=workflow_template)
+    file_name = os.path.join(self.temp_path, 'template.yaml')
+    with files.FileWriter(file_name) as stream:
+      util.WriteYaml(message=workflow_template, stream=stream)
     self.ExpectWorkflowTemplatesInstantiateInlineCalls(
         workflow_template=workflow_template)
-    done = self.MakeCompletedOperation(
-        template=workflow_template.name, state='DONE')
+    done = self.MakeCompletedOperation(state='DONE')
     result = self.RunDataproc(
         'workflow-templates instantiate-from-file --file {0}'.format(file_name))
     self.AssertMessagesEqual(done, result)
@@ -96,34 +99,35 @@ class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
     self.AssertErrEquals(
         textwrap.dedent("""\
       Waiting on operation [{0}].
-      WorkflowTemplate [{1}] RUNNING
-      WorkflowTemplate [{1}] DONE
-        """.format(self.OperationName(), workflow_template.name)))
+      WorkflowTemplate RUNNING
+      WorkflowTemplate DONE
+        """.format(self.OperationName())))
 
   def testInstantiateFromFileWorkflowTemplatesAsync(self):
     workflow_template = self.MakeWorkflowTemplate()
-    file_name = '{0}/{1}'.format(self.temp_path, 'template.yaml')
-    util.WriteYaml(file_path=file_name, message=workflow_template)
+    file_name = os.path.join(self.temp_path, 'template.yaml')
+    with files.FileWriter(file_name) as stream:
+      util.WriteYaml(message=workflow_template, stream=stream)
     self.ExpectWorkflowTemplatesInstantiateInline(
         workflow_template=workflow_template)
     self.RunDataproc(
         'workflow-templates instantiate-from-file --file {0} --async'.format(
             file_name))
     self.AssertOutputEquals('')
-    self.AssertErrContains('Instantiating [{0}] with operation [{1}].'.format(
-        self.WORKFLOW_TEMPLATE, self.OperationName()))
+    self.AssertErrContains('Instantiating with operation [{0}].'.format(
+        self.OperationName()))
 
   def testInstantiateFromFileWorkflowTemplatesWithRegion(self):
     properties.VALUES.dataproc.region.Set('us-test1')
     parent = self.WorkflowTemplateParentName(region='us-test1')
     template_name = self.WorkflowTemplateName(region='us-test1')
     workflow_template = self.MakeWorkflowTemplate(name=template_name)
-    file_name = '{0}/{1}'.format(self.temp_path, 'template.yaml')
-    util.WriteYaml(file_path=file_name, message=workflow_template)
+    file_name = os.path.join(self.temp_path, 'template.yaml')
+    with files.FileWriter(file_name) as stream:
+      util.WriteYaml(message=workflow_template, stream=stream)
     self.ExpectWorkflowTemplatesInstantiateInlineCalls(
         workflow_template=workflow_template, parent=parent)
-    done = self.MakeCompletedOperation(
-        template=workflow_template.name, state='DONE')
+    done = self.MakeCompletedOperation(state='DONE')
     result = self.RunDataproc(
         'workflow-templates instantiate-from-file --file {0}'.format(file_name))
     self.AssertMessagesEqual(done, result)
@@ -131,6 +135,6 @@ class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
     self.AssertErrEquals(
         textwrap.dedent("""\
       Waiting on operation [{0}].
-      WorkflowTemplate [{1}] RUNNING
-      WorkflowTemplate [{1}] DONE
-        """.format(self.OperationName(), workflow_template.name)))
+      WorkflowTemplate RUNNING
+      WorkflowTemplate DONE
+        """.format(self.OperationName())))

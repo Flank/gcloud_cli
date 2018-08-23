@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Category Manager E2e test base."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_base
@@ -33,6 +36,10 @@ class CategoryManagerE2eBase(e2e_base.WithServiceAuth):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def Project(self):
+    """Override the default e2e test project."""
+    return 'catman-e2e-test'
 
   @contextlib.contextmanager
   def CreateAnnotationResource(self, taxonomy, description):

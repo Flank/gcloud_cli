@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -221,6 +222,27 @@ class Collections(enum.Enum):
       [u'project', u'nextHopGateway'],
       True
   )
+  NODEGROUPS = (
+      'nodeGroups',
+      'projects/{project}/zones/{zone}/nodeGroups/{nodeGroup}',
+      {},
+      [u'project', u'zone', u'nodeGroup'],
+      True
+  )
+  NODETEMPLATES = (
+      'nodeTemplates',
+      'projects/{project}/regions/{region}/nodeTemplates/{nodeTemplate}',
+      {},
+      [u'project', u'region', u'nodeTemplate'],
+      True
+  )
+  NODETYPES = (
+      'nodeTypes',
+      'projects/{project}/zones/{zone}/nodeTypes/{nodeType}',
+      {},
+      [u'project', u'zone', u'nodeType'],
+      True
+  )
   PROJECTS = (
       'projects',
       'projects/{project}',
@@ -304,6 +326,13 @@ class Collections(enum.Enum):
       'projects/{project}/global/routes/{route}',
       {},
       [u'project', u'route'],
+      True
+  )
+  SECURITYPOLICIES = (
+      'securityPolicies',
+      'projects/{project}/global/securityPolicies/{securityPolicy}',
+      {},
+      [u'project', u'securityPolicy'],
       True
   )
   SNAPSHOTS = (

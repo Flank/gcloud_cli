@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta composer environments storage dags export \- exports DAGs from an environment into local storage or Cloud Storage
+gcloud beta composer environments storage dags export \- export DAGs from an environment into local storage or Cloud Storage
 
 
 
@@ -36,7 +36,7 @@ which to export files.
 .TP 2m
 
 Environment resource \- The environment from whose Cloud Storage bucket to
-export DAGs.. The arguments in this group can be used to specify the attributes
+export DAGs. The arguments in this group can be used to specify the attributes
 of this resource. (NOTE) Some attributes are not given arguments in this group
 but can be set in other ways. To set the [project] attribute: provide the flag
 [\-\-environment] on the command line with a fully specified name; provide the
@@ -52,7 +52,7 @@ specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the environment.
+Compute Engine region in which to create the environment.
 
 
 .RE
@@ -167,5 +167,10 @@ of 'foo/subdir1/file3.py'.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud composer environments storage dags export
+.RE
 

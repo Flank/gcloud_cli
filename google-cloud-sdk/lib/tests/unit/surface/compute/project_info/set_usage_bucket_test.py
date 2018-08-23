@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the project-info set-usage-bucket subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import cli_test_base
 from tests.lib import test_case
@@ -62,7 +65,7 @@ class ProjectInfoSetUsageBucketTest(test_base.BaseTest):
   def testWithHttpsBucketUri(self):
     self.Run("""
         compute project-info set-usage-bucket
-          --bucket http://storage.googleapis.com/31dd
+          --bucket https://www.googleapis.com/storage/v1/b/31dd
         """)
 
     self.CheckRequests(
@@ -71,7 +74,7 @@ class ProjectInfoSetUsageBucketTest(test_base.BaseTest):
           messages.ComputeProjectsSetUsageExportBucketRequest(
               project='my-project',
               usageExportLocation=messages.UsageExportLocation(
-                  bucketName='http://storage.googleapis.com/31dd')
+                  bucketName='https://www.googleapis.com/storage/v1/b/31dd')
           ))],
     )
 
@@ -87,14 +90,14 @@ class ProjectInfoSetUsageBucketTest(test_base.BaseTest):
           messages.ComputeProjectsSetUsageExportBucketRequest(
               project='my-project',
               usageExportLocation=messages.UsageExportLocation(
-                  bucketName='http://storage.googleapis.com/31dd')
+                  bucketName='https://www.googleapis.com/storage/v1/b/31dd')
           ))],
     )
 
   def testWithPrefix(self):
     self.Run("""
         compute project-info set-usage-bucket
-          --bucket http://storage.googleapis.com/31dd
+          --bucket https://www.googleapis.com/storage/v1/b/31dd
           --prefix my-prefix
         """)
 
@@ -104,7 +107,7 @@ class ProjectInfoSetUsageBucketTest(test_base.BaseTest):
           messages.ComputeProjectsSetUsageExportBucketRequest(
               project='my-project',
               usageExportLocation=messages.UsageExportLocation(
-                  bucketName='http://storage.googleapis.com/31dd',
+                  bucketName='https://www.googleapis.com/storage/v1/b/31dd',
                   reportNamePrefix='my-prefix')
           ))],
     )

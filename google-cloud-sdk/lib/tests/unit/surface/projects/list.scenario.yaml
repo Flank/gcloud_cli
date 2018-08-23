@@ -1,0 +1,78 @@
+title: List projects
+release_tracks: [GA]
+actions:
+- execute_command:
+    command: projects list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects?alt=json&filter=lifecycleState%3AACTIVE&pageSize=500
+          method: GET
+          body:
+        return_response:
+          headers:
+            status: '200'
+          body:
+            nextPageToken: asdf
+            projects:
+            - createTime: '2017-09-22T18:04:56.775Z'
+              lifecycleState: ACTIVE
+              name: project_name
+              parent:
+                id: '00000000000'
+                type: organization
+              projectId: project_id
+              projectNumber: '00000000000'
+            - createTime: '2017-09-22T18:02:05.609Z'
+              lifecycleState: ACTIVE
+              name: project_name
+              parent:
+                id: '00000000000'
+                type: organization
+              projectId: project_id
+              projectNumber: '00000000000'
+            - createTime: '2017-09-22T17:58:52.040Z'
+              lifecycleState: ACTIVE
+              name: project_name
+              parent:
+                id: '00000000000'
+                type: organization
+              projectId: project_id
+              projectNumber: '00000000000'
+            - createTime: '2017-09-22T14:19:08.310Z'
+              lifecycleState: ACTIVE
+              name: project_name
+              parent:
+                id: '00000000000'
+                type: folder
+              projectId: project_id
+              projectNumber: '00000000000'
+            - createTime: '2017-09-22T10:05:58.138Z'
+              labels:
+                creation-date: created-2017-09-22
+              lifecycleState: ACTIVE
+              name: project_name
+              parent:
+                id: '00000000000'
+                type: organization
+              projectId: project_id
+              projectNumber: '00000000000'
+    - api_call:
+        return_response:
+          headers:
+            status: '200'
+          body: ''
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects?alt=json&filter=lifecycleState%3AACTIVE&pageSize=500&pageToken=asdf
+          method: GET
+          headers: {}
+          body:
+    - expect_stdout: |
+        PROJECT_ID  NAME          PROJECT_NUMBER
+        project_id  project_name  0
+        project_id  project_name  0
+        project_id  project_name  0
+        project_id  project_name  0
+        project_id  project_name  0
+    - expect_exit:
+        code: 0

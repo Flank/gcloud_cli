@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +18,7 @@ import enum
 
 
 BASE_URL = 'https://cloudtasks.googleapis.com/v2beta2/'
-DOCS_URL = 'https://cloud.google.com/cloud-tasks/'
+DOCS_URL = 'https://cloud.google.com/tasks/'
 
 
 class Collections(enum.Enum):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the network endpoint groups create subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -22,7 +26,7 @@ from tests.lib.surface.compute import test_base
 class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
     self.region = 'us-central1'
     self.zone = 'us-central1-a'
@@ -40,7 +44,7 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     project = project or self.Project()
     region = region or self.region
 
-    compute_prefix = 'https://www.googleapis.com/compute/alpha/'
+    compute_prefix = 'https://www.googleapis.com/compute/beta/'
     network_uri, subnetwork_uri = None, None
     if network:
       network_uri = (
@@ -52,12 +56,10 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
           '{region}/subnetworks/{name}'.format(
               project=project, region=region, name=subnetwork))
 
-    type_enum = self.messages.NetworkEndpointGroup.TypeValueValuesEnum
     endpoint_type_enum = (self.messages.NetworkEndpointGroup
                           .NetworkEndpointTypeValueValuesEnum)
     network_endpoint_group = self.messages.NetworkEndpointGroup(
         name=name,
-        type=type_enum.LOAD_BALANCING,
         networkEndpointType=endpoint_type_enum.GCE_VM_IP_PORT,
         loadBalancer=self.messages.NetworkEndpointGroupLbNetworkEndpointGroup(
             defaultPort=default_port,
@@ -99,7 +101,6 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     request = self._ExpectCreate(network_endpoint_group)
 
     result = self.Run('compute network-endpoint-groups create my-neg1 '
-                      '--neg-type load-balancing '
                       '--network-endpoint-type GCE_VM_IP_PORT '
                       '--zone ' + self.zone)
 

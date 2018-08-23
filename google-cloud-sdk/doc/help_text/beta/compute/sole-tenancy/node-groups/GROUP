@@ -28,9 +28,17 @@ COMMANDS
      list
         (BETA) List Google Compute Engine node groups.
 
+     list-nodes
+        (BETA) List Google Compute Engine sole-tenant nodes present in a node
+        group.
+
      update
         (BETA) Updates a Google Compute Engine node group.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute sole-tenancy node-groups
+        $ gcloud alpha compute sole-tenancy node-groups
 

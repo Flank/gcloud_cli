@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -73,6 +74,25 @@ class Collections(enum.Enum):
       '{registriesId}/devices/{devicesId}/states/{statesId}',
       {},
       [u'projectsId', u'locationsId', u'registriesId', u'devicesId', u'statesId'],
+      True
+  )
+  PROJECTS_LOCATIONS_REGISTRIES_GROUPS = (
+      'projects.locations.registries.groups',
+      'projects/{projectsId}/locations/{locationsId}/registries/'
+      '{registriesId}/groups/{groupsId}',
+      {},
+      [u'projectsId', u'locationsId', u'registriesId', u'groupsId'],
+      True
+  )
+  PROJECTS_LOCATIONS_REGISTRIES_GROUPS_DEVICES = (
+      'projects.locations.registries.groups.devices',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/registries/'
+              '{registriesId}/groups/{groupsId}/devices/{devicesId}',
+      },
+      [u'name'],
       True
   )
 

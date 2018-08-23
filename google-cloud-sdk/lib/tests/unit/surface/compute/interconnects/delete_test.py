@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,9 @@
 """Tests for the interconnects delete subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 from tests.lib import test_case
@@ -79,14 +81,11 @@ class InterconnectsDeleteTest(test_base.BaseTest):
           messages.ComputeInterconnectsDeleteRequest(
               project='my-project', interconnect='my-interconnect3'))],)
     self.AssertErrContains(
-        textwrap.dedent("""\
-        The following interconnects will be deleted:
-         - [my-interconnect1]
-         - [my-interconnect2]
-         - [my-interconnect3]
-
-
-        Do you want to continue (Y/n)? """))
+        r'The following interconnects will be deleted:\n'
+        r' - [my-interconnect1]\n'
+        r' - [my-interconnect2]\n'
+        r' - [my-interconnect3]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.WriteInput('n\n')

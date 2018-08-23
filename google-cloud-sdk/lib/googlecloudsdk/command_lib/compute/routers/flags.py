@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Flags and helpers for the compute routers commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.command_lib.compute import completers as compute_completers
@@ -83,6 +86,18 @@ def RouterArgumentForOtherResources(required=True, suppress_region=True):
       region_hidden=suppress_region)
 
 
+def RouterArgumentForNat():
+  return compute_flags.ResourceArgument(
+      resource_name='router',
+      name='--router',
+      completer=RoutersCompleter,
+      plural=False,
+      required=True,
+      regional_collection='compute.routers',
+      short_help='The Router to use for NAT.',
+      region_hidden=True)
+
+
 def AddCreateRouterArgs(parser):
   """Adds common arguments for creating routers."""
 
@@ -94,6 +109,20 @@ def AddCreateRouterArgs(parser):
       required=True,
       type=int,
       help='The BGP autonomous system number (ASN) for this router. '
+      'For more information see: https://tools.ietf.org/html/rfc6996.')
+
+
+def AddCreateRouterArgsForAlpha(parser):
+  """Adds common arguments for creating routers. It is only used in alpha."""
+
+  parser.add_argument(
+      '--description', help='An optional description of this router.')
+
+  parser.add_argument(
+      '--asn',
+      required=False,
+      type=int,
+      help='The optional BGP autonomous system number (ASN) for this router. '
       'For more information see: https://tools.ietf.org/html/rfc6996.')
 
 

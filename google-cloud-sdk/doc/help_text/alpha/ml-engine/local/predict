@@ -4,7 +4,8 @@ NAME
 SYNOPSIS
     gcloud alpha ml-engine local predict --model-dir=MODEL_DIR
         (--json-instances=JSON_INSTANCES | --text-instances=TEXT_INSTANCES)
-        [--framework=FRAMEWORK] [GCLOUD_WIDE_FLAG ...]
+        [--framework=FRAMEWORK] [--signature-name=SIGNATURE_NAME]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha ml-engine local predict performs prediction locally
@@ -48,17 +49,23 @@ OPTIONAL FLAGS
         specified, defaults to tensorflow. FRAMEWORK must be one of:
         scikit-learn, tensorflow, xgboost.
 
+     --signature-name=SIGNATURE_NAME
+        The name of the signature defined in the SavedModel to use for this
+        job. Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
+        https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+        which is "serving_default". Only applies to TensorFlow models.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud ml-engine local predict
         $ gcloud beta ml-engine local predict

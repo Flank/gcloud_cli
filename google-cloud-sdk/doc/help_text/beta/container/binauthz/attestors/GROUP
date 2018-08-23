@@ -1,0 +1,60 @@
+NAME
+    gcloud beta container binauthz attestors - create and manage Google Binary
+        Authorization Attestation Authorities
+
+SYNOPSIS
+    gcloud beta container binauthz attestors GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Create and manage Google Binary Authorization Attestation
+    Authorities.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     public-keys
+        (BETA) Create and manage public keys associated with Attestation
+        Authorities.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding to an attestor.
+
+     create
+        (BETA) Create an Attestor.
+
+     delete
+        (BETA) Delete an Attestor.
+
+     describe
+        (BETA) Describe an Attestor.
+
+     get-iam-policy
+        (BETA) Get the IAM policy for an attestor.
+
+     list
+        (BETA) List Attestors associated with the current project.
+
+     remove-iam-policy-binding
+        (BETA) Remove IAM policy binding to an attestor.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for an attestor.
+
+     update
+        (BETA) Update an existing Attestor.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha container binauthz attestors
+

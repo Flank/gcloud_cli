@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,11 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Basic unit tests for the Importer library."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import re
 
@@ -24,14 +26,16 @@ from apitools.base.py.testing import mock as gcloud_mock
 from googlecloudsdk.api_lib.deployment_manager import exceptions
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.command_lib.deployment_manager import importer
+from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
+from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 import mock
 import requests
-
+import six
 
 messages = core_apis.GetMessagesModule('deploymentmanager', 'v2')
 
@@ -51,8 +55,8 @@ class MockResponse(object):
       raise requests.exceptions.HTTPError(self.text)
 
 
-def build_mock_file(content, name=''):
-  mock_obj = importer._ImportFile(name)
+def build_mock_file(content, path='/foo.yaml'):
+  mock_obj = importer._ImportFile(path)
   mock_obj.GetContent = mock.MagicMock(return_value=content)
   return mock_obj
 
@@ -74,6 +78,25 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def GetTestData(self, *path):
     return self.Resource(*(_TEST_DATA_DIR + list(path)))
+
+  def LoadNamedImportFiles(self, imports_name_path_map):
+    import_contents = {}
+    for name, path in six.iteritems(imports_name_path_map):
+      full_import_path = self.GetTestData('simple_configs', path)
+      with open(full_import_path, 'r') as import_file:
+        import_contents[name] = import_file.read()
+    return import_contents
+
+  def testWindowsPathSanitizer(self):
+    self.assertEqual(['foo/bar', 'fizz/buzz'],
+                     importer._SanitizeWindowsPathsGlobs(
+                         ['foo/bar', 'fizz/buzz'], native_separator='\\'))
+    self.assertEqual(['foo/bar/fizz/buzz'],
+                     importer._SanitizeWindowsPathsGlobs(
+                         ['foo/bar\\fizz\\buzz'], native_separator='\\'))
+    self.assertEqual(['C:\\foo\\bar\\fizz\\buzz'],
+                     importer._SanitizeWindowsPathsGlobs(
+                         ['C:\\foo\\bar\\fizz\\buzz'], native_separator='\\'))
 
   def testBuildTargetConfig_EmptyPath(self):
     try:
@@ -341,8 +364,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                      actual_target_config.config)
     self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
-      self.assertTrue(expected_import in actual_target_config.imports,
-                      'missing expected import ' + str(expected_import))
+      self.assertIn(expected_import, actual_target_config.imports)
 
   def testBuildTargetConfig_WithNamedImports(self):
     config_name = self.GetTestData('simple_configs',
@@ -374,20 +396,14 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                      actual_target_config.config)
     self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
-      self.assertTrue(expected_import in actual_target_config.imports,
-                      'missing expected import ' + str(expected_import))
+      self.assertIn(expected_import, actual_target_config.imports)
 
   def testBuildTargetConfig_IdenticalImports(self):
     config_name = self.GetTestData('simple_configs',
                                    'identical_duplicate_imports.yaml')
-    imports = {}
     import_name_map = {'helper.jinja': 'helper.jinja'}
 
-    for import_rename in import_name_map:
-      full_import_path = self.GetTestData('simple_configs',
-                                          import_name_map[import_rename])
-      with open(full_import_path, 'r') as import_file:
-        imports[import_rename] = import_file.read()
+    imports = self.LoadNamedImportFiles(import_name_map)
     with open(config_name, 'r') as config_file:
       config_contents = config_file.read()
 
@@ -407,13 +423,11 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                      actual_target_config.config)
     self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
-      self.assertTrue(expected_import in actual_target_config.imports,
-                      'missing expected import ' + str(expected_import))
+      self.assertIn(expected_import, actual_target_config.imports)
 
   def testBuildTargetConfig_SharedHelperImport(self):
     config_name = self.GetTestData('simple_configs',
                                    'shared_helper.yaml')
-    imports = {}
     import_name_map = {'shared_helper.jinja': 'shared_helper.jinja',
                        'shared_helper.jinja.schema':
                            'shared_helper.jinja.schema',
@@ -422,11 +436,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                        'shared.jinja.schema':
                        'sub_directory/shared.jinja.schema'}
 
-    for import_rename in import_name_map:
-      full_import_path = self.GetTestData('simple_configs',
-                                          import_name_map[import_rename])
-      with open(full_import_path, 'r') as import_file:
-        imports[import_rename] = import_file.read()
+    imports = self.LoadNamedImportFiles(import_name_map)
     with open(config_name, 'r') as config_file:
       config_contents = config_file.read()
 
@@ -446,8 +456,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                      actual_target_config.config)
     self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
-      self.assertTrue(expected_import in actual_target_config.imports,
-                      'missing expected import ' + str(expected_import))
+      self.assertIn(expected_import, actual_target_config.imports)
 
   def testBuildTargetConfig_WithDuplicateImports(self):
     config_name = self.GetTestData('simple_configs',
@@ -499,13 +508,11 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                      actual_target_config.config)
     self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
-      self.assertTrue(expected_import in actual_target_config.imports,
-                      'missing expected import ' + str(expected_import))
+      self.assertIn(expected_import, actual_target_config.imports)
 
   def testBuildTargetConfig_WithNamedNestedSchemas(self):
     config_name = self.GetTestData('simple_configs',
                                    'simple_with_subtemplate.yaml')
-    imports = {}
     import_name_map = {'simple_with_subtemplate.jinja':
                            'simple_with_subtemplate.jinja',
                        'simple_with_subtemplate.jinja.schema':
@@ -519,11 +526,74 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                            os.path.join('sub_directory', 'simple.jinja.schema'),
                        'sub_helper.jinja':
                            os.path.join('sub_directory', 'helper.jinja'),}
-    for import_rename in import_name_map:
-      full_import_path = self.GetTestData('simple_configs',
-                                          import_name_map[import_rename])
-      with open(full_import_path, 'r') as import_file:
-        imports[import_rename] = import_file.read()
+    imports = self.LoadNamedImportFiles(import_name_map)
+    with open(config_name, 'r') as config_file:
+      config_contents = config_file.read()
+
+    actual_target_config = importer.BuildTargetConfig(
+        messages, config=config_name)
+    expected_target_config = messages.TargetConfiguration(
+        config=messages.ConfigFile(content=config_contents),
+        imports=[
+            messages.ImportFile(name=import_item[0], content=import_item[1])
+            for import_item in imports.items()
+        ])
+    self.assertEqual(expected_target_config.config, actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
+    for expected_import in expected_target_config.imports:
+      self.assertIn(expected_import, actual_target_config.imports)
+
+  def testBuildTargetConfig_ImportGlobMatchesMultipleFiles(self):
+    properties.VALUES.deployment_manager.glob_imports.Set(True)
+    config_name = self.GetTestData('simple_configs',
+                                   'simple_with_glob_import.yaml')
+    one = os.path.join('glob_directory', 'import_one.jinja')
+    two = os.path.join('glob_directory', 'import_two.jinja')
+    import_name_map = {one: one, two: two}
+    imports = self.LoadNamedImportFiles(import_name_map)
+    with open(config_name, 'r') as config_file:
+      config_contents = config_file.read()
+
+    # Switch to working with a file in the immediate working directory to test
+    # no-parent-directory edge case
+    parent_dir, config_name = os.path.split(config_name)
+    with files.ChDir(parent_dir):
+      actual_target_config = importer.BuildTargetConfig(
+          messages, config=config_name)
+
+    expected_target_config = messages.TargetConfiguration(
+        config=messages.ConfigFile(content=config_contents),
+        imports=[
+            messages.ImportFile(name=import_item[0], content=import_item[1])
+            for import_item in imports.items()
+        ])
+    self.assertEqual(expected_target_config.config, actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
+    for expected_import in expected_target_config.imports:
+      self.assertIn(expected_import, actual_target_config.imports)
+
+  def testBuildTargetConfig_GlobbingDisabledDoesntMatch(self):
+    """Expect failure for * path with globbig disabled and no file named *."""
+    properties.VALUES.deployment_manager.glob_imports.Set(False)
+    config_name = self.GetTestData('simple_configs',
+                                   'simple_with_glob_import.yaml')
+    with self.assertRaisesRegex(exceptions.ConfigError, r'Unable to read file'
+                                r'.*\*\.jinja'):
+      importer.BuildTargetConfig(messages, config=config_name)
+
+  def testBuildTargetConfig_ImportGlobWithSchema(self):
+    properties.VALUES.deployment_manager.glob_imports.Set(True)
+    config_name = self.GetTestData(
+        'simple_configs', 'simple_with_glob_import_multiple_levels.yaml')
+    three = os.path.join('glob_directory', 'deeper_dir', 'import_three.jinja')
+    three_schema = os.path.join('glob_directory', 'deeper_dir',
+                                'import_three.jinja.schema')
+    import_name_map = {
+        three: three,
+        three_schema: three_schema,
+        'emptytemplate': 'subhelper.jinja'
+    }
+    imports = self.LoadNamedImportFiles(import_name_map)
     with open(config_name, 'r') as config_file:
       config_contents = config_file.read()
 
@@ -543,8 +613,31 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                      actual_target_config.config)
     self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
-      self.assertTrue(expected_import in actual_target_config.imports,
-                      'missing expected import ' + str(expected_import))
+      self.assertIn(expected_import, actual_target_config.imports)
+
+  def testBuildTargetConfig_ImportGlobWorksWithInlineParentPath(self):
+    properties.VALUES.deployment_manager.glob_imports.Set(True)
+    config_name = self.GetTestData(
+        'simple_configs', 'simple_with_glob_import_with_parent_dir.yaml')
+    one = '../simple_configs/glob_directory/import_one.jinja'
+    two = '../simple_configs/glob_directory/import_two.jinja'
+    import_name_map = {one: one, two: two}
+    imports = self.LoadNamedImportFiles(import_name_map)
+    with open(config_name, 'r') as config_file:
+      config_contents = config_file.read()
+
+    actual_target_config = importer.BuildTargetConfig(
+        messages, config=config_name)
+    expected_target_config = messages.TargetConfiguration(
+        config=messages.ConfigFile(content=config_contents),
+        imports=[
+            messages.ImportFile(name=import_item[0], content=import_item[1])
+            for import_item in imports.items()
+        ])
+    self.assertEqual(expected_target_config.config, actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
+    for expected_import in expected_target_config.imports:
+      self.assertIn(expected_import, actual_target_config.imports)
 
   def testBuildTargetConfig_CompositeType_NoProps(self):
     config_name = 'example-project-name/composite:example-composite-type-name'
@@ -638,7 +731,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     self.assertEqual(len(import_objects), 2)
     for import_object in import_objects:
-      self.assertTrue(import_object.GetFullPath() in expected_paths)
+      self.assertIn(import_object.GetFullPath(), expected_paths)
 
   def testImportFile(self):
     config_name = 'simple.yaml'
@@ -718,9 +811,9 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     self.assertEqual(path, config_obj.BuildChildPath(config_obj.GetBaseName()))
 
-    self.assertTrue('type: bar.py' in config_obj.GetContent())
-    self.assertTrue('name: bar-py' in config_obj.GetContent())
-    self.assertTrue('path: bar.py' in config_obj.GetContent())
+    self.assertIn('type: bar.py', config_obj.GetContent())
+    self.assertIn('name: bar-py', config_obj.GetContent())
+    self.assertIn('path: bar.py', config_obj.GetContent())
 
   @mock.patch('requests.get')
   def testBuildConfig_Url(self, mock_request):
@@ -746,10 +839,29 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     self.assertEqual(url, config_obj.BuildChildPath(config_obj.GetBaseName()))
 
-    self.assertTrue('type: bar.py' in config_obj.GetContent())
-    self.assertTrue('name: bar-py' in config_obj.GetContent())
-    self.assertTrue('path: bar.py' in config_obj.GetContent())
+    self.assertIn('type: bar.py', config_obj.GetContent())
+    self.assertIn('name: bar-py', config_obj.GetContent())
+    self.assertIn('path: bar.py', config_obj.GetContent())
     mock_request.assert_called_once_with(url + '.schema')
+
+  def testBuildConfig_WithBadGlobImport_EmptyDirectory(self):
+    properties.VALUES.deployment_manager.glob_imports.Set(True)
+    config_name = self.GetTestData('simple_configs',
+                                   'simple_with_bad_glob_import.yaml')
+    # Expect OS-native path in the exception e.g. glob_directory[/ or \]*.py
+    with self.assertRaisesRegex(exceptions.ConfigError,
+                                r'Unable to read file .+glob_directory.[*].py'):
+      importer.BuildTargetConfig(messages, config=config_name)
+
+  def testBuildConfig_WithBadGlobImport_MissingFileName(self):
+    properties.VALUES.deployment_manager.glob_imports.Set(True)
+    config_name = self.GetTestData('simple_configs',
+                                   'simple_with_glob_import_bad_name.yaml')
+    with self.assertRaisesRegex(
+        exceptions.ConfigError,
+        (r'Cannot use import name thiswillbreak for path glob in file'
+         r' .*bad_name\.yaml that matches multiple objects.')):
+      importer.BuildTargetConfig(messages, config=config_name)
 
   def testBuildConfig_JinjaWithBadSchema(self):
     path = self.GetTestData('simple_configs', 'simple_bad_schema.jinja')
@@ -800,23 +912,23 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       importer._BuildFileImportObject('ssh://www.google.com/foo.py')
       self.fail('Url isnt http')
     except exceptions.ConfigError as e:
-      self.assertTrue('scheme' in str(e))
-      self.assertTrue("'https'" in str(e))
-      self.assertTrue("'http'" in str(e))
+      self.assertIn('scheme', str(e))
+      self.assertIn("'https'", str(e))
+      self.assertIn("'http'", str(e))
 
   def testInvalidUrl_Path(self):
     try:
       importer._BuildFileImportObject('http://www.google.com')
       self.fail('Url has no path')
     except exceptions.ConfigError as e:
-      self.assertTrue('path' in str(e))
+      self.assertIn('path', str(e))
 
   def testInvalidUrl_SlashPath(self):
     try:
       importer._BuildFileImportObject('http://www.google.com/')
       self.fail('Url has no path')
     except exceptions.ConfigError as e:
-      self.assertTrue('path' in str(e))
+      self.assertIn('path', str(e))
 
   def testInvalidUrl_Query(self):
     try:
@@ -824,7 +936,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       importer._BuildFileImportObject(url)
       self.fail('Url has query')
     except exceptions.ConfigError as e:
-      self.assertTrue('queries' in str(e))
+      self.assertIn('queries', str(e))
 
   def testInvalidUrl_Fragment(self):
     try:
@@ -832,7 +944,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       importer._BuildFileImportObject(url)
       self.fail('Url has fragment')
     except exceptions.ConfigError as e:
-      self.assertTrue('fragments' in str(e))
+      self.assertIn('fragments', str(e))
 
   @mock.patch('requests.get')
   def testImportUrl(self, mock_request):
@@ -889,7 +1001,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       url_obj.GetContent()
       self.fail('Url should return 403')
     except requests.exceptions.HTTPError as e:
-      self.assertTrue('forbidden' in str(e))
+      self.assertIn('forbidden', str(e))
 
     # Called twice, for Exists and GetContent
     self.assertEqual(2, mock_request.call_count)
@@ -904,14 +1016,9 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     config_name = self.GetTestData('simple_configs',
                                    'identical_duplicate_url_imports.yaml')
-    imports = {}
     import_name_map = {'my-import.yaml': 'empty.yaml'}
+    imports = self.LoadNamedImportFiles(import_name_map)
 
-    for import_rename in import_name_map:
-      full_import_path = self.GetTestData('simple_configs',
-                                          import_name_map[import_rename])
-      with open(full_import_path, 'r') as import_file:
-        imports[import_rename] = import_file.read()
     with open(config_name, 'r') as config_file:
       config_contents = config_file.read()
 
@@ -931,8 +1038,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                      actual_target_config.config)
     self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
-      self.assertTrue(expected_import in actual_target_config.imports,
-                      'missing expected import ' + str(expected_import))
+      self.assertIn(expected_import, actual_target_config.imports)
 
     mock_request.assert_called_once_with(url)
 
@@ -970,17 +1076,12 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     config_name = self.GetTestData('simple_configs',
                                    'duplicate_url_with_schema.yaml')
-    imports = {}
     import_name_map = {'simple.jinja': 'simple.jinja',
                        'simple.jinja.schema': 'simple.jinja.schema',
                        'helper.jinja': 'helper.jinja',
                       }
 
-    for import_rename in import_name_map:
-      full_import_path = self.GetTestData('simple_configs',
-                                          import_name_map[import_rename])
-      with open(full_import_path, 'r') as import_file:
-        imports[import_rename] = import_file.read()
+    imports = self.LoadNamedImportFiles(import_name_map)
     with open(config_name, 'r') as config_file:
       config_contents = config_file.read()
 
@@ -1061,7 +1162,6 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     config_name = self.GetTestData('simple_configs',
                                    'shared_url_helper.yaml')
-    imports = {}
     import_name_map = {'shared_helper.jinja': 'shared_helper.jinja',
                        'shared_helper.jinja.schema':
                            'shared_helper.jinja.schema',
@@ -1070,11 +1170,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                        'shared.jinja.schema':
                        'sub_directory/shared.jinja.schema'}
 
-    for import_rename in import_name_map:
-      full_import_path = self.GetTestData('simple_configs',
-                                          import_name_map[import_rename])
-      with open(full_import_path, 'r') as import_file:
-        imports[import_rename] = import_file.read()
+    imports = self.LoadNamedImportFiles(import_name_map)
     with open(config_name, 'r') as config_file:
       config_contents = config_file.read()
 

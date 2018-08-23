@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-types describe subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
 
 class NodeTypesDescribeTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -35,7 +33,7 @@ class NodeTypesDescribeTest(test_base.BaseTest):
              '--zone zone-1')
 
     self.CheckRequests(
-        [(self.compute_beta.nodeTypes, 'Get',
+        [(self.compute.nodeTypes, 'Get',
           self.messages.ComputeNodeTypesGetRequest(
               nodeType='iAPX-286', project='my-project', zone='zone-1'))],)
     self.AssertOutputEquals(
@@ -51,7 +49,8 @@ class NodeTypesDescribeTest(test_base.BaseTest):
     localSsdGb: 0
     memoryMb: 256
     name: iAPX-286
-    selfLink: https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/nodeTypes/iAPX-286
+    selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/\
+zone-1/nodeTypes/iAPX-286
     zone: zone-1
     """,
         normalize_space=True)

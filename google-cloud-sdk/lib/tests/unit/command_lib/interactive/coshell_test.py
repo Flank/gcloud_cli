@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 """Tests for coshell module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import io
@@ -176,10 +177,14 @@ class UnixCoshellTest(_CoshellTestBase):
     self.AssertOutputEquals('foo\n')
 
   def testUnixCoshellPwdState(self):
+    self.coshell.Run('pwd=$PWD')
     self.coshell.Run('cd /')
+    self.assertEqual('/', os.getcwd())
     self.coshell.Run('pwd')
     self.coshell.Run('cd /bin')
+    self.assertEqual('/bin', os.getcwd())
     self.coshell.Run('pwd')
+    self.coshell.Run('cd $pwd')
     self.CoClose()
     self.AssertOutputEquals('/\n/bin\n')
 
@@ -522,10 +527,12 @@ class MingWCoshellOnUnixTest(_CoshellTestBase):
     self.AssertOutputEquals('foo\n')
 
   def testMinGWCoshellPwdState(self):
+    self.coshell.Run('pwd=$PWD')
     self.coshell.Run('cd /')
     self.coshell.Run('pwd')
     self.coshell.Run('cd /bin')
     self.coshell.Run('pwd')
+    self.coshell.Run('cd $pwd')
     self.CoClose()
     self.AssertOutputEquals('/\n/bin\n')
 

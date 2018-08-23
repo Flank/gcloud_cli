@@ -56,11 +56,11 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-global\fR
-If provided, it is assumed the backend service is global.
+If set, the backend service is global.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the backend service to operate on. Overrides the default
+Region of the backend service to operate on. Overrides the default
 \fBcompute/region\fR property value for this command invocation.
 
 
@@ -74,16 +74,16 @@ The region of the backend service to operate on. Overrides the default
 .TP 2m
 \fB\-\-filter\fR=\fIEXPRESSION\fR
 Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
-the expression evaluates True then that item is listed. For more details and
-examples of filter expressions run $ gcloud topic filters. This flag interacts
-with other flags that are applied in this order: \fB\-\-flatten\fR,
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-limit\fR=\fILIMIT\fR
-The maximum number of resources to list. The default is \fBunlimited\fR. This
-flag interacts with other flags that are applied in this order:
-\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
@@ -95,9 +95,9 @@ service.
 
 .TP 2m
 \fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
-A comma\-separated list of resource field key names to sort by. The default
-order is ascending. Prefix a field with ``~'' for descending order on that
-field. This flag interacts with other flags that are applied in this order:
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m

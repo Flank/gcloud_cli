@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """The `gcloud compute shared-vpc associated-projects remove` command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import xpn_api
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.xpn import flags
@@ -40,5 +44,5 @@ class Remove(base.Command):
         'remove the associated project from').AddToParser(parser)
 
   def Run(self, args):
-    xpn_client = xpn_api.GetXpnClient()
+    xpn_client = xpn_api.GetXpnClient(self.ReleaseTrack())
     xpn_client.DisableXpnAssociatedProject(args.host_project, args.project)

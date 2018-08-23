@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +16,8 @@
 """Test of the 'operations delete' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.console import console_io
@@ -44,10 +45,9 @@ class OperationsDeleteUnitTest(unit_base.DataprocUnitTestBase):
     self.WriteInput('y\n')
     result = self.RunDataproc(
         'operations delete {0}'.format(self.OperationName()))
-    self.AssertErrContains(textwrap.dedent("""\
-        The operation '{0}' will be deleted.
-
-        Do you want to continue (Y/n)?""".format(self.OperationName())))
+    self.AssertErrContains(
+        "The operation '{0}' will be deleted.".format(self.OperationName()))
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.assertIsNone(result)
     self.AssertErrContains(
         'Deleted [{0}].'.format(self.OperationName()))
@@ -58,10 +58,8 @@ class OperationsDeleteUnitTest(unit_base.DataprocUnitTestBase):
         console_io.OperationCancelledError,
         'Deletion aborted by user.'):
       self.RunDataproc('operations delete {0}'.format(self.OperationName()))
-    self.AssertErrContains(textwrap.dedent("""\
-        The operation '{0}' will be deleted.
-
-        Do you want to continue (Y/n)?""".format(self.OperationName())))
+    self.AssertErrContains(
+        "The operation '{0}' will be deleted.".format(self.OperationName()))
 
   def testDeleteOperationNotFound(self):
     self.ExpectDeleteOperation(

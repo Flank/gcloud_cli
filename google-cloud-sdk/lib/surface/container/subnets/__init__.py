@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,9 @@
 """The command group for cloud container subnets."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container import container_command_util
 from googlecloudsdk.command_lib.container import messages
@@ -36,22 +39,3 @@ class Subnets(base.Group):
         which you can register arguments.  See the public argparse documentation
         for its capabilities.
     """
-
-  def Filter(self, context, args):
-    """Modify the context that will be given to this group's commands when run.
-
-    Args:
-      context: {str:object}, A set of key-value pairs that can be used for
-          common initialization among commands.
-      args: argparse.Namespace: The same namespace given to the corresponding
-          .Run() invocation.
-
-    Returns:
-      The refined command context.
-    """
-    if container_command_util.GetUseV1APIProperty():
-      warning = messages.GetAPIMismatchingWarning(self.ReleaseTrack())
-      if warning:
-        log.warning(warning)
-
-    return context

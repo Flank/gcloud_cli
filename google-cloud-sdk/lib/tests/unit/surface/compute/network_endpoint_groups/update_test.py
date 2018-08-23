@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the network endpoint groups update subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base
@@ -29,10 +33,10 @@ class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
                                       waiter_test_base.Base):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.track = base.ReleaseTrack.BETA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', 'beta')
     self.client.Mock()
     self.messages = self.client.MESSAGES_MODULE
     self.addCleanup(self.client.Unmock)
@@ -84,7 +88,7 @@ class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
 
   def _ExpectPollAndGet(self, operation_suffix='X'):
     neg_name = 'my-neg'
-    neg_uri = ('https://www.googleapis.com/compute/alpha/projects/{0}/zones/'
+    neg_uri = ('https://www.googleapis.com/compute/beta/projects/{0}/zones/'
                '{1}/networkEndpointGroups/{2}'.format(
                    self.Project(), self.zone, neg_name))
     self.client.zoneOperations.Get.Expect(
@@ -172,7 +176,7 @@ class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
         '--zone ' + self.zone)
     self.AssertErrContains('Detaching 2 endpoints from [my-neg].')
 
-  def testUpdate_AddAndRemoveEndpointsMutuallyExlusive(self):
+  def testUpdate_AddAndRemoveEndpointsMutuallyExclusive(self):
     with self.AssertRaisesArgumentErrorMatches(
         'At most one of --add-endpoint | --remove-endpoint may be specified.'):
       self.Run(

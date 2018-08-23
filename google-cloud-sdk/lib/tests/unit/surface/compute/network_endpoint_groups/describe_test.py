@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 """Tests for the network-endpoint-groups describe subcommand."""
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.calliope import base
@@ -25,7 +28,7 @@ from tests.lib.surface.compute import test_resources
 class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):
@@ -36,7 +39,7 @@ class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
                       '--zone zone-1')
 
     self.CheckRequests(
-        [(self.compute_alpha.networkEndpointGroups,
+        [(self.compute_beta.networkEndpointGroups,
           'Get',
           self.messages.ComputeNetworkEndpointGroupsGetRequest(
               networkEndpointGroup='my-neg1',
@@ -54,9 +57,8 @@ class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
              zone: zone-1
            name: my-neg1
            networkEndpointType: GCE_VM_IP_PORT
-           selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
+           selfLink: https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
            size: 5
-           type: LOAD_BALANCING
             """))
 
 

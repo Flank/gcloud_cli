@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,18 @@
 """Test of the 'list' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.bigtable import app_profiles
 from googlecloudsdk.api_lib.bigtable import util
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class AppProfileListTests(base.BigtableV2TestBase):
 
   def SetUp(self):
@@ -44,7 +51,8 @@ class AppProfileListTests(base.BigtableV2TestBase):
                     clusterId='my-cluster-2', allowTransactionalWrites=True)),
         ])
 
-  def testList(self):
+  def testList(self, track):
+    self.track = track
     self.Run('bigtable app-profiles list --instance my-instance')
     self.app_profile_list_mock.assert_called_once_with(
         util.GetInstanceRef('my-instance'))

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Command for creating TCP health checks."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import health_checks_utils
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.health_checks import flags
 
 
-def _Run(args, holder, supports_port_specification=False):
+def _Run(args, holder, supports_port_specification=False, include_alpha=False):
   """Issues the request necessary for adding the health check."""
   client = holder.client
   messages = client.messages
 
-  health_check_ref = flags.HealthCheckArgument('TCP').ResolveAsResource(
-      args, holder.resources)
+  health_check_ref = flags.HealthCheckArgument(
+      'TCP', include_alpha=include_alpha).ResolveAsResource(
+          args, holder.resources)
   proxy_header = messages.TCPHealthCheck.ProxyHeaderValueValuesEnum(
       args.proxy_header)
   tcp_health_check = messages.TCPHealthCheck(
@@ -40,22 +45,37 @@ def _Run(args, holder, supports_port_specification=False):
     health_checks_utils.ValidateAndAddPortSpecificationToHealthCheck(
         args, tcp_health_check)
 
-  request = messages.ComputeHealthChecksInsertRequest(
-      healthCheck=messages.HealthCheck(
-          name=health_check_ref.Name(),
-          description=args.description,
-          type=messages.HealthCheck.TypeValueValuesEnum.TCP,
-          tcpHealthCheck=tcp_health_check,
-          checkIntervalSec=args.check_interval,
-          timeoutSec=args.timeout,
-          healthyThreshold=args.healthy_threshold,
-          unhealthyThreshold=args.unhealthy_threshold),
-      project=health_check_ref.project)
-  return client.MakeRequests(
-      [(client.apitools_client.healthChecks, 'Insert', request)])
+  if health_checks_utils.IsRegionalHealthCheckRef(health_check_ref):
+    request = messages.ComputeRegionHealthChecksInsertRequest(
+        healthCheck=messages.HealthCheck(
+            name=health_check_ref.Name(),
+            description=args.description,
+            type=messages.HealthCheck.TypeValueValuesEnum.TCP,
+            tcpHealthCheck=tcp_health_check,
+            checkIntervalSec=args.check_interval,
+            timeoutSec=args.timeout,
+            healthyThreshold=args.healthy_threshold,
+            unhealthyThreshold=args.unhealthy_threshold),
+        project=health_check_ref.project,
+        region=health_check_ref.region)
+    collection = client.apitools_client.regionHealthChecks
+  else:
+    request = messages.ComputeHealthChecksInsertRequest(
+        healthCheck=messages.HealthCheck(
+            name=health_check_ref.Name(),
+            description=args.description,
+            type=messages.HealthCheck.TypeValueValuesEnum.TCP,
+            tcpHealthCheck=tcp_health_check,
+            checkIntervalSec=args.check_interval,
+            timeoutSec=args.timeout,
+            healthyThreshold=args.healthy_threshold,
+            unhealthyThreshold=args.unhealthy_threshold),
+        project=health_check_ref.project)
+    collection = client.apitools_client.healthChecks
+  return client.MakeRequests([(collection, 'Insert', request)])
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
   """Create a TCP health check to monitor load balanced instances.
 
@@ -67,11 +87,19 @@ class Create(base.CreateCommand):
   """
 
   @classmethod
-  def Args(cls, parser):
+  def Args(cls,
+           parser,
+           supports_port_specification=False,
+           supports_use_serving_port=False,
+           regionalized=False):
     parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
-    flags.HealthCheckArgument('TCP').AddArgument(parser,
-                                                 operation_type='create')
-    health_checks_utils.AddTcpRelatedCreationArgs(parser)
+    flags.HealthCheckArgument(
+        'TCP', include_alpha=regionalized).AddArgument(
+            parser, operation_type='create')
+    health_checks_utils.AddTcpRelatedCreationArgs(
+        parser,
+        port_specification=supports_port_specification,
+        use_serving_port=supports_use_serving_port)
     health_checks_utils.AddProtocolAgnosticCreationArgs(parser, 'TCP')
 
   def Run(self, args):
@@ -80,19 +108,41 @@ class Create(base.CreateCommand):
     return _Run(args, holder)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(Create):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(Create):
   """Create a TCP health check to monitor load balanced instances."""
 
   @staticmethod
-  def Args(parser):
-    Create.Args(parser)
-    health_checks_utils.AddPortSpecificationFlag(parser)
+  def Args(parser,
+           supports_port_specification=False,
+           supports_use_serving_port=True,
+           regionalized=False):
+    Create.Args(
+        parser,
+        supports_port_specification=supports_port_specification,
+        supports_use_serving_port=supports_use_serving_port,
+        regionalized=regionalized)
 
   def Run(self, args):
     """Issues the request necessary for adding the health check."""
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return _Run(args, holder, supports_port_specification=True)
+    return _Run(
+        args, holder, supports_port_specification=True)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(CreateBeta):
+  """Create a TCP health check to monitor load balanced instances."""
+
+  @staticmethod
+  def Args(parser):
+    CreateBeta.Args(parser, supports_port_specification=True, regionalized=True)
+
+  def Run(self, args):
+    """Issues the request necessary for adding the health check."""
+    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
+    return _Run(
+        args, holder, supports_port_specification=True, include_alpha=True)
 
 
 Create.detailed_help = {

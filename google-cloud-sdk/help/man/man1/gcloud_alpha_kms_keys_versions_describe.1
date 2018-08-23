@@ -11,13 +11,19 @@ gcloud alpha kms keys versions describe \- get metadata for a given version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms keys versions describe\fR \fIVERSION\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms keys versions describe\fR \fIVERSION\fR [\fB\-\-attestation\-file\fR=\fIATTESTATION_FILE\fR] [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR Returns metadata for the given version.
+
+The optional flag \f5attestation\-file\fR specifies file to write the
+attestation object into. The attestation object enables the user to verify the
+integrity and provenance of the key. See
+https://cloud.google.com/kms/docs/attest\-key for more information about
+attestations.
 
 
 
@@ -35,6 +41,10 @@ Name of the version to describe.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-attestation\-file\fR=\fIATTESTATION_FILE\fR
+Path to the output attestation file.
+
 .TP 2m
 \fB\-\-key\fR=\fIKEY\fR
 The containing key.
@@ -70,15 +80,24 @@ $ gcloud alpha kms keys versions describe 2 \-\-key frodo \e
     \-\-keyring fellowship \-\-location us\-east1
 .RE
 
+For key versions with protection level \f5HSM\fR, use the
+\f5\-\-attestation\-file\fR flag to save the attestation to a local file.
+
+.RS 2m
+$ gcloud alpha kms keys versions describe 2 \-\-key frodo \e
+    \-\-keyring fellowship \-\-location us\-east1 \e
+    \-\-attestation\-file path/to/attestation.dat
+.RE
+
 
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud kms keys versions describe

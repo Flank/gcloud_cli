@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Command for listing network peerings."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import filter_rewrite
@@ -23,6 +26,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
 class List(base.ListCommand):
   """List Google Compute Engine network peerings."""
 
@@ -70,6 +74,29 @@ class List(base.ListCommand):
       for peering in synthesized_network['peerings']:
         peering['source_network'] = network.selfLink
       yield synthesized_network
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ListAlpha(List):
+  """List Google Compute Engine network peerings."""
+
+  @staticmethod
+  def Args(parser):
+    parser.display_info.AddFormat("""
+        table(peerings:format="table(
+            name,
+            source_network.basename():label=NETWORK,
+            network.map().scope(projects).segment(0):label=PEER_PROJECT,
+            network.basename():label=PEER_NETWORK,
+            autoCreateRoutes,
+            importCustomRoutes,
+            exportCustomRoutes,
+            state,
+            stateDetails
+       )")
+    """)
+    parser.add_argument(
+        '--network', help='Only show peerings of a specific network.')
 
 
 List.detailed_help = base_classes.GetGlobalListerHelp('peerings')

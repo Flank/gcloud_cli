@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for `gcloud scheduler jobs delete`."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -47,7 +50,7 @@ class JobsDeleteTest(base.SchedulerTestBase):
     self.Run('scheduler jobs delete my-job')
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_NoConfirm(self, track):
     self.track = track
@@ -58,7 +61,7 @@ class JobsDeleteTest(base.SchedulerTestBase):
       self.Run('scheduler jobs delete my-job')
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_RelativeName(self, track):
     relative_name = ('projects/{}/locations'
@@ -70,7 +73,7 @@ class JobsDeleteTest(base.SchedulerTestBase):
     self.Run('scheduler jobs delete ' + relative_name)
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
 
 if __name__ == '__main__':

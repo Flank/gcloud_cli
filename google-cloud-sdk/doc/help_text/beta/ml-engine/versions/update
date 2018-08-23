@@ -1,5 +1,5 @@
 NAME
-    gcloud beta ml-engine versions update - update a Cloud ML Engine model
+    gcloud beta ml-engine versions update - update a Cloud ML Engine version
 
 SYNOPSIS
     gcloud beta ml-engine versions update (VERSION : --model=MODEL)
@@ -7,7 +7,7 @@ SYNOPSIS
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Update a Cloud ML Engine model.
+    (BETA) Update a Cloud ML Engine version.
 
 POSITIONAL ARGUMENTS
      Version resource - The Cloud ML Engine model to update. The arguments in

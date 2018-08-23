@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +15,23 @@
 """Tests for bigtable instances set-iam-policy command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import re
 
 from apitools.base.py import encoding
 from googlecloudsdk.api_lib.bigtable import util
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class SetIamPolicyTest(base.BigtableV2TestBase,
                        sdk_test_base.WithOutputCapture):
 
@@ -42,7 +49,8 @@ class SetIamPolicyTest(base.BigtableV2TestBase,
     json = encoding.MessageToJson(self.policy)
     self.temp_file = self.Touch(self.temp_path, contents=json)
 
-  def testSetIamPolicy(self):
+  def testSetIamPolicy(self, track):
+    self.track = track
     set_request = self.msgs.SetIamPolicyRequest(policy=self.policy)
     self.client.projects_instances.SetIamPolicy.Expect(
         request=self.msgs.BigtableadminProjectsInstancesSetIamPolicyRequest(
@@ -55,7 +63,8 @@ class SetIamPolicyTest(base.BigtableV2TestBase,
     self.assertEqual(set_policy_request, self.policy)
     self.AssertErrContains('Updated IAM policy for instance [my-instance].')
 
-  def testBadJsonOrYamlSetIamPolicyProject(self):
+  def testBadJsonOrYamlSetIamPolicyProject(self, track):
+    self.track = track
     temp_file = self.Touch(self.temp_path, 'bad', contents='bad')
 
     with self.AssertRaisesExceptionRegexp(
@@ -64,7 +73,8 @@ class SetIamPolicyTest(base.BigtableV2TestBase,
           bigtable instances set-iam-policy my-instance {0}
           """.format(temp_file))
 
-  def testBadJsonSetIamPolicyProject(self):
+  def testBadJsonSetIamPolicyProject(self, track):
+    self.track = track
     temp_file = os.path.join(self.temp_path, 'doesnotexist')
 
     with self.AssertRaisesExceptionRegexp(

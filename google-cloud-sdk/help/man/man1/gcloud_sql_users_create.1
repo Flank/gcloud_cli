@@ -11,7 +11,7 @@ gcloud sql users create \- creates a user in a given instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud sql users create\fR \fIUSERNAME\fR \fIHOST\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-password\fR=\fIPASSWORD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud sql users create\fR \fIUSERNAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-password\fR=\fIPASSWORD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,10 +27,6 @@ Creates a user in a given instance with specified username, host, and password.
 .TP 2m
 \fIUSERNAME\fR
 Cloud SQL username.
-
-.TP 2m
-\fIHOST\fR
-Cloud SQL user's host.
 
 
 .RE
@@ -56,6 +52,15 @@ Display information about the operation in progress, without waiting for the
 operation to complete.
 
 .TP 2m
+\fB\-\-host\fR=\fIHOST\fR
+Cloud SQL user's host name expressed as a specific IP address or address range.
+\f5%\fR denotes an unrestricted host name. Applicable flag for MySQL instances;
+ignored for PostgreSQL instances. Note, if you connect to your instance using IP
+addresses, you must add your client IP address as an Authorized Address, even if
+your host name is unrestricted. For help on how to do so, read:
+https://cloud.google.com/sql/docs/mysql/configure\-ip
+
+.TP 2m
 \fB\-\-password\fR=\fIPASSWORD\fR
 Cloud SQL user's password.
 
@@ -74,9 +79,10 @@ help\fR for details.
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
+$ gcloud alpha sql users create
 $ gcloud beta sql users create
 .RE
 

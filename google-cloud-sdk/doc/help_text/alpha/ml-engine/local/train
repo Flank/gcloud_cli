@@ -40,7 +40,7 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --module-name=MODULE_NAME
-        Name of the module to run
+        Name of the module to run.
 
 OPTIONAL FLAGS
      --distributed
@@ -48,10 +48,10 @@ OPTIONAL FLAGS
         configurations as environment variables to subprocesses
 
      --job-dir=JOB_DIR
-        A Google Cloud Storage path or local_directory in which to store
-        training outputs and other data needed for training.
+        Google Cloud Storage path or local_directory in which to store training
+        outputs and other data needed for training.
 
-        This path will be passed to your TensorFlow program as --job_dir
+        This path will be passed to your TensorFlow program as the --job_dir
         command-line arg. The benefit of specifying this field is that Cloud ML
         Engine will validate the path for use in training.
 
@@ -83,11 +83,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud ml-engine local train
         $ gcloud beta ml-engine local train

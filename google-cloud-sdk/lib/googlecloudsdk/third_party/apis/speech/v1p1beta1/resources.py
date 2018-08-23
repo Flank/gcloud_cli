@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +18,7 @@ import enum
 
 
 BASE_URL = 'https://speech.googleapis.com/v1p1beta1/'
-DOCS_URL = 'https://cloud.google.com/speech/'
+DOCS_URL = 'https://cloud.google.com/speech-to-text/docs/quickstart-protocol'
 
 
 class Collections(enum.Enum):
@@ -29,6 +30,31 @@ class Collections(enum.Enum):
       {
           '':
               'operations/{operationsId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS = (
+      'projects',
+      'projects/{projectsId}',
+      {},
+      [u'projectsId'],
+      True
+  )
+  PROJECTS_LOCATIONS = (
+      'projects.locations',
+      'projects/{projectsId}/locations/{locationsId}',
+      {},
+      [u'projectsId', u'locationsId'],
+      True
+  )
+  PROJECTS_LOCATIONS_DATASETS = (
+      'projects.locations.datasets',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/datasets/'
+              '{datasetsId}',
       },
       [u'name'],
       True

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Utilities for local ml-engine operations."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 import os
 import subprocess
@@ -47,7 +51,7 @@ class InvalidReturnValueError(core_exceptions.Error):
 
 
 def RunPredict(model_dir, json_instances=None, text_instances=None,
-               framework='tensorflow'):
+               framework='tensorflow', signature_name=None):
   """Run ML Engine local prediction."""
   instances = predict_utilities.ReadInstancesFromArgs(json_instances,
                                                       text_instances)
@@ -79,10 +83,12 @@ def RunPredict(model_dir, json_instances=None, text_instances=None,
   # Use python found on PATH or local_python override if set
   python_executable = (properties.VALUES.ml_engine.local_python.Get() or
                        python_executables[0])
+  predict_args = ['--model-dir', model_dir, '--framework', framework]
+  if signature_name:
+    predict_args += ['--signature-name', signature_name]
   # Start local prediction in a subprocess.
   proc = subprocess.Popen(
-      [python_executable, local_predict.__file__,
-       '--model-dir', model_dir, '--framework', framework],
+      [python_executable, local_predict.__file__] + predict_args,
       stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
       env=env)
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +15,17 @@
 """Tests for bigtable add-iam-policy-binding."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.bigtable import util
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class AddIamPolicyBindingTest(base.BigtableV2TestBase):
 
   def SetUp(self):
@@ -47,8 +54,9 @@ class AddIamPolicyBindingTest(base.BigtableV2TestBase):
         etag='someUniqueEtag'.encode(),
         version=1)
 
-  def testAddIamPolicyBinding(self):
+  def testAddIamPolicyBinding(self, track):
     """Test the standard use case."""
+    self.track = track
     self.client.projects_instances.GetIamPolicy.Expect(
         request=self.msgs.BigtableadminProjectsInstancesGetIamPolicyRequest(
             resource=self.instance_ref.RelativeName()),

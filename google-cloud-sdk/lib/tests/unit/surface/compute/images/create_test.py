@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the images create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import csek_utils
 from googlecloudsdk.api_lib.compute import image_utils
 from googlecloudsdk.calliope import base as calliope_base
@@ -44,7 +47,8 @@ class ImagesCreateTest(test_base.BaseTest):
                   name='my-image',
                   description='nifty',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -52,7 +56,7 @@ class ImagesCreateTest(test_base.BaseTest):
   def testWithSourceUri(self):
     self.Run("""
         compute images create my-image
-          --source-uri http://storage.googleapis.com/31dd/source-image
+          --source-uri https://www.googleapis.com/storage/v1/b/31dd/o/source-image
         """)
 
     self.CheckRequests(
@@ -62,7 +66,8 @@ class ImagesCreateTest(test_base.BaseTest):
               image=self.messages.Image(
                   name='my-image',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -80,7 +85,8 @@ class ImagesCreateTest(test_base.BaseTest):
               image=self.messages.Image(
                   name='my-image',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -248,7 +254,8 @@ class ImagesCreateTest(test_base.BaseTest):
                   description='nifty',
                   licenses=licenses,
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -276,7 +283,8 @@ class ImagesCreateTest(test_base.BaseTest):
                   description='nifty',
                   licenses=licenses,
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -511,7 +519,8 @@ class ImagesCreateGuestOsFeaturesTest(test_base.BaseTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -539,7 +548,8 @@ class ImagesCreateGuestOsFeaturesTest(test_base.BaseTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -599,7 +609,8 @@ class ImagesCreateGuestOsFeaturesBetaTest(test_base.BaseTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -627,7 +638,8 @@ class ImagesCreateGuestOsFeaturesBetaTest(test_base.BaseTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -685,7 +697,8 @@ class ImagesCreateGuestOsFeaturesAlphaTest(test_base.BaseTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -713,7 +726,8 @@ class ImagesCreateGuestOsFeaturesAlphaTest(test_base.BaseTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -1108,7 +1122,8 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
                                  'keyRings/ring/cryptoKeys/image-key'
                   ),
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -1133,7 +1148,8 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
                                  'keyRings/ring/cryptoKeys/image-key'
                   ),
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -1158,7 +1174,8 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
                                  'keyRings/ring/cryptoKeys/image-key'
                   ),
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='http://storage.googleapis.com/31dd/source-image'),
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )

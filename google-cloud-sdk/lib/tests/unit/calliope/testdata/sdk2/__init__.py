@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """The super-group for the cloud CLI."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import log
 
@@ -24,7 +27,7 @@ class Sdk2(base.Group):
   @staticmethod
   def Args(parser):
     parser.display_info.AddFormat('table(top)')
-    parser.display_info.AddAliases({'ALL': 'top', 'TOP': 'Top'})
+    parser.display_info.AddAliases({'ALL': ['top'], 'TOP': ['Top']})
 
   def Filter(self, unused_context, unused_args):
     log.status.Print('Filter Sdk2')

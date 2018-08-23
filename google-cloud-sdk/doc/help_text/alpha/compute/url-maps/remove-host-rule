@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute url-maps remove-host-rule URL_MAP_NAME --host=HOST
-        [--delete-orphaned-path-matcher] [GCLOUD_WIDE_FLAG ...]
+        [--delete-orphaned-path-matcher] [--global | --region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute url-maps remove-host-rule is used to remove a
@@ -25,6 +26,31 @@ OPTIONAL FLAGS
         If provided and a path matcher is orphaned as a result of this command,
         the command removes the orphaned path matcher instead of failing.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the URL map is global.
+
+       --region=REGION
+          Region of the URL map to operate on. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
@@ -35,14 +61,14 @@ EXAMPLES
     named MY-URL-MAP, you can use this command:
 
         $ gcloud alpha compute url-maps remove-host-rule MY-URL-MAP \
-            --host example.com
+            --host example.com --global
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute url-maps remove-host-rule
         $ gcloud beta compute url-maps remove-host-rule

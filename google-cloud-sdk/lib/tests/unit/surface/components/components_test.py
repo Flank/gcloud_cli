@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +14,7 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import os
@@ -207,7 +209,7 @@ c1,False,
 
     self.Run('components post-process')
 
-    self.assertEqual(compile_mock.call_count, 3)
+    self.assertEqual(compile_mock.call_count, 4)
 
   def testPostProcessNoResourceCache(self):
     root = os.path.realpath(self.CreateTempDir('root'))
@@ -216,7 +218,7 @@ c1,False,
 
     self.Run('components post-process')
 
-    self.assertEqual(compile_mock.call_count, 3)
+    self.assertEqual(compile_mock.call_count, 4)
 
 if __name__ == '__main__':
   cli_test_base.main()

@@ -1,0 +1,91 @@
+
+.TH "GCLOUD_BETA_FILESTORE_INSTANCES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta filestore instances delete \- delete a Cloud Filestore instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta filestore instances delete\fR (\fIINSTANCE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Delete a Cloud Filestore instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- The instance to delete. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the flag [instance] on the command line with a fully
+specified name; provide the flag [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+The ID of the instance or a fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Do not wait for the delete operation to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a Cloud Filestore instance named NAME in us\-central1\-c:
+
+.RS 2m
+$ gcloud beta filestore instances delete NAME \e
+    \-\-location=us\-central1\-c
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha filestore instances delete
+.RE
+

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,21 +16,18 @@
 """Tests for container.subnets.list_usable."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.container import base
 
 
-class ListUsableTestAlphaV1Alpha1API(base.AlphaTestBase,
-                                     base.TestBaseV1Alpha1,
-                                     base.SubnetsTestBase,
-                                     test_case.WithOutputCapture):
+class ListUsableTestAlpha(base.AlphaTestBase,
+                          base.SubnetsTestBase,
+                          test_case.WithOutputCapture):
   """gcloud alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
 
   def testMissingProject(self):
     properties.VALUES.core.project.Set(None)

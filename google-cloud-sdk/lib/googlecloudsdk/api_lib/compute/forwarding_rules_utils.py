@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Common classes and functions for forwarding rules."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import lister
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.calliope import exceptions
@@ -23,7 +27,7 @@ from googlecloudsdk.command_lib.compute.forwarding_rules import flags
 from googlecloudsdk.core import properties
 
 
-def _ValidateGlobalArgs(args):
+def _ValidateGlobalArgs(args, include_alpha=False):
   """Validate the global forwarding rules args."""
   if args.target_instance:
     raise exceptions.ToolException(
@@ -49,12 +53,31 @@ def _ValidateGlobalArgs(args):
         'You cannot specify [--target-vpn-gateway] for a global '
         'forwarding rule.')
 
+  if (include_alpha and
+      getattr(args, 'load_balancing_scheme', None) == 'INTERNAL_SELF_MANAGED'):
+    if not (getattr(args, 'target_http_proxy', None) or
+            getattr(args, 'target_https_proxy', None)):
+      raise exceptions.ToolException(
+          'You must specify either [--target-http-proxy] or '
+          '[--target-https-proxy] for an INTERNAL_SELF_MANAGED '
+          '[--load-balancing-scheme].')
 
-def GetGlobalTarget(resources, args):
+    if getattr(args, 'subnet', None):
+      raise exceptions.ToolException(
+          'You cannot specify [--subnet] for an INTERNAL_SELF_MANAGED '
+          '[--load-balancing-scheme].')
+
+    if not getattr(args, 'address', None):
+      raise exceptions.ToolException(
+          'You must specify [--address] for an INTERNAL_SELF_MANAGED '
+          '[--load-balancing-scheme]')
+
+
+def GetGlobalTarget(resources, args, include_alpha=False):
   """Return the forwarding target for a globally scoped request."""
-  _ValidateGlobalArgs(args)
+  _ValidateGlobalArgs(args, include_alpha)
   if args.target_http_proxy:
-    return flags.TARGET_HTTP_PROXY_ARG.ResolveAsResource(args, resources)
+    return flags.TargetHttpProxyArg().ResolveAsResource(args, resources)
 
   if args.target_https_proxy:
     return flags.TARGET_HTTPS_PROXY_ARG.ResolveAsResource(args, resources)
@@ -64,13 +87,12 @@ def GetGlobalTarget(resources, args):
     return flags.TARGET_TCP_PROXY_ARG.ResolveAsResource(args, resources)
 
 
-def _ValidateRegionalArgs(args, allow_global_target):
+def _ValidateRegionalArgs(args, include_alpha=False):
   """Validate the regional forwarding rules args.
 
   Args:
       args: The arguments given to the create/set-target command.
-      allow_global_target: True if the regional forwarding rule can have global
-      target in current api version.
+      include_alpha: Should alpha functionality be included?
   """
 
   if getattr(args, 'global', None):
@@ -82,24 +104,6 @@ def _ValidateRegionalArgs(args, allow_global_target):
   # rule can have global target. The request may not specify network tier
   # because it can be set as default project setting, so here let backend do
   # validation.
-  if not allow_global_target:
-    if args.target_http_proxy:
-      raise exceptions.ToolException(
-          'You cannot specify [--target-http-proxy] for a regional '
-          'forwarding rule.')
-    if getattr(args, 'target_https_proxy', None):
-      raise exceptions.ToolException(
-          'You cannot specify [--target-https-proxy] for a regional '
-          'forwarding rule.')
-    if getattr(args, 'target_ssl_proxy', None):
-      raise exceptions.ToolException(
-          'You cannot specify [--target-ssl-proxy] for a regional '
-          'forwarding rule.')
-    if getattr(args, 'target_tcp_proxy', None):
-      raise exceptions.ToolException(
-          'You cannot specify [--target-tcp-proxy] for a regional '
-          'forwarding rule.')
-
   if args.target_instance_zone and not args.target_instance:
     raise exceptions.ToolException(
         'You cannot specify [--target-instance-zone] unless you are '
@@ -116,14 +120,20 @@ def _ValidateRegionalArgs(args, allow_global_target):
         'You cannot specify [--subnet] or [--network] for non-internal '
         '[--load-balancing-scheme] forwarding rule.')
 
+  if (include_alpha and
+      getattr(args, 'load_balancing_scheme', None) == 'INTERNAL_SELF_MANAGED'):
+    raise exceptions.ToolException(
+        'You cannot specify an INTERNAL_SELF_MANAGED [--load-balancing-scheme] '
+        'for a regional forwarding rule.')
+
 
 def GetRegionalTarget(client,
                       resources,
                       args,
                       forwarding_rule_ref=None,
-                      allow_global_target=False):
+                      include_alpha=False):
   """Return the forwarding target for a regionally scoped request."""
-  _ValidateRegionalArgs(args, allow_global_target)
+  _ValidateRegionalArgs(args, include_alpha)
   if forwarding_rule_ref:
     region_arg = forwarding_rule_ref.region
     project_arg = forwarding_rule_ref.project
@@ -159,7 +169,8 @@ def GetRegionalTarget(client,
     target_ref = flags.BACKEND_SERVICE_ARG.ResolveAsResource(args, resources)
     target_region = target_ref.region
   elif args.target_http_proxy:
-    target_ref = flags.TARGET_HTTP_PROXY_ARG.ResolveAsResource(args, resources)
+    target_ref = flags.TargetHttpProxyArg(
+        include_alpha=include_alpha).ResolveAsResource(args, resources)
     target_region = region_arg
   elif args.target_https_proxy:
     target_ref = flags.TARGET_HTTPS_PROXY_ARG.ResolveAsResource(args, resources)

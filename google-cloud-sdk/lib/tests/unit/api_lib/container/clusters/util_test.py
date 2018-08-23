@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Test for container util functions."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import stat
 
@@ -122,7 +125,7 @@ class ClusterConfigTestBase(base.UnitTestBase):
     return c_config
 
 
-class KubeconfigTestsV1(base.TestBaseV1, base.UnitTestBase):
+class KubeconfigTestGA(base.GATestBase, base.UnitTestBase):
 
   # Verifies expected permission bits of written kubeconfig.
   @test_case.Filters.DoNotRunOnWindows
@@ -240,7 +243,11 @@ class KubeconfigTestsV1(base.TestBaseV1, base.UnitTestBase):
       kconfig._AuthProvider('gcp')
 
 
-class KubeconfigTestsV1Alpha1(base.TestBaseV1Alpha1, KubeconfigTestsV1):
+class KubeconfigTestBeta(base.BetaTestBase, KubeconfigTestGA):
+  pass
+
+
+class KubeconfigTestAlpha(base.AlphaTestBase, KubeconfigTestBeta):
   pass
 
 
@@ -311,8 +318,7 @@ class APIAdapterTests(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self._TestDefault(api_adapter.NewV1Alpha1APIAdapter)
 
 
-class ClusterConfigTest(
-    base.TestBaseV1, base.GATestBase, ClusterConfigTestBase):
+class ClusterConfigTestGA(base.GATestBase, ClusterConfigTestBase):
 
   def SetUp(self):
     self._PatchSDKBinPath()
@@ -540,16 +546,16 @@ class ClusterConfigTest(
     self.assertEqual(user['user']['auth-provider']['name'], 'gcp')
 
 
-class ClusterConfigTestAlpha(ClusterConfigTest, base.AlphaTestBase):
+class ClusterConfigTestBeta(base.BetaTestBase, ClusterConfigTestGA):
   pass
 
 
-class ClusterConfigTestBeta(ClusterConfigTest, base.BetaTestBase):
+class ClusterConfigTestAlpha(base.AlphaTestBase, ClusterConfigTestBeta):
   pass
 
 
 class BundleTest(
-    base.TestBaseV1, base.GATestBase,
+    base.GATestBase,
     ClusterConfigTestBase,
     sdk_test_base.BundledBase):
 

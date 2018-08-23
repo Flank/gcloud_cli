@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the url-maps list-cdn-cache-invalidations subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -92,6 +96,65 @@ class UrlMapsListCacheInvalidationsTest(test_base.BaseTest):
             DESCRIPTION HTTP_STATUS STATUS TIMESTAMP
             /hello/*    200         DONE   2014-09-04T09:55:33.679-07:00
             """), normalize_space=True)
+
+
+class UrlMapsListCacheInvalidationsAlphaTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+
+  def testSimpleCase(self):
+    self.make_requests.side_effect = iter([[URL_MAP], [INVALIDATION]])
+
+    self.Run("""
+        alpha compute url-maps list-cdn-cache-invalidations url-map
+        --region us-west1
+        """)
+
+    self.CheckRequests(
+        [(self.compute_alpha.regionUrlMaps, 'Get',
+          self.messages.ComputeRegionUrlMapsGetRequest(
+              project='my-project', urlMap='url-map', region='us-west1'))],
+        [(self.compute_alpha.globalOperations, 'AggregatedList',
+          self.messages.ComputeGlobalOperationsAggregatedListRequest(
+              filter=EXPECTED_FILTER_EXPR,
+              maxResults=500,
+              orderBy='creationTimestamp desc',
+              project='my-project'))])
+
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            DESCRIPTION HTTP_STATUS STATUS TIMESTAMP
+            /hello/*    200         DONE   2014-09-04T09:55:33.679-07:00
+            """),
+        normalize_space=True)
+
+  def testLimit(self):
+    self.make_requests.side_effect = iter([[URL_MAP], [INVALIDATION]])
+
+    self.Run("""
+        alpha compute url-maps list-cdn-cache-invalidations url-map --limit 10
+        --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute_alpha.urlMaps, 'Get',
+          self.messages.ComputeUrlMapsGetRequest(
+              project='my-project', urlMap='url-map'))],
+        [(self.compute_alpha.globalOperations, 'AggregatedList',
+          self.messages.ComputeGlobalOperationsAggregatedListRequest(
+              filter=EXPECTED_FILTER_EXPR,
+              maxResults=10,
+              orderBy='creationTimestamp desc',
+              project='my-project'))])
+
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            DESCRIPTION HTTP_STATUS STATUS TIMESTAMP
+            /hello/*    200         DONE   2014-09-04T09:55:33.679-07:00
+            """),
+        normalize_space=True)
+
 
 if __name__ == '__main__':
   test_case.main()

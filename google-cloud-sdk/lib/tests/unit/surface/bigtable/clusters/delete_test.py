@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,19 @@
 """Test of the 'delete' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.calliope.concepts import concepts_test_base
 from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class DeleteCommandTest(base.BigtableV2TestBase,
                         resource_completer_test_base.ResourceCompleterBase,
                         concepts_test_base.ConceptsTestBase):
@@ -31,7 +38,8 @@ class DeleteCommandTest(base.BigtableV2TestBase,
         name='projects/{0}/instances/{1}/clusters/{2}'.format(
             self.Project(), 'theinstance', 'thecluster'))
 
-  def testDelete(self):
+  def testDelete(self, track):
+    self.track = track
     self.svc.Expect(request=self.msg, response=self.msgs.Empty())
     self.WriteInput('y\n')
     self.Run('bigtable clusters delete thecluster --instance theinstance')

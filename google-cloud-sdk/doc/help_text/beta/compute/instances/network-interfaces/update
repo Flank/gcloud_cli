@@ -35,7 +35,7 @@ FLAGS
         The name of the network interface to update.
 
      --zone=ZONE
-        The zone of the instance to operate on. If not specified, you may be
+        Zone of the instance to operate on. If not specified, you may be
         prompted to select a zone. gcloud will attempt to identify the zone by
         searching for resources in your project. If the zone cannot be
         determined, you will then be prompted with all Google Cloud Platform

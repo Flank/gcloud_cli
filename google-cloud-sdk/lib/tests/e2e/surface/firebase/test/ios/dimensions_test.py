@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.api_lib.firebase.test import exceptions
@@ -28,14 +31,14 @@ class IosDeviceDimensionsIntegrationTests(e2e_base.TestIntegrationTestBase):
   """Integration tests for device dimensions in gcloud firebase test ios run."""
 
   def testArgConflicts_BadDimensionNameInArgFile(self):
-    with self.assertRaises(exceptions.InvalidIosDimensionNameError):
+    with self.assertRaises(exceptions.InvalidDimensionNameError):
       self.Run('{cmd} {argfile}:ios-bad-dimension '.format(
           cmd=commands.IOS_TEST_RUN, argfile=e2e_base.INTEGRATION_ARGS))
 
     self.AssertErrContains("'brand' is not a valid dimension name.")
 
   def testArgConflicts_BadDimensionNameInFlag(self):
-    with self.assertRaises(exceptions.InvalidIosDimensionNameError):
+    with self.assertRaises(exceptions.InvalidDimensionNameError):
       self.Run(
           '{cmd} --test {zip} --device model=iphone8 --device codename=secret'
           .format(cmd=commands.IOS_TEST_RUN, zip=IOS_XCTEST))

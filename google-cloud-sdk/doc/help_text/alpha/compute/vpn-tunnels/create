@@ -48,7 +48,7 @@ OPTIONAL FLAGS
         strings. Example: 192.168.0.0/16,10.0.0.0/24.
 
      --region=REGION
-        The region of the VPN Tunnel to create. If not specified, you may be
+        Region of the VPN Tunnel to create. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
@@ -80,9 +80,9 @@ OPTIONAL FLAGS
         The Router to use for dynamic routing.
 
      --target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION
-        The region of the Target VPN Gateway to operate on. Should be the same
-        as region, if not specified, it will be automatically set. Overrides
-        the default compute/region property value for this command invocation.
+        Region of the Target VPN Gateway to operate on. Should be the same as
+        region, if not specified, it will be automatically set. Overrides the
+        default compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -90,11 +90,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute vpn-tunnels create
         $ gcloud beta compute vpn-tunnels create

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Command line processing utilities for access policies."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.accesscontextmanager import policies as policies_api
 from googlecloudsdk.api_lib.cloudresourcemanager import organizations
 from googlecloudsdk.calliope.concepts import concepts

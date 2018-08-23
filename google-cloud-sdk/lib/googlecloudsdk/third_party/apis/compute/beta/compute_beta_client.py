@@ -76,6 +76,7 @@ class ComputeBeta(base_api.BaseApiClient):
     self.regionInstanceGroups = self.RegionInstanceGroupsService(self)
     self.regionOperations = self.RegionOperationsService(self)
     self.regions = self.RegionsService(self)
+    self.resourcePolicies = self.ResourcePoliciesService(self)
     self.routers = self.RoutersService(self)
     self.routes = self.RoutesService(self)
     self.securityPolicies = self.SecurityPoliciesService(self)
@@ -604,7 +605,7 @@ class ComputeBeta(base_api.BaseApiClient):
           }
 
     def AddSignedUrlKey(self, request, global_params=None):
-      r"""Adds the given Signed URL Key to the backend bucket.
+      r"""Adds a key for validating requests with signed URLs for this backend bucket.
 
       Args:
         request: (ComputeBackendBucketsAddSignedUrlKeyRequest) input message
@@ -656,7 +657,7 @@ class ComputeBeta(base_api.BaseApiClient):
     )
 
     def DeleteSignedUrlKey(self, request, global_params=None):
-      r"""Deletes the given Signed URL Key from the backend bucket.
+      r"""Deletes a key for validating requests with signed URLs for this backend bucket.
 
       Args:
         request: (ComputeBackendBucketsDeleteSignedUrlKeyRequest) input message
@@ -822,7 +823,7 @@ class ComputeBeta(base_api.BaseApiClient):
           }
 
     def AddSignedUrlKey(self, request, global_params=None):
-      r"""Adds the given Signed URL Key to the specified backend service.
+      r"""Adds a key for validating requests with signed URLs for this backend service.
 
       Args:
         request: (ComputeBackendServicesAddSignedUrlKeyRequest) input message
@@ -900,7 +901,7 @@ class ComputeBeta(base_api.BaseApiClient):
     )
 
     def DeleteSignedUrlKey(self, request, global_params=None):
-      r"""Deletes the given Signed URL Key from the specified backend service.
+      r"""Deletes a key for validating requests with signed URLs for this backend service.
 
       Args:
         request: (ComputeBackendServicesDeleteSignedUrlKeyRequest) input message
@@ -1231,6 +1232,32 @@ class ComputeBeta(base_api.BaseApiClient):
       self._upload_configs = {
           }
 
+    def AddResourcePolicies(self, request, global_params=None):
+      r"""Adds existing resource policies to a disk. You can only add one policy which will be applied to this disk for scheduling snapshot creation.
+
+      Args:
+        request: (ComputeDisksAddResourcePoliciesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('AddResourcePolicies')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AddResourcePolicies.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.disks.addResourcePolicies',
+        ordered_params=[u'project', u'zone', u'disk'],
+        path_params=[u'disk', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/disks/{disk}/addResourcePolicies',
+        request_field=u'disksAddResourcePoliciesRequest',
+        request_type_name=u'ComputeDisksAddResourcePoliciesRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def AggregatedList(self, request, global_params=None):
       r"""Retrieves an aggregated list of persistent disks.
 
@@ -1335,6 +1362,32 @@ class ComputeBeta(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
+
+      Args:
+        request: (ComputeDisksGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.disks.getIamPolicy',
+        ordered_params=[u'project', u'zone', u'resource'],
+        path_params=[u'project', u'resource', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/disks/{resource}/getIamPolicy',
+        request_field='',
+        request_type_name=u'ComputeDisksGetIamPolicyRequest',
+        response_type_name=u'Policy',
+        supports_download=False,
+    )
+
     def Insert(self, request, global_params=None):
       r"""Creates a persistent disk in the specified project using the data in the request. You can create a disk with a sourceImage, a sourceSnapshot, or create an empty 500 GB data disk by omitting all properties. You can also create a disk that is larger than the default size by specifying the sizeGb property.
 
@@ -1387,6 +1440,32 @@ class ComputeBeta(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def RemoveResourcePolicies(self, request, global_params=None):
+      r"""Removes resource policies from a disk.
+
+      Args:
+        request: (ComputeDisksRemoveResourcePoliciesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('RemoveResourcePolicies')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    RemoveResourcePolicies.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.disks.removeResourcePolicies',
+        ordered_params=[u'project', u'zone', u'disk'],
+        path_params=[u'disk', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/disks/{disk}/removeResourcePolicies',
+        request_field=u'disksRemoveResourcePoliciesRequest',
+        request_type_name=u'ComputeDisksRemoveResourcePoliciesRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def Resize(self, request, global_params=None):
       r"""Resizes the specified persistent disk. You can only increase the size of the disk.
 
@@ -1410,6 +1489,32 @@ class ComputeBeta(base_api.BaseApiClient):
         request_field=u'disksResizeRequest',
         request_type_name=u'ComputeDisksResizeRequest',
         response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeDisksSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.disks.setIamPolicy',
+        ordered_params=[u'project', u'zone', u'resource'],
+        path_params=[u'project', u'resource', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/disks/{resource}/setIamPolicy',
+        request_field=u'zoneSetPolicyRequest',
+        request_type_name=u'ComputeDisksSetIamPolicyRequest',
+        response_type_name=u'Policy',
         supports_download=False,
     )
 
@@ -3039,6 +3144,32 @@ If an empty request body is given, clears the deprecation status instead.
         supports_download=False,
     )
 
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
+
+      Args:
+        request: (ComputeImagesGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.images.getIamPolicy',
+        ordered_params=[u'project', u'resource'],
+        path_params=[u'project', u'resource'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/images/{resource}/getIamPolicy',
+        request_field='',
+        request_type_name=u'ComputeImagesGetIamPolicyRequest',
+        response_type_name=u'Policy',
+        supports_download=False,
+    )
+
     def Insert(self, request, global_params=None):
       r"""Creates an image in the specified project using the data included in the request.
 
@@ -3088,6 +3219,32 @@ If an empty request body is given, clears the deprecation status instead.
         request_field='',
         request_type_name=u'ComputeImagesListRequest',
         response_type_name=u'ImageList',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeImagesSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.images.setIamPolicy',
+        ordered_params=[u'project', u'resource'],
+        path_params=[u'project', u'resource'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/images/{resource}/setIamPolicy',
+        request_field=u'globalSetPolicyRequest',
+        request_type_name=u'ComputeImagesSetIamPolicyRequest',
+        response_type_name=u'Policy',
         supports_download=False,
     )
 
@@ -3949,6 +4106,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
+
+      Args:
+        request: (ComputeInstanceTemplatesGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.instanceTemplates.getIamPolicy',
+        ordered_params=[u'project', u'resource'],
+        path_params=[u'project', u'resource'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/instanceTemplates/{resource}/getIamPolicy',
+        request_field='',
+        request_type_name=u'ComputeInstanceTemplatesGetIamPolicyRequest',
+        response_type_name=u'Policy',
+        supports_download=False,
+    )
+
     def Insert(self, request, global_params=None):
       r"""Creates an instance template in the specified project using the data that is included in the request. If you are creating a new template to update an existing instance group, your new instance template must use the same network or, if applicable, the same subnetwork as the original template.
 
@@ -3998,6 +4181,32 @@ If the group is part of a backend service that has enabled connection draining, 
         request_field='',
         request_type_name=u'ComputeInstanceTemplatesListRequest',
         response_type_name=u'InstanceTemplateList',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeInstanceTemplatesSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.instanceTemplates.setIamPolicy',
+        ordered_params=[u'project', u'resource'],
+        path_params=[u'project', u'resource'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/instanceTemplates/{resource}/setIamPolicy',
+        request_field=u'globalSetPolicyRequest',
+        request_type_name=u'ComputeInstanceTemplatesSetIamPolicyRequest',
+        response_type_name=u'Policy',
         supports_download=False,
     )
 
@@ -4064,7 +4273,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def AggregatedList(self, request, global_params=None):
-      r"""Retrieves aggregated list of instances.
+      r"""Retrieves aggregated list of all of the instances in your project across all regions and zones.
 
       Args:
         request: (ComputeInstancesAggregatedListRequest) input message
@@ -4219,8 +4428,34 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
+
+      Args:
+        request: (ComputeInstancesGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.instances.getIamPolicy',
+        ordered_params=[u'project', u'zone', u'resource'],
+        path_params=[u'project', u'resource', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{resource}/getIamPolicy',
+        request_field='',
+        request_type_name=u'ComputeInstancesGetIamPolicyRequest',
+        response_type_name=u'Policy',
+        supports_download=False,
+    )
+
     def GetSerialPortOutput(self, request, global_params=None):
-      r"""Returns the specified instance's serial port output.
+      r"""Returns the last 1 MB of serial port output from the specified instance.
 
       Args:
         request: (ComputeInstancesGetSerialPortOutputRequest) input message
@@ -4398,6 +4633,32 @@ If the group is part of a backend service that has enabled connection draining, 
         request_field='',
         request_type_name=u'ComputeInstancesSetDiskAutoDeleteRequest',
         response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeInstancesSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.instances.setIamPolicy',
+        ordered_params=[u'project', u'zone', u'resource'],
+        path_params=[u'project', u'resource', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{resource}/setIamPolicy',
+        request_field=u'zoneSetPolicyRequest',
+        request_type_name=u'ComputeInstancesSetIamPolicyRequest',
+        response_type_name=u'Policy',
         supports_download=False,
     )
 
@@ -4584,7 +4845,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def SetShieldedVmIntegrityPolicy(self, request, global_params=None):
-      r"""Sets the Shielded VM integrity policy for an instance. This method supports PATCH semantics and uses the JSON merge patch format and processing rules.
+      r"""Sets the Shielded VM integrity policy for a VM instance. You can only use this method on a running VM instance. This method supports PATCH semantics and uses the JSON merge patch format and processing rules.
 
       Args:
         request: (ComputeInstancesSetShieldedVmIntegrityPolicyRequest) input message
@@ -4818,7 +5079,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def UpdateShieldedVmConfig(self, request, global_params=None):
-      r"""Updates the Shielded VM config for an instance. This method supports PATCH semantics and uses the JSON merge patch format and processing rules.
+      r"""Updates the Shielded VM config for a VM instance. You can only use this method on a stopped VM instance. This method supports PATCH semantics and uses the JSON merge patch format and processing rules.
 
       Args:
         request: (ComputeInstancesUpdateShieldedVmConfigRequest) input message
@@ -6078,7 +6339,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def AggregatedList(self, request, global_params=None):
-      r"""Retrieves an aggregated list of node groups.
+      r"""Retrieves an aggregated list of node groups. Note: use nodeGroups.listNodes for more details about each group.
 
       Args:
         request: (ComputeNodeGroupsAggregatedListRequest) input message
@@ -6156,7 +6417,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def Get(self, request, global_params=None):
-      r"""Returns the specified NodeGroup. Get a list of available NodeGroups by making a list() request.
+      r"""Returns the specified NodeGroup. Get a list of available NodeGroups by making a list() request. Note: the "nodes" field should not be used. Use nodeGroups.listNodes instead.
 
       Args:
         request: (ComputeNodeGroupsGetRequest) input message
@@ -6234,7 +6495,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def List(self, request, global_params=None):
-      r"""Retrieves a list of node groups available to the specified project.
+      r"""Retrieves a list of node groups available to the specified project. Note: use nodeGroups.listNodes for more details about each group.
 
       Args:
         request: (ComputeNodeGroupsListRequest) input message
@@ -6256,6 +6517,32 @@ If the group is part of a backend service that has enabled connection draining, 
         request_field='',
         request_type_name=u'ComputeNodeGroupsListRequest',
         response_type_name=u'NodeGroupList',
+        supports_download=False,
+    )
+
+    def ListNodes(self, request, global_params=None):
+      r"""Lists nodes in the node group.
+
+      Args:
+        request: (ComputeNodeGroupsListNodesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeGroupsListNodes) The response message.
+      """
+      config = self.GetMethodConfig('ListNodes')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListNodes.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.nodeGroups.listNodes',
+        ordered_params=[u'project', u'zone', u'nodeGroup'],
+        path_params=[u'nodeGroup', u'project', u'zone'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/zones/{zone}/nodeGroups/{nodeGroup}/listNodes',
+        request_field='',
+        request_type_name=u'ComputeNodeGroupsListNodesRequest',
+        response_type_name=u'NodeGroupsListNodes',
         supports_download=False,
     )
 
@@ -7587,6 +7874,32 @@ If the group is part of a backend service that has enabled connection draining, 
       self._upload_configs = {
           }
 
+    def AddResourcePolicies(self, request, global_params=None):
+      r"""Adds existing resource policies to a regional disk. You can only add one policy which will be applied to this disk for scheduling snapshot creation.
+
+      Args:
+        request: (ComputeRegionDisksAddResourcePoliciesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('AddResourcePolicies')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AddResourcePolicies.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.regionDisks.addResourcePolicies',
+        ordered_params=[u'project', u'region', u'disk'],
+        path_params=[u'disk', u'project', u'region'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/regions/{region}/disks/{disk}/addResourcePolicies',
+        request_field=u'regionDisksAddResourcePoliciesRequest',
+        request_type_name=u'ComputeRegionDisksAddResourcePoliciesRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def CreateSnapshot(self, request, global_params=None):
       r"""Creates a snapshot of this regional disk.
 
@@ -7714,6 +8027,32 @@ If the group is part of a backend service that has enabled connection draining, 
         request_field='',
         request_type_name=u'ComputeRegionDisksListRequest',
         response_type_name=u'DiskList',
+        supports_download=False,
+    )
+
+    def RemoveResourcePolicies(self, request, global_params=None):
+      r"""Removes resource policies from a regional disk.
+
+      Args:
+        request: (ComputeRegionDisksRemoveResourcePoliciesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('RemoveResourcePolicies')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    RemoveResourcePolicies.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.regionDisks.removeResourcePolicies',
+        ordered_params=[u'project', u'region', u'disk'],
+        path_params=[u'disk', u'project', u'region'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/regions/{region}/disks/{disk}/removeResourcePolicies',
+        request_field=u'regionDisksRemoveResourcePoliciesRequest',
+        request_type_name=u'ComputeRegionDisksRemoveResourcePoliciesRequest',
+        response_type_name=u'Operation',
         supports_download=False,
     )
 
@@ -8501,6 +8840,172 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+  class ResourcePoliciesService(base_api.BaseApiService):
+    """Service class for the resourcePolicies resource."""
+
+    _NAME = u'resourcePolicies'
+
+    def __init__(self, client):
+      super(ComputeBeta.ResourcePoliciesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def AggregatedList(self, request, global_params=None):
+      r"""Retrieves an aggregated list of resource policies.
+
+      Args:
+        request: (ComputeResourcePoliciesAggregatedListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ResourcePolicyAggregatedList) The response message.
+      """
+      config = self.GetMethodConfig('AggregatedList')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AggregatedList.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.resourcePolicies.aggregatedList',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/aggregated/resourcePolicies',
+        request_field='',
+        request_type_name=u'ComputeResourcePoliciesAggregatedListRequest',
+        response_type_name=u'ResourcePolicyAggregatedList',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes the specified resource policy.
+
+      Args:
+        request: (ComputeResourcePoliciesDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'DELETE',
+        method_id=u'compute.resourcePolicies.delete',
+        ordered_params=[u'project', u'region', u'resourcePolicy'],
+        path_params=[u'project', u'region', u'resourcePolicy'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/regions/{region}/resourcePolicies/{resourcePolicy}',
+        request_field='',
+        request_type_name=u'ComputeResourcePoliciesDeleteRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Retrieves all information of the specified resource policy.
+
+      Args:
+        request: (ComputeResourcePoliciesGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ResourcePolicy) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.resourcePolicies.get',
+        ordered_params=[u'project', u'region', u'resourcePolicy'],
+        path_params=[u'project', u'region', u'resourcePolicy'],
+        query_params=[],
+        relative_path=u'projects/{project}/regions/{region}/resourcePolicies/{resourcePolicy}',
+        request_field='',
+        request_type_name=u'ComputeResourcePoliciesGetRequest',
+        response_type_name=u'ResourcePolicy',
+        supports_download=False,
+    )
+
+    def Insert(self, request, global_params=None):
+      r"""Creates a new resource policy.
+
+      Args:
+        request: (ComputeResourcePoliciesInsertRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Insert')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Insert.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.resourcePolicies.insert',
+        ordered_params=[u'project', u'region'],
+        path_params=[u'project', u'region'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/regions/{region}/resourcePolicies',
+        request_field=u'resourcePolicy',
+        request_type_name=u'ComputeResourcePoliciesInsertRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""A list all the resource policies that have been configured for the specified project in specified region.
+
+      Args:
+        request: (ComputeResourcePoliciesListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ResourcePoliciesList) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.resourcePolicies.list',
+        ordered_params=[u'project', u'region'],
+        path_params=[u'project', u'region'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/regions/{region}/resourcePolicies',
+        request_field='',
+        request_type_name=u'ComputeResourcePoliciesListRequest',
+        response_type_name=u'ResourcePoliciesList',
+        supports_download=False,
+    )
+
+    def TestIamPermissions(self, request, global_params=None):
+      r"""Returns permissions that a caller has on the specified resource.
+
+      Args:
+        request: (ComputeResourcePoliciesTestIamPermissionsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (TestPermissionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('TestIamPermissions')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    TestIamPermissions.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.resourcePolicies.testIamPermissions',
+        ordered_params=[u'project', u'region', u'resource'],
+        path_params=[u'project', u'region', u'resource'],
+        query_params=[],
+        relative_path=u'projects/{project}/regions/{region}/resourcePolicies/{resource}/testIamPermissions',
+        request_field=u'testPermissionsRequest',
+        request_type_name=u'ComputeResourcePoliciesTestIamPermissionsRequest',
+        response_type_name=u'TestPermissionsResponse',
+        supports_download=False,
+    )
+
   class RoutersService(base_api.BaseApiService):
     """Service class for the routers resource."""
 
@@ -9181,6 +9686,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def SetLabels(self, request, global_params=None):
+      r"""Sets the labels on a security policy. To learn more about labels, read the Labeling Resources documentation.
+
+      Args:
+        request: (ComputeSecurityPoliciesSetLabelsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('SetLabels')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetLabels.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.securityPolicies.setLabels',
+        ordered_params=[u'project', u'resource'],
+        path_params=[u'project', u'resource'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/securityPolicies/{resource}/setLabels',
+        request_field=u'globalSetLabelsRequest',
+        request_type_name=u'ComputeSecurityPoliciesSetLabelsRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def TestIamPermissions(self, request, global_params=None):
       r"""Returns permissions that a caller has on the specified resource.
 
@@ -9271,6 +9802,32 @@ For more information, see Deleting snaphots.
         supports_download=False,
     )
 
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
+
+      Args:
+        request: (ComputeSnapshotsGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.snapshots.getIamPolicy',
+        ordered_params=[u'project', u'resource'],
+        path_params=[u'project', u'resource'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/snapshots/{resource}/getIamPolicy',
+        request_field='',
+        request_type_name=u'ComputeSnapshotsGetIamPolicyRequest',
+        response_type_name=u'Policy',
+        supports_download=False,
+    )
+
     def List(self, request, global_params=None):
       r"""Retrieves the list of Snapshot resources contained within the specified project.
 
@@ -9294,6 +9851,32 @@ For more information, see Deleting snaphots.
         request_field='',
         request_type_name=u'ComputeSnapshotsListRequest',
         response_type_name=u'SnapshotList',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeSnapshotsSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.snapshots.setIamPolicy',
+        ordered_params=[u'project', u'resource'],
+        path_params=[u'project', u'resource'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/snapshots/{resource}/setIamPolicy',
+        request_field=u'globalSetPolicyRequest',
+        request_type_name=u'ComputeSnapshotsSetIamPolicyRequest',
+        response_type_name=u'Policy',
         supports_download=False,
     )
 

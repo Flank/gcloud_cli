@@ -1,0 +1,61 @@
+NAME
+    gcloud alpha datastore - manage your Cloud Datastore indexes
+
+SYNOPSIS
+    gcloud alpha datastore GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The gcloud datastore command group lets you create and delete
+    Google Cloud Datastore indexes.
+
+    Cloud Datastore is a highly-scalable NoSQL database for your applications.
+    Cloud Datastore automatically handles sharding and replication, providing
+    you with a highly available and durable database that scales automatically
+    to handle your applications' load.
+
+    More information on Cloud Datastore can be found here:
+    https://cloud.google.com/datastore and detailed documentation can be found
+    here: https://cloud.google.com/datastore/docs
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     indexes
+        (ALPHA) Manage Cloud Datastore indexes.
+
+     operations
+        (ALPHA) Manage Long Running Operations for Cloud Datastore.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     export
+        (ALPHA) Export Cloud Datastore entities to Google Cloud Storage.
+
+     import
+        (ALPHA) Import Cloud Datastore entities from Google Cloud Storage.
+
+EXAMPLES
+    To create new indexes from a file, run:
+
+        $ gcloud alpha datastore create-indexes index.yaml
+
+    To clean up unused indexes from a file, run:
+
+        $ gcloud alpha datastore cleanup-indexes index.yaml
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud datastore
+        $ gcloud beta datastore
+

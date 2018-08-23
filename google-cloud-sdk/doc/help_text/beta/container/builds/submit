@@ -1,6 +1,6 @@
 NAME
-    gcloud beta container builds submit - submit a build using the Google
-        Container Builder service
+    gcloud beta container builds submit - submit a build using the Google Cloud
+        Build service
 
 SYNOPSIS
     gcloud beta container builds submit [[SOURCE] --no-source]
@@ -11,19 +11,25 @@ SYNOPSIS
         [--timeout=TIMEOUT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Submit a build using the Google Container Builder service.
+    (BETA) (DEPRECATED) Submit a build using the Google Cloud Build service.
+
+    This command is deprecated and will be removed on or after 2018-10-31.
+    Please use gcloud builds submit instead.
+
+    Submit a build using the Google Cloud Build service.
 
 POSITIONAL ARGUMENTS
      At most one of these may be specified:
 
        [SOURCE]
-          The source directory on local disk or tarball in Google Cloud Storage
-          or disk to use for this build. If source is a local directory this
-          command skips files specified in the .gcloudignore file (see $ gcloud
-          topic gcloudignore for more information). If a .gitignore file is
+          The location of the source to build. The location can be a directory
+          on a local disk or a gzipped archive file (.tar.gz) in Google Cloud
+          Storage. If the source is a local directory, this command skips the
+          files specified in the .gcloudignore file. If a .gitignore file is
           present in the local source directory, gcloud will use a
-          Git-compatible .gcloudignore file that respects your .gitignore-ed
-          files. The global .gitignore is not respected.
+          Git-compatible .gcloudignore file that respects your .gitignored
+          files. The global .gitignore is not respected. For more information
+          on .gcloudignore, see $gcloud topic gcloudignore.
 
        --no-source
           Specify that no source should be uploaded with this build.
@@ -35,17 +41,14 @@ REQUIRED FLAGS
           The .yaml or .json file to use for build configuration.
 
        --tag=TAG, -t TAG
-          The tag to use with a docker build image creation. Container Builder
-          will run a remote docker build -t $TAG ., where $TAG is the tag
-          provided by this flag. The tag must be in the gcr.io/* or *.gcr.io/*
-          namespaces.
-
-          Specify a tag if you want Container Builder to build using a
+          The tag to use with a "docker build" image creation. Cloud Build will
+          run a remote "docker build -t $TAG .", where $TAG is the tag provided
+          by this flag. The tag must be in the gcr.io/* or *.gcr.io/*
+          namespaces. Specify a tag if you want Cloud Build to build using a
           Dockerfile instead of a build config file. If you specify a tag in
-          this command, your source must include a Dockerfile.
-
-          For instructions on building using a Dockerfile, see
-          https://cloud.google.com/container-builder/docs/quickstart-docker.
+          this command, your source must include a Dockerfile. For instructions
+          on building using a Dockerfile see
+          https://cloud.google.com/cloud-build/docs/quickstart-docker.
 
 OPTIONAL FLAGS
      --async
@@ -56,14 +59,16 @@ OPTIONAL FLAGS
         Machine disk size (GB) to run the build.
 
      --gcs-log-dir=GCS_LOG_DIR
-        Directory in Google Cloud Storage to hold build logs. If not set,
-        gs://<project num>.cloudbuild-logs.googleusercontent.com/ will be
+        A directory in Google Cloud Storage to hold build logs. If this field
+        is not set,
+        gs://[PROJECT_NUMBER].cloudbuild-logs.googleusercontent.com/ will be
         created and used.
 
      --gcs-source-staging-dir=GCS_SOURCE_STAGING_DIR
-        Directory in Google Cloud Storage to stage a copy of the source used
-        for the build. If the bucket does not exist, it will be created. If not
-        set, gs://<project id>_cloudbuild/source is used.
+        A directory in Google Cloud Storage to copy the source used for staging
+        the build. If the specified bucket does not exist, Cloud Build will
+        create one. If you don't set this field,
+        gs://[PROJECT_ID]_cloudbuild/source is used.
 
      --machine-type=MACHINE_TYPE
         Machine type used to run the build. MACHINE_TYPE must be one of:
@@ -88,14 +93,14 @@ OPTIONAL FLAGS
         COMMIT_SHA, SHORT_SHA.
 
         For more details, see:
-        https://cloud.google.com/container-builder/docs/api/build-requests#substitutions
+        https://cloud.google.com/cloud-build/docs/api/build-requests#substitutions
 
      --timeout=TIMEOUT
-        Maximum time a build can last before it is failed as "TIMEOUT", written
-        as a duration (eg "2h15m5s" is two hours, fifteen minutes, and five
-        seconds). If no unit is specified, seconds is assumed (eg "10" is 10
-        seconds). Overrides the default container/build_timeout property value
-        for this command invocation.
+        Maximum time a build is run before it is failed as TIMEOUT. It is
+        specified as a duration; for example, "2h15m5s" is two hours, fifteen
+        minutes, and five seconds. If you don't specify a unit, seconds is
+        assumed. For example, "10" is 10 seconds. Overrides the default
+        container/build_timeout property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -104,7 +109,7 @@ GCLOUD WIDE FLAGS
 
 NOTES
     You can also run a build locally using the separate component: gcloud
-    components install container-builder-local.
+    components install cloud-build-local.
 
     This command is currently in BETA and may change without notice. These
     variants are also available:

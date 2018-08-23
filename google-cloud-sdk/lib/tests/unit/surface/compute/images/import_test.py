@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,17 @@
 """Tests for the images import subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resources import InvalidResourceException
 from tests.lib import test_case
 from tests.lib.surface.compute import daisy_test_base
+
+_DEFAULT_TIMEOUT = '7056s'
 
 
 class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
@@ -41,7 +46,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     self.daisy_builder = 'gcr.io/compute-image-tools/daisy:release'
     self.daisy_import_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               '-variables=image_name={0},source_disk_file={1}'
               .format(self.image_name, self.copied_source),
               self.import_workflow,],
@@ -49,7 +54,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     )
     self.daisy_import_translate_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               ('-variables=image_name={0},'
                'source_disk_file={1},'
                'translate_workflow={2}').format(
@@ -88,8 +93,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, self.source_disk))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
   def testCommonCaseNoTranslate(self):
@@ -103,8 +107,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, self.source_disk))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
   def testHttpsLinkToGcsImage(self):
@@ -125,8 +128,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, self.https_source_disk))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
   def testNonGcsHttpsUriFails(self):
@@ -153,7 +155,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     translate_workflow = 'ubuntu/translate_ubuntu_1604.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               ('-variables=image_name={0},'
                'translate_workflow={1},'
                'source_image=global/images/{2}').format(
@@ -171,8 +173,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.source_image, self.destination_image))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
   def testTranslateWithCustomWorkflow(self):
@@ -180,7 +181,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     translate_workflow = 'ubuntu/translate_ubuntu_1604_custom.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               ('-variables=image_name={0},'
                'translate_workflow={1},'
                'source_image=global/images/{2}').format(
@@ -200,8 +201,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.source_image, self.destination_image))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
   def testAsync(self):
@@ -220,7 +220,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
   def testTimeoutFlag(self):
     daisy_import_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=60s',
+              '-default_timeout=59s',  # Daisy timeout 2% sooner than Argo.
               '-variables=image_name={0},source_disk_file={1}'
               .format(self.image_name, self.copied_source),
               self.import_workflow,],
@@ -236,8 +236,29 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, self.source_disk))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
+        """, normalize_space=True)
+
+  def testLongTimeoutFlag(self):
+    daisy_import_step = self.cloudbuild_v1_messages.BuildStep(
+        args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=21300s',  # Daisy timeout 5m sooner than Argo.
+              '-variables=image_name={0},source_disk_file={1}'
+              .format(self.image_name, self.copied_source),
+              self.import_workflow,],
+        name=self.daisy_builder,
+    )
+    self.PrepareDaisyMocks(daisy_import_step, timeout='21600s')
+    self.AddStorageRewriteMock()
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --timeout 6h
+             --data-disk
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        [import-image] output
         """, normalize_space=True)
 
   def testLogLocation(self):
@@ -252,8 +273,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, self.source_disk, log_location))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
   def testExitOnMissingPermissions(self):
@@ -352,8 +372,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, self.source_disk))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
   def testUploadLocalFile(self):
@@ -370,8 +389,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, self.local_source_disk))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
     # Expect exactly one call to "gsutil cp <local file> <GCS URI>".
@@ -394,8 +412,6 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, path_with_spaces))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
         """, normalize_space=True)
 
     # Expect exactly one call to "gsutil cp <local file> <GCS URI>".
@@ -408,7 +424,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
                      '1234-5678-1234-567812345678-source-image.ova')
     daisy_import_translate_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               ('-variables=image_name={0},'
                'source_disk_file={1},'
                'translate_workflow={2}').format(
@@ -445,8 +461,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     self.AssertErrContains('The specified input file may contain more than '
                            'one virtual disk.')
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
   def testGcloudBailsWhenFileUploadFails(self):
@@ -479,7 +494,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     import_and_translate_step_with_zone = self.cloudbuild_v1_messages.BuildStep(  # pylint: disable=line-too-long
         args=['-zone=us-west1-c',
               '-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               ('-variables=image_name={0},'
                'source_disk_file={1},'
                'translate_workflow={2}').format(
@@ -515,8 +530,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, self.source_disk))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [import-image] output
         """, normalize_space=True)
 
   def testMissingSource(self):

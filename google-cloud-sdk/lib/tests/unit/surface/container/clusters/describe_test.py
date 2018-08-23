@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for 'clusters describe' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 
 from googlecloudsdk.api_lib.container import api_adapter
@@ -28,14 +31,10 @@ from tests.lib import test_case
 from tests.lib.surface.container import base
 
 
-class DescribeTestGA(base.TestBaseV1,
-                     base.GATestBase,
+class DescribeTestGA(base.GATestBase,
                      base.ClustersTestBase,
                      test_case.WithOutputCapture):
   """gcloud GA track using container v1 API."""
-
-  def SetUp(self):
-    self.api_mismatch = False
 
   def _TestDescribe(self, location):
     name = 'sadpanda-reg'
@@ -52,8 +51,6 @@ class DescribeTestGA(base.TestBaseV1,
     else:
       self.Run(self.clusters_command_base.format(location) +
                ' describe {0}'.format(name))
-    if self.api_mismatch and location == self.REGION:
-      self.AssertErrContains('You invoked')
     # output should be valid yaml
     out = yaml.load(self.GetOutput())
     self.assertIsNotNone(out)
@@ -81,8 +78,6 @@ class DescribeTestGA(base.TestBaseV1,
         error=exceptions.HttpException(base.NOT_FOUND_ERROR,
                                        c_util.HTTP_ERROR_FORMAT),
         name=name, wrong_zone=location, zone='other-zone'))
-    if self.api_mismatch and location == self.REGION:
-      self.AssertErrContains('You invoked')
 
   def testDescribe(self):
     self._TestDescribe(self.ZONE)
@@ -182,40 +177,13 @@ class DescribeTestGA(base.TestBaseV1,
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class DescribeTestBetaV1API(base.BetaTestBase, DescribeTestGA):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class DescribeTestBetaV1Beta1API(base.TestBaseV1Beta1, DescribeTestBetaV1API):
+class DescribeTestBeta(base.BetaTestBase, DescribeTestGA):
   """gcloud Beta track using container v1beta1 API."""
 
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
-
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class DescribeTestAlphaV1API(base.AlphaTestBase, DescribeTestBetaV1API):
-  """gcloud Alpha track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class DescribeTestAlphaV1Alpha1API(
-    base.TestBaseV1Alpha1, DescribeTestAlphaV1API, DescribeTestBetaV1Beta1API):
+class DescribeTestAlpha(base.AlphaTestBase, DescribeTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
 
 
 if __name__ == '__main__':

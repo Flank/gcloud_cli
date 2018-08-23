@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +15,13 @@
 """Tests that exercise creating on-demand backups."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from tests.lib.surface.sql import base
 
 
-class BackupsCreateTest(base.SqlMockTestBeta):
+class _BaseBackupsCreateTest(object):
 
   def testBackupsCreate(self):
     self.mocked_client.backupRuns.Insert.Expect(
@@ -53,3 +56,15 @@ class BackupsCreateTest(base.SqlMockTestBeta):
         response=self.messages.Operation(name='opName', status='DONE'))
     self.Run('sql backups create --instance my-instance '
              '--description "my description" --async')
+
+
+class BackupsCreateGATest(_BaseBackupsCreateTest, base.SqlMockTestGA):
+  pass
+
+
+class BackupsCreateBetaTest(_BaseBackupsCreateTest, base.SqlMockTestBeta):
+  pass
+
+
+class BackupsCreateAlphaTest(_BaseBackupsCreateTest, base.SqlMockTestAlpha):
+  pass

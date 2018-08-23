@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,11 @@
 # limitations under the License.
 
 """Integration test for the 'functions deploy' command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.api_lib.functions import exceptions
@@ -175,7 +179,6 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run('functions list')
     self. AssertOutputNotContains(self.function_name)
 
-  @test_case.Filters.skip('Failing', 'b/110130529')
   def testDeployChangeSourceType(self):
     self.Run(
         'functions deploy {0} '

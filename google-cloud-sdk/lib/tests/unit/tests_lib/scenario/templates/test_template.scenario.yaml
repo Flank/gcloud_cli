@@ -8,11 +8,12 @@ actions:
           uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries?alt=json
           method: POST
           body:
-            httpConfig:
-              httpEnabledState: HTTP_ENABLED
-            id: my-registry
-            mqttConfig:
-              mqttEnabledState: MQTT_ENABLED
+            json:
+              httpConfig:
+                httpEnabledState: HTTP_ENABLED
+              id: my-registry
+              mqttConfig:
+                mqttEnabledState: MQTT_ENABLED
         return_response:
           headers:
             status: '200'
@@ -20,7 +21,8 @@ actions:
     - expect_stderr: |
         Created registry [my-registry].
     - expect_stdout: asdf
-    - expect_exit_code: 0
+    - expect_exit:
+        code: 0
 
 - execute_command:
     command: iot registries describe my-registry --region us-central1
@@ -36,7 +38,8 @@ actions:
           body:
             name: projects/fake-project/locations/us-central1/registries/my-registry
     - expect_stdout: "name: projects/fake-project/locations/us-central1/registries/my-registry\n"
-    - expect_exit_code: 0
+    - expect_exit:
+        code: 0
 
 - execute_command:
     command: iot registries list --region us-central1
@@ -63,14 +66,15 @@ actions:
         my-registry-3  us-central1
         my-registry-4  us-central1
         my-registry-5  us-central1
-    - expect_exit_code: 0
+    - expect_exit:
+        code: 0
 
 - execute_command:
     command: iot registries delete my-registry --region us-central1
     events:
     - expect_prompt_continue:
         message: "You are about to delete registry [my-registry]"
-    - user_input: y
+        user_input: y
     - expect_stderr: "\n"
     - api_call:
         expect_request:
@@ -83,4 +87,5 @@ actions:
           body:
     - expect_stderr: |
         Deleted registry [my-registry].
-    - expect_exit_code: 0
+    - expect_exit:
+        code: 0

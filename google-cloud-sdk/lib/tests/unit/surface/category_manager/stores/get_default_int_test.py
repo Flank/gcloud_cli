@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +15,16 @@
 """Tests for 'gcloud category-manager stores get-default'."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class GetDefaultIntTest(base.CategoryManagerUnitTestBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def _ExpectDefaultStoreResponse(self, organization, expected_store_name):
     """Mocks backend call that gets the common taxonomy store."""
@@ -31,7 +33,8 @@ class GetDefaultIntTest(base.CategoryManagerUnitTestBase):
             parent=organization),
         self.messages.TaxonomyStore(name=expected_store_name))
 
-  def testGettingDefaultStore(self):
+  def testGettingDefaultStore(self, track):
+    self.track = track
     organization = 'organizations/111'
     expected_store_name = 'taxonomyStores/222'
     self._ExpectDefaultStoreResponse(organization, expected_store_name)

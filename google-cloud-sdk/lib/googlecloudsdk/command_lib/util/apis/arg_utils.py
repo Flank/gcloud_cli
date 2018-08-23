@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,11 @@
 # limitations under the License.
 
 """Utilities for generating and parsing arguments from API fields."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from collections import OrderedDict
 import re
 
@@ -111,7 +115,10 @@ DEFAULT_PARAMS = {'project': properties.VALUES.core.project.Get,
 
 def GetFromNamespace(namespace, arg_name, fallback=None, use_defaults=False):
   """Gets the given argument from the namespace."""
-  value = getattr(namespace, arg_name.replace('-', '_'), None)
+  if arg_name.startswith('--'):
+    arg_name = arg_name[2:]
+  normalized_arg_name = arg_name.replace('-', '_')
+  value = getattr(namespace, normalized_arg_name, None)
   if not value and fallback:
     value = fallback()
   if not value and use_defaults:

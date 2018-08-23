@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the routes create subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
@@ -404,14 +406,8 @@ class RoutesCreateTest(test_base.BaseTest):
           --destination-range 10.0.0.0/8
           --next-hop-vpn-tunnel my-tunnel
         """)
-    self.AssertErrContains(textwrap.dedent("""\
-        For the following vpn tunnel:
-         - [my-tunnel]
-        choose a region:
-         [1] region-1
-         [2] region-2
-         [3] region-3
-        Please enter your numeric choice:  \n"""))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains('"choices": ["region-1", "region-2", "region-3"]')
     self.CheckRequests(
         self.regions_list_request,
         [(self.compute.routes, 'Insert',
@@ -487,15 +483,8 @@ class RoutesCreateAlphaTest(RoutesCreateTest):
           --destination-range 20.0.0.0/8
           --next-hop-ilb my-forwarding-rule
         """)
-    self.AssertErrContains(
-        textwrap.dedent("""\
-        For the following forwarding rule:
-         - [my-forwarding-rule]
-        choose a region:
-         [1] region-1
-         [2] region-2
-         [3] region-3
-        Please enter your numeric choice:  \n"""))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains('"choices": ["region-1", "region-2", "region-3"]')
     self.CheckRequests(
         self.regions_list_request,
         [(self.compute.routes, 'Insert',

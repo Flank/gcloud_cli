@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Base classes for Composer tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 
 from apitools.base.py.testing import mock as api_mock
@@ -22,7 +25,6 @@ from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.composer import util as api_util
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 from tests.lib import cli_test_base
@@ -35,9 +37,9 @@ import six
 class _ComposerBase(cli_test_base.CliTestBase):
   """Base class for all Composer tests."""
 
-  def SetUp(self):
-    self.messages = api_util.GetMessagesModule()
-    self.track = calliope_base.ReleaseTrack.BETA
+  def SetTrack(self, track):
+    self.track = track
+    self.messages = api_util.GetMessagesModule(release_track=self.track)
 
 
 class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
@@ -72,10 +74,12 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
     self.test_gcs_bucket = storage_util.BucketReference.FromBucketUrl(
         self.test_gcs_bucket_path)
 
-  def SetUp(self):
+  def SetTrack(self, track):
+    super(ComposerUnitTestBase, self).SetTrack(track)
     self.mock_client = api_mock.Client(
-        apis.GetClientClass(api_util.COMPOSER_API_NAME,
-                            api_util.COMPOSER_API_VERSION))
+        apis.GetClientClass(
+            api_util.COMPOSER_API_NAME,
+            api_util.GetApiVersion(release_track=self.track)))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
 
@@ -96,7 +100,8 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
     if state is not None:
       environment.state = state
     if labels is not None:
-      environment.labels = ComposerUnitTestBase._MakeLabelsValue(labels)
+      environment.labels = ComposerUnitTestBase._MakeLabelsValue(
+          labels, self.messages)
     return environment
 
   def MakeEnvironmentWithStateAndClusterLocation(
@@ -143,7 +148,7 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
         exception=exception)
 
   @staticmethod
-  def _MakeLabelsValue(labels_dict):
+  def _MakeLabelsValue(labels_dict, messages):
     """Constructs an instance of LabelsValue from a dict.
 
     The returned instance should be used as the labels property of an
@@ -151,13 +156,13 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
 
     Args:
       labels_dict: dict(str,str), the dict to convert to LabelsValue proto.
+      messages: the Compoer client library messages.
 
     Returns:
       LabelsValue, the labels_dict converted to LabelsValue proto.
     """
-    additional_property = (
-        api_util.GetMessagesModule().Environment.LabelsValue.AdditionalProperty)
-    labels_value = api_util.GetMessagesModule().Environment.LabelsValue
+    additional_property = (messages.Environment.LabelsValue.AdditionalProperty)
+    labels_value = messages.Environment.LabelsValue
 
     return labels_value(additionalProperties=[
         additional_property(key=key, value=value)
@@ -427,8 +432,8 @@ class StorageApiCallingUnitTest(EnvironmentsUnitTest):
     if response is None and exception is None:
       response = self.messages.Empty()
     self.mock_storage_client.objects.Get.Expect(
-        self.storage_messages.StorageObjectsGetRequest(bucket=object_ref.bucket,
-                                                       object=object_ref.name),
+        self.storage_messages.StorageObjectsGetRequest(
+            bucket=object_ref.bucket, object=object_ref.name),
         response=response,
         exception=exception)
 

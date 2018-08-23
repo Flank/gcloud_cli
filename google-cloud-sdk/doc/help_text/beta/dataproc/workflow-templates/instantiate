@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud beta dataproc workflow-templates instantiate
-        (TEMPLATE : --region=REGION) [--async] [GCLOUD_WIDE_FLAG ...]
+        (TEMPLATE : --region=REGION) [--async] [--parameters=[PARAM=VALUE,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Instantiate a workflow template.
@@ -37,6 +38,12 @@ FLAGS
      --async
         Display information about the operation in progress, without waiting
         for the operation to complete.
+
+     --parameters=[PARAM=VALUE,...]
+        A map from parameter names to values that should be used for those
+        parameters. A value must be provided for every configured parameter.
+        Parameters can be configured when creating or updating a workflow
+        template.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

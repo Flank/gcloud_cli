@@ -40,8 +40,8 @@ FLAGS
      --runtime=RUNTIME
         Generate config files for a given runtime. Can be used in conjunction
         with --custom. Allowed runtimes are: contrib-dart, dart, go, php,
-        php55, php7, python, python27, python-compat, java, java7, nodejs,
-        ruby.
+        php55, php72, python, python27, python-compat, java, java7, java8,
+        nodejs, ruby.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

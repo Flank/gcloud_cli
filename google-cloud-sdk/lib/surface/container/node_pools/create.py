@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Create node pool command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.container import api_adapter
@@ -95,14 +98,23 @@ for examples.
   parser.display_info.AddFormat(util.NODEPOOLS_FORMAT)
   flags.AddNodeVersionFlag(parser)
   flags.AddAcceleratorArgs(parser)
+  flags.AddDiskTypeFlag(parser)
 
 
 def ParseCreateNodePoolOptionsBase(args):
+  """Parses the flags provided with the node pool creation command."""
   if (args.IsSpecified('enable_cloud_endpoints') and
       properties.VALUES.container.new_scopes_behavior.GetBool()):
     raise util.Error('Flag --[no-]enable-cloud-endpoints is not allowed if '
                      'property container/ new_scopes_behavior is set to true.')
-  flags.WarnForUnspecifiedAutorepair(args)
+  if args.IsSpecified('enable_autorepair'):
+    enable_autorepair = args.enable_autorepair
+  else:
+    # Node pools using COS support auto repairs, enable it for them by default.
+    # Other node pools using (Ubuntu, custom images) don't support node auto
+    # repairs, attempting to enable autorepair for them will result in API call
+    # failing so don't do it.
+    enable_autorepair = ((args.image_type or '').lower() in ['', 'cos'])
   return api_adapter.CreateNodePoolOptions(
       accelerators=args.accelerator,
       machine_type=args.machine_type,
@@ -124,7 +136,7 @@ def ParseCreateNodePoolOptionsBase(args):
       image_project=args.image_project,
       image_family=args.image_family,
       preemptible=args.preemptible,
-      enable_autorepair=args.enable_autorepair,
+      enable_autorepair=enable_autorepair,
       enable_autoupgrade=args.enable_autoupgrade,
       service_account=args.service_account,
       disk_type=args.disk_type)
@@ -138,10 +150,9 @@ class Create(base.CreateCommand):
   def Args(parser):
     _Args(parser)
     flags.AddClusterAutoscalingFlags(parser)
-    flags.AddDiskTypeFlag(parser, suppressed=True)
     flags.AddLocalSSDFlag(parser)
     flags.AddPreemptibleFlag(parser, for_node_pool=True)
-    flags.AddEnableAutoRepairFlag(parser, for_node_pool=True)
+    flags.AddEnableAutoRepairFlag(parser, for_node_pool=True, for_create=True)
     flags.AddMinCpuPlatformFlag(parser, for_node_pool=True)
     flags.AddNodeTaintsFlag(parser, for_node_pool=True)
     flags.AddDeprecatedNodePoolNodeIdentityFlags(parser)
@@ -205,19 +216,20 @@ class CreateBeta(Create):
   def Args(parser):
     _Args(parser)
     flags.AddClusterAutoscalingFlags(parser)
-    flags.AddDiskTypeFlag(parser)
     flags.AddLocalSSDFlag(parser)
     flags.AddPreemptibleFlag(parser, for_node_pool=True)
-    flags.AddEnableAutoRepairFlag(parser, for_node_pool=True)
+    flags.AddEnableAutoRepairFlag(parser, for_node_pool=True, for_create=True)
     flags.AddMinCpuPlatformFlag(parser, for_node_pool=True)
     flags.AddWorkloadMetadataFromNodeFlag(parser)
     flags.AddNodeTaintsFlag(parser, for_node_pool=True)
     flags.AddNodePoolNodeIdentityFlags(parser)
+    flags.AddNodePoolAutoprovisioningFlag(parser, hidden=True)
 
   def ParseCreateNodePoolOptions(self, args):
     ops = ParseCreateNodePoolOptionsBase(args)
     ops.workload_metadata_from_node = args.workload_metadata_from_node
     ops.new_scopes_behavior = True
+    ops.enable_autoprovisioning = args.enable_autoprovisioning
     return ops
 
 
@@ -232,22 +244,23 @@ class CreateAlpha(Create):
     ops.new_scopes_behavior = True
     ops.local_ssd_volume_configs = args.local_ssd_volumes
     ops.max_pods_per_node = args.max_pods_per_node
+    ops.sandbox = args.sandbox
     return ops
 
   @staticmethod
   def Args(parser):
     _Args(parser)
     flags.AddClusterAutoscalingFlags(parser)
-    flags.AddDiskTypeFlag(parser)
     flags.AddNodePoolAutoprovisioningFlag(parser, hidden=True)
     flags.AddLocalSSDAndLocalSSDVolumeConfigsFlag(parser, for_node_pool=True)
     flags.AddPreemptibleFlag(parser, for_node_pool=True)
-    flags.AddEnableAutoRepairFlag(parser, for_node_pool=True)
+    flags.AddEnableAutoRepairFlag(parser, for_node_pool=True, for_create=True)
     flags.AddMinCpuPlatformFlag(parser, for_node_pool=True)
     flags.AddWorkloadMetadataFromNodeFlag(parser)
     flags.AddNodeTaintsFlag(parser, for_node_pool=True)
     flags.AddNodePoolNodeIdentityFlags(parser)
     flags.AddMaxPodsPerNodeFlag(parser, for_node_pool=True)
+    flags.AddSandboxFlag(parser, hidden=True)
 
 
 Create.detailed_help = DETAILED_HELP

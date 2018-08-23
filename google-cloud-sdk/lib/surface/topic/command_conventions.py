@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """gcloud command conventions supplementary help."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 
 
@@ -155,7 +158,7 @@ class CommandConventions(base.TopicCommand):
   described below.
 
   Most standard error messaging is also logged to a file that can be accessed
-  by $ gcloud info --show-logs.
+  by $ gcloud info --show-log.
 
   No *gcloud* command should crash with an uncaught exception. However, if
   *gcloud* does crash the stack trace is intercepted and written to the log

@@ -268,6 +268,8 @@ class Node(_messages.Message):
       STOPPED: 7 - Reserved. Was SUSPENDED. TPU node is stopped.
       STOPPING: TPU node is currently stopping.
       STARTING: TPU node is currently starting.
+      PREEMPTED: TPU node has been preempted. Only applies to Preemptible TPU
+        Nodes.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -279,6 +281,7 @@ class Node(_messages.Message):
     STOPPED = 7
     STOPPING = 8
     STARTING = 9
+    PREEMPTED = 10
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -464,10 +467,6 @@ class ReimageNodeRequest(_messages.Message):
   """
 
   tensorflowVersion = _messages.StringField(1)
-
-
-class ResetNodeRequest(_messages.Message):
-  r"""Request for ResetNode."""
 
 
 class SchedulingConfig(_messages.Message):
@@ -756,19 +755,6 @@ class TpuProjectsLocationsNodesReimageRequest(_messages.Message):
 
   name = _messages.StringField(1, required=True)
   reimageNodeRequest = _messages.MessageField('ReimageNodeRequest', 2)
-
-
-class TpuProjectsLocationsNodesResetRequest(_messages.Message):
-  r"""A TpuProjectsLocationsNodesResetRequest object.
-
-  Fields:
-    name: The resource name.
-    resetNodeRequest: A ResetNodeRequest resource to be passed as the request
-      body.
-  """
-
-  name = _messages.StringField(1, required=True)
-  resetNodeRequest = _messages.MessageField('ResetNodeRequest', 2)
 
 
 class TpuProjectsLocationsNodesStartRequest(_messages.Message):

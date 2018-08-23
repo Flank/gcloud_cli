@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-templates delete subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
-from googlecloudsdk.calliope import base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -24,8 +27,6 @@ from tests.lib.surface.compute import test_base
 class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
     self.region = 'us-central1'
 
   def _ExpectCreate(self, template):

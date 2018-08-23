@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +18,11 @@ The main entry point is UploadPythonPackages, which takes in parameters derived
 from the command line arguments and returns a list of URLs to be given to the
 Cloud ML Engine API. See its docstring for details.
 """
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import abc
 import collections
 import contextlib
@@ -272,15 +276,9 @@ class _CloudSdkPythonSetupPyCommand(_SetupPyCommand):
   """
 
   def GetArgs(self):
-    try:
-      return execution_utils.ArgsForPythonTool(self.setup_py_path,
-                                               *self.setup_py_args)
-    except ValueError:
-      # The most common cause of ValueError for ArgsForPythonTool is a missing
-      # executable; we want to display a more specific error in this case.
-      if not sys.executable:
-        raise SysExecutableMissingError()
-    raise
+    return execution_utils.ArgsForPythonTool(self.setup_py_path,
+                                             *self.setup_py_args,
+                                             python=GetPythonExecutable())
 
   def GetEnv(self):
     exec_env = os.environ.copy()
@@ -297,12 +295,19 @@ class _SystemPythonSetupPyCommand(_SetupPyCommand):
   """
 
   def GetArgs(self):
-    if not sys.executable:
-      raise SysExecutableMissingError()
-    return [sys.executable, self.setup_py_path] + self.setup_py_args
+    return [GetPythonExecutable(), self.setup_py_path] + self.setup_py_args
 
   def GetEnv(self):
     return None
+
+
+def GetPythonExecutable():
+  python_executable = None
+  try:
+    python_executable = execution_utils.GetPythonExecutable()
+  except ValueError:
+    raise SysExecutableMissingError()
+  return python_executable
 
 
 def _RunSetupTools(package_root, setup_py_path, output_dir):

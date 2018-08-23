@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the disks add-resource-policies subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
@@ -47,6 +51,24 @@ class DisksAddResourcePoliciesTest(test_base.BaseTest):
                 for name in policy_names]))
     self.CheckRequests(
         [(self.compute_alpha.disks,
+          'AddResourcePolicies',
+          add_request)],
+    )
+
+  def _CheckRegionalAddRequest(self, policy_names):
+    add_request = self.messages.ComputeRegionDisksAddResourcePoliciesRequest(
+        disk=self.disk_name,
+        project=self.Project(),
+        region=self.region,
+        regionDisksAddResourcePoliciesRequest=
+        self.messages.RegionDisksAddResourcePoliciesRequest(
+            resourcePolicies=[
+                self.compute_uri + '/projects/{0}/regions/{1}/'
+                'resourcePolicies/{2}'.format(
+                    self.Project(), self.region, name)
+                for name in policy_names]))
+    self.CheckRequests(
+        [(self.compute_alpha.regionDisks,
           'AddResourcePolicies',
           add_request)],
     )
@@ -85,6 +107,12 @@ class DisksAddResourcePoliciesTest(test_base.BaseTest):
                '--zone {zone}'
                .format(disk=self.disk_name, zone=self.zone))
 
+  def testAddPolicyToRegionalDisk(self):
+    self.Run('compute disks add-resource-policies {disk} '
+             '--region {region} --resource-policies pol1'
+             .format(disk=self.disk_name,
+                     region=self.region))
+    self._CheckRegionalAddRequest(['pol1'])
 
 if __name__ == '__main__':
   test_case.main()

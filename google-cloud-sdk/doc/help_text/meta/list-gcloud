@@ -3,7 +3,8 @@ NAME
         positional and help details
 
 SYNOPSIS
-    gcloud meta list-gcloud [--branch=COMMAND_PATH] [GCLOUD_WIDE_FLAG ...]
+    gcloud meta list-gcloud [--branch=COMMAND_PATH] [--completions]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     List the gcloud CLI command tree with flag, positional and help details.
@@ -13,6 +14,12 @@ FLAGS
         The branch of the CLI subtree to generate as a dotted command path.
         Mainly used to generate test data. For example, for the gcloud compute
         instances branch use "compute.instances".
+
+     --completions
+        List the static completion CLI tree. This is a stripped down variant of
+        the CLI tree that only contains the subcommand and flag name
+        dictionaries. The tree is written as a Python source file (~1MiB) that
+        loads fast (~30ms) as a .pyc file.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

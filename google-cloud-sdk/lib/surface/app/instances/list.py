@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """The `app instances list` command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.app import appengine_api_client
 from googlecloudsdk.calliope import base
 
@@ -26,7 +29,10 @@ APPENGINE_PATH_START = 'https://appengine.googleapis.com/{0}/'.format(
 def _GetUri(resource):
   # TODO(b/29539463): Use parser when instances collection adds simple URIs
   # and a Get method
-  return APPENGINE_PATH_START + resource.instance.name
+  try:
+    return APPENGINE_PATH_START + resource.instance.name
+  except AttributeError:
+    return APPENGINE_PATH_START + resource['instance']['name']
 
 
 class List(base.ListCommand):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +15,26 @@
 """Unit tests for environments storage data import."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.composer import base
 from tests.lib.surface.composer import kubectl_util
 import mock
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-class EnvironmentsStorageDataImportTest(base.GsutilShellingUnitTest):
+class EnvironmentsStorageDataImportTest(base.GsutilShellingUnitTest,
+                                        parameterized.TestCase):
 
-  def testDataImport(self, exec_mock):
+  def testDataImport(self, track, exec_mock):
     """Tests successful data importing."""
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,

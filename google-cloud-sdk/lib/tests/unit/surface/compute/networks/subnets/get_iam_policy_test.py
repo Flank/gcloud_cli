@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Generate tests for the get-iam-policy subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from apitools.base.py.testing import mock
@@ -43,7 +47,7 @@ class GetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.mock_client.subnetworks.GetIamPolicy.Expect(
         self.messages.ComputeSubnetworksGetIamPolicyRequest(
             resource='my-resource', region='my-region', project='fake-project'),
-        response=test_resources.EmptyAlphaIamPolicy())
+        response=test_resources.EmptyIamPolicy(self.messages))
 
     self.Run("""
         compute networks subnets get-iam-policy --region=my-region my-resource
@@ -59,7 +63,8 @@ class GetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.mock_client.subnetworks.GetIamPolicy.Expect(
         self.messages.ComputeSubnetworksGetIamPolicyRequest(
             resource='my-resource', region='my-region', project='fake-project'),
-        response=test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag())
+        response=test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+            self.messages))
 
     self.Run("""
         compute networks subnets get-iam-policy --region=my-region my-resource
@@ -79,7 +84,8 @@ class GetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.mock_client.subnetworks.GetIamPolicy.Expect(
         self.messages.ComputeSubnetworksGetIamPolicyRequest(
             resource='my-resource', region='my-region', project='fake-project'),
-        response=test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag())
+        response=test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+            self.messages))
 
     self.Run("""
         compute networks subnets get-iam-policy --region=my-region my-resource
@@ -99,7 +105,7 @@ class GetIamPolicyBetaTest(test_base.BaseTest, test_case.WithOutputCapture):
 
   def testSimpleEmptyResponseCase(self):
     self.make_requests.side_effect = iter([
-        iter([test_resources.EmptyBetaIamPolicy()]),
+        iter([test_resources.EmptyIamPolicy(self.messages)]),
     ])
     self.Run(
         'compute networks subnets get-iam-policy my-resource --region region-1')
@@ -120,7 +126,8 @@ class GetIamPolicyBetaTest(test_base.BaseTest, test_case.WithOutputCapture):
 
   def testSimpleResponseCase(self):
     self.make_requests.side_effect = iter([
-        iter([test_resources.BetaIamPolicyWithOneBindingAndDifferentEtag()]),
+        iter([test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+            self.messages)]),
     ])
     self.Run(
         'compute networks subnets get-iam-policy my-resource --region region-1')
@@ -145,7 +152,8 @@ class GetIamPolicyBetaTest(test_base.BaseTest, test_case.WithOutputCapture):
 
   def testListCommandFilter(self):
     self.make_requests.side_effect = iter([
-        iter([test_resources.BetaIamPolicyWithOneBindingAndDifferentEtag()]),
+        iter([test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+            self.messages)]),
     ])
     self.Run("""
         compute networks subnets get-iam-policy my-resource --region region-1

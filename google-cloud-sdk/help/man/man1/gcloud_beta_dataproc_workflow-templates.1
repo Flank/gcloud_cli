@@ -61,8 +61,16 @@ help\fR for details.
 \fB(BETA)\fR Describe a workflow template.
 
 .TP 2m
+\fBexport\fR
+\fB(BETA)\fR Export a workflow template.
+
+.TP 2m
 \fBget\-iam\-policy\fR
 \fB(BETA)\fR Get IAM policy for a workflow template.
+
+.TP 2m
+\fBimport\fR
+\fB(BETA)\fR Import a workflow template.
 
 .TP 2m
 \fBinstantiate\fR
@@ -150,7 +158,8 @@ To update cluster selector in a workflow template, run:
 
 .RS 2m
 $ gcloud beta dataproc workflow\-templates set\-cluster\-selector \e
-    my_template \-\-num\-workers 5
+    my_template \e
+    \-\-cluster\-labels environment=prod
 .RE
 
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +15,22 @@
 """Tests for 'clusters set-iam-policy' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import base64
 
 from googlecloudsdk.api_lib.container import api_adapter
-from googlecloudsdk.core import properties
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.container import base
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class SetIamPolicyTestAlphaV1Alpha1API(parameterized.TestCase,
-                                       base.AlphaTestBase,
-                                       base.TestBaseV1Alpha1,
-                                       base.ClustersTestBase):
+class SetIamPolicyTestAlpha(parameterized.TestCase,
+                            base.AlphaTestBase,
+                            base.ClustersTestBase):
   """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
 
   @parameterized.named_parameters(
       ('Zonal', '--zone', 'us-central1-f'),

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """services vpc-peerings connect command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.services import peering
 from googlecloudsdk.api_lib.services import services_util
@@ -23,7 +26,7 @@ from googlecloudsdk.command_lib.projects import util as projects_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
-OP_BASE_CMD = 'gcloud alpha services vpc-peerings operations '
+OP_BASE_CMD = 'gcloud beta services vpc-peerings operations '
 OP_WAIT_CMD = OP_BASE_CMD + 'wait {0}'
 
 _DETAILED_HELP = {
@@ -54,7 +57,6 @@ _NETWORK_HELP = """The network in the current project to be peered with the \
 _RESERVED_RANGES_HELP = """The reserved IP CIDR ranges for service to use"""
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Connect(base.SilentCommand):
   """Connect to a service via VPC peering for a project network."""
 
@@ -70,7 +72,10 @@ class Connect(base.SilentCommand):
     parser.add_argument(
         '--network', metavar='NETWORK', required=True, help=_NETWORK_HELP)
     parser.add_argument(
-        '--service', metavar='SERVICE', required=True, help=_SERVICE_HELP)
+        '--service',
+        metavar='SERVICE',
+        default='servicenetworking.googleapis.com',
+        help=_SERVICE_HELP)
     parser.add_argument(
         '--reserved-ranges',
         metavar='RESERVED_RANGES',
@@ -91,8 +96,8 @@ class Connect(base.SilentCommand):
     project = properties.VALUES.core.project.Get(required=True)
     project_number = _GetProjectNumber(project)
     reserved_ranges = args.reserved_ranges.split(',')
-    op = peering.PeerApiCall(project_number, args.service, args.network,
-                             reserved_ranges)
+    op = peering.CreateConnection(project_number, args.service, args.network,
+                                  reserved_ranges)
     if args.async:
       cmd = OP_WAIT_CMD.format(op.name)
       log.status.Print('Asynchronous operation is in progress... '

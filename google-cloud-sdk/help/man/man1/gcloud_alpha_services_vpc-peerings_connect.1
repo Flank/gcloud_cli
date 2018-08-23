@@ -11,7 +11,7 @@ gcloud alpha services vpc\-peerings connect \- connect to a service via VPC peer
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha services vpc\-peerings connect\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-reserved\-ranges\fR=\fIRESERVED_RANGES\fR \fB\-\-service\fR=\fISERVICE\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha services vpc\-peerings connect\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-reserved\-ranges\fR=\fIRESERVED_RANGES\fR [\fB\-\-async\fR] [\fB\-\-service\fR=\fISERVICE\fR;\ default="servicenetworking.googleapis.com"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -33,10 +33,6 @@ The network in the current project to be peered with the service
 \fB\-\-reserved\-ranges\fR=\fIRESERVED_RANGES\fR
 The reserved IP CIDR ranges for service to use
 
-.TP 2m
-\fB\-\-service\fR=\fISERVICE\fR
-The service to connect to
-
 
 .RE
 .sp
@@ -48,6 +44,10 @@ The service to connect to
 \fB\-\-async\fR
 Display information about the operation in progress, without waiting for the
 operation to complete.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR; default="servicenetworking.googleapis.com"
+The service to connect to
 
 
 .RE
@@ -86,9 +86,13 @@ $ gcloud alpha services vpc\-peerings connect \-\-network my\-network \e
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta services vpc\-peerings connect
+.RE
 

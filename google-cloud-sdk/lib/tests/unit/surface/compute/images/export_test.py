@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the images export subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
@@ -23,6 +26,8 @@ from googlecloudsdk.core import properties
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+
+_DEFAULT_TIMEOUT = '7056s'
 
 
 class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
@@ -103,7 +108,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
         'https://storage.googleapis.com/my-project_cloudbuild/'
         'logs/log-1234.txt',
         request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
+        body='Cloudbuild output\n[image-export] output\n')
 
     self.mocked_servicemanagement_v1.services.List.Expect(
         self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
@@ -159,7 +164,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     export_workflow = ('../workflows/export/image_export.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               '-variables=source_image=projects/my-project/global/images/{0},'
               'destination={1}'
               .format(self.image_name, self.destination_uri),
@@ -175,15 +180,14 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
              """.format(self.image_name, self.destination_uri))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [image-export] output
         """, normalize_space=True)
 
   def testExportFormat(self):
     export_workflow = ('../workflows/export/image_export_ext.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               '-variables=source_image=projects/my-project/global/images/{0},'
               'destination={1},format=vmdk'
               .format(self.image_name, self.destination_uri),
@@ -199,15 +203,39 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
              """.format(self.image_name, self.destination_uri))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [image-export] output
+        """, normalize_space=True)
+
+  def testZoneFlag(self):
+    zone = 'us-west1-c'
+    export_workflow = ('../workflows/export/image_export.wf.json')
+    daisy_step = self.cloudbuild_v1_messages.BuildStep(
+        args=['-zone={0}'.format(zone),
+              '-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
+              '-variables=source_image=projects/my-project/global/images/{0},'
+              'destination={1}'
+              .format(self.image_name, self.destination_uri),
+              export_workflow,],
+        name=self.daisy_builder,
+    )
+
+    self.PrepareMocks(daisy_step)
+
+    self.Run("""
+             compute images export --image {0}
+             --destination-uri {1} --zone={2}
+             """.format(self.image_name, self.destination_uri, zone))
+
+    self.AssertOutputContains("""\
+        [image-export] output
         """, normalize_space=True)
 
   def testImageProject(self):
     export_workflow = ('../workflows/export/image_export.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               '-variables=source_image=projects/debian-cloud/global/images/{0},'
               'destination={1}'
               .format(self.image_name, self.destination_uri),
@@ -223,15 +251,14 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
              """.format(self.image_name, self.destination_uri))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [image-export] output
         """, normalize_space=True)
 
   def testNetworkFlag(self):
     export_workflow = ('../workflows/export/image_export.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout=7200s',
+              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
               '-variables=source_image=projects/my-project/global/images/{0},'
               'destination={1},export_network=global/networks/my-network'
               .format(self.image_name, self.destination_uri),
@@ -247,8 +274,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
              """.format(self.image_name, self.destination_uri))
 
     self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
+        [image-export] output
         """, normalize_space=True)
 
   def testMissingImage(self):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,18 @@
 """Test of the 'create' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class CreateCommandTest(base.BigtableV2TestBase,
                         waiter_test_base.CloudOperationsBase):
 
@@ -41,14 +48,16 @@ class CreateCommandTest(base.BigtableV2TestBase,
         parent='projects/{0}/instances/{1}'.format(self.Project(),
                                                    'theinstance'))
 
-  def testCreateDefault(self):
+  def testCreateDefault(self, track):
+    self.track = track
     self.svc.Expect(
         request=self.buildRequest('thecluster'),
         response=self.msgs.Operation(name='operations/theoperation'))
     self.Run('bigtable clusters create thecluster --instance theinstance '
              '--zone thezone --async')
 
-  def testCreateCustom(self):
+  def testCreateCustom(self, track):
+    self.track = track
     self.svc.Expect(
         request=self.buildRequest(
             'anothercluster',
@@ -58,7 +67,8 @@ class CreateCommandTest(base.BigtableV2TestBase,
     self.Run('bigtable clusters create anothercluster --instance theinstance '
              '--zone anotherzone --num-nodes 4 --async')
 
-  def testCreateWait(self):
+  def testCreateWait(self, track):
+    self.track = track
     self.svc.Expect(
         request=self.buildRequest('thecluster'),
         response=self.msgs.Operation(
@@ -78,7 +88,8 @@ name: p/thecluster
 state: READY
 """)
 
-  def testErrorResponse(self):
+  def testErrorResponse(self, track):
+    self.track = track
     with self.AssertHttpResponseError(self.svc,
                                       self.buildRequest('thecluster')):
       self.Run('bigtable clusters create thecluster --instance theinstance '

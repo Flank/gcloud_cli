@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +41,9 @@ Usage:
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import cli_tree
@@ -206,7 +209,7 @@ class CliTreeMarkdownGenerator(markdown.MarkdownGenerator):
     try:
       return [Argument(a) for a in
               command[cli_tree.LOOKUP_CONSTRAINTS][cli_tree.LOOKUP_ARGUMENTS]]
-    except KeyError:
+    except (KeyError, TypeError):
       return []
 
   def GetArgDetails(self, arg):

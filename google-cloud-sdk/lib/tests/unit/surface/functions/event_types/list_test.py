@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests of the 'list' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from tests.lib.surface.functions import base
 
 
@@ -28,6 +31,15 @@ cloud.storage google.storage.object.delete No bucket No
 cloud.storage google.storage.object.finalize Yes bucket No
 cloud.storage google.storage.object.metadataUpdate No bucket No
 cloud.storage providers/cloud.storage/eventTypes/object.change No bucket No
+google.firebase.analytics.event providers/google.firebase.analytics/eventTypes/event.log Yes firebase analytics No
+google.firebase.database.ref providers/google.firebase.database/eventTypes/ref.create Yes firebase database No
+google.firebase.database.ref providers/google.firebase.database/eventTypes/ref.delete No firebase database No
+google.firebase.database.ref providers/google.firebase.database/eventTypes/ref.update No firebase database No
+google.firebase.database.ref providers/google.firebase.database/eventTypes/ref.write No firebase database No
+google.firestore.document providers/cloud.firestore/eventTypes/document.create Yes firestore document No
+google.firestore.document providers/cloud.firestore/eventTypes/document.delete No firestore document No
+google.firestore.document providers/cloud.firestore/eventTypes/document.update No firestore document No
+google.firestore.document providers/cloud.firestore/eventTypes/document.write No firestore document No
 """
 
 
@@ -35,4 +47,4 @@ class ListTest(base.FunctionsTestBase):
 
   def testSimple(self):
     self.Run('functions event-types list')
-    self.AssertOutputContains(EXPECTED_OUTPUT, normalize_space=True)
+    self.AssertOutputEquals(EXPECTED_OUTPUT, normalize_space=True)

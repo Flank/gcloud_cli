@@ -1,0 +1,419 @@
+title: Create, describe, and delete an SQL instance
+release_tracks: [GA]
+
+skip:
+  reason: Failing
+  bug: b/112260783
+
+actions:
+
+- generate_resource_id:
+    reference: instance
+    prefix: sql-instance
+
+- execute_command:
+    command: sql instances create $$instance$$ --tier D1 --backup --enable-bin-log
+      --backup-start-time 00:00
+    events:
+    - expect_stderr: |
+        WARNING: Starting with release 218.0.0, you will need to specify either a region or a zone to create an instance.
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              databaseVersion: MYSQL_5_6
+              region: us-central
+              project: cloud-sdk-integration-testing
+              settings:
+                tier: D1
+                backupConfiguration:
+                  startTime: 00:00
+                  binaryLogEnabled: true
+                  enabled: true
+                pricingPlan: PER_USE
+                replicationType: SYNCHRONOUS
+              name: $$instance$$
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '642'
+            content-type: application/json; charset=UTF-8
+            date: Mon, 30 Jul 2018 18:14:04 GMT
+            etag: '"owIwbPCMl___5FpvLn6vsQ5VnhQ/NYDq5ikSL6Elf-qL53CbDtS58lM"'
+            expires: Mon, 01 Jan 1990 00:00:00 GMT
+            pragma: no-cache
+            server: GSE
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            kind: sql#operation
+            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/370059e8-193b-452e-b9b5-0a3b356dd51a
+            targetProject: cloud-sdk-integration-testing
+            targetId: $$instance$$
+            targetLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            name: 370059e8-193b-452e-b9b5-0a3b356dd51a
+            operationType: CREATE
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            insertTime: '2018-07-30T18:14:04.037Z'
+        expect_response:
+          extract_references:
+          - field: name
+            reference: operation
+          body:
+            json: {}
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '684'
+            content-location: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/370059e8-193b-452e-b9b5-0a3b356dd51a?alt=json
+            content-type: application/json; charset=UTF-8
+            date: Mon, 30 Jul 2018 18:14:22 GMT
+            etag: '"owIwbPCMl___5FpvLn6vsQ5VnhQ/0glotnODS2h-q_F3RJICRLfW53s"'
+            expires: Mon, 30 Jul 2018 18:14:22 GMT
+            server: GSE
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            kind: sql#operation
+            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/370059e8-193b-452e-b9b5-0a3b356dd51a
+            targetProject: cloud-sdk-integration-testing
+            targetId: $$instance$$
+            targetLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            name: 370059e8-193b-452e-b9b5-0a3b356dd51a
+            operationType: CREATE
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            insertTime: '2018-07-30T18:14:04.037Z'
+            startTime: '2018-07-30T18:14:04.119Z'
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '721'
+            content-location: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/370059e8-193b-452e-b9b5-0a3b356dd51a?alt=json
+            content-type: application/json; charset=UTF-8
+            date: Mon, 30 Jul 2018 18:14:39 GMT
+            etag: '"owIwbPCMl___5FpvLn6vsQ5VnhQ/TdLYF6W2i_X1uaNkJWMn3bFGJl4"'
+            expires: Mon, 30 Jul 2018 18:14:39 GMT
+            server: GSE
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            kind: sql#operation
+            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/370059e8-193b-452e-b9b5-0a3b356dd51a
+            targetProject: cloud-sdk-integration-testing
+            targetId: $$instance$$
+            targetLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            name: 370059e8-193b-452e-b9b5-0a3b356dd51a
+            operationType: CREATE
+            status: DONE
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            insertTime: '2018-07-30T18:14:04.037Z'
+            startTime: '2018-07-30T18:14:04.119Z'
+            endTime: '2018-07-30T18:14:35.210Z'
+    - expect_progress_tracker:
+        status: SUCCESS
+        message: Creating Cloud SQL instance
+    - expect_stderr: |
+        Created [https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '2599'
+            content-location: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
+            content-type: application/json; charset=UTF-8
+            date: Mon, 30 Jul 2018 18:14:40 GMT
+            etag: '"owIwbPCMl___5FpvLn6vsQ5VnhQ/MQ"'
+            expires: Mon, 30 Jul 2018 18:14:40 GMT
+            server: GSE
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            kind: sql#instance
+            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            name: $$instance$$
+            connectionName: cloud-sdk-integration-testing:$$instance$$
+            etag: '"owIwbPCMl___5FpvLn6vsQ5VnhQ/MQ"'
+            project: cloud-sdk-integration-testing
+            state: RUNNABLE
+            backendType: FIRST_GEN
+            databaseVersion: MYSQL_5_6
+            region: us-central
+            maxDiskSize: '268435456000'
+            settings:
+              kind: sql#settings
+              settingsVersion: '1'
+              authorizedGaeApplications: []
+              tier: D1
+              backupConfiguration:
+                kind: sql#backupConfiguration
+                startTime: 00:00
+                enabled: true
+                binaryLogEnabled: true
+              pricingPlan: PER_USE
+              replicationType: SYNCHRONOUS
+              activationPolicy: ON_DEMAND
+              ipConfiguration:
+                ipv4Enabled: false
+                authorizedNetworks: []
+            serverCaCert:
+              kind: sql#sslCert
+              instance: $$instance$$
+              sha1Fingerprint: fbcde13ecd6828a487f10ced1f1e336e01f2cb27
+              commonName: C=US,O=Google\, Inc,CN=Google Cloud SQL Server CA
+              certSerialNumber: '0'
+              cert: "-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBIMSMwIQYDVQQDExpHb29n\n\
+                bGUgQ2xvdWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJ\n\
+                BgNVBAYTAlVTMB4XDTE4MDczMDE4MTMwMVoXDTI4MDcyNzE4MTQwMVowSDEjMCEG\n\
+                A1UEAxMaR29vZ2xlIENsb3VkIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2ds\n\
+                ZSwgSW5jMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC\n\
+                ggEBAJjh5by6eytEXkK2klrvQ+EVIQM46d3h5jZmLlPojbOnBUF9Q3ugquqNTkWs\n\
+                5IrmFojfqmhyKiA5xcHwQR8sC4+iE3U7g6hAh5imGVqOzZgefRAe8l7FVl/elUHz\n\
+                clapbIFzNtc3NmSNcrsxn14uwD9sKo3chxZumCYp9HJNjZFPswWeWHV7URbuurVh\n\
+                D8j0jj6BJKnww3mfD9aOQRX2S5Xg03arhO12JiK7kXaW6Qv5+UpasFO8qPxR9K/L\n\
+                QVFmLbspqOF3WtWWPvthcf1saokTMTpFocfkVWl8A1EfEfkY2DstoG6rJTMIxfBQ\n\
+                FAEolhF7VZsh8PZ0oHaw1hQC158CAwEAAaMWMBQwEgYDVR0TAQH/BAgwBgEB/wIB\n\
+                ADANBgkqhkiG9w0BAQsFAAOCAQEAThWeP7fe9wa+p7K1UcJNbuTuxr2ZyvpRGEgF\n\
+                CmKbB35l+4Q+M2rwRxXRRKkBalek1kmSgb8UBSXQ2VJykOcnxRFsPl0w9OI0dD5m\n\
+                aacoQgbmFgh4k60qc9+nRvWXJ8SJrsAJCKr8cN56Xa35nVO3TtGewMuVJGi40y0l\n\
+                Jqw7eEyvVDCtjWKIE5WnkuVqHJU5tbGc2nztEF3VB4XqOvcuFaxTqOsYa+InX3G4\n\
+                hmLNip07J3YnQAtdcHpYVy7n6A8SFKA5Wa9o6vC626g/t+QPDc2P7dkbyYs1q+dr\n\
+                JDh62cdiBpmTMvKM6fQOdBTJYVRGEB3aS6XcPiUJAST830Xecg==\n-----END CERTIFICATE-----"
+              createTime: '2018-07-30T18:13:01.214Z'
+              expirationTime: '2028-07-27T18:14:01.214Z'
+            instanceType: CLOUD_SQL_INSTANCE
+            ipv6Address: 2001:4860:4864:1:7b34:596:2561:685e
+    - expect_stdout: |
+        NAME                               DATABASE_VERSION  LOCATION    TIER  ADDRESS  STATUS
+        $$instance$$  MYSQL_5_6         us-central  D1    -        RUNNABLE
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: sql instances describe $$instance$$ --format 'yaml(name, selfLink, project,
+      region)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '2599'
+            content-location: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
+            content-type: application/json; charset=UTF-8
+            date: Mon, 30 Jul 2018 18:14:40 GMT
+            etag: '"owIwbPCMl___5FpvLn6vsQ5VnhQ/MQ"'
+            expires: Mon, 30 Jul 2018 18:14:40 GMT
+            server: GSE
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            kind: sql#instance
+            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            name: $$instance$$
+            connectionName: cloud-sdk-integration-testing:$$instance$$
+            etag: '"owIwbPCMl___5FpvLn6vsQ5VnhQ/MQ"'
+            project: cloud-sdk-integration-testing
+            state: RUNNABLE
+            backendType: FIRST_GEN
+            databaseVersion: MYSQL_5_6
+            region: us-central
+            maxDiskSize: '268435456000'
+            settings:
+              kind: sql#settings
+              settingsVersion: '1'
+              authorizedGaeApplications: []
+              tier: D1
+              backupConfiguration:
+                kind: sql#backupConfiguration
+                startTime: 00:00
+                enabled: true
+                binaryLogEnabled: true
+              pricingPlan: PER_USE
+              replicationType: SYNCHRONOUS
+              activationPolicy: ON_DEMAND
+              ipConfiguration:
+                ipv4Enabled: false
+                authorizedNetworks: []
+            serverCaCert:
+              kind: sql#sslCert
+              instance: $$instance$$
+              sha1Fingerprint: fbcde13ecd6828a487f10ced1f1e336e01f2cb27
+              commonName: C=US,O=Google\, Inc,CN=Google Cloud SQL Server CA
+              certSerialNumber: '0'
+              cert: "-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBIMSMwIQYDVQQDExpHb29n\n\
+                bGUgQ2xvdWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJ\n\
+                BgNVBAYTAlVTMB4XDTE4MDczMDE4MTMwMVoXDTI4MDcyNzE4MTQwMVowSDEjMCEG\n\
+                A1UEAxMaR29vZ2xlIENsb3VkIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2ds\n\
+                ZSwgSW5jMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC\n\
+                ggEBAJjh5by6eytEXkK2klrvQ+EVIQM46d3h5jZmLlPojbOnBUF9Q3ugquqNTkWs\n\
+                5IrmFojfqmhyKiA5xcHwQR8sC4+iE3U7g6hAh5imGVqOzZgefRAe8l7FVl/elUHz\n\
+                clapbIFzNtc3NmSNcrsxn14uwD9sKo3chxZumCYp9HJNjZFPswWeWHV7URbuurVh\n\
+                D8j0jj6BJKnww3mfD9aOQRX2S5Xg03arhO12JiK7kXaW6Qv5+UpasFO8qPxR9K/L\n\
+                QVFmLbspqOF3WtWWPvthcf1saokTMTpFocfkVWl8A1EfEfkY2DstoG6rJTMIxfBQ\n\
+                FAEolhF7VZsh8PZ0oHaw1hQC158CAwEAAaMWMBQwEgYDVR0TAQH/BAgwBgEB/wIB\n\
+                ADANBgkqhkiG9w0BAQsFAAOCAQEAThWeP7fe9wa+p7K1UcJNbuTuxr2ZyvpRGEgF\n\
+                CmKbB35l+4Q+M2rwRxXRRKkBalek1kmSgb8UBSXQ2VJykOcnxRFsPl0w9OI0dD5m\n\
+                aacoQgbmFgh4k60qc9+nRvWXJ8SJrsAJCKr8cN56Xa35nVO3TtGewMuVJGi40y0l\n\
+                Jqw7eEyvVDCtjWKIE5WnkuVqHJU5tbGc2nztEF3VB4XqOvcuFaxTqOsYa+InX3G4\n\
+                hmLNip07J3YnQAtdcHpYVy7n6A8SFKA5Wa9o6vC626g/t+QPDc2P7dkbyYs1q+dr\n\
+                JDh62cdiBpmTMvKM6fQOdBTJYVRGEB3aS6XcPiUJAST830Xecg==\n-----END CERTIFICATE-----"
+              createTime: '2018-07-30T18:13:01.214Z'
+              expirationTime: '2028-07-27T18:14:01.214Z'
+            instanceType: CLOUD_SQL_INSTANCE
+            ipv6Address: 2001:4860:4864:1:7b34:596:2561:685e
+    - expect_stdout: |
+        name: $$instance$$
+        project: cloud-sdk-integration-testing
+        region: us-central
+        selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: sql instances delete $$instance$$
+    cleanup_for: instance
+    events:
+    - expect_prompt_continue:
+        message: All of the instance data will be lost when the instance is deleted.
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
+          method: DELETE
+          headers: {}
+          body:
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '639'
+            content-type: application/json; charset=UTF-8
+            date: Mon, 30 Jul 2018 18:14:41 GMT
+            etag: '"owIwbPCMl___5FpvLn6vsQ5VnhQ/s9KQrIiMagk57RDUzC4yz438ycA"'
+            expires: Mon, 01 Jan 1990 00:00:00 GMT
+            pragma: no-cache
+            server: GSE
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            kind: sql#operation
+            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5
+            targetProject: cloud-sdk-integration-testing
+            targetId: $$instance$$
+            targetLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            name: 460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5
+            operationType: DELETE
+            status: DONE
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            insertTime: '2018-07-30T18:14:41.005Z'
+        expect_response:
+          extract_references:
+          - field: name
+            reference: operation
+          body:
+            json: {}
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            -content-encoding: gzip
+            alt-svc: quic=":443"; ma=2592000; v="44,43,39,35"
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '639'
+            content-location: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5?alt=json
+            content-type: application/json; charset=UTF-8
+            date: Mon, 30 Jul 2018 18:14:42 GMT
+            etag: '"owIwbPCMl___5FpvLn6vsQ5VnhQ/IgfHWN6RHlmx4QM2J7LE9Si23hc"'
+            expires: Mon, 30 Jul 2018 18:14:42 GMT
+            server: GSE
+            status: '200'
+            transfer-encoding: chunked
+            vary: Origin, X-Origin
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          body:
+            kind: sql#operation
+            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5
+            targetProject: cloud-sdk-integration-testing
+            targetId: $$instance$$
+            targetLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            name: 460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5
+            operationType: DELETE
+            status: DONE
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            insertTime: '2018-07-30T18:14:41.005Z'
+    - expect_progress_tracker:
+        message: Deleting Cloud SQL instance
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
+    - expect_exit:
+        code: 0

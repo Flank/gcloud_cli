@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Versions library."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.api_lib.ml_engine import versions_api
@@ -196,8 +200,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
         r'Invalid field \[name\] '
         r'in configuration file \[.*version\.yaml\]\. '
         r'Allowed fields: '
-        r'\[autoScaling, deploymentUri, description, framework, labels, '
-        r'machineType, manualScaling, pythonVersion, runtimeVersion\]'):
+        r'\[autoScaling(, [a-zA-Z]+)+\]'):
       self.versions.BuildVersion(
           'myVersion',
           path=self.Touch(self.temp_path, 'version.yaml', test_yaml))
@@ -215,8 +218,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
         r'Invalid fields \[name, toaster\] '
         r'in configuration file \[.*version\.yaml\]\. '
         r'Allowed fields: '
-        r'\[autoScaling, deploymentUri, description, framework, labels, '
-        r'machineType, manualScaling, pythonVersion, runtimeVersion\]'):
+        r'\[autoScaling(, [a-zA-Z]+)+\]'):
       self.versions.BuildVersion(
           'myVersion',
           path=self.Touch(self.temp_path, 'version.yaml', test_yaml))

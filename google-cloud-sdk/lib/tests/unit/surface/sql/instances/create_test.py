@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -492,7 +493,7 @@ class InstancesCreateGATest(_BaseInstancesCreateTest, base.SqlMockTestGA):
   pass
 
 
-class InstancesCreateBetaTest(_BaseInstancesCreateTest, base.SqlMockTestBeta):
+class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
 
   def testCreateWithLabels(self):
     diff = {
@@ -783,6 +784,44 @@ class InstancesCreateBetaTest(_BaseInstancesCreateTest, base.SqlMockTestBeta):
       self.Run('sql instances create xm-instance-replica '
                '--master-username=root --master-instance-name=xm-instance '
                '--master-dump-file-path=gs://xm-bucket/dumpfile.sql ')
+
+
+class InstancesCreateBetaTest(_BaseInstancesCreateBetaTest,
+                              base.SqlMockTestBeta):
+  pass
+
+
+class InstancesCreateAlphaTest(_BaseInstancesCreateBetaTest,
+                               base.SqlMockTestAlpha):
+
+  def testCreatePrivateNetwork(self):
+    diff = {
+        'name': 'create-instance1',
+        'settings': {
+            'ipConfiguration':
+                self.messages.IpConfiguration(
+                    authorizedNetworks=[],
+                    ipv4Enabled=None,
+                    requireSsl=None,
+                    privateNetwork=(
+                        'https://www.googleapis.com/compute/v1/projects/'
+                        'fake-project/global/networks/somenetwork')),
+            'tier':
+                'D1'
+        }
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+
+    self.Run('sql instances create create-instance1 '
+             '--network=somenetwork --tier=D1')
+    self.AssertOutputContains(
+        """\
+NAME              DATABASE_VERSION  LOCATION    TIER  ADDRESS  STATUS
+create-instance1  MYSQL_5_6         us-central  D1    -        RUNNABLE
+""",
+        normalize_space=True)
 
 
 if __name__ == '__main__':

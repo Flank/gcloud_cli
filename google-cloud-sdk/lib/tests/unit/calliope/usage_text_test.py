@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,9 @@
 """Unit tests for the usage_text module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import usage_text
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -653,6 +654,16 @@ OPTIONAL FLAGS
           Optional flag.
 """)
 
+  def testArgumentGroupsShort(self):
+    with self.assertRaises(SystemExit):
+      self.cli.Execute(
+          'sdk2 arg-groups -h'.split())
+    self.AssertOutputContains("""\
+Usage: test sdk2 arg-groups (REQUIRED_MODAL_POSITIONAL : --abc) [[OPTIONAL_MODAL_POSITIONAL ...] --def] (--required-modal-flag : --ghi) [optional flags]
+  optional flags may be  --abc | --def | --ghi | --help | --jkl |
+                         --optional-modal-flag
+""")
+
   def testOrderedChoicesText(self):
     with self.assertRaises(SystemExit):
       self.cli.Execute('sdk2 ordered-choices --help'.split())
@@ -675,6 +686,8 @@ class UsageTextTestWithIOCapture(util.WithTestTool,
 
   def testPromptSuggester(self):
     properties.VALUES.core.disable_prompts.Set(False)
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.NORMAL)
 
     self.WriteInput('hez', 'yoy', 'ovre', 'their')
     options = ['hey', 'you', 'over', 'there']

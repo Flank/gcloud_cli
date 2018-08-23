@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,22 +15,30 @@
 """Unit tests for environments storage plugins list."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.composer import base
 import six
 
 
-class EnvironmentsStoragePluginsListTest(base.StorageApiCallingUnitTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class EnvironmentsStoragePluginsListTest(base.StorageApiCallingUnitTest,
+                                         parameterized.TestCase):
 
   def SetUp(self):
     # Disable user output to not exhaust the generator returned by
     # RunEnvironments
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def testPluginsList(self):
+  def testPluginsList(self, track):
     """Tests successful plugin listing."""
+    self.SetTrack(track)
     file_names = [
         'plugins/', 'plugins/file1.py', 'plugins/file2.py', 'plugins/folder',
         'plugins/file3.py'

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for health checks."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -36,7 +40,12 @@ class HealthChecksTest(e2e_test_base.BaseTest):
 
   def TearDown(self):
     for name in self.health_check_names:
-      self.CleanUpResource(name, 'health-checks', scope=e2e_test_base.GLOBAL)
+      self.CleanUpResource(
+          name,
+          'health-checks',
+          scope=e2e_test_base.EXPLICIT_GLOBAL
+          if self.track == calliope_base.ReleaseTrack.ALPHA else
+          e2e_test_base.GLOBAL)
 
   def GetProtocolAgnosticDefaultParams(self):
     return {
@@ -48,8 +57,10 @@ class HealthChecksTest(e2e_test_base.BaseTest):
 
   def CreateHealthCheck(self, protocol):
     name = self.UniqueName('{0}-hc'.format(protocol))
-    result = self.Run(
-        'compute health-checks create {0} {1}'.format(protocol, name))
+    global_flag = (' --global'
+                   if self.track == calliope_base.ReleaseTrack.ALPHA else '')
+    result = self.Run('compute health-checks create {0} {1} {2}'.format(
+        protocol, name, global_flag))
 
     result_list = list(result)
     self.assertEqual(1, len(result_list))
@@ -65,6 +76,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
       --healthy-threshold 3
       --unhealthy-threshold 4
       --description "Health check test."
+      --global
     """
     expected = {
         'timeoutSec': 1,
@@ -83,13 +95,14 @@ class HealthChecksTest(e2e_test_base.BaseTest):
     return result[0]
 
   def ListHealthCheck(self, name):
-    result = self.Run('compute health-checks list {0}'.format(name))
+    result = self.Run('compute health-checks list --global {0}'.format(name))
     result_list = list(result)
     self.assertEqual(1, len(result_list))
     return result_list[0]
 
   def DeleteHealthCheck(self, hc_name):
-    result = self.Run('compute health-checks delete {0}'.format(hc_name))
+    result = self.Run(
+        'compute health-checks delete --global {0}'.format(hc_name))
     result_list = list(result)
     self.assertEqual(0, len(result_list))
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """ml-engine versions create command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.ml_engine import operations
 from googlecloudsdk.api_lib.ml_engine import versions_api
 from googlecloudsdk.calliope import base
@@ -79,6 +82,7 @@ def _AddCreateArgs(parser):
   ).AddToParser(parser)
   labels_util.AddCreateLabelsFlags(parser)
   flags.FRAMEWORK_MAPPER.choice_arg.AddToParser(parser)
+  flags.AddPythonVersionFlag(parser, 'when creating the version')
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -99,18 +103,20 @@ class CreateGA(base.CreateCommand):
     versions_client = versions_api.VersionsClient()
     labels = versions_util.ParseCreateLabels(versions_client, args)
     framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
-    return versions_util.Create(versions_client,
-                                operations.OperationsClient(),
-                                args.version,
-                                model=args.model,
-                                origin=args.origin,
-                                staging_bucket=args.staging_bucket,
-                                runtime_version=args.runtime_version,
-                                config_file=args.config,
-                                asyncronous=args.async,
-                                description=args.description,
-                                labels=labels,
-                                framework=framework)
+    return versions_util.Create(
+        versions_client,
+        operations.OperationsClient(),
+        args.version,
+        model=args.model,
+        origin=args.origin,
+        staging_bucket=args.staging_bucket,
+        runtime_version=args.runtime_version,
+        config_file=args.config,
+        asyncronous=args.async,
+        description=args.description,
+        labels=labels,
+        framework=framework,
+        python_version=args.python_version)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -126,25 +132,27 @@ class CreateBeta(base.CreateCommand):
   @staticmethod
   def Args(parser):
     _AddCreateArgs(parser)
-    flags.AddPythonVersionFlag(parser, 'when creating the version')
+    flags.MACHINE_TYPE.AddToParser(parser)
 
   def Run(self, args):
     versions_client = versions_api.VersionsClient()
     labels = versions_util.ParseCreateLabels(versions_client, args)
     framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
-    return versions_util.Create(versions_client,
-                                operations.OperationsClient(),
-                                args.version,
-                                model=args.model,
-                                origin=args.origin,
-                                staging_bucket=args.staging_bucket,
-                                runtime_version=args.runtime_version,
-                                config_file=args.config,
-                                asyncronous=args.async,
-                                description=args.description,
-                                labels=labels,
-                                framework=framework,
-                                python_version=args.python_version)
+    return versions_util.Create(
+        versions_client,
+        operations.OperationsClient(),
+        args.version,
+        model=args.model,
+        origin=args.origin,
+        staging_bucket=args.staging_bucket,
+        runtime_version=args.runtime_version,
+        config_file=args.config,
+        asyncronous=args.async,
+        description=args.description,
+        labels=labels,
+        machine_type=args.machine_type,
+        framework=framework,
+        python_version=args.python_version)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -160,8 +168,8 @@ class CreateAlpha(base.CreateCommand):
   @staticmethod
   def Args(parser):
     _AddCreateArgs(parser)
-    flags.MACHINE_TYPE.AddToParser(parser)
-    flags.AddPythonVersionFlag(parser, 'when creating the version')
+    flags.ALPHA_MACHINE_TYPE.AddToParser(parser)
+    flags.AddUserCodeArgs(parser)
 
   def Run(self, args):
     versions_client = versions_api.VersionsClient()
@@ -180,4 +188,6 @@ class CreateAlpha(base.CreateCommand):
                                 description=args.description,
                                 machine_type=args.machine_type,
                                 framework=framework,
-                                python_version=args.python_version)
+                                python_version=args.python_version,
+                                model_class=args.model_class,
+                                package_uris=args.package_uris)

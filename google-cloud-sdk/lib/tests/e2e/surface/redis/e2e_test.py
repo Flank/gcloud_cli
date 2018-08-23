@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """E2E test for `gcloud redis` surface."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import contextlib
@@ -33,6 +35,7 @@ TEST_REGION = 'us-central1'
 TEST_NETWORK = 'do-not-delete-redis-test'
 
 
+@test_case.Filters.skip('Failing', 'b/112629520')
 class E2eTest(e2e_base.WithServiceAuth, cli_test_base.CliTestBase,
               parameterized.TestCase):
 

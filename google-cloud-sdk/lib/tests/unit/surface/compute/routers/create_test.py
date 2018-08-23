@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the routers create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -167,6 +170,63 @@ class CreateTest(parameterized.TestCase, router_test_base.RouterTestBase):
           --set-advertisement-groups=ALL_SUBNETS
           --set-advertisement-ranges=10.10.10.10/30=custom-range,10.10.10.20/30
           """)
+
+
+@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'))
+class CreateTestAlpha(CreateTest):
+
+  def testCreateEmptyRouter(self, track, api_version):
+    self.SelectApi(track, api_version)
+    expected = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, api_version)
+    expected.description = 'my-desc'
+    result = copy.deepcopy(expected)
+    result.region = 'us-central1'
+
+    self.ExpectInsert(expected)
+    self.ExpectOperationsGet()
+    self.ExpectGet(result)
+
+    self.Run("""
+        compute routers create my-router --network default --region us-central1
+        --description my-desc
+        """)
+
+    self.AssertOutputEquals(
+        """\
+        NAME       REGION       NETWORK
+        my-router  us-central1  default
+        """,
+        normalize_space=True)
+    self.AssertErrContains('Creating router [my-router]')
+
+  def testCreateWithAdvertisements_noAsn(self, track, api_version):
+    self.SelectApi(track, api_version)
+    expected = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, api_version)
+    mode = self.messages.RouterBgp.AdvertiseModeValueValuesEnum.DEFAULT
+    expected.bgp = self.messages.RouterBgp()
+    expected.bgp.advertiseMode = mode
+
+    result = copy.deepcopy(expected)
+    result.region = 'us-central1'
+
+    self.ExpectInsert(expected)
+    self.ExpectOperationsGet()
+    self.ExpectGet(result)
+
+    self.Run("""
+        compute routers create my-router --network default --region us-central1
+        --advertisement-mode=DEFAULT
+        """)
+
+    self.AssertOutputEquals(
+        """\
+        NAME       REGION       NETWORK
+        my-router  us-central1  default
+        """,
+        normalize_space=True)
+    self.AssertErrContains('Creating router [my-router]')
 
 
 if __name__ == '__main__':

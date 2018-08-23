@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Stream-logs command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.cloudbuild import logs as cb_logs
 from googlecloudsdk.calliope import base
@@ -22,7 +25,12 @@ from googlecloudsdk.command_lib.container.builds import flags
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 
+DEPRECATED_WARNING_MESSAGE = """\
+This command is deprecated and will be removed on or after 2018-10-31. Please
+use `gcloud builds log` instead."""
 
+
+@base.Deprecate(is_removed=False, warning=DEPRECATED_WARNING_MESSAGE)
 @base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class Log(base.Command):
   """Stream the logs for a build."""

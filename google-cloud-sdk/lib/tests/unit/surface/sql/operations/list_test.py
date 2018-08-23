@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -23,7 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class OperationsListsTest(base.SqlMockTestBeta):
+class _BaseOperationsListTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testOperationsList(self):
@@ -134,6 +137,19 @@ NAME                                  TYPE         START                        
 1cb8a924-898d-41ec-b695-39a6dc018d16  CREATE_USER  2014-07-10T17:23:13.672+00:00  2014-07-10T17:23:16.342+00:00  -      DONE
 27e060bf-4e4b-4fbb-b451-a9ee6c8a433a  RESTART      2014-07-10T17:23:02.165+00:00  2014-07-10T17:23:03.165+00:00  -      DONE
 """, normalize_space=True)
+
+
+class OperationsListGATest(_BaseOperationsListTest, base.SqlMockTestGA):
+  pass
+
+
+class OperationsListBetaTest(_BaseOperationsListTest, base.SqlMockTestBeta):
+  pass
+
+
+class OperationsListAlphaTest(_BaseOperationsListTest, base.SqlMockTestAlpha):
+  pass
+
 
 if __name__ == '__main__':
   test_case.main()

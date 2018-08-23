@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from apitools.base.py import encoding
@@ -341,8 +344,7 @@ class ParsePullTaskArgsTest(ParseArgsTestBase):
     self.schedule_time = time_util.CalculateExpiration(20)
 
   def testParseCreateTaskArgs_NoArgs(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        '(--id --queue): Must be specified'):
+    with self.AssertRaisesArgumentErrorMatches('--queue: Must be specified'):
       self.parser.parse_args([])
 
   def testParseCreateTaskArgs_AllArgs_PayloadContent(self):
@@ -351,10 +353,10 @@ class ParsePullTaskArgsTest(ParseArgsTestBase):
     expected_config.scheduleTime = schedule_time
     expected_config.pullMessage = _MESSAGES_MODULE.PullMessage(
         tag='tag', payload=b'payload')
-    args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
-                                   '--tag=tag',
-                                   '--payload-content=payload',
-                                   '--id=my-task'])
+    args = self.parser.parse_args([
+        '--schedule-time={}'.format(schedule_time), '--tag=tag',
+        '--payload-content=payload', '--queue=queue_id', 'my-task'
+    ])
     actual_config = parsers.ParseCreateTaskArgs(
         args, constants.PULL_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
@@ -367,24 +369,23 @@ class ParsePullTaskArgsTest(ParseArgsTestBase):
         tag='tag', payload=b'payload')
     self.Touch(self.temp_path, 'payload.txt', contents='payload')
     payload_file = os.path.join(self.temp_path, 'payload.txt')
-    args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
-                                   '--tag=tag',
-                                   '--id=my-task',
-                                   '--payload-file={}'.format(payload_file)])
+    args = self.parser.parse_args([
+        '--schedule-time={}'.format(schedule_time), '--tag=tag',
+        '--queue=queue_name', 'my-task',
+        '--payload-file={}'.format(payload_file)
+    ])
     actual_config = parsers.ParseCreateTaskArgs(
         args, constants.PULL_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
 
   def testParseCreateTaskArgs_IncludeAppEngineArgs(self):
     with self.AssertRaisesArgumentErrorMatches('unrecognized arguments:'):
-      self.parser.parse_args(['--schedule-time={}'.format(self.schedule_time),
-                              '--tag=tag',
-                              '--id=my-task',
-                              '--payload-content=payload',
-                              '--method=POST',
-                              '--url=/paths/a/',
-                              '--header=header:value',
-                              '--routing=service:abc'])
+      self.parser.parse_args([
+          '--schedule-time={}'.format(
+              self.schedule_time), '--tag=tag', '--queue=queue_name', 'my-task',
+          '--payload-content=payload', '--method=POST', '--url=/paths/a/',
+          '--header=header:value', '--routing=service:abc'
+      ])
 
 
 class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
@@ -395,7 +396,7 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
 
   def testParseCreateTaskArgs_NoArgs(self):
     with self.AssertRaisesArgumentErrorMatches(
-        '(--id --queue): Must be specified'):
+        'argument --queue: Must be specified.'):
       self.parser.parse_args([])
 
   def testParseCreateTaskArgs_AllArgs_PayloadContent(self):
@@ -413,14 +414,12 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
                 _MESSAGES_MODULE.AppEngineHttpRequest.HeadersValue),
             httpMethod=http_method, payload=b'payload',
             relativeUrl='/paths/a/'))
-    args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
-                                   '--payload-content=payload',
-                                   '--method=POST',
-                                   '--id=my-task',
-                                   '--url=/paths/a/',
-                                   '--header=header1:value1',
-                                   '--header=header2:value2',
-                                   '--routing=service:abc'])
+    args = self.parser.parse_args([
+        '--schedule-time={}'.format(schedule_time), '--payload-content=payload',
+        '--method=POST', 'my-task', '--queue=queue_name', '--url=/paths/a/',
+        '--header=header1:value1', '--header=header2:value2',
+        '--routing=service:abc'
+    ])
     actual_config = parsers.ParseCreateTaskArgs(
         args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
@@ -442,14 +441,12 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
             relativeUrl='/paths/a/'))
     self.Touch(self.temp_path, 'payload.txt', contents='payload')
     payload_file = os.path.join(self.temp_path, 'payload.txt')
-    args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
-                                   '--payload-file={}'.format(payload_file),
-                                   '--method=POST',
-                                   '--id=my-task',
-                                   '--url=/paths/a/',
-                                   '--header=header1:value1',
-                                   '--header=header2:value2',
-                                   '--routing=service:abc'])
+    args = self.parser.parse_args([
+        '--schedule-time={}'.format(schedule_time),
+        '--payload-file={}'.format(payload_file), '--method=POST', 'my-task',
+        '--queue=queue_id', '--url=/paths/a/', '--header=header1:value1',
+        '--header=header2:value2', '--routing=service:abc'
+    ])
     actual_config = parsers.ParseCreateTaskArgs(
         args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
@@ -461,23 +458,22 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header': 'value2'},
                 _MESSAGES_MODULE.AppEngineHttpRequest.HeadersValue)))
-    args = self.parser.parse_args(['--id=my-task',
-                                   '--header=header:value1',
-                                   '--header=header:value2'])
+    args = self.parser.parse_args([
+        'my-task', '--queue=queue_id', '--header=header:value1',
+        '--header=header:value2'
+    ])
     actual_config = parsers.ParseCreateTaskArgs(
         args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
 
   def testParseCreateTaskArgs_IncludePullArgs(self):
     with self.AssertRaisesArgumentErrorMatches('unrecognized arguments:'):
-      self.parser.parse_args(['--schedule-time={}'.format(self.schedule_time),
-                              '--tag=tag',
-                              '--payload-content=payload',
-                              '--method=POST',
-                              '--url=/paths/a/',
-                              '--header=header1:value1',
-                              '--header=header2:value2',
-                              '--routing=service:abc'])
+      self.parser.parse_args([
+          '--schedule-time={}'.format(self.schedule_time), '--tag=tag',
+          '--payload-content=payload', '--method=POST', '--queue=queue_id',
+          '--url=/paths/a/', '--header=header1:value1',
+          '--header=header2:value2', '--routing=service:abc'
+      ])
 
   def testAppEngineRoutingKeyValidator(self):
     with self.AssertRaisesArgumentErrorMatches(

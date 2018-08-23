@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests of the 'sinks' subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.logging import base
@@ -83,14 +86,13 @@ More information about sinks can be found at https://cloud.google.com/logging/do
     self.WriteInput('Y')
     self.RunLogging('sinks create my-sink dest')
     self.AssertOutputEquals('')
-    self.AssertErrEquals("""\
-Sink with empty filter matches all entries.
-
-Do you want to continue (Y/n)?  \
-
-Created [https://logging.googleapis.com/v2/projects/my-project/sinks/my-sink].
-More information about sinks can be found at https://cloud.google.com/logging/docs/export/configure_export
-""")
+    self.AssertErrContains('Sink with empty filter matches all entries.')
+    self.AssertErrContains('PROMPT_CONTINUE')
+    self.AssertErrContains(
+        'Created [https://logging.googleapis.com/v2/projects/my-project/'
+        'sinks/my-sink].\n'
+        'More information about sinks can be found at '
+        'https://cloud.google.com/logging/docs/export/configure_export')
 
   def testListNoPerms(self):
     new_sink = self.msgs.LogSink(

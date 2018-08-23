@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +18,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import functools
 import os
 import re
@@ -242,15 +244,18 @@ class _Sections(object):
     self.app = _SectionApp()
     self.auth = _SectionAuth()
     self.billing = _SectionBilling()
+    self.builds = _SectionBuilds()
     self.component_manager = _SectionComponentManager()
     self.composer = _SectionComposer()
     self.compute = _SectionCompute()
     self.container = _SectionContainer()
     self.core = _SectionCore()
     self.dataproc = _SectionDataproc()
+    self.deployment_manager = _SectionDeploymentManager()
     self.devshell = _SectionDevshell()
     self.emulator = _SectionEmulator()
     self.experimental = _SectionExperimental()
+    self.filestore = _SectionFilestore()
     self.functions = _SectionFunctions()
     self.gcloudignore = _SectionGcloudignore()
     self.interactive = _SectionInteractive()
@@ -269,15 +274,18 @@ class _Sections(object):
         self.app,
         self.auth,
         self.billing,
+        self.builds,
         self.component_manager,
         self.composer,
         self.compute,
         self.container,
         self.core,
         self.dataproc,
+        self.deployment_manager,
         self.devshell,
         self.emulator,
         self.experimental,
+        self.filestore,
         self.functions,
         self.gcloudignore,
         self.interactive,
@@ -673,7 +681,7 @@ class _SectionApp(_Section):
         validator=CloudBuildTimeoutValidator,
         help_text='Timeout, in seconds, to wait for Docker builds to '
                   'complete during deployments. All Docker builds now use the '
-                  'Container Builder API.')
+                  'Cloud Build API.')
     self.container_builder_image = self._Add(
         'container_builder_image',
         default='gcr.io/cloud-builders/docker',
@@ -736,6 +744,33 @@ class _SectionApp(_Section):
         hidden=True)
 
 
+class _SectionBuilds(_Section):
+  """Contains the properties for the 'builds' section."""
+
+  def __init__(self):
+    super(_SectionBuilds, self).__init__('builds')
+
+    def TimeoutValidator(timeout):
+      if timeout is None:
+        return
+      try:
+        seconds = int(timeout)  # bare int means seconds
+      except ValueError:
+        seconds = times.ParseDuration(timeout).total_seconds
+      if seconds <= 0:
+        raise InvalidValueError('Timeout must be a positive time duration.')
+    self.timeout = self._Add(
+        'timeout',
+        validator=TimeoutValidator,
+        help_text='Timeout, in seconds, to wait for builds to complete.')
+    self.check_tag = self._AddBool(
+        'check_tag',
+        default=True,
+        hidden=True,
+        help_text='If True, validate that the --tag value to builds '
+        'submit is in the gcr.io or *.gcr.io namespace.')
+
+
 class _SectionContainer(_Section):
   """Contains the properties for the 'container' section."""
 
@@ -754,26 +789,6 @@ class _SectionContainer(_Section):
         default=False,
         help_text='If True, use application default credentials to authenticate'
         ' to the cluster API server.')
-    self.use_v1_api = self._AddBool(
-        'use_v1_api',
-        default=False,
-        help_text='This property is DEPRECATED. '
-        'If True, all `gcloud` Kubernetes Engine commands (regardless '
-        'of release track) will use the v1 API; otherwise, `gcloud beta` track '
-        'commands will use v1beta1 API and `gcloud alpha` track commands will '
-        'use v1alpha1 API. By default, this property is set to false. The '
-        'Kubernetes Engine v1alpha1 API is whitelist-only at this time. '
-        'Note: use_v1_api is an alias of use_v1_api_client.')
-    self.use_v1_api_client = self._AddBool(
-        'use_v1_api_client',
-        default=False,
-        help_text='This property is DEPRECATED. '
-        'If True, all `gcloud` Kubernetes Engine commands (regardless '
-        'of release track) will use the v1 API; otherwise, `gcloud beta` track '
-        'commands will use v1beta1 API and `gcloud alpha` track commands will '
-        'use v1alpha1 API. By default, this property is set to false. The '
-        'Kubernetes Engine v1alpha1 API is whitelist-only at this time. '
-        'Note: use_v1_api_client is an alias of use_v1_api.')
     self.new_scopes_behavior = self._AddBool(
         'new_scopes_behavior',
         default=False,
@@ -875,7 +890,7 @@ class _SectionCore(_Section):
         # Current runtime lint patterns. Delete from this comment when the
         # pattern usage has been deleted.
         #
-        #   AddCacheUpdaters: Throws an exeption for each command that needs
+        #   AddCacheUpdaters: Throws an exception for each command that needs
         #     a parser.display_info.AddCacheUpdater() call.
         #
         # When running tests set default=PATTERN[,PATTERN...] here to weed out
@@ -1196,6 +1211,18 @@ class _SectionExperimental(_Section):
         default=False)
 
 
+class _SectionFilestore(_Section):
+  """Contains the properties for the 'filestore' section."""
+
+  def __init__(self):
+    super(_SectionFilestore, self).__init__('filestore')
+    self.location = self._Add(
+        'location',
+        help_text='Default location to use when working with Cloud Filestore '
+        'locations. When a `--location` flag is required but not '
+        'provided, the command will fall back to this value, if set.')
+
+
 class _SectionTest(_Section):
   """Contains the properties for the 'test' section."""
 
@@ -1270,6 +1297,19 @@ class _SectionDataproc(_Section):
             'from other Cloud Dataproc regions.'))
 
 
+class _SectionDeploymentManager(_Section):
+  """Contains the properties for the 'deployment_manager' section."""
+
+  def __init__(self):
+    super(_SectionDeploymentManager, self).__init__('deployment_manager')
+    self.glob_imports = self._AddBool(
+        'glob_imports',
+        default=False,
+        help_text=(
+            'Enable import path globbing. Uses glob patterns to match multiple '
+            'imports in a config file.'))
+
+
 class _SectionInteractive(_Section):
   """Contains the properties for the 'interactive' section."""
 
@@ -1287,6 +1327,9 @@ class _SectionInteractive(_Section):
     self.context = self._Add(
         'context', default='',
         help_text='Command context string.')
+    self.debug = self._AddBool(
+        'debug', default=False, hidden=True,
+        help_text='If True, enable the debugging display.')
     self.fixed_prompt_position = self._Add(
         'fixed_prompt_position', default=False,
         help_text='If True, display the prompt at the same position.')
@@ -1306,6 +1349,9 @@ class _SectionInteractive(_Section):
     self.multi_column_completion_menu = self._AddBool(
         'multi_column_completion_menu', default=False,
         help_text='If True, display the completions as a multi-column menu.')
+    self.obfuscate = self._AddBool(
+        'obfuscate', default=False, hidden=True,
+        help_text='If True, obfuscate status PII.')
     self.prompt = self._Add(
         'prompt', default='$ ',
         help_text='Command prompt string.')
@@ -1407,12 +1453,15 @@ class _SectionApiEndpointOverrides(_Section):
     self.deploymentmanager = self._Add('deploymentmanager')
     self.discovery = self._Add('discovery')
     self.dns = self._Add('dns')
+    self.file = self._Add('file')
+    self.firestore = self._Add('firestore')
     self.genomics = self._Add('genomics')
     self.iam = self._Add('iam')
     self.language = self._Add('language')
     self.logging = self._Add('logging')
     self.manager = self._Add('manager')
     self.ml = self._Add('ml')
+    self.monitoring = self._Add('monitoring')
     self.oslogin = self._Add('oslogin')
     self.pubsub = self._Add('pubsub')
     self.replicapoolupdater = self._Add('replicapoolupdater')
@@ -1431,6 +1480,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.toolresults = self._Add('toolresults')
     self.tpu = self._Add('tpu')
     self.vision = self._Add('vision')
+    self.vpcaccess = self._Add('vpcaccess')
 
   def EndpointValidator(self, value):
     """Checks to see if the endpoint override string is valid."""
@@ -1490,7 +1540,7 @@ class _SectionAccessContextManager(_Section):
                                                        hidden=True)
     self.policy = self._Add(
         'policy',
-        help_text=('The ID of the policy resource to operate on. Can be found '
+        help_text=('ID of the policy resource to operate on. Can be found '
                    'by running the `access-context-manager policies list` '
                    'command.'))
 
@@ -1502,7 +1552,7 @@ class _SectionRedis(_Section):
     super(_SectionRedis, self).__init__('redis')
     self.region = self._Add(
         'region',
-        help_text='The default region to use when working with Cloud '
+        help_text='Default region to use when working with Cloud '
         'Memorystore for Redis resources. When a `region` is required but not '
         'provided by a flag, the command will fall back to this value, if set.')
 

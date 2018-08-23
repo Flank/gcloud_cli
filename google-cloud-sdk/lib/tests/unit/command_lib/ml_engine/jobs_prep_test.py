@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 
 #
@@ -13,12 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Engine jobs_prep command_lib utils."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import collections
 import contextlib
 import os
-import sys
 import tarfile
 import zipfile
 
@@ -179,6 +182,7 @@ if __name__ == '__main__':
     setup(name='test_package', packages=['test_package'])
 """
 _EXISTING_SETUP_PY = '''\
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -262,8 +266,7 @@ class BuildPackagesUnitTest(base.MlBetaPlatformTestBase):
       out_func('Writing to stdout...\n')
       err_func('Writing to stderr...\n')
 
-      if sys.executable:
-        self.assertEqual(args[0], sys.executable)
+      self.assertEqual(args[0], 'current/python')
 
       self.assertEqual(os.path.basename(args[1]), 'setup.py')
       self.AssertFileExistsWithContents(setup_py_contents, args[1])
@@ -320,7 +323,9 @@ class BuildPackagesUnitTest(base.MlBetaPlatformTestBase):
     self.output_path = os.path.join(self.temp_path, 'output')
     self.package_dir = os.path.join(self.package_root, 'test_package')
 
-    self.StartObjectPatch(sys, 'executable', 'fake/python')
+    self.get_python_mock = self.StartObjectPatch(execution_utils,
+                                                 'GetPythonExecutable')
+    self.get_python_mock.return_value = 'current/python'
 
   def testBuildPackages(self):
     self._RunExpectingPackages(['trainer-0.0.0.tar.gz'])
@@ -407,7 +412,7 @@ class BuildPackagesUnitTest(base.MlBetaPlatformTestBase):
 
   def testBuildPackages_NoSysExecutable(self):
     self.StartDictPatch(os.environ, {}, clear=True)
-    self.StartObjectPatch(sys, 'executable', None)
+    self.get_python_mock.side_effect = ValueError()
     with self.assertRaises(jobs_prep.SysExecutableMissingError):
       jobs_prep.BuildPackages(self.package_dir, self.output_path)
 

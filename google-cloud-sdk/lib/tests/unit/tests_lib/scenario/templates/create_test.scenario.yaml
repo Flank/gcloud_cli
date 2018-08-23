@@ -12,10 +12,11 @@ actions:
               headers:
                 content-length: '115'
               body:
-                acceleratorType: v2-8
-                cidrBlock: 10.143.0.0/29
-                network: datalab-network
-                tensorflowVersion: 1.6
+                json:
+                  acceleratorType: v2-8
+                  cidrBlock: 10.143.0.0/29
+                  network: datalab-network
+                  tensorflowVersion: 1.6
             return_response:
               headers:
                 status: '200'
@@ -34,7 +35,7 @@ actions:
             expect_request:
               uri: https://tpu.googleapis.com/v1alpha1/projects/fakeproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887?alt=json
               method: GET
-              body: {}
+              body:
             return_response:
               headers:
                 status: '200'
@@ -91,4 +92,5 @@ actions:
             message: Waiting for operation [projects/fakepproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887] to complete.
             status: SUCCESS
         - expect_stderr: Created [dec-tpu-3].
-        - expect_exit_code: 0
+        - expect_exit:
+            code: 0

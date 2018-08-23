@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for 'clusters upgrade' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.command_lib.container import container_command_util
 from googlecloudsdk.core import properties
@@ -26,13 +29,12 @@ from tests.lib import test_case
 from tests.lib.surface.container import base
 
 
-class UpgradeTestGA(base.TestBaseV1,
+class UpgradeTestGA(parameterized.TestCase,
                     base.GATestBase,
                     base.ClustersTestBase):
   """gcloud GA track using container v1 API."""
 
   def SetUp(self):
-    self.api_mismatch = False
     self.locations = [self.ZONE, self.REGION]
 
   def _TestUpgrade(self, update, flags, cluster_kwargs=None):
@@ -49,6 +51,7 @@ class UpgradeTestGA(base.TestBaseV1,
     cluster.currentNodeVersion = '1.1.2'
     cluster.currentMasterVersion = '1.1.3'
     self.ExpectGetCluster(cluster, zone=location)
+    self.ExpectGetServerConfig(location)
     if update.desiredNodeVersion:
       op_type = self.op_upgrade_nodes
     else:
@@ -67,8 +70,6 @@ class UpgradeTestGA(base.TestBaseV1,
     else:
       self.Run(self.clusters_command_base.format(self.ZONE) +
                ' upgrade {0} {1}'.format(name, flags))
-    if self.api_mismatch and location == self.REGION:
-      self.AssertErrContains('You invoked')
     self.AssertErrContains('Upgrading {cluster}'.format(cluster=name))
 
   def _TestUpgradeAsync(self, update, flags, location, cluster_kwargs=None):
@@ -80,6 +81,7 @@ class UpgradeTestGA(base.TestBaseV1,
     cluster.currentNodeVersion = '1.1.2'
     cluster.currentMasterVersion = '1.1.3'
     self.ExpectGetCluster(cluster, zone=location)
+    self.ExpectGetServerConfig(location)
     if update.desiredNodeVersion:
       op_type = self.op_upgrade_nodes
     else:
@@ -95,13 +97,12 @@ class UpgradeTestGA(base.TestBaseV1,
     else:
       self.Run(self.clusters_command_base.format(self.ZONE) +
                ' upgrade {0} {1} --async'.format(name, flags))
-    if self.api_mismatch and location == self.REGION:
-      self.AssertErrContains('You invoked')
 
   def testUpgradeAborted(self):
     properties.VALUES.core.disable_prompts.Set(False)
     self.WriteInput('n')
     self.ExpectGetCluster(self._RunningCluster())
+    self.ExpectGetServerConfig(self.locations[0])
     self.ClearOutput()
     self.ClearErr()
     with self.assertRaises(console_io.OperationCancelledError):
@@ -116,6 +117,7 @@ class UpgradeTestGA(base.TestBaseV1,
     message = 'Bad upgrade, no cookie'
     update = self.msgs.ClusterUpdate(desiredNodeVersion='-')
     self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectGetServerConfig(self.locations[0])
     self.ExpectUpgradeCluster(
         cluster_name=name,
         update=update,
@@ -129,30 +131,175 @@ class UpgradeTestGA(base.TestBaseV1,
     self.AssertErrContains('Upgrading {cluster}'.format(cluster=name))
     self.AssertErrContains('finished with error: {error}'.format(error=message))
 
+  def testUpgradeNodesGetClusterFailure(self):
+    properties.VALUES.core.disable_prompts.Set(False)
+    self.WriteInput('y\ny')
+    name = 'tobeupgraded'
+    location = self.locations[0]
+    cluster = self._RunningCluster(name=name)
+    cluster.currentNodeVersion = '1.1.2'
+    cluster.currentMasterVersion = '1.1.3'
+    update = self.msgs.ClusterUpdate(desiredNodeVersion='-')
+    flags = ''
+
+    self.ExpectGetCluster(cluster, base.UNAUTHORIZED_ERROR)
+    self.ExpectGetServerConfig(location)
+    self.ExpectUpgradeCluster(
+        cluster_name=name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_upgrade_nodes))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done,
+                                                zone=location))
+
+    if location == self.REGION:
+      self.Run(self.regional_clusters_command_base.format(self.REGION) +
+               ' upgrade {0} {1}'.format(name, flags))
+    else:
+      self.Run(self.clusters_command_base.format(self.ZONE) +
+               ' upgrade {0} {1}'.format(name, flags))
+
+    self.AssertErrContains('All nodes of cluster [tobeupgraded] will be '
+                           'upgraded from its current version '
+                           'to the master version')
+
+  def testUpgradeMasterGetClusterFailure(self):
+    properties.VALUES.core.disable_prompts.Set(False)
+    self.WriteInput('y\ny')
+    name = 'tobeupgraded'
+    location = self.locations[0]
+    cluster = self._RunningCluster(name=name)
+    cluster.currentNodeVersion = '1.1.2'
+    cluster.currentMasterVersion = '1.1.3'
+    update = self.msgs.ClusterUpdate(desiredMasterVersion='-')
+    flags = '--master'
+
+    self.ExpectGetCluster(cluster,
+                          exception=base.UNAUTHORIZED_ERROR)
+    self.ExpectGetServerConfig(location)
+    self.ExpectUpgradeCluster(
+        cluster_name=name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_upgrade_nodes))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done,
+                                                zone=location))
+
+    if location == self.REGION:
+      self.Run(self.regional_clusters_command_base.format(self.REGION) +
+               ' upgrade {0} {1}'.format(name, flags))
+    else:
+      self.Run(self.clusters_command_base.format(self.ZONE) +
+               ' upgrade {0} {1}'.format(name, flags))
+
+    self.AssertErrContains('Master of cluster [tobeupgraded] will be upgraded '
+                           'from its current version to version [1.2.3]')
+
+  def testUpgradeNodesGetServerConfigFailure(self):
+    properties.VALUES.core.disable_prompts.Set(False)
+    self.WriteInput('y\ny')
+    name = 'tobeupgraded'
+    location = self.locations[0]
+    cluster = self._RunningCluster(name=name)
+    cluster.currentNodeVersion = '1.1.2'
+    cluster.currentMasterVersion = '1.1.3'
+    update = self.msgs.ClusterUpdate(desiredNodeVersion='-')
+    flags = ''
+
+    self.ExpectGetCluster(cluster)
+    self.ExpectGetServerConfig(location,
+                               exception=base.UNAUTHORIZED_ERROR)
+    self.ExpectUpgradeCluster(
+        cluster_name=name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_upgrade_nodes))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done,
+                                                zone=location))
+
+    if location == self.REGION:
+      self.Run(self.regional_clusters_command_base.format(self.REGION) +
+               ' upgrade {0} {1}'.format(name, flags))
+    else:
+      self.Run(self.clusters_command_base.format(self.ZONE) +
+               ' upgrade {0} {1}'.format(name, flags))
+
+    self.AssertErrContains('All nodes (3 nodes) of cluster [tobeupgraded] '
+                           'will be upgraded from version [1.1.2] '
+                           'to version [1.1.3]')
+
+  def testUpgradeMasterGetServerConfigFailure(self):
+    properties.VALUES.core.disable_prompts.Set(False)
+    self.WriteInput('y\ny')
+    name = 'tobeupgraded'
+    location = self.locations[0]
+    cluster = self._RunningCluster(name=name)
+    cluster.currentNodeVersion = '1.1.2'
+    cluster.currentMasterVersion = '1.1.3'
+    update = self.msgs.ClusterUpdate(desiredMasterVersion='-')
+    flags = '--master'
+
+    self.ExpectGetCluster(cluster)
+    self.ExpectGetServerConfig(location, base.UNAUTHORIZED_ERROR)
+    self.ExpectUpgradeCluster(
+        cluster_name=name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_upgrade_nodes))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done,
+                                                zone=location))
+
+    if location == self.REGION:
+      self.Run(self.regional_clusters_command_base.format(self.REGION) +
+               ' upgrade {0} {1}'.format(name, flags))
+    else:
+      self.Run(self.clusters_command_base.format(self.ZONE) +
+               ' upgrade {0} {1}'.format(name, flags))
+
+    self.AssertErrContains('Master of cluster [tobeupgraded] '
+                           'will be upgraded from version [1.1.3] '
+                           'to the default cluster version')
+
   def testUpgradeNodesNoVersion(self):
     self._TestUpgrade(
         update=self.msgs.ClusterUpdate(desiredNodeVersion='-'),
         flags='')
-    self.AssertErrContains('All nodes (3 nodes) of cluster [tobeupgraded]')
-    self.AssertErrContains(
-        'will be upgraded from version [1.1.2] to master version')
+    self.AssertErrContains('All nodes (3 nodes) of cluster [tobeupgraded] '
+                           'will be upgraded from version [1.1.2] '
+                           'to version [1.1.3]')
 
   def testUpgradeNodesWithVersion(self):
     self._TestUpgrade(
         update=self.msgs.ClusterUpdate(desiredNodeVersion='1.2.3'),
         flags='--cluster-version=1.2.3')
-    self.AssertErrContains(
-        'will be upgraded from version [1.1.2] to version [1.2.3]')
+    self.AssertErrContains('All nodes (3 nodes) of cluster [tobeupgraded] '
+                           'will be upgraded from version [1.1.2] '
+                           'to version [1.2.3]')
+
+  def testUpgradeNodesSameVersion(self):
+    self._TestUpgrade(
+        update=self.msgs.ClusterUpdate(desiredNodeVersion='1.1.2'),
+        flags='--cluster-version=1.1.2')
+    self.AssertErrContains('All nodes (3 nodes) of cluster [tobeupgraded] '
+                           'will be upgraded from version [1.1.2] '
+                           'to version [1.1.2]')
 
   def testUpgradeMasterNoVersion(self):
     self._TestUpgrade(
         update=self.msgs.ClusterUpdate(desiredMasterVersion='-'),
         flags='--master')
+    self.AssertErrContains('Master of cluster [tobeupgraded] will be upgraded '
+                           'from version [1.1.3] to version [1.2.3]')
 
   def testUpgradeMasterWithVersion(self):
     self._TestUpgrade(
-        update=self.msgs.ClusterUpdate(desiredMasterVersion='1.2.3'),
-        flags='--cluster-version=1.2.3 --master')
+        update=self.msgs.ClusterUpdate(desiredMasterVersion='1.3.2'),
+        flags='--cluster-version=1.3.2 --master')
+    self.AssertErrContains('Master of cluster [tobeupgraded] will be upgraded '
+                           'from version [1.1.3] to version [1.3.2]')
+
+  def testUpgradeMasterSameVersion(self):
+    self._TestUpgrade(
+        update=self.msgs.ClusterUpdate(desiredMasterVersion='1.1.3'),
+        flags='--cluster-version=1.1.3 --master')
+    self.AssertErrContains('Master of cluster [tobeupgraded] will be upgraded '
+                           'from version [1.1.3] to version [1.1.3]')
 
   def testUpgradeNodesWithImageType(self):
     self._TestUpgrade(
@@ -185,10 +332,10 @@ class UpgradeTestGA(base.TestBaseV1,
             'nodePools': [{'name': 'default-pool', 'version': '1.1.2'},
                           {'name': 'NodePoolName', 'version': '1.1.4'}]
         })
-    self.AssertErrContains(
-        'will be upgraded from version [1.1.4] to version [1.2.3]')
-    self.AssertErrContains(
-        'All nodes in node pool [NodePoolName]')
+    self.AssertErrContains('All nodes in node pool [NodePoolName] '
+                           'of cluster [tobeupgraded] '
+                           'will be upgraded from version [1.1.4] '
+                           'to version [1.2.3]')
 
   def testUpgradeNodesWithNonExistentNodePool(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -199,6 +346,7 @@ class UpgradeTestGA(base.TestBaseV1,
                       {'name': 'NodePoolName', 'version': '1.1.4'}]}
     cluster = self._RunningCluster(name=name, **cluster_kwargs)
     self.ExpectGetCluster(cluster)
+    self.ExpectGetServerConfig(self.locations[0])
     with self.assertRaises(container_command_util.NodePoolError):
       self.Run(self.clusters_command_base.format(self.ZONE) +
                ' upgrade tobeupgraded --cluster-version=1.2.3 '
@@ -207,41 +355,13 @@ class UpgradeTestGA(base.TestBaseV1,
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpgradeTestBetaV1API(base.BetaTestBase, UpgradeTestGA):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpgradeTestBetaV1Beta1API(base.TestBaseV1Beta1, UpgradeTestBetaV1API):
+class UpgradeTestBeta(base.BetaTestBase, UpgradeTestGA):
   """gcloud Beta track using container v1beta1 API."""
 
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
-
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpgradeTestAlphaV1API(base.AlphaTestBase, UpgradeTestBetaV1API):
-  """gcloud Alpha track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpgradeTestAlphaV1Alpha1API(
-    parameterized.TestCase, base.TestBaseV1Alpha1, UpgradeTestAlphaV1API,
-    UpgradeTestBetaV1Beta1API):
+class UpgradeTestAlpha(base.AlphaTestBase, UpgradeTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
 
   @parameterized.parameters(
       0, -1, 21

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +18,9 @@ TODO(b/35101597): Merge surface/sql/beta tests into surface/sql tree.
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -29,7 +32,7 @@ from tests.lib.surface.sql import base
 
 
 # TODO(b/73653002): Remove after `sql instances import` deprecation period.
-class InstancesImportTest(base.SqlMockTestBeta):
+class _BaseInstancesImportTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def _ExpectImport(self):
@@ -141,7 +144,7 @@ class InstancesImportTest(base.SqlMockTestBeta):
     self.Run('sql instances import testinstance '
              'gs://speckletest/testinstance.gz')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains(
         'Imported '
         '[https://www.googleapis.com/sql/v1beta4'
@@ -155,7 +158,7 @@ class InstancesImportTest(base.SqlMockTestBeta):
     self.Run('sql instances import testinstance '
              'gs://speckletest/testinstance.gz --async')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrNotContains(
         'Imported '
         '[https://www.googleapis.com/sql/v1beta4'
@@ -279,6 +282,18 @@ class InstancesImportTest(base.SqlMockTestBeta):
     with self.assertRaises(console_io.OperationCancelledError):
       self.Run('sql instances import testinstance '
                'gs://nosuchbucket/testinstance.gz')
+
+
+class InstancesImportGATest(_BaseInstancesImportTest, base.SqlMockTestGA):
+  pass
+
+
+class InstancesImportBetaTest(_BaseInstancesImportTest, base.SqlMockTestBeta):
+  pass
+
+
+class InstancesImportAlphaTest(_BaseInstancesImportTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

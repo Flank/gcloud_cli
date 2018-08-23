@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta composer environments storage data export \- exports data from an environment into local storage or Cloud Storage
+gcloud beta composer environments storage data export \- export data from an environment into local storage or Cloud Storage
 
 
 
@@ -52,7 +52,7 @@ specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the environment.
+Compute Engine region in which to create the environment.
 
 
 .RE
@@ -168,5 +168,10 @@ instead of 'foo/subdir1/file3.txt'.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud composer environments storage data export
+.RE
 

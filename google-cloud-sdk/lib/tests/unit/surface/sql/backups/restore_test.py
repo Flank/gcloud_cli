@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,14 @@
 """Tests that exercise restoring backups."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.console import console_io
 from tests.lib.surface.sql import base
 
 
-class BackupsRestoreTest(base.SqlMockTestBeta):
+class _BaseBackupsRestoreTest(object):
 
   def testBackupsRestore(self):
     prompt_mock = self.StartObjectPatch(
@@ -79,3 +82,15 @@ class BackupsRestoreTest(base.SqlMockTestBeta):
         response=self.messages.Operation(name='opName', status='DONE'))
     self.Run(
         'sql backups restore 12345 --restore-instance restore-target --async')
+
+
+class BackupsRestoreGATest(_BaseBackupsRestoreTest, base.SqlMockTestGA):
+  pass
+
+
+class BackupsRestoreBetaTest(_BaseBackupsRestoreTest, base.SqlMockTestBeta):
+  pass
+
+
+class BackupsRestoreAlphaTest(_BaseBackupsRestoreTest, base.SqlMockTestAlpha):
+  pass

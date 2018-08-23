@@ -57,11 +57,10 @@ FLAGS
         to the specified value.
 
      --zone=ZONE
-        The zone of the instance to update. If not specified, you may be
-        prompted to select a zone. gcloud will attempt to identify the zone by
-        searching for resources in your project. If the zone cannot be
-        determined, you will then be prompted with all Google Cloud Platform
-        zones.
+        Zone of the instance to update. If not specified, you may be prompted
+        to select a zone. gcloud will attempt to identify the zone by searching
+        for resources in your project. If the zone cannot be determined, you
+        will then be prompted with all Google Cloud Platform zones.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:

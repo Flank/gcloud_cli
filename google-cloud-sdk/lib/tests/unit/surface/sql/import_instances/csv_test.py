@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -138,7 +139,7 @@ class _BaseInstancesImportCsvTest(object):
         'sql import csv testinstance  gs://speckletest/testinstance.gz '
         '--database=somedb --table=sometable')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains(
         'Imported data from '
         '[gs://speckletest/testinstance.gz] into '
@@ -153,7 +154,7 @@ class _BaseInstancesImportCsvTest(object):
         'sql import csv testinstance  gs://speckletest/testinstance.gz '
         '--database=somedb --table=sometable --async')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrNotContains(
         'Imported data from '
         '[gs://speckletest/testinstance.gz] into '
@@ -278,7 +279,7 @@ class _BaseInstancesImportCsvTest(object):
     self.AssertErrContains(
         'Data from [gs://speckletest/testinstance.gz] will be imported to '
         '[testinstance].')
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testImportWithColumns(self):
     self._ExpectImport(
@@ -289,7 +290,7 @@ class _BaseInstancesImportCsvTest(object):
         'sql import csv testinstance gs://speckletest/testinstance.gz '
         '--database=somedb --table=sometable --columns=col1,col2')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains('Imported data from '
                            '[gs://speckletest/testinstance.gz] into '
                            '[https://www.googleapis.com/sql/v1beta4'
@@ -303,7 +304,7 @@ class _BaseInstancesImportCsvTest(object):
     self.Run('sql import csv testinstance gs://speckletest/testinstance.gz '
              '--database=somedb --table=sometable --user=someuser')
 
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains(
         'Imported data from '
         '[gs://speckletest/testinstance.gz] into '
@@ -311,14 +312,18 @@ class _BaseInstancesImportCsvTest(object):
         '/projects/{0}/instances/testinstance].'.format(self.Project()))
 
 
+class InstancesImportCsvGATest(_BaseInstancesImportCsvTest, base.SqlMockTestGA):
+  pass
+
+
 class InstancesImportCsvBetaTest(_BaseInstancesImportCsvTest,
                                  base.SqlMockTestBeta):
   pass
 
 
-class InstancesImportCsvGATest(_BaseInstancesImportCsvTest, base.SqlMockTestGA):
+class InstancesImportCsvAlphaTest(_BaseInstancesImportCsvTest,
+                                  base.SqlMockTestAlpha):
   pass
-
 
 if __name__ == '__main__':
   test_case.main()

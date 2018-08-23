@@ -8,13 +8,13 @@ SYNOPSIS
           | --enable-autoscaling | --enable-legacy-authorization
           | --enable-master-authorized-networks | --enable-network-policy
           | --enable-pod-security-policy | --generate-password
-          | --logging-service=LOGGING_SERVICE
-          | --maintenance-window=MAINTENANCE_WINDOW
-          | --monitoring-service=MONITORING_SERVICE | --remove-labels=[KEY,...]
+          | --maintenance-window=MAINTENANCE_WINDOW | --remove-labels=[KEY,...]
           | --set-password | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
           | --update-labels=[KEY=VALUE,...] | --additional-zones=[ZONE,...]
           | --node-locations=ZONE,[ZONE,...]
+          | --logging-service=LOGGING_SERVICE
+          --monitoring-service=MONITORING_SERVICE
           | --password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME) [--async]
         [--master-authorized-networks=NETWORK,[NETWORK,...]]
@@ -95,11 +95,6 @@ REQUIRED FLAGS
           Ask the server to generate a secure password and use that as the
           basic auth password, keeping the existing username.
 
-       --logging-service=LOGGING_SERVICE
-          The logging service to use for the cluster. Options are:
-          "logging.googleapis.com" (the Google Cloud Logging service), "none"
-          (logs will not be exported from the cluster)
-
        --maintenance-window=MAINTENANCE_WINDOW
           Set a time of day when you prefer maintenance to start on this
           cluster. For example:
@@ -110,11 +105,6 @@ REQUIRED FLAGS
           The time corresponds to the UTC time zone, and must be in HH:MM
           format. To remove an existing maintenance window from the cluster,
           use '--maintenance-window=None'
-
-       --monitoring-service=MONITORING_SERVICE
-          The monitoring service to use for the cluster. Options are:
-          "monitoring.googleapis.com" (the Google Cloud Monitoring service),
-          "none" (no metrics will be exported from the cluster)
 
        --remove-labels=[KEY,...]
           Labels to remove from the Google Cloud resources in use by the
@@ -151,8 +141,7 @@ REQUIRED FLAGS
           Cluster addons to enable or disable. Options are
           HorizontalPodAutoscaling=ENABLED|DISABLED
           HttpLoadBalancing=ENABLED|DISABLED
-          KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
-          NetworkPolicy=ENABLED|DISABLED
+          KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
 
        --update-labels=[KEY=VALUE,...]
           Labels to apply to the Google Cloud resources in use by the
@@ -210,6 +199,20 @@ REQUIRED FLAGS
                     --zone us-central1-a \
                     --node-locations us-central1-a,us-central1-b
 
+       --logging-service=LOGGING_SERVICE
+          Logging service to use for the cluster. Options are:
+          "logging.googleapis.com/kubernetes" (the Google Cloud Logging service
+          with Kubernetes-native resource model enabled),
+          "logging.googleapis.com" (the Google Cloud Logging service), "none"
+          (logs will not be exported from the cluster)
+
+       --monitoring-service=MONITORING_SERVICE
+          Monitoring service to use for the cluster. Options are:
+          "monitoring.googleapis.com/kubernetes" (the Google Cloud Monitoring
+          service with Kubernetes-native resource model enabled),
+          "monitoring.googleapis.com" (the Google Cloud Monitoring service),
+          "none" (no metrics will be exported from the cluster)
+
        Basic auth
 
          --password=PASSWORD
@@ -263,10 +266,10 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS

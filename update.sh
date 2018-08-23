@@ -1,10 +1,10 @@
-# get latest version number from https://cloud.google.com/sdk/downloads
+# get latest version number from https://cloud.google.com/sdk/docs/downloads-versioned-archives
 #
 # https://storage.cloud.google.com/cloud-sdk-release
 #
 # gsutil ls -l gs://cloud-sdk-release/for_packagers/linux > list.txt
 
-VERSION=206.0.0
+VERSION=213.0.0
 SDK_TESTS=google-cloud-sdk-tests_$VERSION.orig.tar.gz
 SDK=google-cloud-sdk_$VERSION.orig.tar.gz
 

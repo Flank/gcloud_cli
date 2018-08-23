@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the SSL certificates describe subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from tests.lib import test_case
@@ -97,6 +100,7 @@ class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
         textwrap.dedent("""\
                 creationTimestamp: '2017-12-18T11:11:11.000-07:00'
                 description: Self-managed certificate.
+                expireTime: '2018-12-18T11:11:11.000-07:00'
                 name: ssl-cert-1
                 selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/global/sslCertificates/ssl-cert-1
                 selfManaged:
@@ -141,6 +145,7 @@ class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
         textwrap.dedent("""\
                 creationTimestamp: '2017-12-17T10:00:00.000-07:00'
                 description: Managed certificate.
+                expireTime: '2018-12-17T10:00:00.000-07:00'
                 managed:
                   domainStatus:
                     test1.certsbridge.com: ACTIVE

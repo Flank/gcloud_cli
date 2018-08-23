@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -23,7 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class InstancesDeleteTest(base.SqlMockTestBeta):
+class _BaseInstancesDeleteTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testDeleteNoConfirm(self):
@@ -123,7 +126,7 @@ class InstancesDeleteTest(base.SqlMockTestBeta):
     self.WriteInput('y')
 
     self.Run('sql instances delete mock-instance')
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains(
         'Deleted [https://www.googleapis.com/sql/v1beta4/'
         'projects/{0}/instances/mock-instance].'.format(self.Project()))
@@ -133,10 +136,22 @@ class InstancesDeleteTest(base.SqlMockTestBeta):
     self.WriteInput('y')
 
     self.Run('sql instances delete mock-instance --async')
-    self.AssertErrContains('Do you want to continue (Y/n)?')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrNotContains(
         'Deleted [https://www.googleapis.com/sql/v1beta4/'
         'projects/{0}/instances/mock-instance].'.format(self.Project()))
+
+
+class InstancesDeleteGATest(_BaseInstancesDeleteTest, base.SqlMockTestGA):
+  pass
+
+
+class InstancesDeleteBetaTest(_BaseInstancesDeleteTest, base.SqlMockTestBeta):
+  pass
+
+
+class InstancesDeleteAlphaTest(_BaseInstancesDeleteTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

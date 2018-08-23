@@ -1,0 +1,53 @@
+NAME
+    gcloud composer environments - create and manage Cloud Composer
+        environments
+
+SYNOPSIS
+    gcloud composer environments GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    The gcloud composer environments command group lets you create Cloud
+    Composer environments containing an Apache Airflow setup. Additionally, the
+    command group supports environment updates including varying number of
+    machines used to run Airflow, setting Airflow configs, or installing Python
+    dependencies used in Airflow DAGs. The command group can also be used to
+    delete Composer environments.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     storage
+        Manage Cloud Storage objects stored as part of Cloud Composer
+        environments.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create and initialize a Cloud Composer environment.
+
+     delete
+        Delete one or more Cloud Composer environments.
+
+     describe
+        Get details about a Cloud Composer environment.
+
+     list
+        List the Cloud Composer environments under a project and location.
+
+     run
+        Run an Airflow sub-command remotely in a Cloud Composer environment.
+
+     update
+        Update properties of a Cloud Composer environment.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta composer environments
+

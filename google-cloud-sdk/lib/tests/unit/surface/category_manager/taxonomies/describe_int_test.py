@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for 'gcloud category-manager taxonomies describe'."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class TaxonomiesDescribeIntTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
@@ -46,8 +52,6 @@ class TaxonomiesDescribeIntTest(base.CategoryManagerUnitTestBase):
         displayName='store taxonomy display name',
         description='store taxonomy description')
 
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def _ExpectGetTaxonomyStoreTaxonomy(self, expected_taxonomy):
     self.mock_client.taxonomyStores_taxonomies.Get.Expect(
         self.messages.CategorymanagerTaxonomyStoresTaxonomiesGetRequest(
@@ -60,14 +64,16 @@ class TaxonomiesDescribeIntTest(base.CategoryManagerUnitTestBase):
             name=expected_taxonomy.name),
         copy.deepcopy(expected_taxonomy))
 
-  def testDescribeProjectTaxonomyId(self):
+  def testDescribeProjectTaxonomyId(self, track):
+    self.track = track
     self._ExpectGetProjectTaxonomy(self.expected_project_taxonomy)
     actual_taxonomy = self.Run(
         'category-manager taxonomies describe ' + self.taxonomy_id)
     self.assertEqual(actual_taxonomy, self.expected_project_taxonomy)
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
-  def testDescribeWithTaxonomyStoreTaxonomyName(self):
+  def testDescribeWithTaxonomyStoreTaxonomyName(self, track):
+    self.track = track
     self._ExpectGetTaxonomyStoreTaxonomy(self.expected_store_taxonomy)
     actual_taxonomy = self.Run('category-manager taxonomies describe ' +
                                self.taxonomy_store_taxonomy.RelativeName())
@@ -75,7 +81,8 @@ class TaxonomiesDescribeIntTest(base.CategoryManagerUnitTestBase):
                      self.taxonomy_store_taxonomy.RelativeName())
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
-  def testDescribeWithTaxonomyStoreTaxonomyPositionalAndFlag(self):
+  def testDescribeWithTaxonomyStoreTaxonomyPositionalAndFlag(self, track):
+    self.track = track
     self._ExpectGetTaxonomyStoreTaxonomy(self.expected_store_taxonomy)
     actual_taxonomy = self.Run(
         'category-manager taxonomies describe ' + self.taxonomy_id +

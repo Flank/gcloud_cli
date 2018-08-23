@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for googlecloudsdk.command_lib.util.gcloudignore."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 import ntpath
 import os
@@ -23,6 +26,7 @@ import shutil
 import tempfile
 
 from googlecloudsdk.command_lib.util import gcloudignore
+from googlecloudsdk.command_lib.util import glob
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
@@ -91,7 +95,7 @@ class PatternTest(parameterized.TestCase, test_case.TestCase):
     self._RunTest(pattern, path, result)
 
   def testPattern_BeginsWithHash(self):
-    with self.assertRaises(gcloudignore.InvalidLineError):
+    with self.assertRaises(glob.InvalidLineError):
       gcloudignore.Pattern.FromString('#foo')
 
   @parameterized.parameters(
@@ -99,11 +103,11 @@ class PatternTest(parameterized.TestCase, test_case.TestCase):
       ('  ',),
   )
   def testPattern_BlankLineInvalid(self, pattern):
-    with self.assertRaises(gcloudignore.InvalidLineError):
+    with self.assertRaises(glob.InvalidLineError):
       gcloudignore.Pattern.FromString(pattern)
 
   def testPattern_TrailingBackslash(self):
-    with self.assertRaises(gcloudignore.InvalidLineError):
+    with self.assertRaises(glob.InvalidLineError):
       gcloudignore.Pattern.FromString('\\')
 
   @parameterized.parameters(
@@ -287,7 +291,7 @@ class PatternTest(parameterized.TestCase, test_case.TestCase):
       ('\\]', ']'),
   )
   def testUnescape(self, escaped, unescaped):
-    self.assertEqual(gcloudignore._Unescape(escaped), unescaped)
+    self.assertEqual(glob._Unescape(escaped), unescaped)
 
   @parameterized.parameters(
       ('', ''),
@@ -306,7 +310,7 @@ class PatternTest(parameterized.TestCase, test_case.TestCase):
       ('\\ \\ f\\!oo', '  f\\!oo'),
   )
   def testHandleSpaces(self, original, stripped):
-    self.assertEqual(gcloudignore._HandleSpaces(original), stripped)
+    self.assertEqual(glob._HandleSpaces(original), stripped)
 
 
 class FileChooserTest(parameterized.TestCase, test_case.Base):

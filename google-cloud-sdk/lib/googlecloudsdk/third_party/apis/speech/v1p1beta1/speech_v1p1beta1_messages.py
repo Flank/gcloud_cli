@@ -12,6 +12,224 @@ from apitools.base.py import extra_types
 package = 'speech'
 
 
+class DataErrors(_messages.Message):
+  r"""Different types of dataset errors and the stats associated with each
+  error.
+
+  Enums:
+    ErrorTypeValueValuesEnum: Type of the error.
+
+  Fields:
+    count: Number of records having errors associated with the enum.
+    errorType: Type of the error.
+  """
+
+  class ErrorTypeValueValuesEnum(_messages.Enum):
+    r"""Type of the error.
+
+    Values:
+      ERROR_TYPE_UNSPECIFIED: Not specified.
+      UNSUPPORTED_AUDIO_FORMAT: Audio format not in the formats supported by
+        the cloud speech API
+      FILE_EXTENSION_MISMATCH_WITH_AUDIO_FORMAT: File format different from
+        what is specified in the file name extension
+      FILE_TOO_LARGE: File too large. Maximum allowed size is 50 MB.
+    """
+    ERROR_TYPE_UNSPECIFIED = 0
+    UNSUPPORTED_AUDIO_FORMAT = 1
+    FILE_EXTENSION_MISMATCH_WITH_AUDIO_FORMAT = 2
+    FILE_TOO_LARGE = 3
+
+  count = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  errorType = _messages.EnumField('ErrorTypeValueValuesEnum', 2)
+
+
+class DataStats(_messages.Message):
+  r"""Contains stats about the data which was uploaded and preprocessed to be
+  use by downstream pipelines like training, evals pipelines.
+
+  Fields:
+    dataErrors: Different types of data errors and the counts associated with
+      them.
+    testExampleCount: The number of examples used for testing.
+    trainingExampleCount: The number of examples used for training.
+  """
+
+  dataErrors = _messages.MessageField('DataErrors', 1, repeated=True)
+  testExampleCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  trainingExampleCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+
+
+class Dataset(_messages.Message):
+  r"""Specifies the parameters needed for creating a dataset. In addition this
+  is also the message returned to the client by the `CreateDataset` method. It
+  is included in the `result.response` field of the `Operation` returned by
+  the `GetOperation` call of the `google::longrunning::Operations` service.
+
+  Fields:
+    blockingOperationIds: Output only. All the blocking operations associated
+      with this dataset. Like (pre-processing, training-model, testing-model)
+    createTime: Output only. The timestamp this dataset is created.
+    dataProcessingRegion: Location where the data should be processed. If not
+      specified then we will pick a location on behalf of the user for storing
+      and processing the data. Currently only us-central is supported.
+    dataStats: Output only. Stats assoiated with the data.
+    displayName: Required. Name of the data set for display.
+    hasSufficientData: Output only. True if the data is sufficient to create
+      custom models.
+    languageCode: Required. The language of the supplied audio as a
+      [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
+      Example: "en-US". See [Language
+      Support](https://cloud.google.com/speech/docs/languages) for a list of
+      the currently supported language codes.
+    models: All the models (including models pending training) built using the
+      dataset.
+    name: Output only. Resource name of the dataset. Form :-
+      '/projects/{project_number}/locations/{location_id}/datasets/{dataset_id
+      }'
+    updateTime: Output only. The timestamp this dataset is last updated.
+    uri: URI that points to a file in csv file where each row has following
+      format. <gs_path_to_audio>,<gs_path_to_transcript>,<label> label can be
+      HUMAN_TRANSCRIBED or MACHINE_TRANSCRIBED. Few rules for a row to be
+      considered valid are :- 1. Each row must have at least a label and
+      <gs_path_to_transcript> 2. If a row is marked HUMAN_TRANSCRIBED, then
+      both <gs_path_to_audio> and <gs_path_to_transcript> needs to be
+      specified. 3. There has to be minimum 500 number of rows labelled
+      HUMAN_TRANSCRIBED if evaluation stats are required. 4. If
+      use_logged_data is set to true, then we ignore the rows labelled as
+      MACHINE_TRANSCRIBED. 5. There has to be minimum 100,000 words in the
+      transcripts in order to provide sufficient textual training data for the
+      language model. Currently, only Google Cloud Storage URIs are supported,
+      which must be specified in the following format:
+      `gs://bucket_name/object_name` (other URI formats will be ignored). For
+      more information, see [Request
+      URIs](https://cloud.google.com/storage/docs/reference-uris).
+    useLoggedData: If this is true, then use the previously logged data (for
+      the project) The logs data for this project will be preprocessed and
+      prepared for downstream pipelines (like training)
+  """
+
+  blockingOperationIds = _messages.StringField(1, repeated=True)
+  createTime = _messages.StringField(2)
+  dataProcessingRegion = _messages.StringField(3)
+  dataStats = _messages.MessageField('DataStats', 4)
+  displayName = _messages.StringField(5)
+  hasSufficientData = _messages.BooleanField(6)
+  languageCode = _messages.StringField(7)
+  models = _messages.MessageField('Model', 8, repeated=True)
+  name = _messages.StringField(9)
+  updateTime = _messages.StringField(10)
+  uri = _messages.StringField(11)
+  useLoggedData = _messages.BooleanField(12)
+
+
+class DeployModelRequest(_messages.Message):
+  r"""Message sent by the client for the `DeployModel` method."""
+
+
+class EvaluateModelRequest(_messages.Message):
+  r"""Message sent by the client for the `EvaluateModel` method."""
+
+
+class EvaluateModelResponse(_messages.Message):
+  r"""The only message returned to the client by the `EvaluateModel` method.
+  This is also returned as part of the Dataset message returned to the client
+  by the CreateDataset method. It is included in the `result.response` field
+  of the `Operation` returned by the `GetOperation` call of the
+  `google::longrunning::Operations` service.
+
+  Enums:
+    ModelTypeValueValuesEnum: Required. The type of model used in this
+      evaluation.
+
+  Fields:
+    isEnhancedModel: If true then it means we are referring to the results of
+      an enhanced version of the model_type. Currently only PHONE_CALL
+      model_type has an enhanced version.
+    modelType: Required. The type of model used in this evaluation.
+    wordErrorRate: Word error rate metric computed on the test set using the
+      AutoML model.
+  """
+
+  class ModelTypeValueValuesEnum(_messages.Enum):
+    r"""Required. The type of model used in this evaluation.
+
+    Values:
+      MODEL_TYPE_UNSPECIFIED: <no description>
+      DEFAULT: Model for audio that is not one of the specific models below.
+        This is a generic model and can be used in various scenarios but is
+        not necessarily the best in any particular scenario.
+      COMMAND_AND_SEARCH: Model for audio from short queries like voice
+        commands or voice search
+      PHONE_CALL: Model for phone call conversation type op audio.
+      VIDEO: Model for audio that originated from from video or includes
+        multiple speakers.
+    """
+    MODEL_TYPE_UNSPECIFIED = 0
+    DEFAULT = 1
+    COMMAND_AND_SEARCH = 2
+    PHONE_CALL = 3
+    VIDEO = 4
+
+  isEnhancedModel = _messages.BooleanField(1)
+  modelType = _messages.EnumField('ModelTypeValueValuesEnum', 2)
+  wordErrorRate = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
+
+
+class ListDatasetsResponse(_messages.Message):
+  r"""A ListDatasetsResponse object.
+
+  Fields:
+    datasets: Repeated list of data sets containing details about each data
+      set.
+    nextPageToken: Token to retrieve the next page of results, or empty if
+      there are no more results in the list.
+  """
+
+  datasets = _messages.MessageField('Dataset', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListLogDataStatsResponse(_messages.Message):
+  r"""Message received by the client for the `ListLogDataStats` method.
+
+  Fields:
+    logDataEnabled: Output only. True if user has opted in for log data
+      collection.
+    logDataStats: The stats for each bucket.
+    totalCount: The overall count for log data (including all bucket data).
+  """
+
+  logDataEnabled = _messages.BooleanField(1)
+  logDataStats = _messages.MessageField('LogBucketStats', 2, repeated=True)
+  totalCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+
+
+class ListModelsResponse(_messages.Message):
+  r"""A ListModelsResponse object.
+
+  Fields:
+    models: Repeated list of models containing details about each model.
+    nextPageToken: Token to retrieve the next page of results, or empty if
+      there are no more results in the list.
+  """
+
+  models = _messages.MessageField('Model', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class LogBucketStats(_messages.Message):
+  r"""Stats for log data within a bucket.
+
+  Fields:
+    bucketName: The display name for the bucket in which logs are collected.
+    count: Number of audio samples that have been collected in this bucket.
+  """
+
+  bucketName = _messages.StringField(1)
+  count = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+
+
 class LongRunningRecognizeRequest(_messages.Message):
   r"""The top-level message sent by the client for the `LongRunningRecognize`
   method.
@@ -24,6 +242,50 @@ class LongRunningRecognizeRequest(_messages.Message):
 
   audio = _messages.MessageField('RecognitionAudio', 1)
   config = _messages.MessageField('RecognitionConfig', 2)
+
+
+class Model(_messages.Message):
+  r"""Specifies the model parameters needed for training a model. In addition
+  this is also the message returned to the client by the `CreateModel` method.
+  It is included in the `result.response` field of the `Operation` returned by
+  the `GetOperation` call of the `google::longrunning::Operations` service.
+
+  Enums:
+    TrainingTypeValueValuesEnum: Required. Type of the training to perform.
+
+  Fields:
+    createTime: Output only. Timestamp when this model was created.
+    displayName: Required. Display name of the model to be trained.
+    evaluateModelResponses: Output only. Evaluation results associated with
+      this model. A model can contain multiple sub-models in which case the
+      evaluation results for all of those are available. If there are no sub
+      models then there would be just a single EvaluateModelResponse.
+    name: Output only. Resource name of the model. Format:
+      "projects/{project_id}/locations/{location_id}/models/{model_id}"
+    trainingType: Required. Type of the training to perform.
+  """
+
+  class TrainingTypeValueValuesEnum(_messages.Enum):
+    r"""Required. Type of the training to perform.
+
+    Values:
+      TRAINING_TYPE_UNSPECIFIED: <no description>
+      CUSTOM_ADAPTATION_LANGUAGE_MODEL: Build adaptation language model based
+        on the users data. These models are built on top of the existing
+        prebuilt models (like phone_call, video etc.).
+      PREBUILT_MODEL: Output only. This is set to indicate that the model we
+        are talking about is a prebuilt model (for e.g in the context of
+        evaluations).
+    """
+    TRAINING_TYPE_UNSPECIFIED = 0
+    CUSTOM_ADAPTATION_LANGUAGE_MODEL = 1
+    PREBUILT_MODEL = 2
+
+  createTime = _messages.StringField(1)
+  displayName = _messages.StringField(2)
+  evaluateModelResponses = _messages.MessageField('EvaluateModelResponse', 3, repeated=True)
+  name = _messages.StringField(4)
+  trainingType = _messages.EnumField('TrainingTypeValueValuesEnum', 5)
 
 
 class Operation(_messages.Message):
@@ -177,6 +439,14 @@ class RecognitionConfig(_messages.Message):
       detected in the audio. NOTE: This feature is only supported for Voice
       Command and Voice Search use cases and performance may vary for other
       use cases (e.g., phone call transcription).
+    audioChannelCount: *Optional* The number of channels in the input audio
+      data. ONLY set this for MULTI-CHANNEL recognition. Valid values for
+      LINEAR16 and FLAC are `1`-`8`. Valid values for OGG_OPUS are '1'-'254'.
+      Valid value for MULAW, AMR, AMR_WB and SPEEX_WITH_HEADER_BYTE is only
+      `1`. If `0` or omitted, defaults to one channel (mono). NOTE: We only
+      recognize the first channel by default. To perform independent
+      recognition on each channel set enable_separate_recognition_per_channel
+      to 'true'.
     diarizationSpeakerCount: *Optional* If set, specifies the estimated number
       of speakers in the conversation. If not set, defaults to '2'. Ignored
       unless enable_speaker_diarization is set to true."
@@ -187,6 +457,13 @@ class RecognitionConfig(_messages.Message):
       hypotheses. NOTE: "This is currently offered as an experimental service,
       complimentary to all users. In the future this may be exclusively
       available as a premium feature."
+    enableSeparateRecognitionPerChannel: This needs to be set to 'true'
+      explicitly and audio_channel_count > 1 to get each channel recognized
+      separately. The recognition result will contain a channel_tag field to
+      state which channel that result belongs to. If this is not 'true', we
+      will only recognize the first channel. NOTE: The request is also billed
+      cumulatively for all channels recognized:     (audio_channel_count times
+      the audio length)
     enableSpeakerDiarization: *Optional* If 'true', enables speaker detection
       for each recognized word in the top alternative of the recognition
       result using a speaker_tag provided in the WordInfo. Note: When this is
@@ -304,20 +581,22 @@ class RecognitionConfig(_messages.Message):
     SPEEX_WITH_HEADER_BYTE = 7
 
   alternativeLanguageCodes = _messages.StringField(1, repeated=True)
-  diarizationSpeakerCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  enableAutomaticPunctuation = _messages.BooleanField(3)
-  enableSpeakerDiarization = _messages.BooleanField(4)
-  enableWordConfidence = _messages.BooleanField(5)
-  enableWordTimeOffsets = _messages.BooleanField(6)
-  encoding = _messages.EnumField('EncodingValueValuesEnum', 7)
-  languageCode = _messages.StringField(8)
-  maxAlternatives = _messages.IntegerField(9, variant=_messages.Variant.INT32)
-  metadata = _messages.MessageField('RecognitionMetadata', 10)
-  model = _messages.StringField(11)
-  profanityFilter = _messages.BooleanField(12)
-  sampleRateHertz = _messages.IntegerField(13, variant=_messages.Variant.INT32)
-  speechContexts = _messages.MessageField('SpeechContext', 14, repeated=True)
-  useEnhanced = _messages.BooleanField(15)
+  audioChannelCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  diarizationSpeakerCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  enableAutomaticPunctuation = _messages.BooleanField(4)
+  enableSeparateRecognitionPerChannel = _messages.BooleanField(5)
+  enableSpeakerDiarization = _messages.BooleanField(6)
+  enableWordConfidence = _messages.BooleanField(7)
+  enableWordTimeOffsets = _messages.BooleanField(8)
+  encoding = _messages.EnumField('EncodingValueValuesEnum', 9)
+  languageCode = _messages.StringField(10)
+  maxAlternatives = _messages.IntegerField(11, variant=_messages.Variant.INT32)
+  metadata = _messages.MessageField('RecognitionMetadata', 12)
+  model = _messages.StringField(13)
+  profanityFilter = _messages.BooleanField(14)
+  sampleRateHertz = _messages.IntegerField(15, variant=_messages.Variant.INT32)
+  speechContexts = _messages.MessageField('SpeechContext', 16, repeated=True)
+  useEnhanced = _messages.BooleanField(17)
 
 
 class RecognitionMetadata(_messages.Message):
@@ -355,6 +634,9 @@ class RecognitionMetadata(_messages.Message):
       'Nexus 5X' or 'Polycom SoundStation IP 6000' or 'POTS' or 'VoIP' or
       'Cardioid Microphone'.
     recordingDeviceType: The type of device the speech was recorded with.
+    tags: A freeform field to tag this input sample with. This can be used for
+      grouping the logs into separate buckets. This enables selective purging
+      of data based on the tags, and also for training models in AutoML.
   """
 
   class InteractionTypeValueValuesEnum(_messages.Enum):
@@ -448,6 +730,7 @@ class RecognitionMetadata(_messages.Message):
   originalMimeType = _messages.StringField(7)
   recordingDeviceName = _messages.StringField(8)
   recordingDeviceType = _messages.EnumField('RecordingDeviceTypeValueValuesEnum', 9)
+  tags = _messages.StringField(10, repeated=True)
 
 
 class RecognizeRequest(_messages.Message):
@@ -481,19 +764,13 @@ class SpeechContext(_messages.Message):
   phrases in the results.
 
   Enums:
-    BiasingStrengthValueValuesEnum: Strength of biasing to use (strong, medium
-      or weak). If you use strong biasing option then more likely to see those
-      phrases in the results. If biasing strength is not specified then by
-      default medium biasing would be used. If you'd like different phrases to
-      have different biasing strengths, you can specify multiple
-      speech_contexts.
+    StrengthValueValuesEnum: Hint strength to use (high, medium or low). If
+      you use a high strength then you are more likely to see those phrases in
+      the results. If strength is not specified then by default medium
+      strength will be used. If you'd like different phrases to have different
+      strengths, you can specify multiple speech_contexts.
 
   Fields:
-    biasingStrength: Strength of biasing to use (strong, medium or weak). If
-      you use strong biasing option then more likely to see those phrases in
-      the results. If biasing strength is not specified then by default medium
-      biasing would be used. If you'd like different phrases to have different
-      biasing strengths, you can specify multiple speech_contexts.
     phrases: *Optional* A list of strings containing words and phrases "hints"
       so that the speech recognition is more likely to recognize them. This
       can be used to improve the accuracy for specific words and phrases, for
@@ -501,28 +778,33 @@ class SpeechContext(_messages.Message):
       also be used to add additional words to the vocabulary of the
       recognizer. See [usage
       limits](https://cloud.google.com/speech/limits#content).
+    strength: Hint strength to use (high, medium or low). If you use a high
+      strength then you are more likely to see those phrases in the results.
+      If strength is not specified then by default medium strength will be
+      used. If you'd like different phrases to have different strengths, you
+      can specify multiple speech_contexts.
   """
 
-  class BiasingStrengthValueValuesEnum(_messages.Enum):
-    r"""Strength of biasing to use (strong, medium or weak). If you use strong
-    biasing option then more likely to see those phrases in the results. If
-    biasing strength is not specified then by default medium biasing would be
-    used. If you'd like different phrases to have different biasing strengths,
-    you can specify multiple speech_contexts.
+  class StrengthValueValuesEnum(_messages.Enum):
+    r"""Hint strength to use (high, medium or low). If you use a high strength
+    then you are more likely to see those phrases in the results. If strength
+    is not specified then by default medium strength will be used. If you'd
+    like different phrases to have different strengths, you can specify
+    multiple speech_contexts.
 
     Values:
-      BIASING_STRENGTH_UNSPECIFIED: <no description>
-      LOW: Low bias
-      MEDIUM: Medium bias
-      HIGH: High bias
+      STRENGTH_UNSPECIFIED: <no description>
+      LOW: Low strength
+      MEDIUM: Medium strength
+      HIGH: High strength
     """
-    BIASING_STRENGTH_UNSPECIFIED = 0
+    STRENGTH_UNSPECIFIED = 0
     LOW = 1
     MEDIUM = 2
     HIGH = 3
 
-  biasingStrength = _messages.EnumField('BiasingStrengthValueValuesEnum', 1)
-  phrases = _messages.StringField(2, repeated=True)
+  phrases = _messages.StringField(1, repeated=True)
+  strength = _messages.EnumField('StrengthValueValuesEnum', 2)
 
 
 class SpeechOperationsGetRequest(_messages.Message):
@@ -533,6 +815,131 @@ class SpeechOperationsGetRequest(_messages.Message):
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class SpeechProjectsLocationsDatasetsCreateRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsDatasetsCreateRequest object.
+
+  Fields:
+    dataset: A Dataset resource to be passed as the request body.
+    parent: Required. Resource name of the parent. Has the format :-
+      "projects/{project_id}/locations/{location_id}"
+  """
+
+  dataset = _messages.MessageField('Dataset', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class SpeechProjectsLocationsDatasetsGetRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsDatasetsGetRequest object.
+
+  Fields:
+    includeModelInfo: If true then also include information about the models
+      built using this dataset.
+    name: The resource name of the dataset to retrieve. Form :-
+      '/projects/{project_number}/locations/{location_id}/datasets/{dataset_id
+      }'
+  """
+
+  includeModelInfo = _messages.BooleanField(1)
+  name = _messages.StringField(2, required=True)
+
+
+class SpeechProjectsLocationsDatasetsListRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsDatasetsListRequest object.
+
+  Fields:
+    filter: Filter the response based on display_name of the dataset. For e.g
+      display_name=Foo The filter string is case sensitive
+    includeModelInfo: If true then also include information about the models
+      built using the datasets.
+    pageSize: The maximum number of items to return.
+    pageToken: The next_page_token value returned from a previous List
+      request, if any.
+    parent: Required. Resource name of the parent. Has the format :-
+      "projects/{project_id}/locations/{location_id}"
+  """
+
+  filter = _messages.StringField(1)
+  includeModelInfo = _messages.BooleanField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
+
+
+class SpeechProjectsLocationsLogDataStatsListRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsLogDataStatsListRequest object.
+
+  Fields:
+    parent: Required. Resource name of the parent. Has the format :-
+      "projects/{project_id}/locations/{location_id}"
+  """
+
+  parent = _messages.StringField(1, required=True)
+
+
+class SpeechProjectsLocationsModelsCreateRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsModelsCreateRequest object.
+
+  Fields:
+    model: A Model resource to be passed as the request body.
+    name: Required. Resource name of the dataset being used to create the
+      model.
+      '/projects/{project_id}/locations/{location_id}/datasets/{dataset_id}'
+    parent: Required. Resource name of the parent. Has the format :-
+      "projects/{project_id}/locations/{location_id}"
+  """
+
+  model = _messages.MessageField('Model', 1)
+  name = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class SpeechProjectsLocationsModelsDeployRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsModelsDeployRequest object.
+
+  Fields:
+    deployModelRequest: A DeployModelRequest resource to be passed as the
+      request body.
+    name: Resource name of the model. Format:
+      "projects/{project_id}/locations/{location_id}/models/{model_id}"
+  """
+
+  deployModelRequest = _messages.MessageField('DeployModelRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class SpeechProjectsLocationsModelsEvaluateRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsModelsEvaluateRequest object.
+
+  Fields:
+    evaluateModelRequest: A EvaluateModelRequest resource to be passed as the
+      request body.
+    name: Resource name of the model. Format:
+      "projects/{project_id}/locations/{location_id}/models/{model_id}"
+  """
+
+  evaluateModelRequest = _messages.MessageField('EvaluateModelRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class SpeechProjectsLocationsModelsListRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsModelsListRequest object.
+
+  Fields:
+    filter: Filter the response based on display_name of the model. For e.g
+      display_name=Foo The filter string is case sensitive
+    pageSize: The maximum number of items to return.
+    pageToken: The next_page_token value returned from a previous List
+      request, if any.
+    parent: Required. Resource name of the parent. Has the format :-
+      "projects/{project_id}/locations/{location_id}"
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class SpeechRecognitionAlternative(_messages.Message):
@@ -566,9 +973,19 @@ class SpeechRecognitionResult(_messages.Message):
       (up to the maximum specified in `max_alternatives`). These alternatives
       are ordered in terms of accuracy, with the top (first) alternative being
       the most probable, as ranked by the recognizer.
+    channelTag: For multi-channel audio, this is the channel number
+      corresponding to the recognized result for the audio from that channel.
+      For audio_channel_count = N, its output values can range from '1' to
+      'N'.
+    languageCode: Output only. The [BCP-47](https://www.rfc-
+      editor.org/rfc/bcp/bcp47.txt) language tag of the language in this
+      result. This language code was detected to have the most likelihood of
+      being spoken in the audio.
   """
 
   alternatives = _messages.MessageField('SpeechRecognitionAlternative', 1, repeated=True)
+  channelTag = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  languageCode = _messages.StringField(3)
 
 
 class StandardQueryParameters(_messages.Message):

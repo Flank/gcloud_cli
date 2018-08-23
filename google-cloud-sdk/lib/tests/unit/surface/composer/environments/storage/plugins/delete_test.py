@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +15,13 @@
 """Unit tests for environments storage plugins delete."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
@@ -24,15 +29,19 @@ from tests.lib.surface.composer import kubectl_util
 import mock
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 @mock.patch('googlecloudsdk.core.execution_utils.Exec')
 class EnvironmentsStoragePluginsDeleteTest(base.GsutilShellingUnitTest,
-                                           base.StorageApiCallingUnitTest):
+                                           base.StorageApiCallingUnitTest,
+                                           parameterized.TestCase):
 
   def SetUp(self):
     properties.VALUES.core.disable_prompts.Set(True)
 
-  def testPluginsDeleteTargetSpecified(self, exec_mock):
+  def testPluginsDeleteTargetSpecified(self, track, exec_mock):
     """Tests successful plugins deleting for a specific file."""
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -60,8 +69,9 @@ class EnvironmentsStoragePluginsDeleteTest(base.GsutilShellingUnitTest,
                          target)
     fake_exec.Verify()
 
-  def testPluginsDeleteTargetNotSpecified(self, exec_mock):
+  def testPluginsDeleteTargetNotSpecified(self, track, exec_mock):
     """Tests successful deletion of the entire plugins directory."""
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -86,8 +96,9 @@ class EnvironmentsStoragePluginsDeleteTest(base.GsutilShellingUnitTest,
                          '--environment', self.TEST_ENVIRONMENT_ID)
     fake_exec.Verify()
 
-  def testPluginsDeleteRestoresSubdir(self, exec_mock):
+  def testPluginsDeleteRestoresSubdir(self, track, exec_mock):
     """Tests that the plugins dir is restored if it's missing after deletion."""
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,

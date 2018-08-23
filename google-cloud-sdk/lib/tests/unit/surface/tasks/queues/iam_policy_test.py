@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +16,10 @@
 """IAM tests for `gcloud tasks queues`."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
-from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.tasks import test_base
 
@@ -143,8 +144,6 @@ class RemoveIamPolicyBindingTest(test_base.CloudTasksTestBase):
     self.assertEqual(actual_new_policy, expected_new_policy)
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
 class GetIamPolicyTest(test_base.CloudTasksTestBase):
 
   def SetUp(self):
@@ -152,8 +151,7 @@ class GetIamPolicyTest(test_base.CloudTasksTestBase):
         'projects/other-project/locations/us-central1/queues/my-queue')
     self.admin_role = 'roles/cloudtasks.queueAdmin'
 
-  def testGetIamPolicy(self, track):
-    self.track = track
+  def testGetIamPolicy(self):
     expected_policy = self.messages.Policy(
         bindings=[self.messages.Binding(
             role=self.admin_role, members=['user:test-user@google.com'])],
@@ -164,13 +162,11 @@ class GetIamPolicyTest(test_base.CloudTasksTestBase):
         response=expected_policy)
 
     actual_policy = self.Run(
-        'tasks queues get-iam-policy {}'.format(self.queue_name),
-        track=calliope_base.ReleaseTrack.ALPHA)
+        'tasks queues get-iam-policy {}'.format(self.queue_name))
 
     self.assertEqual(actual_policy, expected_policy)
 
-  def testGetIamPolicy_Location(self, track):
-    self.track = track
+  def testGetIamPolicy_Location(self):
     queue_id = 'my-queue'
     queue_name = (
         'projects/fake-project/locations/us-central2/queues/{}'.format(
@@ -191,8 +187,6 @@ class GetIamPolicyTest(test_base.CloudTasksTestBase):
     self.assertEqual(actual_policy, expected_policy)
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
 class SetIamPolicyTest(test_base.CloudTasksTestBase):
 
   def SetUp(self):
@@ -200,8 +194,7 @@ class SetIamPolicyTest(test_base.CloudTasksTestBase):
         'projects/other-project/locations/us-central1/queues/my-queue')
     self.admin_role = 'roles/cloudtasks.queueAdmin'
 
-  def testSetIamPolicy(self, track):
-    self.track = track
+  def testSetIamPolicy(self):
     expected_policy = self.messages.Policy(
         bindings=[self.messages.Binding(
             role=self.admin_role, members=['user:test-user@google.com'])])
@@ -220,8 +213,7 @@ class SetIamPolicyTest(test_base.CloudTasksTestBase):
 
     self.assertEqual(actual_policy, expected_policy)
 
-  def testSetIamPolicy_Location(self, track):
-    self.track = track
+  def testSetIamPolicy_Location(self):
     queue_id = 'my-queue'
     queue_name = (
         'projects/fake-project/locations/us-central2/queues/{}'.format(

@@ -14,7 +14,9 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import resource as resource_util
 from tests.lib import test_case
 

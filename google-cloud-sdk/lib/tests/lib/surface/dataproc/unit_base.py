@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +16,14 @@
 """Base for all Dataproc unit tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import copy
+
 import difflib
 
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
-from googlecloudsdk import calliope
 from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
@@ -164,10 +165,8 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         'secondaryWorkerBootDiskType' in kwargs):
 
       disk_config = self.messages.DiskConfig(
-          bootDiskSizeGb=kwargs.get('secondaryWorkerBootDiskSizeGb', None))
-      if self.track == calliope.base.ReleaseTrack.BETA:
-        disk_config.bootDiskType = kwargs.get('secondaryWorkerBootDiskType',
-                                              None)
+          bootDiskSizeGb=kwargs.get('secondaryWorkerBootDiskSizeGb', None),
+          bootDiskType=kwargs.get('secondaryWorkerBootDiskType', None))
 
       secondary_worker_config = self.messages.InstanceGroupConfig(
           numInstances=kwargs.get('secondaryWorkerConfigNumInstances', None),
@@ -183,13 +182,9 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
       ])
 
     def make_disk_config(group_name):
-      if self.track == calliope.base.ReleaseTrack.BETA:
-        return self.messages.DiskConfig(
-            bootDiskSizeGb=kwargs.get(group_name + 'BootDiskSizeGb', None),
-            bootDiskType=kwargs.get(group_name + 'BootDiskType', None),
-            numLocalSsds=kwargs.get(group_name + 'NumLocalSsds', None))
       return self.messages.DiskConfig(
           bootDiskSizeGb=kwargs.get(group_name + 'BootDiskSizeGb', None),
+          bootDiskType=kwargs.get(group_name + 'BootDiskType', None),
           numLocalSsds=kwargs.get(group_name + 'NumLocalSsds', None))
 
     def make_accelerators(group_name):
@@ -365,20 +360,15 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         jobs=jobs)
 
   def ExpectGetWorkflowTemplate(self,
-                                workflow_template=None,
-                                region=None,
+                                name=None,
+                                version=None,
                                 response=None,
                                 exception=None):
-    if not region:
-      region = self.REGION
-    if not workflow_template:
-      workflow_template = self.MakeWorkflowTemplate()
-      response = None
-    if not exception:
-      response = copy.deepcopy(workflow_template)
+    if not name:
+      name = self.WorkflowTemplateName()
     self.mock_client.projects_regions_workflowTemplates.Get.Expect(
         self.messages.DataprocProjectsRegionsWorkflowTemplatesGetRequest(
-            name=workflow_template.name, version=workflow_template.version),
+            name=name, version=version),
         response=response,
         exception=exception)
 

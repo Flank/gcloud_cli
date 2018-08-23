@@ -146,42 +146,42 @@ OPTIONAL FLAGS
         specified.
 
      --subnet-region=SUBNET_REGION
-        The region of the subnetwork to operate on. If not specified it will be
-        set the region of the forwarding rule. Overrides the default
-        compute/region property value for this command invocation.
+        Region of the subnetwork to operate on. If not specified it will be set
+        the region of the forwarding rule. Overrides the default compute/region
+        property value for this command invocation.
 
      --target-instance-zone=TARGET_INSTANCE_ZONE
-        The zone of the target instance to operate on. Overrides the default
+        Zone of the target instance to operate on. Overrides the default
         compute/zone property value for this command invocation.
 
      --target-pool-region=TARGET_POOL_REGION
-        The region of the target pool to operate on. If not specified it will
-        be set the region of the forwarding rule. Overrides the default
+        Region of the target pool to operate on. If not specified it will be
+        set the region of the forwarding rule. Overrides the default
         compute/region property value for this command invocation.
 
      --target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION
-        The region of the VPN gateway to operate on. If not specified it will
-        be set the region of the forwarding rule. Overrides the default
+        Region of the VPN gateway to operate on. If not specified it will be
+        set the region of the forwarding rule. Overrides the default
         compute/region property value for this command invocation.
 
      At most one of these may be specified:
 
        --backend-service-region=BACKEND_SERVICE_REGION
-          The region of the backend service to operate on. If not specified it
-          will be set the region of the forwarding rule. Overrides the default
+          Region of the backend service to operate on. If not specified it will
+          be set the region of the forwarding rule. Overrides the default
           compute/region property value for this command invocation.
 
        --global-backend-service
-          If provided, it is assumed the backend service is global.
+          If set, the backend service is global.
 
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the forwarding rule is global.
+          If set, the forwarding rule is global.
 
        --region=REGION
-          The region of the forwarding rule to operate on. If not specified,
-          you may be prompted to select a region.
+          Region of the forwarding rule to operate on. If not specified, you
+          may be prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:

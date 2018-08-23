@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +24,7 @@ from googlecloudsdk.core import resources
 
 PROJECTS_COLLECTION = 'binaryauthorization.projects'
 PROJECTS_POLICY_COLLECTION = 'binaryauthorization.projects.policy'
-PROJECTS_AUTHORITIES_COLLECTION = 'binaryauthorization.projects.attestationAuthorities'
+PROJECTS_ATTESTORS_COLLECTION = 'binaryauthorization.projects.attestors'
 
 
 def GetProjectRef():
@@ -42,9 +43,9 @@ def GetPolicyRef():
   )
 
 
-def GetAuthorityRef(authority_name):
+def GetAttestorRef(attestor_name):
   return resources.REGISTRY.Parse(
-      authority_name,
+      attestor_name,
       params={'projectsId': properties.VALUES.core.project.GetOrFail},
-      collection=PROJECTS_AUTHORITIES_COLLECTION,
+      collection=PROJECTS_ATTESTORS_COLLECTION,
   )

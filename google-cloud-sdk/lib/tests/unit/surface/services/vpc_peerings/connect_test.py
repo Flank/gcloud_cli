@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,64 +15,80 @@
 """Unit tests for service-management enable command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.services import exceptions
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
+import mock
 
 
-class ConnectTest(unit_test_base.SNV1alphaUnitTestBase):
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
+class ConnectTest(unit_test_base.SNUnitTestBase):
   """Unit tests for services vpc-peerings connect command."""
   OPERATION_NAME = 'operations/abc.0000000000'
   NETWORK = 'hello'
-  RANGES = ['10.0.1.0/30', '10.0.3.0/30']
+  RANGES = ['google1', 'google2']
 
-  def testConnect(self):
-    self.ExpectPeerApiCall(self.NETWORK, self.RANGES, self.OPERATION_NAME)
+  def testConnect(self, track):
+    self.track = track
+    self.ExpectCreateConnection(self.NETWORK, self.RANGES, self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
     self.SetProjectNumber()
 
-    self.Run('alpha services vpc-peerings connect --service=%s --network=%s '
-             '--reserved-ranges=%s' % (self.DEFAULT_SERVICE_NAME, self.NETWORK,
-                                       ','.join(self.RANGES)))
+    self.Run('services vpc-peerings connect --service=%s --network=%s '
+             '--reserved-ranges=%s' % (self.service, self.NETWORK, ','.join(
+                 self.RANGES)))
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testConnectAsync(self):
-    self.ExpectPeerApiCall(self.NETWORK, self.RANGES, self.OPERATION_NAME)
+  def testConnectAsync(self, track):
+    self.track = track
+    self.ExpectCreateConnection(self.NETWORK, self.RANGES, self.OPERATION_NAME)
     self.SetProjectNumber()
 
-    self.Run('alpha services vpc-peerings connect --service=%s --network=%s '
-             '--reserved-ranges=%s --async' %
-             (self.DEFAULT_SERVICE_NAME, self.NETWORK, ','.join(self.RANGES)))
+    self.Run('services vpc-peerings connect --service=%s --network=%s '
+             '--reserved-ranges=%s --async' % (self.service, self.NETWORK,
+                                               ','.join(self.RANGES)))
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
-  def testConnectPermissionDenied(self):
+  def testConnectAsyncWithDefaultService(self, track):
+    self.track = track
+    self.service = 'servicenetworking.googleapis.com'
+    self.ExpectCreateConnection(self.NETWORK, self.RANGES, self.OPERATION_NAME)
+    self.SetProjectNumber()
+
+    self.Run(
+        'services vpc-peerings connect --network=%s '
+        '--reserved-ranges=%s --async' % (self.NETWORK, ','.join(self.RANGES)))
+    self.AssertErrContains(self.OPERATION_NAME)
+    self.AssertErrContains('operation is in progress')
+
+  def testConnectPermissionDenied(self, track):
+    self.track = track
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
-    self.ExpectPeerApiCall(self.NETWORK, self.RANGES, None, error=server_error)
+    self.ExpectCreateConnection(
+        self.NETWORK, self.RANGES, None, error=server_error)
     self.SetProjectNumber()
 
     with self.assertRaisesRegex(
-        exceptions.PeerServicePermissionDeniedException, r'Error.'):
-      self.Run('alpha services vpc-peerings connect --service=%s --network=%s '
-               '--reserved-ranges=%s' % (self.DEFAULT_SERVICE_NAME,
-                                         self.NETWORK, ','.join(self.RANGES)))
+        exceptions.CreateConnectionsPermissionDeniedException, r'Error.'):
+      self.Run('services vpc-peerings connect --service=%s --network=%s '
+               '--reserved-ranges=%s' % (self.service, self.NETWORK, ','.join(
+                   self.RANGES)))
 
   def SetProjectNumber(self):
     mock_get = self.StartObjectPatch(projects_api, 'Get')
-    p = Project()
-    p.SetProjectNumber(self.PROJECT_NUMBER)
+    p = mock.Mock()
+    p.projectNumber = self.PROJECT_NUMBER
     mock_get.return_value = p
-
-
-class Project(object):
-
-  # pylint: disable=invalid-name
-  def SetProjectNumber(self, num):
-    self.projectNumber = num
 
 
 if __name__ == '__main__':

@@ -22,7 +22,8 @@ COMMANDS
         Imports data into a Cloud SQL instance from a SQL dump file.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql import
         $ gcloud beta sql import
 

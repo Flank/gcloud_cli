@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +15,25 @@
 """Unit tests for environments delete."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.composer import util as api_util
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import util as command_util
 from googlecloudsdk.core.console import console_io
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 
 
-class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class EnvironmentsDeleteTest(base.EnvironmentsUnitTest, parameterized.TestCase):
 
-  def testSuccessfulDeleteSingle_synchronous(self):
+  def testSuccessfulDeleteSingle_synchronous(self, track):
+    self.SetTrack(track)
     self.WriteInput('y\n')
     self._ExpectDeletionCalls(self.TEST_PROJECT, self.TEST_LOCATION,
                               self.TEST_ENVIRONMENT_ID,
@@ -35,7 +42,8 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
     self.RunEnvironments('delete', '--project', self.TEST_PROJECT, '--location',
                          self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID)
 
-  def testSuccessfulDeleteSingle_asynchronous(self):
+  def testSuccessfulDeleteSingle_asynchronous(self, track):
+    self.SetTrack(track)
     self.WriteInput('y\n')
     self._ExpectDeletionCalls(
         self.TEST_PROJECT,
@@ -48,7 +56,8 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
                          self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID,
                          '--async')
 
-  def testSuccessfulDeleteMultiple_asynchronous(self):
+  def testSuccessfulDeleteMultiple_asynchronous(self, track):
+    self.SetTrack(track)
     self.WriteInput('y\n')
     deletions = [
         _Deletion(
@@ -71,7 +80,8 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
                          self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID,
                          self.TEST_ENVIRONMENT_ID2, '--async')
 
-  def testSuccessfulDeleteMultiple_synchronous(self):
+  def testSuccessfulDeleteMultiple_synchronous(self, track):
+    self.SetTrack(track)
     self.WriteInput('y\n')
     deletions = [
         _Deletion(self.TEST_PROJECT, self.TEST_LOCATION,
@@ -86,7 +96,9 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
                          self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID,
                          self.TEST_ENVIRONMENT_ID2)
 
-  def testSuccessfulDeleteMultipleWithSingleFastFailure_synchronous(self):
+  def testSuccessfulDeleteMultipleWithSingleFastFailure_synchronous(
+      self, track):
+    self.SetTrack(track)
     self.WriteInput('y\n')
     deletions = [
         _Deletion(
@@ -113,7 +125,9 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
         r'^{{"ux": "PROGRESS_TRACKER", "message": "Waiting for \[{}] to '
         r'be deleted'.format(self.TEST_ENVIRONMENT_NAME2))
 
-  def testSuccessfulDeleteMultipleWithSingleSlowFailure_synchronous(self):
+  def testSuccessfulDeleteMultipleWithSingleSlowFailure_synchronous(
+      self, track):
+    self.SetTrack(track)
     failed_op_metadata = self.messages.OperationMetadata(
         state=self.messages.OperationMetadata.StateValueValuesEnum.FAILED,
         operationType=self.messages.OperationMetadata.
@@ -153,7 +167,9 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
         r'^{{"ux": "PROGRESS_TRACKER", "message": "Waiting for \[{}] to be '
         'deleted"'.format(self.TEST_ENVIRONMENT_NAME2))
 
-  def testSuccessfulDeleteMultipleWithSingleFastFailure_asynchronous(self):
+  def testSuccessfulDeleteMultipleWithSingleFastFailure_asynchronous(
+      self, track):
+    self.SetTrack(track)
     self.WriteInput('y\n')
     deletions = [
         _Deletion(
@@ -185,7 +201,8 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
     self.AssertErrMatches(r'^Delete in progress for environment \[{}]'
                           .format(self.TEST_ENVIRONMENT_NAME2))
 
-  def testDeleteEnvironmentNotFound(self):
+  def testDeleteEnvironmentNotFound(self, track):
+    self.SetTrack(track)
     self.WriteInput('y\n')
     self.ExpectEnvironmentDelete(
         self.TEST_PROJECT,
@@ -200,7 +217,8 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
     self.AssertErrMatches(r'Failed to delete environment \[{}]'.format(
         self.TEST_ENVIRONMENT_NAME))
 
-  def testDeleteEnvironmentDecline(self):
+  def testDeleteEnvironmentDecline(self, track):
+    self.SetTrack(track)
     self.WriteInput('n\n')
     with self.AssertRaisesExceptionMatches(console_io.OperationCancelledError,
                                            'Deletion aborted by user'):
@@ -208,7 +226,8 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
                            '--location', self.TEST_LOCATION,
                            self.TEST_ENVIRONMENT_ID)
 
-  def testDeleteInsufficentPermissions(self):
+  def testDeleteInsufficentPermissions(self, track):
+    self.SetTrack(track)
     self.WriteInput('y\n')
     self.ExpectEnvironmentDelete(
         self.TEST_PROJECT,

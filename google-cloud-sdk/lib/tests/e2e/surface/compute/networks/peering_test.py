@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Integration tests for manipulating network peerings."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import logging
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -24,12 +27,12 @@ from six.moves import range  # pylint: disable=redefined-builtin
 from six.moves import zip  # pylint: disable=redefined-builtin
 
 
-class NetworkPeeringTest(e2e_test_base.BaseTest):
+class NetworkPeeringTestBase(e2e_test_base.BaseTest):
 
   SUBNET_RANGES = ['10.1.0.0/16', '10.2.0.0/16']
 
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
+  def SetUpCommon(self, track):
+    self.track = track
     self.network_names = []
     self.subnetwork_names = []
     self.peering_names = []
@@ -37,27 +40,20 @@ class NetworkPeeringTest(e2e_test_base.BaseTest):
     for _ in range(2):
       # Prefix limited in size to avoid conflict in firewall names based on
       # first 43 characters of network names.
-      self.network_names.append(next(e2e_utils.GetResourceNameGenerator(
-          prefix='compute-peering-net')))
-      self.subnetwork_names.append(next(e2e_utils.GetResourceNameGenerator(
-          prefix='compute-peering-sub')))
-      self.peering_names.append(next(e2e_utils.GetResourceNameGenerator(
-          prefix='compute-peering-peer')))
+      self.network_names.append(
+          next(
+              e2e_utils.GetResourceNameGenerator(prefix='compute-peering-net')))
+      self.subnetwork_names.append(
+          next(
+              e2e_utils.GetResourceNameGenerator(prefix='compute-peering-sub')))
+      self.peering_names.append(
+          next(
+              e2e_utils.GetResourceNameGenerator(
+                  prefix='compute-peering-peer')))
 
-  def TearDown(self):
-    logging.info('Starting TearDown (will delete resources if test fails).')
-    for subnetwork_name in self.subnetwork_names:
-      self.CleanUpResource(subnetwork_name, 'networks subnets',
-                           scope=e2e_test_base.REGIONAL)
-    for network_name in self.network_names:
-      self.CleanUpResource(network_name, 'networks',
-                           scope=e2e_test_base.GLOBAL)
-
-  def testNetworkPeering(self):
     # Create two networks with non-overlapping custom subnets
-    for (network_name, subnetwork_name,
-         subnet_range) in zip(self.network_names, self.subnetwork_names,
-                              self.SUBNET_RANGES):
+    for (network_name, subnetwork_name, subnet_range) in zip(
+        self.network_names, self.subnetwork_names, self.SUBNET_RANGES):
       self.Run('compute networks create {0} --subnet-mode custom'.format(
           network_name))
       self.AssertNewOutputContains(network_name)
@@ -66,6 +62,21 @@ class NetworkPeeringTest(e2e_test_base.BaseTest):
                                                  self.region, subnet_range))
       self.AssertNewOutputContains(subnetwork_name)
 
+  def TearDown(self):
+    logging.info('Starting TearDown (will delete resources if test fails).')
+    for subnetwork_name in self.subnetwork_names:
+      self.CleanUpResource(
+          subnetwork_name, 'networks subnets', scope=e2e_test_base.REGIONAL)
+    for network_name in self.network_names:
+      self.CleanUpResource(network_name, 'networks', scope=e2e_test_base.GLOBAL)
+
+
+class NetworkPeeringTestGa(NetworkPeeringTestBase):
+
+  def SetUp(self):
+    self.SetUpCommon(calliope_base.ReleaseTrack.GA)
+
+  def testNetworkPeering(self):
     # Create a peering in network 0 to network 1
     self.Run('compute networks peerings create {0} --network {1} '
              '--peer-network {2} --auto-create-routes'.format(
@@ -100,6 +111,35 @@ class NetworkPeeringTest(e2e_test_base.BaseTest):
 
     for network_name in self.network_names:
       self.Run('compute networks delete {0}'.format(network_name))
+
+
+class NetworkPeeringTestAlpha(NetworkPeeringTestBase):
+
+  def SetUp(self):
+    self.SetUpCommon(calliope_base.ReleaseTrack.ALPHA)
+
+  def testPeeringWithRoutePolicy(self):
+    # Create a peering in network 0 to network 1 which imports routes.
+    self.Run('compute networks peerings create {0} --network {1} '
+             '--peer-network {2} --auto-create-routes '
+             '--no-export-custom-routes --import-custom-routes'.format(
+                 self.peering_names[0], self.network_names[0],
+                 self.network_names[1]))
+    # Create a matching peering in network 1 to 0 which exports routes.
+    self.Run('compute networks peerings create {0} --network {1} '
+             '--peer-network {2} --auto-create-routes '
+             '--export-custom-routes --no-import-custom-routes'.format(
+                 self.peering_names[1], self.network_names[1],
+                 self.network_names[0]))
+    # Verify route policies.
+    self.Run('compute networks describe {0}'.format(self.network_names[0]))
+    self.AssertNewOutputContainsAll('state: ACTIVE',
+                                    'exportCustomRoutes: false',
+                                    'importCustomRoutes: true')
+    self.Run('compute networks describe {0}'.format(self.network_names[1]))
+    self.AssertNewOutputContainsAll('state: ACTIVE', 'exportCustomRoutes: true',
+                                    'importCustomRoutes: false')
+
 
 if __name__ == '__main__':
   e2e_test_base.main()

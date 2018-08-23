@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups unmanaged delete subcommand."""
-from __future__ import absolute_import
-from __future__ import unicode_literals
-import textwrap
 
-from googlecloudsdk.core import properties
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -76,14 +77,12 @@ class UnmanagedInstanceGroupsDeleteTest(test_base.BaseTest):
               project='my-project',
               zone='central2-a'))],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following instance groups will be deleted:
-         - [group-1] in [central2-a]
-         - [group-2] in [central2-a]
-         - [group-3] in [central2-a]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following instance groups will be deleted:\n'
+        r' - [group-1] in [central2-a]\n'
+        r' - [group-2] in [central2-a]\n'
+        r' - [group-3] in [central2-a]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.WriteInput('n\n')

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Unit tests for services list command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core import properties
 
 from tests.lib import cli_test_base
@@ -160,6 +163,23 @@ service-name7.googleapis.com.googleapis.com
 service-name8.googleapis.com.googleapis.com
 service-name9.googleapis.com.googleapis.com
 """, normalize_space=True)
+
+
+class ListAlphaTest(unit_test_base.SUUnitTestBase):
+  """Unit tests for services list command."""
+  OPERATION_NAME = 'operations/abc.0000000000'
+
+  def testList(self):
+    self.ExpectListServicesCall()
+
+    self.Run('alpha services list --available')
+    self.AssertOutputEquals(
+        """\
+NAME TITLE
+service-name-1.googleapis.com
+service-name.googleapis.com
+""",
+        normalize_space=True)
 
 
 # DO NOT REMOVE THIS TEST.

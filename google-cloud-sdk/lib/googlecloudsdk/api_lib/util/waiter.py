@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Utilities to support long running operations."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import abc
 import time
 
@@ -155,7 +158,7 @@ class CloudOperationPollerNoResources(OperationPoller):
 
   # TODO(b/62478975): Remove get_name_func when ML API operation names
   # are compatible with gcloud parsing, and use RelativeName instead.
-  def __init__(self, operation_service, get_name_func):
+  def __init__(self, operation_service, get_name_func=None):
     """Sets up poller for cloud operations.
 
     Args:
@@ -170,7 +173,7 @@ class CloudOperationPollerNoResources(OperationPoller):
         `lambda x: x.RelativeName()`.
     """
     self.operation_service = operation_service
-    self.get_name = get_name_func
+    self.get_name = get_name_func or (lambda x: x.RelativeName())
 
   def IsDone(self, operation):
     """Overrides."""
@@ -253,13 +256,13 @@ def WaitFor(poller, operation_ref, message,
   except retry.WaitException:
     raise TimeoutError(
         'Operation {0} has not finished in {1} seconds. {2}'
-        .format(operation_ref, int(max_wait_ms / 1000), _TIMEOUT_MESSAGE))
+        .format(operation_ref, max_wait_ms // 1000, _TIMEOUT_MESSAGE))
   except retry.MaxRetrialsException as e:
     raise TimeoutError(
         'Operation {0} has not finished in {1} seconds '
         'after max {2} retrials. {3}'
         .format(operation_ref,
-                int(e.state.time_passed_ms / 1000),
+                e.state.time_passed_ms // 1000,
                 e.state.retrial,
                 _TIMEOUT_MESSAGE))
 
@@ -275,6 +278,10 @@ def PollUntilDone(poller, operation_ref,
                   sleep_ms=2000,
                   status_update=None):
   """Waits for poller.Poll to complete.
+
+  Note that this *does not* print nice messages to stderr for the user; most
+  callers should use WaitFor instead for the best UX unless there's a good
+  reason not to print.
 
   Args:
     poller: OperationPoller, poller to use during retrials.
@@ -313,4 +320,3 @@ def PollUntilDone(poller, operation_ref,
 
 def _SleepMs(miliseconds):
   time.sleep(miliseconds / 1000)
-

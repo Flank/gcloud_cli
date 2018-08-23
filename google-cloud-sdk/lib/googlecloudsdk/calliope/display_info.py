@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Resource display info for the Calliope display module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.cache import cache_update_ops
 
 
@@ -116,7 +119,9 @@ class DisplayInfo(object):
     """Adds aliases to the display info, newer values takes precedence.
 
     Args:
-      aliases: The resource name alias dict.
+      aliases: {str: parsed_key} The resource name alias dict that maps short
+        names to parsed keys. The parsed key for 'abc.xyz' is ['abc', 'xyz'].
+        See the resource_lex.Lexer.Key() docstring for parsed key details.
     """
     if aliases:
       self._aliases.update(aliases)

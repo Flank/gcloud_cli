@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,11 @@
 # limitations under the License.
 
 """Implements the command for SSHing into an instance."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.oslogin import client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties

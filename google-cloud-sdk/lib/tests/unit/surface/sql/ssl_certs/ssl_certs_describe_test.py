@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -23,7 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class SslCertsDescribeTest(base.SqlMockTestBeta):
+class _BaseSslCertsDescribeTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testSslCertsDescribe(self):
@@ -82,6 +85,19 @@ sha1Fingerprint: 77299aad4c8136911c1f0b07dd9802a9a72124e8
 
     # Checking for deprecation warning.
     self.AssertErrContains('`gcloud sql ssl-certs` is deprecated')
+
+
+class SslCertsDescribeGATest(_BaseSslCertsDescribeTest, base.SqlMockTestGA):
+  pass
+
+
+class SslCertsDescribeBetaTest(_BaseSslCertsDescribeTest, base.SqlMockTestBeta):
+  pass
+
+
+class SslCertsDescribeAlphaTest(_BaseSslCertsDescribeTest,
+                                base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

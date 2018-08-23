@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Base for Services V1 unit tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import time
 
 from apitools.base.py import encoding
@@ -25,7 +28,7 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
-from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import range
 
 
 class SV1UnitTestBase(sdk_test_base.WithFakeAuth,
@@ -123,40 +126,39 @@ class SV1UnitTestBase(sdk_test_base.WithFakeAuth,
 NETWORK_URL_FORMAT = 'projects/%s/global/networks/%s'
 
 
-class SNV1alphaUnitTestBase(sdk_test_base.WithFakeAuth,
-                            sdk_test_base.WithLogCapture,
-                            cli_test_base.CliTestBase):
+class SNUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
+                     cli_test_base.CliTestBase):
   """Base class for service networking unit tests."""
 
   PROJECT_NAME = 'fake-project'
   PROJECT_NUMBER = 12481632
-  DEFAULT_SERVICE_NAME = 'service-name.googleapis.com'
 
   def PreSetUp(self):
     self.services_messages = core_apis.GetMessagesModule(
-        'servicenetworking', 'v1alpha')
+        'servicenetworking', 'v1beta')
 
   def SetUp(self):
     properties.VALUES.core.project.Set(self.PROJECT_NAME)
 
     # Mock out the service networking API
     self.mocked_client = mock.Client(
-        core_apis.GetClientClass('servicenetworking', 'v1alpha'),
+        core_apis.GetClientClass('servicenetworking', 'v1beta'),
         real_client=core_apis.GetClientInstance(
-            'servicenetworking', 'v1alpha', no_http=True))
+            'servicenetworking', 'v1beta', no_http=True))
     self.mocked_client.Mock()
     self.addCleanup(self.mocked_client.Unmock)
+    self.service = 'service-name.googleapis.com'
 
-  def ExpectPeerApiCall(self, network, ranges, operation, error=None):
+  def ExpectCreateConnection(self, network, ranges, operation, error=None):
     if error:
       op = None
     else:
       op = self.services_messages.Operation(name=operation, done=False)
-    self.mocked_client.services.Peer.Expect(
-        self.services_messages.ServicenetworkingServicesPeerRequest(
-            name='services/%s' % self.DEFAULT_SERVICE_NAME,
-            peerSharedNetworkRequest=self.services_messages.
-            PeerSharedNetworkRequest(
+    self.mocked_client.services_connections.Create.Expect(
+        self.services_messages.
+        ServicenetworkingServicesConnectionsCreateRequest(
+            parent='services/%s' % self.service,
+            connection=self.services_messages.Connection(
                 network=NETWORK_URL_FORMAT % (self.PROJECT_NUMBER, network),
                 reservedPeeringRanges=ranges)),
         op,
@@ -177,3 +179,117 @@ class SNV1alphaUnitTestBase(sdk_test_base.WithFakeAuth,
         self.services_messages.ServicenetworkingOperationsGetRequest(name=name),
         op,
         exception=error)
+
+  def ExpectListConnections(self, network, conns, error=None):
+    if error:
+      resp = None
+    else:
+      resp = self.services_messages.ListConnectionsResponse(connections=conns)
+    self.mocked_client.services_connections.List.Expect(
+        self.services_messages.ServicenetworkingServicesConnectionsListRequest(
+            parent='services/%s' % self.service,
+            network=NETWORK_URL_FORMAT % (self.PROJECT_NUMBER, network)),
+        resp,
+        exception=error)
+
+
+class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
+                     cli_test_base.CliTestBase):
+  """Base class for service usage unit tests."""
+
+  PROJECT_NAME = 'fake-project'
+  DEFAULT_SERVICE_NAME = 'service-name.googleapis.com'
+  DEFAULT_SERVICE_NAME_2 = 'service-name-1.googleapis.com'
+
+  def PreSetUp(self):
+    self.services_messages = core_apis.GetMessagesModule('serviceusage', 'v1')
+
+  def SetUp(self):
+    properties.VALUES.core.project.Set(self.PROJECT_NAME)
+
+    # Mock out the service networking API
+    self.mocked_client = mock.Client(
+        core_apis.GetClientClass('serviceusage', 'v1'),
+        real_client=core_apis.GetClientInstance(
+            'serviceusage', 'v1', no_http=True))
+    self.mocked_client.Mock()
+    self.addCleanup(self.mocked_client.Unmock)
+
+  def ExpectEnableApiCall(self, operation, error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    self.mocked_client.services.Enable.Expect(
+        self.services_messages.ServiceusageServicesEnableRequest(
+            name='projects/%s/services/%s' % (self.PROJECT_NAME,
+                                              self.DEFAULT_SERVICE_NAME),),
+        op,
+        exception=error)
+
+  def ExpectBatchEnableApiCall(self, operation, error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    self.mocked_client.services.BatchEnable.Expect(
+        self.services_messages.ServiceusageServicesBatchEnableRequest(
+            batchEnableServicesRequest=self.services_messages.
+            BatchEnableServicesRequest(serviceIds=[
+                self.DEFAULT_SERVICE_NAME, self.DEFAULT_SERVICE_NAME_2
+            ]),
+            parent='projects/%s' % self.PROJECT_NAME),
+        op,
+        exception=error)
+
+  def ExpectDisableApiCall(self, operation, force=False, error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    self.mocked_client.services.Disable.Expect(
+        self.services_messages.ServiceusageServicesDisableRequest(
+            name='projects/%s/services/%s' % (self.PROJECT_NAME,
+                                              self.DEFAULT_SERVICE_NAME),
+            disableServiceRequest=self.services_messages.DisableServiceRequest(
+                disableDependentServices=force,),
+        ),
+        op,
+        exception=error)
+
+  def ExpectListServicesCall(self, error=None):
+    if error:
+      resp = None
+    else:
+      resp = self.services_messages.ListServicesResponse(services=[
+          self._NewServiceConfig(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME),
+          self._NewServiceConfig(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME_2)
+      ])
+    self.mocked_client.services.List.Expect(
+        self.services_messages.ServiceusageServicesListRequest(
+            parent='projects/%s' % self.PROJECT_NAME),
+        resp,
+        exception=error)
+
+  def ExpectOperation(self, name, poll_count=2, error=None):
+    for _ in range(poll_count):
+      op = self.services_messages.Operation(name=name, done=False)
+      self.mocked_client.operations.Get.Expect(
+          request=self.services_messages.ServiceusageOperationsGetRequest(
+              name=name),
+          response=op)
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=name, done=True)
+    self.mocked_client.operations.Get.Expect(
+        self.services_messages.ServiceusageOperationsGetRequest(name=name),
+        op,
+        exception=error)
+
+  def _NewServiceConfig(self, project, service):
+    return self.services_messages.GoogleApiServiceusageV1Service(
+        name='projects/%s/services/%s' % (project, service),
+        config=self.services_messages.GoogleApiServiceusageV1ServiceConfig(
+            name=service,),
+    )

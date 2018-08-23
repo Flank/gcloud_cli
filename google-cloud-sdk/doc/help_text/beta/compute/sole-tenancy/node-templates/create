@@ -61,8 +61,8 @@ OPTIONAL FLAGS
         instances create and compute instance-templates create.
 
      --region=REGION
-        The region of the node templates to operate on. If not specified, you
-        may be prompted to select a region.
+        Region of the node templates to operate on. If not specified, you may
+        be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:
@@ -86,5 +86,9 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute sole-tenancy node-templates create
+        $ gcloud alpha compute sole-tenancy node-templates create
 

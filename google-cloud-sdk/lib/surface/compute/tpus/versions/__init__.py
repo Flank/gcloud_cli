@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """The TensorflowVersions command group for the Cloud TPU ClI."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Versions(base.Group):
   """Explore Available Tensorflow versions for Cloud TPUs."""

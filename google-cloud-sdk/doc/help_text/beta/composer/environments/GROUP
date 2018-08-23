@@ -29,10 +29,10 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (BETA) Creates and initializes a Cloud Composer environment.
+        (BETA) Create and initialize a Cloud Composer environment.
 
      delete
-        (BETA) Deletes one or more Cloud Composer environments.
+        (BETA) Delete one or more Cloud Composer environments.
 
      describe
         (BETA) Get details about a Cloud Composer environment.
@@ -46,8 +46,11 @@ COMMANDS
         environment.
 
      update
-        (BETA) Updates properties of an environment.
+        (BETA) Update properties of a Cloud Composer environment.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud composer environments
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,21 +31,19 @@ from tests.lib.scenario import updates
 class ModeTests(test_case.TestCase, parameterized.TestCase):
 
   @parameterized.parameters([
-      (None, [], False),
-      ('', [], False),
-      ('RESULT', [updates.Mode.RESULT], False),
-      ('RESULT,UX,API_REQUESTS',
-       [updates.Mode.RESULT, updates.Mode.UX, updates.Mode.API_REQUESTS],
-       False),
-      ('RESULT,UX,API_REQUESTS,API_RESPONSES',
+      (None, []),
+      ('', []),
+      ('RESULT', [updates.Mode.RESULT]),
+      ('RESULT UX API_REQUESTS',
+       [updates.Mode.RESULT, updates.Mode.UX, updates.Mode.API_REQUESTS]),
+      ('RESULT UX API_REQUESTS API_RESPONSE_PAYLOADS',
        [updates.Mode.RESULT, updates.Mode.UX, updates.Mode.API_REQUESTS,
-        updates.Mode.API_RESPONSES], True),
+        updates.Mode.API_RESPONSE_PAYLOADS]),
   ])
-  def testCurrentMode(self, value, expected, makes_api_calls):
+  def testCurrentMode(self, value, expected):
     encoding.SetEncodedValue(os.environ, updates.UPDATE_MODES_ENV_VAR, value)
-    actual = updates.Mode.Current()
+    actual = updates.Mode.FromEnv()
     self.assertEqual(expected, actual)
-    self.assertEqual(makes_api_calls, updates.Mode.MakesApiCalls())
 
   @parameterized.parameters([
       ('BOGUS'),
@@ -53,7 +52,7 @@ class ModeTests(test_case.TestCase, parameterized.TestCase):
   def testCurrentModeErrors(self, value):
     with self.assertRaises(updates.Error):
       encoding.SetEncodedValue(os.environ, updates.UPDATE_MODES_ENV_VAR, value)
-      updates.Mode.Current()
+      updates.Mode.FromEnv()
 
 
 class ContextTests(test_case.TestCase):
@@ -108,6 +107,32 @@ a:
 
     c = context.ForKey('b.c')
     self.assertEqual(('3', '4'), c.Location())
+
+  def testBlockText(self):
+    data_string = """\
+a:
+  b: "this\\nis\\nsomething\\nwith\\nnewlines"
+  c: d
+"""
+    data = yaml.load(data_string, round_trip=True)
+    self.assertEqual(
+        'a:\n  b: "this\\nis\\nsomething\\nwith\\nnewlines"\n  c: d\n',
+        yaml.dump(data, round_trip=True))
+    context = updates.Context(data, 'a', updates.Mode.RESULT)
+    context.ForKey('b').Update('this\nis\na\ndifferent\nthing\nwith\nnewlines',
+                               [updates.Mode.RESULT])
+    self.assertEqual("""\
+a:
+  b: |-
+    this
+    is
+    a
+    different
+    thing
+    with
+    newlines
+  c: d
+""", yaml.dump(context.BackingData(), round_trip=True))
 
 
 if __name__ == '__main__':

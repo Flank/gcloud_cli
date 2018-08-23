@@ -35,8 +35,7 @@ COMMANDS
         (BETA) List Google Compute Engine subnetworks.
 
      list-usable
-        (BETA) List Google Compute Engine subnetworks in a project that the
-        user has permission to use.
+        (BETA) List Google Compute Engine subnetworks permitted for use.
 
      set-iam-policy
         (BETA) Set the IAM Policy for a Google Compute Engine subnetwork.

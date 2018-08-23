@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """Command to delete Airflow DAGs for a Cloud Composer environment."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
@@ -30,7 +32,7 @@ class Delete(base.Command):
   @staticmethod
   def Args(parser):
     resource_args.AddEnvironmentResourceArg(
-        parser, 'whose DAGs to delete.', positional=False)
+        parser, 'whose DAGs to delete', positional=False)
     flags.AddDeleteTargetPositional(parser, 'dags')
 
   def Run(self, args):
@@ -41,4 +43,5 @@ class Delete(base.Command):
         'subdirectory of environment [{}]'.format(subtarget,
                                                   env_ref.RelativeName()),
         cancel_on_no=True)
-    return storage_util.Delete(env_ref, args.target or '*', 'dags')
+    return storage_util.Delete(
+        env_ref, args.target or '*', 'dags', release_track=self.ReleaseTrack())

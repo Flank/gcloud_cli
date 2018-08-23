@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the disks create subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import re
-import textwrap
 
 from googlecloudsdk.api_lib.compute import csek_utils
 from googlecloudsdk.calliope import base as calliope_base
@@ -502,12 +505,11 @@ class DisksCreateTest(test_base.BaseTest):
               project='my-project',
               zone='central2-a'))],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        Found two possible choices for [--image] value [debian-8].
-         [1] {compute_uri}/projects/my-project/global/images/debian-8
-         [2] {compute_uri}/projects/debian-cloud/global/images/debian-8-jessie-v20151130
-        Please enter your numeric choice (1):""".format(
-            compute_uri=self.compute_uri)))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains(
+        '"choices": ["{compute_uri}/projects/my-project/global/images/debian-8"'
+        ', "{compute_uri}/projects/debian-cloud/global/images/debian-8-jessie-'
+        'v20151130"]'.format(compute_uri=self.compute_uri))
 
   def testImageAliasExpansionWithNoMatches(self):
     self.make_requests.side_effect = iter([
@@ -690,12 +692,11 @@ class DisksCreateTest(test_base.BaseTest):
     )
 
     # pylint: disable=line-too-long
-    self.AssertErrContains(textwrap.dedent("""\
-        WARNING: The following selected zone is deprecated. All resources in this zone will be deleted after the turndown date.
-         - [central2-b] 2015-03-29T00:00.000-07:00
-
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        r'WARNING: The following selected zone is deprecated. All resources in '
+        r'this zone will be deleted after the turndown date.\n'
+        r' - [central2-b] 2015-03-29T00:00.000-07:00')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testUriSupport(self):
     self.Run("""
@@ -1303,12 +1304,11 @@ class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
     )
 
     # pylint: disable=line-too-long
-    self.AssertErrContains(textwrap.dedent("""\
-      WARNING: The following selected region is deprecated. All resources in this region will be deleted after the turndown date.
-       - [central2] 2015-03-29T00:00.000-07:00
-
-
-      Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        r'WARNING: The following selected region is deprecated. All resources '
+        r'in this region will be deleted after the turndown date.\n'
+        r' - [central2] 2015-03-29T00:00.000-07:00')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testRegionButNoReplicaZones(self, track, api_version):
     SetUp(self, api_version)
@@ -1843,14 +1843,35 @@ class DisksCreateTestWithResourcePoliciesAlpha(test_base.BaseTest):
               zone='central2-a'))])
 
   def testCreate_RegionalWithResourcePolicy(self):
-    with self.AssertRaisesExceptionMatches(
-        exceptions.InvalidArgumentException,
-        'Resource policies are not supported for regional disks.'):
-      self.Run("""
-          compute disks create disk-with-backup --region central2 \
-              --replica-zones central2-b,central2-c \
-              --resource-policies my-policy
-          """)
+    self.make_requests.side_effect = iter([
+        [],
+        [
+            self.messages.Region(
+                name='central2',),
+        ],
+        [],
+    ])
+    self.Run('compute disks create disk-1 --region central2 '
+             '--replica-zones central2-b,central2-c '
+             '--resource-policies pol1')
+    self.CheckRequests(
+        [],
+        [(self.compute.regions, 'Get', self.messages.ComputeRegionsGetRequest(
+            project='my-project', region='central2'))],
+        [(self.compute.regionDisks, 'Insert',
+          self.messages.ComputeRegionDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='disk-1',
+                  sizeGb=500,
+                  resourcePolicies=[
+                      'https://www.googleapis.com/compute/alpha/projects/'
+                      'my-project/regions/central2/resourcePolicies/pol1'],
+                  replicaZones=[
+                      self.compute_uri+'/projects/my-project/zones/central2-b',
+                      self.compute_uri+'/projects/my-project/zones/central2-c'
+                  ]),
+              project='my-project',
+              region='central2'))])
 
 
 if __name__ == '__main__':

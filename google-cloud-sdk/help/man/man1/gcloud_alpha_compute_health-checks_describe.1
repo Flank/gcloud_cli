@@ -11,7 +11,7 @@ gcloud alpha compute health\-checks describe \- display detailed information abo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute health\-checks describe\fR \fINAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute health\-checks describe\fR \fINAME\fR [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -33,6 +33,50 @@ Name of the health check to describe.
 .RE
 .sp
 
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the health check is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the health check to describe. If not specified, you may be prompted to
+select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
@@ -44,11 +88,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute health\-checks describe

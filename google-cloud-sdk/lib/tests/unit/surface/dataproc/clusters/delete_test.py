@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +14,10 @@
 # limitations under the License.
 
 """Test of the 'clusters delete' command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope import base as calliope_base
@@ -56,10 +58,9 @@ class ClustersDeleteUnitTest(unit_base.DataprocUnitTestBase):
     expected = self.MakeCompletedOperation()
     self.WriteInput('y\n')
     result = self.RunDataproc('clusters delete ' + self.CLUSTER_NAME)
-    self.AssertErrContains(textwrap.dedent("""\
-        The cluster 'test-cluster' and all attached disks will be deleted.
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        "The cluster 'test-cluster' and all attached disks will be deleted.")
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertMessagesEqual(expected, result)
 
   def testDeleteClusterDecline(self):
@@ -68,10 +69,9 @@ class ClustersDeleteUnitTest(unit_base.DataprocUnitTestBase):
         console_io.OperationCancelledError,
         'Deletion aborted by user.'):
       self.RunDataproc('clusters delete ' + self.CLUSTER_NAME)
-      self.AssertErrContains(textwrap.dedent("""\
-        The cluster 'test-cluster' and all attached disks will be deleted.
-
-        Do you want to continue (Y/n)?"""))
+      self.AssertErrContains(
+          "The cluster 'test-cluster' and all attached disks will be deleted.")
+      self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDeleteClusterOperationFailure(self):
     self.ExpectDeleteCalls(error=self.MakeRpcError())

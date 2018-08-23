@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Base class for all Datastore Command Unit tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
@@ -32,6 +35,8 @@ class DatastoreCommandUnitTest(cli_test_base.CliTestBase,
         'datastore', 'v1'))
     self.mock_datastore_v1.Mock()
     self.addCleanup(self.mock_datastore_v1.Unmock)
+    self.messages = self.mock_datastore_v1.MESSAGES_MODULE
+    self.projects_indexes = self.mock_datastore_v1.projects_indexes
     properties.VALUES.core.disable_prompts.Set(True)
 
   def Serialize(self, x):
@@ -41,7 +46,7 @@ class DatastoreCommandUnitTest(cli_test_base.CliTestBase,
     elif isinstance(x, list):
       return ','.join(x)
     else:
-      raise ValueError('%s is not a dict or list: %s', x, type(x))
+      raise ValueError('{0} is not a dict or list: {1}'.format(x, type(x)))
 
   def Project(self):
     """Override to set the application project."""

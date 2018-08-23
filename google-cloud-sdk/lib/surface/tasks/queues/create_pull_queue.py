@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """`gcloud tasks queues create-pull-queue` command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.tasks import queues
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.tasks import constants
@@ -38,13 +41,13 @@ class CreatePull(base.CreateCommand):
 
   @staticmethod
   def Args(parser):
-    flags.AddIdArg(parser, 'pull queue', 'to create')
+    flags.AddQueueResourceArg(parser, 'to create')
     flags.AddLocationFlag(parser)
     flags.AddCreatePullQueueFlags(parser)
 
   def Run(self, args):
     queues_client = queues.Queues()
-    queue_ref = parsers.ParseQueue(args.id, args.location)
+    queue_ref = parsers.ParseQueue(args.queue, args.location)
     location_ref = parsers.ExtractLocationRefFromQueueRef(queue_ref)
     queue_config = parsers.ParseCreateOrUpdateQueueArgs(
         args, constants.PULL_QUEUE, queues_client.api.messages)

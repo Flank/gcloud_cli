@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Unit tests for the instance_template_utils module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import constants
 from googlecloudsdk.api_lib.compute import instance_template_utils
@@ -156,15 +159,13 @@ class InstanceTemplateUtilsTest(cli_test_base.CliTestBase,
         {'network': 'network2',
          'subnet': 'subnet2',
          'aliases': '/24'}]
-    support_network_tier = False
 
     result = instance_template_utils.CreateNetworkInterfaceMessages(
         self.resources,
         self.scope_lister,
         self.messages,
         network_interface_arg,
-        self.region,
-        support_network_tier)
+        self.region)
 
     expected = [
         self.messages.NetworkInterface(
@@ -197,15 +198,13 @@ class InstanceTemplateUtilsTest(cli_test_base.CliTestBase,
         # There is special handling for when address is an empty string.
         {'network': 'network2',
          'address': ''}]
-    support_network_tier = False
 
     result = instance_template_utils.CreateNetworkInterfaceMessages(
         self.resources,
         self.scope_lister,
         self.messages,
         network_interface_arg,
-        self.region,
-        support_network_tier)
+        self.region)
 
     expected = [
         self.messages.NetworkInterface(
@@ -234,14 +233,12 @@ class InstanceTemplateUtilsTest(cli_test_base.CliTestBase,
 
   def testCreateNetworkInterfaceMessagesEmpty(self):
     network_interface_arg = None
-    support_network_tier = False
     result = instance_template_utils.CreateNetworkInterfaceMessages(
         self.resources,
         self.scope_lister,
         self.messages,
         network_interface_arg,
-        self.region,
-        support_network_tier)
+        self.region)
     expected = []
     self.assertEqual(expected, result)
 
@@ -485,7 +482,6 @@ class InstanceTemplateUtilsNetworkTierTest(cli_test_base.CliTestBase,
     self.assertEqual(expected, result)
 
   def testCreateNetworkInterfaceMessagesWithNetworkTier(self):
-    support_network_tier = True
     network_interface_arg = [
         # Ensure address is correctly passed.
         {'network': 'network1',
@@ -494,7 +490,7 @@ class InstanceTemplateUtilsNetworkTierTest(cli_test_base.CliTestBase,
 
     result = instance_template_utils.CreateNetworkInterfaceMessages(
         self.resources, self.scope_lister, self.messages, network_interface_arg,
-        self.region, support_network_tier)
+        self.region)
 
     expected = [self.messages.NetworkInterface(
         network=self.resources.Parse(
@@ -509,32 +505,6 @@ class InstanceTemplateUtilsNetworkTierTest(cli_test_base.CliTestBase,
                 natIP='address1',
                 networkTier=self.messages.AccessConfig
                 .NetworkTierValueValuesEnum('PREMIUM')
-            )])]
-    self.assertEqual(expected, result)
-
-  def testCreateNetworkInterfaceMessagesWithNetworkTierNotSupported(self):
-    support_network_tier = False
-    network_interface_arg = [
-        {'network': 'network1',
-         'address': 'address1',
-         # This is ignored.
-         'network-tier': 'PREMIUM'}]
-
-    result = instance_template_utils.CreateNetworkInterfaceMessages(
-        self.resources, self.scope_lister, self.messages, network_interface_arg,
-        self.region, support_network_tier)
-
-    expected = [self.messages.NetworkInterface(
-        network=self.resources.Parse(
-            'network1',
-            params={'project': self.Project()},
-            collection='compute.networks').SelfLink(),
-        accessConfigs=[
-            self.messages.AccessConfig(
-                name=constants.DEFAULT_ACCESS_CONFIG_NAME,
-                type=self.messages.AccessConfig.TypeValueValuesEnum
-                .ONE_TO_ONE_NAT,
-                natIP='address1'
             )])]
     self.assertEqual(expected, result)
 

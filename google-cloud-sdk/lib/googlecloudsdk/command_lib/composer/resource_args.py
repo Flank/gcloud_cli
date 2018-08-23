@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Shared resource flags for Cloud Composer commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
@@ -28,7 +31,7 @@ def LocationAttributeConfig(fallthroughs_enabled=True):
   ] if fallthroughs_enabled else [])
   return concepts.ResourceParameterAttributeConfig(
       name='location',
-      help_text='Compute Engine zone in which to create the {resource}.',
+      help_text='Compute Engine region in which to create the {resource}.',
       fallthroughs=fallthroughs)
 
 

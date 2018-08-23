@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute networks subnets list\-usable \- list Google Compute Engine subnetworks in a project that the user has         permission to use
+gcloud alpha compute networks subnets list\-usable \- list Google Compute Engine subnetworks permitted for use
 
 
 
@@ -33,16 +33,16 @@ flags: \f5\-\-project=PROJECT_ID\fR and/or \f5\-\-account=ACCOUNT\fR.
 .TP 2m
 \fB\-\-filter\fR=\fIEXPRESSION\fR
 Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
-the expression evaluates True then that item is listed. For more details and
-examples of filter expressions run $ gcloud topic filters. This flag interacts
-with other flags that are applied in this order: \fB\-\-flatten\fR,
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-limit\fR=\fILIMIT\fR
-The maximum number of resources to list. The default is \fBunlimited\fR. This
-flag interacts with other flags that are applied in this order:
-\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
@@ -54,9 +54,9 @@ service.
 
 .TP 2m
 \fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
-A comma\-separated list of resource field key names to sort by. The default
-order is ascending. Prefix a field with ``~'' for descending order on that
-field. This flag interacts with other flags that are applied in this order:
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
@@ -97,13 +97,14 @@ $ gcloud alpha compute networks subnets list\-usable                \e
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. This variant is also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud compute networks subnets list\-usable
 $ gcloud beta compute networks subnets list\-usable
 .RE
 

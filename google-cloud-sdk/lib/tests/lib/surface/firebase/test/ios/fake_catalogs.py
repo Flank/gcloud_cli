@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Fake iOS device catalogs for testing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 
 TESTING_MESSAGES = apis.GetMessagesModule('testing', 'v1')
@@ -22,7 +25,11 @@ TESTING_MESSAGES = apis.GetMessagesModule('testing', 'v1')
 
 def EmptyIosCatalog():
   """Returns a fake iOS device catalog containing no resources."""
-  return TESTING_MESSAGES.IosDeviceCatalog(models=[], versions=[])
+  return TESTING_MESSAGES.IosDeviceCatalog(
+      models=[],
+      versions=[],
+      runtimeConfiguration=TESTING_MESSAGES.IosRuntimeConfiguration(
+          locales=[], orientations=[]))
 
 
 def FakeIosCatalog():
@@ -49,6 +56,20 @@ def FakeIosCatalog():
       id='6.0', majorVersion=6, minorVersion=0, tags=['default'])
   ios_version_7 = testing_messages.IosVersion(
       id='7.2', majorVersion=7, minorVersion=2)
+
+  locale_ro = TESTING_MESSAGES.Locale(
+      id='ro', name='Romulan', region='Romulus', tags=['cunning', 'default'])
+  locale_kl = TESTING_MESSAGES.Locale(
+      id='kl', name='Klingon', region='Empire', tags=['feisty'])
+
+  orientation_askew = TESTING_MESSAGES.Orientation(
+      id='askew', name='off-kilter', tags=['default', 'graffiti'])
+  orientation_diagonal = TESTING_MESSAGES.Orientation(
+      id='diagonal', name='diag', tags=['popcorn'])
+
   return testing_messages.IosDeviceCatalog(
       models=[ios_model_1, ios_model_2, ios_model_3],
-      versions=[ios_version_5, ios_version_6, ios_version_7])
+      versions=[ios_version_5, ios_version_6, ios_version_7],
+      runtimeConfiguration=TESTING_MESSAGES.IosRuntimeConfiguration(
+          locales=[locale_ro, locale_kl],
+          orientations=[orientation_askew, orientation_diagonal]))

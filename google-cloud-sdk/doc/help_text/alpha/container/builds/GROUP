@@ -1,11 +1,14 @@
 NAME
-    gcloud alpha container builds - create and manage container builds
+    gcloud alpha container builds - create and manage builds
 
 SYNOPSIS
     gcloud alpha container builds COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create and manage container builds.
+    (ALPHA) (DEPRECATED) Create and manage builds.
+
+    This command is deprecated and will be removed on or after 2018-10-31.
+    Please use gcloud builds instead.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -16,26 +19,27 @@ COMMANDS
     COMMAND is one of the following:
 
      cancel
-        (ALPHA) Cancel an ongoing build.
+        (ALPHA) (DEPRECATED) Cancel an ongoing build.
 
      describe
-        (ALPHA) Get information about a particular build.
+        (ALPHA) (DEPRECATED) Get information about a particular build.
 
      list
-        (ALPHA) List builds.
+        (ALPHA) (DEPRECATED) List builds.
 
      stream-logs
-        (ALPHA) Stream the logs for a build.
+        (ALPHA) (DEPRECATED) Stream the logs for a build.
 
      submit
-        (ALPHA) Submit a build using the Google Container Builder service.
+        (ALPHA) (DEPRECATED) Submit a build using the Google Cloud Build
+        service.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud container builds
         $ gcloud beta container builds

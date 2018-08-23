@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,12 +14,16 @@
 # limitations under the License.
 
 """The gcloud datastore group."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.ALPHA)
 @base.DisallowPython3  # TODO(b/77812235): Enable for py3.
 class Datastore(base.Group):
   """Manage your Cloud Datastore indexes.

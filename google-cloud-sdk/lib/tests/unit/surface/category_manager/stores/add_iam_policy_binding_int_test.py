@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +15,16 @@
 """Tests for 'category-manager taxonomies add-iam-policy-binding' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class AddIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
   """Tests for category-manager stores add-iam-policy-binding."""
 
@@ -66,15 +72,17 @@ class AddIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
                 policy=self.new_policy)), self.new_policy)
 
-  def testAddIamPolicyBindingWithOrganizationId(self):
-    result = self.Run('alpha category-manager stores add-iam-policy-binding '
+  def testAddIamPolicyBindingWithOrganizationId(self, track):
+    self.track = track
+    result = self.Run('category-manager stores add-iam-policy-binding '
                       '--organization=246 '
                       '--role=roles/categorymanager.admin '
                       '--member=user:admin2@gmail.com')
     self.assertEqual(self.new_policy, result)
 
-  def testAddIamPolicyBindingWithOrganizationResourceName(self):
-    result = self.Run('alpha category-manager stores add-iam-policy-binding '
+  def testAddIamPolicyBindingWithOrganizationResourceName(self, track):
+    self.track = track
+    result = self.Run('category-manager stores add-iam-policy-binding '
                       '--organization organizations/246 '
                       '--role=roles/categorymanager.admin '
                       '--member=user:admin2@gmail.com')

@@ -36,6 +36,10 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Add IAM policy binding for a disk.
+
+.TP 2m
 \fBadd\-labels\fR
 \fB(ALPHA)\fR Add labels to Google Compute Engine persistent disks.
 
@@ -56,12 +60,20 @@ help\fR for details.
 \fB(ALPHA)\fR Describe a Google Compute Engine disk.
 
 .TP 2m
+\fBget\-iam\-policy\fR
+\fB(ALPHA)\fR Get the IAM policy for a Google Compute Engine disk.
+
+.TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List Google Compute Engine disks.
 
 .TP 2m
 \fBmove\fR
 \fB(ALPHA)\fR Move a disk between zones.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Remove IAM policy binding for a disk.
 
 .TP 2m
 \fBremove\-labels\fR
@@ -74,6 +86,10 @@ help\fR for details.
 .TP 2m
 \fBresize\fR
 \fB(ALPHA)\fR Resize a disk or disks.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(ALPHA)\fR Set IAM policy for a disk.
 
 .TP 2m
 \fBsnapshot\fR
@@ -89,11 +105,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute disks

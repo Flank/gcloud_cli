@@ -11,7 +11,7 @@ gcloud alpha functions deploy \- create or update a Google Cloud Function
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-runtime\fR=\fIRUNTIME\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -74,6 +74,24 @@ flag.
 \fB\-\-retry\fR
 If specified, then the function will be retried in case of a failure.
 
+.TP 2m
+\fB\-\-runtime\fR=\fIRUNTIME\fR
+The runtime in which to run the function. Defaults to Node.js 6.
+
+Choices:
+
+.RS 2m
+.IP "\(em" 2m
+\f5nodejs6\fR: Node.js 6
+.IP "\(em" 2m
+\f5nodejs8\fR: Node.js 8
+.IP "\(em" 2m
+\f5python37\fR: Python 3.7
+.RE
+.RE
+.sp
+
+.RS 2m
 .TP 2m
 \fB\-\-source\fR=\fISOURCE\fR
 Location of source code to deploy.
@@ -167,6 +185,43 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
+\fB\-\-clear\-env\-vars\fR
+Remove all environment variables.
+
+.TP 2m
+\fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR
+Path to a local YAML file with definitions for all environment variables. All
+existing environment variables will be removed before the new environment
+variables are added.
+
+.TP 2m
+\fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as environment variables. All existing
+environment variables will be removed first.
+
+.TP 2m
+
+Only \-\-update\-env\-vars and \-\-remove\-env\-vars can be used together. If
+both are specified, \-\-remove\-env\-vars will be applied first.
+
+.RS 2m
+.TP 2m
+\fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]
+List of environment variables to be removed.
+
+.TP 2m
+\fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as environment variables.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-clear\-labels\fR
 Removes all labels. If \f5\-\-update\-labels\fR is also specified then
 \f5\-\-clear\-labels\fR is applied first.
@@ -221,15 +276,7 @@ function execution with message contents passed as input data.
 .TP 2m
 \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR
 Specifies which action should trigger the function. For a list of acceptable
-values, call \f5functions event_types list\fR. \fIEVENT_TYPE\fR must be one of:
-\fBgoogle.pubsub.topic.publish\fR, \fBgoogle.storage.object.archive\fR,
-\fBgoogle.storage.object.delete\fR, \fBgoogle.storage.object.finalize\fR,
-\fBgoogle.storage.object.metadataUpdate\fR,
-\fBproviders/cloud.pubsub/eventTypes/topic.publish\fR,
-\fBproviders/cloud.storage/eventTypes/object.change\fR,
-\fBproviders/firebase.auth/eventTypes/data.write\fR,
-\fBproviders/firebase.auth/eventTypes/user.create\fR,
-\fBproviders/firebase.auth/eventTypes/user.delete\fR.
+values, call \f5functions event\-types list\fR.
 
 .TP 2m
 \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR
@@ -237,7 +284,7 @@ Specifies which resource from \f5\-\-trigger\-event\fR is being observed. E.g.
 if \f5\-\-trigger\-event\fR is
 \f5providers/cloud.storage/eventTypes/object.change\fR,
 \f5\-\-trigger\-resource\fR must be a bucket name. For a list of expected
-resources, call \f5functions event_types list\fR.
+resources, call \f5functions event\-types list\fR.
 
 
 .RE
@@ -255,13 +302,14 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. This variant is also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud functions deploy
 $ gcloud beta functions deploy
 .RE
 

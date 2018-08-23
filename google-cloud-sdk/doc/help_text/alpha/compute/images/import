@@ -1,5 +1,6 @@
 NAME
-    gcloud alpha compute images import - import a Google Compute Engine image
+    gcloud alpha compute images import - import an image into Google Compute
+        Engine
 
 SYNOPSIS
     gcloud alpha compute images import IMAGE_NAME (--data-disk | --os=OS)
@@ -20,6 +21,10 @@ DESCRIPTION
 
     This command uses the --os flag to choose the appropriate translation. You
     can omit the translation step using the --data-disk flag.
+
+    If you exported your disk from Google Compute Engine then you do not need
+    to re-import it. Instead, use the create command to create further images
+    from it.
 
     Files stored on Cloud Storage and images in Compute Engine incur charges.
     See
@@ -68,7 +73,7 @@ OPTIONAL FLAGS
         gcloud topic datetimes for information on duration formats.
 
      --zone=ZONE
-        The zone of the image to import. The zone in which to do the work of
+        Zone of the image to import. The zone in which to do the work of
         importing the image. Overrides the default compute/zone property value
         for this command invocation.
 
@@ -78,11 +83,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute images import
         $ gcloud beta compute images import

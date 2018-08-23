@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Base classes for all 'gcloud firebase test ios' unit tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.firebase.test import matrix_ops
 from googlecloudsdk.api_lib.firebase.test.ios import matrix_creator
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -84,7 +87,9 @@ class IosMockClientTest(unit_base.TestMockClientTest):
         test='ios-test.zip',
         device=[{
             'model': 'ipod9',
-            'version': 'ios2'
+            'version': 'ios2',
+            'locale': 'en',
+            'orientation': 'portrait'
         }],
         results_bucket='oak',
         results_dir='dir')

@@ -91,6 +91,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import abc
 import os
 import sys
 import unicodedata
@@ -159,6 +160,32 @@ class BoxLineCharactersAscii(BoxLineCharacters):
   d_vh = '#'
   d_vl = '#'
   d_vr = '#'
+
+
+@six.add_metaclass(abc.ABCMeta)
+class ProgressTrackerSymbols(object):
+  """Characters used by progress trackers."""
+
+  @property
+  @abc.abstractmethod
+  def spin_marks(self):
+    pass
+
+
+class ProgressTrackerSymbolsUnicode(ProgressTrackerSymbols):
+  """Characters used by progress trackers."""
+
+  @property
+  def spin_marks(self):
+    return ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧']
+
+
+class ProgressTrackerSymbolsAscii(ProgressTrackerSymbols):
+  """Characters used by progress trackers."""
+
+  @property
+  def spin_marks(self):
+    return ['|', '/', '-', '\\',]
 
 
 class ConsoleAttr(object):
@@ -235,16 +262,22 @@ class ConsoleAttr(object):
     if self._encoding == 'utf8':
       self._box_line_characters = BoxLineCharactersUnicode()
       self._bullets = self._BULLETS_UNICODE
+      self._progress_tracker_symbols = ProgressTrackerSymbolsUnicode()
     elif self._encoding == 'cp437':
       self._box_line_characters = BoxLineCharactersUnicode()
       self._bullets = self._BULLETS_WINDOWS
+      # Windows does not suport the unicode characters used for the spinner.
+      self._progress_tracker_symbols = ProgressTrackerSymbolsAscii()
     else:
       self._box_line_characters = BoxLineCharactersAscii()
       self._bullets = self._BULLETS_ASCII
+      self._progress_tracker_symbols = ProgressTrackerSymbolsAscii()
 
     # OS specific attributes.
     self._get_raw_key = [console_attr_os.GetRawKeyFunction()]
     self._term_size = console_attr_os.GetTermSize()
+
+    self._display_width_cache = {}
 
   def _GetConsoleEncoding(self):
     """Gets the encoding as declared by the stdout stream.
@@ -323,6 +356,14 @@ class ConsoleAttr(object):
       A tuple of bullet characters.
     """
     return self._bullets
+
+  def GetProgressTrackerSymbols(self):
+    """Returns the progress tracker characters object.
+
+    Returns:
+      A ProgressTrackerSymbols object for the console output device.
+    """
+    return self._progress_tracker_symbols
 
   def GetControlSequenceIndicator(self):
     """Returns the control sequence indicator string.
@@ -409,6 +450,11 @@ class ConsoleAttr(object):
     if not isinstance(buf, six.string_types):
       # Handle non-string objects like Colorizer().
       return len(buf)
+
+    cached = self._display_width_cache.get(buf, None)
+    if cached is not None:
+      return cached
+
     width = 0
     max_width = 0
     i = 0
@@ -425,6 +471,8 @@ class ConsoleAttr(object):
         width += GetCharacterDisplayWidth(buf[i])
         i += 1
     max_width = max(width, max_width)
+
+    self._display_width_cache[buf] = max_width
     return max_width
 
   def SplitIntoNormalAndControl(self, buf):

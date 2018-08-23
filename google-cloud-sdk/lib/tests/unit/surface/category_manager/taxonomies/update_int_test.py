@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for 'gcloud category-manager taxonomies update'."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class TaxonomiesUpdateIntTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
@@ -34,8 +40,6 @@ class TaxonomiesUpdateIntTest(base.CategoryManagerUnitTestBase):
     self.expected_project_taxonomy = self.messages.Taxonomy(
         description=self.taxonomy_description)
 
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def _ExpectUpdateProjectTaxonomy(self, project_taxonomy, expected_taxonomy):
     """Mocks backend call thats updates a taxonomy's description."""
 
@@ -46,7 +50,8 @@ class TaxonomiesUpdateIntTest(base.CategoryManagerUnitTestBase):
             name=project_taxonomy.RelativeName(), taxonomy=expected_taxonomy),
         created_taxonomy)
 
-  def testUpdateProjectTaxonomyDescription(self):
+  def testUpdateProjectTaxonomyDescription(self, track):
+    self.track = track
     self._ExpectUpdateProjectTaxonomy(self.project_taxonomy,
                                       self.expected_project_taxonomy)
     args = '{} --description "{}"'.format(self.taxonomy_id,

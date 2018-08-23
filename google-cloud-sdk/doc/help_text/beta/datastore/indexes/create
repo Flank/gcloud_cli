@@ -31,5 +31,9 @@ EXAMPLES
     (https://cloud.google.com/appengine/docs/standard/python/config/indexref).
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud datastore indexes create
+        $ gcloud alpha datastore indexes create
 

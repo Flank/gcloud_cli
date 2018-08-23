@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
@@ -13,8 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """e2e tests for compute tpus command group."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 import random
 

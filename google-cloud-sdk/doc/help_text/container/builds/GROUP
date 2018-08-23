@@ -1,11 +1,14 @@
 NAME
-    gcloud container builds - create and manage container builds
+    gcloud container builds - create and manage builds
 
 SYNOPSIS
     gcloud container builds COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create and manage container builds.
+    (DEPRECATED) Create and manage builds.
+
+    This command is deprecated and will be removed on or after 2018-10-31.
+    Please use gcloud builds instead.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -16,19 +19,19 @@ COMMANDS
     COMMAND is one of the following:
 
      cancel
-        Cancel an ongoing build.
+        (DEPRECATED) Cancel an ongoing build.
 
      describe
-        Get information about a particular build.
+        (DEPRECATED) Get information about a particular build.
 
      list
-        List builds.
+        (DEPRECATED) List builds.
 
      log
-        Stream the logs for a build.
+        (DEPRECATED) Stream the logs for a build.
 
      submit
-        Submit a build using the Google Container Builder service.
+        (DEPRECATED) Submit a build using the Google Cloud Build service.
 
 NOTES
     These variants are also available:

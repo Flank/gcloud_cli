@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +15,10 @@
 """Test of the 'workflow-template set-managed-cluster' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
-import textwrap
 
 from apitools.base.py import encoding
 
@@ -54,10 +56,13 @@ class WorkflowTemplateSetManagedClusterUnitTest(
                                   exception=None):
     if not workflow_template:
       workflow_template = self.MakeWorkflowTemplate()
-    self.ExpectGetWorkflowTemplate(workflow_template=workflow_template)
+    self.ExpectGetWorkflowTemplate(
+        name=workflow_template.name,
+        version=workflow_template.version,
+        response=workflow_template)
     if not managed_cluster:
-      managed_cluster = self.MakeManagedCluster(
-          clusterName=workflow_template.id)
+      cluster_name = 'test-cluster'
+      managed_cluster = self.MakeManagedCluster(clusterName=cluster_name)
     workflow_template.placement = self.messages.WorkflowTemplatePlacement(
         managedCluster=managed_cluster)
     if not (response or exception):
@@ -74,21 +79,23 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
 
   def testSetManagedCluster(self):
     workflow_template = self.MakeWorkflowTemplate()
+    cluster_name = 'test-cluster'
     managed_cluster = self.MakeManagedCluster(
-        clusterName=workflow_template.id,
+        clusterName=cluster_name,
         zoneUri='us-west1-a',
         masterMachineTypeUri='n1-standard-2',
         workerConfigNumInstances=2)
     self.ExpectCallSetManagedCluster(
         workflow_template=workflow_template, managed_cluster=managed_cluster)
-    result = self.RunDataproc(
-        'workflow-templates set-managed-cluster {0} '
-        '--zone us-west1-a --num-workers 2 '
-        '--master-machine-type n1-standard-2'.format(self.WORKFLOW_TEMPLATE))
+    result = self.RunDataproc('workflow-templates set-managed-cluster {0} '
+                              '--cluster-name {1} '
+                              '--zone us-west1-a --num-workers 2 '
+                              '--master-machine-type n1-standard-2'.format(
+                                  self.WORKFLOW_TEMPLATE, cluster_name))
     self.AssertMessagesEqual(workflow_template, result)
 
   def testSetManagedClusterFlags(self):
-    cluster_name = self.WORKFLOW_TEMPLATE
+    cluster_name = 'test-cluster'
     zone = 'foo-zone'
     master_machine_type = 'foo-type'
     worker_machine_type = 'bar-type'
@@ -146,6 +153,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
         workflow_template=workflow_template, managed_cluster=managed_cluster)
 
     command = ('workflow-templates set-managed-cluster {template} '
+               '--cluster-name {cluster_name} '
                '--bucket {bucket} '
                '--zone {zone} '
                '--num-masters {num_masters} '
@@ -163,6 +171,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                '--tags tag1,tag2 '
                '--metadata key1=value1,key2=value2 ').format(
                    template=self.WORKFLOW_TEMPLATE,
+                   cluster_name=cluster_name,
                    bucket=bucket,
                    zone=zone,
                    num_masters=num_masters,
@@ -180,7 +189,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
     self.AssertMessagesEqual(workflow_template, result)
 
   def testSetManagedClusterBetaFlags(self):
-    cluster_name = self.WORKFLOW_TEMPLATE
+    cluster_name = 'test-cluster'
     master_accelerator_type = 'foo-gpu'
     worker_accelerator_type = 'bar-gpu'
     zone = 'foo-zone'
@@ -217,6 +226,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
         workflow_template=workflow_template, managed_cluster=managed_cluster)
 
     command = ('workflow-templates set-managed-cluster {template} '
+               '--cluster-name {cluster_name} '
                '--master-accelerator type={master_accelerator_type},count=1 '
                '--worker-accelerator type={worker_accelerator_type},count=2 '
                '--master-boot-disk-size 15GB '
@@ -233,6 +243,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                '--no-address '
                '--zone {zone} ').format(
                    template=self.WORKFLOW_TEMPLATE,
+                   cluster_name=cluster_name,
                    master_accelerator_type=master_accelerator_type,
                    worker_accelerator_type=worker_accelerator_type,
                    master_machine_type=master_machine_type,
@@ -248,7 +259,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
   def testSetManagedClusterWithExpirationTimeAndMaxIdle(self):
     """Tests TTL cluster related flags."""
     project = self.Project()
-    cluster_name = self.WORKFLOW_TEMPLATE
+    cluster_name = 'test-cluster'
     zone = 'foo-zone'
 
     managed_cluster = self.MakeManagedCluster(
@@ -260,10 +271,12 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
         workflow_template=workflow_template, managed_cluster=managed_cluster)
 
     command = ('workflow-templates set-managed-cluster {template} '
+               '--cluster-name {cluster_name} '
                '--zone {zone} '
                '--max-idle={max_idle} '
                '--expiration-time={expiration_time} ').format(
                    template=self.WORKFLOW_TEMPLATE,
+                   cluster_name=cluster_name,
                    zone=zone,
                    max_idle='30m',
                    expiration_time='2017-08-25T00:00:00-07:00')
@@ -273,14 +286,31 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
   def testSetManagedClusterAutoZone(self):
     properties.VALUES.dataproc.region.Set('us-test1')
     template_name = self.WorkflowTemplateName(region='us-test1')
+    cluster_name = 'test-cluster'
     workflow_template = self.MakeWorkflowTemplate(name=template_name)
     managed_cluster = self.MakeManagedCluster(
-        clusterName=workflow_template.id, region='us-test1', zoneUri='')
+        clusterName=cluster_name, region='us-test1', zoneUri='')
     self.ExpectCallSetManagedCluster(
         workflow_template=workflow_template, managed_cluster=managed_cluster)
     result = self.RunDataproc(
-        'workflow-templates set-managed-cluster {template} --zone=""'.format(
-            template=workflow_template.id))
+        'workflow-templates set-managed-cluster {template} '
+        '--cluster-name {cluster_name} '
+        '--zone=""'.format(
+            template=workflow_template.id, cluster_name=cluster_name))
+    self.AssertMessagesEqual(workflow_template, result)
+
+  def testSetManagedClusterNoName(self):
+    workflow_template = self.MakeWorkflowTemplate()
+    project = self.Project()
+    zone = 'foo-zone'
+    managed_cluster = self.MakeManagedCluster(
+        clusterName=workflow_template.id, projectId=project, zoneUri=zone)
+    self.ExpectCallSetManagedCluster(
+        workflow_template=workflow_template, managed_cluster=managed_cluster)
+
+    result = self.RunDataproc(
+        'workflow-templates set-managed-cluster {template} '
+        '--zone {zone}'.format(template=workflow_template.id, zone=zone))
     self.AssertMessagesEqual(workflow_template, result)
 
   def testSetManagedClusterOmitZone_globalRegion(self):
@@ -289,23 +319,19 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
     self.WriteInput('3\n')  # us-central1-a
 
     template_name = self.WorkflowTemplateName()
+    cluster_name = 'test-cluster'
     workflow_template = self.MakeWorkflowTemplate(name=template_name)
     managed_cluster = self.MakeManagedCluster(
-        clusterName=workflow_template.id, zoneUri='')
+        clusterName=cluster_name, zoneUri='')
     self.ExpectCallSetManagedCluster(
         workflow_template=workflow_template, managed_cluster=managed_cluster)
     result = self.RunDataproc(
-        'workflow-templates set-managed-cluster {template} --zone=""'.format(
-            template=workflow_template.id))
+        'workflow-templates set-managed-cluster {template} '
+        '--cluster-name {cluster_name} '
+        '--zone=""'.format(
+            template=workflow_template.id, cluster_name=cluster_name))
     self.AssertMessagesEqual(workflow_template, result)
-    self.AssertErrEquals(
-        textwrap.dedent("""\
-        For the following cluster:
-         - [test-workflow-template]
-        choose a zone:
-         [1] europe-west1-a
-         [2] europe-west1-b (DELETED)
-         [3] us-central1-a (DEPRECATED)
-         [4] us-central1-b
-        Please enter your numeric choice:  \n\
-        """))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains(
+        '"choices": ["europe-west1-a", "europe-west1-b (DELETED)", '
+        '"us-central1-a (DEPRECATED)", "us-central1-b"]')

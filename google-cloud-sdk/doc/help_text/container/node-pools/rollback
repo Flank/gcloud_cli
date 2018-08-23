@@ -26,10 +26,10 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS

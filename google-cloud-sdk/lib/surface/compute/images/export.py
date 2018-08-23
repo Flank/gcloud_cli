@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Export image command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.api_lib.compute import image_utils
@@ -24,6 +27,7 @@ from googlecloudsdk.core import properties
 
 _DEFAULT_WORKFLOW = '../workflows/export/image_export.wf.json'
 _EXTERNAL_WORKFLOW = '../workflows/export/image_export_ext.wf.json'
+_OUTPUT_FILTER = ['[Daisy', '[image-export', '  image', 'ERROR']
 
 
 class Export(base.CreateCommand):
@@ -44,6 +48,10 @@ class Export(base.CreateCommand):
               'associated with that family is used.'),
     )
     image_utils.AddImageProjectFlag(parser)
+
+    flags.compute_flags.AddZoneFlag(
+        parser, 'image', 'export',
+        explanation='The zone to use when exporting the image.')
 
     parser.add_argument(
         '--destination-uri',
@@ -100,7 +108,8 @@ class Export(base.CreateCommand):
 
     tags = ['gce-daisy-image-export']
     return daisy_utils.RunDaisyBuild(args, workflow, variables,
-                                     tags=tags)
+                                     tags=tags, user_zone=args.zone,
+                                     output_filter=_OUTPUT_FILTER)
 
 Export.detailed_help = {
     'brief': 'Export a Google Compute Engine image',

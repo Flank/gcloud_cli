@@ -1,0 +1,108 @@
+
+.TH "GCLOUD_BETA_CONTAINER_BINAUTHZ_ATTESTATIONS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta container binauthz attestations create \- create a Binary Authorization attestation
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta container binauthz attestations create\fR \fB\-\-artifact\-url\fR=\fIARTIFACT_URL\fR \fB\-\-pgp\-key\-fingerprint\fR=\fIPGP_KEY_FINGERPRINT\fR \fB\-\-signature\-file\fR=\fISIGNATURE_FILE\fR (\fB\-\-attestor\fR=\fIATTESTOR\fR\ :\ \fB\-\-attestor\-project\fR=\fIATTESTOR_PROJECT\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command creates a Binary Authorization attestation for your
+project. The attestation is created for the specified artifact (e.g. a grc.io
+container URL), associate with the specified attestor, and stored under the
+specified project.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-artifact\-url\fR=\fIARTIFACT_URL\fR
+Container URL. May be in the \f5\fB.gcr.io/repository/image\fR format, or may
+optionally contain the \f5http\fR or \f5https\fR scheme
+
+.TP 2m
+\fR\-\-pgp\-key\-fingerprint\fB=\fIPGP_KEY_FINGERPRINT\fR
+The cryptographic ID of the key used to generate the signature. For Binary
+Authorization, this must be the version 4, full 160\-bit fingerprint, expressed
+as a 40 character hexidecimal string. See
+https://tools.ietf.org/html/rfc4880#section\-12.2 for details.
+
+.TP 2m
+\fR\-\-signature\-file\fB=\fISIGNATURE_FILE\fR
+Path to file containing the signature to store, or \f5\-\fR to read signature
+from stdin.
+
+.TP 2m
+
+Attestor resource \- The Attestor whose Container Analysis Note will be used to
+host the created attestation. In order to successfully attach the attestation,
+the active gcloud account (core/account) must be able to read this attestor and
+must have the \f5containeranalysis.notes.attachOccurrence\fR permission for the
+Attestor's underlying Note resource (usually via the
+\f5containeranalysis.notes.attacher\fR role). The arguments in this group can be
+used to specify the attributes of this resource. This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fR\-\-attestor\fB=\fIATTESTOR\fR
+The ID of the attestor or a fully qualified identifier for the attestor. This
+flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fR\-\-attestor\-project\fB=\fIATTESTOR_PROJECT\fR
+The Cloud project for the attestor.
+
+
+\fR
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an attestation in the project "my_proj" as the attestor with resource
+path "projects/foo/attestors/bar", run:
+
+.RS 2m
+$ gcloud beta container binauthz attestations create \e
+    \-\-project=my_proj \e
+    \-\-artifact\-url='gcr.io/example\-project/example\-image@sha256:abcd' \e
+    \-\-attestor=projects/foo/attestors/bar \e
+    \-\-signature\-file=signed_artifact_attestation.pgp.sig \e
+    \-\-pgp\-key\-fingerprint=AAAA0000000000000000FFFFFFFFFFFFFFFFFFFF
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha container binauthz attestations create
+.RE
+

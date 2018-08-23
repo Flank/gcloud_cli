@@ -32,6 +32,9 @@ COMMANDS
      set-usage-bucket
         Set usage reporting bucket for a project.
 
+     update
+        Update a Google Compute Engine project resource.
+
 NOTES
     These variants are also available:
 

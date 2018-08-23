@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-types list subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
-from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.sole_tenancy.node_types import flags
 from tests.lib import completer_test_base
 from tests.lib import test_case
@@ -29,8 +32,6 @@ class NodeTypesListTest(test_base.BaseTest,
                         completer_test_base.CompleterBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
     self.addCleanup(list_json_patcher.stop)
@@ -61,7 +62,6 @@ class NodeTypesListTest(test_base.BaseTest,
     self.RunCompleter(
         flags.NodeTypesCompleter,
         expected_command=[
-            'beta',
             'compute',
             'sole-tenancy',
             'node-types',

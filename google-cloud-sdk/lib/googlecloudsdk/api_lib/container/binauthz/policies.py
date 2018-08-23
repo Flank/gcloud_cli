@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,9 +25,9 @@ from googlecloudsdk.api_lib.container.binauthz import apis
 class Client(object):
   """A client for interacting with policies."""
 
-  def __init__(self, client=None, messages=None):
-    self.client = client or apis.GetClientInstance()
-    self.messages = messages or apis.GetMessagesModule()
+  def __init__(self, api_version=None):
+    self.client = apis.GetClientInstance(api_version)
+    self.messages = apis.GetMessagesModule(api_version)
 
   def Get(self, policy_ref):
     """Get the Policy associated with the current project."""

@@ -38,7 +38,8 @@ COMMANDS
         (DEPRECATED) Lists all SSL certs for a Cloud SQL instance.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql ssl-certs
         $ gcloud beta sql ssl-certs
 

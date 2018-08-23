@@ -1,0 +1,146 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_INSTANCE\-TEMPLATES_ADD\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute instance\-templates add\-iam\-policy\-binding \- add an IAM policy binding to an instance template
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute instance\-templates add\-iam\-policy\-binding\fR \fIINSTANCE_TEMPLATE\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Add an IAM policy binding to an instance template.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance template resource \- The instance template to which to add an IAM
+policy binding. This represents a Cloud resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the flag [instance_template] on the command line with a fully
+specified name; provide the flag [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIINSTANCE_TEMPLATE\fR
+The ID of the instance_template or a fully qualified identifier for the
+instance_template.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to add the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- anyone who is on the internet, with or without a Google
+account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
+or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+Define the role of the member.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/alpha\fR API. The full documentation for this
+API can be found at:
+https://developers.google.com/compute/docs/reference/latest/
+
+
+
+.SH "EXAMPLES"
+
+The following command will add an IAM policy binding for the role of
+\'roles/compute.admin' for the user 'test\-user@gmail.com' on an instance
+template with identifier 'my\-template':
+
+.RS 2m
+$ gcloud alpha compute instance\-templates add\-iam\-policy\-binding \e
+    my\-template \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/compute.admin'
+.RE
+
+For a service account \f5test\-proj1@example.domain.com\fR, the following
+command will add an IAM policy binding for the role of 'roles/compute.admin' to
+the given service account:
+
+.RS 2m
+$ gcloud alpha compute instance\-templates add\-iam\-policy\-binding \e
+    test\-proj1@example.domain.com \e
+    \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
+    \-\-role='roles/compute.admin'
+.RE
+
+The following command will add an IAM policy binding for the role of
+\'roles/compute.admin' for all authenticated users on an instance template with
+identifier 'my\-template':
+
+.RS 2m
+$ gcloud alpha compute instance\-templates add\-iam\-policy\-binding \e
+    my\-template \-\-member='allAuthenticatedUsers' \e
+    \-\-role='roles/compute.admin'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute instance\-templates add\-iam\-policy\-binding
+.RE
+

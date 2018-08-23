@@ -1,0 +1,36 @@
+NAME
+    gcloud beta services vpc-peerings - VPC Peerings to various services
+
+SYNOPSIS
+    gcloud beta services vpc-peerings GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) VPC Peerings to various services.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     operations
+        (BETA) Manage VPC Peering operations.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     connect
+        (BETA) Connect to a service via VPC peering for a project network.
+
+     list
+        (BETA) List connections to a service via VPC peering for a project
+        network.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha services vpc-peerings
+

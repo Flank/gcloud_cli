@@ -15,7 +15,9 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 import io
 import logging
@@ -30,7 +32,19 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 import mock
-import six
+
+
+def MockPrintException():
+  # pylint: disable=redefined-builtin
+  # pylint: disable=unused-argument
+  def PrintException(unused_etype, unused_value, unused_tb, limit=None,
+                     file=None, chain=True):
+    file.write('<STACKTRACE>')
+
+  mock_method = mock.patch('traceback.print_exception', return_value=None,
+                           side_effect=PrintException)
+  mock_method.start()
+  return mock_method
 
 
 class LoggingConfigTest(sdk_test_base.WithOutputCapture):
@@ -38,9 +52,11 @@ class LoggingConfigTest(sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
     self.logs_dir = self.temp_path
+    self.mock_method = MockPrintException()
 
   def TearDown(self):
     log.Reset()
+    self.mock_method.stop()
 
   def GetLogFileContents(self):
     """Makes sure a single log file was created and gets its contents.
@@ -772,10 +788,12 @@ class StructuredLoggingTest(sdk_test_base.WithLogCapture):
     log_time = times.GetTimeStampFromDateTime(log_date, tzinfo=times.UTC)
     self.StartObjectPatch(time, 'time').return_value = log_time
     properties.VALUES.core.show_structured_logs.Set(None)
-    self.no_stacktrace_string = 'None' if six.PY2 else 'NoneType: None'
+
+    self.mock_method = MockPrintException()
 
   def TearDown(self):
     log.Reset()
+    self.mock_method.stop()
 
   def testExceptionsTerminalOnly(self):
     """Test that structured errors and exceptions go to terminal only."""
@@ -792,8 +810,8 @@ class StructuredLoggingTest(sdk_test_base.WithLogCapture):
     CRITICAL: -2-
     CRITICAL: -3-
     ERROR: test exception - 4
-    {}
-    """.format(self.no_stacktrace_string), normalize_space=True)
+    <STACKTRACE>
+    """, normalize_space=True)
 
     self.StartObjectPatch(log._ConsoleWriter, 'isatty').return_value = True
     self.ClearErr()
@@ -847,8 +865,8 @@ class StructuredLoggingTest(sdk_test_base.WithLogCapture):
     CRITICAL: -6-
     CRITICAL: -7-
     ERROR: test exception - 8
-    {}
-    """.format(self.no_stacktrace_string), normalize_space=True)
+    <STACKTRACE>
+    """, normalize_space=True)
 
     self.StartObjectPatch(log._ConsoleWriter, 'isatty').return_value = True
     self.ClearErr()
@@ -940,8 +958,8 @@ class StructuredLoggingTest(sdk_test_base.WithLogCapture):
     CRITICAL: -6-
     CRITICAL: -7-
     ERROR: test exception - 8
-    {}
-    """.format(self.no_stacktrace_string), normalize_space=True)
+    <STACKTRACE>
+    """, normalize_space=True)
 
   def testMessagesLogOnly(self):
     """Test that all structured messages go to stderr log only."""
@@ -1010,8 +1028,8 @@ class StructuredLoggingTest(sdk_test_base.WithLogCapture):
     CRITICAL: -14-
     CRITICAL: -15-
     ERROR: test exception - 16
-    {}
-    """.format(self.no_stacktrace_string), normalize_space=True)
+    <STACKTRACE>
+    """, normalize_space=True)
 
   def testExceptionsAlways(self):
     """Test that structured errors/exceptions go to stderr log and terminal."""
@@ -1189,8 +1207,8 @@ class StructuredLoggingTest(sdk_test_base.WithLogCapture):
     CRITICAL: -6-
     CRITICAL: -7-
     ERROR: test exception - 8
-    {}
-    """.format(self.no_stacktrace_string), normalize_space=True)
+    <STACKTRACE>
+    """, normalize_space=True)
 
     self.StartObjectPatch(log._ConsoleWriter, 'isatty').return_value = True
     self.ClearErr()
@@ -1209,8 +1227,8 @@ class StructuredLoggingTest(sdk_test_base.WithLogCapture):
     ERROR: -13-
     CRITICAL: -14-
     ERROR: test exception - 15
-    {}
-    """.format(self.no_stacktrace_string), normalize_space=True)
+    <STACKTRACE>
+    """, normalize_space=True)
 
   def testLogFileIsText(self):
     """Test that all messages sent to log file are plain text."""

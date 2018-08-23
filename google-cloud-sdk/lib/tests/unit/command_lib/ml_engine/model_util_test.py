@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 
 #
@@ -13,8 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Engine jobs command_lib utils."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.ml_engine import models
 from googlecloudsdk.command_lib.ml_engine import models_util
 from googlecloudsdk.core import resources

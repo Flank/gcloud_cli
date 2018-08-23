@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +16,11 @@
 """Test of the functions surface deploy.trigger_util module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.functions import triggers
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.functions.deploy import trigger_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
@@ -81,6 +85,14 @@ class TriggerUtilTest(sdk_test_base.SdkBase):
             args.trigger_event, args.trigger_resource)
     finally:
       triggers.INPUT_TRIGGER_PROVIDER_REGISTRY.providers = copy
+
+  def testValidateTriggerArgs_UnadvertisedEvent_Succeeds(self):
+    trigger_util.ValidateTriggerArgs('UnknownEvent', None, False, True)
+
+  def testValidateTriggerArgs_UnadvertisedEvent_ConflictingArguments(self):
+    with self.assertRaises(calliope_exceptions.ConflictingArgumentsException):
+      trigger_util.ValidateTriggerArgs(
+          'UnknownEvent', 'my.resource', True, True)
 
 if __name__ == '__main__':
   test_case.main()

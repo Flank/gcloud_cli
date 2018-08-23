@@ -16,6 +16,7 @@ DESCRIPTION
     1.2.3.0/24, run:
 
         $ gcloud beta compute security-policies rules create 1000 \
+            --action deny-403 \
             --security-policy my-policy \
             --description "block 1.2.3.0/24" \
             --src-ip-ranges 1.2.3.0/24
@@ -37,7 +38,8 @@ REQUIRED FLAGS
           The Cloud Armor rules language expression to match for this rule.
 
        --src-ip-ranges=[SRC_IP_RANGE,...]
-          The source IP ranges to match for this rule.
+          The source IPs/IP ranges to match for this rule. To match all IPs
+          specify *.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION

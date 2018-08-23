@@ -16,8 +16,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --zone=ZONE
-        The zone of the disk type to describe. Overrides the default
-        compute/zone property value for this command invocation.
+        Zone of the disk type to describe. Overrides the default compute/zone
+        property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

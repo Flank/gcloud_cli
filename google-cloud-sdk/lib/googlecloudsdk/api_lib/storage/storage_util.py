@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Utilities for interacting with Google Cloud Storage."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
 import os
 import re
@@ -296,8 +299,7 @@ def RunGsutilCommand(command_name,
                      err_func=log.file_only_logger.debug):
   """Runs the specified gsutil command and returns the command's exit code.
 
-  This is more reliable than storage_api.StorageClient.CopyFilesToGcs especially
-  for large files.
+  WARNING: This is not compatible with python 3 and should no longer be used.
 
   Args:
     command_name: The gsutil command to run.

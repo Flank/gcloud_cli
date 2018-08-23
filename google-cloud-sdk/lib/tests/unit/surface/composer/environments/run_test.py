@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,23 +15,30 @@
 """Unit tests for environments run."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import util as command_util
+from tests.lib import parameterized
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 from tests.lib.surface.composer import kubectl_util
 import mock
 
 
-@mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
-@mock.patch('googlecloudsdk.core.execution_utils.Exec')
-class EnvironmentsRunTest(base.KubectlShellingUnitTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class EnvironmentsRunTest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
   TEST_POD = 'airflow-worker'
   TEST_CONTAINER = 'airflow-worker'
   TEST_SUBCOMMAND = 'version'
 
-  def testRunEnvironmentNotFound(self, exec_mock, *_):
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunEnvironmentNotFound(self, track, exec_mock, *_):
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -44,7 +52,10 @@ class EnvironmentsRunTest(base.KubectlShellingUnitTest):
                            self.TEST_SUBCOMMAND)
     self.assertFalse(exec_mock.called)
 
-  def testRunCreatingState(self, exec_mock, *_):
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunCreatingState(self, track, exec_mock, *_):
+    self.SetTrack(track)
     test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
         self.messages.Environment.StateValueValuesEnum.CREATING)
     self.ExpectEnvironmentGet(
@@ -59,7 +70,10 @@ class EnvironmentsRunTest(base.KubectlShellingUnitTest):
                            self.TEST_SUBCOMMAND)
     self.assertFalse(exec_mock.called)
 
-  def testRunGetPodsFail(self, exec_mock, tmp_kubeconfig_mock):
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunGetPodsFail(self, track, exec_mock, tmp_kubeconfig_mock):
+    self.SetTrack(track)
     test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
         self.messages.Environment.StateValueValuesEnum.RUNNING)
     self.ExpectEnvironmentGet(
@@ -85,7 +99,10 @@ class EnvironmentsRunTest(base.KubectlShellingUnitTest):
     self.assertEquals(1, exec_mock.call_count)
     fake_exec.Verify()
 
-  def testRunEmptyPodList(self, exec_mock, tmp_kubeconfig_mock):
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunEmptyPodList(self, track, exec_mock, tmp_kubeconfig_mock):
+    self.SetTrack(track)
     test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
         self.messages.Environment.StateValueValuesEnum.RUNNING)
     self.ExpectEnvironmentGet(
@@ -108,7 +125,10 @@ class EnvironmentsRunTest(base.KubectlShellingUnitTest):
     self.assertEquals(1, exec_mock.call_count)
     fake_exec.Verify()
 
-  def testRunMissingDesiredPod(self, exec_mock, tmp_kubeconfig_mock):
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunMissingDesiredPod(self, track, exec_mock, tmp_kubeconfig_mock):
+    self.SetTrack(track)
     test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
         self.messages.Environment.StateValueValuesEnum.RUNNING)
     self.ExpectEnvironmentGet(
@@ -131,7 +151,10 @@ class EnvironmentsRunTest(base.KubectlShellingUnitTest):
                            self.TEST_SUBCOMMAND)
     fake_exec.Verify()
 
-  def testRunWithoutArgs(self, exec_mock, tmp_kubeconfig_mock):
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunWithoutArgs(self, track, exec_mock, tmp_kubeconfig_mock):
+    self.SetTrack(track)
     test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
         self.messages.Environment.StateValueValuesEnum.RUNNING)
     self.ExpectEnvironmentGet(
@@ -153,7 +176,10 @@ class EnvironmentsRunTest(base.KubectlShellingUnitTest):
                          self.TEST_SUBCOMMAND)
     fake_exec.Verify()
 
-  def testRunWithArgs(self, exec_mock, tmp_kubeconfig_mock):
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunWithArgs(self, track, exec_mock, tmp_kubeconfig_mock):
+    self.SetTrack(track)
     test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
         self.messages.Environment.StateValueValuesEnum.RUNNING)
     self.ExpectEnvironmentGet(

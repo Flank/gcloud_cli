@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +23,7 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.sql import base
 
 
-class BackupsDeleteTest(base.SqlMockTestBeta):
+class _BaseBackupsDeleteTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testDeleteNoConfirmCancels(self):
@@ -70,6 +71,18 @@ class BackupsDeleteTest(base.SqlMockTestBeta):
     with self.AssertRaisesHttpExceptionRegexp(
         r'The backup run status is not valid for the given request.'):
       self.Run('sql backups delete 12345 --instance=mock-instance')
+
+
+class BackupsDeleteGATest(_BaseBackupsDeleteTest, base.SqlMockTestGA):
+  pass
+
+
+class BackupsDeleteBetaTest(_BaseBackupsDeleteTest, base.SqlMockTestBeta):
+  pass
+
+
+class BackupsDeleteAlphaTest(_BaseBackupsDeleteTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

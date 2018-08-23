@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +21,11 @@ Contains things like:
 
 That make interactive debugging with gcloud a dream.
 """
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import code
 import pdb
 # `site` initializes the interactive mode (defines `exit`/`quit`, sets up

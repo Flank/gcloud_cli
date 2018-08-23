@@ -1,6 +1,6 @@
 NAME
-    gcloud beta composer environments storage dags export - exports DAGs from
-        an environment into local storage or Cloud Storage
+    gcloud beta composer environments storage dags export - export DAGs from an
+        environment into local storage or Cloud Storage
 
 SYNOPSIS
     gcloud beta composer environments storage dags export
@@ -21,7 +21,7 @@ REQUIRED FLAGS
         bucket/directory into which to export files.
 
      Environment resource - The environment from whose Cloud Storage bucket to
-     export DAGs.. The arguments in this group can be used to specify the
+     export DAGs. The arguments in this group can be used to specify the
      attributes of this resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
      attribute: provide the flag [--environment] on the command line with a
@@ -34,7 +34,7 @@ REQUIRED FLAGS
           arguments in this group are specified.
 
        --location=LOCATION
-          Compute Engine zone in which to create the environment.
+          Compute Engine region in which to create the environment.
 
 OPTIONAL FLAGS
      --source=SOURCE
@@ -118,5 +118,8 @@ EXAMPLES
     instead of 'foo/subdir1/file3.py'.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud composer environments storage dags export
 

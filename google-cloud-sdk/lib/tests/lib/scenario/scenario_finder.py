@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,36 +16,80 @@
 """Utility to locate scenario tests that exist in the surface test tree."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import os
 
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import yaml
+import tests
+import tests.e2e.surface
+from tests.lib import sdk_test_base
 import tests.unit.surface
+
+
+class ScenarioConfig(object):
+
+  def __init__(self, name, resource_path, tracks):
+    self.name = name
+    self.resource_path = resource_path
+    self.tracks = tracks
+
+  def __str__(self):
+    return self.resource_path
 
 
 def FindScenarioTests(prefixes=None):
   """Locate all the scenario tests that exist in the surface unit test tree.
 
   Args:
-    prefixes: [str], An optional list of prefixes to filter to. These prefixes
-      are from the root of the surface directory (ex iot/registries/).
+    prefixes: [str], An optional list of module prefixes to filter to
+      (ex. unit.surface.iot.registries).
 
   Returns:
-    [str], The list of paths relative to the tests/unit/surface/ directory
-    for all the matching scenario tests.
+    ([ScenarioConfig], [ScenarioConfig]), The unit and e2e scenario tests
+    configurations that were found.
   """
+  unit_scenarios = _Find(
+      prefixes, os.path.dirname(tests.unit.surface.__file__))
+  e2e_scenarios = _Find(
+      prefixes, os.path.dirname(tests.e2e.surface.__file__))
+  return unit_scenarios, e2e_scenarios
+
+
+def _Find(prefixes, scenario_root):
+  """Find scenarios that match the given prefixes and execution mode."""
+  module_root = os.path.dirname(tests.__file__)
+  code_root = os.path.dirname(module_root)
+
   scenarios = []
-  scenario_root = os.path.dirname(tests.unit.surface.__file__)
-  prefix_len = len(scenario_root)
   for root, _, files in os.walk(scenario_root):
     for f in files:
       if f.endswith('scenario.yaml'):
         file_path = os.path.join(root, f)
-        relative_path = file_path[prefix_len + 1:]
-        if not prefixes:
-          scenarios.append(relative_path)
-        else:
-          for prefix in prefixes:
-            if relative_path.startswith(prefix):
-              scenarios.append(relative_path)
+        name = (file_path[len(scenario_root) + 1:]
+                .replace('.scenario.yaml', '')
+                .title())
+        if _MatchesPrefix(prefixes, file_path[len(module_root) + 1:]):
+          resource_path = file_path[len(code_root) + 1:]
+          tracks = GetTracksFromFile(resource_path)
+          scenarios.append(ScenarioConfig(name, resource_path, tracks))
   return scenarios
+
+
+def _MatchesPrefix(prefixes, relative_path):
+  if not prefixes:
+    return True
+  module_path = relative_path.replace('/', '.').replace('\\', '.')
+  for prefix in prefixes:
+    if module_path.startswith(prefix):
+      return True
+  return False
+
+
+def GetTracksFromFile(spec_path):
+  full_spec_path = sdk_test_base.SdkBase.Resource(spec_path)
+  spec_data = yaml.load_path(full_spec_path, round_trip=True)
+  return ([calliope_base.ReleaseTrack.FromId(t)
+           for t in spec_data.get('release_tracks') or ['GA']])

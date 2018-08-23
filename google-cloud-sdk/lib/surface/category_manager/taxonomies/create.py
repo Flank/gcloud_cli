@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.category_manager import taxonomies
 from googlecloudsdk.api_lib.category_manager import utils
 from googlecloudsdk.calliope import base

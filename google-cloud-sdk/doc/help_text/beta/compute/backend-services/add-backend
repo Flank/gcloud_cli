@@ -4,14 +4,18 @@ NAME
 
 SYNOPSIS
     gcloud beta compute backend-services add-backend BACKEND_SERVICE_NAME
-        --instance-group=INSTANCE_GROUP [--balancing-mode=BALANCING_MODE]
-        [--capacity-scaler=CAPACITY_SCALER] [--description=DESCRIPTION]
-        [--max-utilization=MAX_UTILIZATION] [--global | --region=REGION]
-        [--instance-group-region=INSTANCE_GROUP_REGION
+        ([--instance-group=INSTANCE_GROUP
+          : --instance-group-region=INSTANCE_GROUP_REGION
           | --instance-group-zone=INSTANCE_GROUP_ZONE]
+          | [--network-endpoint-group=NETWORK_ENDPOINT_GROUP
+          : --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE])
+        [--balancing-mode=BALANCING_MODE] [--capacity-scaler=CAPACITY_SCALER]
+        [--description=DESCRIPTION] [--max-utilization=MAX_UTILIZATION]
+        [--global | --region=REGION]
         [--max-connections=MAX_CONNECTIONS
+          | --max-connections-per-endpoint=MAX_CONNECTIONS_PER_ENDPOINT
           | --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
-          | --max-rate=MAX_RATE
+          | --max-rate=MAX_RATE | --max-rate-per-endpoint=MAX_RATE_PER_ENDPOINT
           | --max-rate-per-instance=MAX_RATE_PER_INSTANCE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -20,11 +24,11 @@ DESCRIPTION
     backend to a backend service. A backend is a group of tasks that can handle
     requests sent to a backend service. Currently, the group of tasks can be
     one or more Google Compute Engine virtual machine instances grouped
-    together using an instance group.
+    together using an instance group or network endpoint group.
 
-    Traffic is first spread evenly across all virtual machines in the group.
-    When the group is full, traffic is sent to the next nearest group(s) that
-    still have remaining capacity.
+    Traffic is first spread evenly across all virtual machines or network
+    endpoints in the group. When the group is full, traffic is sent to the next
+    nearest group(s) that still have remaining capacity.
 
     To modify the parameters of a backend after it has been added to the
     backend service, use gcloud compute backend-services update-backend or
@@ -35,8 +39,85 @@ POSITIONAL ARGUMENTS
         Name of the backend service to operate on.
 
 REQUIRED FLAGS
-     --instance-group=INSTANCE_GROUP
-        Name of the instance group to add to the backend service.
+     Exactly one of these must be specified:
+
+       Instance Group
+
+         --instance-group=INSTANCE_GROUP
+            Name of the instance group to add to the backend service. This flag
+            must be specified if any of the other arguments in this group are
+            specified.
+
+         At most one of these may be specified:
+
+           --instance-group-region=INSTANCE_GROUP_REGION
+              Region of the instance group to add to the backend service. If
+              not specified, you may be prompted to select a region.
+
+              To avoid prompting when this flag is omitted, you can set the
+              compute/region property:
+
+                  $ gcloud config set compute/region REGION
+
+              A list of regions can be fetched by running:
+
+                  $ gcloud compute regions list
+
+              To unset the property, run:
+
+                  $ gcloud config unset compute/region
+
+              Alternatively, the region can be stored in the environment
+              variable CLOUDSDK_COMPUTE_REGION.
+
+           --instance-group-zone=INSTANCE_GROUP_ZONE
+              Zone of the instance group to add to the backend service. If not
+              specified and the compute/zone property isn't set, you may be
+              prompted to select a zone.
+
+              To avoid prompting when this flag is omitted, you can set the
+              compute/zone property:
+
+                  $ gcloud config set compute/zone ZONE
+
+              A list of zones can be fetched by running:
+
+                  $ gcloud compute zones list
+
+              To unset the property, run:
+
+                  $ gcloud config unset compute/zone
+
+              Alternatively, the zone can be stored in the environment variable
+              CLOUDSDK_COMPUTE_ZONE.
+
+       Network Endpoint Group
+
+         --network-endpoint-group=NETWORK_ENDPOINT_GROUP
+            Name of the network endpoint group to add to the backend service.
+            This flag must be specified if any of the other arguments in this
+            group are specified.
+
+         --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
+            Zone of the network endpoint group to add to the backend service.
+            If not specified and the compute/zone property isn't set, you may
+            be prompted to select a zone.
+
+            To avoid prompting when this flag is omitted, you can set the
+            compute/zone property:
+
+                $ gcloud config set compute/zone ZONE
+
+            A list of zones can be fetched by running:
+
+                $ gcloud compute zones list
+
+            To unset the property, run:
+
+                $ gcloud config unset compute/zone
+
+            Alternatively, the zone can be stored in the environment variable
+            CLOUDSDK_COMPUTE_ZONE.
 
 OPTIONAL FLAGS
      --balancing-mode=BALANCING_MODE
@@ -46,15 +127,17 @@ OPTIONAL FLAGS
             Spreads load based on how many concurrent connections the group can
             handle. There are two ways to specify max connections:
             --max-connections which defines the max number of connections for
-            the whole group or --max-connections-per-instance, which defines
-            the max number of connections on a per-instance basis. Available
-            for all services.
+            the whole group or
+            --max-connections-per-instance**--max-max-per-endpoint, which
+            defines the max number of connections on a per-instance basis.
+            Available for all services.
          RATE
             Spreads load based on how many requests per second (RPS) the group
             can handle. There are two ways to specify max RPS: --max-rate which
-            defines the max RPS for the whole group or --max-rate-per-instance,
-            which defines the max RPS on a per-instance basis. Available only
-            for HTTP-based protocols.
+            defines the max RPS for the whole group or
+            --max-rate-per-instance/--max-rate-per-endpoint, which defines the
+            max RPS on a per-instance basis. Available only for HTTP-based
+            protocols.
          UTILIZATION
             Relies on the CPU utilization of the instances in the group when
             balancing load. Use --max-utilization to set a maximum target CPU
@@ -63,7 +146,8 @@ OPTIONAL FLAGS
             can optionally also limit based on connections (for TCP/SSL) in
             addition to CPU by setting --max-connections or
             --max-connections-per-instance. Available for all services without
-            --load-balancing-scheme INTERNAL.
+            --load-balancing-scheme INTERNAL. This is incompatible with
+            --network-endpoint-group.
 
      --capacity-scaler=CAPACITY_SCALER
         A setting that applies to all balancing modes. This value is multiplied
@@ -85,87 +169,63 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the backend service is global.
+          If set, the backend service is global.
 
        --region=REGION
-          The region of the backend service to operate on. Overrides the
-          default compute/region property value for this command invocation.
+          Region of the backend service to operate on. Overrides the default
+          compute/region property value for this command invocation.
 
      At most one of these may be specified:
 
-       --instance-group-region=INSTANCE_GROUP_REGION
-          The region of the instance group to add to the backend service. If
-          not specified, you may be prompted to select a region.
+       At most one of these may be specified:
 
-          To avoid prompting when this flag is omitted, you can set the
-          compute/region property:
+         --max-connections=MAX_CONNECTIONS
+            Maximum concurrent connections that the group can handle. Valid
+            only for TCP/SSL connections.
 
-              $ gcloud config set compute/region REGION
+         --max-connections-per-endpoint=MAX_CONNECTIONS_PER_ENDPOINT
+            Valid only for --network-endpoint-group. The maximum number of
+            simultaneous connections that a single network endpoint can handle.
+            This is used to calculate the capacity of the group. Balancing mode
+            must be set to CONNECTION and one of --max-connections,
+            --max-connections-per-instance, or --max-connections-per-endpoint
+            must be set.
 
-          A list of regions can be fetched by running:
+         --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
+            The maximum concurrent connections per instance. Valid only for
+            TCP/SSL connections.
 
-              $ gcloud compute regions list
+       At most one of these may be specified:
 
-          To unset the property, run:
+         --max-rate=MAX_RATE
+            Maximum number of requests per second that can be sent to the
+            instance group. Must not be used with Autoscaled Managed Instance
+            Groups. --max-rate and --max-rate-per-instance are mutually
+            exclusive. However, one of them can be set even if --balancing-mode
+            is set to UTILIZATION. If either --max-rate or
+            --max-rate-per-instance is set and --balancing-mode is set to RATE,
+            then only that value is considered when judging capacity. If either
+            --max-rate or --max-rate-per-instance is set and --balancing-mode
+            is set to UTILIZATION, then instances are judged to be at capacity
+            when either the UTILIZATION or RATE value is reached.
 
-              $ gcloud config unset compute/region
+         --max-rate-per-endpoint=MAX_RATE_PER_ENDPOINT
+            Valid only for --network-endpoint-group. This is used to calculate
+            the capacity of the group. Can be used in any balancing mode except
+            UTILIZATION. Maximum number of requests per second that can be sent
+            to each endpoint in the network endpoint group.
 
-          Alternatively, the region can be stored in the environment variable
-          CLOUDSDK_COMPUTE_REGION.
-
-       --instance-group-zone=INSTANCE_GROUP_ZONE
-          The zone of the instance group to add to the backend service. If not
-          specified and the compute/zone property isn't set, you may be
-          prompted to select a zone.
-
-          To avoid prompting when this flag is omitted, you can set the
-          compute/zone property:
-
-              $ gcloud config set compute/zone ZONE
-
-          A list of zones can be fetched by running:
-
-              $ gcloud compute zones list
-
-          To unset the property, run:
-
-              $ gcloud config unset compute/zone
-
-          Alternatively, the zone can be stored in the environment variable
-          CLOUDSDK_COMPUTE_ZONE.
-
-     At most one of these may be specified:
-
-       --max-connections=MAX_CONNECTIONS
-          Maximum concurrent connections that the group can handle. Valid only
-          for TCP/SSL connections.
-
-       --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
-          The maximum concurrent connections per instance. Valid only for
-          TCP/SSL connections.
-
-       --max-rate=MAX_RATE
-          Maximum number of requests per second that can be sent to the
-          instance group. Must not be used with Autoscaled Managed Instance
-          Groups. --max-rate and --max-rate-per-instance are mutually
-          exclusive. However, one of them can be set even if --balancing-mode
-          is set to UTILIZATION. If either --max-rate or
-          --max-rate-per-instance is set and --balancing-mode is set to RATE,
-          then only that value is considered when judging capacity. If either
-          --max-rate or --max-rate-per-instance is set and --balancing-mode is
-          set to UTILIZATION, then instances are judged to be at capacity when
-          either the UTILIZATION or RATE value is reached.
-
-       --max-rate-per-instance=MAX_RATE_PER_INSTANCE
-          Maximum number of requests per second that can be sent to each
-          instance in the instance group. --max-rate and
-          --max-rate-per-instance are mutually exclusive. However, one of them
-          can be set even if --balancing-mode is set to UTILIZATION. If either
-          --max-rate or --max-rate-per-instance is set and --balancing-mode is
-          set to RATE, then only that value is considered when judging
-          capacity. If either --max-rate or --max-rate-per-instance is set and
-          --balancing-mode is set to UTILIZATION, then instances are judged to
-          be at capacity when either the UTILIZATION or RATE value is reached.
+         --max-rate-per-instance=MAX_RATE_PER_INSTANCE
+            Maximum number of requests per second that can be sent to each
+            instance in the instance group. --max-rate and
+            --max-rate-per-instance are mutually exclusive. However, one of
+            them can be set even if --balancing-mode is set to UTILIZATION. If
+            either --max-rate or --max-rate-per-instance is set and
+            --balancing-mode is set to RATE, then only that value is considered
+            when judging capacity. If either --max-rate or
+            --max-rate-per-instance is set and --balancing-mode is set to
+            UTILIZATION, then instances are judged to be at capacity when
+            either the UTILIZATION or RATE value is reached.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

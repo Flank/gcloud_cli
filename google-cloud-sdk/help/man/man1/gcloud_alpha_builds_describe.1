@@ -1,0 +1,57 @@
+
+.TH "GCLOUD_ALPHA_BUILDS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha builds describe \- get information about a particular build
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha builds describe\fR \fIBUILD\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Get information about a particular build.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIBUILD\fR
+The build to describe. The ID of the build is printed at the end of the build
+submission process, or in the ID column when listing builds.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud builds describe
+$ gcloud beta builds describe
+.RE
+

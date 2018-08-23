@@ -19,7 +19,7 @@ COMMANDS
         (BETA) Start a Cloud ML Engine batch prediction job.
 
      training
-        (BETA) Submits a Cloud Machine Learning training job.
+        (BETA) Submit a Cloud Machine Learning training job.
 
 NOTES
     This command is currently in BETA and may change without notice. These

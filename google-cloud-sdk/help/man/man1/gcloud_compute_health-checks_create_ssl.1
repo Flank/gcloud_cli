@@ -11,7 +11,7 @@ gcloud compute health\-checks create ssl \- create a SSL health check to monitor
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute health\-checks create ssl\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-port\fR=\fIPORT\fR;\ default=80] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\fR=\fIREQUEST\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute health\-checks create ssl\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\fR=\fIREQUEST\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-port\fR=\fIPORT\fR;\ default=80\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,14 +54,6 @@ An optional string description for the SSL health check.
 \fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR; default=2
 The number of consecutive successful health checks before an unhealthy instance
 is marked as healthy. The default is 2.
-
-.TP 2m
-\fB\-\-port\fR=\fIPORT\fR; default=80
-The TCP port number that this health check monitors. The default value is 80.
-
-.TP 2m
-\fB\-\-port\-name\fR=\fIPORT_NAME\fR
-The port name that this health check monitors. By default, this is empty.
 
 .TP 2m
 \fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR; default="NONE"
@@ -112,7 +104,23 @@ duration formats.
 The number of consecutive health check failures before a healthy instance is
 marked as unhealthy. The default is 2.
 
+.TP 2m
 
+These flags configure the port that the health check monitors. If none is
+specified, the default port of 80 is used; if both \f5\-\-port\fR and
+\f5\-\-port\-name\fR are specified, \f5\-\-port\fR takes precedence.
+
+.RS 2m
+.TP 2m
+\fB\-\-port\fR=\fIPORT\fR; default=80
+The TCP port number that this health check monitors.
+
+.TP 2m
+\fB\-\-port\-name\fR=\fIPORT_NAME\fR
+The port name that this health check monitors. By default, this is empty.
+
+
+.RE
 .RE
 .sp
 

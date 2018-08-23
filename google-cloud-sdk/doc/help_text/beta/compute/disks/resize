@@ -27,7 +27,7 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The region of the disks to operate on. If not specified, you may be
+          Region of the disks to operate on. If not specified, you may be
           prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
@@ -47,7 +47,7 @@ OPTIONAL FLAGS
           CLOUDSDK_COMPUTE_REGION.
 
        --zone=ZONE
-          The zone of the disks to operate on. If not specified and the
+          Zone of the disks to operate on. If not specified and the
           compute/zone property isn't set, you may be prompted to select a
           zone.
 

@@ -894,14 +894,10 @@ class StackTrace(_messages.Message):
   r"""A stacktrace.
 
   Fields:
-    clusterId: Exception cluster ID
     exception: The stack trace message.  Required
-    reportId: Exception report ID
   """
 
-  clusterId = _messages.StringField(1)
-  exception = _messages.StringField(2)
-  reportId = _messages.StringField(3)
+  exception = _messages.StringField(1)
 
 
 class StandardQueryParameters(_messages.Message):
@@ -1225,10 +1221,12 @@ class TestIssue(_messages.Message):
   r"""An issue detected occurring during a test execution.
 
   Enums:
+    CategoryValueValuesEnum: Category of issue. Required.
     SeverityValueValuesEnum: Severity of issue. Required.
     TypeValueValuesEnum: Type of issue. Required.
 
   Fields:
+    category: Category of issue. Required.
     errorMessage: A brief human-readable message describing the issue.
       Required.
     severity: Severity of issue. Required.
@@ -1239,53 +1237,74 @@ class TestIssue(_messages.Message):
       always be a message from com.google.devtools.toolresults.v1.warnings
   """
 
+  class CategoryValueValuesEnum(_messages.Enum):
+    r"""Category of issue. Required.
+
+    Values:
+      common: <no description>
+      robo: <no description>
+      unspecifiedCategory: <no description>
+    """
+    common = 0
+    robo = 1
+    unspecifiedCategory = 2
+
   class SeverityValueValuesEnum(_messages.Enum):
     r"""Severity of issue. Required.
 
     Values:
       info: <no description>
       severe: <no description>
+      suggestion: <no description>
       unspecifiedSeverity: <no description>
       warning: <no description>
     """
     info = 0
     severe = 1
-    unspecifiedSeverity = 2
-    warning = 3
+    suggestion = 2
+    unspecifiedSeverity = 3
+    warning = 4
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""Type of issue. Required.
 
     Values:
       anr: <no description>
+      availableDeepLinks: <no description>
       compatibleWithOrchestrator: <no description>
       completeRoboScriptExecution: <no description>
+      encounteredNonAndroidUiWidgetScreen: <no description>
       failedToInstall: <no description>
       fatalException: <no description>
       incompleteRoboScriptExecution: <no description>
       launcherActivityNotFound: <no description>
       nativeCrash: <no description>
+      nonSdkApiUsageViolation: <no description>
       startActivityNotFound: <no description>
       unspecifiedType: <no description>
       unusedRoboDirective: <no description>
     """
     anr = 0
-    compatibleWithOrchestrator = 1
-    completeRoboScriptExecution = 2
-    failedToInstall = 3
-    fatalException = 4
-    incompleteRoboScriptExecution = 5
-    launcherActivityNotFound = 6
-    nativeCrash = 7
-    startActivityNotFound = 8
-    unspecifiedType = 9
-    unusedRoboDirective = 10
+    availableDeepLinks = 1
+    compatibleWithOrchestrator = 2
+    completeRoboScriptExecution = 3
+    encounteredNonAndroidUiWidgetScreen = 4
+    failedToInstall = 5
+    fatalException = 6
+    incompleteRoboScriptExecution = 7
+    launcherActivityNotFound = 8
+    nativeCrash = 9
+    nonSdkApiUsageViolation = 10
+    startActivityNotFound = 11
+    unspecifiedType = 12
+    unusedRoboDirective = 13
 
-  errorMessage = _messages.StringField(1)
-  severity = _messages.EnumField('SeverityValueValuesEnum', 2)
-  stackTrace = _messages.MessageField('StackTrace', 3)
-  type = _messages.EnumField('TypeValueValuesEnum', 4)
-  warning = _messages.MessageField('Any', 5)
+  category = _messages.EnumField('CategoryValueValuesEnum', 1)
+  errorMessage = _messages.StringField(2)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 3)
+  stackTrace = _messages.MessageField('StackTrace', 4)
+  type = _messages.EnumField('TypeValueValuesEnum', 5)
+  warning = _messages.MessageField('Any', 6)
 
 
 class TestSuiteOverview(_messages.Message):

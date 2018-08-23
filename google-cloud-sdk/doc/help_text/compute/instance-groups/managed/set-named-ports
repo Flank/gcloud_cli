@@ -37,8 +37,8 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The region of the instance group to operate on. If not specified, you
-          may be prompted to select a region.
+          Region of the instance group to operate on. If not specified, you may
+          be prompted to select a region.
 
           A list of regions can be fetched by running:
 
@@ -48,8 +48,8 @@ OPTIONAL FLAGS
           invocation.
 
        --zone=ZONE
-          The zone of the instance group to operate on. If not specified, you
-          may be prompted to select a zone.
+          Zone of the instance group to operate on. If not specified, you may
+          be prompted to select a zone.
 
           A list of zones can be fetched by running:
 

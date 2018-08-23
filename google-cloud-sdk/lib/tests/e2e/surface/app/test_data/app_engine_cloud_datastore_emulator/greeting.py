@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 """A demo app for basic read and write operations on datastore."""
 
 import webapp2

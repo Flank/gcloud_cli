@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for tests.unit.api_lib.util.enablement."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from apitools.base.py import exceptions as api_exceptions
@@ -64,8 +67,10 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
     # pylint: disable=unused-argument
     def Perform(arg, method, body, headers, redirections, connection_type):
       # We ignore the inputs and just return what we expect
+      # Since we are mocking at the core.http level, the contents here are
+      # text instead of bytes as core.http.Http handles this decoding usually.
       if service_enablement['enabled']:
-        return ({'status': '200'}, '{"field": "abc"}'.encode('utf8'))
+        return ({'status': '200'}, '{"field": "abc"}')
       else:
         return ({'status': '403'}, textwrap.dedent("""\
           {{
@@ -74,7 +79,7 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
             "message": "{message}",
             "status": "PERMISSION_DENIED"
            }}
-          }}""").format(message=self.message).encode('utf8'))
+          }}""").format(message=self.message))
 
     mock_http_methods = mock.Mock()
     self.StartObjectPatch(http, 'Http', autospec=True,

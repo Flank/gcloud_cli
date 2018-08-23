@@ -1,0 +1,114 @@
+
+.TH "GCLOUD_ALPHA_DATASTORE_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha datastore export \- export Cloud Datastore entities to Google Cloud Storage
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha datastore export\fR \fIOUTPUT_URL_PREFIX\fR [\fB\-\-async\fR] [\fB\-\-kinds\fR=[\fIKIND\fR,...]] [\fB\-\-namespaces\fR=[\fINAMESPACE\fR,...]] [\fB\-\-operation\-labels\fR=[\fIOPERATION_LABEL\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Export a copy of all or a subset of entities from Google Cloud
+Datastore to another storage system, such as Google Cloud Storage. Recent
+updates to entities may not be reflected in the export. The export occurs in the
+background and its progress can be monitored and managed via the operation
+commands. The output of an export may only be used once the operation has
+completed. If an export operation is cancelled before completion then it may
+leave partial data behind in Google Cloud Storage.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIOUTPUT_URL_PREFIX\fR
+Location for the export metadata and data files. Must be a valid Google Cloud
+Storage bucket with an optional path prefix. For example:
+
+.RS 2m
+$ gcloud alpha datastore export gs://mybucket/my/path
+.RE
+
+Will place the export in the \f5mybucket\fR bucket in objects prefixed with
+\f5my/path\fR.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-kinds\fR=[\fIKIND\fR,...]
+A list specifying what kinds will be included in the operation. When omitted,
+all Kinds are included. For example, to operate on only the 'Customer' and
+\'Order' Kinds:
+
+.RS 2m
+$ gcloud alpha datastore export \-\-kinds='Customer','Order'
+.RE
+
+.TP 2m
+\fB\-\-namespaces\fR=[\fINAMESPACE\fR,...]
+A list specifying what namespaces will be included in the operation. When
+omitted, all namespaces are included in the operation, including the default
+namespace. To specify that \fBonly\fR the default namespace should be operated
+on, use the special symbol '(default)'. For example, to operate on entities from
+both the 'customers' and default namespaces:
+
+.RS 2m
+$ gcloud alpha datastore export \-\-namespaces='(default)','customers'
+.RE
+
+.TP 2m
+\fB\-\-operation\-labels\fR=[\fIOPERATION_LABEL\fR,...]
+A string:string map of custom labels to associate with this operation. For
+example:
+
+.RS 2m
+$ gcloud alpha datastore export \e
+    \-\-operation\-labels=comment='customer orders','sales rep'=pending
+.RE
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud datastore export
+$ gcloud beta datastore export
+.RE
+

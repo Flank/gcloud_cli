@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the health-checks update ssl subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions as core_exceptions
 
 from tests.lib import test_case
@@ -795,6 +800,179 @@ class HealthChecksUpdateSslTest(test_base.BaseTest,
           compute health-checks update ssl my-health-check
             --proxy-header bad_value
           """)
+
+
+class HealthChecksUpdateSslAlphaTest(test_base.BaseTest,
+                                     test_case.WithOutputCapture):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+  def testUriSupport(self):
+    # This is the same as testRequestOption, but uses a full URI.
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    request='initial-req', port=80, response='ack'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update ssl
+          https://www.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/my-health-check
+          --request req
+        """)
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      request='req', port=80, response='ack')),
+              project='my-project'))],
+    )
+
+  def testRequestOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    request='req1', port=80, response='ack'))
+        ],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    request='req2', port=80, response='ack'))
+        ],
+    ])
+
+    self.Run("""
+        compute health-checks update ssl my-health-check
+          --request req2 --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      request='req2', port=80, response='ack')),
+              project='my-project'))],
+    )
+
+    # By default, the resource should not be displayed
+    self.assertFalse(self.GetOutput())
+
+
+class RegionHealthChecksUpdateSslTest(test_base.BaseTest,
+                                      test_case.WithOutputCapture):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+  def testUriSupport(self):
+    # This is the same as testRequestOption, but uses a full URI.
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    request='initial-req', port=80, response='ack'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update ssl
+          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          --request req
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      request='req', port=80, response='ack')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testRequestOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    request='req1', port=80, response='ack'))
+        ],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    request='req2', port=80, response='ack'))
+        ],
+    ])
+
+    self.Run("""
+        compute health-checks update ssl my-health-check
+          --request req2 --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      request='req2', port=80, response='ack')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+    # By default, the resource should not be displayed
+    self.assertFalse(self.GetOutput())
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-templates describe subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
 
 class NodeTemplatesDescribeTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -34,7 +32,7 @@ class NodeTemplatesDescribeTest(test_base.BaseTest):
     result = self.Run('compute sole-tenancy node-templates describe '
                       'template-1 --region region-1')
 
-    self.CheckRequests([(self.compute_beta.nodeTemplates, 'Get',
+    self.CheckRequests([(self.compute.nodeTemplates, 'Get',
                          self.messages.ComputeNodeTemplatesGetRequest(
                              nodeTemplate='template-1',
                              project='my-project',
@@ -50,8 +48,10 @@ class NodeTemplatesDescribeTest(test_base.BaseTest):
       environment: prod
       nodeGrouping: backend
     nodeType: n1-node-96-624
-    region: https://www.googleapis.com/compute/beta/projects/my-project/regions/region-1
-    selfLink: https://www.googleapis.com/compute/beta/projects/my-project/regions/region-1/nodeTemplates/template-2
+    region: https://www.googleapis.com/compute/v1/projects/my-project/regions/\
+region-1
+    selfLink: https://www.googleapis.com/compute/v1/projects/my-project/\
+regions/region-1/nodeTemplates/template-2
     status: CREATING
     statusMessage: Template is being created.
     """,

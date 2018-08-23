@@ -1,0 +1,254 @@
+NAME
+    gcloud alpha sql instances patch - updates the settings of a Cloud SQL
+        instance
+
+SYNOPSIS
+    gcloud alpha sql instances patch INSTANCE
+        [--activation-policy=ACTIVATION_POLICY] [--[no-]assign-ip] [--async]
+        [--availability-type=AVAILABILITY_TYPE] [--cpu=CPU] [--diff]
+        [--[no-]enable-bin-log] [--[no-]enable-database-replication]
+        [--follow-gae-app=FOLLOW_GAE_APP] [--gce-zone=GCE_ZONE]
+        [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
+        [--maintenance-window-any]
+        [--maintenance-window-day=MAINTENANCE_WINDOW_DAY]
+        [--maintenance-window-hour=MAINTENANCE_WINDOW_HOUR] [--memory=MEMORY]
+        [--network=NETWORK] [--pricing-plan=PRICING_PLAN, -p PRICING_PLAN]
+        [--replication=REPLICATION] [--[no-]require-ssl]
+        [--storage-auto-increase]
+        [--storage-auto-increase-limit=STORAGE_AUTO_INCREASE_LIMIT]
+        [--storage-size=STORAGE_SIZE] [--tier=TIER, -t TIER]
+        [--update-labels=[KEY=VALUE,...]]
+        [--authorized-gae-apps=APP,[APP,...] | --clear-gae-apps]
+        [--authorized-networks=NETWORK,[NETWORK,...]
+          | --clear-authorized-networks]
+        [--clear-database-flags | --database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]]
+        [--no-backup | --backup-start-time=BACKUP_START_TIME]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Updates the settings of a Cloud SQL instance.
+
+POSITIONAL ARGUMENTS
+     INSTANCE
+        Cloud SQL instance ID.
+
+FLAGS
+     --activation-policy=ACTIVATION_POLICY
+        The activation policy for this instance. This specifies when the
+        instance should be activated and is applicable only when the instance
+        state is RUNNABLE. The default is on-demand. More information on
+        activation policies can be found here:
+        https://cloud.google.com/sql/faq#activation_policy. ACTIVATION_POLICY
+        must be one of: always, never, on-demand.
+
+     --[no-]assign-ip
+        The instance must be assigned an IP address. Use --assign-ip to enable
+        and --no-assign-ip to disable.
+
+     --async
+        Do not wait for the operation to complete.
+
+     --availability-type=AVAILABILITY_TYPE
+        Specifies level of availability. Only applies to PostgreSQL instances.
+        AVAILABILITY_TYPE must be one of:
+
+         regional
+            Provides high availability and is recommended for production
+            instances; instance automatically fails over to another zone within
+            your selected region.
+         zonal
+            Provides no failover capability. This is the default.
+
+     --cpu=CPU
+        A whole number value indicating how many cores are desired in the
+        machine. Both --cpu and --memory must be specified if a custom machine
+        type is desired, and the --tier flag must be omitted.
+
+     --diff
+        Show what changed as a result of the update.
+
+     --[no-]enable-bin-log
+        Specified if binary log should be enabled. If backup configuration is
+        disabled, binary log must be disabled as well. Use --enable-bin-log to
+        enable and --no-enable-bin-log to disable.
+
+     --[no-]enable-database-replication
+        Enable database replication. Applicable only for read replica
+        instance(s). WARNING: Instance will be restarted. Use
+        --enable-database-replication to enable and
+        --no-enable-database-replication to disable.
+
+     --follow-gae-app=FOLLOW_GAE_APP
+        First Generation instances only. The App Engine app this instance
+        should follow. It must be in the same region as the instance. WARNING:
+        Instance may be restarted.
+
+     --gce-zone=GCE_ZONE
+        The preferred Compute Engine zone (e.g. us-central1-a, us-central1-b,
+        etc.). WARNING: Instance may be restarted.
+
+     --maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL
+        Which channel's updates to apply during the maintenance window. If not
+        specified, Cloud SQL chooses the timing of updates to your instance.
+        MAINTENANCE_RELEASE_CHANNEL must be one of:
+
+         preview
+            Preview updates release prior to production updates. You may wish
+            to use the preview channel for dev/test applications so that you
+            can preview their compatibility with your application prior to the
+            production release.
+         production
+            Production updates are stable and recommended for applications in
+            production.
+
+     --maintenance-window-any
+        Removes the user-specified maintenance window.
+
+     --maintenance-window-day=MAINTENANCE_WINDOW_DAY
+        Day of week for maintenance window, in UTC time zone.
+        MAINTENANCE_WINDOW_DAY must be one of: SUN, MON, TUE, WED, THU, FRI,
+        SAT.
+
+     --maintenance-window-hour=MAINTENANCE_WINDOW_HOUR
+        Hour of day for maintenance window, in UTC time zone.
+
+     --memory=MEMORY
+        A whole number value indicating how much memory is desired in the
+        machine. A size unit should be provided (eg. 3072MiB or 9GiB) - if no
+        units are specified, GiB is assumed. Both --cpu and --memory must be
+        specified if a custom machine type is desired, and the --tier flag must
+        be omitted.
+
+     --network=NETWORK
+        The network in the current project that the instance will be part of.
+
+     --pricing-plan=PRICING_PLAN, -p PRICING_PLAN
+        First Generation instances only. The pricing plan for this instance.
+        PRICING_PLAN must be one of: PER_USE, PACKAGE.
+
+     --replication=REPLICATION
+        The type of replication this instance uses. The default is synchronous.
+        REPLICATION must be one of: synchronous, asynchronous.
+
+     --[no-]require-ssl
+        mysqld should default to 'REQUIRE X509' for users connecting over IP.
+        Use --require-ssl to enable and --no-require-ssl to disable.
+
+     --storage-auto-increase
+        Storage size can be increased, but it cannot be decreased; storage
+        increases are permanent for the life of the instance. With this setting
+        enabled, a spike in storage requirements can result in permanently
+        increased storage costs for your instance. However, if an instance runs
+        out of available space, it can result in the instance going offline,
+        dropping existing connections. This setting is enabled by default.
+
+     --storage-auto-increase-limit=STORAGE_AUTO_INCREASE_LIMIT
+        Allows you to set a maximum storage capacity, in GB. Automatic
+        increases to your capacity will stop once this limit has been reached.
+        Default capacity is unlimited.
+
+     --storage-size=STORAGE_SIZE
+        Amount of storage allocated to the instance. Must be an integer number
+        of GB between 10GB and 10230GB inclusive. The default is 10GB.
+
+     --tier=TIER, -t TIER
+        The tier for this instance. For Second Generation instances, TIER is
+        the instance's machine type (e.g., db-n1-standard-1). For PostgreSQL
+        instances, only shared-core machine types (e.g., db-f1-micro) apply. A
+        complete list of tiers is available here:
+        https://cloud.google.com/sql/pricing. WARNING: Instance will be
+        restarted.
+
+     --update-labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to update. If a label exists its value
+        is modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     At most one of these may be specified:
+
+       --authorized-gae-apps=APP,[APP,...]
+          First Generation instances only. List of project IDs for App Engine
+          applications running in the Standard environment that can access this
+          instance.
+
+          The value given for this argument replaces the existing list.
+
+       --clear-gae-apps
+          Specified to clear the list of App Engine apps that can access this
+          instance.
+
+     At most one of these may be specified:
+
+       --authorized-networks=NETWORK,[NETWORK,...]
+          The list of external networks that are allowed to connect to the
+          instance. Specified in CIDR notation, also known as 'slash' notation
+          (e.g. 192.168.100.0/24).
+
+          The value given for this argument replaces the existing list.
+
+       --clear-authorized-networks
+          Clear the list of external networks that are allowed to connect to
+          the instance.
+
+     At most one of these may be specified:
+
+       --clear-database-flags
+          Clear the database flags set on the instance. WARNING: Instance will
+          be restarted.
+
+       --database-flags=FLAG=VALUE,[FLAG=VALUE,...]
+          A comma-separated list of database flags to set on the instance. Use
+          an equals sign to separate flag name and value. Flags without values,
+          like skip_grant_tables, can be written out without a value after,
+          e.g., skip_grant_tables=. Use on/off for booleans. View the Instance
+          Resource API for allowed flags. (e.g., --database-flags
+          max_allowed_packet=55555,skip_grant_tables=,log_output=1)
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Removes all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud alpha sql instances patch --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud alpha sql instances patch --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          A list of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+     At most one of these may be specified:
+
+       --no-backup
+          Specified if daily backup should be disabled.
+
+       --backup-start-time=BACKUP_START_TIME
+          The start time of daily backups, specified in the 24 hour format -
+          HH:MM, in the UTC timezone.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud sql instances patch
+        $ gcloud beta sql instances patch
+

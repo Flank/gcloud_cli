@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Unit tests for the resource_filter module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.resource import resource_exceptions
 from googlecloudsdk.core.resource import resource_filter
 from googlecloudsdk.core.resource import resource_lex
@@ -72,8 +75,8 @@ class Resource(object):
 class ResourceFilterTest(subtests.Base, sdk_test_base.WithLogCapture):
 
   _ALIASES = {
-      'i': resource_lex.Lexer('integer').Key(),
-      'v': resource_lex.Lexer('compound.string.value').Key(),
+      'i': resource_lex.Lexer('integer').KeyWithAttribute(),
+      'v': resource_lex.Lexer('compound.string.value').KeyWithAttribute(),
   }
 
   def SetUp(self):
@@ -609,14 +612,12 @@ class ResourceFilterTest(subtests.Base, sdk_test_base.WithLogCapture):
     T(False, 'compound.string.dictionary:5')
     T(True, 'compound.string.dictionary:Abc')
     T(True, 'compound.string.dictionary:abc')
-    T(True, 'compound.string.dictionary:ab', deprecated=True)
     T(True, 'compound.string.dictionary:ab*')
 
     # (...) set operands for :
 
     T(True, 'compound.string.array:(ab)', deprecated=True)
     T(True, 'compound.string.array:(ab*)')
-    T(True, 'compound.string.dictionary:(b)', deprecated=True)
     T(True, 'compound.string.dictionary:(ab*)')
 
     T(True, 'compound.number.array:(1)')
@@ -684,12 +685,6 @@ class ResourceFilterTest(subtests.Base, sdk_test_base.WithLogCapture):
     T(True, 'compound.number.dictionary=(aaa 1 zzz)')
     T(True, 'compound.number.dictionary=(aaa\n1\nzzz)')
     T(True, 'compound.number.dictionary=(  aaa  1  zzz )')
-    T(False, 'compound.number.dictionary=(3)', deprecated=True)
-    T(False, 'compound.number.dictionary=(aaa,3,zzz)', deprecated=True)
-    T(False, 'compound.number.dictionary=(aaa, 3, zzz)', deprecated=True)
-    T(False, 'compound.number.dictionary=(aaa 3 zzz)', deprecated=True)
-    T(False, 'compound.number.dictionary=(aaa\n3\nzzz)', deprecated=True)
-    T(False, 'compound.number.dictionary=(  aaa  3  zzz )', deprecated=True)
     T(False, 'compound.number.dictionary=(  aaa  5  zzz )')
     T(False, 'compound.number.dictionary=(  aaa  zzz )')
 

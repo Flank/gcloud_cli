@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the SSL certificates list subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.command_lib.compute.ssl_certificates import flags
@@ -138,11 +141,11 @@ class SslCertificatesListAlphaTest(SslCertificatesListTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME TYPE CREATION_TIMESTAMP EXPIRY_TIME MANAGED_STATUS
-            ssl-cert-1 SELF_MANAGED 2017-12-18T11:11:11.000-07:00
-            ssl-cert-2 MANAGED 2017-12-17T10:00:00.000-07:00 ACTIVE
-              test1.certsbridge.com: ACTIVE
-              xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
+            NAME TYPE CREATION_TIMESTAMP EXPIRE_TIME MANAGED_STATUS
+            ssl-cert-1 SELF_MANAGED 2017-12-18T11:11:11.000-07:00 2018-12-18T11:11:11.000-07:00
+            ssl-cert-2 MANAGED 2017-12-17T10:00:00.000-07:00 2018-12-17T10:00:00.000-07:00 ACTIVE
+            test1.certsbridge.com: ACTIVE
+            xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
             """),
         normalize_space=True)
 

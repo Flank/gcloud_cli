@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +15,22 @@
 """Unit tests for operations describe."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 
 
-class OperationsDescribeTest(base.OperationsUnitTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class OperationsDescribeTest(base.OperationsUnitTest, parameterized.TestCase):
 
-  def testSuccessfulDescribe(self):
+  def testSuccessfulDescribe(self, track):
+    self.SetTrack(track)
     expected = self.MakeOperation(self.TEST_PROJECT, self.TEST_LOCATION,
                                   self.TEST_OPERATION_UUID)
     self.ExpectOperationGet(
@@ -35,7 +43,8 @@ class OperationsDescribeTest(base.OperationsUnitTest):
                                 self.TEST_OPERATION_UUID)
     self.assertEqual(expected, actual)
 
-  def testDescribeOperationNotFound(self):
+  def testDescribeOperationNotFound(self, track):
+    self.SetTrack(track)
     self.ExpectOperationGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -47,7 +56,8 @@ class OperationsDescribeTest(base.OperationsUnitTest):
                          '--location', self.TEST_LOCATION,
                          self.TEST_OPERATION_UUID)
 
-  def testDescribeEnvironmentInsufficientPermissions(self):
+  def testDescribeEnvironmentInsufficientPermissions(self, track):
+    self.SetTrack(track)
     self.ExpectOperationGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,

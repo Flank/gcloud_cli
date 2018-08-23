@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Unit tests for the compute flags module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import collections
 
 from googlecloudsdk.calliope import actions
@@ -422,14 +425,10 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'regions/baltic/forwardingRules/fish',
         ref.SelfLink())
-    self.AssertErrEquals("""\
-        For the following forwarding rule:
-          - [fish]
-        choose a region:
-          [1] baltic
-          [2] north-sea
-        Please enter your numeric choice:
-        """, normalize_space=True)
+    self.AssertErrEquals(
+        r'{"ux": "PROMPT_CHOICE", "message": "For the following forwarding '
+        r'rule:\n - [fish]\nchoose a region:", "choices": ["baltic", '
+        '"north-sea"]}\n')
 
   def testOptional_UnderspecifiedMultiScoped(self):
     resource_arg = flags.ResourceArgument(
@@ -460,15 +459,10 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
     self.WriteInput('1')
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=None, scope_lister=ScopeLister)
-    self.AssertErrEquals("""\
-        For the following forwarding rule:
-          - [fish]
-        choose a region or global:
-          [1] global
-          [2] region: atlantic
-          [3] region: indian
-        Please enter your numeric choice:
-        """, normalize_space=True)
+    self.AssertErrEquals(
+        r'{"ux": "PROMPT_CHOICE", "message": "For the following forwarding '
+        r'rule:\n - [fish]\nchoose a region or global:", "choices": ["global", '
+        '"region: atlantic", "region: indian"]}\n')
     self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'global/forwardingRules/fish',
@@ -501,9 +495,8 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'regions/{0}/forwardingRules/fish'.format(region),
         ref.SelfLink())
-    self.AssertErrEquals("""\
-        Did you mean region [{0}] for forwarding rule: [fish] (Y/n)?
-        """.format(region), normalize_space=True)
+    self.AssertErrContains(
+        'Did you mean region [{0}] for forwarding rule: [fish]'.format(region))
 
   def testOptional_UnderspecifiedSingleScoped_WithZoneGce(self):
     properties.VALUES.core.check_gce_metadata.Set(True)
@@ -532,9 +525,8 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'zones/{0}/instanceGroups/fish'.format(zone),
         ref.SelfLink())
-    self.AssertErrEquals("""\
-        Did you mean zone [{0}] for instance group: [fish] (Y/n)?
-        """.format(zone), normalize_space=True)
+    self.AssertErrContains(
+        'Did you mean zone [{0}] for instance group: [fish]'.format(zone))
 
   def testZoneByUri(self):
     resource_arg = flags.ResourceArgument(

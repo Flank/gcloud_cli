@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud monitoring policies describe`."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 
 from apitools.base.py import encoding
@@ -47,10 +51,13 @@ class MonitoringDescribeTest(base.MonitoringTestBase, parameterized.TestCase,
       (False, False)
   )
   def testCreate_FromString(self, use_yaml, from_file):
+    # The round trip through json/yaml loses dict ordering, and self._Expect()
+    # fails on out-of-order user_labels and channel_labels maps (lists of
+    # key=value), so we only test one label name per property.
     user_labels = encoding.DictToAdditionalPropertyMessage(
-        {'k1': 'v1', 'k2': 'v2'}, self.user_labels_cls)
+        {'k1': 'v1'}, self.user_labels_cls)
     channel_labels = encoding.DictToAdditionalPropertyMessage(
-        {'k3': 'v3', 'k4': 'v4'}, self.channel_labels_cls)
+        {'k3': 'v3'}, self.channel_labels_cls)
     channel = self.CreateChannel(
         display_name='my-str-channel',
         description='This will be imported as a string.',
@@ -76,9 +83,9 @@ class MonitoringDescribeTest(base.MonitoringTestBase, parameterized.TestCase,
 
   def testCreate_FromStringGetsModified(self):
     user_labels = encoding.DictToAdditionalPropertyMessage(
-        {'k1': 'v1', 'k2': 'v2'}, self.user_labels_cls)
+        {'k1': 'v1', 'k2': 'v2'}, self.user_labels_cls, sort_items=True)
     channel_labels = encoding.DictToAdditionalPropertyMessage(
-        {'k3': 'v3', 'k4': 'v4'}, self.channel_labels_cls)
+        {'k3': 'v3', 'k4': 'v4'}, self.channel_labels_cls, sort_items=True)
     channel = self.CreateChannel(
         display_name='my-str-channel',
         description='This will be imported as a string.',
@@ -136,7 +143,7 @@ class MonitoringDescribeTest(base.MonitoringTestBase, parameterized.TestCase,
 
   def testCreate_AlternativeLabelsName(self):
     channel_labels = encoding.DictToAdditionalPropertyMessage(
-        {'k3': 'v3', 'k4': 'v4'}, self.channel_labels_cls)
+        {'k3': 'v3', 'k4': 'v4'}, self.channel_labels_cls, sort_items=True)
     channel = self.CreateChannel(
         display_name='my-str-channel',
         description='This will be imported as a string.',

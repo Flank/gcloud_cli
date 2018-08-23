@@ -1,0 +1,32 @@
+NAME
+    gcloud beta container binauthz policy export - export the Binary
+        Authorization policy for the current project
+
+SYNOPSIS
+    gcloud beta container binauthz policy export [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This function's default output is a valid policy YAML file. If
+    dumped to a file and edited, the new policy can be provided to the $ gcloud
+    beta container binauthz policy import command to cause these edits to be
+    reflected in the project policy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLE
+    One way of updating the current project's policy is to run:
+
+        $ gcloud beta container binauthz policy export > my_policy.yaml
+        $ edit my_policy.yaml
+        $ gcloud beta container binauthz policy import \
+          --policy-file=my_policy.yaml
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha container binauthz policy export
+

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for 'clusters list' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 
 from googlecloudsdk.command_lib.container import constants
@@ -31,11 +34,8 @@ def _MockUri(project='test', zone='us-central1-a', name=None):
               project=project, zone=zone, name=name)
 
 
-class ListTestGA(base.TestBaseV1, base.GATestBase, base.ClustersTestBase):
+class ListTestGA(base.GATestBase, base.ClustersTestBase):
   """gcloud GA track using container v1 API."""
-
-  def SetUp(self):
-    self.api_mismatch = False
 
   def testListAggregate(self):
     clusters = [
@@ -246,15 +246,11 @@ cluster2 zone2 2.2.2.2 5 PROVISIONING
     self.AssertOutputContains(str(self.running))
 
   def testListOneRegion(self):
-    if self.api_mismatch:
-      self.WriteInput('y')
     kwargs = {'zone': self.REGION}
     self.ExpectListClusters([self._RunningCluster(**kwargs)], zone=self.REGION)
     self.Run(self.regional_clusters_command_base.format(self.REGION) + ' list')
     self.AssertOutputContains(self.ENDPOINT)
     self.AssertOutputContains(str(self.running))
-    if self.api_mismatch:
-      self.AssertErrContains('You invoked')
 
   def testListMissingProject(self):
     properties.VALUES.core.project.Set(None)
@@ -307,45 +303,38 @@ cluster2 zone2 2.2.2.2 5 PROVISIONING
     self.ExpectListClusters([self._MakeCluster(status=self.degraded)])
     self.Run(self.COMMAND_BASE + ' clusters list')
     self.AssertOutputContains(str(self.degraded))
-    self.AssertErrContains(constants.DEGRADED_WARNING)
+    self.AssertOutputContains(str('DEGRADED'))
+    self.AssertErrContains('Missing edit permissions on project')
 
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class ListTestBetaV1API(base.BetaTestBase, ListTestGA):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class ListTestBetaV1Beta1API(base.TestBaseV1Beta1, ListTestBetaV1API):
+class ListTestBeta(base.BetaTestBase, ListTestGA):
   """gcloud Beta track using container v1beta1 API."""
 
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
+  def testDegradedClusters(self):
+    code = self.messages.StatusCondition.CodeValueValuesEnum.GCE_STOCKOUT
+    message = 'test error message'
+    self.ExpectListClusters([
+        self._MakeCluster(
+            status=self.degraded,
+            conditions=[
+                self.messages.StatusCondition(
+                    code=code,
+                    message=message,
+                ),
+            ]),
+    ])
+    self.Run(self.COMMAND_BASE + ' clusters list')
+    self.AssertOutputContains(str(self.degraded))
+    self.AssertOutputContains(str('DEGRADED'))
+    self.AssertErrContains(str(code))
+    self.AssertErrContains(message)
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class ListTestAlphaV1API(base.AlphaTestBase, ListTestBetaV1API):
-  """gcloud Alpha track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class ListTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, ListTestAlphaV1API,
-                               ListTestBetaV1Beta1API):
+class ListTestAlphaV1Alpha1API(base.AlphaTestBase, ListTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
 
 
 if __name__ == '__main__':

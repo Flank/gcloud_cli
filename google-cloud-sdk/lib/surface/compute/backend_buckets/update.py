@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Commands for updating backend buckets."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.compute import backend_buckets_utils
@@ -26,7 +29,6 @@ from googlecloudsdk.command_lib.compute.backend_buckets import flags as backend_
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Update(base.UpdateCommand):
   """Update a backend bucket.
 
@@ -40,6 +42,8 @@ class Update(base.UpdateCommand):
     """Set up arguments for this command."""
     backend_buckets_utils.AddUpdatableArgs(cls, parser, 'update')
     backend_buckets_flags.GCS_BUCKET_ARG.AddArgument(parser)
+    signed_url_flags.AddSignedUrlCacheMaxAge(
+        parser, required=False, unspecified_help='')
 
   def AnyArgsSpecified(self, args):
     """Returns true if any args for updating backend bucket were specified."""
@@ -60,20 +64,21 @@ class Update(base.UpdateCommand):
     """Returns a request to update the backend bucket."""
     return (
         client.apitools_client.backendBuckets,
-        'Update',
-        client.messages.ComputeBackendBucketsUpdateRequest(
+        'Patch',
+        client.messages.ComputeBackendBucketsPatchRequest(
             project=backend_bucket_ref.project,
             backendBucket=backend_bucket_ref.Name(),
             backendBucketResource=replacement))
 
   def Modify(self, args, existing):
     """Modifies and returns the updated backend bucket."""
+    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
+    client = holder.client
     replacement = encoding.CopyProtoMessage(existing)
+    cleared_fields = []
 
-    if args.description:
+    if args.IsSpecified('description'):
       replacement.description = args.description
-    elif args.description == '':  # pylint: disable=g-explicit-bool-comparison
-      replacement.description = None
 
     if args.gcs_bucket_name:
       replacement.bucketName = args.gcs_bucket_name
@@ -81,7 +86,13 @@ class Update(base.UpdateCommand):
     if args.enable_cdn is not None:
       replacement.enableCdn = args.enable_cdn
 
-    return replacement
+    if args.IsSpecified('signed_url_cache_max_age'):
+      replacement.cdnPolicy = client.messages.BackendBucketCdnPolicy(
+          signedUrlCacheMaxAgeSec=args.signed_url_cache_max_age)
+
+    if not replacement.description:
+      cleared_fields.append('description')
+    return replacement, cleared_fields
 
   def MakeRequests(self, args):
     """Makes the requests for updating the backend bucket."""
@@ -94,7 +105,7 @@ class Update(base.UpdateCommand):
 
     objects = client.MakeRequests([get_request])
 
-    new_object = self.Modify(args, objects[0])
+    new_object, cleared_fields = self.Modify(args, objects[0])
 
     # If existing object is equal to the proposed object or if
     # Modify() returns None, then there is no work to be done, so we
@@ -105,46 +116,13 @@ class Update(base.UpdateCommand):
               objects[0].name))
       return objects
 
-    return client.MakeRequests(
-        [self.GetSetRequest(client, backend_bucket_ref, new_object)])
-
-  def Run(self, args):
-    """Issues the request necessary for updating a backend bucket."""
-    if not self.AnyArgsSpecified(args):
-      raise exceptions.ToolException('At least one property must be modified.')
-    return self.MakeRequests(args)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
-class UpdateAlphaBeta(Update):
-  """Update a backend bucket.
-
-  *{command}* is used to update backend buckets.
-  """
-
-  @classmethod
-  def Args(cls, parser):
-    """Set up arguments for this command."""
-    super(UpdateAlphaBeta, cls).Args(parser)
-    signed_url_flags.AddSignedUrlCacheMaxAge(
-        parser, required=False, unspecified_help='')
-
-  def Modify(self, args, existing):
-    """Modifies and returns the updated backend bucket."""
-    replacement = super(UpdateAlphaBeta, self).Modify(args, existing)
-
-    if args.IsSpecified('signed_url_cache_max_age'):
-      holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-      client = holder.client
-      replacement.cdnPolicy = client.messages.BackendBucketCdnPolicy(
-          signedUrlCacheMaxAgeSec=args.signed_url_cache_max_age)
-
-    return replacement
+    with client.apitools_client.IncludeFields(cleared_fields):
+      return client.MakeRequests(
+          [self.GetSetRequest(client, backend_bucket_ref, new_object)])
 
   def Run(self, args):
     """Issues the request necessary for updating a backend bucket."""
     if not self.AnyArgsSpecified(args) and not args.IsSpecified(
         'signed_url_cache_max_age'):
       raise exceptions.ToolException('At least one property must be modified.')
-
-    return super(UpdateAlphaBeta, self).MakeRequests(args)
+    return self.MakeRequests(args)

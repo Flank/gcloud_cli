@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise user password changes."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import getpass
 
 from googlecloudsdk.api_lib.util import apis
@@ -22,8 +25,9 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class UsersSetPasswordTest(base.SqlMockTestBeta):
+class _BaseUsersSetPasswordTest(object):
 
+  # TODO(b/110486599): Remove the positional host argument.
   def testSetPassword(self):
     msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
     self.mocked_client.users.Update.Expect(
@@ -46,7 +50,56 @@ class UsersSetPasswordTest(base.SqlMockTestBeta):
     self.Run('sql users set-password --instance my_instance my_username '
              'my_host --password my_password')
     self.AssertErrContains('Updating Cloud SQL user')
+    # TODO(b/110486599): Remove the deprecation warning.
+    self.AssertErrContains('Positional argument deprecated_host is deprecated')
 
+  def testSetPasswordWithNoHostArgument(self):
+    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    self.mocked_client.users.Update.Expect(
+        msgs.SqlUsersUpdateRequest(
+            project=self.Project(),
+            instance='my_instance',
+            name='my_username',
+            host=None,
+            user=msgs.User(
+                project=self.Project(),
+                instance='my_instance',
+                name='my_username',
+                host=None,
+                password='my_password')),
+        msgs.Operation(name='op_name'))
+    self.mocked_client.operations.Get.Expect(
+        msgs.SqlOperationsGetRequest(
+            operation='op_name', project=self.Project()),
+        msgs.Operation(name='op_name', status='DONE'))
+    self.Run('sql users set-password --instance my_instance my_username '
+             '--password my_password')
+    self.AssertErrContains('Updating Cloud SQL user')
+
+  def testSetPasswordWithHostFlag(self):
+    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    self.mocked_client.users.Update.Expect(
+        msgs.SqlUsersUpdateRequest(
+            project=self.Project(),
+            instance='my_instance',
+            name='my_username',
+            host='my_host',
+            user=msgs.User(
+                project=self.Project(),
+                instance='my_instance',
+                name='my_username',
+                host='my_host',
+                password='my_password')),
+        msgs.Operation(name='op_name'))
+    self.mocked_client.operations.Get.Expect(
+        msgs.SqlOperationsGetRequest(
+            operation='op_name', project=self.Project()),
+        msgs.Operation(name='op_name', status='DONE'))
+    self.Run('sql users set-password --instance my_instance my_username '
+             '--password my_password --host my_host')
+    self.AssertErrContains('Updating Cloud SQL user')
+
+  # TODO(b/110486599): Remove the positional host argument.
   def testSetPasswordAsync(self):
     msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
     self.mocked_client.users.Update.Expect(
@@ -71,8 +124,9 @@ class UsersSetPasswordTest(base.SqlMockTestBeta):
                       'my_username my_host --password my_password --async')
     self.assertEqual(result.name, 'op_name')
     self.AssertOutputEquals('')
-    self.AssertErrEquals('')
+    self.AssertErrNotContains('Updating Cloud SQL user')
 
+  # TODO(b/110486599): Remove the positional host argument.
   def testSetPasswordPrompt(self):
     self.StartObjectPatch(getpass, 'getpass', return_value='my_password')
     msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
@@ -96,6 +150,19 @@ class UsersSetPasswordTest(base.SqlMockTestBeta):
     self.Run('sql users set-password --instance my_instance my_username '
              'my_host --prompt-for-password')
     self.AssertErrContains('Updating Cloud SQL user')
+
+
+class UsersSetPasswordGATest(_BaseUsersSetPasswordTest, base.SqlMockTestGA):
+  pass
+
+
+class UsersSetPasswordBetaTest(_BaseUsersSetPasswordTest, base.SqlMockTestBeta):
+  pass
+
+
+class UsersSetPasswordAlphaTest(_BaseUsersSetPasswordTest,
+                                base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

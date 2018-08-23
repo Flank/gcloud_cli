@@ -19,11 +19,41 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding for a queue.
+
+     create-app-engine-queue
+        (BETA) Create an App Engine queue.
+
+     delete
+        (BETA) Delete a queue.
+
+     describe
+        (BETA) Show details about a queue.
+
      get-iam-policy
         (BETA) Get the IAM policy for a queue.
 
+     list
+        (BETA) List all queues.
+
+     pause
+        (BETA) Pause a queue.
+
+     purge
+        (BETA) Purge a queue by deleting all of its tasks.
+
+     remove-iam-policy-binding
+        (BETA) Remove IAM policy binding for a queue.
+
+     resume
+        (BETA) Request to resume a paused or disabled queue.
+
      set-iam-policy
-        (BETA) Set IAM policy for a queue.
+        (BETA) Set the IAM policy for a queue.
+
+     update-app-engine-queue
+        (BETA) Update an App Engine queue.
 
 NOTES
     This command is currently in BETA and may change without notice. This

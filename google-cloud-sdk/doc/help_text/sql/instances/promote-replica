@@ -24,7 +24,8 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql instances promote-replica
         $ gcloud beta sql instances promote-replica
 

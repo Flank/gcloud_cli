@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the networks subnets set-iam-policy subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from apitools.base.py import encoding
@@ -34,12 +38,13 @@ class SetIamPolicyTest(test_base.BaseTest):
     self.SelectApi('beta')
     self.track = calliope_base.ReleaseTrack.BETA
     json = encoding.MessageToJson(
-        test_resources.BetaIamPolicyWithOneBindingAndDifferentEtag())
+        test_resources.IamPolicyWithOneBindingAndDifferentEtag(self.messages))
     self.temp_file = self.Touch(self.temp_path, 'good.json', contents=json)
 
   def testSetIamPolicy(self):
 
-    policy = test_resources.BetaIamPolicyWithOneBindingAndDifferentEtag()
+    policy = test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+        self.messages)
 
     self.make_requests.side_effect = iter([
         iter([policy]),

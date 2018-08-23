@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the forwarding-rules describe subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -29,6 +34,11 @@ def SetUp(test_obj, api_version):
     test_obj._forwarding_rules = test_resources.FORWARDING_RULES_V1
     test_obj._global_forwarding_rules = (
         test_resources.GLOBAL_FORWARDING_RULES_V1)
+  elif api_version == 'alpha':
+    test_obj._forwarding_rules = test_resources.FORWARDING_RULES_ALPHA
+    test_obj._global_forwarding_rules = (
+        test_resources.GLOBAL_FORWARDING_RULES_ALPHA)
+    test_obj.track = calliope_base.ReleaseTrack.ALPHA
   else:
     raise ValueError('Bad API version: [{0}]'.format(api_version))
 
@@ -178,6 +188,55 @@ class ForwardingRulesDescribeTest(test_base.BaseTest,
           compute forwarding-rules describe
             {uri}/projects/my-project/global/networks/network-1
           """.format(uri=self.compute_uri))
+
+
+class ForwardingRulesDescribeAlphaTest(ForwardingRulesDescribeTest):
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+
+  def _MakeForwardingRuleWithFlexPort(self):
+    prefix = 'https://www.googleapis.com/compute/alpha'
+    return self.messages.ForwardingRule(
+        name='forwarding-rule-flex-port',
+        IPAddress='162.222.178.84',
+        IPProtocol=self.messages.ForwardingRule.IPProtocolValueValuesEnum.TCP,
+        allPorts=True,
+        loadBalancingScheme=self.messages.ForwardingRule.
+        LoadBalancingSchemeValueValuesEnum.INTERNAL,
+        region=(prefix + '/projects/my-project/regions/region-1'),
+        selfLink=(prefix + '/projects/my-project/regions/'
+                  'region-1/forwardingRules/forwarding-rule-flex-port'),
+        backendService=(prefix + '/projects/my-project/'
+                        'regions/region-1/backendServices/bs-1'))
+
+  def testWithFlexPort(self):
+    self.make_requests.side_effect = iter([
+        [self._MakeForwardingRuleWithFlexPort()],
+    ])
+
+    self.Run("""
+        compute forwarding-rules describe forwarding-rule-flex-port
+          --region region-1
+        """)
+
+    self.CheckRequests([(self.compute.forwardingRules, 'Get',
+                         self.messages.ComputeForwardingRulesGetRequest(
+                             forwardingRule='forwarding-rule-flex-port',
+                             region='region-1',
+                             project='my-project'))])
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+            IPAddress: 162.222.178.84
+            IPProtocol: TCP
+            allPorts: true
+            backendService: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/backendServices/bs-1
+            loadBalancingScheme: INTERNAL
+            name: forwarding-rule-flex-port
+            region: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1
+            selfLink: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-flex-port
+            """.format(api=self.api)))
 
 
 if __name__ == '__main__':

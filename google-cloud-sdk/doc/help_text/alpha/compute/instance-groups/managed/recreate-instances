@@ -25,8 +25,8 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The region of the managed instance group to operate on. If not
-          specified, you may be prompted to select a region.
+          Region of the managed instance group to operate on. If not specified,
+          you may be prompted to select a region.
 
           A list of regions can be fetched by running:
 
@@ -36,8 +36,8 @@ OPTIONAL FLAGS
           invocation.
 
        --zone=ZONE
-          The zone of the managed instance group to operate on. If not
-          specified, you may be prompted to select a zone.
+          Zone of the managed instance group to operate on. If not specified,
+          you may be prompted to select a zone.
 
           A list of zones can be fetched by running:
 
@@ -52,11 +52,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute instance-groups managed recreate-instances
         $ gcloud beta compute instance-groups managed recreate-instances

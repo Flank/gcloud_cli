@@ -75,7 +75,8 @@ A bucket is auto created when this parameter is not specified.
 
 .TP 2m
 \fB\-\-cluster\-name\fR=\fICLUSTER_NAME\fR
-The name of the managed dataproc cluster.
+The name of the managed dataproc cluster. If unspecified, the workflow template
+ID will be used.
 
 .TP 2m
 \fB\-\-initialization\-action\-timeout\fR=\fITIMEOUT\fR; default="10m"
@@ -89,7 +90,7 @@ cluster.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain

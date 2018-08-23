@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.api_lib.app import instances_util
@@ -80,6 +83,29 @@ class InstancesListTest(instances_base.InstancesTestBase):
     ])
 
     self.Run('app instances list --uri')
+    self.AssertOutputContains('\n'.join(
+        ['https://appengine.googleapis.com/v1/{inst}'.format(inst=instance)
+         for instance in [
+             'apps/{0}/services/default/versions/v1/instances/i1'.format(
+                 self.PROJECT),
+             'apps/{0}/services/default/versions/v1/instances/i2'.format(
+                 self.PROJECT),
+             'apps/{0}/services/foo/versions/v1/instances/i3'.format(
+                 self.PROJECT),
+             'apps/{0}/services/foo/versions/v2/instances/i4'.format(
+                 self.PROJECT)]
+        ]), normalize_space=True)
+
+  def testListUriTransformOutput(self):
+    self._ExpectCalls([
+        ('default', [
+            ('v1', ['i1', 'i2'])]),
+        ('foo', [
+            ('v1', ['i3']),
+            ('v2', ['i4'])])
+    ])
+
+    self.Run('app instances list --format=value(uri())')
     self.AssertOutputContains('\n'.join(
         ['https://appengine.googleapis.com/v1/{inst}'.format(inst=instance)
          for instance in [

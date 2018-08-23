@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +22,7 @@ from within calliope.
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import errno
@@ -174,7 +176,7 @@ def _TruncateToLineWidth(string, align, width, fill=''):
   Raises:
     ValueError, if provided fill is too long for the terminal.
   """
-  if len(fill) >= width / 2:
+  if len(fill) >= width // 2:
     # Either the caller provided a fill that's way too long, or the user has a
     # terminal that's way too narrow. In either case, we aren't going to be able
     # to make this look nice, but we don't want to throw an error because that
@@ -508,12 +510,7 @@ def HandleError(exc, command_path, known_error_handler=None):
   """
   known_exc, print_error = ConvertKnownError(exc)
   if known_exc:
-    msg = '({0}) {1}'.format(
-        console_attr.SafeText(command_path),
-        console_attr.SafeText(known_exc))
-    log.debug(msg, exc_info=sys.exc_info())
-    if print_error:
-      log.error(msg)
+    _LogKnownError(known_exc, command_path, print_error)
     # Uncaught errors will be handled in gcloud_main.
     if known_error_handler:
       known_error_handler(exc)
@@ -524,6 +521,15 @@ def HandleError(exc, command_path, known_error_handler=None):
     # Make sure any uncaught exceptions still make it into the log file.
     log.debug(console_attr.SafeText(exc), exc_info=sys.exc_info())
     core_exceptions.reraise(exc)
+
+
+def _LogKnownError(known_exc, command_path, print_error):
+  msg = '({0}) {1}'.format(
+      console_attr.SafeText(command_path),
+      console_attr.SafeText(known_exc))
+  log.debug(msg, exc_info=sys.exc_info())
+  if print_error:
+    log.error(msg)
 
 
 def _Exit(exc):

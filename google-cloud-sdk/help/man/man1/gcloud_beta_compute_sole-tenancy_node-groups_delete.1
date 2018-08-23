@@ -37,7 +37,7 @@ Name of the node group to operate on.
 .RS 2m
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-The zone of the node group to operate on. If not specified and the
+Zone of the node group to operate on. If not specified and the
 \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
 zone.
 
@@ -78,5 +78,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute sole\-tenancy node\-groups delete
+$ gcloud alpha compute sole\-tenancy node\-groups delete
+.RE
 

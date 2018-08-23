@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the disks snapshot subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import itertools
 import os
 import re
@@ -445,16 +448,8 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
     self.Run('compute disks snapshot disk-1 --async')
 
     self.AssertOutputEquals('')
-    self.AssertErrEquals(
-        'For the following disk:\n'
-        ' - [disk-1]\n'
-        'choose a zone:\n'
-        ' [1] central2-a\n'
-        ' [2] central2-b\n'
-        'Please enter your numeric choice:  \n'
-        'Disk snapshot in progress for [{}].\n'
-        'Use [gcloud compute operations describe URI] command to check '
-        'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains('"choices": ["central2-a", "central2-b"]')
 
   def testUriSupport(self):
     disk_ref = self._GetDiskRef('disk-1')

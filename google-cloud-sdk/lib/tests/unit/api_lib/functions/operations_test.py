@@ -16,7 +16,9 @@
 """Unit tests for the operations module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.functions import operations
 from tests.lib import test_case
 

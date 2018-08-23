@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests of the AppEngine API Client."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.app import appengine_api_client
@@ -64,6 +67,7 @@ class AppEngineApiClientTestBase(sdk_test_base.WithFakeAuth):
 
     self.appyaml = appinfo.AppInfoExternal()
     self.appyaml.Set('runtime', 'python27')
+    self.appyaml.Set('entrypoint', 'ls')
 
 
 class AppEngineApiClientTests(AppEngineApiClientTestBase):
@@ -79,17 +83,14 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
         request=self.messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.messages.Version(
+                entrypoint=self.messages.Entrypoint(shell='ls'),
                 runtime='python27',
                 deployment=self.messages.Deployment(
-                    container=self.messages.ContainerInfo(
-                        image=fake_image
-                    )
-                ),
+                    container=self.messages.ContainerInfo(image=fake_image)),
                 id=fake_version,
             ),
         ),
-        response=self.messages.Operation(
-            done=True))
+        response=self.messages.Operation(done=True))
 
     fake_build = app_build.BuildArtifact.MakeImageArtifact('fake-image')
     self.client.DeployService('fake-service', fake_version, fake_service,
@@ -105,6 +106,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
         request=self.beta_messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.beta_messages.Version(
+                entrypoint=self.beta_messages.Entrypoint(shell='ls'),
                 runtime='python27',
                 deployment=self.beta_messages.Deployment(
                     build=self.beta_messages.BuildInfo(
@@ -171,6 +173,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
         request=self.beta_messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.beta_messages.Version(
+                entrypoint=self.beta_messages.Entrypoint(shell='ls'),
                 runtime='python27',
                 deployment=deployment_message,
                 id=fake_version,
@@ -222,6 +225,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
 
     image_version_expected = self.messages.Version(
+        entrypoint=self.messages.Entrypoint(shell='ls'),
         runtime='python27',
         deployment=self.messages.Deployment(
             container=self.messages.ContainerInfo(image='fake-image')))
@@ -234,6 +238,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     # buildId deployments are only supported in the v1beta and v1alpha Admin API
     # versions currently, so use the v1beta client and messages.
     build_version_expected = self.beta_messages.Version(
+        entrypoint=self.beta_messages.Entrypoint(shell='ls'),
         runtime='python27',
         deployment=self.beta_messages.Deployment(
             build=self.beta_messages.BuildInfo(cloudBuildId='fake-build')))
@@ -268,6 +273,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
         request=self.messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.messages.Version(
+                entrypoint=self.messages.Entrypoint(shell='ls'),
                 runtime='python27',
                 deployment=self.messages.Deployment(
                     container=self.messages.ContainerInfo(image=fake_image)),

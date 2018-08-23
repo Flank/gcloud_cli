@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +16,14 @@
 """Common utilities for the gcloud dataproc tool."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+import os
 import time
 import uuid
-
 from apitools.base.py import encoding
 from apitools.base.py import exceptions as apitools_exceptions
-
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.api_lib.dataproc import storage_helpers
 from googlecloudsdk.core import log
@@ -30,9 +32,12 @@ from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.console import progress_tracker
-from googlecloudsdk.core.util import files
-
+from googlecloudsdk.core.util import pkg_resources
+from jsonschema import exceptions as jsonschema_exceptions
+from jsonschema import validators
 import six
+
+SCHEMA_DIR = os.path.join(os.path.dirname(__file__), 'schemas')
 
 
 def FormatRpcError(error):
@@ -191,16 +196,21 @@ def PrintWorkflowMetadata(metadata, status, operations, errors):
     metadata: Dataproc WorkflowMetadata message object, contains the latest
         states of a workflow template.
     status: Dictionary, stores all jobs' status in the current workflow
-        template.
+        template, as well as the status of the overarching workflow.
     operations: Dictionary, stores cluster operation status for the workflow
         template.
     errors: Dictionary, stores errors from the current workflow template.
   """
-  if metadata.template not in status or metadata.state != status[metadata.
-                                                                 template]:
-    log.status.Print('WorkflowTemplate [{0}] {1}'.format(
-        metadata.template, metadata.state))
-    status[metadata.template] = metadata.state
+  # Key chosen to avoid collision with job ids, which are at least 3 characters.
+  template_key = 'wt'
+  if template_key not in status or metadata.state != status[template_key]:
+    if metadata.template is not None:
+      log.status.Print('WorkflowTemplate [{0}] {1}'.format(
+          metadata.template, metadata.state))
+    else:
+      # Workflows instantiated inline do not store an id in their metadata.
+      log.status.Print('WorkflowTemplate {0}'.format(metadata.state))
+    status[template_key] = metadata.state
   if metadata.createCluster != operations['createCluster']:
     if hasattr(metadata.createCluster,
                'error') and metadata.createCluster.error is not None:
@@ -497,17 +507,64 @@ def ParseRegion(dataproc):
   return ref
 
 
-def ReadYaml(file_path, message_type):
-  parsed_yaml = yaml.load_path(file_path)
+def _ValidateYaml(parsed_yaml, schema_path):
+  """Validate yaml against schema.
+
+  Args:
+    parsed_yaml: yaml to validate
+    schema_path: Path to schema, relative to schemas directory.
+
+  Raises:
+    ValidationError: if the template doesn't obey the schema.
+    SchemaError: if the schema is invalid.
+  """
+  schema = yaml.load(
+      pkg_resources.GetResourceFromFile(os.path.join(SCHEMA_DIR, schema_path)))
+  validators.validate(parsed_yaml, schema)
+
+
+def ReadYaml(message_type, stream, schema_path=None):
+  """Read yaml from a stream as a message.
+
+  Args:
+    message_type: Type of message to interpret the yaml as.
+    stream: Stream from which yaml should be read.
+    schema_path: Path to schema used to validate yaml, relative to schemas dir.
+
+  Returns:
+    Message that was read.
+
+  Raises:
+    ParseError: if yaml could not be parsed as the given message type.
+  """
+  parsed_yaml = yaml.load(stream)
+  if schema_path:
+    # If a schema is provided, validate against it.
+    try:
+      _ValidateYaml(parsed_yaml, schema_path)
+    except jsonschema_exceptions.ValidationError as e:
+      raise exceptions.ParseError('Validation Error: [{0}]'.format(e.message))
   try:
     message = encoding.PyValueToMessage(message_type, parsed_yaml)
   except Exception as e:
-    raise exceptions.ParseError('Cannot parse YAML from file {0}: [{1}]'.format(
-        file_path, e))
+    raise exceptions.ParseError('Cannot parse YAML: [{0}]'.format(e))
   return message
 
 
-def WriteYaml(file_path, message):
+def WriteYaml(message, stream, filter_function=None):
+  """Write a message as yaml to a stream.
+
+  Args:
+    message: Message to write.
+    stream: Stream to which the yaml should be written.
+    filter_function: Function used to filter out unwanted fields from the yaml.
+  """
   py_value = encoding.MessageToPyValue(message)
-  with files.FileWriter(file_path) as f:
-    yaml.dump(py_value, stream=f)
+  if filter_function:
+    # TODO(b/110426036): Use schema to filter instead of custom method.
+    filter_function(py_value)
+  yaml.dump(py_value, stream=stream)
+
+
+def MessageToYaml(message):
+  return yaml.dump(encoding.MessageToPyValue(message))

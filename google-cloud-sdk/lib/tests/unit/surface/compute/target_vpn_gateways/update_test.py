@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +15,10 @@
 """Tests for target VPN gateways update."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
-import textwrap
 
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
@@ -162,15 +164,8 @@ class UpdateLabelsTestBeta(
         ],)
     self.WriteInput('1\n')
     self.Run('compute target-vpn-gateways update gw-1 --remove-labels key0')
-    self.AssertErrEquals(
-        textwrap.dedent("""\
-            For the following Target VPN Gateway:
-             - [gw-1]
-            choose a region:
-             [1] us-central1
-             [2] us-central2
-            Please enter your numeric choice:{0}
-            """.format('  ')))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains('"choices": ["us-central1", "us-central2"]')
 
 
 if __name__ == '__main__':

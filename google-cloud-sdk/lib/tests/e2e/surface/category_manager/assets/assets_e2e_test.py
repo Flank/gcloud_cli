@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """E2e tests for 'category-manager assets' command group."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 from googlecloudsdk.api_lib.category_manager import utils
 from googlecloudsdk.core import resources
@@ -27,8 +30,8 @@ class AssetE2eTest(base.CategoryManagerE2eBase):
   """E2e test for asset related commands."""
   _BQ_TABLE_ASSET_FMT = 'projects/{project}/datasets/{dataset}/entries/{entry}'
 
-  _BQ_DATASET = 'do_not_delete_cat_man_dataset'
-  _BQ_TABLE = 'test_table'
+  _BQ_DATASET = 'DO_NOT_DELETE_CATEGORY_MANAGER_TEST_DATASET'
+  _BQ_TABLE = 'test_table1'
 
   def SetUp(self):
     self._asset = self._BQ_TABLE_ASSET_FMT.format(
@@ -60,9 +63,9 @@ class AssetE2eTest(base.CategoryManagerE2eBase):
     with self.CreateTaxonomyResource(description) as taxonomy, \
         self.CreateAnnotationResource(taxonomy, description) as annotation, \
         self.TagAsset(self._asset, annotation) as asset_tag:
-      escaped_asset = ('assets/projects%2Fcloud-sdk-integration-testing%2Fdatas'
-                       'ets%2Fdo_not_delete_cat_man_dataset%2Fentries%2Ftest_ta'
-                       'ble')
+      escaped_asset = ('assets/projects%2Fcatman-e2e-test%2Fdatasets%2F'
+                       'DO_NOT_DELETE_CATEGORY_MANAGER_TEST_DATASET%2Fentries'
+                       '%2Ftest_table1')
       expected_tag = utils.GetMessagesModule().AnnotationTag(
           annotation=annotation.name,
           annotationDisplayName=annotation.displayName,

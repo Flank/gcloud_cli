@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -24,7 +27,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class InstancesRestartTest(base.SqlMockTestBeta):
+class _BaseInstancesRestartTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def _ExpectRestart(self):
@@ -153,6 +156,19 @@ class InstancesRestartTest(base.SqlMockTestBeta):
     self.WriteInput('n\n')
     with self.assertRaises(console_io.OperationCancelledError):
       self.Run('sql instances restart reset-test')
+
+
+class InstancesRestartGATest(_BaseInstancesRestartTest, base.SqlMockTestGA):
+  pass
+
+
+class InstancesRestartBetaTest(_BaseInstancesRestartTest, base.SqlMockTestBeta):
+  pass
+
+
+class InstancesRestartAlphaTest(_BaseInstancesRestartTest,
+                                base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

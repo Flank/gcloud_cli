@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Utilities shared by cloud-shell commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import base64
 
 from googlecloudsdk.api_lib.util import apis
@@ -22,6 +25,7 @@ from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.command_lib.util.ssh import ssh
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
+from googlecloudsdk.core.credentials import store
 
 DEFAULT_ENVIRONMENT_NAME = 'users/me/environments/default'
 
@@ -96,9 +100,17 @@ def PrepareEnvironment(args):
   # If the environment isn't running, start it
   if environment.state != messages.Environment.StateValueValuesEnum.RUNNING:
     log.Print('Starting your Cloud Shell machine...')
+
+    creds = store.LoadIfEnabled()
+    access_token = None
+    if creds is not None:
+      access_token = creds.get_access_token().access_token
+
     start_operation = client.users_environments.Start(
         messages.CloudshellUsersEnvironmentsStartRequest(
-            name=DEFAULT_ENVIRONMENT_NAME))
+            name=DEFAULT_ENVIRONMENT_NAME,
+            startEnvironmentRequest=messages.StartEnvironmentRequest(
+                accessToken=access_token)))
 
     environment = waiter.WaitFor(
         StartEnvironmentPoller(client.users_environments,

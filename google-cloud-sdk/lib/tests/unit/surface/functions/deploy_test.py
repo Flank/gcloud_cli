@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +24,9 @@ they get gradually replaced by tests in deploy_simplified_test.py:
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from argparse import ArgumentTypeError
 import functools
 import os
@@ -136,6 +139,26 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         labels=self._GetDefaultLabelsMessage(),
     )
 
+  def _GenerateFunctionWithMaxInstances(self, name, url, max_instances, bucket):
+    return self.messages.CloudFunction(
+        name=name, sourceArchiveUrl=url, maxInstances=max_instances,
+        eventTrigger=self.messages.EventTrigger(
+            eventType='google.storage.object.finalize',
+            resource='projects/_/buckets/' + bucket,
+        ),
+        labels=self._GetDefaultLabelsMessage(),
+    )
+
+  def _GenerateFunctionWithConnectedVPC(self, name, url, connected_vpc, bucket):
+    return self.messages.CloudFunction(
+        name=name, sourceArchiveUrl=url, network=connected_vpc,
+        eventTrigger=self.messages.EventTrigger(
+            eventType='google.storage.object.finalize',
+            resource='projects/_/buckets/' + bucket,
+        ),
+        labels=self._GetDefaultLabelsMessage(),
+    )
+
   def _GenerateFunctionWithHttp(
       self, name, url, entry_point=None, timeout=None):
     https_trigger = self.messages.HttpsTrigger()
@@ -219,6 +242,37 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
             location=test_location,
             cloudFunction=self._GenerateFunctionWithTimeout(
                 test_name, args[-1], '30s', 'path')),
+        self._GenerateActiveOperation('operations/operation'))
+    self._ExpectGetOperationAndGetFunction(test_name)
+    return 0
+
+  def _ExpectFunctionCreateWithMaxInstances(self, args, max_instances=8):
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(
+        self.Project(), self.GetRegion())
+    self.mock_client.projects_locations_functions.Create.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
+            location=test_location,
+            cloudFunction=self._GenerateFunctionWithMaxInstances(
+                test_name, args[-1], max_instances, 'path')),
+        self._GenerateActiveOperation('operations/operation'))
+    self._ExpectGetOperationAndGetFunction(test_name)
+    return 0
+
+  def _ExpectFunctionCreateWithClearMaxInstances(self, args):
+    return self._ExpectFunctionCreateWithMaxInstances(args, max_instances=0)
+
+  def _ExpectFunctionCreateWithConnectedVPC(self, args):
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(
+        self.Project(), self.GetRegion())
+    self.mock_client.projects_locations_functions.Create.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
+            location=test_location,
+            cloudFunction=self._GenerateFunctionWithConnectedVPC(
+                test_name, args[-1], 'my-vpc', 'path')),
         self._GenerateActiveOperation('operations/operation'))
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
@@ -500,14 +554,6 @@ class FunctionsDeployArgumentValidationTest(FunctionsDeployTestBase):
           '--trigger-resource topic --trigger-http --stage-bucket buck'
       )
 
-  def testUnknownTriggerEvent(self):
-    self.MockUnpackedSourcesDirSize()
-    with self.AssertRaisesArgumentErrorRegexp(
-        'argument --trigger-event: Invalid choice: \'asdf\'.*'):
-      self.Run(
-          'functions deploy my-test --trigger-event asdf '
-          '--stage-bucket buck')
-
   def testMissingTriggerResource(self):
     self.MockUnpackedSourcesDirSize()
     with self.assertRaisesRegex(FunctionsError, (
@@ -609,6 +655,53 @@ class FunctionsAlphaTests(FunctionsDeployTestBase):
         'functions deploy my-test '
         '--trigger-event providers/firebase.auth/eventTypes/user.create '
         '--trigger-resource asdf --stage-bucket buck')
+
+  def testCreateWithMaxInstances(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    self._ExpectGsutilCall(self._ExpectFunctionCreateWithMaxInstances)
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    self.Run(
+        'functions deploy my-test --max-instances 8 --trigger-bucket path '
+        '--stage-bucket buck')
+
+  def testCreateWithClearMaxInstances(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+
+    self._ExpectGsutilCall(self._ExpectFunctionCreateWithClearMaxInstances)
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    self.Run(
+        'functions deploy my-test --clear-max-instances --trigger-bucket path '
+        '--stage-bucket buck')
+
+  def testCreateWithConnectedVPC(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    self._ExpectGsutilCall(self._ExpectFunctionCreateWithConnectedVPC)
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    self.Run(
+        'functions deploy my-test --connected-vpc my-vpc --trigger-bucket path '
+        '--stage-bucket buck')
+
 
 if __name__ == '__main__':
   test_case.main()

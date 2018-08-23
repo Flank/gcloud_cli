@@ -1,0 +1,164 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_ROUTERS_NATS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute routers nats create \- add a NAT to a Google Compute Engine router
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute routers nats create\fR \fINAME\fR \fB\-\-router\fR=\fIROUTER\fR (\fB\-\-auto\-allocate\-nat\-external\-ips\fR\ |\ \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]) (\fB\-\-nat\-all\-subnet\-ip\-ranges\fR\ |\ \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]\ |\ \fB\-\-nat\-primary\-subnet\-ip\-ranges\fR) [\fB\-\-async\fR] [\fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR] [\fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR] [\fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR] [\fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute routers nats create\fR is used to create a
+NAT on a Google Compute Engine router.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the NAT to create
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-router\fR=\fIROUTER\fR
+The Router to use for NAT.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-auto\-allocate\-nat\-external\-ips\fR
+Automatically allocate external IP addresses for Cloud NAT
+
+.TP 2m
+\fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]
+External IP Addresses to use for NAT
+
+.RE
+.sp
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-nat\-all\-subnet\-ip\-ranges\fR
+Allow all IP ranges of all subnetworks in the region, including primary and
+secondary ranges, to use NAT.
+
+.TP 2m
+\fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]
+A list of subnetwork primary and secondary IP ranges to be allowed to use NAT.
+[SUBNETWORK]: including a subnetwork name includes only the primary subnet range
+of the subnetwork. [SUBNETWORK]:[RANGE_NAME]: specifying a subnetwork and
+secondary range name includes only that secondary range.It does not include the
+primary range of the subnet.
+
+.TP 2m
+\fB\-\-nat\-primary\-subnet\-ip\-ranges\fR
+Allow only primary IP ranges of all subnetworks in the region to use NAT.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR
+Timeout for ICMP connections. See $ gcloud topic datetimes for information on
+duration formats.
+
+.TP 2m
+\fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR
+Minimum ports to be allocated to a VM
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the NAT to create. If not specified, you may be prompted to select a
+region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR
+Timeout for TCP established connections. See $ gcloud topic datetimes for
+information on duration formats.
+
+.TP 2m
+\fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR
+Timeout for TCP transitory connections. See $ gcloud topic datetimes for
+information on duration formats.
+
+.TP 2m
+\fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR
+Timeout for UDP connections. See $ gcloud topic datetimes for information on
+duration formats.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

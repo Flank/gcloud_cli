@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Integration tests for manipulating interconnects."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 import time
 
@@ -101,7 +104,7 @@ class AlphaInterconnectsTest(e2e_test_base.BaseTest):
       self.PollInterconnectUntilBecomeActive()
 
       updated_interconnect = self.RunCompute(
-          'interconnects', 'patch', self.interconnect_name, '--description',
+          'interconnects', 'update', self.interconnect_name, '--description',
           'this is my attachment')
       self.assertEqual('this is my attachment',
                        updated_interconnect.description)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Fetch cluster credentials."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.container import util
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import base
@@ -30,16 +33,27 @@ cluster {0} is not running. The kubernetes API may not be available.'''
 class GetCredentials(base.Command):
   """Fetch credentials for a running cluster.
 
-  {command} updates a kubeconfig file with appropriate credentials and endpoint
-  information to point kubectl at a specific cluster in Google Kubernetes
-  Engine. It takes a project and a zone as parameters, passed through by set
-  defaults or flags.
-  By default, credentials are written to HOME/.kube/config. You can provide an
-  alternate path by setting the KUBECONFIG environment variable.
+  {command} updates a `kubeconfig` file with appropriate credentials and
+  endpoint information to point `kubectl` at a specific cluster in Google
+  Kubernetes Engine.
+
+  It takes a project and a zone as parameters, passed through by set
+  defaults or flags. By default, credentials are written to `HOME/.kube/config`.
+  You can provide an alternate path by setting the `KUBECONFIG` environment
+  variable.
 
   This command enables switching to a specific cluster, when working
   with multiple clusters. It can also be used to access a previously created
   cluster from a new workstation.
+
+  By default, {command} will configure kubectl to automatically refresh its
+  credentials using the same identity as gcloud. If you are running kubectl as
+  part of an application, it is recommended to use [application default
+  credentials](https://cloud.google.com/docs/authentication/production).
+  To configure a `kubeconfig` file to use application default credentials, set
+  the container/use_application_default_credentials
+  [Cloud SDK property](https://cloud.google.com/sdk/docs/properties) to true
+  before running {command}
 
   See [](https://cloud.google.com/kubernetes-engine/docs/kubectl) for
   kubectl documentation.
@@ -49,7 +63,7 @@ class GetCredentials(base.Command):
           """\
           To switch to working on your cluster 'testcluster1', run:
 
-            $ {command} testcluster1 --zone us-central1-f
+            $ {command} testcluster1 --zone=us-central1-f
       """,
   }
 
@@ -63,7 +77,7 @@ class GetCredentials(base.Command):
     """
     parser.add_argument(
         'name',
-        help='The name of the cluster to get credentials for.',
+        help='Name of the cluster to get credentials for.',
         action=actions.StoreProperty(properties.VALUES.container.cluster))
 
   def Run(self, args):

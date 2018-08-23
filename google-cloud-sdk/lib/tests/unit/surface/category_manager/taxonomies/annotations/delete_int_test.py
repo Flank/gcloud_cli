@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,17 @@
 """Tests for 'gcloud category-manager taxonomies annotations delete'."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
+from tests.lib import parameterized
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class AnnotationsDeleteIntTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
@@ -31,9 +36,9 @@ class AnnotationsDeleteIntTest(base.CategoryManagerUnitTestBase):
         projectsId=self.Project(),
         taxonomiesId=self.project_taxonomy_id,
         annotationsId=self.annotation_id)
-    self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testDeleteAnnotationPromptingWithYes(self):
+  def testDeleteAnnotationPromptingWithYes(self, track):
+    self.track = track
     self.ExpectProjectAnnotationDelete(self.annotation_ref.RelativeName())
     self.WriteInput('Y\n')
     args = '{} --taxonomy {}'.format(self.annotation_ref.annotationsId,
@@ -42,7 +47,8 @@ class AnnotationsDeleteIntTest(base.CategoryManagerUnitTestBase):
     self.AssertErrContains('Deleted project_annotation [{}].'.format(
         self.annotation_ref.annotationsId))
 
-  def testDeleteAnnotationPromptingWithNo(self):
+  def testDeleteAnnotationPromptingWithNo(self, track):
+    self.track = track
     self.WriteInput('n\n')
     with self.AssertRaisesExceptionMatches(
         console_io.OperationCancelledError,

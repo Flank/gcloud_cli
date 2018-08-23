@@ -17,8 +17,13 @@ gcloud datastore create\-indexes \- create new datastore indexes based on your l
 
 .SH "DESCRIPTION"
 
-This command creates new datastore indexes based on your local index
-configuration. Any indexes in your index file that do not exist will be created.
+\fB(DEPRECATED)\fR \f5create\-indexes\fR is deprecated. Please use \f5gcloud
+datastore indexes create\fR instead.
+
+
+
+Create new datastore indexes based on your local index configuration. Any
+indexes in your index file that do not exist will be created.
 
 
 
@@ -55,14 +60,3 @@ $ gcloud datastore create\-indexes ~/myapp/index.yaml
 Detailed information about index configuration can be found at the index.yaml
 reference
 (https://cloud.google.com/appengine/docs/standard/python/config/indexref).
-
-
-
-.SH "NOTES"
-
-This variant is also available:
-
-.RS 2m
-$ gcloud beta datastore create\-indexes
-.RE
-

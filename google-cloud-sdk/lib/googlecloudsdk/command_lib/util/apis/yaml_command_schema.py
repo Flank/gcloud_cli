@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,9 @@
 
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from enum import Enum
 
 from googlecloudsdk.calliope import base
@@ -64,12 +67,15 @@ class CommandType(Enum):
   DELETE = 'delete'
   CREATE = 'create'
   WAIT = 'get'
+  # For update commands, the API method needs to be specified in the spec.
+  UPDATE = ''
   # IAM support currently implemented as subcommands
   GET_IAM_POLICY = 'getIamPolicy'
   SET_IAM_POLICY = 'setIamPolicy'
   # For add/remove-iam-policy-binding commands, the actual API method to modify
   # the iam support is 'setIamPolicy'.
   ADD_IAM_POLICY_BINDING = 'setIamPolicy'
+  REMOVE_IAM_POLICY_BINDING = 'setIamPolicy'
   # Generic commands are those that don't extend a specific calliope command
   # base class.
   GENERIC = None
@@ -99,6 +105,8 @@ class Request(object):
           'request.method was not specified and there is no default for this '
           'command type.')
     self.resource_method_params = data.get('resource_method_params', {})
+    self.parse_resource_into_request = data.get(
+        'parse_resource_into_request', True)
     self.static_fields = data.get('static_fields', {})
     self.modify_request_hooks = [
         util.Hook.FromPath(p) for p in data.get('modify_request_hooks', [])]
@@ -171,7 +179,7 @@ class Arguments(object):
   """Everything about cli arguments are registered in this section."""
 
   def __init__(self, data):
-    self.resource = resource_arg_schema.YAMLResourceArgument.FromData(
+    self.resource = resource_arg_schema.YAMLConceptArgument.FromData(
         data.get('resource'))
     self.additional_arguments_hook = util.Hook.FromData(
         data, 'additional_arguments_hook')

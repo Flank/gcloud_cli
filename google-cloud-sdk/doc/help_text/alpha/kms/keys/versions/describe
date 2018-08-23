@@ -2,17 +2,27 @@ NAME
     gcloud alpha kms keys versions describe - get metadata for a given version
 
 SYNOPSIS
-    gcloud alpha kms keys versions describe VERSION [--key=KEY]
-        [--keyring=KEYRING] [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms keys versions describe VERSION
+        [--attestation-file=ATTESTATION_FILE] [--key=KEY] [--keyring=KEYRING]
+        [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Returns metadata for the given version.
+
+    The optional flag attestation-file specifies file to write the attestation
+    object into. The attestation object enables the user to verify the
+    integrity and provenance of the key. See
+    https://cloud.google.com/kms/docs/attest-key for more information about
+    attestations.
 
 POSITIONAL ARGUMENTS
      VERSION
         Name of the version to describe.
 
 FLAGS
+     --attestation-file=ATTESTATION_FILE
+        Path to the output attestation file.
+
      --key=KEY
         The containing key.
 
@@ -34,12 +44,19 @@ EXAMPLES
         $ gcloud alpha kms keys versions describe 2 --key frodo \
             --keyring fellowship --location us-east1
 
+    For key versions with protection level HSM, use the --attestation-file flag
+    to save the attestation to a local file.
+
+        $ gcloud alpha kms keys versions describe 2 --key frodo \
+            --keyring fellowship --location us-east1 \
+            --attestation-file path/to/attestation.dat
+
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud kms keys versions describe
         $ gcloud beta kms keys versions describe

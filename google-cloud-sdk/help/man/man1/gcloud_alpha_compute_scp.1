@@ -11,7 +11,7 @@ gcloud alpha compute scp \- copy files to and from Google Compute Engine virtual
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute scp\fR [[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR\ ...] [[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR [\fB\-\-compress\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-recurse\fR] [\fB\-\-scp\-flag\fR=\fISCP_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute scp\fR [[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR\ ...] [[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR [\fB\-\-compress\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-internal\-ip\fR] [\fB\-\-plain\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-recurse\fR] [\fB\-\-scp\-flag\fR=\fISCP_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -39,29 +39,6 @@ When the destination of your transfer is remote instead, all sources must be
 local.
 .RE
 .sp
-
-To copy a remote directory, \f5~/narnia\fR, from \f5\fIexample\-instance\fR\fR
-to the \f5~/wardrobe\fR directory of your local host, run:
-
-.RS 2m
-$ gcloud alpha compute scp \-\-recurse example\-instance:~/narnia \e
-    ~/wardrobe
-.RE
-
-Conversely, files from your local computer can be copied to a virtual machine:
-
-.RS 2m
-$ gcloud alpha compute scp ~/localtest.txt ~/localtest2.txt \e
-    example\-instance:~/narnia
-.RE
-
-If the zone cannot be determined, you will be prompted for it. Use the
-\f5\-\-zone\fR flag to avoid being prompted:
-
-.RS 2m
-$ gcloud alpha compute scp \-\-recurse example\-instance:~/narnia \e
-    ~/wardrobe \-\-zone us\-central1\-a
-.RE
 
 Under the covers, \fBscp(1)\fR is used to facilitate the transfer.
 
@@ -102,6 +79,19 @@ interactive and non\-interactive environments.
 
 If disabled, the files associated with a broken SSH key will not be regenerated
 and will fail in both interactive and non\-interactive environments.
+
+.TP 2m
+\fB\-\-internal\-ip\fR
+Connect to instances using their internal IP addresses rather than their
+external IP addresses. Use this to connect from one instance to another on the
+same VPC network, over a VPN connection, or between two peered VPC networks.
+
+For this connection to work, you must configure your networks and firewall to
+allow SSH connections to the internal IP address of the instance to which you
+want to connect.
+
+To learn how to use this flag, see
+https://cloud.google.com/compute/docs/instances/connecting\-advanced#sshbetweeninstances.
 
 .TP 2m
 \fB\-\-plain\fR
@@ -175,13 +165,40 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To copy a remote directory, \f5~/narnia\fR, from \f5\fIexample\-instance\fR\fR
+to the \f5~/wardrobe\fR directory of your local host, run:
+
+.RS 2m
+$ gcloud alpha compute scp \-\-recurse example\-instance:~/narnia \e
+    ~/wardrobe
+.RE
+
+Conversely, files from your local computer can be copied to a virtual machine:
+
+.RS 2m
+$ gcloud alpha compute scp ~/localtest.txt ~/localtest2.txt \e
+    example\-instance:~/narnia
+.RE
+
+If the zone cannot be determined, you will be prompted for it. Use the
+\f5\-\-zone\fR flag to avoid being prompted:
+
+.RS 2m
+$ gcloud alpha compute scp \-\-recurse example\-instance:~/narnia \e
+    ~/wardrobe \-\-zone us\-central1\-a
+.RE
+
+
+
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute scp

@@ -16,7 +16,9 @@
 # Tests for the console_io module.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import subprocess
 import sys
@@ -75,10 +77,8 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
   def SetUp(self):
     """Disables prompts."""
     properties.VALUES.core.disable_prompts.Set(False)
-
-  def TearDown(self):
-    """Disables prompts."""
-    properties.VALUES.core.disable_prompts.Set(False)
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.NORMAL.name)
 
   def testNoPrompt(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -386,7 +386,7 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
                                        cancel_option=True)
 
   def testChoice(self):
-    self.SetAnswers('2', '1', '', '')
+    self.SetAnswers('2', '1', '', '', '')
     result = console_io.PromptChoice(
         ['a', 'b', 'c'], default=2, message='message', prompt_string='prompt')
     self.assertIn(textwrap.dedent("""\
@@ -402,8 +402,7 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
     result = console_io.PromptChoice(['a', 'b', 'c'], default=2)
     self.assertEqual(result, 2)
     with self.assertRaises(console_io.OperationCancelledError):
-      result = console_io.PromptChoice(['a', 'b', 'c'], default=3,
-                                       cancel_option=True)
+      console_io.PromptChoice(['a', 'b', 'c'], default=3, cancel_option=True)
 
   def testRepeatChoice(self):
     self.SetAnswers('junk', '1.5', '', '-1', '4', '2')
@@ -1049,7 +1048,7 @@ class UxlementTests(sdk_test_base.WithOutputCapture):
         prompt_string='pickone', choices=['1', '2', '3'])
     self.assertEqual(stub_output, (
         '{"ux": "PROMPT_CHOICE", '
-        '"choices": ["1", "2", "3"], "prompt_string": "pickone"}'))
+        '"prompt_string": "pickone", "choices": ["1", "2", "3"]}'))
 
   def testJsonUXStubExtraArgsFails(self):
     with self.assertRaisesRegex(ValueError,

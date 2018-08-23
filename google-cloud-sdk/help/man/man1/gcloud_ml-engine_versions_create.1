@@ -11,7 +11,7 @@ gcloud ml\-engine versions create \- create a new Cloud ML Engine version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -96,7 +96,7 @@ defaults to \f5tensorflow\fR. \fIFRAMEWORK\fR must be one of:
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -117,9 +117,15 @@ In the latter case the files will be uploaded to Google Cloud Storage and a
 \f5\-\-staging\-bucket\fR argument is required.
 
 .TP 2m
+\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
+Version of Python used when creating the version. If not set, the default
+version is 2.7. Python 3.5 is available when \f5runtime_version\fR is set to 1.4
+and above. Python 2.7 works with all supported runtime versions.
+
+.TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-The Google Cloud ML Engine runtime version for this job. Defaults to a stable
-version, which is defined in the documentation along with the list of supported
+Google Cloud ML Engine runtime version for this job. Defaults to a stable
+version, which is defined in documentation along with the list of supported
 versions:
 https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
 

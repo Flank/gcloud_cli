@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,16 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.sql import exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.sql import base
 
 
-class InstancesDescribeTest(base.SqlMockTestBeta):
+class _BaseInstancesDescribeTest(object):
 
   def testSimpleDescribe(self):
     self.mocked_client.instances.Get.Expect(
@@ -182,6 +185,20 @@ settings:
 
     with self.assertRaises(exceptions.ResourceNotFoundError):
       self.Run('sql instances describe nosuchinstance')
+
+
+class InstancesDescribeGATest(_BaseInstancesDescribeTest, base.SqlMockTestGA):
+  pass
+
+
+class InstancesDescribeBetaTest(_BaseInstancesDescribeTest,
+                                base.SqlMockTestBeta):
+  pass
+
+
+class InstancesDescribeAlphaTest(_BaseInstancesDescribeTest,
+                                 base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

@@ -19,16 +19,16 @@ gcloud kms keys create \- create a new key
 
 Creates a new key within the given keyring.
 
-The optional flags \f5\-\-rotation\-period\fR and \f5\-\-next\-rotation\-time\fR
-define a rotation schedule for the key. A schedule can also be defined by the
+The optional flags \f5rotation\-period\fR and \f5next\-rotation\-time\fR define
+a rotation schedule for the key. A schedule can also be defined by the
 \f5create\-rotation\-schedule\fR command.
 
-The flag \f5\-\-next\-rotation\-time\fR must be in ISO or RFC3339 format, and
-\f5\-\-rotation\-period\fR must be in the form INTEGER[UNIT], where units can be
-one of seconds (s), minutes (m), hours (h) or days (d).
+The flag \f5next\-rotation\-time\fR must be in ISO 8601 or RFC3339 format, and
+\f5rotation\-period\fR must be in the form INTEGER[UNIT], where units can be one
+of seconds (s), minutes (m), hours (h) or days (d).
 
-The optional flag '\-\-labels' defines a user specified key/value pair for the
-given crypto_key.
+The optional flag 'labels' defines a user specified key/value pair for the given
+key.
 
 
 
@@ -48,8 +48,8 @@ Name of the key to create.
 .RS 2m
 .TP 2m
 \fB\-\-purpose\fR=\fIPURPOSE\fR
-The "purpose" of the key. \fIPURPOSE\fR must be (currently only one value is
-supported): \fBencryption\fR.
+The "purpose" of the key. \fIPURPOSE\fR must be one of:
+\fBasymmetric\-encryption\fR, \fBasymmetric\-signing\fR, \fBencryption\fR.
 
 
 .RE
@@ -64,7 +64,7 @@ Key ring of the key.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain

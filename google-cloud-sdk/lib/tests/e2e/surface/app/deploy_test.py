@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for dev_app_server for java and python."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import glob
 import json
 import os
@@ -276,6 +279,9 @@ class DeployTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
       # why. It seems to work consistently here though.
       if os.path.exists(git_dir):
         files.RmTree(git_dir)
+
+  def testDeployNodejsUsingApi(self):
+    self._deployStandardApp('app_engine_nodejs_data')
 
 
 if __name__ == '__main__':

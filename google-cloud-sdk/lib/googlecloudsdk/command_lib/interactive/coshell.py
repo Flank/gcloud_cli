@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +21,8 @@ pipe. Only one command runs at a time. ^C interrupts and kills the currently
 running command but does not kill the coshell. The coshell process exits when
 the shell 'exit' command is executed. State is maintained by the coshell across
 commands, including the current working directory and local and environment
-variables. The "$ENV" file, if it exists, is sourced into the coshell at
-startup. This gives the caller the opportunity to set up aliases and default
+variables. ~/.bashrc or the $ENV file, if it exists, is sourced into the coshell
+at startup. This gives the caller the opportunity to set up aliases and default
 'set -o ...' shell modes.
 
 Usage:
@@ -39,10 +40,11 @@ This module contains three Coshell implementations:
   * _MinGWCoshell using MinGW bash or git bash
   * _WindowsCoshell using cmd.exe, does not support state across commands
 On the first instantiation Coshell.__init__() determines what implementation to
-use.  All subsequent instantiations will use the same implementation.
+use. All subsequent instantiations will use the same implementation.
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import abc
@@ -54,12 +56,17 @@ import subprocess
 import six
 
 
-_GET_COMPLETIONS_SHELL_FUNCTION = r"""
+COSHELL_VERSION = '1.1'
+
+
+_GET_COMPLETIONS_INIT = r"""
+# defines functions to support completion requests to the coshell
+
 __get_completions__() {
   # prints the completions for the (partial) command line "$@" followed by
   # a blank line
 
-  local command completion_function
+  local command completion_function last_word next_to_last_word
   local COMP_CWORD COMP_LINE COMP_POINT COMP_WORDS COMPREPLY=()
 
   (( $# )) || {
@@ -68,18 +75,7 @@ __get_completions__() {
   }
 
   command=$1
-  shift
   COMP_WORDS=("$@")
-
-  # load bash-completion if necessary
-  declare -F _completion_loader &>/dev/null || {
-    source /usr/share/bash-completion/bash_completion 2>/dev/null || {
-      _completion_loader() {
-        return 1
-      }
-      return
-    }
-  }
 
   # get the command specific completion function
   set -- $(complete -p "$command" 2>/dev/null)
@@ -87,20 +83,19 @@ __get_completions__() {
     shift $(( $# - 2 ))
     completion_function=$1
   else
-    # check the _completion_loader
-    (( $# )) || {
-      # load the completion function for the command
-      _completion_loader "$command"
+    # load the completion function for the command
+    _completion_loader "$command"
 
-      # get the command specific completion function
-      set -- $(complete -p "$command" 2>/dev/null)
-      (( $# )) || {
-        printf '\n'
-        return
-      }
+    # check if it was loaded
+    set -- $(complete -p "$command" 2>/dev/null)
+    if (( $# )); then
       shift $(( $# - 2 ))
       completion_function=$1
-    }
+    else
+      # default to file completions
+      __get_file_completions__ "${COMP_WORDS[${#COMP_WORDS[*]}-1]}"
+      return
+    fi
   fi
 
   # set up the completion call stack -- really, this is the api?
@@ -110,15 +105,41 @@ __get_completions__() {
   # add '' to COMP_WORDS if the last character of the command line is a space
   [[ ${COMP_LINE[@]: -1} = ' ' ]] && COMP_WORDS+=('')
 
-  # index of the last word
+  # index and value of the last word
   COMP_CWORD=$(( ${#COMP_WORDS[@]} - 1 ))
+  last_word=${COMP_WORDS[$COMP_CWORD]}
+
+  # value of the next to last word
+  if (( COMP_CWORD >= 2 )); then
+    next_to_last_word=${COMP_WORDS[$((${COMP_CWORD}-1))]}
+  else
+    next_to_last_word=''
+  fi
 
   # execute the completion function
-  $completion_function
+  $completion_function "${command}" "${last_word}" "${next_to_last_word}" 2>/dev/null
 
   # print the completions to stdout
   printf '%s\n' "${COMPREPLY[@]}" ''
 }
+
+__get_file_completions__() {
+  # prints the file completions for the first arg, followed by a blank line
+  compgen -o filenames -A file "$1"
+  printf '\n'
+}
+
+__init_completions__(){
+  # loads bash-completion if necessary
+  declare -F _completion_loader &>/dev/null || {
+    source /usr/share/bash-completion/bash_completion 2>/dev/null || {
+      _completion_loader() {
+        return 1
+      }
+    }
+  }
+}
+__init_completions__
 """
 
 
@@ -136,10 +157,13 @@ class _CoshellBase(six.with_metaclass(abc.ABCMeta, object)):
   Attributes:
     _edit_mode: The coshell edit mode, one of {'emacs', 'vi'}.
     _ignore_eof: True if the coshell should ignore EOF on stdin and not exit.
+    _set_modes_callback: Called when SetModesCallback() is called or when
+      mutable shell modes may have changed.
     _state_is_preserved: True if shell process state is preserved across Run().
   """
 
   def __init__(self, state_is_preserved=True):
+    self._set_modes_callback = None
     # Immutable coshell object properties.
     self._encoding = locale.getpreferredencoding()
     self._state_is_preserved = state_is_preserved
@@ -172,6 +196,19 @@ class _CoshellBase(six.with_metaclass(abc.ABCMeta, object)):
     """Closes the coshell connection and release any resources."""
     pass
 
+  def SetModesCallback(self, callback):
+    """Sets the callback function to be called when any mutable mode changed.
+
+    If callback is not None then it is called immediately to initialize the
+    caller.
+
+    Args:
+      callback: func() called when any mutable mode changed, None to disable.
+    """
+    self._set_modes_callback = callback
+    if callback:
+      callback()
+
   @abc.abstractmethod
   def Run(self, command, check_modes=True):
     """Runs command in the coshell and waits for it to complete.
@@ -198,11 +235,12 @@ class _CoshellBase(six.with_metaclass(abc.ABCMeta, object)):
     del args
     return None
 
-  def Communicate(self, args):
+  def Communicate(self, args, quote=True):
     """Runs args and returns the list of output lines, up to first empty one.
 
     Args:
       args: The list of command line arguments.
+      quote: Shell quote args if True.
 
     Returns:
       The list of output lines from command args up to the first empty line.
@@ -268,33 +306,67 @@ class _UnixCoshellBase(six.with_metaclass(abc.ABCMeta, _CoshellBase)):
     return int(status_string)
 
   def _GetModes(self):
-    """Syncs the user settable modes of interest to the Coshell."""
+    """Syncs the user settable modes of interest to the Coshell.
+
+    Calls self._set_modes_callback if it was specified and any mode changed.
+    """
+
+    changed = False
 
     # Get the caller $ENV emacs/vi mode.
     if self.Run('set -o | grep -q "^vi.*on"', check_modes=False) == 0:
-      self._edit_mode = 'vi'
+      if self._edit_mode != 'vi':
+        changed = True
+        self._edit_mode = 'vi'
     else:
-      self._edit_mode = 'emacs'
+      if self._edit_mode != 'emacs':
+        changed = True
+        self._edit_mode = 'emacs'
 
     # Get the caller $ENV ignoreeof setting.
+    ignore_eof = self._ignore_eof
     self._ignore_eof = self.Run(
         'set -o | grep -q "^ignoreeof.*on"', check_modes=False) == 0
+    if self._ignore_eof != ignore_eof:
+      changed = True
+
+    if changed and self._set_modes_callback:
+      self._set_modes_callback()
+
+  def GetPwd(self):
+    """Gets the coshell pwd, sets local pwd, returns the pwd, None on error."""
+    pwd = self.Communicate([r'printf "$PWD\n\n"'], quote=False)
+    if len(pwd) == 1:
+      try:
+        os.chdir(pwd[0])
+        return pwd[0]
+      except OSError:
+        pass
+    return None
 
   def _GetUserConfigDefaults(self):
     """Consults the user shell config for defaults."""
 
     self._SendCommand(
+        # For rc file tests.
+        'COSHELL_VERSION={coshell_version};'
         # Set $? to $1.
         '_status() {{ return $1; }};'
-        # The $ENV file configures aliases and set -o modes.
-        '[ -f "$ENV" ] && . "$ENV";'
+        # The env rc files configures aliases and set -o modes.
+        'for rc in "$HOME/.bashrc" "$ENV"; do'
+        '  if [[ $rc && -f $rc ]]; then'
+        '    source "$rc";'
+        '    break;'
+        '  fi;'
+        'done;'
         # The exit command hits this trap, reaped by _GetStatus() in Run().
         "trap 'echo $?{exit} >&{fdstatus}' 0;"
         # This catches interrupts so commands die while the coshell stays alive.
-        'trap ":" 2;{get_completions}'
-        .format(exit=self.SHELL_STATUS_EXIT,
+        'trap ":" 2;{get_completions_init}'
+        .format(coshell_version=COSHELL_VERSION,
+                exit=self.SHELL_STATUS_EXIT,
                 fdstatus=self.SHELL_STATUS_FD,
-                get_completions=_GET_COMPLETIONS_SHELL_FUNCTION))
+                get_completions_init=_GET_COMPLETIONS_INIT))
 
     # Enable job control if supported.
     self._SendCommand('set -o monitor 2>/dev/null')
@@ -324,6 +396,18 @@ class _UnixCoshellBase(six.with_metaclass(abc.ABCMeta, _CoshellBase)):
     finally:
       signal.signal(signal.SIGINT, sigint)
     return status
+
+  def GetCompletions(self, args):
+    """Returns the list of completion choices for args.
+
+    Args:
+      args: The list of command line argument strings to complete.
+
+    Returns:
+      The list of completions for args.
+    """
+    # Some shell completers return unsorted with dups -- that stops here.
+    return sorted(set(self.Communicate(['__get_completions__'] + args)))
 
   def Interrupt(self):
     """Sends the interrupt signal to the coshell."""
@@ -407,24 +491,31 @@ class _UnixCoshell(_UnixCoshellBase):
             fdin=self.SHELL_STDIN_FD))
     status = self._GetStatus()
 
-    # Re-check shell shared modes.
-    if check_modes and re.search(r'\bset\s+[-+]o\s+\w', command):
-      self._GetModes()
+    # Re-check shell shared state and modes.
+    if check_modes:
+      if re.search(r'\bset\s+[-+]o\s+\w', command):
+        self._GetModes()
+      if re.search(r'\bcd\b', command):
+        self.GetPwd()
 
     return status
 
-  def Communicate(self, args):
+  def Communicate(self, args, quote=True):
     """Runs args and returns the list of output lines, up to first empty one.
 
     Args:
       args: The list of command line arguments.
+      quote: Shell quote args if True.
 
     Returns:
       The list of output lines from command args up to the first empty line.
     """
+    if quote:
+      command = ' '.join([self._Quote(arg) for arg in args])
+    else:
+      command = ' '.join(args)
     self._SendCommand('{command} >&{fdstatus}\n'.format(
-        command=' '.join([self._Quote(arg) for arg in args]),
-        fdstatus=self.SHELL_STATUS_FD))
+        command=command, fdstatus=self.SHELL_STATUS_FD))
     lines = []
     line = []
     while True:
@@ -442,17 +533,6 @@ class _UnixCoshell(_UnixCoshellBase):
         line.append(c)
     return lines
 
-  def GetCompletions(self, args):
-    """Returns the list of completion choices for args.
-
-    Args:
-      args: The list of command line argument strings to complete.
-
-    Returns:
-      The list of completions for args.
-    """
-    return sorted(self.Communicate(['__get_completions__'] + args))
-
 
 class _MinGWCoshell(_UnixCoshellBase):
   """The MinGW local coshell implementation.
@@ -463,7 +543,8 @@ class _MinGWCoshell(_UnixCoshellBase):
   no others. It is possble to pass handles that can be converted to/from fds,
   but the child process needs to know what handles to convert back to fds. Until
   we figure out how to reconstitute handles as fds >= 3 we are stuck with
-  restricting fds 0,1,2 to be /dev/tty. Luckily this works for the shell
+  restricting fds 0,1,2 to be /dev/tty, via shell redirection, for Run(). For
+  internal communication fds 0,1 are pipes. Luckily this works for the shell
   interactive prompt. Unfortunately this fails for the test environment.
   """
 
@@ -517,11 +598,41 @@ class _MinGWCoshell(_UnixCoshellBase):
         ))
     status = self._GetStatus()
 
-    # Re-check shell shared modes.
-    if check_modes and re.search(r'\bset\s+[-+]o\s+\w+', command):
-      self._GetModes()
+    # Re-check shell shared state and modes.
+    if check_modes:
+      if re.search(r'\bset\s+[-+]o\s+\w', command):
+        self._GetModes()
+      if re.search(r'\bcd\b', command):
+        self.GetPwd()
 
     return status
+
+  def Communicate(self, args, quote=True):
+    """Runs args and returns the list of output lines, up to first empty one.
+
+    Args:
+      args: The list of command line arguments.
+      quote: Shell quote args if True.
+
+    Returns:
+      The list of output lines from command args up to the first empty line.
+    """
+    if quote:
+      command = ' '.join([self._Quote(arg) for arg in args])
+    else:
+      command = ' '.join(args)
+    self._SendCommand(command + '\n')
+    lines = []
+    while True:
+      try:
+        line = self._shell.stdout.readline().rstrip('\n')
+      except (IOError, OSError, ValueError):
+        # Yeah, ValueError for IO on a closed file.
+        self._Exited()
+      if not line:
+        break
+      lines.append(line.decode(self._encoding))
+    return lines
 
   def Interrupt(self):
     """Sends the interrupt signal to the coshell."""

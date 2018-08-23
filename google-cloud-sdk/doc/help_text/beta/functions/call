@@ -40,8 +40,9 @@ EXAMPLES
           --data '{"message": "Hello World!"}'
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud functions call
         $ gcloud alpha functions call
 

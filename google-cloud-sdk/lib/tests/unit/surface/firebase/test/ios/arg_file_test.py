@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.api_lib.firebase.test import arg_file
@@ -94,19 +97,22 @@ class IosArgFileTests(unit_base.IosUnitTestBase):
     })
 
   def testDevice_ValidSparseMatrix_VerboseSyntax(self):
-    args = arg_file.GetArgsFromArgFile(GOOD_ARGS + ':ios-verbose',
+    args = arg_file.GetArgsFromArgFile(GOOD_ARGS + ':sparse-verbose',
                                        self.ios_args_set)
-    # TODO(b/78015882): add tests for locales and orientations when supported.
     self.assertEqual(len(args['device']), 2)
     d1 = args['device'][0]
     d2 = args['device'][1]
     self.assertDictEqual(d1, {
-        'model': 'iphone7',
+        'model': 'm1',
         'version': 'v1',
+        'locale': 'l1',
+        'orientation': 'o1'
     })
     self.assertDictEqual(d2, {
-        'model': 'ipad5',
+        'model': 'm2',
         'version': 'v2',
+        'locale': 'l2',
+        'orientation': 'o2'
     })
 
   def testDevice_ValidSparseMatrix_EmptyDevice(self):

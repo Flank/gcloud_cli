@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # -*- coding: UTF-8 -*-
 #
 # Copyright 2015 Google Inc. All Rights Reserved.
@@ -19,6 +20,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
 
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_util

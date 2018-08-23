@@ -1,13 +1,13 @@
 NAME
-    gcloud beta bigtable clusters update - update a Bigtable cluster's friendly
-        name and serving nodes
+    gcloud beta bigtable clusters update - update a Bigtable cluster's number
+        of nodes
 
 SYNOPSIS
     gcloud beta bigtable clusters update (CLUSTER : --instance=INSTANCE)
         --num-nodes=NUM_NODES [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Update a Bigtable cluster's friendly name and serving nodes.
+    (BETA) Update a Bigtable cluster's number of nodes.
 
 POSITIONAL ARGUMENTS
      Cluster resource - The cluster to update. The arguments in this group can
@@ -39,5 +39,8 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha bigtable clusters update
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """bigtable clusters update command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.bigtable import clusters
 from googlecloudsdk.api_lib.bigtable import util
 from googlecloudsdk.calliope import base
@@ -22,9 +25,8 @@ from googlecloudsdk.command_lib.bigtable import arguments
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
 class UpdateCluster(base.UpdateCommand):
-  """Update a Bigtable cluster's friendly name and serving nodes."""
+  """Update a Bigtable cluster's number of nodes."""
 
   @staticmethod
   def Args(parser):

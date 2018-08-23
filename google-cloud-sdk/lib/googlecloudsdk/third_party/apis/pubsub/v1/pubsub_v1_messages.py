@@ -27,6 +27,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
+    condition: Unimplemented. The condition that is associated with this
+      binding. NOTE: an unsatisfied condition will not allow user access via
+      current binding. Different bindings, including their conditions, are
+      examined independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -41,11 +45,12 @@ class Binding(_messages.Message):
       * `domain:{domain}`: A Google Apps domain name that represents all the
       users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
-      `roles/editor`, or `roles/owner`. Required
+      `roles/editor`, or `roles/owner`.
   """
 
-  members = _messages.StringField(1, repeated=True)
-  role = _messages.StringField(2)
+  condition = _messages.MessageField('Expr', 1)
+  members = _messages.StringField(2, repeated=True)
+  role = _messages.StringField(3)
 
 
 class CreateSnapshotRequest(_messages.Message):
@@ -55,10 +60,12 @@ class CreateSnapshotRequest(_messages.Message):
   subject to any SLA or deprecation policy.
 
   Messages:
-    LabelsValue: User labels.
+    LabelsValue: See <a href="/pubsub/docs/labels"> Creating and managing
+      labels</a>.
 
   Fields:
-    labels: User labels.
+    labels: See <a href="/pubsub/docs/labels"> Creating and managing
+      labels</a>.
     subscription: The subscription whose backlog the snapshot retains.
       Specifically, the created snapshot is guaranteed to retain:  (a) The
       existing backlog on the subscription. More precisely, this is
@@ -72,7 +79,7 @@ class CreateSnapshotRequest(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""User labels.
+    r"""See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -106,6 +113,30 @@ class Empty(_messages.Message):
   JSON representation for `Empty` is empty JSON object `{}`.
   """
 
+
+
+class Expr(_messages.Message):
+  r"""Represents an expression text. Example:      title: "User account
+  presence"     description: "Determines whether the request has a user
+  account"     expression: "size(request.user) > 0"
+
+  Fields:
+    description: An optional description of the expression. This is a longer
+      text which describes the expression, e.g. when hovered over it in a UI.
+    expression: Textual representation of an expression in Common Expression
+      Language syntax.  The application context of the containing message
+      determines which well-known feature set of CEL is supported.
+    location: An optional string indicating the location of the expression for
+      error reporting, e.g. a file name and a position in the file.
+    title: An optional title for the expression, i.e. a short string
+      describing its purpose. This can be used e.g. in UIs which allow to
+      enter the expression.
+  """
+
+  description = _messages.StringField(1)
+  expression = _messages.StringField(2)
+  location = _messages.StringField(3)
+  title = _messages.StringField(4)
 
 
 class ListSnapshotsResponse(_messages.Message):
@@ -294,8 +325,8 @@ class PublishResponse(_messages.Message):
 
 
 class PubsubMessage(_messages.Message):
-  r"""A message data and its attributes. The message payload must not be
-  empty; it must contain either a non-empty data field, or at least one
+  r"""A message that is published by publishers and consumed by subscribers.
+  The message must contain either a non-empty data field or at least one
   attribute.
 
   Messages:
@@ -303,7 +334,8 @@ class PubsubMessage(_messages.Message):
 
   Fields:
     attributes: Optional attributes for this message.
-    data: The message payload.
+    data: The message data field. If this field is empty, the message must
+      contain at least one attribute.
     messageId: ID of this message, assigned by the server when the message is
       published. Guaranteed to be unique within the topic. This value may be
       read by a subscriber that receives a `PubsubMessage` via a `Pull` call
@@ -403,8 +435,8 @@ class PubsubProjectsSnapshotsListRequest(_messages.Message):
     pageToken: The value returned by the last `ListSnapshotsResponse`;
       indicates that this is a continuation of a prior `ListSnapshots` call,
       and that the system should return the next page of data.
-    project: The name of the cloud project that snapshots belong to. Format is
-      `projects/{project}`.
+    project: The name of the project in which to list snapshots. Format is
+      `projects/{project-id}`.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -511,8 +543,8 @@ class PubsubProjectsSubscriptionsListRequest(_messages.Message):
     pageToken: The value returned by the last `ListSubscriptionsResponse`;
       indicates that this is a continuation of a prior `ListSubscriptions`
       call, and that the system should return the next page of data.
-    project: The name of the cloud project that subscriptions belong to.
-      Format is `projects/{project}`.
+    project: The name of the project in which to list subscriptions. Format is
+      `projects/{project-id}`.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -663,8 +695,8 @@ class PubsubProjectsTopicsListRequest(_messages.Message):
     pageToken: The value returned by the last `ListTopicsResponse`; indicates
       that this is a continuation of a prior `ListTopics` call, and that the
       system should return the next page of data.
-    project: The name of the cloud project that topics belong to. Format is
-      `projects/{project}`.
+    project: The name of the project in which to list topics. Format is
+      `projects/{project-id}`.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -779,8 +811,7 @@ class PullRequest(_messages.Message):
       immediately even if it there are no messages available to return in the
       `Pull` response. Otherwise, the system may wait (for a bounded amount of
       time) until at least one message is available, rather than returning no
-      messages. The client may cancel the request if it does not wish to wait
-      any longer for the response.
+      messages.
   """
 
   maxMessages = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -791,10 +822,11 @@ class PullResponse(_messages.Message):
   r"""Response for the `Pull` method.
 
   Fields:
-    receivedMessages: Received Pub/Sub messages. The Pub/Sub system will
-      return zero messages if there are no more available in the backlog. The
-      Pub/Sub system may return fewer than the `maxMessages` requested even if
-      there are more messages available in the backlog.
+    receivedMessages: Received Pub/Sub messages. The list will be empty if
+      there are no more messages available in the backlog. For JSON, the
+      response can be entirely empty. The Pub/Sub system may return fewer than
+      the `maxMessages` requested even if there are more messages available in
+      the backlog.
   """
 
   receivedMessages = _messages.MessageField('ReceivedMessage', 1, repeated=True)
@@ -945,7 +977,8 @@ class Snapshot(_messages.Message):
   deprecation policy.
 
   Messages:
-    LabelsValue: User labels.
+    LabelsValue: See <a href="/pubsub/docs/labels"> Creating and managing
+      labels</a>.
 
   Fields:
     expireTime: The snapshot is guaranteed to exist up until this time. A
@@ -959,7 +992,8 @@ class Snapshot(_messages.Message):
       backlog as long as the snapshot exists -- will expire in 4 days. The
       service will refuse to create a snapshot that would expire in less than
       1 hour after creation.
-    labels: User labels.
+    labels: See <a href="/pubsub/docs/labels"> Creating and managing
+      labels</a>.
     name: The name of the snapshot.
     topic: The name of the topic from which this snapshot is retaining
       messages.
@@ -967,7 +1001,7 @@ class Snapshot(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""User labels.
+    r"""See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -1062,7 +1096,8 @@ class Subscription(_messages.Message):
   r"""A subscription resource.
 
   Messages:
-    LabelsValue: User labels.
+    LabelsValue: See <a href="/pubsub/docs/labels"> Creating and managing
+      labels</a>.
 
   Fields:
     ackDeadlineSeconds: This value is the maximum time after a subscriber
@@ -1081,7 +1116,8 @@ class Subscription(_messages.Message):
       value is also used to set the request timeout for the call to the push
       endpoint.  If the subscriber never acknowledges the message, the Pub/Sub
       system will eventually redeliver the message.
-    labels: User labels.
+    labels: See <a href="/pubsub/docs/labels"> Creating and managing
+      labels</a>.
     messageRetentionDuration: How long to retain unacknowledged messages in
       the subscription's backlog, from the moment a message is published. If
       `retain_acked_messages` is true, then this also configures the retention
@@ -1114,7 +1150,7 @@ class Subscription(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""User labels.
+    r"""See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -1173,10 +1209,12 @@ class Topic(_messages.Message):
   r"""A topic resource.
 
   Messages:
-    LabelsValue: User labels.
+    LabelsValue: See <a href="/pubsub/docs/labels"> Creating and managing
+      labels</a>.
 
   Fields:
-    labels: User labels.
+    labels: See <a href="/pubsub/docs/labels"> Creating and managing
+      labels</a>.
     messageStoragePolicy: Policy constraining how messages published to the
       topic may be stored. It is determined when the topic is created based on
       the policy configured at the project level. It must not be set by the
@@ -1194,7 +1232,7 @@ class Topic(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""User labels.
+    r"""See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.

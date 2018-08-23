@@ -86,17 +86,17 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the backend service is global.
+          If set, the backend service is global.
 
        --region=REGION
-          The region of the backend service to operate on. Overrides the
-          default compute/region property value for this command invocation.
+          Region of the backend service to operate on. Overrides the default
+          compute/region property value for this command invocation.
 
      At most one of these may be specified:
 
        --instance-group-region=INSTANCE_GROUP_REGION
-          The region of the instance group to update the backend service. If
-          not specified, you may be prompted to select a region.
+          Region of the instance group to update the backend service. If not
+          specified, you may be prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -115,7 +115,7 @@ OPTIONAL FLAGS
           CLOUDSDK_COMPUTE_REGION.
 
        --instance-group-zone=INSTANCE_GROUP_ZONE
-          The zone of the instance group to update the backend service. If not
+          Zone of the instance group to update the backend service. If not
           specified and the compute/zone property isn't set, you may be
           prompted to select a zone.
 

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta composer environments storage dags import \- imports DAGs from local storage or Cloud Storage into an environment
+gcloud beta composer environments storage dags import \- import DAGs from local storage or Cloud Storage into an environment
 
 
 
@@ -38,7 +38,7 @@ Storage paths must begin with 'gs://'.
 .TP 2m
 
 Environment resource \- The environment into whose Cloud Storage bucket to
-import DAGs.. The arguments in this group can be used to specify the attributes
+import DAGs. The arguments in this group can be used to specify the attributes
 of this resource. (NOTE) Some attributes are not given arguments in this group
 but can be set in other ways. To set the [project] attribute: provide the flag
 [\-\-environment] on the command line with a fully specified name; provide the
@@ -54,7 +54,7 @@ specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the environment.
+Compute Engine region in which to create the environment.
 
 
 .RE
@@ -183,5 +183,10 @@ gs://the\-bucket
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud composer environments storage dags import
+.RE
 

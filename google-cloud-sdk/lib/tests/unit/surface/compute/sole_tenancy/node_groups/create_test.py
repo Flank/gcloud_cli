@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-groups delete subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base
+
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -22,8 +25,6 @@ from tests.lib.surface.compute import test_base
 class NodeGroupsCreateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
     self.region = 'us-central1'
     self.zone = 'us-central1-a'
 
@@ -38,7 +39,7 @@ class NodeGroupsCreateTest(test_base.BaseTest):
 
   def _CreateNodeGroup(self, name, description, node_template):
     node_template_self_link = (
-        'https://www.googleapis.com/compute/beta/projects/{project}/regions/'
+        'https://www.googleapis.com/compute/v1/projects/{project}/regions/'
         '{region}/nodeTemplates/{name}'.format(
             project=self.Project(), region=self.region, name=node_template))
     node_group = self.messages.NodeGroup(

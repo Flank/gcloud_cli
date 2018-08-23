@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 """Tests for the health-checks update http2 subcommand."""
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -26,14 +29,17 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
                                   test_case.WithOutputCapture):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def global_flag(self):
+    return ''
 
   def testNoArgs(self):
     with self.AssertRaisesToolExceptionRegexp(
         'At least one property must be modified.'):
-      self.Run(
-          'compute health-checks update http2 my-health-check')
+      self.Run('compute health-checks update http2 my-health-check' +
+               self.global_flag())
     self.CheckRequests()
 
   def testUriSupport(self):
@@ -95,7 +101,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --host www.google.com
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -141,7 +147,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
         compute health-checks update http2 my-health-check
           --host www.google.com
           --format json
-        """)
+        """ + self.global_flag())
 
     self.assertMultiLineEqual(
         self.GetOutput(),
@@ -181,7 +187,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
         compute health-checks update http2 my-health-check
           --host www.google.com
           --format text
-        """)
+        """ + self.global_flag())
 
     self.assertMultiLineEqual(
         self.GetOutput(),
@@ -216,7 +222,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
         compute health-checks update http2 my-health-check
           --host www.google.com
           --format yaml
-        """)
+        """ + self.global_flag())
 
     self.assertMultiLineEqual(
         self.GetOutput(),
@@ -244,7 +250,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update http2 my-health-check --host ''
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -277,8 +283,9 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
         [],
     ])
 
-    self.Run(
-        'compute health-checks update http2 my-health-check --port 8888')
+    self.Run("""
+        compute health-checks update http2 my-health-check --port 8888
+    """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -311,9 +318,8 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
         [],
     ])
 
-    self.Run(
-        'compute health-checks update http2 my-health-check '
-        '--port-name new-port')
+    self.Run('compute health-checks update http2 my-health-check '
+             '--port-name new-port' + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -344,9 +350,8 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
         [],
     ])
 
-    self.Run(
-        'compute health-checks update http2 my-health-check '
-        '--port-name new-port')
+    self.Run('compute health-checks update http2 my-health-check '
+             '--port-name new-port' + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -379,8 +384,9 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     ])
 
     self.Run("""
-        compute health-checks update http2 my-health-check --port-name ''
-        """)
+        compute health-checks update http2 my-health-check
+          --port-name ''
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -415,7 +421,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --request-path /newpath
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -452,7 +458,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --check-interval 30s
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -481,7 +487,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
       self.Run("""
           compute health-checks update http2 my-health-check
             --check-interval 0
-          """)
+          """ + self.global_flag())
     self.CheckRequests()
 
   def testTimeoutSecOption(self):
@@ -499,7 +505,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --timeout 2m
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -528,7 +534,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
       self.Run("""
           compute health-checks update http2 my-health-check
              --timeout 0
-          """)
+          """ + self.global_flag())
     self.CheckRequests()
 
   def testHealthyThresholdOption(self):
@@ -546,7 +552,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --healthy-threshold 7
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -575,7 +581,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
       self.Run("""
           compute health-checks update http2 my-health-check
             --healthy-threshold 0
-          """)
+          """ + self.global_flag())
     self.CheckRequests()
 
   def testUnhealthyThresholdOption(self):
@@ -593,7 +599,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --unhealthy-threshold 8
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -616,14 +622,14 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
               project='my-project'))],
     )
 
-  def testUnhealthyTresholdBadValue(self):
+  def testUnhealthyThresholdBadValue(self):
     with self.AssertRaisesToolExceptionRegexp(
         r'\[--unhealthy-threshold\] must be an integer between 1 and 10, '
         r'inclusive; received \[0\].'):
       self.Run("""
           compute health-checks update http2 my-health-check
             --unhealthy-threshold 0
-          """)
+          """ + self.global_flag())
     self.CheckRequests()
 
   def testDescriptionOption(self):
@@ -641,7 +647,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --description 'Circulation, Airway, Breathing'
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -680,7 +686,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --description ''
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -716,8 +722,10 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
         core_exceptions.Error,
         'update http2 subcommand applied to health check with protocol '
         'HTTPS'):
-      self.Run(
-          'compute health-checks update http2 my-health-check --port 8888')
+      self.Run("""
+          compute health-checks update http2 my-health-check
+            --port 8888
+      """ + self.global_flag())
 
   def testProxyHeaderOption(self):
     self.make_requests.side_effect = iter([
@@ -734,7 +742,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --proxy-header PROXY_V1
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -774,7 +782,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
       self.Run("""
           compute health-checks update http2 my-health-check
             --proxy-header bad_value
-          """)
+          """ + self.global_flag())
 
   def testResponseOption(self):
     self.make_requests.side_effect = iter([
@@ -790,7 +798,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     self.Run("""
         compute health-checks update http2 my-health-check
           --response new-response
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -825,8 +833,9 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
     ])
 
     self.Run("""
-        compute health-checks update http2 my-health-check --response ''
-        """)
+        compute health-checks update http2
+          my-health-check --response ''
+        """ + self.global_flag())
     self.CheckRequests(
         [(self.compute.healthChecks,
           'Get',
@@ -845,6 +854,103 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest,
                       requestPath='/testpath')),
               project='my-project'))],
     )
+
+
+class HealthChecksUpdateHttp2AlphaTest(HealthChecksUpdateHttp2Test):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def global_flag(self):
+    return ' --global'
+
+
+class RegionHealthChecksUpdateHttp2Test(test_base.BaseTest,
+                                        test_case.WithOutputCapture):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testUriSupport(self):
+    # This is the same as testHostOption, but uses a full URI.
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                http2HealthCheck=self.messages.HTTP2HealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http2
+          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          --host www.google.com
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                  http2HealthCheck=self.messages.HTTP2HealthCheck(
+                      host='www.google.com', port=80, requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testHostOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                http2HealthCheck=self.messages.HTTP2HealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                http2HealthCheck=self.messages.HTTP2HealthCheck(
+                    host='www.google.com', port=80, requestPath='/testpath'))
+        ],
+    ])
+
+    self.Run("""
+        compute health-checks update http2 my-health-check
+          --host www.google.com --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                  http2HealthCheck=self.messages.HTTP2HealthCheck(
+                      host='www.google.com', port=80, requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
 
 if __name__ == '__main__':
   test_case.main()

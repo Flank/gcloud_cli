@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +16,18 @@
 """Integration tests for container node pools."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import logging
 
 from googlecloudsdk.calliope import base
+from googlecloudsdk.core import log
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.container import base as testbase
 
 
+@test_case.Filters.skip('Failing', 'b/112466355')
 class NodePoolsTestGA(testbase.IntegrationTestBase):
 
   def SetUp(self):
@@ -37,18 +40,17 @@ class NodePoolsTestGA(testbase.IntegrationTestBase):
         e2e_utils.GetResourceNameGenerator(prefix=prefix))
 
     # Cluster deleted in "TeadDown" method of base class.
-    logging.info('Creating %s', self.cluster_name)
-    self.Run('container clusters create {0} {1} --num-nodes=1 '
-             '--timeout={2}'
-             .format(self.cluster_name, location_flag, self.TIMEOUT),
+    log.status.Print('Creating cluster %s', self.cluster_name)
+    self.Run('container clusters create {0} {1} --num-nodes=1'
+             .format(self.cluster_name, location_flag),
              track=track)
     self.AssertErrContains('Created')
     self.AssertOutputContains(self.cluster_name)
     self.AssertOutputContains('RUNNING')
-    logging.info('Enabling auto-upgrade')
+    log.status.Print('Enabling auto-upgrade for cluster %s', self.cluster_name)
     self.Run('container node-pools update default-pool --cluster={0} {1} '
-             '--enable-autoupgrade --timeout={2}'
-             .format(self.cluster_name, location_flag, self.TIMEOUT),
+             '--enable-autoupgrade'
+             .format(self.cluster_name, location_flag),
              track=track)
     self.AssertErrContains('Updated')
     node_pool = self.Run('container node-pools describe default-pool '
@@ -72,12 +74,11 @@ class NodePoolsTestGA(testbase.IntegrationTestBase):
     self.CleanupLeakedClusters(self.REGION, self.releasetrack)
 
 
+@test_case.Filters.skip('Failing', 'b/112466355')
 class NodePoolsTestBeta(NodePoolsTestGA):
 
   def SetUp(self):
     self.releasetrack = base.ReleaseTrack.BETA
-    # Required to call v1beta1 API.
-    self.Run('config set container/use_v1_api false')
     self.ZONE = 'us-east1-d'  # pylint: disable=invalid-name
     self.REGION = 'us-east1'  # pylint: disable=invalid-name
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Unit tests for source_files_util module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import re
 
 from googlecloudsdk.api_lib.app import env
@@ -74,7 +77,7 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
                                               env.STANDARD)
       mock_method.assert_called_once_with(
           self.temp_path,
-          default_ignore_file=gcloudignore.DEFAULT_IGNORE_FILE,
+          default_ignore_file=source_files_util._PYTHON_GCLOUDIGNORE,
           include_gitignore=False,
           gcloud_ignore_creation_predicate=mock.ANY,
           write_on_disk=True)

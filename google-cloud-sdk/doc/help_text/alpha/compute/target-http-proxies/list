@@ -4,13 +4,17 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute target-http-proxies list [NAME ...]
-        [--regexp=REGEXP, -r REGEXP] [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+        [--regexp=REGEXP, -r REGEXP] [--global | --regions=[REGION,...]]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute target-http-proxies list displays all Google
     Compute Engine target HTTP proxies in a project.
+
+    By default, global target HTTP proxies and target HTTP proxies from all
+    regions are listed. The results can be narrowed down by providing the
+    --global or --regions flag.
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -22,22 +26,35 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --regexp=REGEXP, -r REGEXP
-        (DEPRECATED) A regular expression to filter the names of the results
-        on. Any names that do not match the entire regular expression will be
+        (DEPRECATED) Regular expression to filter the names of the results on.
+        Any names that do not match the entire regular expression will be
         filtered out.
 
         Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
 
+     At most one of these may be specified:
+
+       --global
+          If provided, only global resources are shown.
+
+       --regions=[REGION,...]
+          (DEPRECATED) If provided, only regional resources are shown. If
+          arguments are provided, only resources from the given regions are
+          shown.
+
+          Flag --regions is deprecated. Use --filter="region:( REGION ... )"
+          instead. For example --filter="region:( europe-west1 europe-west2 )".
+
 LIST COMMAND FLAGS
      --filter=EXPRESSION
         Apply a Boolean filter EXPRESSION to each resource item to be listed.
-        If the expression evaluates True then that item is listed. For more
-        details and examples of filter expressions run $ gcloud topic filters.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
         This flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
      --limit=LIMIT
-        The maximum number of resources to list. The default is unlimited. This
+        Maximum number of resources to list. The default is unlimited. This
         flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
@@ -49,7 +66,7 @@ LIST COMMAND FLAGS
         and --limit depending on the service.
 
      --sort-by=[FIELD,...]
-        A comma-separated list of resource field key names to sort by. The
+        Comma-separated list of resource field key names to sort by. The
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
@@ -71,12 +88,22 @@ EXAMPLES
 
         $ gcloud alpha compute target-http-proxies list --uri
 
+    To list all global target HTTP proxies in a project, run:
+
+        $ gcloud alpha compute target-http-proxies list --global
+
+    To list all target HTTP proxies in the us-central1 and europe-west1
+    regions, given they are regional resources, run:
+
+        $ gcloud alpha compute target-http-proxies list \
+            --filter="region:( europe-west1 us-central1 )"
+
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute target-http-proxies list
         $ gcloud beta compute target-http-proxies list

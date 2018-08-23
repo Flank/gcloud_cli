@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """Command for creating SSL certificates."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import base_classes
@@ -31,8 +33,7 @@ class Create(base.CreateCommand):
   configure a target HTTPS proxy. An SSL certificate consists of a
   certificate and private key. The private key is encrypted before it is
   stored. For more information, see:
-
-  [](https://cloud.google.com/compute/docs/load-balancing/http/ssl-certificates)
+  [](https://cloud.google.com/load-balancing/docs/ssl-certificates)
   """
 
   SSL_CERTIFICATE_ARG = None

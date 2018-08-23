@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """A utility library to support interaction with the Tool Results service."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import collections
 import time
 
@@ -159,6 +162,10 @@ def _ErrorFromInvalidMatrix(matrix):
       enum_values.USE_DESTINATION_ARTIFACTS:
           'One or more of the test targets defined in the .xctestrun file '
           'specifies "UseDestinationArtifacts", which is not allowed',
+      enum_values.TEST_NOT_APP_HOSTED:
+          'One or more of the test targets defined in the .xctestrun file '
+          'does not have a host binary to run on the physical iOS device, '
+          'which may cause errors when running xcodebuild',
       enum_values.NO_CODE_APK:
           '"hasCode" is false in the Manifest. Tested APKs must contain code',
       enum_values.INVALID_INPUT_APK:

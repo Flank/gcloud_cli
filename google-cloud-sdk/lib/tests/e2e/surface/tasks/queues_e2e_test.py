@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """End-to-end tests for the `gcloud tasks` commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.util import retry
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
@@ -32,16 +35,77 @@ class QueuesTest(e2e_base.WithServiceAuth):
         self.Run, args=['alpha tasks queues delete {}'.format(self.queue_id)])
     self.AssertErrContains('Deleted queue [{}].'.format(self.queue_id))
 
-  def testCreateQueueNoOptions(self):
+  def testUsePullQueue(self):
+    self.queue_id = next(e2e_utils.GetResourceNameGenerator('queue'))
+    expected_queue = self.Run('alpha tasks queues create-pull-queue {}'.format(
+        self.queue_id))
+    actual_queue = self.retryer.RetryOnException(  # Creation can take 1 minute
+        self.Run,
+        args=['alpha tasks queues describe {}'.format(self.queue_id)])
+    self.assertEqual(actual_queue, expected_queue)
+    self.Run(
+        'alpha tasks queues get-iam-policy {} --location us-central1'.format(
+            self.queue_id))
+    self.Run('alpha tasks queues pause {}'.format(self.queue_id))
+    self.Run('alpha tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('state: PAUSED')
+    self.Run('alpha tasks queues resume {}'.format(self.queue_id))
+    self.Run('alpha tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('state: RUNNING')
+    self.Run('alpha tasks queues purge {}'.format(self.queue_id))
+    self.Run('alpha tasks queues update-pull-queue {} --max-attempts=6'.format(
+        self.queue_id))
+    self.Run('alpha tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('maxAttempts: 6')
+    self.Run(
+        'alpha tasks queues update-pull-queue {} --clear-max-attempts'.format(
+            self.queue_id))
+    self.Run('alpha tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('maxAttempts: 100')
+    self.Run('alpha tasks queues update-pull-queue {} --max-retry-duration=66s'.
+             format(self.queue_id))
+    self.Run('alpha tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('maxRetryDuration: 66s')
+    self.Run(
+        'alpha tasks queues update-pull-queue {} --clear-max-retry-duration'.
+        format(self.queue_id))
+
+  def testUseAppengineQueue(self):
     self.queue_id = next(e2e_utils.GetResourceNameGenerator('queue'))
     expected_queue = self.Run(
-        'alpha tasks queues create-pull-queue {}'.format(self.queue_id))
-
+        'beta tasks queues create-app-engine-queue {}'.format(self.queue_id))
     actual_queue = self.retryer.RetryOnException(  # Creation can take 1 minute
-        self.Run, args=['alpha tasks queues describe {}'.format(self.queue_id)])
-
+        self.Run,
+        args=['beta tasks queues describe {}'.format(self.queue_id)])
     self.assertEqual(actual_queue, expected_queue)
-
+    self.Run(
+        'beta tasks queues get-iam-policy {} --location us-central1'.format(
+            self.queue_id))
+    self.Run('beta tasks queues pause {}'.format(self.queue_id))
+    self.Run('beta tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('state: PAUSED')
+    self.Run('beta tasks queues resume {}'.format(self.queue_id))
+    self.Run('beta tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('state: RUNNING')
+    self.Run('beta tasks queues purge {}'.format(self.queue_id))
+    self.Run(
+        'beta tasks queues update-app-engine-queue {} --max-attempts=6'.format(
+            self.queue_id))
+    self.Run('beta tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('maxAttempts: 6')
+    self.Run(
+        'beta tasks queues update-app-engine-queue {} --clear-max-attempts'.
+        format(self.queue_id))
+    self.Run('beta tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('maxAttempts: 100')
+    self.Run(
+        'beta tasks queues update-app-engine-queue {} --max-retry-duration=66s'.
+        format(self.queue_id))
+    self.Run('beta tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('maxRetryDuration: 66s')
+    self.Run(
+        ('beta tasks queues update-app-engine-queue {}' +
+         ' --clear-max-retry-duration').format(self.queue_id))
 
 if __name__ == '__main__':
   test_case.main()

@@ -20,6 +20,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) Add an IAM policy binding to an instance template.
+
      create
         (BETA) Create a Compute Engine virtual machine instance template.
 
@@ -33,8 +36,19 @@ COMMANDS
      describe
         (BETA) Describe a virtual machine instance template.
 
+     get-iam-policy
+        (BETA) Get the IAM policy for a Google Compute Engine instance
+        template.
+
      list
         (BETA) List Google Compute Engine instance templates.
+
+     remove-iam-policy-binding
+        (BETA) Remove an IAM policy binding from an instance template.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for a Google Compute Engine instance
+        template.
 
 NOTES
     This command is currently in BETA and may change without notice. These

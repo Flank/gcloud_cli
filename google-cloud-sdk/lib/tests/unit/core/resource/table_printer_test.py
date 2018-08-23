@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 """Unit tests for the table_printer module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import io
@@ -126,9 +127,43 @@ class TablePrinterFormatZeroIndexTest(resource_printer_test_base.Base):
         """))
 
 
+class TablePrinterFormatAliasTest(resource_printer_test_base.Base):
+
+  def testEmptyKeyDefaultLabel(self):
+    printer = resource_printer.Printer("""\
+        table(firstof(name), firstof(kind):label=K)
+        """)
+    for resource in self.CreateResourceList(4):
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        NAME                K
+        my-instance-a-0     compute#instance
+        my-instance-az-1    compute#instance
+        my-instance-azz-2   compute#instance
+        my-instance-azzz-3  compute#instance
+        """))
+
+  def testEmptyKeyAlias(self):
+    printer = resource_printer.Printer("""\
+        table(firstof(name), firstof(kind):label=K)
+        table(NAME, K.split('#').list():label=kind)
+        """)
+    for resource in self.CreateResourceList(4):
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        NAME                kind
+        my-instance-a-0     compute,instance
+        my-instance-az-1    compute,instance
+        my-instance-azz-2   compute,instance
+        my-instance-azzz-3  compute,instance
+        """))
+
+
 class TablePrinterFormatHeadingTest(resource_printer_test_base.Base):
 
-  def testNoHeadingTest(self):
+  def testNoHeading(self):
     printer = resource_printer.Printer(
         'table[no-heading](name:label=MONIKER:sort=2, kind:sort=1)')
     for resource in self.CreateResourceList(4):
@@ -141,7 +176,7 @@ class TablePrinterFormatHeadingTest(resource_printer_test_base.Base):
         my-instance-azzz-3  compute#instance
         """))
 
-  def testEmptyHeadingTest(self):
+  def testEmptyHeading(self):
     printer = resource_printer.Printer(
         'table(name:label="":sort=2, kind:sort=1)')
     for resource in self.CreateResourceList(4):
@@ -155,7 +190,7 @@ class TablePrinterFormatHeadingTest(resource_printer_test_base.Base):
         my-instance-azzz-3  compute#instance
         """))
 
-  def testEmptyOptionalHeadingTest(self):
+  def testEmptyOptionalHeading(self):
     printer = resource_printer.Printer(
         'table(name:sort=2, unknown:optional, kind:sort=1)')
     for resource in self.CreateResourceList(4):
@@ -169,7 +204,7 @@ class TablePrinterFormatHeadingTest(resource_printer_test_base.Base):
         my-instance-azzz-3  compute#instance
         """))
 
-  def testEmptyOptionalNoHeadingTest(self):
+  def testEmptyOptionalNoHeading(self):
     printer = resource_printer.Printer(
         'table[no-heading](name:sort=2, unknown:optional, kind:sort=1)')
     for resource in self.CreateResourceList(4):
@@ -2591,7 +2626,7 @@ hello
         defaults=defaults
     )
     self.AssertOutputEquals("""\
-FORMAT
+VALUE
 a=b
 c=d
 e=f

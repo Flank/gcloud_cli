@@ -11,13 +11,18 @@ gcloud beta spanner instances get\-iam\-policy \- get the IAM policy for a Cloud
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta spanner instances get\-iam\-policy\fR \fIINSTANCE\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta spanner instances get\-iam\-policy\fR [\fIINSTANCE\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Get the IAM policy for a Cloud Spanner instance.
+\fB(BETA)\fR \fBgcloud beta spanner instances get\-iam\-policy\fR displays the
+IAM policy associated with a Cloud Spanner instance. If formatted as JSON, the
+output can be edited and used as a policy file for \fBset\-iam\-policy\fR. The
+output includes an "etag" field identifying the version emitted and allowing
+detection of concurrent policy updates; see $ {parent} set\-iam\-policy for
+additional details.
 
 
 
@@ -25,10 +30,22 @@ gcloud beta spanner instances get\-iam\-policy \- get the IAM policy for a Cloud
 
 .RS 2m
 .TP 2m
-\fIINSTANCE\fR
-Cloud Spanner instance ID.
+
+Instance resource \- The Cloud Spanner instance for which to display the IAM
+policy. This represents a Cloud resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the flag [instance] on the command line with a fully
+specified name; set the property [spanner/instance] with a fully specified name;
+provide the flag [\-\-project] on the command line; set the property
+[core/project].
+
+.RS 2m
+.TP 2m
+[\fIINSTANCE\fR]
+The ID of the instance or a fully qualified identifier for the instance.
 
 
+.RE
 .RE
 .sp
 
@@ -38,16 +55,16 @@ Cloud Spanner instance ID.
 .TP 2m
 \fB\-\-filter\fR=\fIEXPRESSION\fR
 Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
-the expression evaluates True then that item is listed. For more details and
-examples of filter expressions run $ gcloud topic filters. This flag interacts
-with other flags that are applied in this order: \fB\-\-flatten\fR,
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-limit\fR=\fILIMIT\fR
-The maximum number of resources to list. The default is \fBunlimited\fR. This
-flag interacts with other flags that are applied in this order:
-\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
@@ -59,9 +76,9 @@ service.
 
 .TP 2m
 \fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
-A comma\-separated list of resource field key names to sort by. The default
-order is ascending. Prefix a field with ``~'' for descending order on that
-field. This flag interacts with other flags that are applied in this order:
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 
@@ -74,6 +91,23 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBspanner/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/spanner/
+
+
+
+.SH "EXAMPLES"
+
+To print the IAM policy for a given Cloud Spanner instance, run:
+
+.RS 2m
+$ gcloud beta spanner instances get\-iam\-policy my\-instance
+.RE
 
 
 

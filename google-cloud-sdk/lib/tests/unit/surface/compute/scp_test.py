@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for `gcloud beta compute scp`."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import ssh_utils
 from googlecloudsdk.command_lib.util.ssh import ssh
@@ -695,6 +698,71 @@ class ScpOsloginTest(test_base.BaseSSHTest):
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
         self.env, force_connect=True)
+
+
+class SCPPrivateIpTest(test_base.BaseSSHTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+    self.instance_with_internal_ip_address = self.messages.Instance(
+        id=33333,
+        name='instance-3',
+        networkInterfaces=[
+            self.messages.NetworkInterface(networkIP='10.240.0.52'),
+        ],
+        status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
+        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+                  'zones/zone-1/instances/instance-3'),
+        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+              'zones/zone-1'))
+
+  def testWithInternalIPAddress(self):
+    self.make_requests.side_effect = iter([
+        [self.instance_with_internal_ip_address],
+        [self.project_resource],
+    ])
+
+    self.Run("""
+      compute scp
+      ~/local-file-1 instance-3:~/remote-dir
+      --zone zone-1 --internal-ip
+      """)
+    self.CheckRequests(
+        [(self.compute.instances, 'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-3', project='my-project', zone='zone-1'))],
+        [(self.compute.projects, 'Get',
+          self.messages.ComputeProjectsGetRequest(project='my-project'))],
+    )
+    self.remote = ssh.Remote.FromArg('me@10.240.0.52')
+    self.remote_dir = ssh.FileReference('~/remote-dir', self.remote)
+    self.local_file = ssh.FileReference('~/local-file-1')
+
+    self.scp_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SCPCommand), [self.local_file],
+        self.remote_dir,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        port=None,
+        recursive=False,
+        compress=False,
+        options=dict(self.options, HostKeyAlias='compute.33333'))
+
+    self.ssh_init.assert_has_calls(
+        [
+            mock.call(
+                mock_matchers.TypeMatcher(ssh.SSHCommand),
+                self.remote,
+                identity_file=self.private_key_file,
+                options=dict(self.options, HostKeyAlias='compute.33333'),
+                remote_command=[
+                    '[ `curl "http://metadata.google.internal/'
+                    'computeMetadata/v1/instance/id" -H "Metadata-Flavor: '
+                    'Google" -q` = 33333 ] || exit 23'
+                ]),
+        ],
+        any_order=True)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 NAME
-    gcloud beta composer operations delete - deletes one or more completed
-        Cloud Composer operations
+    gcloud beta composer operations delete - delete one or more completed Cloud
+        Composer operations
 
 SYNOPSIS
     gcloud beta composer operations delete
@@ -8,7 +8,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Deletes operations that are done. If more than one operation is
+    (BETA) Delete operations that are done. If more than one operation is
     specified, all deletes will be attempted. If any of the deletes fail, those
     operations and their failure messages will be listed on the standard error,
     and the command will exit with a non-zero status.
@@ -27,7 +27,7 @@ POSITIONAL ARGUMENTS
           arguments in this group are specified.
 
        --location=LOCATION
-          Compute Engine zone in which to create the operations.
+          Compute Engine region in which to create the operations.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -35,5 +35,8 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud composer operations delete
 

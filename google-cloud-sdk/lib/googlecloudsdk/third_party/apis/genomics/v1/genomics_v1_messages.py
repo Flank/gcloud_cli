@@ -240,6 +240,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
+    condition: Unimplemented. The condition that is associated with this
+      binding. NOTE: an unsatisfied condition will not allow user access via
+      current binding. Different bindings, including their conditions, are
+      examined independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -254,11 +258,12 @@ class Binding(_messages.Message):
       * `domain:{domain}`: A Google Apps domain name that represents all the
       users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
-      `roles/editor`, or `roles/owner`. Required
+      `roles/editor`, or `roles/owner`.
   """
 
-  members = _messages.StringField(1, repeated=True)
-  role = _messages.StringField(2)
+  condition = _messages.MessageField('Expr', 1)
+  members = _messages.StringField(2, repeated=True)
+  role = _messages.StringField(3)
 
 
 class CallSet(_messages.Message):
@@ -447,32 +452,44 @@ class ComputeEngine(_messages.Message):
   zone = _messages.StringField(4)
 
 
+class ContainerKilledEvent(_messages.Message):
+  r"""An event generated when a container is forcibly terminated by the
+  worker. Currently, this only occurs when the container outlives the timeout
+  specified by the user.
+
+  Fields:
+    actionId: The numeric ID of the action that started the container.
+  """
+
+  actionId = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
 class ContainerStartedEvent(_messages.Message):
-  r"""This event is generated when a container starts.
+  r"""An event generated when a container starts.
 
   Messages:
-    PortMappingsValue: The container to host port mappings installed for this
-      container.  This set will contain any ports exposed using the
-      PUBLISH_EXPOSED_PORTS flag as well as any specified in the Action
+    PortMappingsValue: The container-to-host port mappings installed for this
+      container. This set will contain any ports exposed using the
+      `PUBLISH_EXPOSED_PORTS` flag as well as any specified in the `Action`
       definition.
 
   Fields:
     actionId: The numeric ID of the action that started this container.
     ipAddress: The public IP address that can be used to connect to the
-      container.  This field is only populated when at least one port mapping
-      is present.  If the instance was created with a private address this
+      container. This field is only populated when at least one port mapping
+      is present. If the instance was created with a private address, this
       field will be empty even if port mappings exist.
-    portMappings: The container to host port mappings installed for this
-      container.  This set will contain any ports exposed using the
-      PUBLISH_EXPOSED_PORTS flag as well as any specified in the Action
+    portMappings: The container-to-host port mappings installed for this
+      container. This set will contain any ports exposed using the
+      `PUBLISH_EXPOSED_PORTS` flag as well as any specified in the `Action`
       definition.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class PortMappingsValue(_messages.Message):
-    r"""The container to host port mappings installed for this container.
-    This set will contain any ports exposed using the PUBLISH_EXPOSED_PORTS
-    flag as well as any specified in the Action definition.
+    r"""The container-to-host port mappings installed for this container. This
+    set will contain any ports exposed using the `PUBLISH_EXPOSED_PORTS` flag
+    as well as any specified in the `Action` definition.
 
     Messages:
       AdditionalProperty: An additional property for a PortMappingsValue
@@ -501,18 +518,18 @@ class ContainerStartedEvent(_messages.Message):
 
 
 class ContainerStoppedEvent(_messages.Message):
-  r"""This event is generated when a container exits.
+  r"""An event generated when a container exits.
 
   Fields:
     actionId: The numeric ID of the action that started this container.
     exitStatus: The exit status of the container.
     stderr: The tail end of any content written to standard error by the
-      container. To prevent this from being recorded if the action is known to
-      emit large amounts of debugging noise or sensitive information, set the
-      DISABLE_STANDARD_ERROR_CAPTURE flag.  Note that only a small amount of
-      the end of the stream is captured here. The entire stream is stored in
-      the /google/logs directory mounted into each action, and may be copied
-      off the machine as described elsewhere.
+      container. If the content emits large amounts of debugging noise or
+      contains sensitive information, you can prevent the content from being
+      printed by setting the `DISABLE_STANDARD_ERROR_CAPTURE` flag.  Note that
+      only a small amount of the end of the stream is captured here. The
+      entire stream is stored in the `/google/logs` directory mounted into
+      each action, and can be copied off the machine as described elsewhere.
   """
 
   actionId = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -551,17 +568,17 @@ class Dataset(_messages.Message):
 
 
 class DelayedEvent(_messages.Message):
-  r"""This event is generated whenever a resource limitation or transient
-  error delays execution of a pipeline that was otherwise ready to run.
+  r"""An event generated whenever a resource limitation or transient error
+  delays execution of a pipeline that was otherwise ready to run.
 
   Fields:
-    cause: A textual description of the cause of the delay.  The string may
-      change without notice since it is often generated by another service
+    cause: A textual description of the cause of the delay. The string can
+      change without notice because it is often generated by another service
       (such as Compute Engine).
     metrics: If the delay was caused by a resource shortage, this field lists
       the Compute Engine metrics that are preventing this operation from
-      running (for example, CPUS or INSTANCES).  If the particular metric is
-      not known, a single UNKNOWN metric will be present.
+      running (for example, `CPUS` or `INSTANCES`). If the particular metric
+      is not known, a single `UNKNOWN` metric will be present.
   """
 
   cause = _messages.StringField(1)
@@ -591,23 +608,22 @@ class Entry(_messages.Message):
 
 
 class Event(_messages.Message):
-  r"""Event carries information about events that occur during pipeline
-  execution.
+  r"""Carries information about events that occur during pipeline execution.
 
   Messages:
-    DetailsValue: Machine readable details about the event.
+    DetailsValue: Machine-readable details about the event.
 
   Fields:
-    description: A human readable description of the event.  Note that these
-      strings may change at any time without notice.  Any application logic
-      must use the information in the details field.
-    details: Machine readable details about the event.
-    timestamp: The time that the event occurred.
+    description: A human-readable description of the event. Note that these
+      strings can change at any time without notice. Any application logic
+      must use the information in the `details` field.
+    details: Machine-readable details about the event.
+    timestamp: The time at which the event occurred.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class DetailsValue(_messages.Message):
-    r"""Machine readable details about the event.
+    r"""Machine-readable details about the event.
 
     Messages:
       AdditionalProperty: An additional property for a DetailsValue object.
@@ -740,6 +756,30 @@ class ExportVariantSetRequest(_messages.Message):
   projectId = _messages.StringField(5)
 
 
+class Expr(_messages.Message):
+  r"""Represents an expression text. Example:      title: "User account
+  presence"     description: "Determines whether the request has a user
+  account"     expression: "size(request.user) > 0"
+
+  Fields:
+    description: An optional description of the expression. This is a longer
+      text which describes the expression, e.g. when hovered over it in a UI.
+    expression: Textual representation of an expression in Common Expression
+      Language syntax.  The application context of the containing message
+      determines which well-known feature set of CEL is supported.
+    location: An optional string indicating the location of the expression for
+      error reporting, e.g. a file name and a position in the file.
+    title: An optional title for the expression, i.e. a short string
+      describing its purpose. This can be used e.g. in UIs which allow to
+      enter the expression.
+  """
+
+  description = _messages.StringField(1)
+  expression = _messages.StringField(2)
+  location = _messages.StringField(3)
+  title = _messages.StringField(4)
+
+
 class ExternalId(_messages.Message):
   r"""A ExternalId object.
 
@@ -753,15 +793,15 @@ class ExternalId(_messages.Message):
 
 
 class FailedEvent(_messages.Message):
-  r"""This event is generated when the execution of a pipeline has failed.
-  Note that other events may continue to occur after this event.
+  r"""An event generated when the execution of a pipeline has failed. Note
+  that other events can continue to occur after this event.
 
   Enums:
     CodeValueValuesEnum: The Google standard error code that best describes
       this failure.
 
   Fields:
-    cause: The human readable description of the cause of the failure.
+    cause: The human-readable description of the cause of the failure.
     code: The Google standard error code that best describes this failure.
   """
 
@@ -1124,10 +1164,12 @@ class GenomicsOperationsListRequest(_messages.Message):
       determine if a   particular event has occurred. * error&#58; If the
       pipeline is running, this value is NULL.  Once the   pipeline finishes,
       the value is the standard Google error code. * labels.key or labels."key
-      with space" where key is a label key.  In v1 and v1alpha2, the following
-      filter fields are supported&#58;  * projectId&#58; Required. Corresponds
-      to   OperationMetadata.projectId. * createTime&#58; The time this job
-      was created, in seconds from the
+      with space" where key is a label key. * done&#58; If the pipeline is
+      running, this value is false. Once the   pipeline finishes, the value is
+      true.  In v1 and v1alpha2, the following filter fields are
+      supported&#58;  * projectId&#58; Required. Corresponds to
+      OperationMetadata.projectId. * createTime&#58; The time this job was
+      created, in seconds from the
       [epoch](http://en.wikipedia.org/wiki/Unix_time). Can use `>=` and/or
       `<=`   operators. * status&#58; Can be `RUNNING`, `SUCCESS`, `FAILURE`,
       or `CANCELED`. Only   one status may be specified. * labels.key where
@@ -2003,7 +2045,7 @@ class Program(_messages.Message):
 
 
 class PullStartedEvent(_messages.Message):
-  r"""This event is generated when the worker starts pulling an image.
+  r"""An event generated when the worker starts pulling an image.
 
   Fields:
     imageUri: The URI of the image that was pulled.
@@ -2013,7 +2055,7 @@ class PullStartedEvent(_messages.Message):
 
 
 class PullStoppedEvent(_messages.Message):
-  r"""This event is generated when the worker stops pulling an image.
+  r"""An event generated when the worker stops pulling an image.
 
   Fields:
     imageUri: The URI of the image that was pulled.
@@ -3036,10 +3078,10 @@ class UndeleteDatasetRequest(_messages.Message):
 
 
 class UnexpectedExitStatusEvent(_messages.Message):
-  r"""This event is generated when the execution of a container results in a
-  non-zero exit status that was not otherwise ignored.  Execution will
-  continue, but only actions that are flagged as ALWAYS_RUN will be executed:
-  other actions will be skipped.
+  r"""An event generated when the execution of a container results in a non-
+  zero exit status that was not otherwise ignored. Execution will continue,
+  but only actions that are flagged as `ALWAYS_RUN` will be executed. Other
+  actions will be skipped.
 
   Fields:
     actionId: The numeric ID of the action that started the container.
@@ -3459,7 +3501,7 @@ class VariantSetMetadata(_messages.Message):
 
 
 class WorkerAssignedEvent(_messages.Message):
-  r"""This event is generated once a worker VM has been assigned to run the
+  r"""An event generated after a worker VM has been assigned to run the
   pipeline.
 
   Fields:
@@ -3472,8 +3514,8 @@ class WorkerAssignedEvent(_messages.Message):
 
 
 class WorkerReleasedEvent(_messages.Message):
-  r"""This event is generated when the worker VM that was assigned to the
-  pipeline has been released (i.e., deleted).
+  r"""An event generated when the worker VM that was assigned to the pipeline
+  has been released (deleted).
 
   Fields:
     instance: The worker's instance name.

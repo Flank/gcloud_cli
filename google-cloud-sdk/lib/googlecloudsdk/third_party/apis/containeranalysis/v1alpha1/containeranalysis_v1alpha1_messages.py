@@ -180,6 +180,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
+    condition: Unimplemented. The condition that is associated with this
+      binding. NOTE: an unsatisfied condition will not allow user access via
+      current binding. Different bindings, including their conditions, are
+      examined independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -194,11 +198,12 @@ class Binding(_messages.Message):
       * `domain:{domain}`: A Google Apps domain name that represents all the
       users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
-      `roles/editor`, or `roles/owner`. Required
+      `roles/editor`, or `roles/owner`.
   """
 
-  members = _messages.StringField(1, repeated=True)
-  role = _messages.StringField(2)
+  condition = _messages.MessageField('Expr', 1)
+  members = _messages.StringField(2, repeated=True)
+  role = _messages.StringField(3)
 
 
 class BuildDetails(_messages.Message):
@@ -309,14 +314,14 @@ class BuildSignature(_messages.Message):
     publicKey: Public key of the builder which can be used to verify that the
       related findings are valid and unchanged. If `key_type` is empty, this
       defaults to PEM encoded public keys.  This field may be empty if
-      `key_id` references an external key.  For Cloud Container Builder based
-      signatures, this is a PEM encoded public key. To verify the Cloud
-      Container Builder signature, place the contents of this field into a
-      file (public.pem). The signature field is base64-decoded into its binary
-      representation in signature.bin, and the provenance bytes from
-      `BuildDetails` are base64-decoded into a binary representation in
-      signed.bin. OpenSSL can then verify the signature: `openssl sha256
-      -verify public.pem -signature signature.bin signed.bin`
+      `key_id` references an external key.  For Cloud Build based signatures,
+      this is a PEM encoded public key. To verify the Cloud Build signature,
+      place the contents of this field into a file (public.pem). The signature
+      field is base64-decoded into its binary representation in signature.bin,
+      and the provenance bytes from `BuildDetails` are base64-decoded into a
+      binary representation in signed.bin. OpenSSL can then verify the
+      signature: `openssl sha256 -verify public.pem -signature signature.bin
+      signed.bin`
     signature: Signature of the related `BuildProvenance`, encoded in a base64
       string.
   """
@@ -715,7 +720,7 @@ class ContaineranalysisProjectsScanConfigsGetRequest(_messages.Message):
 
   Fields:
     name: The name of the ScanConfig in the form
-      projects/{project_id}/scanConfigs/{scan_config_id} instead.
+      projects/{project_id}/scanConfigs/{scan_config_id}
   """
 
   name = _messages.StringField(1, required=True)
@@ -729,7 +734,6 @@ class ContaineranalysisProjectsScanConfigsListRequest(_messages.Message):
     pageSize: The number of items to return.
     pageToken: The page token to use for the next request.
     parent: This containers the project Id i.e.: projects/{project_id}
-      instead.
   """
 
   filter = _messages.StringField(1)
@@ -743,9 +747,9 @@ class ContaineranalysisProjectsScanConfigsPatchRequest(_messages.Message):
 
   Fields:
     name: The scan config to update of the form
-      projects/{project_id}/scanConfigs/{scan_config_id}. instead.
+      projects/{project_id}/scanConfigs/{scan_config_id}.
     scanConfig: A ScanConfig resource to be passed as the request body.
-    updateMask: A string attribute.
+    updateMask: The fields to update.
   """
 
   name = _messages.StringField(1, required=True)
@@ -1163,6 +1167,30 @@ class Empty(_messages.Message):
 
 
 
+class Expr(_messages.Message):
+  r"""Represents an expression text. Example:      title: "User account
+  presence"     description: "Determines whether the request has a user
+  account"     expression: "size(request.user) > 0"
+
+  Fields:
+    description: An optional description of the expression. This is a longer
+      text which describes the expression, e.g. when hovered over it in a UI.
+    expression: Textual representation of an expression in Common Expression
+      Language syntax.  The application context of the containing message
+      determines which well-known feature set of CEL is supported.
+    location: An optional string indicating the location of the expression for
+      error reporting, e.g. a file name and a position in the file.
+    title: An optional title for the expression, i.e. a short string
+      describing its purpose. This can be used e.g. in UIs which allow to
+      enter the expression.
+  """
+
+  description = _messages.StringField(1)
+  expression = _messages.StringField(2)
+  location = _messages.StringField(3)
+  title = _messages.StringField(4)
+
+
 class FileHashes(_messages.Message):
   r"""Container message for hashes of byte content of files, used in Source
   messages to verify integrity of source input to the build.
@@ -1366,18 +1394,6 @@ class GoogleDevtoolsContaineranalysisV1alpha1SourceContext(_messages.Message):
   gerrit = _messages.MessageField('GoogleDevtoolsContaineranalysisV1alpha1GerritSourceContext', 2)
   git = _messages.MessageField('GoogleDevtoolsContaineranalysisV1alpha1GitSourceContext', 3)
   labels = _messages.MessageField('LabelsValue', 4)
-
-
-class GrafeasV1beta1OperationMetadata(_messages.Message):
-  r"""Metadata for an operation.
-
-  Fields:
-    createTime: Output only. The time this operation was created.
-    endTime: Output only. The time that this operation was marked as done.
-  """
-
-  createTime = _messages.StringField(1)
-  endTime = _messages.StringField(2)
 
 
 class Hash(_messages.Message):
@@ -2317,7 +2333,7 @@ class UpdateOperationRequest(_messages.Message):
 
   Fields:
     operation: The operation to create.
-    updateMask: A string attribute.
+    updateMask: The fields to update.
   """
 
   operation = _messages.MessageField('Operation', 1)

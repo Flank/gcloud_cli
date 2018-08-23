@@ -11,7 +11,7 @@ gcloud alpha tasks queues create\-app\-engine\-queue \- create an App Engine que
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha tasks queues create\-app\-engine\-queue\fR \fIAPP_ENGINE_QUEUE_ID\fR [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha tasks queues create\-app\-engine\-queue\fR \fIQUEUE\fR [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -32,8 +32,8 @@ here: https://goo.gl/Ya0AZd
 
 .RS 2m
 .TP 2m
-\fIAPP_ENGINE_QUEUE_ID\fR
-ID of the App Engine queue to create.
+\fIQUEUE\fR
+The queue to create.
 
 
 
@@ -60,9 +60,18 @@ dispatching tasks until the number of outstanding requests decreases.
 
 .TP 2m
 \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR
-The maximum number of times that the interval between failed task retries will
-be doubled before the increase becomes constant. The constant is: min\-backoff *
-2 ** (max\-doublings \- 1).
+The time between retries will double maxDoublings times.
+
+A tasks retry interval starts at minBackoff, then doubles maxDoublings times,
+then increases linearly, and finally retries retries at intervals of maxBackoff
+up to maxAttempts times.
+
+For example, if minBackoff is 10s, maxBackoff is 300s, and maxDoublings is 3,
+then the a task will first be retried in 10s. The retry interval will double
+three times, and then increase linearly by 2^3 * 10s. Finally, the task will
+retry at intervals of maxBackoff until the task has been attempted maxAttempts
+times. Thus, the requests will retry at 10s, 20s, 40s, 80s, 160s, 240s, 300s,
+300s.
 
 .TP 2m
 \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR
@@ -75,10 +84,7 @@ Must be a string that ends in 's', such as "5s".
 
 .TP 2m
 \fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR
-The maximum rate at which tasks are dispatched from this queue. This also
-determines "max burst size" for App Engine queues: if
-\f5\-\-max\-tasks\-dispatched\-per\-second\fR is 1, then max burst size is 10;
-otherwise it is \f5max\-tasks\-dispatched\-per\-second\fR / 5.
+The maximum rate at which tasks are dispatched from this queue.
 
 .TP 2m
 \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR
@@ -108,9 +114,13 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta tasks queues create\-app\-engine\-queue
+.RE
 

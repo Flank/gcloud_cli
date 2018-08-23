@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
     gcloud beta compute firewall-rules update NAME
         [--allow=[PROTOCOL[:PORT[-PORT]],...]] [--description=DESCRIPTION]
-        [--destination-ranges=[CIDR_RANGE,...]] [--disabled]
+        [--destination-ranges=[CIDR_RANGE,...]] [--disabled] [--enable-logging]
         [--priority=PRIORITY] [--rules=[PROTOCOL[:PORT[-PORT]],...]]
         [--source-ranges=[CIDR_RANGE,...]]
         [--source-service-accounts=[EMAIL,...]] [--source-tags=[TAG,...]]
@@ -80,6 +80,10 @@ FLAGS
         enable a disabled rule instead, use:
 
             $ gcloud beta compute firewall-rules update MY-RULE --no-disabled
+
+     --enable-logging
+        Enable logging for the firewall rule. Logs will be exported to
+        StackDriver. Firewall logging is disabled by default.
 
      --priority=PRIORITY
         This is an integer between 0 and 65535, both inclusive. When NOT

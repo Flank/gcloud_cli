@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha datastore indexes - manage Cloud Datastore indexes
+
+SYNOPSIS
+    gcloud alpha datastore indexes COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud Datastore indexes.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cleanup
+        (ALPHA) Remove unused datastore indexes based on your local index
+        configuration.
+
+     create
+        (ALPHA) Create new datastore indexes based on your local index
+        configuration.
+
+     describe
+        (ALPHA) Show details about an Cloud Datastore index.
+
+     list
+        (ALPHA) List Cloud Datastore indexes.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud datastore indexes
+        $ gcloud beta datastore indexes
+

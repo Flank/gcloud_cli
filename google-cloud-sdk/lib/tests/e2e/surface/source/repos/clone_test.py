@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Test of the 'source clone' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import stat
 import subprocess
@@ -22,7 +25,6 @@ import sys
 
 import gcloud
 from googlecloudsdk.api_lib.auth import service_account
-from googlecloudsdk.api_lib.source import git
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
@@ -44,10 +46,6 @@ class CloneTest(cli_test_base.CliTestBase):
     git_path = files.FindExecutableOnPath('git')
     if not git_path:
       self.skipTest('Git is not available')
-    try:
-      git.CheckGitVersion(git._HELPER_MIN)
-    except git.GitVersionException as e:
-      self.skipTest('Git version {0} is too old'.format(e.cur_version))
 
     # The system under which we are testing could have credential manager
     # installed at system or global level. It could interfere with gcloud

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.container.binauthz import apis
 from googlecloudsdk.api_lib.container.binauthz import policies
 from googlecloudsdk.api_lib.container.binauthz import util
 from googlecloudsdk.calliope import base
@@ -40,4 +42,5 @@ class Export(base.Command):
   """
 
   def Run(self, args):
-    return policies.Client().Get(util.GetPolicyRef())
+    api_version = apis.GetApiVersion(self.ReleaseTrack())
+    return policies.Client(api_version).Get(util.GetPolicyRef())

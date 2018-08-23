@@ -11,7 +11,7 @@ gcloud beta ml\-engine local predict \- run prediction locally
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml\-engine local predict\fR \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml\-engine local predict\fR \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -79,6 +79,13 @@ This flag accepts "\-" for stdin.
 The ML framework used to train this version of the model. If not specified,
 defaults to \f5tensorflow\fR. \fIFRAMEWORK\fR must be one of:
 \fBscikit\-learn\fR, \fBtensorflow\fR, \fBxgboost\fR.
+
+.TP 2m
+\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR
+The name of the signature defined in the SavedModel to use for this job.
+Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
+https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+which is "serving_default". Only applies to TensorFlow models.
 
 
 .RE

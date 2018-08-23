@@ -58,7 +58,8 @@ EXAMPLES
             --bin-log-file-name mysql-bin.000020 --bin-log-position 170
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql instances clone
         $ gcloud beta sql instances clone
 

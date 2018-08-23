@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Integration tests for creating/deleting firewalls."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import logging
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -132,8 +135,12 @@ class BetaFirewallsTest(e2e_test_base.BaseTest):
         e2e_utils.GetResourceNameGenerator(prefix='firewall-disabled'))
     self.firewall_name_enabled = next(
         e2e_utils.GetResourceNameGenerator(prefix='firewall-enabled'))
+    self.firewall_name_logging = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='gcloud-compute-test-firewall'))
     self.firewall_names_used.append(self.firewall_name_disabled)
     self.firewall_names_used.append(self.firewall_name_enabled)
+    self.firewall_names_used.append(self.firewall_name_logging)
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')
@@ -186,25 +193,6 @@ class BetaFirewallsTest(e2e_test_base.BaseTest):
     self.AssertNewOutputContains("ports:\n  - '443'", reset=False)
     self.AssertNewOutputNotContains('disabled: false')
 
-
-class AlphaFirewallsTest(e2e_test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.firewall_names_used = []
-    self.GetFirewallName()
-
-  def GetFirewallName(self):
-    self.firewall_name = next(
-        e2e_utils.GetResourceNameGenerator(
-            prefix='gcloud-compute-test-firewall'))
-    self.firewall_names_used.append(self.firewall_name)
-
-  def TearDown(self):
-    logging.info('Starting TearDown (will delete resources if test fails).')
-    for name in self.firewall_names_used:
-      self.CleanUpResource(name, 'firewall-rules', scope=e2e_test_base.GLOBAL)
-
   def testFirewallLogging(self):
     self._TestCreateLoggingFirewall()
 
@@ -213,10 +201,12 @@ class AlphaFirewallsTest(e2e_test_base.BaseTest):
     self.Run('compute firewall-rules create {0} --action deny '
              '--rules tcp:9000,udp:1000-2000,icmp '
              '--direction out --destination-ranges 10.128.1.0/24 '
-             '--priority 900 --enable-logging'.format(self.firewall_name))
-    self.Run('compute firewall-rules describe {0}'.format(self.firewall_name))
+             '--priority 900 --enable-logging'.format(
+                 self.firewall_name_logging))
+    self.Run('compute firewall-rules describe {0}'.format(
+        self.firewall_name_logging))
     self.AssertNewOutputContains(
-        'name: {0}'.format(self.firewall_name), reset=False)
+        'name: {0}'.format(self.firewall_name_logging), reset=False)
     self.AssertNewOutputContains('denied:\n', reset=False)
     self.AssertNewOutputContains("ports:\n  - '9000'", reset=False)
     self.AssertNewOutputContains('ports:\n  - 1000-2000', reset=False)
@@ -226,6 +216,14 @@ class AlphaFirewallsTest(e2e_test_base.BaseTest):
     self.AssertNewOutputContains('direction: EGRESS', reset=False)
     self.AssertNewOutputContains('priority: 900', reset=False)
     self.AssertNewOutputContains('enableLogging: true')
+
+
+class AlphaFirewallsTest(e2e_test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.firewall_names_used = []
+    self.GetFirewallName()
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,9 @@
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 
 from apitools.base.py import encoding
@@ -34,7 +37,7 @@ from googlecloudsdk.core import resources
 
 # Default is to retry every 5 seconds for 1 hour.
 DEFAULT_OPERATION_RETRY_INTERVAL = 5
-DEFAULT_OPERATION_MAX_TRIES = (60 / DEFAULT_OPERATION_RETRY_INTERVAL) * 60
+DEFAULT_OPERATION_MAX_TRIES = (60 // DEFAULT_OPERATION_RETRY_INTERVAL) * 60
 
 
 def CallAndCollectOpErrors(method, *args, **kwargs):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +15,13 @@
 """Integration tests for creating/using/deleting instances."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
+from tests.lib.surface.compute import utils
 
 
 class InstancesCreateDiskTest(e2e_instances_test_base.InstancesTestBase):
@@ -29,10 +33,12 @@ class InstancesCreateDiskTest(e2e_instances_test_base.InstancesTestBase):
     self.GetInstanceName()
     self.Run('compute instances create {0} '
              '--create-disk size=10GB,name={0}-3,mode=rw,'
-             'device-name=data,auto-delete=yes,image=debian-8 '
+             'device-name=data,auto-delete=yes,image-family={1},'
+             'image-project=debian-cloud '
              '--create-disk size=10GB,name={0}-4,mode=rw,'
              'device-name=data-2,auto-delete=no '
-             '--zone {1}'.format(self.instance_name, self.zone))
+             '--zone {2}'.format(
+                 self.instance_name, utils.DEBIAN_IMAGE_FAMILY, self.zone))
     self.Run('compute instances describe {0} --zone {1}'.format(
         self.instance_name, self.zone))
     self.AssertNewOutputContainsAll(

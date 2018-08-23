@@ -609,6 +609,10 @@
         "endpointsApiService": {
           "description": "Cloud Endpoints configuration.If endpoints_api_service is set, the Cloud Endpoints Extensible Service Proxy will be provided to serve the API implemented by the app.",
           "$ref": "EndpointsApiService"
+        },
+        "entrypoint": {
+          "description": "The entrypoint for the application.",
+          "$ref": "Entrypoint"
         }
       }
     },
@@ -912,7 +916,7 @@
           "$ref": "StaticFilesHandler"
         },
         "script": {
-          "description": "Executes a script to handle the request that matches this URL pattern.",
+          "description": "Executes a script to handle the requests that match this URL pattern. Only the auto value is supported for Node.js in the App Engine standard environment, for example \"script\": \"auto\".",
           "$ref": "ScriptHandler"
         },
         "apiEndpoint": {
@@ -938,7 +942,7 @@
           ]
         },
         "login": {
-          "description": "Level of login required to access this resource.",
+          "description": "Level of login required to access this resource. Not supported for Node.js in the App Engine standard environment.",
           "enumDescriptions": [
             "Not specified. LOGIN_OPTIONAL is assumed.",
             "Does not require that the user is signed in.",
@@ -1300,7 +1304,7 @@
           "$ref": "ZipInfo"
         },
         "cloudBuildOptions": {
-          "description": "Options for any Google Cloud Container Builder builds created as a part of this deployment.Note that this is orthogonal to the build parameter, where the deployment depends on an already existing cloud build. These options will only be used if a new build is created, such as when deploying to the App Engine flexible environment using files or zip.",
+          "description": "Options for any Google Cloud Build builds created as a part of this deployment.Note that this is orthogonal to the build parameter, where the deployment depends on an already existing cloud build. These options will only be used if a new build is created, such as when deploying to the App Engine flexible environment using files or zip.",
           "$ref": "CloudBuildOptions"
         }
       }
@@ -1393,6 +1397,17 @@
             "FIXED",
             "MANAGED"
           ]
+        }
+      }
+    },
+    "Entrypoint": {
+      "id": "Entrypoint",
+      "description": "The entrypoint for the application.",
+      "type": "object",
+      "properties": {
+        "shell": {
+          "description": "The format should be a shell command that can be fed to bash -c.",
+          "type": "string"
         }
       }
     },

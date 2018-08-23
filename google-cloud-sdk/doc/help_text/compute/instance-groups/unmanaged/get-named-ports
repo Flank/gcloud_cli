@@ -22,7 +22,7 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --zone=ZONE
-        The zone of the instance group to operate on. If not specified and the
+        Zone of the instance group to operate on. If not specified and the
         compute/zone property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
@@ -44,13 +44,13 @@ FLAGS
 LIST COMMAND FLAGS
      --filter=EXPRESSION
         Apply a Boolean filter EXPRESSION to each resource item to be listed.
-        If the expression evaluates True then that item is listed. For more
-        details and examples of filter expressions run $ gcloud topic filters.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
         This flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
      --limit=LIMIT
-        The maximum number of resources to list. The default is unlimited. This
+        Maximum number of resources to list. The default is unlimited. This
         flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
@@ -62,7 +62,7 @@ LIST COMMAND FLAGS
         and --limit depending on the service.
 
      --sort-by=[FIELD,...]
-        A comma-separated list of resource field key names to sort by. The
+        Comma-separated list of resource field key names to sort by. The
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.

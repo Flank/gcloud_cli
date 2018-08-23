@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2011 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,9 @@
 """Setup installation module for gcloud-cli."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 from setuptools import find_packages
 from setuptools import setup
@@ -27,7 +29,6 @@ long_desc = ('gcloud-cli is a Python application that lets you access '
 
 
 tests_require = [
-    'jsonschema>=2.0.0',
     'modulegraph>=0.15',
     'portpicker>=1.1.1',
     'pytest',
@@ -88,6 +89,7 @@ setup(
         'grpcio>=1.4.0',
         'httplib2==0.9.2',
         'ipaddr==2.1.11',
+        'jsonschema>=2.0.0',
         'Mako>=0.7.3',
         'monotonic==1.2',
         'oauth2==1.5.170',

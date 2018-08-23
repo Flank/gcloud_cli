@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Lists all available service tiers for Google Cloud SQL."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.sql import api_util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.sql import flags
@@ -49,6 +52,7 @@ class _BaseList(object):
     return iter(result.items)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.ALPHA)
 class List(_BaseList, base.ListCommand):
   """Lists all available service tiers for Google Cloud SQL."""

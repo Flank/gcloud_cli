@@ -62,6 +62,9 @@ class ComputeV1(base_api.BaseApiClient):
     self.licenses = self.LicensesService(self)
     self.machineTypes = self.MachineTypesService(self)
     self.networks = self.NetworksService(self)
+    self.nodeGroups = self.NodeGroupsService(self)
+    self.nodeTemplates = self.NodeTemplatesService(self)
+    self.nodeTypes = self.NodeTypesService(self)
     self.projects = self.ProjectsService(self)
     self.regionAutoscalers = self.RegionAutoscalersService(self)
     self.regionBackendServices = self.RegionBackendServicesService(self)
@@ -74,6 +77,7 @@ class ComputeV1(base_api.BaseApiClient):
     self.regions = self.RegionsService(self)
     self.routers = self.RoutersService(self)
     self.routes = self.RoutesService(self)
+    self.securityPolicies = self.SecurityPoliciesService(self)
     self.snapshots = self.SnapshotsService(self)
     self.sslCertificates = self.SslCertificatesService(self)
     self.sslPolicies = self.SslPoliciesService(self)
@@ -521,7 +525,7 @@ class ComputeV1(base_api.BaseApiClient):
           }
 
     def AddSignedUrlKey(self, request, global_params=None):
-      r"""Adds the given Signed URL Key to the backend bucket.
+      r"""Adds a key for validating requests with signed URLs for this backend bucket.
 
       Args:
         request: (ComputeBackendBucketsAddSignedUrlKeyRequest) input message
@@ -573,7 +577,7 @@ class ComputeV1(base_api.BaseApiClient):
     )
 
     def DeleteSignedUrlKey(self, request, global_params=None):
-      r"""Deletes the given Signed URL Key from the backend bucket.
+      r"""Deletes a key for validating requests with signed URLs for this backend bucket.
 
       Args:
         request: (ComputeBackendBucketsDeleteSignedUrlKeyRequest) input message
@@ -739,7 +743,7 @@ class ComputeV1(base_api.BaseApiClient):
           }
 
     def AddSignedUrlKey(self, request, global_params=None):
-      r"""Adds the given Signed URL Key to the specified backend service.
+      r"""Adds a key for validating requests with signed URLs for this backend service.
 
       Args:
         request: (ComputeBackendServicesAddSignedUrlKeyRequest) input message
@@ -817,7 +821,7 @@ class ComputeV1(base_api.BaseApiClient):
     )
 
     def DeleteSignedUrlKey(self, request, global_params=None):
-      r"""Deletes the given Signed URL Key from the specified backend service.
+      r"""Deletes a key for validating requests with signed URLs for this backend service.
 
       Args:
         request: (ComputeBackendServicesDeleteSignedUrlKeyRequest) input message
@@ -968,6 +972,32 @@ class ComputeV1(base_api.BaseApiClient):
         relative_path=u'projects/{project}/global/backendServices/{backendService}',
         request_field=u'backendServiceResource',
         request_type_name=u'ComputeBackendServicesPatchRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def SetSecurityPolicy(self, request, global_params=None):
+      r"""Sets the security policy for the specified backend service.
+
+      Args:
+        request: (ComputeBackendServicesSetSecurityPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('SetSecurityPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetSecurityPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.backendServices.setSecurityPolicy',
+        ordered_params=[u'project', u'backendService'],
+        path_params=[u'backendService', u'project'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/global/backendServices/{backendService}/setSecurityPolicy',
+        request_field=u'securityPolicyReference',
+        request_type_name=u'ComputeBackendServicesSetSecurityPolicyRequest',
         response_type_name=u'Operation',
         supports_download=False,
     )
@@ -3431,7 +3461,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def AggregatedList(self, request, global_params=None):
-      r"""Retrieves aggregated list of instances.
+      r"""Retrieves aggregated list of all of the instances in your project across all regions and zones.
 
       Args:
         request: (ComputeInstancesAggregatedListRequest) input message
@@ -3587,7 +3617,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def GetSerialPortOutput(self, request, global_params=None):
-      r"""Returns the specified instance's serial port output.
+      r"""Returns the last 1 MB of serial port output from the specified instance.
 
       Args:
         request: (ComputeInstancesGetSerialPortOutputRequest) input message
@@ -3972,6 +4002,32 @@ If the group is part of a backend service that has enabled connection draining, 
         relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/setTags',
         request_field=u'tags',
         request_type_name=u'ComputeInstancesSetTagsRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def SimulateMaintenanceEvent(self, request, global_params=None):
+      r"""Simulates a maintenance event on the instance.
+
+      Args:
+        request: (ComputeInstancesSimulateMaintenanceEventRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('SimulateMaintenanceEvent')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SimulateMaintenanceEvent.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.instances.simulateMaintenanceEvent',
+        ordered_params=[u'project', u'zone', u'instance'],
+        path_params=[u'instance', u'project', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/simulateMaintenanceEvent',
+        request_field='',
+        request_type_name=u'ComputeInstancesSimulateMaintenanceEventRequest',
         response_type_name=u'Operation',
         supports_download=False,
     )
@@ -4982,6 +5038,478 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+  class NodeGroupsService(base_api.BaseApiService):
+    """Service class for the nodeGroups resource."""
+
+    _NAME = u'nodeGroups'
+
+    def __init__(self, client):
+      super(ComputeV1.NodeGroupsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def AddNodes(self, request, global_params=None):
+      r"""Adds specified number of nodes to the node group.
+
+      Args:
+        request: (ComputeNodeGroupsAddNodesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('AddNodes')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AddNodes.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.nodeGroups.addNodes',
+        ordered_params=[u'project', u'zone', u'nodeGroup'],
+        path_params=[u'nodeGroup', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/nodeGroups/{nodeGroup}/addNodes',
+        request_field=u'nodeGroupsAddNodesRequest',
+        request_type_name=u'ComputeNodeGroupsAddNodesRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def AggregatedList(self, request, global_params=None):
+      r"""Retrieves an aggregated list of node groups. Note: use nodeGroups.listNodes for more details about each group.
+
+      Args:
+        request: (ComputeNodeGroupsAggregatedListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeGroupAggregatedList) The response message.
+      """
+      config = self.GetMethodConfig('AggregatedList')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AggregatedList.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.nodeGroups.aggregatedList',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/aggregated/nodeGroups',
+        request_field='',
+        request_type_name=u'ComputeNodeGroupsAggregatedListRequest',
+        response_type_name=u'NodeGroupAggregatedList',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes the specified NodeGroup resource.
+
+      Args:
+        request: (ComputeNodeGroupsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'DELETE',
+        method_id=u'compute.nodeGroups.delete',
+        ordered_params=[u'project', u'zone', u'nodeGroup'],
+        path_params=[u'nodeGroup', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/nodeGroups/{nodeGroup}',
+        request_field='',
+        request_type_name=u'ComputeNodeGroupsDeleteRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def DeleteNodes(self, request, global_params=None):
+      r"""Deletes specified nodes from the node group.
+
+      Args:
+        request: (ComputeNodeGroupsDeleteNodesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('DeleteNodes')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    DeleteNodes.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.nodeGroups.deleteNodes',
+        ordered_params=[u'project', u'zone', u'nodeGroup'],
+        path_params=[u'nodeGroup', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/nodeGroups/{nodeGroup}/deleteNodes',
+        request_field=u'nodeGroupsDeleteNodesRequest',
+        request_type_name=u'ComputeNodeGroupsDeleteNodesRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Returns the specified NodeGroup. Get a list of available NodeGroups by making a list() request. Note: the "nodes" field should not be used. Use nodeGroups.listNodes instead.
+
+      Args:
+        request: (ComputeNodeGroupsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeGroup) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.nodeGroups.get',
+        ordered_params=[u'project', u'zone', u'nodeGroup'],
+        path_params=[u'nodeGroup', u'project', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/nodeGroups/{nodeGroup}',
+        request_field='',
+        request_type_name=u'ComputeNodeGroupsGetRequest',
+        response_type_name=u'NodeGroup',
+        supports_download=False,
+    )
+
+    def Insert(self, request, global_params=None):
+      r"""Creates a NodeGroup resource in the specified project using the data included in the request.
+
+      Args:
+        request: (ComputeNodeGroupsInsertRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Insert')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Insert.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.nodeGroups.insert',
+        ordered_params=[u'project', u'zone', u'initialNodeCount'],
+        path_params=[u'project', u'zone'],
+        query_params=[u'initialNodeCount', u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/nodeGroups',
+        request_field=u'nodeGroup',
+        request_type_name=u'ComputeNodeGroupsInsertRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Retrieves a list of node groups available to the specified project. Note: use nodeGroups.listNodes for more details about each group.
+
+      Args:
+        request: (ComputeNodeGroupsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeGroupList) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.nodeGroups.list',
+        ordered_params=[u'project', u'zone'],
+        path_params=[u'project', u'zone'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/zones/{zone}/nodeGroups',
+        request_field='',
+        request_type_name=u'ComputeNodeGroupsListRequest',
+        response_type_name=u'NodeGroupList',
+        supports_download=False,
+    )
+
+    def ListNodes(self, request, global_params=None):
+      r"""Lists nodes in the node group.
+
+      Args:
+        request: (ComputeNodeGroupsListNodesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeGroupsListNodes) The response message.
+      """
+      config = self.GetMethodConfig('ListNodes')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListNodes.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.nodeGroups.listNodes',
+        ordered_params=[u'project', u'zone', u'nodeGroup'],
+        path_params=[u'nodeGroup', u'project', u'zone'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/zones/{zone}/nodeGroups/{nodeGroup}/listNodes',
+        request_field='',
+        request_type_name=u'ComputeNodeGroupsListNodesRequest',
+        response_type_name=u'NodeGroupsListNodes',
+        supports_download=False,
+    )
+
+    def SetNodeTemplate(self, request, global_params=None):
+      r"""Updates the node template of the node group.
+
+      Args:
+        request: (ComputeNodeGroupsSetNodeTemplateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('SetNodeTemplate')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetNodeTemplate.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.nodeGroups.setNodeTemplate',
+        ordered_params=[u'project', u'zone', u'nodeGroup'],
+        path_params=[u'nodeGroup', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/nodeGroups/{nodeGroup}/setNodeTemplate',
+        request_field=u'nodeGroupsSetNodeTemplateRequest',
+        request_type_name=u'ComputeNodeGroupsSetNodeTemplateRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+  class NodeTemplatesService(base_api.BaseApiService):
+    """Service class for the nodeTemplates resource."""
+
+    _NAME = u'nodeTemplates'
+
+    def __init__(self, client):
+      super(ComputeV1.NodeTemplatesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def AggregatedList(self, request, global_params=None):
+      r"""Retrieves an aggregated list of node templates.
+
+      Args:
+        request: (ComputeNodeTemplatesAggregatedListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeTemplateAggregatedList) The response message.
+      """
+      config = self.GetMethodConfig('AggregatedList')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AggregatedList.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.nodeTemplates.aggregatedList',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/aggregated/nodeTemplates',
+        request_field='',
+        request_type_name=u'ComputeNodeTemplatesAggregatedListRequest',
+        response_type_name=u'NodeTemplateAggregatedList',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes the specified NodeTemplate resource.
+
+      Args:
+        request: (ComputeNodeTemplatesDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'DELETE',
+        method_id=u'compute.nodeTemplates.delete',
+        ordered_params=[u'project', u'region', u'nodeTemplate'],
+        path_params=[u'nodeTemplate', u'project', u'region'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/regions/{region}/nodeTemplates/{nodeTemplate}',
+        request_field='',
+        request_type_name=u'ComputeNodeTemplatesDeleteRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Returns the specified node template. Gets a list of available node templates by making a list() request.
+
+      Args:
+        request: (ComputeNodeTemplatesGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeTemplate) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.nodeTemplates.get',
+        ordered_params=[u'project', u'region', u'nodeTemplate'],
+        path_params=[u'nodeTemplate', u'project', u'region'],
+        query_params=[],
+        relative_path=u'projects/{project}/regions/{region}/nodeTemplates/{nodeTemplate}',
+        request_field='',
+        request_type_name=u'ComputeNodeTemplatesGetRequest',
+        response_type_name=u'NodeTemplate',
+        supports_download=False,
+    )
+
+    def Insert(self, request, global_params=None):
+      r"""Creates a NodeTemplate resource in the specified project using the data included in the request.
+
+      Args:
+        request: (ComputeNodeTemplatesInsertRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Insert')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Insert.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.nodeTemplates.insert',
+        ordered_params=[u'project', u'region'],
+        path_params=[u'project', u'region'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/regions/{region}/nodeTemplates',
+        request_field=u'nodeTemplate',
+        request_type_name=u'ComputeNodeTemplatesInsertRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Retrieves a list of node templates available to the specified project.
+
+      Args:
+        request: (ComputeNodeTemplatesListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeTemplateList) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.nodeTemplates.list',
+        ordered_params=[u'project', u'region'],
+        path_params=[u'project', u'region'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/regions/{region}/nodeTemplates',
+        request_field='',
+        request_type_name=u'ComputeNodeTemplatesListRequest',
+        response_type_name=u'NodeTemplateList',
+        supports_download=False,
+    )
+
+  class NodeTypesService(base_api.BaseApiService):
+    """Service class for the nodeTypes resource."""
+
+    _NAME = u'nodeTypes'
+
+    def __init__(self, client):
+      super(ComputeV1.NodeTypesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def AggregatedList(self, request, global_params=None):
+      r"""Retrieves an aggregated list of node types.
+
+      Args:
+        request: (ComputeNodeTypesAggregatedListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeTypeAggregatedList) The response message.
+      """
+      config = self.GetMethodConfig('AggregatedList')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AggregatedList.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.nodeTypes.aggregatedList',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/aggregated/nodeTypes',
+        request_field='',
+        request_type_name=u'ComputeNodeTypesAggregatedListRequest',
+        response_type_name=u'NodeTypeAggregatedList',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Returns the specified node type. Gets a list of available node types by making a list() request.
+
+      Args:
+        request: (ComputeNodeTypesGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeType) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.nodeTypes.get',
+        ordered_params=[u'project', u'zone', u'nodeType'],
+        path_params=[u'nodeType', u'project', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/nodeTypes/{nodeType}',
+        request_field='',
+        request_type_name=u'ComputeNodeTypesGetRequest',
+        response_type_name=u'NodeType',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Retrieves a list of node types available to the specified project.
+
+      Args:
+        request: (ComputeNodeTypesListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NodeTypeList) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.nodeTypes.list',
+        ordered_params=[u'project', u'zone'],
+        path_params=[u'project', u'zone'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/zones/{zone}/nodeTypes',
+        request_field='',
+        request_type_name=u'ComputeNodeTypesListRequest',
+        response_type_name=u'NodeTypeList',
+        supports_download=False,
+    )
+
   class ProjectsService(base_api.BaseApiService):
     """Service class for the projects resource."""
 
@@ -5274,6 +5802,32 @@ If the group is part of a backend service that has enabled connection draining, 
         relative_path=u'projects/{project}/setCommonInstanceMetadata',
         request_field=u'metadata',
         request_type_name=u'ComputeProjectsSetCommonInstanceMetadataRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def SetDefaultNetworkTier(self, request, global_params=None):
+      r"""Sets the default network tier of the project. The default network tier is used when an address/forwardingRule/instance is created without specifying the network tier field.
+
+      Args:
+        request: (ComputeProjectsSetDefaultNetworkTierRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('SetDefaultNetworkTier')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetDefaultNetworkTier.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.projects.setDefaultNetworkTier',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/setDefaultNetworkTier',
+        request_field=u'projectsSetDefaultNetworkTierRequest',
+        request_type_name=u'ComputeProjectsSetDefaultNetworkTierRequest',
         response_type_name=u'Operation',
         supports_download=False,
     )
@@ -6990,6 +7544,250 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+  class SecurityPoliciesService(base_api.BaseApiService):
+    """Service class for the securityPolicies resource."""
+
+    _NAME = u'securityPolicies'
+
+    def __init__(self, client):
+      super(ComputeV1.SecurityPoliciesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def AddRule(self, request, global_params=None):
+      r"""Inserts a rule into a security policy.
+
+      Args:
+        request: (ComputeSecurityPoliciesAddRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('AddRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AddRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.securityPolicies.addRule',
+        ordered_params=[u'project', u'securityPolicy'],
+        path_params=[u'project', u'securityPolicy'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/securityPolicies/{securityPolicy}/addRule',
+        request_field=u'securityPolicyRule',
+        request_type_name=u'ComputeSecurityPoliciesAddRuleRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes the specified policy.
+
+      Args:
+        request: (ComputeSecurityPoliciesDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'DELETE',
+        method_id=u'compute.securityPolicies.delete',
+        ordered_params=[u'project', u'securityPolicy'],
+        path_params=[u'project', u'securityPolicy'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/global/securityPolicies/{securityPolicy}',
+        request_field='',
+        request_type_name=u'ComputeSecurityPoliciesDeleteRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""List all of the ordered rules present in a single specified policy.
+
+      Args:
+        request: (ComputeSecurityPoliciesGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (SecurityPolicy) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.securityPolicies.get',
+        ordered_params=[u'project', u'securityPolicy'],
+        path_params=[u'project', u'securityPolicy'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/securityPolicies/{securityPolicy}',
+        request_field='',
+        request_type_name=u'ComputeSecurityPoliciesGetRequest',
+        response_type_name=u'SecurityPolicy',
+        supports_download=False,
+    )
+
+    def GetRule(self, request, global_params=None):
+      r"""Gets a rule at the specified priority.
+
+      Args:
+        request: (ComputeSecurityPoliciesGetRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (SecurityPolicyRule) The response message.
+      """
+      config = self.GetMethodConfig('GetRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.securityPolicies.getRule',
+        ordered_params=[u'project', u'securityPolicy'],
+        path_params=[u'project', u'securityPolicy'],
+        query_params=[u'priority'],
+        relative_path=u'projects/{project}/global/securityPolicies/{securityPolicy}/getRule',
+        request_field='',
+        request_type_name=u'ComputeSecurityPoliciesGetRuleRequest',
+        response_type_name=u'SecurityPolicyRule',
+        supports_download=False,
+    )
+
+    def Insert(self, request, global_params=None):
+      r"""Creates a new policy in the specified project using the data included in the request.
+
+      Args:
+        request: (ComputeSecurityPoliciesInsertRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Insert')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Insert.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.securityPolicies.insert',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/global/securityPolicies',
+        request_field=u'securityPolicy',
+        request_type_name=u'ComputeSecurityPoliciesInsertRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""List all the policies that have been configured for the specified project.
+
+      Args:
+        request: (ComputeSecurityPoliciesListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (SecurityPolicyList) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.securityPolicies.list',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/global/securityPolicies',
+        request_field='',
+        request_type_name=u'ComputeSecurityPoliciesListRequest',
+        response_type_name=u'SecurityPolicyList',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Patches the specified policy with the data included in the request.
+
+      Args:
+        request: (ComputeSecurityPoliciesPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'PATCH',
+        method_id=u'compute.securityPolicies.patch',
+        ordered_params=[u'project', u'securityPolicy'],
+        path_params=[u'project', u'securityPolicy'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/global/securityPolicies/{securityPolicy}',
+        request_field=u'securityPolicyResource',
+        request_type_name=u'ComputeSecurityPoliciesPatchRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def PatchRule(self, request, global_params=None):
+      r"""Patches a rule at the specified priority.
+
+      Args:
+        request: (ComputeSecurityPoliciesPatchRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('PatchRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    PatchRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.securityPolicies.patchRule',
+        ordered_params=[u'project', u'securityPolicy'],
+        path_params=[u'project', u'securityPolicy'],
+        query_params=[u'priority'],
+        relative_path=u'projects/{project}/global/securityPolicies/{securityPolicy}/patchRule',
+        request_field=u'securityPolicyRule',
+        request_type_name=u'ComputeSecurityPoliciesPatchRuleRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def RemoveRule(self, request, global_params=None):
+      r"""Deletes a rule at the specified priority.
+
+      Args:
+        request: (ComputeSecurityPoliciesRemoveRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('RemoveRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    RemoveRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.securityPolicies.removeRule',
+        ordered_params=[u'project', u'securityPolicy'],
+        path_params=[u'project', u'securityPolicy'],
+        query_params=[u'priority'],
+        relative_path=u'projects/{project}/global/securityPolicies/{securityPolicy}/removeRule',
+        request_field='',
+        request_type_name=u'ComputeSecurityPoliciesRemoveRuleRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
   class SnapshotsService(base_api.BaseApiService):
     """Service class for the snapshots resource."""
 
@@ -7549,6 +8347,32 @@ For more information, see Deleting snaphots.
         request_field='',
         request_type_name=u'ComputeSubnetworksListRequest',
         response_type_name=u'SubnetworkList',
+        supports_download=False,
+    )
+
+    def ListUsable(self, request, global_params=None):
+      r"""Retrieves an aggregated list of usable subnetworks.
+
+      Args:
+        request: (ComputeSubnetworksListUsableRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (UsableSubnetworksAggregatedList) The response message.
+      """
+      config = self.GetMethodConfig('ListUsable')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListUsable.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.subnetworks.listUsable',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/aggregated/subnetworks/listUsable',
+        request_field='',
+        request_type_name=u'ComputeSubnetworksListUsableRequest',
+        response_type_name=u'UsableSubnetworksAggregatedList',
         supports_download=False,
     )
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,14 @@
 """Command for setting usage buckets."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import base_classes
-from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import resources
 
 
 class SetUsageBucket(base.SilentCommand):
@@ -79,7 +82,9 @@ class SetUsageBucket(base.SilentCommand):
       raise calliope_exceptions.ToolException(
           '[--prefix] cannot be specified when unsetting the usage bucket.')
 
-    bucket_uri = utils.NormalizeGoogleStorageUri(args.bucket or None)
+    bucket_uri = None
+    if args.bucket:
+      bucket_uri = str(resources.REGISTRY.Parse(args.bucket))
 
     request = client.messages.ComputeProjectsSetUsageExportBucketRequest(
         project=properties.VALUES.core.project.GetOrFail(),

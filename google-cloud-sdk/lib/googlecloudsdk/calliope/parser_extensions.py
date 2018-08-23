@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,7 +57,9 @@ methods to access/modify info collected during the parse.
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import abc
 import argparse
 import itertools
@@ -357,7 +360,7 @@ class ArgumentParser(argparse.ArgumentParser):
     return self._remainder_action
 
   def GetSpecifiedArgNames(self):
-    """Returns the scrubbed names for args specified on the comman line."""
+    """Returns the scrubbed names for args specified on the command line."""
     return sorted(self._specified_args.values())
 
   def _Suggest(self, unknown_args):

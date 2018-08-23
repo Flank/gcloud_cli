@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +15,13 @@
 """Unit tests for environments storage dags delete."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
@@ -24,15 +29,19 @@ from tests.lib.surface.composer import kubectl_util
 import mock
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 @mock.patch('googlecloudsdk.core.execution_utils.Exec')
 class EnvironmentsStorageDagsDeleteTest(base.GsutilShellingUnitTest,
-                                        base.StorageApiCallingUnitTest):
+                                        base.StorageApiCallingUnitTest,
+                                        parameterized.TestCase):
 
   def SetUp(self):
     properties.VALUES.core.disable_prompts.Set(False)
 
-  def testDagsDeleteTargetSpecified(self, exec_mock):
+  def testDagsDeleteTargetSpecified(self, track, exec_mock):
     """Tests successful DAG deleting for a specific file."""
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -60,8 +69,9 @@ class EnvironmentsStorageDagsDeleteTest(base.GsutilShellingUnitTest,
                          target)
     fake_exec.Verify()
 
-  def testDagsDeleteTargetNotSpecified(self, exec_mock):
+  def testDagsDeleteTargetNotSpecified(self, track, exec_mock):
     """Tests successful deletion of the entire DAGs directory."""
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -85,8 +95,9 @@ class EnvironmentsStorageDagsDeleteTest(base.GsutilShellingUnitTest,
                          '--environment', self.TEST_ENVIRONMENT_ID)
     fake_exec.Verify()
 
-  def testDagsDeleteRestoresSubdir(self, exec_mock):
+  def testDagsDeleteRestoresSubdir(self, track, exec_mock):
     """Tests that the DAGs dir is restored if it's missing after deletion."""
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,

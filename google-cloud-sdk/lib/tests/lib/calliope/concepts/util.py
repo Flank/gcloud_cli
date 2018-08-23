@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +18,9 @@ Used for tests.lib.calliope.concepts.concepts_test_base.
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.command_lib.util import completers
@@ -126,6 +129,28 @@ def GetOrgShelfBookResource(name='book', with_completers=False,
       'example.organizations.shelves.books',
       name,
       attribute_names=['organizationsId', 'shelvesId', 'booksId'],
+      with_completers=with_completers,
+      auto_completers=auto_completers)
+
+
+def GetOrgShelfResource(name='shelf', with_completers=False,
+                        auto_completers=False):
+  """Makes the test shelf resource."""
+  return _GetFakeResource(
+      'example.organizations.shelves',
+      name,
+      attribute_names=['organizationsId', 'shelvesId'],
+      with_completers=with_completers,
+      auto_completers=auto_completers)
+
+
+def GetOrgCaseResource(name='shelf', with_completers=False,
+                       auto_completers=False):
+  """Makes the test shelf resource."""
+  return _GetFakeResource(
+      'example.organizations.cases',
+      name,
+      attribute_names=['organizationsId', 'casesId'],
       with_completers=with_completers,
       auto_completers=auto_completers)
 

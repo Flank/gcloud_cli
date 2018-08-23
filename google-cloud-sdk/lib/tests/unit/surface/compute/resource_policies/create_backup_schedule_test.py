@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the resource policies create-backup-schedule command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import exceptions
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -250,7 +254,11 @@ class CreateBackupScheduleTest(resource_policies_base.TestBase,
     self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
     self.assertEqual(result, policy)
 
-  def testCreate_SnapshotProperties(self):
+  @parameterized.named_parameters(
+      ('WithStorageLocation', '--storage-location us-west1', ['us-west1']),
+      ('WithoutStorageLocation', '', []))
+  def testCreate_SnapshotProperties(self, storage_location_flag,
+                                    storage_location_value):
     description = 'This is a maintenance policy.'
     schedule = self.messages.ResourcePolicyBackupSchedulePolicySchedule(
         dailySchedule=self.messages.ResourcePolicyDailyCycle(
@@ -269,7 +277,8 @@ class CreateBackupScheduleTest(resource_policies_base.TestBase,
                         value='v1'),
                     labels_cls.AdditionalProperty(
                         key='k2',
-                        value='v2')])))
+                        value='v2')]),
+            storageLocations=storage_location_value))
     policy = self.messages.ResourcePolicy(
         name='pol1',
         region=self.region,
@@ -285,8 +294,8 @@ class CreateBackupScheduleTest(resource_policies_base.TestBase,
     result = self.Run(
         'compute resource-policies create-backup-schedule pol1 '
         '--start-time 04:00Z --region {} --description "{}" --daily-schedule '
-        '--max-retention-days 1 --guest-flush --snapshot-labels k1=v1,k2=v2'
-        .format(self.region, description))
+        '--max-retention-days 1 --guest-flush --snapshot-labels k1=v1,k2=v2 {}'
+        .format(self.region, description, storage_location_flag))
 
     self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
     self.assertEqual(result, policy)

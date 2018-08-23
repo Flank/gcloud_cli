@@ -56,12 +56,16 @@ FLAGS
         be one of: pd-standard, pd-ssd.
 
      --enable-autorepair
-        Sets autorepair feature for a node-pool.
+        Enable node autorepair feature for a node-pool.
 
             $ gcloud alpha container node-pools create node-pool-1 \
                 --cluster=example-cluster --enable-autorepair
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-auto-repair
+        Node autorepair is enabled by default for node pools using COS as a
+        base image.
+
+        See
+        https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
         for more info.
 
      --enable-autoupgrade
@@ -70,7 +74,7 @@ FLAGS
             $ gcloud alpha container node-pools create node-pool-1 \
                 --cluster=example-cluster --enable-autoupgrade
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-managament for
+        See https://cloud.google.com/kubernetes-engine/docs/node-management for
         more info.
 
      --image-type=IMAGE_TYPE
@@ -282,10 +286,10 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
      Options to specify the node identity. At most one of these may be
@@ -406,11 +410,11 @@ EXAMPLES
             --cluster=example-cluster --num-nodes=5
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud container node-pools create
         $ gcloud beta container node-pools create

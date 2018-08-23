@@ -8,7 +8,7 @@ SYNOPSIS
         (--remove-findings | --replace-with-info-type
           | --replacement-text=REPLACEMENT_TEXT)
         [--min-likelihood=MIN_LIKELIHOOD; default="possible"]
-        [GCLOUD_WIDE_FLAG ...]
+        [--output-file=OUTPUT_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Redacts potentially sensitive data from text content.
@@ -49,6 +49,9 @@ OPTIONAL FLAGS
         Only return findings equal to or above this threshold. MIN_LIKELIHOOD
         must be one of: likely, possible, unlikely, very-likely, very-unlikely.
 
+     --output-file=OUTPUT_FILE
+        Path to the file to write redacted contents to.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
@@ -58,10 +61,18 @@ API REFERENCE
     This command uses the dlp/v2 API. The full documentation for this API can
     be found at: https://cloud.google.com/dlp/docs/
 
+EXAMPLES
+    To redact email addresses from a file named my-data.csv and write the
+    redacted contents to my-redacted-data.csv, run:
+
+        $ gcloud alpha dlp text redact --info-types EMAIL_ADDRESS \
+            --replace-with-info-type \
+          --content-file my-data.csv --output-file my-redacted-data.csv
+
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
 

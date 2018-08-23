@@ -8,20 +8,21 @@ SYNOPSIS
           | --enable-autoscaling | --enable-legacy-authorization
           | --enable-master-authorized-networks | --enable-network-policy
           | --enable-pod-security-policy | --generate-password
-          | --logging-service=LOGGING_SERVICE
-          | --maintenance-window=MAINTENANCE_WINDOW
-          | --monitoring-service=MONITORING_SERVICE | --remove-labels=[KEY,...]
+          | --maintenance-window=MAINTENANCE_WINDOW | --remove-labels=[KEY,...]
           | --set-password | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
           | --update-labels=[KEY=VALUE,...] | --additional-zones=[ZONE,...]
-          | --node-locations=ZONE,[ZONE,...] | [--enable-autoprovisioning
-          : --max-cpu=MAX_CPU --max-memory=MAX_MEMORY --min-cpu=MIN_CPU
-          --min-memory=MIN_MEMORY
+          | --node-locations=ZONE,[ZONE,...]
+          | --clear-resource-usage-bigquery-dataset
+          | --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
+          | [--enable-autoprovisioning : --max-cpu=MAX_CPU
+          --max-memory=MAX_MEMORY --min-cpu=MIN_CPU --min-memory=MIN_MEMORY
           [--max-accelerator=[type=TYPE,count=COUNT,...]
           : --min-accelerator=[type=TYPE,count=COUNT,...]]]
+          | --logging-service=LOGGING_SERVICE
+          --monitoring-service=MONITORING_SERVICE
           | --password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME) [--async]
-        [--istio-config=[auth=NONE,...]]
         [--master-authorized-networks=NETWORK,[NETWORK,...]]
         [--node-pool=NODE_POOL] [--max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -100,11 +101,6 @@ REQUIRED FLAGS
           Ask the server to generate a secure password and use that as the
           basic auth password, keeping the existing username.
 
-       --logging-service=LOGGING_SERVICE
-          The logging service to use for the cluster. Options are:
-          "logging.googleapis.com" (the Google Cloud Logging service), "none"
-          (logs will not be exported from the cluster)
-
        --maintenance-window=MAINTENANCE_WINDOW
           Set a time of day when you prefer maintenance to start on this
           cluster. For example:
@@ -115,11 +111,6 @@ REQUIRED FLAGS
           The time corresponds to the UTC time zone, and must be in HH:MM
           format. To remove an existing maintenance window from the cluster,
           use '--maintenance-window=None'
-
-       --monitoring-service=MONITORING_SERVICE
-          The monitoring service to use for the cluster. Options are:
-          "monitoring.googleapis.com" (the Google Cloud Monitoring service),
-          "none" (no metrics will be exported from the cluster)
 
        --remove-labels=[KEY,...]
           Labels to remove from the Google Cloud resources in use by the
@@ -156,8 +147,7 @@ REQUIRED FLAGS
           Cluster addons to enable or disable. Options are
           HorizontalPodAutoscaling=ENABLED|DISABLED
           HttpLoadBalancing=ENABLED|DISABLED
-          KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
-          NetworkPolicy=ENABLED|DISABLED
+          KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
 
        --update-labels=[KEY=VALUE,...]
           Labels to apply to the Google Cloud resources in use by the
@@ -214,6 +204,24 @@ REQUIRED FLAGS
                 $ gcloud alpha container clusters update example-cluster \
                     --zone us-central1-a \
                     --node-locations us-central1-a,us-central1-b
+
+       Exports cluster's usage of cloud resources At most one of these may be
+       specified:
+
+         --clear-resource-usage-bigquery-dataset
+            Disables exporting cluster resource usage to BigQuery.
+
+         --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
+            The name of the BigQuery dataset to which the cluster's usage of
+            cloud resources is exported. A table will be created in the
+            specified dataset to store cluster resource usage. The resulting
+            table can be joined with BigQuery Billing Export to produce a
+            fine-grained cost breakdown.
+
+            Example:
+
+                $ gcloud alpha container clusters update example-cluster \
+                    --resource-usage-bigquery-dataset=example_bigquery_dataset_name
 
        Node autoprovisioning
 
@@ -280,6 +288,20 @@ REQUIRED FLAGS
           (Required) The minimum number of accelerators to which the cluster
           can be scaled.
 
+       --logging-service=LOGGING_SERVICE
+          Logging service to use for the cluster. Options are:
+          "logging.googleapis.com/kubernetes" (the Google Cloud Logging service
+          with Kubernetes-native resource model enabled),
+          "logging.googleapis.com" (the Google Cloud Logging service), "none"
+          (logs will not be exported from the cluster)
+
+       --monitoring-service=MONITORING_SERVICE
+          Monitoring service to use for the cluster. Options are:
+          "monitoring.googleapis.com/kubernetes" (the Google Cloud Monitoring
+          service with Kubernetes-native resource model enabled),
+          "monitoring.googleapis.com" (the Google Cloud Monitoring service),
+          "none" (no metrics will be exported from the cluster)
+
        Basic auth
 
          --password=PASSWORD
@@ -304,16 +326,6 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --async
         Don't wait for the operation to complete.
-
-     --istio-config=[auth=NONE,...]
-        Configurations for Istio addon, requires --addons contains Istio for
-        create, or --update-addons Istio=ENABLED for update.
-
-         auth
-            Optional Type of auth NONE or MUTUAL_TLS Example:
-
-                $ gcloud alpha container clusters update example-cluster \
-                    --istio-config=auth=NONE
 
      --master-authorized-networks=NETWORK,[NETWORK,...]
         The list of CIDR blocks (up to 20) that are allowed to connect to
@@ -343,10 +355,10 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
@@ -355,11 +367,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud container clusters update
         $ gcloud beta container clusters update

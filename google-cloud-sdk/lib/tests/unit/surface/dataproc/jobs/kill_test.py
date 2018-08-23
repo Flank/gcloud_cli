@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +16,10 @@
 """Test of the 'jobs kill' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
-import textwrap
 
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope import base as calliope_base
@@ -64,10 +66,9 @@ class JobsKillUnitTest(jobs_unit_base.JobsUnitTestBase):
     expected = self.ExpectKillCalls()
     self.WriteInput('y\n')
     result = self.RunDataproc('jobs kill ' + self.JOB_ID)
-    self.AssertErrContains(textwrap.dedent("""\
-        The job 'dbf5f287-f332-470b-80b2-c94b49358c45' will be killed.
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        "The job 'dbf5f287-f332-470b-80b2-c94b49358c45' will be killed.")
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertMessagesEqual(expected, result)
     self.AssertErrContains('Job cancellation initiated')
     self.AssertErrContains('Waiting for job cancellation')
@@ -88,10 +89,9 @@ class JobsKillUnitTest(jobs_unit_base.JobsUnitTestBase):
         console_io.OperationCancelledError,
         'Cancellation aborted by user.'):
       self.RunDataproc('jobs kill ' + self.JOB_ID)
-    self.AssertErrContains(textwrap.dedent("""\
-      The job 'dbf5f287-f332-470b-80b2-c94b49358c45' will be killed.
-
-      Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        "The job 'dbf5f287-f332-470b-80b2-c94b49358c45' will be killed.")
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testKillJobNotFound(self):
     self.ExpectCancelJob(

@@ -75,7 +75,8 @@ FLAGS
         unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB for
         terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB.
+        multiple of 1 GB. Limit your boot disk size to 2TB to account for MBR
+        partition table limitations.
 
      --boot-disk-type=BOOT_DISK_TYPE
         The type of the boot disk. This option can only be specified if a new
@@ -272,7 +273,7 @@ FLAGS
             is no.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -388,6 +389,10 @@ FLAGS
             exclusive with address. If neither key is present the instance will
             get an ephemeral IP.
 
+         network-tier
+            Specifies the network tier of the interface. NETWORK_TIER must be
+            one of: PREMIUM, STANDARD. The default value is PREMIUM.
+
          subnet
             Specifies the subnet that the interface will be part of. If network
             key is also specified this must be a subnetwork of the specified
@@ -422,8 +427,8 @@ FLAGS
         instances can not be restarted and will not migrate.
 
      --region=REGION
-        The region of the instance template to create. If not specified, you
-        may be prompted to select a region.
+        Region of the instance template to create. If not specified, you may be
+        prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:

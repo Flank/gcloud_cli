@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +15,24 @@
 """Tests for Bigtable instances get-iam-policy command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.bigtable import util
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class GetIamPolicyTest(base.BigtableV2TestBase):
 
   def SetUp(self):
     self.instance_ref = util.GetInstanceRef('my-instance')
 
-  def testGetIamPolicy(self):
+  def testGetIamPolicy(self, track):
+    self.track = track
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
@@ -42,8 +50,9 @@ class GetIamPolicyTest(base.BigtableV2TestBase):
         'bigtable instances get-iam-policy my-instance')
     self.assertEqual(get_policy_request, test_iam_policy)
 
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track):
     """Ensure get-iam-policy properly applies list command filters."""
+    self.track = track
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(

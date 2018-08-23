@@ -51,7 +51,7 @@ Specifies a list of instances to add to the target pool.
 .RS 2m
 .TP 2m
 \fB\-\-instances\-zone\fR=\fIINSTANCES_ZONE\fR
-The zone of the instances to add to the target pool. If not specified and the
+Zone of the instances to add to the target pool. If not specified and the
 \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
 zone.
 
@@ -79,13 +79,13 @@ Alternatively, the zone can be stored in the environment variable
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the target pool to operate on. If not specified it will be set the
+Region of the target pool to operate on. If not specified, it will be set to the
 region of the instances. Overrides the default \fBcompute/region\fR property
 value for this command invocation.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-The zone of the instances to add to the target pool. DEPRECATED, use
+Zone of the instances to add to the target pool. DEPRECATED, use
 \-\-instances\-zone. If not specified, you will be prompted to select a zone.
 Overrides the default \fBcompute/zone\fR property value for this command
 invocation.
@@ -105,11 +105,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute target\-pools add\-instances

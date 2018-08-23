@@ -6,17 +6,14 @@ SYNOPSIS
     gcloud alpha container binauthz attestations create
         --artifact-url=ARTIFACT_URL --pgp-key-fingerprint=PGP_KEY_FINGERPRINT
         --signature-file=SIGNATURE_FILE
-        ([--attestation-authority=ATTESTATION_AUTHORITY
-          : --attestation-authority-project=ATTESTATION_AUTHORITY_PROJECT]
-          | [--attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
-          : --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT])
+        (--attestor=ATTESTOR : --attestor-project=ATTESTOR_PROJECT)
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command creates a Binary Authorization attestation for your
     project. The attestation is created for the specified artifact (e.g. a
-    grc.io container URL) and stored under the specified attestation authority
-    (i.e. the Container Analysis Note).
+    grc.io container URL), associate with the specified attestor, and stored
+    under the specified project.
 
 REQUIRED FLAGS
      --artifact-url=ARTIFACT_URL
@@ -33,39 +30,21 @@ REQUIRED FLAGS
         Path to file containing the signature to store, or - to read signature
         from stdin.
 
-     Exactly one of these must be specified:
+     Attestor resource - The Attestor whose Container Analysis Note will be
+     used to host the created attestation. In order to successfully attach the
+     attestation, the active gcloud account (core/account) must be able to read
+     this attestor and must have the containeranalysis.notes.attachOccurrence
+     permission for the Attestor's underlying Note resource (usually via the
+     containeranalysis.notes.attacher role). The arguments in this group can be
+     used to specify the attributes of this resource. This must be specified.
 
-       Authority resource - The Attestation Authority whose Container Analysis
-       Note will be used to host the created attestation. In order to
-       successfully attach the attestation, the active gcloud account
-       (core/account) must have the containeranalysis.notes.attachOccurrence
-       permission for the Authority's underlying Note resource (usually via the
-       containeranalysis.notes.attacher role). The arguments in this group can
-       be used to specify the attributes of this resource.
+       --attestor=ATTESTOR
+          The ID of the attestor or a fully qualified identifier for the
+          attestor. This flag must be specified if any of the other arguments
+          in this group are specified.
 
-         --attestation-authority=ATTESTATION_AUTHORITY
-            The ID of the authority or a fully qualified identifier for the
-            authority. This flag must be specified if any of the other
-            arguments in this group are specified.
-
-         --attestation-authority-project=ATTESTATION_AUTHORITY_PROJECT
-            The Cloud project for the authority.
-
-       Note resource - The Container Analysis ATTESTATION_AUTHORITY Note that
-       the created attestation will be bound to. This note must exist and the
-       active gcloud account (core/account) must have the
-       containeranalysis.notes.attachOccurrence permission for the note
-       resource (usually via the containeranalysis.notes.attacher role). The
-       arguments in this group can be used to specify the attributes of this
-       resource.
-
-         --attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
-            The ID of the note or a fully qualified identifier for the note.
-            This flag must be specified if any of the other arguments in this
-            group are specified.
-
-         --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT
-            The Container Analysis project for the note.
+       --attestor-project=ATTESTOR_PROJECT
+          The Cloud project for the attestor.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -73,20 +52,22 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 EXAMPLES
-    To create an attestation as the attestation authority with resource path
-    "projects/foo/attestationAuthorities/bar", run:
+    To create an attestation in the project "my_proj" as the attestor with
+    resource path "projects/foo/attestors/bar", run:
 
         $ gcloud alpha container binauthz attestations create \
+            --project=my_proj \
             --artifact-url='gcr.io/example-project/example-image@sha256:abcd' \
-            --attestation-authority=projects/foo/attestationAuthorities/bar \
+            --attestor=projects/foo/attestors/bar \
             --signature-file=signed_artifact_attestation.pgp.sig \
             --pgp-key-fingerprint=AAAA0000000000000000FFFFFFFFFFFFFFFFFFFF
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. Usually, users of ALPHA commands and flags need to apply
-    for access, agree to applicable terms, and have their projects whitelisted.
-    Contact Google or sign up on a product's page for ALPHA access. Product
-    pages can be found at https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta container binauthz attestations create
 

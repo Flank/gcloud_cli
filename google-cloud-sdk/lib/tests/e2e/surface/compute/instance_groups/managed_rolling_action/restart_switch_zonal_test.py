@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Managed Instance Group Updater zonal restart switch e2e test."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from tests.lib.surface.compute import e2e_managers_updater_test_base
 from tests.lib.surface.compute import e2e_test_base
 

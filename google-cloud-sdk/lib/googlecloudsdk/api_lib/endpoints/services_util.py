@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +18,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import json
 import re
 
@@ -386,12 +388,14 @@ def PushOpenApiServiceConfig(
                                         validate_only=validate_only)
 
 
-def CreateServiceIfNew(service_name, project):
-  """Creates a Service resource if it does not already exist.
+def DoesServiceExist(service_name):
+  """Check if a service resource exists.
 
   Args:
-    service_name: name of the service to be returned or created.
-    project: the project Id
+    service_name: name of the service to check if exists.
+
+  Returns:
+    Whether or not the service exists.
   """
   messages = GetMessagesModule()
   client = GetClientInstance()
@@ -404,12 +408,26 @@ def CreateServiceIfNew(service_name, project):
           apitools_exceptions.HttpNotFoundError):
     # Older versions of service management backend return a 404 when service is
     # new, but more recent versions return a 403. Check for either one for now.
-    # create service
-    create_request = messages.ManagedService(
-        serviceName=service_name,
-        producerProjectId=project,
-    )
-    client.services.Create(create_request)
+    return False
+  else:
+    return True
+
+
+def CreateService(service_name, project):
+  """Creates a Service resource.
+
+  Args:
+    service_name: name of the service to be created.
+    project: the project Id
+  """
+  messages = GetMessagesModule()
+  client = GetClientInstance()
+  # create service
+  create_request = messages.ManagedService(
+      serviceName=service_name,
+      producerProjectId=project,
+  )
+  client.services.Create(create_request)
 
 
 def GetByteStringFromFingerprint(fingerprint):

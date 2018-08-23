@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests of the progress_tracker module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import io
 import os
 import signal
@@ -27,13 +30,15 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.console import progress_tracker
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
+class ProgressTrackerTest(sdk_test_base.WithOutputCapture,
+                          parameterized.TestCase):
 
   def SetUp(self):
     self._interactive_mock = self.StartObjectPatch(console_io, 'IsInteractive')
@@ -257,7 +262,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
     self.AssertErrContains(
         '\r' + ' ' * console_size +
         '\rtracker...'
-        '\ntracker... this is a\n'
+        '\r' + ' ' * console_size +
+        '\rtracker... this is a\n'
         ' multiline display m\n'
         'essage.../'
         '\r' + ' ' * console_size +
@@ -278,7 +284,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
     self.AssertErrContains(
         '\r' + ' ' * console_size +
         '\rtracker...'
-        '\ntracker... this is a\n'
+        '\r' + ' ' * console_size +
+        '\rtracker... this is a\n'
         ' multiline display m\n'
         'essage.../'
         '\r' + ' ' * console_size +
@@ -304,7 +311,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
     self.AssertErrContains(
         '\r' + ' ' * console_size +
         '\rtracker...'
-        '\ntracker... this is a\n'
+        '\r' + ' ' * console_size +
+        '\rtracker... this is a\n'
         ' multiline display m\n'
         'essage.../'
         '\r' + ' ' * console_size +
@@ -332,7 +340,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
     self.AssertErrContains(
         '\r' + ' ' * console_size +
         '\rtracker...'
-        '\ntracker... this is a\n'
+        '\r' + ' ' * console_size +
+        '\rtracker... this is a\n'
         ' multiline display m\n'
         'essage.../'
         '\ntracker... this is a\n'
@@ -341,9 +350,11 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
         'ssage...-'
         '\ntracker... short...\\'
         '\r' + ' ' * console_size +
-        '\rtracker... short...done.\n')
+        '\rtracker... short...d\n' +
+        'one.\n')
 
   def testOutputDisabled(self):
+    self.SetConsoleSize(20)
     log.SetUserOutputEnabled(False)
     with progress_tracker.ProgressTracker('tracker', autotick=True) as t:
       t.Tick()
@@ -435,6 +446,29 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
     self.AssertOutputEquals('')
     self.AssertErrEquals('{"ux": "PROGRESS_TRACKER", "message": "tracker", '
                          '"status": "SUCCESS"}\n')
+
+  @parameterized.named_parameters(
+      ('Utf8', 'utf8', ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧']),
+      ('Cp437', 'cp437', ['|', '/', '-', '\\']),  # windows
+      ('Ascii', 'ascii', ['|', '/', '-', '\\']))
+  def testProgressTrackerSpinnersByEncoding(self, encoding, spinners):
+    self.SetConsoleSize(30)
+    self.SetEncoding(encoding)
+    with progress_tracker.ProgressTracker('tracker', autotick=False) as t:
+      for _ in range(len(spinners)):
+        t.Tick()
+    for tick_mark in spinners:
+      self.AssertErrContains('\rtracker...' + tick_mark)
+
+  def testProgressTrackerNonInteractivePseudoTty(self):
+    # This actually sets it to 0. This size is incremented due to legacy
+    # reasons.
+    self.SetConsoleSize(-1)
+    self._interactive_mock.return_value = False
+    with progress_tracker.ProgressTracker('tracker', autotick=False) as t:
+      t.Tick()
+      t.Tick()
+    self.AssertErrEquals('')
 
 
 @test_case.Filters.SkipOnWindows('Enable completion on Windows', 'b/24905560')

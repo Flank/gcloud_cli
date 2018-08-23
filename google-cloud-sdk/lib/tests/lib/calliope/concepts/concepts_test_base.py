@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Test base for the Calliope concepts library."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import resource as resource_util
 from googlecloudsdk.calliope import parser_arguments
 from googlecloudsdk.calliope import parser_extensions
@@ -78,6 +81,11 @@ class ConceptsTestBase(sdk_test_base.WithFakeAuth,
         allow_positional=True)
     command.ai = self.parser
 
+    # Set up a default fallthrough.
+    def Fallthrough():
+      return '!'
+    self.fallthrough = deps.Fallthrough(Fallthrough, hint='h')
+
   def _GetMockNamespace(self, **kwargs):
 
     class MockNamespace(object):
@@ -110,21 +118,21 @@ class ConceptsTestBase(sdk_test_base.WithFakeAuth,
     # Lazy creation allows checking of the GetCollectionInfo mock.
     return util.GetBookResource(auto_completers=True)
 
-  def SetUpFallthroughSpec(self, return_value):
-    def Fallthrough():
-      return return_value
+  def SetUpFallthroughSpec(self, fallthrough=None):
+    if not fallthrough:
+      fallthrough = self.fallthrough
     return concepts.ResourceSpec(
         'example.projects.shelves.books',
         'project',
         projectsId=concepts.ResourceParameterAttributeConfig(
             name='project', help_text='Auxilio aliis.',
-            fallthroughs=[deps.Fallthrough(Fallthrough, hint='hint')]),
+            fallthroughs=[fallthrough]),
         shelvesId=concepts.ResourceParameterAttributeConfig(
             name='shelf', help_text='Auxilio aliis.',
-            fallthroughs=[deps.Fallthrough(Fallthrough, hint='hint')]),
+            fallthroughs=[fallthrough]),
         booksId=concepts.ResourceParameterAttributeConfig(
             name='book', help_text='Auxilio aliis.',
-            fallthroughs=[deps.Fallthrough(Fallthrough, hint='hint')]))
+            fallthroughs=[fallthrough]))
 
 
 class MultitypeTestBase(ConceptsTestBase):
@@ -195,9 +203,90 @@ class MultitypeTestBase(ConceptsTestBase):
         name='projcasebook')
     organization_case_book_resource = util.GetOrgCaseBookResource(
         name='orgcasebook')
-    return multitype.MultitypeConceptSpec(
+    return multitype.MultitypeResourceSpec(
         'book',
         project_shelf_book_resource,
         organization_shelf_book_resource,
         project_case_book_resource,
         organization_case_book_resource)
+
+  @property
+  def four_way_parent_child_resource(self):
+    """A multitype concept spec with four types."""
+    project_shelf_book_resource = util.GetBookResource()
+    organization_shelf_book_resource = util.GetOrgShelfBookResource()
+    project_shelf_resource = util.GetProjShelfResource()
+    organization_shelf_resource = util.GetOrgShelfResource()
+    return multitype.MultitypeResourceSpec(
+        'book',
+        project_shelf_book_resource,
+        organization_shelf_book_resource,
+        project_shelf_resource,
+        organization_shelf_resource)
+
+  @property
+  def parent_child_resource(self):
+    """A multitype concept spec with four types."""
+    project_shelf_book_resource = util.GetBookResource('book')
+    project_shelf_resource = util.GetProjShelfResource('shelf')
+    return multitype.MultitypeResourceSpec(
+        'book',
+        project_shelf_book_resource,
+        project_shelf_resource)
+
+  @property
+  def two_way_resource(self):
+    project_book_resource = util.GetBookResource(name='projectbook')
+    organization_book_resource = util.GetOrgShelfBookResource(name='orgbook')
+    return multitype.MultitypeResourceSpec(
+        'book',
+        project_book_resource,
+        organization_book_resource)
+
+  @property
+  def two_way_shelf_case_book(self):
+    project_shelf_book_resource = util.GetBookResource(name='shelfbook')
+    project_case_book_resource = util.GetProjCaseBookResource(name='casebook')
+    return multitype.MultitypeResourceSpec(
+        'book',
+        project_shelf_book_resource,
+        project_case_book_resource)
+
+  @property
+  def different_anchor_resource(self):
+    """A multitype concept spec with four types."""
+    org_shelf_resource = util.GetOrgShelfResource()
+    org_case_resource = util.GetOrgCaseResource()
+    return multitype.MultitypeResourceSpec(
+        'book',
+        org_shelf_resource,
+        org_case_resource)
+
+  def SetUpFallthroughSpec(self, fallthrough=None, is_multitype=False):
+    if not is_multitype:
+      return super(MultitypeTestBase, self).SetUpFallthroughSpec(
+          fallthrough=fallthrough)
+    if not fallthrough:
+      fallthrough = self.fallthrough
+    project = concepts.ResourceParameterAttributeConfig(
+        name='project', help_text='h', fallthroughs=[fallthrough])
+    shelf = concepts.ResourceParameterAttributeConfig(
+        name='shelf', help_text='h', fallthroughs=[fallthrough])
+    book = concepts.ResourceParameterAttributeConfig(
+        name='book', help_text='h', fallthroughs=[fallthrough])
+    org = concepts.ResourceParameterAttributeConfig(
+        name='organization', help_text='h', fallthroughs=[fallthrough])
+    return multitype.MultitypeResourceSpec(
+        'book',
+        concepts.ResourceSpec(
+            'example.projects.shelves.books',
+            'projectbook',
+            projectsId=project,
+            shelvesId=shelf,
+            booksId=book),
+        concepts.ResourceSpec(
+            'example.organizations.shelves.books',
+            'orgbook',
+            organizationsId=org,
+            shelvesId=shelf,
+            booksId=book))

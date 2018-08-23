@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the url-maps set-default-service subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -134,7 +137,119 @@ class UrlMapsSetDefaultServiceAlphaTest(UrlMapsSetDefaultServiceTest):
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',)
 
   def RunSetDefaultService(self, command):
-    self.Run('alpha compute url-maps set-default-service ' + command)
+    self.Run('alpha compute url-maps set-default-service --global' + command)
+
+
+class RegionUrlMapsSetDefaultServiceTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self._backend_buckets_uri_prefix = (
+        self.compute_uri + '/projects/my-project/global/backendBuckets/')
+    self._backend_services_uri_prefix = (
+        self.compute_uri + '/projects/my-project/regions/us-west-1/'
+        'backendServices/')
+    self._url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
+    )
+
+  def RunSetDefaultService(self, command):
+    self.Run('alpha compute url-maps set-default-service --region us-west-1' +
+             command)
+
+  def _MakeExpectedUrlMapGetRequest(self):
+    return self.messages.ComputeRegionUrlMapsGetRequest(
+        urlMap='url-map-1', project='my-project', region='us-west-1')
+
+  def _MakeExpectedUrlMapUpdateRequest(self, expected_url_map):
+    return self.messages.ComputeRegionUrlMapsUpdateRequest(
+        urlMap='url-map-1',
+        project='my-project',
+        urlMapResource=expected_url_map,
+        region='us-west-1')
+
+  def testSimpleCase(self):
+    self.make_requests.side_effect = iter([
+        [self._url_map],
+        [],
+    ])
+
+    self.RunSetDefaultService("""
+        url-map-1
+          --default-service new-service
+        """)
+
+    expected_url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._backend_services_uri_prefix + 'new-service',
+    )
+
+    self.CheckRequests(
+        [(self._url_maps_api, 'Get', self._MakeExpectedUrlMapGetRequest())],
+        [(self._url_maps_api, 'Update',
+          self._MakeExpectedUrlMapUpdateRequest(expected_url_map))])
+
+  def testNoChangeCase(self):
+    self.make_requests.side_effect = [
+        [self._url_map],
+    ]
+
+    self.RunSetDefaultService("""
+        url-map-1
+          --default-backend-bucket default-bucket
+        """)
+
+    self.CheckRequests(
+        [(self._url_maps_api, 'Get', self._MakeExpectedUrlMapGetRequest())],)
+
+    self.AssertErrEquals(
+        'No change requested; skipping update for [url-map-1].\n',
+        normalize_space=True)
+
+  def testSimpleBackendBucketCase(self):
+    self.make_requests.side_effect = iter([
+        [self._url_map],
+        [],
+    ])
+
+    self.RunSetDefaultService("""
+        url-map-1
+          --default-backend-bucket new-bucket
+        """)
+
+    expected_url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._backend_buckets_uri_prefix + 'new-bucket',
+    )
+
+    self.CheckRequests(
+        [(self._url_maps_api, 'Get', self._MakeExpectedUrlMapGetRequest())],
+        [(self._url_maps_api, 'Update',
+          self._MakeExpectedUrlMapUpdateRequest(expected_url_map))])
+
+  def testDefaultServiceOrDefaultBackendBucketIsRequired(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of (--default-backend-bucket | --default-service) '
+        'must be specified.'):
+      self.RunSetDefaultService("""
+          url-map-1
+          """)
+
+    self.CheckRequests()
+
+  def testBothDefaultServiceAndDefaultBackendBucket(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --default-backend-bucket: Exactly one of '
+        '(--default-backend-bucket | --default-service) must be specified.'):
+      self.RunSetDefaultService("""
+          url-map-1
+            --default-backend-bucket new-bucket
+            --default-service new-service
+          """)
+
+    self.CheckRequests()
 
 
 class UrlMapsSetDefaultServiceBetaTest(UrlMapsSetDefaultServiceTest):

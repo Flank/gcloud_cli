@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +15,24 @@
 """Tests for environment patch command utility functions."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import environment_patch_util as patch_util
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.composer import base
 
 
-class EnvironmentPatchUtilTest(base.EnvironmentsUnitTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class EnvironmentPatchUtilTest(base.EnvironmentsUnitTest,
+                               parameterized.TestCase):
 
-  def SetUp(self):
+  # Must be called after self.SetTrack() for self.messages to be present
+  def _SetTestMessages(self):
     self.field_mask = 'testfieldmask'
     self.patch_environment = self.messages.Environment(name='patch')
     self.env_resource = resources.REGISTRY.Parse(
@@ -45,7 +54,9 @@ class EnvironmentPatchUtilTest(base.EnvironmentsUnitTest):
         self.TEST_OPERATION_UUID,
         done=True)
 
-  def testPatch_Synchronous(self):
+  def testPatch_Synchronous(self, track):
+    self.SetTrack(track)
+    self._SetTestMessages()
     self.ExpectEnvironmentPatch(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -59,15 +70,21 @@ class EnvironmentPatchUtilTest(base.EnvironmentsUnitTest):
         self.TEST_OPERATION_UUID,
         response=self.successful_op)
 
-    retval = patch_util.Patch(self.env_resource, self.field_mask,
-                              self.patch_environment, False)
+    retval = patch_util.Patch(
+        self.env_resource,
+        self.field_mask,
+        self.patch_environment,
+        False,
+        release_track=self.track)
     self.assertIsNone(retval)
     self.AssertErrMatches(
         r'^{{"ux": "PROGRESS_TRACKER", "message": "Waiting for \[{}] to be '
         r'updated with \[{}]"'.format(self.TEST_ENVIRONMENT_NAME,
                                       self.TEST_OPERATION_NAME))
 
-  def testPatch_Asynchronous(self):
+  def testPatch_Asynchronous(self, track):
+    self.SetTrack(track)
+    self._SetTestMessages()
     self.ExpectEnvironmentPatch(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -76,8 +93,12 @@ class EnvironmentPatchUtilTest(base.EnvironmentsUnitTest):
         update_mask=self.field_mask,
         response=self.running_op)
 
-    retval = patch_util.Patch(self.env_resource, self.field_mask,
-                              self.patch_environment, True)
+    retval = patch_util.Patch(
+        self.env_resource,
+        self.field_mask,
+        self.patch_environment,
+        True,
+        release_track=self.track)
     self.assertEqual(self.running_op, retval)
     self.AssertErrMatches(
         r'^Update in progress for environment \[{}] with operation \[{}]'.

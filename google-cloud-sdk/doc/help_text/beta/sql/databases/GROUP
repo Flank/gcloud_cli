@@ -34,8 +34,9 @@ COMMANDS
         (BETA) Patches the settings of a Cloud SQL database.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud sql databases
+        $ gcloud alpha sql databases
 

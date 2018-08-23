@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for deploying a MVM app."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 import urllib2
@@ -33,7 +36,11 @@ class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
                         sdk_test_base.WithTempCWD):
   """Test we can deploy an app."""
 
-  TIMEOUT = 900  # 15 minutes
+  # Total test time: DEPLOY_TIMEOUT + DELETE_TIMEOUT * DELETE_RETRIALS + ε
+  # Make sure to allow for enough time in the test runner for these to complete.
+  DEPLOY_TIMEOUT = 1200  # 20 minutes
+  DELETE_TIMEOUT = 180  # 3 minutes
+  DELETE_RETRIALS = 3  # Total of 29 minutes
 
   def SetUp(self):
     self.version = next(e2e_utils.GetResourceNameGenerator(prefix='gaetest'))
@@ -65,7 +72,8 @@ class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
     if image_url:
       args.append('--image-url=%s' % image_url)
 
-    return self.ExecuteScript('gcloud', args, timeout=DeployCustomTests.TIMEOUT)
+    return self.ExecuteScript('gcloud', args,
+                              timeout=DeployCustomTests.DEPLOY_TIMEOUT)
 
   def testDeployCustom(self):
     test_app = self._Resource('app_engine_custom_data', 'app.yaml')
@@ -147,13 +155,13 @@ class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
     self.deployApp(test_app)
 
   def TearDown(self):
-    @retry.RetryOnException(max_retrials=3)
+    @retry.RetryOnException(max_retrials=DeployCustomTests.DELETE_RETRIALS)
     def _InnerTearDown():
       self.ExecuteScript('gcloud', ['app', 'versions', 'delete', '--service',
                                     'default', '-q',
                                     self.version,
                                     '--verbosity=debug'],
-                         timeout=DeployCustomTests.TIMEOUT)
+                         timeout=DeployCustomTests.DELETE_TIMEOUT)
     try:
       _InnerTearDown()
     except exec_utils.ExecutionError as e:

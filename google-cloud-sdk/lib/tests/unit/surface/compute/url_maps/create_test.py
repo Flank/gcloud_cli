@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the url-maps create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -25,6 +28,7 @@ class URLMapsCreateTest(test_base.BaseTest):
     self.SelectApi('v1')
     self._api = 'v1'
     self._url_maps_api = self.compute_v1.urlMaps
+    self._region_name = 'us-west-1'
 
   def RunCreate(self, command):
     self.Run('compute url-maps create ' + command)
@@ -157,7 +161,132 @@ class URLMapsCreateAlphaTest(URLMapsCreateTest):
     self._url_maps_api = self.compute_alpha.urlMaps
 
   def RunCreate(self, command):
-    self.Run('alpha compute url-maps create ' + command)
+    self.Run('alpha compute url-maps create --global ' + command)
+
+
+class RegionURLMapsCreateTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._api = 'alpha'
+    self._url_maps_api = self.compute_alpha.regionUrlMaps
+
+  def RunCreate(self, command):
+    self.Run('alpha compute url-maps create --region us-west-1 ' + command)
+
+  def testSimpleBackendServiceCase(self):
+    self.RunCreate("""
+        my-url-map
+          --default-service my-service
+        """)
+
+    self.CheckRequests(
+        [(self._url_maps_api, 'Insert',
+          self.messages.ComputeRegionUrlMapsInsertRequest(
+              project='my-project',
+              region='us-west-1',
+              urlMap=self.messages.UrlMap(
+                  defaultService=(
+                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'my-project/regions/us-west-1/backendServices/my-service')
+                  % {'api': self._api},
+                  name='my-url-map')))],)
+
+  def testSimpleBackendBucketCase(self):
+    self.RunCreate("""
+        my-url-map
+          --default-backend-bucket my-backend-bucket
+        """)
+
+    self.CheckRequests(
+        [(self._url_maps_api, 'Insert',
+          self.messages.ComputeRegionUrlMapsInsertRequest(
+              project='my-project',
+              region='us-west-1',
+              urlMap=self.messages.UrlMap(
+                  defaultService=(
+                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'my-project/global/backendBuckets/my-backend-bucket') %
+                  {'api': self._api},
+                  name='my-url-map')))],)
+
+  def testBackendBucketWithDescription(self):
+    self.RunCreate("""
+        my-url-map
+          --description "My URL map"
+          --default-backend-bucket my-backend-bucket
+        """)
+
+    self.CheckRequests(
+        [(self._url_maps_api, 'Insert',
+          self.messages.ComputeRegionUrlMapsInsertRequest(
+              project='my-project',
+              region='us-west-1',
+              urlMap=self.messages.UrlMap(
+                  defaultService=(
+                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'my-project/global/backendBuckets/my-backend-bucket') %
+                  {'api': self._api},
+                  description='My URL map',
+                  name='my-url-map')))],)
+
+  def testWithoutDefaultServiceOrBucket(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of (--default-backend-bucket | --default-service) '
+        'must be specified.'):
+      self.RunCreate("""
+          my-url-map
+          """)
+
+    self.CheckRequests()
+
+  def testWithDefaultServiceAndDefaultBucket(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --default-backend-bucket: Exactly one of '
+        '(--default-backend-bucket | --default-service) must be specified.'):
+      self.RunCreate("""
+          my-url-map
+            --default-backend-bucket my-backend-bucket
+            --default-service my-service
+          """)
+
+    self.CheckRequests()
+
+  def testUriSupportBackendService(self):
+    self.RunCreate("""
+        https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-url-map
+          --default-service https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/my-service
+        """ % {'api': self._api})
+
+    self.CheckRequests(
+        [(self._url_maps_api, 'Insert',
+          self.messages.ComputeRegionUrlMapsInsertRequest(
+              project='my-project',
+              region='us-west-1',
+              urlMap=self.messages.UrlMap(
+                  defaultService=(
+                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'my-project/regions/us-west-1/backendServices/my-service')
+                  % {'api': self._api},
+                  name='my-url-map')))],)
+
+  def testUriSupportBackendBucket(self):
+    self.RunCreate("""
+        https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-url-map
+          --default-backend-bucket https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/my-backend-bucket
+        """ % {'api': self._api})
+
+    self.CheckRequests(
+        [(self._url_maps_api, 'Insert',
+          self.messages.ComputeRegionUrlMapsInsertRequest(
+              project='my-project',
+              region='us-west-1',
+              urlMap=self.messages.UrlMap(
+                  defaultService=(
+                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'my-project/global/backendBuckets/my-backend-bucket') %
+                  {'api': self._api},
+                  name='my-url-map')))],)
 
 
 class URLMapsCreateBetaTest(URLMapsCreateTest):

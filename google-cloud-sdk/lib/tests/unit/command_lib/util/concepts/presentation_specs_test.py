@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """Tests for the concepts.presentation_specs module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope.concepts import deps
@@ -110,11 +112,16 @@ class MultitypePresentationSpecTest(concepts_test_base.MultitypeTestBase,
       ('WithPrefixesAndOverridesAnchor', 'book', True,
        {'book': '--surprise'},
        {'organization': '--book-organization', 'shelf': '--book-shelf',
-        'case': '--book-case', 'book': '--surprise'})
+        'case': '--book-case', 'book': '--surprise'}),
+      ('WithPluralName', '--books', True, {},
+       {'organization': '--books-organization', 'shelf': '--books-shelf',
+        'book': '--books', 'case': '--books-case'}),
+      ('WithRandomName', '--surprise', True, {},
+       {'organization': '--surprise-organization', 'shelf': '--surprise-shelf',
+        'book': '--surprise', 'case': '--surprise-case'})
   )
-  def testMultitypeArgNames(self, name, prefixes, flag_name_overrides,
-                            expected):
-    resource = presentation_specs.MultitypeConceptPresentationSpec(
+  def testArgNames(self, name, prefixes, flag_name_overrides, expected):
+    resource = presentation_specs.MultitypeResourcePresentationSpec(
         name,
         self.four_way_resource,
         'The book to act upon.',
@@ -123,6 +130,46 @@ class MultitypePresentationSpecTest(concepts_test_base.MultitypeTestBase,
 
     self.assertEqual(expected, resource.attribute_to_args_map)
 
+  @parameterized.named_parameters(
+      ('NoPrefixes', '--x', False, {},
+       {'shelf': '--shelf', 'book': '--x'}),
+      ('Prefixes', '--x', True, {},
+       {'shelf': '--x-shelf', 'book': '--x'}))
+  def testArgNamesParentChild(self, name, prefixes, flag_name_overrides,
+                              expected):
+    resource = presentation_specs.MultitypeResourcePresentationSpec(
+        name,
+        self.parent_child_resource,
+        'The book to act upon.',
+        prefixes=prefixes,
+        flag_name_overrides=flag_name_overrides)
+
+    self.assertEqual(expected, resource.attribute_to_args_map)
+
+  @parameterized.named_parameters(
+      ('NoPrefixes', '--x', False, {},
+       # The "name" has no effect without prefixes or an identifiable anchor.
+       {'shelf': '--shelf', 'case': '--case',
+        'organization': '--organization'}),
+      ('Prefixes', '--x', True, {},
+       {'shelf': '--x-shelf', 'case': '--x-case',
+        'organization': '--x-organization'}),
+      ('Overrides', '--x', False, {'case': '--x'},
+       {'shelf': '--shelf', 'case': '--x',
+        'organization': '--organization'}),
+      ('OverridesPrefixes', '--x', True, {'case': '--case'},
+       {'shelf': '--x-shelf', 'case': '--case',
+        'organization': '--x-organization'}))
+  def testArgNamesNoSingleAnchor(self, name, prefixes, flag_name_overrides,
+                                 expected):
+    resource = presentation_specs.MultitypeResourcePresentationSpec(
+        name,
+        self.different_anchor_resource,
+        'The book to act upon.',
+        prefixes=prefixes,
+        flag_name_overrides=flag_name_overrides)
+
+    self.assertEqual(expected, resource.attribute_to_args_map)
 
 if __name__ == '__main__':
   test_case.main()

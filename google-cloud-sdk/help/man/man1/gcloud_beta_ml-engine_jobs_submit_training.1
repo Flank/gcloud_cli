@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta ml\-engine jobs submit training \- submits a Cloud Machine Learning training job
+gcloud beta ml\-engine jobs submit training \- submit a Cloud Machine Learning training job
 
 
 
@@ -17,7 +17,7 @@ gcloud beta ml\-engine jobs submit training \- submits a Cloud Machine Learning 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Submits a Cloud Machine Learning training job.
+\fB(BETA)\fR Submit a Cloud Machine Learning training job.
 
 This creates temporary files and executes Python code staged by a user on Google
 Cloud Storage. Model code can either be specified with a path, e.g.:
@@ -39,10 +39,11 @@ $ gcloud beta ml\-engine jobs submit training my_job \e
         \-\-packages trainer\-0.0.1.tar.gz,additional\-dep1.tar.gz,dep2.whl
 .RE
 
-If \-\-package\-path /my/code/path/trainer is specified and there is a setup.py
-file at /my/code/path/setup.py then that file will be invoked with \f5sdist\fR
-and the generated tar files will be uploaded to Cloud Storage. Otherwise a
-temporary setup.py file will be generated for the build.
+If \f5\-\-package\-path=/my/code/path/trainer\fR is specified and there is a
+\f5setup.py\fR file at \f5/my/code/path/setup.py\fR, the setup file will be
+invoked with \f5sdist\fR and the generated tar files will be uploaded to Cloud
+Storage. Otherwise, a temporary \f5setup.py\fR file will be generated for the
+build.
 
 By default, this command runs asynchronously; it exits once the job is
 successfully submitted.
@@ -80,7 +81,7 @@ and USER_ARGS on the right.
 .RS 2m
 .TP 2m
 \fB\-\-module\-name\fR=\fIMODULE_NAME\fR
-Name of the module to run
+Name of the module to run.
 
 
 .RE
@@ -91,19 +92,19 @@ Name of the module to run
 .RS 2m
 .TP 2m
 \fB\-\-config\fR=\fICONFIG\fR
-Path to the job configuration file. The file should be a YAML document (JSON
+Path to the job configuration file. This file should be a YAML document (JSON
 also accepted) containing a Job resource as defined in the API (all fields are
 optional): https://cloud.google.com/ml/reference/rest/v1/projects.jobs
 
-If an option is specified both in the configuration file \fBand\fR via command
+If an option is specified both in the configuration file **and** via command
 line arguments, the command line arguments override the configuration file.
 
 .TP 2m
 \fB\-\-job\-dir\fR=\fIJOB_DIR\fR
-A Google Cloud Storage path in which to store training outputs and other data
+Google Cloud Storage path in which to store training outputs and other data
 needed for training.
 
-This path will be passed to your TensorFlow program as \f5\-\-job_dir\fR
+This path will be passed to your TensorFlow program as the \f5\-\-job_dir\fR
 command\-line arg. The benefit of specifying this field is that Cloud ML Engine
 will validate the path for use in training.
 
@@ -112,7 +113,7 @@ path will be used instead.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -122,10 +123,10 @@ numbers.
 .TP 2m
 \fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR
 Path to a Python package to build. This should point to a directory containing
-the Python source for the job. It will be built using setuptools (which must be
-installed) using its \fBparent\fR directory as context. If the parent directory
-contains a \f5setup.py\fR file, the build will use that; otherwise, it will use
-a simple built\-in one.
+the Python source for the job. It will be built using \fBsetuptools\fR (which
+must be installed) using its \fBparent\fR directory as context. If the parent
+directory contains a \f5setup.py\fR file, the build will use that; otherwise, it
+will use a simple built\-in one.
 
 .TP 2m
 \fB\-\-packages\fR=[\fIPACKAGE\fR,...]
@@ -136,14 +137,14 @@ by \f5\-\-staging\-bucket\fR, or Cloud Storage URLs
 
 .TP 2m
 \fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
-The version of Python used during training. If not set, the default version is
-2.7. Python 3.5 is available when \f5runtime_version\fR is set to 1.4 and above.
+Version of Python used during training. If not set, the default version is 2.7.
+Python 3.5 is available when \f5runtime_version\fR is set to 1.4 and above.
 Python 2.7 works with all supported runtime versions.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the machine learning training job to submit. If not specified, you
-may be prompted to select a region.
+Region of the machine learning training job to submit. If not specified, you may
+be prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -169,32 +170,32 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-The Google Cloud ML Engine runtime version for this job. Defaults to a stable
-version, which is defined in the documentation along with the list of supported
+Google Cloud ML Engine runtime version for this job. Defaults to a stable
+version, which is defined in documentation along with the list of supported
 versions:
 https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
 
 .TP 2m
 \fB\-\-scale\-tier\fR=\fISCALE_TIER\fR
-Specifies the machine types, the number of replicas for workers and parameter
+Specify the machine types, the number of replicas for workers, and parameter
 servers. \fISCALE_TIER\fR must be one of:
 
 .RS 2m
 .TP 2m
 \fBbasic\fR
-A single worker instance. This tier is suitable for learning how to use Cloud ML
+Single worker instance. This tier is suitable for learning how to use Cloud ML
 Engine, and for experimenting with new models using small datasets.
 .TP 2m
 \fBbasic\-gpu\fR
-A single worker instance with a GPU.
+Single worker instance with a GPU.
 .TP 2m
 \fBbasic\-tpu\fR
-A single worker instance with a Cloud TPU.
+Single worker instance with a Cloud TPU.
 .TP 2m
 \fBcustom\fR
-The CUSTOM tier is not a set tier, but rather enables you to use your own
-cluster specification. When you use this tier, set values to configure your
-processing cluster according to these guidelines (using the \-\-config flag):
+CUSTOM tier is not a set tier, but rather enables you to use your own cluster
+specification. When you use this tier, set values to configure your processing
+cluster according to these guidelines (using the \f5\-\-config\fR flag):
 
 .RS 2m
 .IP "\(bu" 2m
@@ -217,7 +218,7 @@ type, which can be different from your worker type and master type.
 .sp
 .TP 2m
 \fBpremium\-1\fR
-A large number of workers with many parameter servers.
+Large number of workers with many parameter servers.
 .TP 2m
 \fBstandard\-1\fR
 Many workers and a few parameter servers.

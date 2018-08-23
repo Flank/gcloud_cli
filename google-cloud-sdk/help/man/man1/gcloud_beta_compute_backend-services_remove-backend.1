@@ -11,7 +11,7 @@ gcloud beta compute backend\-services remove\-backend \- remove a backend from a
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute backend\-services remove\-backend\fR \fIBACKEND_SERVICE_NAME\fR \fB\-\-instance\-group\fR=\fIINSTANCE_GROUP\fR [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR\ |\ \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute backend\-services remove\-backend\fR \fIBACKEND_SERVICE_NAME\fR ([\fB\-\-instance\-group\fR=\fIINSTANCE_GROUP\fR\ :\ \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR\ |\ \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR]\ |\ [\fB\-\-network\-endpoint\-group\fR=\fINETWORK_ENDPOINT_GROUP\fR\ :\ \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR]) [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,32 +41,20 @@ Name of the backend service to operate on.
 
 .RS 2m
 .TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+Instance Group
+
+.RS 2m
+.TP 2m
 \fB\-\-instance\-group\fR=\fIINSTANCE_GROUP\fR
-Name of the instance group to remove from the backend service.
+Name of the instance group to remove from the backend service. This flag must be
+specified if any of the other arguments in this group are specified.
 
-
-.RE
-.sp
-
-.SH "OPTIONAL FLAGS"
-
-.RS 2m
-.TP 2m
-
-At most one of these may be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-global\fR
-If provided, it is assumed the backend service is global.
-
-.TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-The region of the backend service to operate on. Overrides the default
-\fBcompute/region\fR property value for this command invocation.
-
-.RE
-.sp
 .TP 2m
 
 At most one of these may be specified:
@@ -74,7 +62,7 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR
-The region of the instance group to remove from the backend service. If not
+Region of the instance group to remove from the backend service. If not
 specified, you may be prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
@@ -101,7 +89,48 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR
-The zone of the instance group to remove from the backend service. If not
+Zone of the instance group to remove from the backend service. If not specified
+and the \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to
+select a zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+Network Endpoint Group
+
+.RS 2m
+.TP 2m
+\fB\-\-network\-endpoint\-group\fR=\fINETWORK_ENDPOINT_GROUP\fR
+Name of the network endpoint group to remove from the backend service. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR
+Zone of the network endpoint group to remove from the backend service. If not
 specified and the \f5\fIcompute/zone\fR\fR property isn't set, you may be
 prompted to select a zone.
 
@@ -126,6 +155,29 @@ $ gcloud config unset compute/zone
 
 Alternatively, the zone can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the backend service is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the backend service to operate on. Overrides the default
+\fBcompute/region\fR property value for this command invocation.
 
 
 .RE

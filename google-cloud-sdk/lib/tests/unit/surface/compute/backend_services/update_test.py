@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the backend services update subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -1837,6 +1840,113 @@ class WithIAPApiTest(UpdateTestBase):
         r'^Invalid value for \[--iap\]: Invalid sub-argument \'invalid-arg1\'$',
         self.RunUpdate,
         'backend-service-1 --iap enabled,invalid-arg1=VAL1,invalid-arg2=VAL2')
+
+
+class WithCdnSignedUrlApiUpdateTest(UpdateTestBase):
+  """Tests CDN Signed URL update flags."""
+
+  def SetUp(self):
+    self.make_requests.side_effect = iter([
+        [self._backend_services[0]],
+        [],
+    ])
+
+  def CheckRequestMadeWithCdnPolicy(self, expected_message):
+    """Verifies the request was made with the expected CDN policy."""
+    messages = self.messages
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
+              backendService='backend-service-1',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  cdnPolicy=expected_message,
+                  description='my backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-1'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
+  def testSetValidCacheMaxAge(self):
+    """Tests updating backend service with a valid cache max age."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 456789
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=456789))
+
+  def testUpdateWithCacheMaxAgeZero(self):
+    """Tests updating backend service with a cache max age of 0."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 0
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=0))
+
+  def testUpdateWithCacheMaxAgeSeconds(self):
+    """Tests updating backend service with a cache max age in seconds."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 7890s
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=7890))
+
+  def testUpdateWithCacheMaxAgeMinutes(self):
+    """Tests updating backend service with a cache max age in minutes."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 234m
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=234 * 60))
+
+  def testUpdateWithCacheMaxAgeHours(self):
+    """Tests updating backend service with a cache max age in hours."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 38h
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=38 * 60 *
+                                              60))
+
+  def testUpdateWithCacheMaxAgeDays(self):
+    """Tests updating backend service with a cache max age in days."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 99d
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=99 * 24 *
+                                              60 * 60))
+
+  def testSetInvalidCacheMaxAge(self):
+    """Tests updating backend service with an invalid cache max age."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --signed-url-cache-max-age: given value must be of the form '
+        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: '
+        r'invalid-value'):
+      self.RunUpdate("""
+          backend-service-1 --signed-url-cache-max-age invalid-value
+          """)
+
+  def testSetCacheMaxAgeNegative(self):
+    """Tests updating backend service with a negative cache max age."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --signed-url-cache-max-age: given value must be of the form '
+        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: -1'):
+      self.RunUpdate("""
+          backend-service-1 --signed-url-cache-max-age -1
+          """)
 
 
 if __name__ == '__main__':

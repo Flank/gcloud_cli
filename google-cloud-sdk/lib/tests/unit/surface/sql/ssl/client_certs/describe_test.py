@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise client cert describing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -23,7 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class ClientCertsDescribeTest(base.SqlMockTestBeta):
+class _BaseClientCertsDescribeTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testClientCertsDescribe(self):
@@ -79,6 +82,22 @@ instance: integration-test
 kind: sql#sslCert
 sha1Fingerprint: 77299aad4c8136911c1f0b07dd9802a9a72124e8
 """, normalize_space=True)
+
+
+class ClientCertsDescribeGATest(_BaseClientCertsDescribeTest,
+                                base.SqlMockTestGA):
+  pass
+
+
+class ClientCertsDescribeBetaTest(_BaseClientCertsDescribeTest,
+                                  base.SqlMockTestBeta):
+  pass
+
+
+class ClientCertsDescribeAlphaTest(_BaseClientCertsDescribeTest,
+                                   base.SqlMockTestAlpha):
+  pass
+
 
 if __name__ == '__main__':
   test_case.main()

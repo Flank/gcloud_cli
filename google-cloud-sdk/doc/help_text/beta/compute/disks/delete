@@ -19,8 +19,8 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The region of the disks to delete. If not specified, you may be
-          prompted to select a region.
+          Region of the disks to delete. If not specified, you may be prompted
+          to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -39,9 +39,8 @@ FLAGS
           CLOUDSDK_COMPUTE_REGION.
 
        --zone=ZONE
-          The zone of the disks to delete. If not specified and the
-          compute/zone property isn't set, you may be prompted to select a
-          zone.
+          Zone of the disks to delete. If not specified and the compute/zone
+          property isn't set, you may be prompted to select a zone.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/zone property:

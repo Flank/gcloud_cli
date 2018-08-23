@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Instantiate a workflow template from a file."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import uuid
 
 from googlecloudsdk.api_lib.dataproc import dataproc as dp
@@ -23,6 +27,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.dataproc import flags
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import files
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -48,7 +53,9 @@ class InstantiateFromFile(base.CreateCommand):
     instance_id = uuid.uuid4().hex
     regions_ref = util.ParseRegion(dataproc)
     # Read template from YAML file.
-    template = util.ReadYaml(args.file, msgs.WorkflowTemplate)
+    with files.FileReader(args.file) as stream:
+      template = util.ReadYaml(
+          message_type=msgs.WorkflowTemplate, stream=stream)
 
     # Send instantiate inline request.
     request = \
@@ -60,8 +67,8 @@ class InstantiateFromFile(base.CreateCommand):
       dataproc.client.projects_regions_workflowTemplates.InstantiateInline(
           request)
     if args.async:
-      log.status.Print('Instantiating [{0}] with operation [{1}].'.format(
-          template.id, operation.name))
+      log.status.Print('Instantiating with operation [{0}].'.format(
+          operation.name))
       return
     operation = util.WaitForWorkflowTemplateOperation(dataproc, operation)
     return operation

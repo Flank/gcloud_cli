@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for the arg_marshalling module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import itertools
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -433,6 +436,24 @@ class DeclarativeTests(base.Base, parameterized.TestCase):
     else:
       self.assertEqual('i', req.instancesId)
       self.assertEqual('parent', req.parentsId)
+
+  def testCreateRequestIgnoreResource(self):
+    self.MockGetListCreateMethods(('foo.instances', True))
+    method = registry.GetMethod('foo.instances', 'get')
+
+    gen = arg_marshalling.DeclarativeArgumentGenerator(
+        method, [], MakeResource(collection='foo.instances'))
+    (parser, args) = CheckArgs(gen.GenerateArgs())
+    self.assertEqual(['instance'], sorted(args.keys()))
+    self.assertEqual(
+        args['instance'].kwargs['help'],
+        'The ID of the instance or a fully qualified identifier for the '
+        'instance.')
+
+    namespace = parser.parse_args(['i'])
+    properties.VALUES.core.project.Set('p')
+    req = gen.CreateRequest(namespace, parse_resource_into_request=False)
+    self.assertIsNone(req.name)
 
 
 class AutoTests(base.Base, parameterized.TestCase):

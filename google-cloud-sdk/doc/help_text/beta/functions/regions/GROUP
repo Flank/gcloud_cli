@@ -20,8 +20,9 @@ COMMANDS
         (BETA) List regions available to Google Cloud Functions.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud functions regions
         $ gcloud alpha functions regions
 

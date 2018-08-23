@@ -335,7 +335,7 @@ class SqladminV1beta4(base_api.BaseApiClient):
           }
 
     def List(self, request, global_params=None):
-      r"""List all available database flags for Google Cloud SQL instances.
+      r"""List all available database flags for Cloud SQL instances.
 
       Args:
         request: (SqlFlagsListRequest) input message
@@ -397,7 +397,7 @@ class SqladminV1beta4(base_api.BaseApiClient):
     )
 
     def Clone(self, request, global_params=None):
-      r"""Creates a Cloud SQL instance as a clone of the source instance. The API is not ready for Second Generation instances yet.
+      r"""Creates a Cloud SQL instance as a clone of the source instance.
 
       Args:
         request: (SqlInstancesCloneRequest) input message
@@ -449,7 +449,7 @@ class SqladminV1beta4(base_api.BaseApiClient):
     )
 
     def DemoteMaster(self, request, global_params=None):
-      r"""Demotes the standalone instance to be a Cloud SQL read replica for an external database server.
+      r"""Demotes the stand-alone instance to be a Cloud SQL read replica for an external database server.
 
       Args:
         request: (SqlInstancesDemoteMasterRequest) input message
@@ -475,7 +475,7 @@ class SqladminV1beta4(base_api.BaseApiClient):
     )
 
     def Export(self, request, global_params=None):
-      r"""Exports data from a Cloud SQL instance to a Google Cloud Storage bucket as a MySQL dump file.
+      r"""Exports data from a Cloud SQL instance to a Cloud Storage bucket as a SQL dump or CSV file.
 
       Args:
         request: (SqlInstancesExportRequest) input message
@@ -553,7 +553,7 @@ class SqladminV1beta4(base_api.BaseApiClient):
     )
 
     def Import(self, request, global_params=None):
-      r"""Imports data into a Cloud SQL instance from a MySQL dump file in Google Cloud Storage.
+      r"""Imports data into a Cloud SQL instance from a SQL dump or CSV file in Cloud Storage.
 
       Args:
         request: (SqlInstancesImportRequest) input message
@@ -709,7 +709,7 @@ class SqladminV1beta4(base_api.BaseApiClient):
     )
 
     def ResetSslConfig(self, request, global_params=None):
-      r"""Deletes all client certificates and generates a new server SSL certificate for the instance. The changes will not take effect until the instance is restarted. Existing instances without a server certificate will need to call this once to set a server certificate.
+      r"""Deletes all client certificates and generates a new server SSL certificate for the instance.
 
       Args:
         request: (SqlInstancesResetSslConfigRequest) input message
@@ -1015,7 +1015,7 @@ class SqladminV1beta4(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes the SSL certificate. The change will not take effect until the instance is restarted.
+      r"""Deletes the SSL certificate. For First Generation instances, the certificate remains valid until the instance is restarted.
 
       Args:
         request: (SqlSslCertsDeleteRequest) input message
@@ -1129,7 +1129,7 @@ class SqladminV1beta4(base_api.BaseApiClient):
           }
 
     def List(self, request, global_params=None):
-      r"""Lists all available service tiers for Google Cloud SQL, for example D1, D2. For related information, see Pricing.
+      r"""Lists all available machine types (tiers) for Cloud SQL, for example, db-n1-standard-1. For related information, see Pricing.
 
       Args:
         request: (SqlTiersListRequest) input message

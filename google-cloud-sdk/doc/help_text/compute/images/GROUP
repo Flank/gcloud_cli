@@ -38,7 +38,7 @@ COMMANDS
         Export a Google Compute Engine image.
 
      import
-        Import a Google Compute Engine image.
+        Import an image into Google Compute Engine.
 
      list
         List Google Compute Engine images.

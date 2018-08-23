@@ -11,7 +11,7 @@ gcloud alpha container images list\-tags \- list tags and digests for the specif
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container images list\-tags\fR \fIIMAGE_NAME\fR [\fB\-\-occurrence\-filter\fR=\fIOCCURRENCE_FILTER\fR;\ default='kind\ =\ "BUILD_DETAILS"\ OR\ kind\ =\ "IMAGE_BASIS"'] [\fB\-\-show\-occurrences\fR] [\fB\-\-show\-occurrences\-from\fR=\fISHOW_OCCURRENCES_FROM\fR;\ default=10] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...];\ default="~timestamp"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container images list\-tags\fR \fIIMAGE_NAME\fR [\fB\-\-occurrence\-filter\fR=\fIOCCURRENCE_FILTER\fR;\ default='kind\ =\ "BUILD_DETAILS"\ OR\ kind\ =\ "IMAGE_BASIS"\ OR\ kind\ =\ "DISCOVERY"'] [\fB\-\-no\-show\-occurrences\fR] [\fB\-\-show\-occurrences\-from\fR=\fISHOW_OCCURRENCES_FROM\fR;\ default=10] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...];\ default="~timestamp"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -39,12 +39,13 @@ The name of the image to list tags for. The name format should be
 
 .RS 2m
 .TP 2m
-\fB\-\-occurrence\-filter\fR=\fIOCCURRENCE_FILTER\fR; default='kind = "BUILD_DETAILS" OR kind = "IMAGE_BASIS"'
+\fB\-\-occurrence\-filter\fR=\fIOCCURRENCE_FILTER\fR; default='kind = "BUILD_DETAILS" OR kind = "IMAGE_BASIS" OR kind = "DISCOVERY"'
 A filter for the Occurrences which will be summarized.
 
 .TP 2m
 \fB\-\-show\-occurrences\fR
-Whether to show summaries of the various Occurrence types.
+Whether to show summaries of the various Occurrence types. Enabled by default,
+use \fB\-\-no\-show\-occurrences\fR to disable.
 
 .TP 2m
 \fB\-\-show\-occurrences\-from\fR=\fISHOW_OCCURRENCES_FROM\fR; default=10
@@ -60,16 +61,16 @@ How many of the most recent images for which to summarize Occurences.
 .TP 2m
 \fB\-\-filter\fR=\fIEXPRESSION\fR
 Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
-the expression evaluates True then that item is listed. For more details and
-examples of filter expressions run $ gcloud topic filters. This flag interacts
-with other flags that are applied in this order: \fB\-\-flatten\fR,
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-limit\fR=\fILIMIT\fR
-The maximum number of resources to list. The default is \fBunlimited\fR. This
-flag interacts with other flags that are applied in this order:
-\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
@@ -81,9 +82,9 @@ service.
 
 .TP 2m
 \fB\-\-sort\-by\fR=[\fIFIELD\fR,...]; default="~timestamp"
-A comma\-separated list of resource field key names to sort by. The default
-order is ascending. Prefix a field with ``~'' for descending order on that
-field. This flag interacts with other flags that are applied in this order:
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR. The
 default is \fB~timestamp\fR.
 
@@ -126,11 +127,11 @@ $ gcloud alpha container images list\-tags gcr.io/myproject/myimage \e
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud container images list\-tags

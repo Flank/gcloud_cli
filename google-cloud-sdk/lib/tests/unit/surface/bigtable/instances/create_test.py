@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,18 @@
 """Test of the 'create' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class CreateCommandTest(base.BigtableV2TestBase,
                         waiter_test_base.CloudOperationsBase):
 
@@ -61,7 +68,8 @@ class CreateCommandTest(base.BigtableV2TestBase,
                         self.Project())))
         ]))
 
-  def testCreateAsync(self):
+  def testCreateAsync(self, track):
+    self.track = track
     self.svc.Expect(
         request=self.production_msg,
         response=self.msgs.Operation(name='operations/theop'))
@@ -74,13 +82,15 @@ class CreateCommandTest(base.BigtableV2TestBase,
         '[https://bigtableadmin.googleapis.com/v2/operations/theop].\n')
     self.AssertOutputEquals('')
 
-  def testCreateDisplayNameRequired(self):
+  def testCreateDisplayNameRequired(self, track):
+    self.track = track
     with self.AssertRaisesArgumentError():
       self.Run('bigtable instances create theinstance --cluster thecluster '
                '--cluster-num-nodes 5 --cluster-zone us-central1-b '
                '--instance-type PRODUCTION')
 
-  def testCreateWait(self):
+  def testCreateWait(self, track):
+    self.track = track
     self.client.projects_instances.Create.Expect(
         request=self.production_msg,
         response=self.msgs.Operation(name='operations/longlong', done=False),)
@@ -101,7 +111,8 @@ name: p/theinstance
 state: READY
 """)
 
-  def testCreateDevelopment(self):
+  def testCreateDevelopment(self, track):
+    self.track = track
     self.client.projects_instances.Create.Expect(
         request=self.development_msg,
         response=self.msgs.Operation(name='operations/longlong', done=False),)
@@ -122,7 +133,8 @@ name: p/theinstance
 state: READY
 """)
 
-  def testErrorResponse(self):
+  def testErrorResponse(self, track):
+    self.track = track
     with self.AssertHttpResponseError(self.svc, self.production_msg):
       self.Run(
           'bigtable instances create theinstance --cluster thecluster '

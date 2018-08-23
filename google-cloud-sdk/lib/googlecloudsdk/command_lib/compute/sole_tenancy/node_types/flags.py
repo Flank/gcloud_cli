@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Flags for the `compute sole-tenancy node-types` commands."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.compute import completers as compute_completers
 from googlecloudsdk.command_lib.compute import flags as compute_flags
 
@@ -31,6 +35,5 @@ class NodeTypesCompleter(compute_completers.ListCommandCompleter):
   def __init__(self, **kwargs):
     super(NodeTypesCompleter, self).__init__(
         collection='compute.nodeTypes',
-        api_version='beta',
-        list_command='beta compute sole-tenancy node-types list --uri',
+        list_command='compute sole-tenancy node-types list --uri',
         **kwargs)

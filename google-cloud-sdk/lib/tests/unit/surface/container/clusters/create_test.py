@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for 'clusters create' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 import os
 
@@ -33,12 +36,9 @@ from tests.lib.surface.container import base
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
+class CreateTestGA(parameterized.TestCase, base.GATestBase,
                    base.ClustersTestBase):
   """gcloud GA track using container v1 API."""
-
-  def SetUp(self):
-    self.api_mismatch = False
 
   def updateResponse(self, cluster, **kwargs):
     """Update the CreateCluster response with fake values."""
@@ -68,9 +68,13 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
       location = self.ZONE
     kwargs = {'zone': location}
     # Create cluster returns operation pending
-    self.ExpectCreateCluster(self._MakeCluster(),
-                             self._MakeOperation(**kwargs),
-                             zone=location)
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(**kwargs),
+        zone=location)
     # Initial get operation returns pending
     self.ExpectGetOperation(self._MakeOperation(**kwargs))
     # Second get operation returns done
@@ -98,8 +102,6 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     cluster = self._RunningCluster(**kwargs)
     self.AssertOutputContains(str(cluster.status))
     self.AssertOutputContains(str(cluster.endpoint))
-    if self.api_mismatch and location == self.REGION:
-      self.AssertErrContains('You invoked')
     self.AssertErrContains('Created')
     c_config = c_util.ClusterConfig.Load(
         self.CLUSTER_NAME, location, self.PROJECT_ID)
@@ -130,7 +132,11 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
   def testCreateAsync(self):
     # Create cluster returns operation pending
-    self.ExpectCreateCluster(self._MakeCluster(), self._MakeOperation())
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
     # Get cluster returns pending cluster
     cluster = self._MakeCluster(
         status=self.provisioning,
@@ -218,7 +224,7 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
             True,
         'management':
             self.msgs.NodeManagement(
-                autoRepair=True, autoUpgrade=True, upgradeOptions=None),
+                autoRepair=False, autoUpgrade=True, upgradeOptions=None),
         'authorizedNetworks':
             self.msgs.MasterAuthorizedNetworksConfig(
                 enabled=True,
@@ -292,7 +298,7 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
         '--image-family=cos-cloud '
         '--image-project=gke-node-images '
         '--preemptible '
-        '--enable-autorepair '
+        '--no-enable-autorepair '
         '--enable-autoupgrade '
         '--enable-master-authorized-networks '
         '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 '
@@ -314,7 +320,7 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     # Note: We use ErrContains rather than ErrEquals because this command can
     # have a warning at the top depending on if kubectl is currently available,
     # which can vary depending on environment.
-    self.AssertErrContains("""This will enable the autorepair feature for \
+    self.AssertErrContains("""This will disable the autorepair feature for \
 nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more
 information on node autorepairs.
@@ -334,14 +340,17 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
 
   def testCreateEnableAddons(self):
     cluster_kwargs = {
-        'addonsConfig': self.msgs.AddonsConfig(
-            httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
-            horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
-                disabled=True),
-            kubernetesDashboard=self.msgs.KubernetesDashboard(
-                disabled=False),
-            networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                disabled=True)),
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True)),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
                              self._MakeOperation())
@@ -364,9 +373,14 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
 
   def testServiceAccountCloudPlatformScopes(self):
     cluster_kwargs = {
-        'serviceAccount': 'my-sa',
-        'oauthScopes': ['https://www.googleapis.com/auth/cloud-platform',
-                        'https://www.googleapis.com/auth/userinfo.email'],
+        'serviceAccount':
+            'my-sa',
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
+        'oauthScopes': [
+            'https://www.googleapis.com/auth/cloud-platform',
+            'https://www.googleapis.com/auth/userinfo.email'
+        ],
     }
     expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
         cluster_kwargs)
@@ -384,6 +398,7 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
 
   def _testScopes(self, flags, scopes):
     cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
         # Sort the scopes to assert equality of the lists
         'oauthScopes': sorted(scopes),
     }
@@ -404,7 +419,11 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
   def testCreateDefaultAuth(self):
     properties.VALUES.container.use_client_certificate.Set(None)
     properties.VALUES.container.use_app_default_credentials.Set(None)
-    self.ExpectCreateCluster(self._MakeCluster(), self._MakeOperation())
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.ExpectGetCluster(self._RunningClusterForVersion('1.3.0'))
     self.Run(
@@ -418,7 +437,11 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
 
   def testCreateADCAuth(self):
     properties.VALUES.container.use_app_default_credentials.Set(True)
-    self.ExpectCreateCluster(self._MakeCluster(), self._MakeOperation())
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.ExpectGetCluster(self._RunningClusterForVersion('1.3.0'))
     self.Run(
@@ -435,7 +458,10 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
   def testCreateWarning(self):
     msg = 'Cluster was created but API is reporting 1 unhealthy node.'
     # Create cluster returns operation pending
-    self.ExpectCreateCluster(self._MakeCluster(), self._MakeOperation())
+    self.ExpectCreateCluster(
+        self._MakeCluster(
+            management=self.messages.NodeManagement(autoRepair=True),),
+        self._MakeOperation())
     # Initial get operation returns pending
     self.ExpectGetOperation(self._MakeOperation())
     # Second get operation returns done with detail
@@ -524,8 +550,11 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
     self.AssertErrContains('argument --num-nodes')
 
   def testCreateUnauthorized(self):
-    self.ExpectCreateCluster(self._MakeCluster(),
-                             exception=base.UNAUTHORIZED_ERROR)
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), exception=base.UNAUTHORIZED_ERROR)
     with self.assertRaises(exceptions.HttpException):
       self.Run(
           self.clusters_command_base.format(self.ZONE) +
@@ -533,7 +562,11 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
     self.AssertErrContains('code=403, message=unauthorized')
 
   def testCreateGetOperationUnauthorized(self):
-    self.ExpectCreateCluster(self._MakeCluster(), self._MakeOperation())
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
     self.ExpectGetOperation(
         self._MakeOperation(), exception=base.UNAUTHORIZED_ERROR)
     with self.assertRaises(exceptions.HttpException):
@@ -552,7 +585,9 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
         'The required property [project] is not currently set.')
 
   def testCreateMasterAuthorizedNetworksDisable(self):
-    cluster_kwargs = {}
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     # Cluster create returns operation pending
     self.ExpectCreateCluster(
         self._MakeCluster(**cluster_kwargs),
@@ -578,7 +613,9 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
       self.AssertErrContains('Cannot use --master-authorized-networks')
 
   def testEnableIPAlias(self):
-    cluster_kwargs = {}
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     # Cluster create returns operation pending
     expected_cluster = self._MakeCluster(**cluster_kwargs)
     policy = self._MakeIPAllocationPolicy(
@@ -636,9 +673,40 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
       self.AssertRaisesExceptionMatches(c_util.Error, expected_err, self.Run,
                                         command)
 
+  def testDeprecatedAuthDefaultWarnings(self):
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    # Cluster create returns operation pending
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run('{base} create {name}'.format(
+        base=self.clusters_command_base.format(self.ZONE),
+        name=self.CLUSTER_NAME))
+    self.AssertErrContains('Created')
+    self.AssertErrContains(
+        'Starting in 1.12, new clusters will have basic '
+        'authentication disabled by default. Basic authentication '
+        'can be enabled (or disabled) manually using the '
+        '`--[no-]enable-basic-auth` flag.')
+    self.AssertErrContains(
+        'Starting in 1.12, new clusters will not have a client '
+        'certificate issued. You can manually enable (or disable) the '
+        'issuance of the client certificate using the '
+        '`--[no-]issue-client-certificate` flag.')
+
   @parameterized.parameters('', '--username=admin', '--enable-basic-auth')
   def testEnableBasicAuth(self, flags):
-    cluster_kwargs = {}
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     # Cluster create returns operation pending
     expected_cluster = self._MakeCluster(**cluster_kwargs)
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
@@ -659,7 +727,9 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
 
   @parameterized.parameters('--username=""', '--no-enable-basic-auth')
   def testDisableBasicAuth(self, flags):
-    cluster_kwargs = {}
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     # Cluster create returns operation pending
     expected_cluster = self._MakeCluster(**cluster_kwargs)
     expected_cluster.masterAuth.username = ''
@@ -705,22 +775,47 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
       ('--issue-client-certificate', True),
   )
   def testNoIssueClientCertificate(self, flags, expect_issue):
-    cluster_kwargs = {}
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
         cluster_kwargs)
     (expected_cluster.masterAuth.clientCertificateConfig
      .issueClientCertificate) = expect_issue
-    # Create cluster expects cluster and returns pending operation.
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done operation.
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns expected cluster, populated with other fields by server.
     self.ExpectGetCluster(return_cluster)
     self.Run('{base} create {name} {flags} '
              '--quiet'.format(
                  base=self.clusters_command_base.format(self.ZONE),
                  name=self.CLUSTER_NAME,
                  flags=flags))
+
+  @parameterized.parameters(
+      ('', '', True),
+      ('--image-type', 'COS', True),
+      ('--image-type', 'UBUNTU', False))
+  def testAutoRepairDefaults(
+      self, image_flag, image_value, expect_autorepair):
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(
+            autoRepair=expect_autorepair,),
+        'imageType': image_value if image_value else None,
+    }
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
+        cluster_kwargs)
+    # Create cluster expects cluster and returns pending operation.
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done operation.
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns expected cluster, populated with other fields by server.
+    self.ExpectGetCluster(return_cluster)
+    self.Run('{base} create {name} {flag} {value} '
+             '--quiet'.format(
+                 base=self.clusters_command_base.format(self.ZONE),
+                 name=self.CLUSTER_NAME,
+                 flag=image_flag,
+                 value=image_value))
 
   def testCreateInvalidAcceleratorMissingType(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -733,11 +828,14 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
   def testCreateWithValidAccelerators(self):
     m = self.messages
     cluster_kwargs = {
-        'name': 'my-gpu-cluster',
+        'name':
+            'my-gpu-cluster',
         'accelerators': [
-            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
-                                acceleratorCount=int(2))
+            m.AcceleratorConfig(
+                acceleratorType='nvidia-tesla-k80', acceleratorCount=int(2))
         ],
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     cluster_kwargs['nodePools'] = [self._MakeDefaultNodePool(
         nodePoolName='default-pool',
@@ -784,11 +882,14 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
   def testAcceleratorCountDefaulting(self):
     m = self.messages
     cluster_kwargs = {
-        'name': 'my-gpu-cluster',
+        'name':
+            'my-gpu-cluster',
         'accelerators': [
-            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
-                                acceleratorCount=int(1))
+            m.AcceleratorConfig(
+                acceleratorType='nvidia-tesla-k80', acceleratorCount=int(1))
         ],
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     cluster_kwargs['nodePools'] = [self._MakeDefaultNodePool(
         nodePoolName='default-pool',
@@ -1072,17 +1173,16 @@ class CreateTestGAOnly(CreateTestGA):
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
+class CreateTestBeta(base.BetaTestBase, CreateTestGA):
+  """gcloud Beta track using container v1beta1 API."""
 
   def testCreateAlphaCluster(self):
     properties.VALUES.core.disable_prompts.Set(False)
     self.WriteInput('y')
-    cluster_kwargs = {'enableKubernetesAlpha': True}
+    cluster_kwargs = {
+        'enableKubernetesAlpha': True,
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
                              self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
@@ -1099,18 +1199,21 @@ class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
         self.CLUSTER_NAME, self.ZONE, self.PROJECT_ID)
     self._TestDefaultAuth(c_config)
     self.AssertErrContains('Created')
-    self.AssertErrContains(constants.KUBERNETES_ALPHA_PROMPT)
+    self.AssertErrContains(
+        'This will create a cluster with all Kubernetes Alpha features enabled')
 
   def testCreateWithLabels(self):
     cluster_kwargs = {
-        'labels': self.msgs.Cluster.ResourceLabelsValue(
-            additionalProperties=[
-                self.msgs.Cluster.ResourceLabelsValue.AdditionalProperty(
-                    key='k', value='v'),
-                self.msgs.Cluster.ResourceLabelsValue.AdditionalProperty(
-                    key='k2', value=''),
-            ],
-        ),
+        'labels':
+            self.msgs.Cluster.ResourceLabelsValue(
+                additionalProperties=[
+                    self.msgs.Cluster.ResourceLabelsValue.AdditionalProperty(
+                        key='k', value='v'),
+                    self.msgs.Cluster.ResourceLabelsValue.AdditionalProperty(
+                        key='k2', value=''),
+                ],),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
 
     # Cluster create returns operation pending
@@ -1144,7 +1247,10 @@ class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
             value='val3',
             effect=effect_enum.NO_EXECUTE)
     ]
-    cluster_kwargs = {'nodeTaints': taints}
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+        'nodeTaints': taints,
+    }
 
     # Cluster create returns operation pending
     self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
@@ -1164,7 +1270,10 @@ class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
     self.AssertOutputContains('RUNNING')
 
   def testCreateMinCpuPlatform(self):
-    cluster_kwargs = {'minCpuPlatform': 'Skylake'}
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+        'minCpuPlatform': 'Skylake',
+    }
     self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
                              self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
@@ -1177,11 +1286,15 @@ class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
   def testCreateMaintenanceWindow(self):
     m = self.messages
     cluster_kwargs = {
-        'name': 'mw-cluster',
-        'maintenancePolicy': m.MaintenancePolicy(
-            window=m.MaintenanceWindow(
-                dailyMaintenanceWindow=m.DailyMaintenanceWindow(
-                    startTime='11:43'))),
+        'name':
+            'mw-cluster',
+        'maintenancePolicy':
+            m.MaintenancePolicy(
+                window=m.MaintenanceWindow(
+                    dailyMaintenanceWindow=m.DailyMaintenanceWindow(
+                        startTime='11:43'))),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateCluster(
         self._MakeCluster(**cluster_kwargs),
@@ -1253,25 +1366,30 @@ class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
   def testScopes(self, flags, scopes):
     self._testScopes(flags, scopes)
 
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
-  """gcloud Beta track using container v1beta1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
-
   def testCreateBetaFeatures(self):
     m = self.messages
     cluster_kwargs = {
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
         'name':
             'my-cluster',
         'binaryAuthorization':
             m.BinaryAuthorization(enabled=True),
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', maximum=10),
+                    m.ResourceLimit(
+                        resourceType='memory', maximum=64, minimum=8),
+                    m.ResourceLimit(
+                        resourceType='nvidia-tesla-k80', maximum=4, minimum=1),
+                ]),
         'workloadMetadataConfig':
             m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig.
                                      NodeMetadataValueValuesEnum.SECURE),
+        'verticalPodAutoscaling':
+            m.VerticalPodAutoscaling(enabled=True),
     }
     cluster_kwargs['nodePools'] = [
         self._MakeDefaultNodePool(
@@ -1303,7 +1421,11 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
         self.clusters_command_base.format(self.ZONE) +
         ' create my-cluster --num-nodes=500 '
         '--enable-binauthz '
-        '--workload-metadata-from-node=secure')
+        '--workload-metadata-from-node=secure '
+        '--enable-autoprovisioning --max-cpu 10 --max-memory 64 --min-memory 8 '
+        '--max-accelerator type=nvidia-tesla-k80,count=4 '
+        '--min-accelerator type=nvidia-tesla-k80,count=1 '
+        '--enable-vertical-pod-autoscaling ')
     self.AssertOutputMatches(
         (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
          'NUM_NODES STATUS\n'
@@ -1318,7 +1440,11 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
 
   def testCreateNodeLocations(self):
     locations = sorted(['us-central1-a', 'us-central1-b', self.ZONE])
-    kwargs = {'name': self.CLUSTER_NAME, 'locations': locations}
+    kwargs = {
+        'name': self.CLUSTER_NAME,
+        'locations': locations,
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     # Cluster create returns operation pending
     self.ExpectCreateCluster(
         self._MakeCluster(**kwargs),
@@ -1343,6 +1469,7 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
   def testEnablePodSecurityPolicy(self):
     psp_config = self.messages.PodSecurityPolicyConfig(enabled=True)
     cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
         'podSecurityPolicyConfig': psp_config
     }
     # Cluster create returns operation pending
@@ -1364,7 +1491,10 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
     self.AssertErrContains('Created')
 
   def testCreateAllowRouteOverlap(self):
-    cluster_kwargs = {'clusterIpv4Cidr': '10.1.0.0/16'}
+    cluster_kwargs = {
+        'clusterIpv4Cidr': '10.1.0.0/16',
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     expected_cluster = self._MakeCluster(**cluster_kwargs)
     policy = self._MakeIPAllocationPolicy(allowRouteOverlap=True)
     expected_cluster.ipAllocationPolicy = policy
@@ -1380,7 +1510,10 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
             name=self.CLUSTER_NAME))
 
   def testCreateAllowRouteOverlapWithIPAlias(self):
-    expected_cluster = self._MakeCluster()
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
     policy = self._MakeIPAllocationPolicy(
         allowRouteOverlap=True,
         useIpAliases=True,
@@ -1426,6 +1559,7 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
 
   def testEnablePrivateCluster(self):
     cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
         'name': self.CLUSTER_NAME,
     }
 
@@ -1450,6 +1584,7 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
   def testEnableTpu(self):
     cluster_kwargs = {
         'enableTpu': True,
+        'management': self.messages.NodeManagement(autoRepair=True),
     }
     # Cluster create returns operation pending
     expected_cluster = self._MakeCluster(**cluster_kwargs)
@@ -1494,23 +1629,21 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
     self.AssertRaisesExceptionMatches(c_util.Error, expected_msg, self.Run,
                                       command)
 
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestAlphaV1API(base.AlphaTestBase, CreateTestBetaV1API):
-  """gcloud Alpha track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-  def testCreateMaintenanceWindow(self):
+  def testCreateResourceLimits(self):
     m = self.messages
     cluster_kwargs = {
-        'name': 'mw-cluster',
-        'maintenancePolicy': m.MaintenancePolicy(
-            window=m.MaintenanceWindow(
-                dailyMaintenanceWindow=m.DailyMaintenanceWindow(
-                    startTime='11:43'))),
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=False,
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=10, maximum=20),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=16, maximum=128)
+                ]),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateCluster(
         self._MakeCluster(**cluster_kwargs),
@@ -1519,42 +1652,24 @@ class CreateTestAlphaV1API(base.AlphaTestBase, CreateTestBetaV1API):
             self.PROJECT_NUM,
             self.ZONE,
             cluster_kwargs['name'])))
-    self.ExpectGetOperation(self._MakeOperation(
-        status=self.op_done))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create mw-cluster --maintenance-window=11:43')
-
-  def testCreateEmptyMaintenanceWindow(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --maintenance-window: expected one argument'):
-      self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' create {0} --maintenance-window'.format(
-                   self.CLUSTER_NAME))
-
-  def testCreateInvalidMaintenanceWindow(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --maintenance-window: Bad value [24:93]: Maintenance '
-        'windows must be passed in using HH:MM format.'):
-      self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' create {0} --maintenance-window=24:93'.format(
-                   self.CLUSTER_NAME))
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--no-enable-autoprovisioning --min-cpu 10 --max-cpu 20 '
+        '--min-memory 16 --max-memory 128')
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
-                                 CreateTestBetaV1Beta1API):
+class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
 
   def testCreateAlphaFeatures(self):
     m = self.messages
     format_enum = self.messages.LocalSsdVolumeConfig.FormatValueValuesEnum
     cluster_kwargs = {
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
         'name':
             'my-cluster',
         'binaryAuthorization':
@@ -1562,24 +1677,10 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
         'workloadMetadataConfig':
             m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig.
                                      NodeMetadataValueValuesEnum.SECURE),
-        'clusterAutoscaling':
-            m.ClusterAutoscaling(
-                enableNodeAutoprovisioning=True,
-                resourceLimits=[
-                    m.ResourceLimit(name='cpu',
-                                    maximum=10),
-                    m.ResourceLimit(name='memory',
-                                    maximum=64,
-                                    minimum=8),
-                    m.ResourceLimit(name='nvidia-tesla-k80',
-                                    maximum=4,
-                                    minimum=1),
-                ]),
         'localSsdVolumeConfigs': [
-            m.LocalSsdVolumeConfig(count=2, type='nvme',
-                                   format=format_enum.FS),
-            m.LocalSsdVolumeConfig(count=1, type='scsi',
-                                   format=format_enum.BLOCK),
+            m.LocalSsdVolumeConfig(count=2, type='nvme', format=format_enum.FS),
+            m.LocalSsdVolumeConfig(
+                count=1, type='scsi', format=format_enum.BLOCK),
         ],
     }
     cluster_kwargs['nodePools'] = [self._MakeDefaultNodePool(
@@ -1614,10 +1715,7 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
         '--enable-binauthz '
         '--workload-metadata-from-node=secure '
         '--local-ssd-volumes count=2,type=nvme,format=fs '
-        '--local-ssd-volumes count=1,type=scsi,format=block '
-        '--enable-autoprovisioning --max-cpu 10 --max-memory 64 --min-memory 8 '
-        '--max-accelerator type=nvidia-tesla-k80,count=4 '
-        '--min-accelerator type=nvidia-tesla-k80,count=1 ')
+        '--local-ssd-volumes count=1,type=scsi,format=block ')
     self.AssertOutputMatches(
         (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
          'NUM_NODES STATUS\n'
@@ -1639,6 +1737,7 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
 
   def testEnableSharedNetwork(self):
     cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
         'name': self.CLUSTER_NAME,
         'subnetwork': 'my-subnetwork',
     }
@@ -1649,12 +1748,9 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
         servicesSecondaryRangeName='services-range',
         clusterSecondaryRangeName='cluster-range',
     )
-    nc = self._MakeNetworkConfig(enableSharedNetwork=True)
-
     expected_cluster = self._MakeCluster(**cluster_kwargs)
     expected_cluster.ipAllocationPolicy = policy
     expected_cluster.enableKubernetesAlpha = True
-    expected_cluster.networkConfig = nc
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     return_args = cluster_kwargs.copy()
@@ -1662,14 +1758,12 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
         return_args,
         enableKubernetesAlpha=True,
         ipAllocationPolicy=policy,
-        enableSharedNetwork=True,
         subnetwork=cluster_kwargs['subnetwork'])
     return_cluster = self._MakeCluster(**return_args)
     self.ExpectGetCluster(return_cluster)
 
     self.Run(
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--enable-shared-network '
         '--enable-kubernetes-alpha '
         '--enable-ip-alias '
         '--subnetwork my-subnetwork '
@@ -1679,95 +1773,12 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
-  def testEnableSharedNetworkBadArgs(self):
-    base_command = (
-        self.clusters_command_base.format(self.ZONE) + ' create {name} --quiet '
-        '--enable-shared-network '.format(name=self.CLUSTER_NAME))
-    subnetwork = '--subnetwork asub '
-    alpha = '--enable-kubernetes-alpha '
-    ip_alias = '--enable-ip-alias '
-    cluster_range = '--cluster-secondary-range-name aclu'
-
-    for command, expected_opt_err in [
-        (base_command, 'enable-kubernetes-alpha'),
-        (base_command + alpha, 'enable-ip-alias'),
-        (base_command + alpha + ip_alias, 'subnetwork'),
-        (base_command + alpha + ip_alias + subnetwork,
-         'cluster-secondary-range-name'),
-        (base_command + alpha + ip_alias + subnetwork + cluster_range,
-         'services-secondary-range-name'),
-    ]:
-      self.AssertRaisesExceptionMatches(
-          c_util.MissingArgForSharedSubnetError,
-          c_util.ENABLE_SHARED_NETWORK_REQS_ERROR_MSG.format(expected_opt_err),
-          self.Run, command)
-
-  def testCreateMaintenanceWindow(self):
-    m = self.messages
-    cluster_kwargs = {
-        'name': 'mw-cluster',
-        'maintenancePolicy': m.MaintenancePolicy(
-            window=m.MaintenanceWindow(
-                dailyMaintenanceWindow=m.DailyMaintenanceWindow(
-                    startTime='11:43'))),
-    }
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs),
-        self._MakeOperation(targetLink=self.TARGET_LINK.format(
-            self.API_VERSION,
-            self.PROJECT_NUM,
-            self.ZONE,
-            cluster_kwargs['name'])))
-    self.ExpectGetOperation(self._MakeOperation(
-        status=self.op_done))
-    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create mw-cluster --maintenance-window=11:43')
-
-  def testCreateResourceLimits(self):
-    m = self.messages
-    cluster_kwargs = {
-        'name': 'rl-cluster',
-        'clusterAutoscaling': m.ClusterAutoscaling(
-            enableNodeAutoprovisioning=False,
-            resourceLimits=[
-                m.ResourceLimit(name='cpu', minimum=10, maximum=20),
-                m.ResourceLimit(name='memory', minimum=16, maximum=128)
-            ]),
-    }
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs),
-        self._MakeOperation(targetLink=self.TARGET_LINK.format(
-            self.API_VERSION,
-            self.PROJECT_NUM,
-            self.ZONE,
-            cluster_kwargs['name'])))
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
-        '--no-enable-autoprovisioning --min-cpu 10 --max-cpu 20 '
-        '--min-memory 16 --max-memory 128')
-
-  def testCreateEmptyMaintenanceWindow(self):
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' create {0} --maintenance-window'.format(
-                   self.CLUSTER_NAME))
-    self.AssertErrContains('argument --maintenance-window')
-
-  def testCreateInvalidMaintenanceWindow(self):
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' create {0} --maintenance-window=24:93'.format(
-                   self.CLUSTER_NAME))
-    self.AssertErrContains('argument --maintenance-window')
-
   def testCreateLocalSsdVolumeConfig(self):
     m = self.messages
     format_enum = self.messages.LocalSsdVolumeConfig.FormatValueValuesEnum
     cluster_kwargs = {
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
         'name':
             'localssdvolumeconfig-cluster',
         'localSsdVolumeConfigs': [
@@ -1809,20 +1820,54 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
           ' create {0} --local-ssd-volumes'.format(self.CLUSTER_NAME))
     self.AssertErrContains('argument --local-ssd-volumes')
 
+  class ServerlessAddon(parameterized.TestCase):
+
+    @parameterized.named_parameters(
+        ('IstioEnabled', 'Istio,Serverless'),
+        ('IstioAutoEnabled', 'Serverless'))
+    def testCreateEnableAddonsServerless(self, addons):
+      auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
+      cluster_kwargs = {
+          'addonsConfig': self.msgs.AddonsConfig(
+              httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+              horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                  disabled=True),
+              kubernetesDashboard=self.msgs.KubernetesDashboard(
+                  disabled=False),
+              networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                  disabled=True),
+              serverlessConfig=self.msgs.ServerlessConfig(
+                  disabled=False),
+              istioConfig=self.msgs.IstioConfig(
+                  disabled=False,
+                  auth=auth)),
+      }
+      self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
+                               self._MakeOperation())
+      self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+      self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' create {0}'
+          ' --addons=HttpLoadBalancing,KubernetesDashboard,' + addons
+          .format(self.CLUSTER_NAME))
+      self.AssertOutputContains('RUNNING')
+
   def testCreateEnableAddonsIstio(self):
     mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
     cluster_kwargs = {
-        'addonsConfig': self.msgs.AddonsConfig(
-            httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
-            horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
-                disabled=True),
-            kubernetesDashboard=self.msgs.KubernetesDashboard(
-                disabled=False),
-            networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                disabled=True),
-            istioConfig=self.msgs.IstioConfig(
-                disabled=False,
-                auth=mtls)),
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                istioConfig=self.msgs.IstioConfig(disabled=False, auth=mtls)),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
                              self._MakeOperation())
@@ -1838,17 +1883,18 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
   def testCreateEnableAddonsIstioNoAuth(self):
     auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
     cluster_kwargs = {
-        'addonsConfig': self.msgs.AddonsConfig(
-            httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
-            horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
-                disabled=True),
-            kubernetesDashboard=self.msgs.KubernetesDashboard(
-                disabled=False),
-            networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                disabled=True),
-            istioConfig=self.msgs.IstioConfig(
-                disabled=False,
-                auth=auth)),
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                istioConfig=self.msgs.IstioConfig(disabled=False, auth=auth)),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
                              self._MakeOperation())
@@ -1862,14 +1908,17 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
 
   def testCreateDisableAddonsIstio(self):
     cluster_kwargs = {
-        'addonsConfig': self.msgs.AddonsConfig(
-            httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
-            horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
-                disabled=True),
-            kubernetesDashboard=self.msgs.KubernetesDashboard(
-                disabled=False),
-            networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                disabled=True)),
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True)),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
                              self._MakeOperation())
@@ -1902,7 +1951,9 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
   def testDefaultMaxPodsConstraint(self):
     cluster_kwargs = {
         'defaultMaxPodsConstraint':
-            self.msgs.MaxPodsConstraint(maxPodsPerNode=30)
+            self.msgs.MaxPodsConstraint(maxPodsPerNode=30),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     # Cluster create returns operation pending
     expected_cluster = self._MakeCluster(**cluster_kwargs)
@@ -1943,7 +1994,9 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
       ('--enable-managed-pod-identity', True),
   )
   def testEnableManagedPodIdentity(self, flags, expect_enable):
-    cluster_kwargs = {}
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
         cluster_kwargs)
     if expect_enable:
@@ -1960,6 +2013,58 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
                  base=self.clusters_command_base.format(self.ZONE),
                  name=self.CLUSTER_NAME,
                  flags=flags))
+
+  @parameterized.parameters(
+      ('test_dataset_id'),
+      (''),
+  )
+  def testResourceUsageExportConfig(self, dataset_id):
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
+        cluster_kwargs)
+    flags = ''
+    if dataset_id:
+      flags = '--resource-usage-bigquery-dataset={dataset_id}'.format(
+          dataset_id=dataset_id)
+      bigquery_destination = self.messages.BigQueryDestination(
+          datasetId=dataset_id)
+      expected_cluster.resourceUsageExportConfig = \
+          self.messages.ResourceUsageExportConfig(
+              bigqueryDestination=bigquery_destination)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(return_cluster)
+    self.Run('{base} create {name} {flags} --quiet'.format(
+        base=self.clusters_command_base.format(self.ZONE),
+        name=self.CLUSTER_NAME,
+        flags=flags))
+
+  def testEnableAuthenticatorSecurityGroups(self):
+    cluster_kwargs = {
+        'enableKubernetesAlpha': True,
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    expected_cluster.authenticatorGroupsConfig = (
+        self.messages.AuthenticatorGroupsConfig(
+            enabled=True, securityGroup='AdminPeople'))
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {name} '
+        '--enable-kubernetes-alpha '
+        '--security-group=AdminPeople '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
 
 
 if __name__ == '__main__':

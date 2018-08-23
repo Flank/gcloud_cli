@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """bigtable clusters list command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.bigtable import util
 from googlecloudsdk.calliope import base
@@ -28,7 +31,6 @@ def _GetUriFunction(resource):
       collection='bigtableadmin.projects.instances.clusters').SelfLink()
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
 class ListClusters(base.ListCommand):
   """List existing Bigtable clusters.
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -25,7 +28,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class OperationsWaitTest(base.SqlMockTestBeta):
+class _BaseOperationsWaitTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testOperationsWait(self):
@@ -244,6 +247,138 @@ NAME                                  TYPE         START                        
 27e060bf-4e4b-4fbb-b451-a9ee6c8a433a  RESTART      2014-07-10T17:23:02.165+00:00  2014-07-10T17:23:03.165+00:00  -      DONE
 """, normalize_space=True)
 
+  def testWaitForOperationWithTimeout(self):
+    # Test that WaitForOperation is called with the correct timeout kwarg.
+    wait_mock = self.StartPatch(
+        'googlecloudsdk.api_lib.sql.operations.OperationsV1Beta4.'
+        'WaitForOperation')
+    op_ref = ('https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/'
+              '1cb8a924-898d-41ec-b695-39a6dc018d16'.format(self.Project()))
+
+    self.mocked_client.operations.Get.Expect(
+        self.messages.SqlOperationsGetRequest(
+            operation='1cb8a924-898d-41ec-b695-39a6dc018d16',
+            project=self.Project(),
+        ),
+        self.messages.Operation(
+            insertTime=datetime.datetime(
+                2014,
+                7,
+                10,
+                17,
+                23,
+                1,
+                104000,
+                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            startTime=datetime.datetime(
+                2014,
+                7,
+                10,
+                17,
+                23,
+                2,
+                165000,
+                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            endTime=datetime.datetime(
+                2014,
+                7,
+                10,
+                17,
+                23,
+                3,
+                165000,
+                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            error=None,
+            exportContext=None,
+            importContext=None,
+            targetId='integration-test',
+            targetLink=(
+                'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/'
+                'integration-test').format(self.Project()),
+            targetProject=self.Project(),
+            kind='sql#operation',
+            name='1cb8a924-898d-41ec-b695-39a6dc018d16',
+            selfLink=op_ref,
+            operationType='RESTART',
+            status='DONE',
+            user='1@developer.gserviceaccount.com',
+        ))
+
+    self.Run('sql operations wait 1cb8a924-898d-41ec-b695-39a6dc018d16 '
+             '--timeout=400')
+
+    call_args = wait_mock.call_args
+    kwargs = call_args[1] if call_args else {}
+
+    # Assert that WaitForOperation was called with timeout specified.
+    self.assertEquals(kwargs.get('max_wait_seconds'), 400)
+
+  def testWaitForOperationWithUnlimitedTimeout(self):
+    # Test that WaitForOperation is called with the correct timeout kwarg.
+    wait_mock = self.StartPatch(
+        'googlecloudsdk.api_lib.sql.operations.OperationsV1Beta4.'
+        'WaitForOperation')
+    op_ref = ('https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/'
+              '1cb8a924-898d-41ec-b695-39a6dc018d16'.format(self.Project()))
+
+    self.mocked_client.operations.Get.Expect(
+        self.messages.SqlOperationsGetRequest(
+            operation='1cb8a924-898d-41ec-b695-39a6dc018d16',
+            project=self.Project(),
+        ),
+        self.messages.Operation(
+            insertTime=datetime.datetime(
+                2014,
+                7,
+                10,
+                17,
+                23,
+                1,
+                104000,
+                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            startTime=datetime.datetime(
+                2014,
+                7,
+                10,
+                17,
+                23,
+                2,
+                165000,
+                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            endTime=datetime.datetime(
+                2014,
+                7,
+                10,
+                17,
+                23,
+                3,
+                165000,
+                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            error=None,
+            exportContext=None,
+            importContext=None,
+            targetId='integration-test',
+            targetLink=(
+                'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/'
+                'integration-test').format(self.Project()),
+            targetProject=self.Project(),
+            kind='sql#operation',
+            name='1cb8a924-898d-41ec-b695-39a6dc018d16',
+            selfLink=op_ref,
+            operationType='RESTART',
+            status='DONE',
+            user='1@developer.gserviceaccount.com',
+        ))
+
+    self.Run('sql operations wait 1cb8a924-898d-41ec-b695-39a6dc018d16 '
+             '--timeout=unlimited')
+
+    call_args = wait_mock.call_args
+    kwargs = call_args[1] if call_args else {}
+
+    # Assert that WaitForOperation was called with timeout disabled.
+    self.assertEquals(kwargs.get('max_wait_seconds'), None)
+
   def testOperationsWaitExceptionMessage(self):
     self.StartPatch('googlecloudsdk.core.util.retry.Retryer.RetryOnResult',
                     side_effect=retry.WaitException('forced timeout',
@@ -253,6 +388,19 @@ NAME                                  TYPE         START                        
         'Operation .* is taking longer than expected. You can continue waiting '
         'for the operation by running `gcloud beta sql operations wait .*`'):
       self.Run('sql operations wait 1cb8a924-898d-41ec-b695-39a6dc018d16')
+
+
+class OperationsWaitGATest(_BaseOperationsWaitTest, base.SqlMockTestGA):
+  pass
+
+
+class OperationsWaitBetaTest(_BaseOperationsWaitTest, base.SqlMockTestBeta):
+  pass
+
+
+class OperationsWaitAlphaTest(_BaseOperationsWaitTest, base.SqlMockTestAlpha):
+  pass
+
 
 if __name__ == '__main__':
   test_case.main()

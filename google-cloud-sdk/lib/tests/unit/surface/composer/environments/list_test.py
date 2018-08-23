@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +15,15 @@
 """Unit tests for environments list."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import collections
 from googlecloudsdk.api_lib.composer import util as api_util
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.composer import base
 
@@ -29,14 +34,17 @@ LOCATION1 = 'us-central1'
 LOCATION2 = 'europe-west1'
 
 
-class EnvironmentsListTest(base.EnvironmentsUnitTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class EnvironmentsListTest(base.EnvironmentsUnitTest, parameterized.TestCase):
 
   def SetUp(self):
     # Disable user output to not exhaust the generator returned by
     # RunEnvironments
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def testSuccessfulListSingleLocation(self):
+  def testSuccessfulListSingleLocation(self, track):
+    self.SetTrack(track)
     locations = [LOCATION1]
     expected_list_response = self._GenerateExpectedList(locations)
     actual_list_response = self.RunEnvironments(
@@ -45,7 +53,8 @@ class EnvironmentsListTest(base.EnvironmentsUnitTest):
         '--locations', ','.join(locations))
     six.assertCountEqual(self, expected_list_response, actual_list_response)
 
-  def testSuccessfulListMultipleLocations(self):
+  def testSuccessfulListMultipleLocations(self, track):
+    self.SetTrack(track)
     locations = [LOCATION1, LOCATION2]
     expected_list_response = self._GenerateExpectedList(locations)
     actual_list_response = self.RunEnvironments(
@@ -54,7 +63,8 @@ class EnvironmentsListTest(base.EnvironmentsUnitTest):
         '--locations', ','.join(locations))
     six.assertCountEqual(self, expected_list_response, actual_list_response)
 
-  def testListFromPropertyFallthroughLocation(self):
+  def testListFromPropertyFallthroughLocation(self, track):
+    self.SetTrack(track)
     properties.VALUES.composer.location.Set(LOCATION1)
     locations = [LOCATION1]
     expected_list_response = self._GenerateExpectedList(locations)
@@ -63,7 +73,8 @@ class EnvironmentsListTest(base.EnvironmentsUnitTest):
         '--project', self.TEST_PROJECT)
     six.assertCountEqual(self, expected_list_response, actual_list_response)
 
-  def testListFromPropertyFallthroughLocationMissing(self):
+  def testListFromPropertyFallthroughLocationMissing(self, track):
+    self.SetTrack(track)
     with self.AssertRaisesExceptionRegexp(
         exceptions.RequiredArgumentException,
         '--locations'):

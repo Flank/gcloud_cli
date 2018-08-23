@@ -23,9 +23,10 @@ the way a backend behaves. Example changes that can be made include changing the
 load balancing policy and \f5draining\fR a backend by setting its capacity
 scaler to zero.
 
-Backends are named by their associated instances groups, and one of the
-\f5\-\-group\fR or \f5\-\-instance\-group\fR flags is required to identify the
-backend that you are modifying. You cannot "change" the instance group
+Backends are named by their associated instances groups or network endpoint
+groups, and one of the \f5\-\-network\-endpoint\-group\fR or
+\f5\-\-instance\-group\fR flags is required to identify the backend that you are
+modifying. You cannot "change" the instance group or network endpoint group
 associated with a backend, but you can accomplish something similar with
 \f5backend\-services remove\-backend\fR and \f5backend\-services
 add\-backend\fR.
@@ -71,8 +72,8 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR
-The region of the instance group to update in the backend service. If not
-specified, you may be prompted to select a region.
+Region of the instance group to update in the backend service. If not specified,
+you may be prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -98,9 +99,9 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR
-The zone of the instance group to update in the backend service. If not
-specified and the \f5\fIcompute/zone\fR\fR property isn't set, you may be
-prompted to select a zone.
+Zone of the instance group to update in the backend service. If not specified
+and the \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to
+select a zone.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/zone\fR\fR property:
@@ -139,7 +140,7 @@ must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR
-The zone of the network endpoint group to update in the backend service. If not
+Zone of the network endpoint group to update in the backend service. If not
 specified and the \f5\fIcompute/zone\fR\fR property isn't set, you may be
 prompted to select a zone.
 
@@ -241,11 +242,11 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-global\fR
-If provided, it is assumed the backend service is global.
+If set, the backend service is global.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the backend service to operate on. Overrides the default
+Region of the backend service to operate on. Overrides the default
 \fBcompute/region\fR property value for this command invocation.
 
 .RE
@@ -335,11 +336,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute backend\-services update\-backend

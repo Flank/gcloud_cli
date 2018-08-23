@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Api client adapter containers commands."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from os import linesep
 import time
 
@@ -21,6 +25,7 @@ from apitools.base.py import exceptions as apitools_exceptions
 from apitools.base.py import http_wrapper
 
 from googlecloudsdk.api_lib.compute import constants
+from googlecloudsdk.api_lib.container import constants as gke_constants
 from googlecloudsdk.api_lib.container import util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions
@@ -54,8 +59,7 @@ if --enable-master-authorized-networks is not \
 specified."""
 
 NO_AUTOPROVISIONING_MSG = """\
-Node autoprovisioning is currently in alpha. Please contact GKE support \
-if you're interested in enabling alpha features in your cluster.
+Node autoprovisioning is currently in beta.
 """
 
 NO_AUTOPROVISIONING_LIMITS_ERROR_MSG = """\
@@ -125,10 +129,12 @@ MAX_AUTHORIZED_NETWORKS_CIDRS = 20
 INGRESS = 'HttpLoadBalancing'
 HPA = 'HorizontalPodAutoscaling'
 DASHBOARD = 'KubernetesDashboard'
+SERVERLESS = 'Serverless'
 ISTIO = 'Istio'
 NETWORK_POLICY = 'NetworkPolicy'
 DEFAULT_ADDONS = [INGRESS, HPA]
-ADDONS_OPTIONS = [INGRESS, HPA, DASHBOARD, ISTIO, NETWORK_POLICY]
+ADDONS_OPTIONS = DEFAULT_ADDONS + [DASHBOARD, ISTIO, NETWORK_POLICY]
+ALPHA_ADDONS_OPTIONS = ADDONS_OPTIONS + [SERVERLESS]
 
 UNSPECIFIED = 'UNSPECIFIED'
 SECURE = 'SECURE'
@@ -338,7 +344,6 @@ class CreateClusterOptions(object):
                create_subnetwork=None,
                cluster_secondary_range_name=None,
                services_secondary_range_name=None,
-               enable_shared_network=None,
                accelerators=None,
                enable_binauthz=None,
                min_cpu_platform=None,
@@ -351,7 +356,10 @@ class CreateClusterOptions(object):
                tpu_ipv4_cidr=None,
                enable_tpu=None,
                default_max_pods_per_node=None,
-               enable_managed_pod_identity=None):
+               enable_managed_pod_identity=None,
+               resource_usage_bigquery_dataset=None,
+               security_group=None,
+               enable_vertical_pod_autoscaling=None):
     self.node_machine_type = node_machine_type
     self.node_source_image = node_source_image
     self.node_disk_size_gb = node_disk_size_gb
@@ -401,7 +409,6 @@ class CreateClusterOptions(object):
     self.create_subnetwork = create_subnetwork
     self.cluster_secondary_range_name = cluster_secondary_range_name
     self.services_secondary_range_name = services_secondary_range_name
-    self.enable_shared_network = enable_shared_network
     self.accelerators = accelerators
     self.enable_binauthz = enable_binauthz
     self.min_cpu_platform = min_cpu_platform
@@ -416,6 +423,9 @@ class CreateClusterOptions(object):
     self.issue_client_certificate = issue_client_certificate
     self.default_max_pods_per_node = default_max_pods_per_node
     self.enable_managed_pod_identity = enable_managed_pod_identity
+    self.resource_usage_bigquery_dataset = resource_usage_bigquery_dataset
+    self.security_group = security_group
+    self.enable_vertical_pod_autoscaling = enable_vertical_pod_autoscaling
 
 
 class UpdateClusterOptions(object):
@@ -426,8 +436,8 @@ class UpdateClusterOptions(object):
                update_nodes=None,
                node_pool=None,
                monitoring_service=None,
+               logging_service=None,
                disable_addons=None,
-               istio_config=None,
                enable_autoscaling=None,
                min_nodes=None,
                max_nodes=None,
@@ -440,14 +450,15 @@ class UpdateClusterOptions(object):
                enable_autoprovisioning=None,
                enable_pod_security_policy=None,
                enable_binauthz=None,
-               concurrent_node_count=None):
+               concurrent_node_count=None,
+               enable_vertical_pod_autoscaling=None):
     self.version = version
     self.update_master = bool(update_master)
     self.update_nodes = bool(update_nodes)
     self.node_pool = node_pool
     self.monitoring_service = monitoring_service
+    self.logging_service = logging_service
     self.disable_addons = disable_addons
-    self.istio_config = istio_config
     self.enable_autoscaling = enable_autoscaling
     self.min_nodes = min_nodes
     self.max_nodes = max_nodes
@@ -461,6 +472,7 @@ class UpdateClusterOptions(object):
     self.enable_pod_security_policy = enable_pod_security_policy
     self.enable_binauthz = enable_binauthz
     self.concurrent_node_count = concurrent_node_count
+    self.enable_vertical_pod_autoscaling = enable_vertical_pod_autoscaling
 
 
 class SetMasterAuthOptions(object):
@@ -513,7 +525,8 @@ class CreateNodePoolOptions(object):
                accelerators=None,
                min_cpu_platform=None,
                workload_metadata_from_node=None,
-               max_pods_per_node=None):
+               max_pods_per_node=None,
+               sandbox=None):
     self.machine_type = machine_type
     self.disk_size_gb = disk_size_gb
     self.scopes = scopes
@@ -543,6 +556,7 @@ class CreateNodePoolOptions(object):
     self.min_cpu_platform = min_cpu_platform
     self.workload_metadata_from_node = workload_metadata_from_node
     self.max_pods_per_node = max_pods_per_node
+    self.sandbox = sandbox
 
 
 class UpdateNodePoolOptions(object):
@@ -713,14 +727,14 @@ class APIAdapter(object):
     with progress_tracker.ProgressTracker(message, autotick=True,
                                           detail_message_callback=
                                           lambda: detail_message):
-      start_time = time.clock()
-      while timeout_s > (time.clock() - start_time):
+      start_time = time.time()
+      while timeout_s > (time.time() - start_time):
         try:
           operation = self.GetOperation(operation_ref)
           if self.IsOperationFinished(operation):
             # Success!
             log.info('Operation %s succeeded after %.3f seconds',
-                     operation, (time.clock() - start_time))
+                     operation, (time.time() - start_time))
             break
           detail_message = operation.detail
         except apitools_exceptions.HttpError as error:
@@ -745,87 +759,8 @@ class APIAdapter(object):
 
   def CreateClusterCommon(self, cluster_ref, options):
     """Returns a CreateCluster operation."""
-    node_config = self.messages.NodeConfig()
-    if options.node_machine_type:
-      node_config.machineType = options.node_machine_type
-    if options.node_disk_size_gb:
-      node_config.diskSizeGb = options.node_disk_size_gb
-    if options.disk_type:
-      node_config.diskType = options.disk_type
-    if options.node_source_image:
-      raise util.Error('cannot specify node source image in container v1 api')
-
-    NodeIdentityOptionsToNodeConfig(options, node_config)
-
-    if options.local_ssd_count:
-      node_config.localSsdCount = options.local_ssd_count
-
-    if options.tags:
-      node_config.tags = options.tags
-    else:
-      node_config.tags = []
-
-    if options.image_type:
-      node_config.imageType = options.image_type
-
-    custom_config = self.messages.CustomImageConfig()
-    if options.image:
-      custom_config.image = options.image
-    if options.image_project:
-      custom_config.imageProject = options.image_project
-    if options.image_family:
-      custom_config.imageFamily = options.image_family
-    if options.image or options.image_project or options.image_family:
-      node_config.nodeImageConfig = custom_config
-
-    _AddNodeLabelsToNodeConfig(node_config, options)
-    self._AddNodeTaintsToNodeConfig(node_config, options)
-
-    if options.preemptible:
-      node_config.preemptible = options.preemptible
-
-    if options.accelerators is not None:
-      type_name = options.accelerators['type']
-      # Accelerator count defaults to 1.
-      count = int(options.accelerators.get('count', 1))
-      node_config.accelerators = [
-          self.messages.AcceleratorConfig(acceleratorType=type_name,
-                                          acceleratorCount=count)
-      ]
-
-    if options.min_cpu_platform is not None:
-      node_config.minCpuPlatform = options.min_cpu_platform
-
-    _AddWorkloadMetadataToNodeConfig(node_config, options, self.messages)
-
-    max_nodes_per_pool = options.max_nodes_per_pool or MAX_NODES_PER_POOL
-    pools = (options.num_nodes + max_nodes_per_pool - 1) // max_nodes_per_pool
-    if pools == 1:
-      pool_names = ['default-pool']  # pool consistency with server default
-    else:
-      # default-pool-0, -1, ...
-      pool_names = ['default-pool-{0}'.format(i) for i in range(0, pools)]
-
-    pools = []
-    per_pool = (options.num_nodes + len(pool_names) - 1) // len(pool_names)
-    to_add = options.num_nodes
-    for name in pool_names:
-      nodes = per_pool if (to_add > per_pool) else to_add
-      autoscaling = None
-      if options.enable_autoscaling:
-        autoscaling = self.messages.NodePoolAutoscaling(
-            enabled=options.enable_autoscaling,
-            minNodeCount=options.min_nodes,
-            maxNodeCount=options.max_nodes)
-      pools.append(
-          self.messages.NodePool(
-              name=name,
-              initialNodeCount=nodes,
-              config=node_config,
-              autoscaling=autoscaling,
-              version=options.node_version,
-              management=self._GetNodeManagement(options)))
-      to_add -= nodes
+    node_config = self.ParseNodeConfig(options)
+    pools = self.ParseNodePools(options, node_config)
 
     cluster = self.messages.Cluster(
         name=cluster_ref.clusterId,
@@ -856,18 +791,8 @@ class APIAdapter(object):
           disable_network_policy=(
               NETWORK_POLICY not in options.addons))
       cluster.addonsConfig = addons
-    if options.enable_master_authorized_networks:
-      authorized_networks = self.messages.MasterAuthorizedNetworksConfig(
-          enabled=options.enable_master_authorized_networks)
-      if options.master_authorized_networks:
-        for network in options.master_authorized_networks:
-          authorized_networks.cidrBlocks.append(self.messages.CidrBlock(
-              cidrBlock=network))
-      cluster.masterAuthorizedNetworksConfig = authorized_networks
-    elif options.master_authorized_networks:
-      # Raise error if use --master-authorized-networks without
-      # --enable-master-authorized-networks.
-      raise util.Error(MISMATCH_AUTHORIZED_NETWORKS_ERROR_MSG)
+
+    self.ParseMasterAuthorizedNetworkOptions(options, cluster)
 
     if options.enable_kubernetes_alpha:
       cluster.enableKubernetesAlpha = options.enable_kubernetes_alpha
@@ -899,13 +824,7 @@ class APIAdapter(object):
                   startTime=options.maintenance_window)))
       cluster.maintenancePolicy = policy
 
-    if options.labels is not None:
-      labels = self.messages.Cluster.ResourceLabelsValue()
-      props = []
-      for k, v in sorted(six.iteritems(options.labels)):
-        props.append(labels.AdditionalProperty(key=k, value=v))
-      labels.additionalProperties = props
-      cluster.resourceLabels = labels
+    self.ParseResourceLabels(options, cluster)
 
     if options.enable_pod_security_policy is not None:
       cluster.podSecurityPolicyConfig = self.messages.PodSecurityPolicyConfig(
@@ -916,36 +835,135 @@ class APIAdapter(object):
           self.messages.ClientCertificateConfig(
               issueClientCertificate=options.issue_client_certificate))
 
-    self.ParseNetworkConfigOptions(options, cluster)
+    if options.security_group is not None:
+      # The presence of the --security_group="foo" flag implies enabled=True.
+      cluster.authenticatorGroupsConfig = (
+          self.messages.AuthenticatorGroupsConfig(
+              enabled=True,
+              securityGroup=options.security_group))
+
     self.ParseIPAliasOptions(options, cluster)
     self.ParseAllowRouteOverlapOptions(options, cluster)
     self.ParsePrivateClusterOptions(options, cluster)
     self.ParseTpuOptions(options, cluster)
+    if options.enable_vertical_pod_autoscaling is not None:
+      cluster.verticalPodAutoscaling = self.messages.VerticalPodAutoscaling(
+          enabled=options.enable_vertical_pod_autoscaling)
     return cluster
 
-  def ParseNetworkConfigOptions(self, options, cluster):
-    """Asserts the options for Shared VPC Networking."""
-    if not options.enable_shared_network:
-      return cluster
+  def ParseNodeConfig(self, options):
+    """Creates node config based on node config options."""
+    node_config = self.messages.NodeConfig()
+    if options.node_machine_type:
+      node_config.machineType = options.node_machine_type
+    if options.node_disk_size_gb:
+      node_config.diskSizeGb = options.node_disk_size_gb
+    if options.disk_type:
+      node_config.diskType = options.disk_type
+    if options.node_source_image:
+      raise util.Error('cannot specify node source image in container v1 api')
 
-    req_related_options = [('enable-kubernetes-alpha',
-                            options.enable_kubernetes_alpha),
-                           ('enable-ip-alias',
-                            options.enable_ip_alias), ('subnetwork',
-                                                       options.subnetwork),
-                           ('cluster-secondary-range-name',
-                            options.cluster_secondary_range_name),
-                           ('services-secondary-range-name',
-                            options.services_secondary_range_name)]
+    NodeIdentityOptionsToNodeConfig(options, node_config)
 
-    for name, opt in req_related_options:
-      if not opt:
-        raise util.MissingArgForSharedSubnetError(name)
+    if options.local_ssd_count:
+      node_config.localSsdCount = options.local_ssd_count
 
-    network_config = self.messages.NetworkConfig(
-        enableSharedNetwork=options.enable_shared_network)
-    cluster.networkConfig = network_config
-    return cluster
+    if options.tags:
+      node_config.tags = options.tags
+    else:
+      node_config.tags = []
+
+    if options.image_type:
+      node_config.imageType = options.image_type
+
+    self.ParseCustomNodeConfig(options, node_config)
+
+    _AddNodeLabelsToNodeConfig(node_config, options)
+    self._AddNodeTaintsToNodeConfig(node_config, options)
+
+    if options.preemptible:
+      node_config.preemptible = options.preemptible
+
+    self.ParseAcceleratorOptions(options, node_config)
+
+    if options.min_cpu_platform is not None:
+      node_config.minCpuPlatform = options.min_cpu_platform
+
+    _AddWorkloadMetadataToNodeConfig(node_config, options, self.messages)
+
+    return node_config
+
+  def ParseCustomNodeConfig(self, options, node_config):
+    """Parses custom node config options."""
+    custom_config = self.messages.CustomImageConfig()
+    if options.image:
+      custom_config.image = options.image
+    if options.image_project:
+      custom_config.imageProject = options.image_project
+    if options.image_family:
+      custom_config.imageFamily = options.image_family
+    if options.image or options.image_project or options.image_family:
+      node_config.nodeImageConfig = custom_config
+
+  def ParseNodePools(self, options, node_config):
+    """Creates a list of node pools for the cluster by parsing options.
+
+    Args:
+      options: cluster creation options
+      node_config: node configuration for nodes in the node pools
+    Returns:
+      List of node pools.
+    """
+    max_nodes_per_pool = options.max_nodes_per_pool or MAX_NODES_PER_POOL
+    pools = (options.num_nodes + max_nodes_per_pool - 1) // max_nodes_per_pool
+    if pools == 1:
+      pool_names = ['default-pool']  # pool consistency with server default
+    else:
+      # default-pool-0, -1, ...
+      pool_names = ['default-pool-{0}'.format(i) for i in range(0, pools)]
+
+    pools = []
+    per_pool = (options.num_nodes + len(pool_names) - 1) // len(pool_names)
+    to_add = options.num_nodes
+    for name in pool_names:
+      nodes = per_pool if (to_add > per_pool) else to_add
+      autoscaling = None
+      if options.enable_autoscaling:
+        autoscaling = self.messages.NodePoolAutoscaling(
+            enabled=options.enable_autoscaling,
+            minNodeCount=options.min_nodes,
+            maxNodeCount=options.max_nodes)
+      pools.append(
+          self.messages.NodePool(
+              name=name,
+              initialNodeCount=nodes,
+              config=node_config,
+              autoscaling=autoscaling,
+              version=options.node_version,
+              management=self._GetNodeManagement(options)))
+      to_add -= nodes
+    return pools
+
+  def ParseAcceleratorOptions(self, options, node_config):
+    """Parses accrelerator options for the nodes in the cluster."""
+    if options.accelerators is not None:
+      type_name = options.accelerators['type']
+      # Accelerator count defaults to 1.
+      count = int(options.accelerators.get('count', 1))
+      node_config.accelerators = [
+          self.messages.AcceleratorConfig(acceleratorType=type_name,
+                                          acceleratorCount=count)
+      ]
+
+  def ParseResourceLabels(self, options, cluster):
+    """Parses resource labels options for the cluster."""
+    if options.labels is not None:
+      labels = self.messages.Cluster.ResourceLabelsValue()
+      props = []
+      for k, v in sorted(six.iteritems(options.labels)):
+        props.append(labels.AdditionalProperty(key=k, value=v))
+      labels.additionalProperties = props
+      cluster.resourceLabels = labels
 
   def ParseIPAliasOptions(self, options, cluster):
     """Parses the options for IP Alias."""
@@ -1033,6 +1051,21 @@ class APIAdapter(object):
     if options.enable_tpu:
       cluster.enableTpu = options.enable_tpu
 
+  def ParseMasterAuthorizedNetworkOptions(self, options, cluster):
+    """Parses the options for master authorized networks."""
+    if options.enable_master_authorized_networks:
+      authorized_networks = self.messages.MasterAuthorizedNetworksConfig(
+          enabled=options.enable_master_authorized_networks)
+      if options.master_authorized_networks:
+        for network in options.master_authorized_networks:
+          authorized_networks.cidrBlocks.append(self.messages.CidrBlock(
+              cidrBlock=network))
+      cluster.masterAuthorizedNetworksConfig = authorized_networks
+    elif options.master_authorized_networks:
+      # Raise error if use --master-authorized-networks without
+      # --enable-master-authorized-networks.
+      raise util.Error(MISMATCH_AUTHORIZED_NETWORKS_ERROR_MSG)
+
   def CreateCluster(self, cluster_ref, options):
     cluster = self.CreateClusterCommon(cluster_ref, options)
     req = self.messages.CreateClusterRequest(
@@ -1058,9 +1091,12 @@ class APIAdapter(object):
     elif options.update_master:
       update = self.messages.ClusterUpdate(
           desiredMasterVersion=options.version)
-    elif options.monitoring_service:
-      update = self.messages.ClusterUpdate(
-          desiredMonitoringService=options.monitoring_service)
+    elif options.monitoring_service or options.logging_service:
+      update = self.messages.ClusterUpdate()
+      if options.monitoring_service:
+        update.desiredMonitoringService = options.monitoring_service
+      if options.logging_service:
+        update.desiredLoggingService = options.logging_service
     elif options.disable_addons:
       addons = self._AddonsConfig(
           disable_ingress=options.disable_addons.get(INGRESS),
@@ -1104,6 +1140,22 @@ class APIAdapter(object):
           enabled=options.enable_binauthz)
       update = self.messages.ClusterUpdate(
           desiredBinaryAuthorization=binary_authorization)
+    elif options.enable_vertical_pod_autoscaling is not None:
+      vertical_pod_autoscaling = self.messages.VerticalPodAutoscaling(
+          enabled=options.enable_vertical_pod_autoscaling)
+      update = self.messages.ClusterUpdate(
+          desiredVerticalPodAutoscaling=vertical_pod_autoscaling)
+    elif options.resource_usage_bigquery_dataset is not None:
+      bigquery_destination = self.messages.BigQueryDestination(
+          datasetId=options.resource_usage_bigquery_dataset)
+      export_config = self.messages.ResourceUsageExportConfig(
+          bigqueryDestination=bigquery_destination)
+      update = self.messages.ClusterUpdate(
+          desiredResourceUsageExportConfig=export_config)
+    elif options.clear_resource_usage_bigquery_dataset is not None:
+      export_config = self.messages.ResourceUsageExportConfig()
+      update = self.messages.ClusterUpdate(
+          desiredResourceUsageExportConfig=export_config)
 
     if (options.master_authorized_networks
         and not options.enable_master_authorized_networks):
@@ -1386,6 +1438,10 @@ class APIAdapter(object):
           nodeMetadata=self.messages.WorkloadMetadataConfig.
           NodeMetadataValueValuesEnum.SECURE)
 
+    if options.sandbox is not None:
+      node_config.sandboxConfig = self.messages.SandboxConfig(
+          sandboxType=options.sandbox['type'])
+
     pool = self.messages.NodePool(
         name=node_pool_ref.nodePoolId,
         initialNodeCount=options.num_nodes,
@@ -1521,6 +1577,9 @@ class APIAdapter(object):
   def IsDegraded(self, cluster):
     return (cluster.status ==
             self.messages.Cluster.StatusValueValuesEnum.DEGRADED)
+
+  def GetDegradedWarning(self, cluster):  # pylint: disable=unused-argument
+    return gke_constants.DEFAULT_DEGRADED_WARNING
 
   def GetOperationError(self, operation):
     return operation.statusMessage
@@ -1675,81 +1734,19 @@ class V1Beta1Adapter(V1Adapter):
 
   def CreateCluster(self, cluster_ref, options):
     cluster = self.CreateClusterCommon(cluster_ref, options)
-    if options.enable_stackdriver_kubernetes:
-      if options.enable_cloud_logging and options.enable_cloud_monitoring:
-        cluster.loggingService = 'logging.googleapis.com/kubernetes'
-        cluster.monitoringService = 'monitoring.googleapis.com/kubernetes'
-      else:
-        raise util.Error(CLOUD_LOGGING_OR_MONITORING_DISABLED_ERROR_MSG)
-    req = self.messages.CreateClusterRequest(
-        parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
-        cluster=cluster)
-    operation = self.client.projects_locations_clusters.Create(req)
-    return self.ParseOperation(operation.name, cluster_ref.zone)
-
-
-class V1Alpha1Adapter(V1Beta1Adapter):
-  """APIAdapter for v1alpha1."""
-
-  def CreateCluster(self, cluster_ref, options):
-    cluster = self.CreateClusterCommon(cluster_ref, options)
     if options.enable_autoprovisioning is not None:
       cluster.autoscaling = self.CreateClusterAutoscalingCommon(options)
-    if options.local_ssd_volume_configs:
-      for pool in cluster.nodePools:
-        self._AddLocalSSDVolumeConfigsToNodeConfig(pool.config, options)
     if options.enable_stackdriver_kubernetes:
       if options.enable_cloud_logging and options.enable_cloud_monitoring:
         cluster.loggingService = 'logging.googleapis.com/kubernetes'
         cluster.monitoringService = 'monitoring.googleapis.com/kubernetes'
       else:
         raise util.Error(CLOUD_LOGGING_OR_MONITORING_DISABLED_ERROR_MSG)
-    if options.addons:
-      # Istio is disabled by default
-      if ISTIO in options.addons:
-        istio_auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
-        mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
-        istio_config = options.istio_config
-        if istio_config is not None:
-          auth_config = istio_config.get('auth')
-          if auth_config is not None:
-            if auth_config == 'MUTUAL_TLS':
-              istio_auth = mtls
-        cluster.addonsConfig.istioConfig = self.messages.IstioConfig(
-            disabled=False, auth=istio_auth)
-    if options.enable_managed_pod_identity:
-      cluster.managedPodIdentityConfig = self.messages.ManagedPodIdentityConfig(
-          enabled=options.enable_managed_pod_identity)
-
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
         cluster=cluster)
     operation = self.client.projects_locations_clusters.Create(req)
     return self.ParseOperation(operation.name, cluster_ref.zone)
-
-  def UpdateCluster(self, cluster_ref, options):
-    update = self.UpdateClusterCommon(options)
-    if (options.disable_addons is not None and
-        options.disable_addons.get(ISTIO) is not None):
-      istio_auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
-      mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
-      istio_config = options.istio_config
-      if istio_config is not None:
-        auth_config = istio_config.get('auth')
-        if auth_config is not None:
-          if auth_config == 'MUTUAL_TLS':
-            istio_auth = mtls
-      update.desiredAddonsConfig.istioConfig = self.messages.IstioConfig(
-          disabled=options.disable_addons.get(ISTIO), auth=istio_auth)
-    if options.update_nodes and options.concurrent_node_count:
-      update.concurrentNodeCount = options.concurrent_node_count
-    op = self.client.projects_locations_clusters.Update(
-        self.messages.UpdateClusterRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
-                                        cluster_ref.clusterId),
-            update=update))
-    return self.ParseOperation(op.name, cluster_ref.zone)
 
   def CreateClusterAutoscalingCommon(self, options):
     """Create cluster's autoscaling configuration.
@@ -1765,12 +1762,12 @@ class V1Alpha1Adapter(V1Beta1Adapter):
     resource_limits = []
     if options.min_cpu is not None or options.max_cpu is not None:
       resource_limits.append(self.messages.ResourceLimit(
-          name='cpu',
+          resourceType='cpu',
           minimum=options.min_cpu,
           maximum=options.max_cpu))
     if options.min_memory is not None or options.max_memory is not None:
       resource_limits.append(self.messages.ResourceLimit(
-          name='memory',
+          resourceType='memory',
           minimum=options.min_memory,
           maximum=options.max_memory))
     if options.max_accelerator is not None:
@@ -1781,26 +1778,20 @@ class V1Alpha1Adapter(V1Beta1Adapter):
           raise util.Error(MISMATCH_ACCELERATOR_TYPE_LIMITS_ERROR_MSG)
         min_count = options.min_accelerator.get('count', 0)
       resource_limits.append(self.messages.ResourceLimit(
-          name=options.max_accelerator.get('type'),
+          resourceType=options.max_accelerator.get('type'),
           minimum=min_count,
           maximum=options.max_accelerator.get('count', 0)))
     return self.messages.ClusterAutoscaling(
         enableNodeAutoprovisioning=options.enable_autoprovisioning,
         resourceLimits=resource_limits)
 
-  def CreateNodePool(self, node_pool_ref, options):
-    pool = self.CreateNodePoolCommon(node_pool_ref, options)
-    if options.local_ssd_volume_configs:
-      self._AddLocalSSDVolumeConfigsToNodeConfig(pool.config, options)
-    if options.enable_autoprovisioning is not None:
-      pool.autoscaling.autoprovisioned = options.enable_autoprovisioning
-    req = self.messages.CreateNodePoolRequest(
-        nodePool=pool,
-        parent=ProjectLocationCluster(node_pool_ref.projectId,
-                                      node_pool_ref.zone,
-                                      node_pool_ref.clusterId))
-    operation = self.client.projects_locations_clusters_nodePools.Create(req)
-    return self.ParseOperation(operation.name, node_pool_ref.zone)
+  def GetDegradedWarning(self, cluster):
+    if cluster.conditions:
+      codes = [condition.code for condition in cluster.conditions]
+      messages = [condition.message for condition in cluster.conditions]
+      return ('Codes: {0}\n' 'Messages: {1}.').format(codes, messages)
+    else:
+      return gke_constants.DEFAULT_DEGRADED_WARNING
 
   def UpdateNodePool(self, node_pool_ref, options):
     if options.IsAutoscalingUpdate():
@@ -1827,6 +1818,104 @@ class V1Alpha1Adapter(V1Beta1Adapter):
       operation = (
           self.client.projects_locations_clusters_nodePools.SetManagement(req))
       return self.ParseOperation(operation.name, node_pool_ref.zone)
+
+
+class V1Alpha1Adapter(V1Beta1Adapter):
+  """APIAdapter for v1alpha1."""
+
+  def CreateCluster(self, cluster_ref, options):
+    cluster = self.CreateClusterCommon(cluster_ref, options)
+    if options.enable_autoprovisioning is not None:
+      cluster.autoscaling = self.CreateClusterAutoscalingCommon(options)
+    if options.local_ssd_volume_configs:
+      for pool in cluster.nodePools:
+        self._AddLocalSSDVolumeConfigsToNodeConfig(pool.config, options)
+    if options.enable_stackdriver_kubernetes:
+      if options.enable_cloud_logging and options.enable_cloud_monitoring:
+        cluster.loggingService = 'logging.googleapis.com/kubernetes'
+        cluster.monitoringService = 'monitoring.googleapis.com/kubernetes'
+      else:
+        raise util.Error(CLOUD_LOGGING_OR_MONITORING_DISABLED_ERROR_MSG)
+    if options.addons:
+      # Serverless is disabled by default.
+      if SERVERLESS in options.addons:
+        if ISTIO not in options.addons:
+          # Istio is a dependency of Serverless. We auto-enable Istio in no
+          # auth mode if not specified by the user.
+          log.warning('Auto-enabling the Istio addon, which is required to run '
+                      'the Serverless addon.')
+          options.addons.append(ISTIO)
+        cluster.addonsConfig.serverlessConfig = self.messages.ServerlessConfig(
+            disabled=False)
+      # Istio is disabled by default
+      if ISTIO in options.addons:
+        istio_auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
+        mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
+        istio_config = options.istio_config
+        if istio_config is not None:
+          auth_config = istio_config.get('auth')
+          if auth_config is not None:
+            if auth_config == 'MUTUAL_TLS':
+              istio_auth = mtls
+        cluster.addonsConfig.istioConfig = self.messages.IstioConfig(
+            disabled=False, auth=istio_auth)
+    if options.enable_managed_pod_identity:
+      cluster.managedPodIdentityConfig = self.messages.ManagedPodIdentityConfig(
+          enabled=options.enable_managed_pod_identity)
+    if options.resource_usage_bigquery_dataset:
+      bigquery_destination = self.messages.BigQueryDestination(
+          datasetId=options.resource_usage_bigquery_dataset)
+      cluster.resourceUsageExportConfig = \
+          self.messages.ResourceUsageExportConfig(
+              bigqueryDestination=bigquery_destination)
+
+    req = self.messages.CreateClusterRequest(
+        parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
+        cluster=cluster)
+    operation = self.client.projects_locations_clusters.Create(req)
+    return self.ParseOperation(operation.name, cluster_ref.zone)
+
+  def UpdateCluster(self, cluster_ref, options):
+    update = self.UpdateClusterCommon(options)
+    if options.disable_addons is not None:
+      if options.disable_addons.get(ISTIO) is not None:
+        istio_auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
+        mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
+        istio_config = options.istio_config
+        if istio_config is not None:
+          auth_config = istio_config.get('auth')
+          if auth_config is not None:
+            if auth_config == 'MUTUAL_TLS':
+              istio_auth = mtls
+        update.desiredAddonsConfig.istioConfig = self.messages.IstioConfig(
+            disabled=options.disable_addons.get(ISTIO), auth=istio_auth)
+      if options.disable_addons.get(SERVERLESS) is not None:
+        update.desiredAddonsConfig.serverlessConfig = (
+            self.messages.ServerlessConfig(
+                disabled=options.disable_addons.get(SERVERLESS)))
+    if options.update_nodes and options.concurrent_node_count:
+      update.concurrentNodeCount = options.concurrent_node_count
+    op = self.client.projects_locations_clusters.Update(
+        self.messages.UpdateClusterRequest(
+            name=ProjectLocationCluster(cluster_ref.projectId,
+                                        cluster_ref.zone,
+                                        cluster_ref.clusterId),
+            update=update))
+    return self.ParseOperation(op.name, cluster_ref.zone)
+
+  def CreateNodePool(self, node_pool_ref, options):
+    pool = self.CreateNodePoolCommon(node_pool_ref, options)
+    if options.local_ssd_volume_configs:
+      self._AddLocalSSDVolumeConfigsToNodeConfig(pool.config, options)
+    if options.enable_autoprovisioning is not None:
+      pool.autoscaling.autoprovisioned = options.enable_autoprovisioning
+    req = self.messages.CreateNodePoolRequest(
+        nodePool=pool,
+        parent=ProjectLocationCluster(node_pool_ref.projectId,
+                                      node_pool_ref.zone,
+                                      node_pool_ref.clusterId))
+    operation = self.client.projects_locations_clusters_nodePools.Create(req)
+    return self.ParseOperation(operation.name, node_pool_ref.zone)
 
   def GetIamPolicy(self, cluster_ref):
     return self.client.projects.GetIamPolicy(

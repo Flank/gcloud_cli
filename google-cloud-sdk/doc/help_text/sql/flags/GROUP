@@ -19,7 +19,8 @@ COMMANDS
         List customizable flags for Google Cloud SQL instances.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql flags
         $ gcloud beta sql flags
 

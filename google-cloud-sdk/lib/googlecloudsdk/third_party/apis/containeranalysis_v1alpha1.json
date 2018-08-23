@@ -1308,7 +1308,7 @@
       "type": "object",
       "properties": {
         "publicKey": {
-          "description": "Public key of the builder which can be used to verify that the related\nfindings are valid and unchanged. If `key_type` is empty, this defaults\nto PEM encoded public keys.\n\nThis field may be empty if `key_id` references an external key.\n\nFor Cloud Container Builder based signatures, this is a PEM encoded public\nkey. To verify the Cloud Container Builder signature, place the contents of\nthis field into a file (public.pem). The signature field is base64-decoded\ninto its binary representation in signature.bin, and the provenance bytes\nfrom `BuildDetails` are base64-decoded into a binary representation in\nsigned.bin. OpenSSL can then verify the signature:\n`openssl sha256 -verify public.pem -signature signature.bin signed.bin`",
+          "description": "Public key of the builder which can be used to verify that the related\nfindings are valid and unchanged. If `key_type` is empty, this defaults\nto PEM encoded public keys.\n\nThis field may be empty if `key_id` references an external key.\n\nFor Cloud Build based signatures, this is a PEM encoded public\nkey. To verify the Cloud Build signature, place the contents of\nthis field into a file (public.pem). The signature field is base64-decoded\ninto its binary representation in signature.bin, and the provenance bytes\nfrom `BuildDetails` are base64-decoded into a binary representation in\nsigned.bin. OpenSSL can then verify the signature:\n`openssl sha256 -verify public.pem -signature signature.bin signed.bin`",
           "type": "string"
         },
         "signature": {
@@ -1625,7 +1625,7 @@
       "type": "object",
       "properties": {
         "role": {
-          "description": "Role that is assigned to `members`.\nFor example, `roles\/viewer`, `roles\/editor`, or `roles\/owner`.\nRequired",
+          "description": "Role that is assigned to `members`.\nFor example, `roles\/viewer`, `roles\/editor`, or `roles\/owner`.",
           "type": "string"
         },
         "members": {
@@ -1634,6 +1634,33 @@
           "items": {
             "type": "string"
           }
+        },
+        "condition": {
+          "description": "Unimplemented. The condition that is associated with this binding.\nNOTE: an unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently.",
+          "$ref": "Expr"
+        }
+      }
+    },
+    "Expr": {
+      "id": "Expr",
+      "description": "Represents an expression text. Example:\n\n    title: \"User account presence\"\n    description: \"Determines whether the request has a user account\"\n    expression: \"size(request.user) > 0\"",
+      "type": "object",
+      "properties": {
+        "expression": {
+          "description": "Textual representation of an expression in\nCommon Expression Language syntax.\n\nThe application context of the containing message determines which\nwell-known feature set of CEL is supported.",
+          "type": "string"
+        },
+        "title": {
+          "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
+          "type": "string"
+        },
+        "description": {
+          "description": "An optional description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
+          "type": "string"
+        },
+        "location": {
+          "description": "An optional string indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
+          "type": "string"
         }
       }
     },
@@ -1745,6 +1772,7 @@
           "$ref": "Operation"
         },
         "updateMask": {
+          "description": "The fields to update.",
           "type": "string",
           "format": "google-fieldmask"
         }
@@ -1809,23 +1837,6 @@
         },
         "endTime": {
           "description": "Output only. The time that this operation was marked completed or failed.",
-          "type": "string",
-          "format": "google-datetime"
-        }
-      }
-    },
-    "GrafeasV1beta1OperationMetadata": {
-      "id": "GrafeasV1beta1OperationMetadata",
-      "description": "Metadata for an operation.",
-      "type": "object",
-      "properties": {
-        "createTime": {
-          "description": "Output only. The time this operation was created.",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "endTime": {
-          "description": "Output only. The time that this operation was marked as done.",
           "type": "string",
           "format": "google-datetime"
         }
@@ -2529,7 +2540,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "The name of the ScanConfig in the form\nprojects\/{project_id}\/scanConfigs\/{scan_config_id}\ninstead.",
+                  "description": "The name of the ScanConfig in the form\nprojects\/{project_id}\/scanConfigs\/{scan_config_id}",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/scanConfigs\/[^\/]+$",
@@ -2554,7 +2565,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "This containers the project Id i.e.: projects\/{project_id}\ninstead.",
+                  "description": "This containers the project Id i.e.: projects\/{project_id}",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -2595,13 +2606,14 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "The scan config to update of the form\nprojects\/{project_id}\/scanConfigs\/{scan_config_id}.\ninstead.",
+                  "description": "The scan config to update of the form\nprojects\/{project_id}\/scanConfigs\/{scan_config_id}.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/scanConfigs\/[^\/]+$",
                   "type": "string"
                 },
                 "updateMask": {
+                  "description": "The fields to update.",
                   "location": "query",
                   "type": "string",
                   "format": "google-fieldmask"

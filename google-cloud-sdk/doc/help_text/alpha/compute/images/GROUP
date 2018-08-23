@@ -16,11 +16,17 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     packages
+        (ALPHA) List and diff image packages.
+
      vulnerabilities
         (ALPHA) List and describe image vulnerabilities and related notes.
 
 COMMANDS
     COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding for an image.
 
      add-labels
         (ALPHA) Add labels to Google Compute Engine images.
@@ -43,24 +49,33 @@ COMMANDS
      export
         (ALPHA) Export a Google Compute Engine image.
 
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a Google Compute Engine image.
+
      import
-        (ALPHA) Import a Google Compute Engine image.
+        (ALPHA) Import an image into Google Compute Engine.
 
      list
         (ALPHA) List Google Compute Engine images.
 
+     remove-iam-policy-binding
+        (ALPHA) Remove IAM policy binding for an image.
+
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine images.
+
+     set-iam-policy
+        (ALPHA) Set IAM policy for a disk image.
 
      update
         (ALPHA) Update a Google Compute Engine image.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute images
         $ gcloud beta compute images

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +14,7 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firebase.test import exceptions
@@ -55,6 +57,13 @@ class AndroidCatalogManagerTests(unit_base.AndroidMockClientTest):
     with self.assertRaises(exceptions.DefaultDimensionNotFoundError) as ex_ctx:
       mgr.GetDefaultLocale()
     self.assertIn('locale', six.text_type(ex_ctx.exception))
+
+  def testOrientationDefaultIsMissing(self):
+    empty_catalog = fake_catalogs.EmptyAndroidCatalog()
+    mgr = catalog_manager.AndroidCatalogManager(empty_catalog)
+    with self.assertRaises(exceptions.DefaultDimensionNotFoundError) as ex_ctx:
+      mgr.GetDefaultOrientation()
+    self.assertIn('orientation', six.text_type(ex_ctx.exception))
 
   def testValidateModels(self):
     catalog = fake_catalogs.FakeAndroidCatalog()

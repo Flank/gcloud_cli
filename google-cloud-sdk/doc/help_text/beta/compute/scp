@@ -26,24 +26,6 @@ DESCRIPTION
       o When the destination of your transfer is remote instead, all sources
         must be local.
 
-    To copy a remote directory, ~/narnia, from example-instance to the
-    ~/wardrobe directory of your local host, run:
-
-        $ gcloud beta compute scp --recurse example-instance:~/narnia \
-            ~/wardrobe
-
-    Conversely, files from your local computer can be copied to a virtual
-    machine:
-
-        $ gcloud beta compute scp ~/localtest.txt ~/localtest2.txt \
-            example-instance:~/narnia
-
-    If the zone cannot be determined, you will be prompted for it. Use the
-    --zone flag to avoid being prompted:
-
-        $ gcloud beta compute scp --recurse example-instance:~/narnia \
-            ~/wardrobe --zone us-central1-a
-
     Under the covers, scp(1) is used to facilitate the transfer.
 
 POSITIONAL ARGUMENTS
@@ -121,6 +103,25 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To copy a remote directory, ~/narnia, from example-instance to the
+    ~/wardrobe directory of your local host, run:
+
+        $ gcloud beta compute scp --recurse example-instance:~/narnia \
+            ~/wardrobe
+
+    Conversely, files from your local computer can be copied to a virtual
+    machine:
+
+        $ gcloud beta compute scp ~/localtest.txt ~/localtest2.txt \
+            example-instance:~/narnia
+
+    If the zone cannot be determined, you will be prompted for it. Use the
+    --zone flag to avoid being prompted:
+
+        $ gcloud beta compute scp --recurse example-instance:~/narnia \
+            ~/wardrobe --zone us-central1-a
 
 NOTES
     This command is currently in BETA and may change without notice. These

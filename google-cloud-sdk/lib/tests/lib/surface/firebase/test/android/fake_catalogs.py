@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Fake Android device catalogs for testing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 
 TESTING_MESSAGES = apis.GetMessagesModule('testing', 'v1')
@@ -39,7 +42,7 @@ def FakeAndroidCatalog():
       name='Nexus 2099',
       screenX=600,
       screenY=800,
-      supportedVersionIds=['v98', 'v99'])
+      supportedVersionIds=['F', 'P'])
   android_physical_model = TESTING_MESSAGES.AndroidModel(
       brand='Sungsam',
       form=TESTING_MESSAGES.AndroidModel.FormValueValuesEnum.PHYSICAL,
@@ -58,10 +61,10 @@ def FakeAndroidCatalog():
       name='Esperia XYZ',
       screenX=10,
       screenY=7,
-      supportedVersionIds=['0', '1', '2'],
-      tags=['deprecated=1,2'])
+      supportedVersionIds=['C', 'F', 'P'],
+      tags=['deprecated=C,F'])
 
-  android_version_3 = TESTING_MESSAGES.AndroidVersion(
+  android_v3 = TESTING_MESSAGES.AndroidVersion(
       apiLevel=3,
       codeName='Cupcake',
       distribution=TESTING_MESSAGES.Distribution(
@@ -70,27 +73,37 @@ def FakeAndroidCatalog():
       releaseDate=TESTING_MESSAGES.Date(month=4, day=27, year=2009),
       tags=['unsupported', 'deprecated'],
       versionString='1.5')
-  android_version_8 = TESTING_MESSAGES.AndroidVersion(
+  android_v8 = TESTING_MESSAGES.AndroidVersion(
       apiLevel=8,
       codeName='Froyo',
       id='F',
       releaseDate=TESTING_MESSAGES.Date(month=5, day=10, year=2010),
       tags=['default'],
       versionString='2.2.x')
+  android_v28 = TESTING_MESSAGES.AndroidVersion(
+      apiLevel=28,
+      codeName='Pie',
+      id='P',
+      releaseDate=TESTING_MESSAGES.Date(month=11, day=1, year=2018),
+      tags=['shiny', 'unstable'],
+      versionString='9.0.x')
 
   locale_ro = TESTING_MESSAGES.Locale(
       id='ro', name='Romulan', region='Romulus', tags=['cunning', 'default'])
   locale_kl = TESTING_MESSAGES.Locale(
       id='kl', name='Klingon', region='Empire', tags=['feisty'])
 
-  orientation = TESTING_MESSAGES.Orientation(
+  orientation1 = TESTING_MESSAGES.Orientation(
       id='askew', name='off-kilter', tags=['default', 'graffiti'])
+  orientation2 = TESTING_MESSAGES.Orientation(
+      id='wonky', name='cattywampus', tags=['oh-my'])
 
   return TESTING_MESSAGES.AndroidDeviceCatalog(
       models=[
           android_virtual_model, android_physical_model,
           android_deprecated_model
       ],
-      versions=[android_version_3, android_version_8],
+      versions=[android_v3, android_v8, android_v28],
       runtimeConfiguration=TESTING_MESSAGES.AndroidRuntimeConfiguration(
-          locales=[locale_ro, locale_kl], orientations=[orientation]))
+          locales=[locale_ro, locale_kl],
+          orientations=[orientation1, orientation2]))

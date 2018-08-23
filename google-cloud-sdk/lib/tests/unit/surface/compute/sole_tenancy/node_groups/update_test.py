@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-groups update subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -28,10 +31,9 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
                            cli_test_base.CliTestBase, waiter_test_base.Base):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'v1'))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', 'v1')
     self.client.Mock()
     self.messages = self.client.MESSAGES_MODULE
     self.addCleanup(self.client.Unmock)
@@ -44,7 +46,7 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
     return self.messages.Operation(
         name=operation_name,
         status=status,
-        selfLink='https://www.googleapis.com/compute/beta/projects/{0}/zones/'
+        selfLink='https://www.googleapis.com/compute/v1/projects/{0}/zones/'
         '{1}/operations/{2}'.format(self.Project(), self.zone, operation_name),
         targetLink=resource_uri)
 
@@ -94,7 +96,7 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
         self._GetOperationMessage(
             'operation-' + operation_suffix,
             self.messages.Operation.StatusValueValuesEnum.DONE,
-            'https://www.googleapis.com/compute/beta/projects/{0}/zones/'
+            'https://www.googleapis.com/compute/v1/projects/{0}/zones/'
             '{1}/nodeGroups/{2}'.format(self.Project(), self.zone,
                                         'my-node-group')))
     self.client.nodeGroups.Get.Expect(

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Wrapper to manipulate GCP git repository."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import errno
 import os
 import re
@@ -25,6 +28,7 @@ import textwrap
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 from six.moves import range  # pylint: disable=redefined-builtin
@@ -98,7 +102,7 @@ def CheckGitVersion(version_lower_bound=None):
     NoGitException: if `git` was not found.
   """
   try:
-    output = subprocess.check_output(['git', 'version'])
+    output = encoding.Decode(subprocess.check_output(['git', 'version']))
     if not output:
       raise InvalidGitException('The git version string is empty.')
     if not output.startswith('git version '):

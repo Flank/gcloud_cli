@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the disks delete subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base
@@ -103,14 +105,12 @@ class DisksDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
               zone='central2-a'))],
     )
     # pylint: disable=line-too-long
-    self.AssertErrContains(textwrap.dedent("""\
-        The following disks will be deleted:
-         - [disk-1] in [central2-a]
-         - [disk-2] in [central2-a]
-         - [disk-3] in [central2-a]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following disks will be deleted:\n'
+        r' - [disk-1] in [central2-a]\n'
+        r' - [disk-2] in [central2-a]\n'
+        r' - [disk-3] in [central2-a]\n')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.WriteInput('n\n')

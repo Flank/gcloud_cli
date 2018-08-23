@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -624,14 +627,22 @@ class _BasePsqlConnectTest(_BaseConnectTest):
     self.RunPsqlConnectTest()
 
 
+class _BasePsqlConnectBetaTest(_BasePsqlConnectTest):
+
+  def testPsqlConnectWithDatabase(self):
+    self.RunPsqlConnectTest('somedb')
+
+
 class PsqlConnectGATest(_BasePsqlConnectTest, base.SqlMockTestGA):
   pass
 
 
-class PsqlConnectBetaTest(_BasePsqlConnectTest, base.SqlMockTestBeta):
+class PsqlConnectBetaTest(_BasePsqlConnectBetaTest, base.SqlMockTestBeta):
+  pass
 
-  def testPsqlConnectWithDatabase(self):
-    self.RunPsqlConnectTest('somedb')
+
+class PsqlConnectAlphaTest(_BasePsqlConnectBetaTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

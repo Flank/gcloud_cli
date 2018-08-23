@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,15 @@
 """Tests that exercise triggering instance failover."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class InstancesFailoverTest(base.SqlMockTestBeta):
+class _BaseInstancesFailoverTest(object):
 
   def testInstancesFailover(self):
     prompt_mock = self.StartObjectPatch(
@@ -49,6 +52,20 @@ class InstancesFailoverTest(base.SqlMockTestBeta):
     self.WriteInput('n\n')
     with self.assertRaises(console_io.OperationCancelledError):
       self.Run('sql instances failover my-instance')
+
+
+class InstancesFailoverGATest(_BaseInstancesFailoverTest, base.SqlMockTestGA):
+  pass
+
+
+class InstancesFailoverBetaTest(_BaseInstancesFailoverTest,
+                                base.SqlMockTestBeta):
+  pass
+
+
+class InstancesFailoverAlphaTest(_BaseInstancesFailoverTest,
+                                 base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Command to show Container Analysis Data for a specified image."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.container.images import container_data_util
 from googlecloudsdk.api_lib.container.images import util
 from googlecloudsdk.calliope import base
@@ -26,6 +29,7 @@ _DEFAULT_KINDS = [
     'PACKAGE_VULNERABILITY',
     'IMAGE_BASIS',
     'DEPLOYABLE',
+    'DISCOVERY',
 ]
 
 
@@ -142,6 +146,7 @@ class DescribeAlpha(Describe):
       filter_kinds.append('BUILD_DETAILS')
     if args.show_package_vulnerability:
       filter_kinds.append('PACKAGE_VULNERABILITY')
+      filter_kinds.append('DISCOVERY')
     if args.show_image_basis:
       filter_kinds.append('IMAGE_BASIS')
     if args.show_deployment:
@@ -178,6 +183,10 @@ class DescribeAlpha(Describe):
             and not args.show_package_vulnerability
             and not args.show_all_metadata):
           del data.package_vulnerability_summary
+        if (not data.discovery_summary.discovery
+            and not args.show_package_vulnerability
+            and not args.show_all_metadata):
+          del data.discovery_summary
         if (not data.image_basis_summary.base_images
             and not args.show_image_basis
             and not args.show_all_metadata):

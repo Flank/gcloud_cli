@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +16,11 @@
 
 Mocks subprocess; everything else is an integration test.
 """
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import subprocess
 import textwrap
@@ -65,15 +69,20 @@ class LocalPredictTestBase(object):
         subprocess, 'Popen', return_value=popen_mock, autospec=True)
 
   def _AssertPopenCalledCorrectly(self, popen_mock, instances,
-                                  additional_env=None, framework='tensorflow'):
+                                  additional_env=None,
+                                  framework='tensorflow',
+                                  additional_python_args=None):
     expected_env = {'CLOUDSDK_ROOT': 'fake-sdk-root'}
     if additional_env:
       expected_env.update(additional_env)
+    expected_command = ['/tmp/python', local_predict.__file__,
+                        '--model-dir', self.temp_path,
+                        '--framework', framework]
+    if additional_python_args:
+      expected_command += additional_python_args
     self.assertEqual(popen_mock.call_count, 1)
     args, kwargs = popen_mock.call_args
-    self.assertEqual(args[0], ['/tmp/python', local_predict.__file__,
-                               '--model-dir', self.temp_path,
-                               '--framework', framework])
+    self.assertEqual(args[0], expected_command)
     self.assertEqual(set(kwargs.keys()), {'stdout', 'stderr', 'stdin', 'env'})
     self.assertEqual(kwargs['stdout'], subprocess.PIPE)
     self.assertEqual(kwargs['stderr'], subprocess.PIPE)
@@ -257,6 +266,24 @@ class LocalPredictTestBase(object):
                                        self.JSON_INSTANCES_NORMALIZED,
                                        {'test_key': 'test_value'})
       self.AssertErrNotContains('WARNING: warning!\n')
+
+  def testLocalPredict_SignatureName(self):
+    popen_mock = self._MockPopen()
+    instances_file = self.Touch(self.temp_path, 'instances.json',
+                                contents=self.JSON_INSTANCES_UNNORMALIZED)
+
+    results = self.Run(
+        'ml-engine local predict '
+        '--model-dir {} '
+        '--json-instances {} '
+        '--framework tensorflow '
+        '--signature-name signature'.format(self.temp_path, instances_file))
+
+    self.assertEqual(results, [])
+    self._AssertPopenCalledCorrectly(popen_mock, self.JSON_INSTANCES_NORMALIZED,
+                                     additional_python_args=['--signature-name',
+                                                             'signature'])
+    self.AssertErrNotContains('WARNING: warning!\n')
 
 
 class LocalPredictGaTest(LocalPredictTestBase, base.MlGaPlatformTestBase):

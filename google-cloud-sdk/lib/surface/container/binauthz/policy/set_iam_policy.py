@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,10 @@
 """Set the IAM policy for a Binary Authorization policy."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.container.binauthz import apis
 from googlecloudsdk.api_lib.container.binauthz import iam
 from googlecloudsdk.api_lib.container.binauthz import util
 from googlecloudsdk.calliope import base
@@ -38,13 +41,14 @@ class SetIamPolicy(base.Command):
   # The above text is based on output of
   # iam_util.GetDetailedHelpForSetIamPolicy.
 
-  @staticmethod
-  def Args(parser):
+  @classmethod
+  def Args(cls, parser):
     parser.add_argument('policy_file', help=('The JSON or YAML '
                                              'file containing the IAM policy.'))
 
   def Run(self, args):
-    client = iam.Client()
+    api_version = apis.GetApiVersion(self.ReleaseTrack())
+    client = iam.Client(api_version)
     policy_ref = util.GetPolicyRef()
 
     policy, _ = iam_util.ParseYamlOrJsonPolicyFile(args.policy_file,

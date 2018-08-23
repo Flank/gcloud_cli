@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-groups list subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base
+
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -24,8 +27,6 @@ import mock
 class NodeGroupsListTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
     self.addCleanup(list_json_patcher.stop)
@@ -43,11 +44,13 @@ class NodeGroupsListTest(test_base.BaseTest):
         batch_url=self.batch_url,
         errors=[])
 
-    self.AssertOutputEquals("""\
-NAME     ZONE    DESCRIPTION   NODE_TEMPLATE  NUM_NODES
+    self.AssertOutputEquals(
+        """\
+NAME     ZONE    DESCRIPTION   NODE_TEMPLATE  NODES
 group-1  zone-1  description1  template-1     2
 group-2  zone-1  description2  template-2     1
-""", normalize_space=True)
+""",
+        normalize_space=True)
 
 
 if __name__ == '__main__':

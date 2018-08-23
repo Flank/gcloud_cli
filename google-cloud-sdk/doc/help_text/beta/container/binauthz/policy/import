@@ -1,0 +1,45 @@
+NAME
+    gcloud beta container binauthz policy import - import a Binary
+        Authorization policy to the current project
+
+SYNOPSIS
+    gcloud beta container binauthz policy import POLICY_FILE
+        [--strict-validation] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This command accepts a description of the desired policy in the form
+    of a YAML-formatted file. A representation of the current policy can be
+    retrieved using the $ gcloud beta container binauthz policy describe
+    command. One method of modifying the policy is to run gcloud beta container
+    binauthz policy export, dump the contents to a file, modify them to reflect
+    the desired end-state, and provide this modifyied file to gcloud beta
+    container binauthz policy import.
+
+POSITIONAL ARGUMENTS
+     POLICY_FILE
+        The file containing the YAML-formatted policy description.
+
+FLAGS
+     --strict-validation
+        Whether to perform additional checks on the validity of policy
+        contents.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLE
+    One way of updating the current project's policy is to run:
+
+        $ gcloud beta container binauthz policy export > my_policy.yaml
+        $ edit my_policy.yaml
+        $ gcloud beta container binauthz policy import \
+          --policy-file=my_policy.yaml
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha container binauthz policy import
+

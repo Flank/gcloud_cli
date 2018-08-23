@@ -6,9 +6,11 @@ SYNOPSIS
     gcloud datastore create-indexes INDEX_FILE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    This command creates new datastore indexes based on your local index
-    configuration. Any indexes in your index file that do not exist will be
-    created.
+    (DEPRECATED) create-indexes is deprecated. Please use gcloud datastore
+    indexes create instead.
+
+    Create new datastore indexes based on your local index configuration. Any
+    indexes in your index file that do not exist will be created.
 
 POSITIONAL ARGUMENTS
      INDEX_FILE
@@ -29,9 +31,3 @@ EXAMPLES
     Detailed information about index configuration can be found at the
     index.yaml reference
     (https://cloud.google.com/appengine/docs/standard/python/config/indexref).
-
-NOTES
-    This variant is also available:
-
-        $ gcloud beta datastore create-indexes
-

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Integration tests for backend services."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
@@ -79,7 +82,10 @@ class BackendServicesTest(e2e_test_base.BaseTest):
   def CreateHealthCheck(self):
     """Creates a TCP health check and returns its name."""
     name = self.UniqueName('tcp-hc')
-    result = self.Run('compute health-checks create tcp {0}'.format(name))
+    global_flag = (' --global'
+                   if self.track == calliope_base.ReleaseTrack.ALPHA else '')
+    result = self.Run('compute health-checks create tcp {0} {1}'.format(
+        name, global_flag))
     result_list = list(result)
     self.assertEqual(1, len(result_list))
     self.assertEqual(name, result_list[0].name)
@@ -123,23 +129,26 @@ class BackendServicesTest(e2e_test_base.BaseTest):
   def CreateTcpBackendService(self, health_check_name):
     """Creates a backend service with TCP health check and returns its name."""
     name = self.UniqueName('tcp-bs')
+    global_health_check_flag = (' --global-health-checks' if
+                                self.track == calliope_base.ReleaseTrack.ALPHA
+                                else '')
     result = self.Run('compute backend-services create {0} '
                       '--protocol TCP '
                       '--health-checks {1} '
                       '--connection-draining-timeout 10 '
-                      '--global'.format(name, health_check_name))
+                      '--global {2}'.format(name, health_check_name,
+                                            global_health_check_flag))
     self.assertEqual(1, len(result))
     self.assertEqual(name, result[0].name)
     self.backend_service_names.append(name)
     return name
 
-  def HttpBackendServiceLbTests(self, cache_max_age_sec=None):
+  def testHttpBackendServiceLb(self):
     """Verifies backend service operations when using a HTTP health check."""
     vm_name = self.CreateInstance()
     ig_name = self.CreateInstanceGroup()
     hc_name = self.CreateHttpHealthCheck()
-    bs_name = self.CreateHttpBackendService(
-        hc_name, cache_max_age_sec=cache_max_age_sec)
+    bs_name = self.CreateHttpBackendService(hc_name, cache_max_age_sec=1234)
 
     # Add instance to instance group.
     self.Run('compute instance-groups unmanaged add-instances {0} '
@@ -174,9 +183,6 @@ class BackendServicesTest(e2e_test_base.BaseTest):
     self.assertEqual('RATE', str(result[0].backends[0].balancingMode))
     self.assertEqual(10, result[0].backends[0].maxRatePerInstance)
     self.assertIsNone(result[0].backends[0].maxRate)
-
-  def testHttpBackendServiceLb(self):
-    self.HttpBackendServiceLbTests()
 
   def testTcpBackendServiceLb(self):
     """Verifies backend service operations when using a TCP health check."""
@@ -241,7 +247,12 @@ class BackendServicesTest(e2e_test_base.BaseTest):
       self.CleanUpResource(
           name, 'backend-services', scope=e2e_test_base.EXPLICIT_GLOBAL)
     for name in self.health_check_names:
-      self.CleanUpResource(name, 'health-checks', scope=e2e_test_base.GLOBAL)
+      self.CleanUpResource(
+          name,
+          'health-checks',
+          scope=e2e_test_base.EXPLICIT_GLOBAL
+          if self.track == calliope_base.ReleaseTrack.ALPHA else
+          e2e_test_base.GLOBAL)
     for name in self.http_health_check_names:
       self.CleanUpResource(
           name, 'http-health-checks', scope=e2e_test_base.GLOBAL)
@@ -254,10 +265,6 @@ class BackendServicesTestBeta(BackendServicesTest):
 
   def SetUp(self):
     self._SetUpReleaseTrack(calliope_base.ReleaseTrack.BETA, 'beta')
-
-  def testHttpBackendServiceLb(self):
-    """Verifies backend service operations when using a HTTP health check."""
-    self.HttpBackendServiceLbTests(cache_max_age_sec=1234)
 
   def testCustomRequestHeadersBackendServiceLb(self):
     hc_name = self.CreateHttpHealthCheck()

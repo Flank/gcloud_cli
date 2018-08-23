@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +17,7 @@
 
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from tests.lib import sdk_test_base
@@ -24,6 +26,7 @@ from tests.lib import session_test_base
 from six.moves import zip
 
 
+@sdk_test_base.Filters.SkipOnPy3('This is going to be deleted.', 'b/110029404')
 class TestSessionTest(sdk_test_base.SdkBase):
 
   def SetUp(self):

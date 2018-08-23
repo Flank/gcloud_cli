@@ -6,7 +6,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Cancel an ongoing build.
+    (BETA) (DEPRECATED) Cancel an ongoing build.
+
+    This command is deprecated and will be removed on or after 2018-10-31.
+    Please use gcloud builds cancel instead.
 
 POSITIONAL ARGUMENTS
      BUILDS [BUILDS ...]

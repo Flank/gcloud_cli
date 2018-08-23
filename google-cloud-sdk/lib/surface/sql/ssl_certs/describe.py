@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Retrieves information about an SSL cert for a Cloud SQL instance."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.sql import api_util
 from googlecloudsdk.api_lib.sql import cert
 from googlecloudsdk.api_lib.sql import validate
@@ -66,7 +69,8 @@ class _BaseGet(object):
                                 args.common_name)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.ALPHA)
 class Get(_BaseGet, base.DescribeCommand):
   """Retrieves information about an SSL cert for a Cloud SQL instance."""
   pass

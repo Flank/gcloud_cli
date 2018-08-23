@@ -81,7 +81,8 @@ class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
     TypeValueValuesEnum: The available types of accelerators.
 
   Fields:
-    count: The number of accelerators to attach to the machines.
+    count: The number of accelerators to attach to each machine running the
+      job.
     type: The available types of accelerators.
   """
 
@@ -93,7 +94,8 @@ class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
         no GPU.
       NVIDIA_TESLA_K80: Nvidia tesla k80 GPU.
       NVIDIA_TESLA_P100: Nvidia tesla P100 GPU.
-      NVIDIA_TESLA_V100: Nvidia tesla V100 GPU.
+      NVIDIA_TESLA_V100: Nvidia tesla V100 GPU. Not supported for batch
+        prediction.
     """
     ACCELERATOR_TYPE_UNSPECIFIED = 0
     NVIDIA_TESLA_K80 = 1
@@ -959,10 +961,9 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       <i>complex_model_m</i> that also includes   four NVIDIA Tesla P100 GPUs.
       The availability of these GPUs is in   the <i>Beta</i> launch stage.
       </dd>   <dt>cloud_tpu</dt>   <dd>   A TPU VM including one Cloud TPU.
-      The availability of Cloud TPU is in   <i>Beta</i> launch stage. See more
-      about   <a href="/ml-engine/docs/tensorflow/using-tpus">using TPUs to
-      train   your model</a>.   </dd> </dl>  You must set this value when
-      `scaleTier` is set to `CUSTOM`.
+      See more about   <a href="/ml-engine/docs/tensorflow/using-tpus">using
+      TPUs to train   your model</a>.   </dd> </dl>  You must set this value
+      when `scaleTier` is set to `CUSTOM`.
     packageUris: Required. The Google Cloud Storage location of the packages
       with the training program and any additional dependencies. The maximum
       number of package URIs is 100.
@@ -1014,8 +1015,7 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       BASIC_GPU: A single worker instance [with a GPU](/ml-
         engine/docs/tensorflow/using-gpus).
       BASIC_TPU: A single worker instance with a [Cloud TPU](/ml-
-        engine/docs/tensorflow/using-tpus). The availability of Cloud TPU is
-        in <i>Beta</i> launch stage.
+        engine/docs/tensorflow/using-tpus).
       CUSTOM: The CUSTOM tier is not a set tier, but rather enables you to use
         your own cluster specification. When you use this tier, set values to
         configure your processing cluster according to these guidelines:  *
@@ -1141,21 +1141,42 @@ class GoogleCloudMlV1Version(_messages.Message):
     lastUseTime: Output only. The time the version was last used for
       prediction.
     machineType: Optional. The type of machine on which to serve the model.
-      Currently only applies to online prediction service. Naming design doc
-      for CMLE online prediction Machine Types: https://docs.google.com/docume
-      nt/d/1V3tko3VJ64PcpsmNxCXiPoPGccL9_K8gX1YjC8UofzQ/edit#heading=h.7lvy6ow
-      fx4eh. The following are currently supported and will be deprecated in
-      Beta release.   mls1-highmem-1    1 core    2 Gb RAM   mls1-highcpu-4
-      4 core    2 Gb RAM The following are available in Beta:   mls1-c1-m2
-      1 core    2 Gb RAM   Default   mls1-c4-m2        1 core    4 Gb RAM
+      Currently only applies to online prediction service. The following are
+      currently supported and will be deprecated in Beta release.
+      mls1-highmem-1    1 core    2 Gb RAM   mls1-highcpu-4    4 core    2 Gb
+      RAM The following are available in Beta:   mls1-c1-m2        1 core    2
+      Gb RAM   Default   mls1-c4-m2        4 core    2 Gb RAM
     manualScaling: Manually select the number of nodes to use for serving the
       model. You should generally use `auto_scaling` with an appropriate
       `min_nodes` instead, but this option is available if you want more
       predictable billing. Beware that latency and error rates will increase
       if the traffic exceeds that capability of the system to serve it based
       on the selected number of nodes.
+    modelClass: class Model(object):   " " "A Model performs predictions on a
+      given list of instances.    The input instances are the raw values sent
+      by the user. It is the   responsibility of a Model to translate these
+      instances into   actual predictions.    The input instances and the
+      output use python data types. The input   instances have been decoded
+      prior to being passed to the predict   method. The output, which should
+      use python data types is   encoded after being returned from the predict
+      method.   " " "    def predict(self, instances, **kwargs):     " "
+      "Returns predictions for the provided instances.      Instances are the
+      decoded values from the request. Clients need not     worry about
+      decoding json nor base64 decoding.      Args:       instances: A list of
+      instances, as described in the API.       **kwargs: Additional keyword
+      arguments, will be passed into the           client's predict method.
+      Returns:       A list of outputs containing the prediction results.
+      " " "    @classmethod   def from_path(cls, model_path):     " " "Creates
+      a model using the given model path.      Path is useful, e.g., to load
+      files from the exported directory     containing the model.      Args:
+      model_path: The local directory that contains the exported model
+      file along with any additional files uploaded when creating the
+      version resource.      Returns:       An instance implementing this
+      Model class.     " " "
     name: Required.The name specified for the version when it was created.
       The version name must be unique within the model it is created in.
+    packageUris: Optional. The Google Cloud Storage location of the packages
+      for custom prediction and any additional dependencies.
     pythonVersion: Optional. The version of Python used in prediction. If not
       set, the default version is '2.7'. Python '3.5' is available when
       `runtime_version` is set to '1.4' and above. Python '2.7' works with all
@@ -1248,10 +1269,12 @@ class GoogleCloudMlV1Version(_messages.Message):
   lastUseTime = _messages.StringField(10)
   machineType = _messages.StringField(11)
   manualScaling = _messages.MessageField('GoogleCloudMlV1ManualScaling', 12)
-  name = _messages.StringField(13)
-  pythonVersion = _messages.StringField(14)
-  runtimeVersion = _messages.StringField(15)
-  state = _messages.EnumField('StateValueValuesEnum', 16)
+  modelClass = _messages.StringField(13)
+  name = _messages.StringField(14)
+  packageUris = _messages.StringField(15, repeated=True)
+  pythonVersion = _messages.StringField(16)
+  runtimeVersion = _messages.StringField(17)
+  state = _messages.EnumField('StateValueValuesEnum', 18)
 
 
 class GoogleIamV1AuditConfig(_messages.Message):
@@ -1326,6 +1349,10 @@ class GoogleIamV1Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
+    condition: Unimplemented. The condition that is associated with this
+      binding. NOTE: an unsatisfied condition will not allow user access via
+      current binding. Different bindings, including their conditions, are
+      examined independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -1340,11 +1367,12 @@ class GoogleIamV1Binding(_messages.Message):
       * `domain:{domain}`: A Google Apps domain name that represents all the
       users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
-      `roles/editor`, or `roles/owner`. Required
+      `roles/editor`, or `roles/owner`.
   """
 
-  members = _messages.StringField(1, repeated=True)
-  role = _messages.StringField(2)
+  condition = _messages.MessageField('GoogleTypeExpr', 1)
+  members = _messages.StringField(2, repeated=True)
+  role = _messages.StringField(3)
 
 
 class GoogleIamV1Policy(_messages.Message):
@@ -1637,6 +1665,30 @@ class GoogleRpcStatus(_messages.Message):
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   details = _messages.MessageField('DetailsValueListEntry', 2, repeated=True)
   message = _messages.StringField(3)
+
+
+class GoogleTypeExpr(_messages.Message):
+  r"""Represents an expression text. Example:      title: "User account
+  presence"     description: "Determines whether the request has a user
+  account"     expression: "size(request.user) > 0"
+
+  Fields:
+    description: An optional description of the expression. This is a longer
+      text which describes the expression, e.g. when hovered over it in a UI.
+    expression: Textual representation of an expression in Common Expression
+      Language syntax.  The application context of the containing message
+      determines which well-known feature set of CEL is supported.
+    location: An optional string indicating the location of the expression for
+      error reporting, e.g. a file name and a position in the file.
+    title: An optional title for the expression, i.e. a short string
+      describing its purpose. This can be used e.g. in UIs which allow to
+      enter the expression.
+  """
+
+  description = _messages.StringField(1)
+  expression = _messages.StringField(2)
+  location = _messages.StringField(3)
+  title = _messages.StringField(4)
 
 
 class MlProjectsGetConfigRequest(_messages.Message):
@@ -1999,7 +2051,8 @@ class MlProjectsModelsVersionsPatchRequest(_messages.Message):
       the description of a version to "foo", the `update_mask` parameter would
       be specified as `description`, and the `PATCH` request body would
       specify the new value, as follows:     {       "description": "foo"
-      }  Currently the only supported update mask is`description`.
+      }  Currently the only supported update mask fields are `description` and
+      `autoScaling.minNodes`.
   """
 
   googleCloudMlV1Version = _messages.MessageField('GoogleCloudMlV1Version', 1)

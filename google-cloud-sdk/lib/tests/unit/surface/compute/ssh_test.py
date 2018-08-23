@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """Tests for the ssh subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import io
@@ -2186,8 +2188,8 @@ class SSHInstanceProjectOverrideTest(test_base.BaseSSHTest):
 class SSHPrivateIpTest(test_base.BaseSSHTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
 
     # Common test vars
     self.remote = ssh.Remote('10.240.0.52', user='john')

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """The Calliope command help document markdown generator."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import abc
 import io
 import re
@@ -780,14 +783,15 @@ class MarkdownGenerator(six.with_metaclass(abc.ABCMeta, object)):
     # are converted to unquoted strings with the _UserInput() font
     # embellishment. This is a subjective choice for aesthetically pleasing
     # renderings.
-    pat = re.compile(r"[^`](``([^`]*\w{2,}[^`']*)'')")
+    pat = re.compile(r"[^`](``([^`']*)'')")
     pos = 0
     rep = ''
-    while True:
-      match = pat.search(doc, pos)
-      if not match:
-        break
-      rep += doc[pos:match.start(1)] + self._UserInput(match.group(2))
+    for match in pat.finditer(doc):
+      if re.search(r'\w\w', match.group(2)):
+        quoted_string = self._UserInput(match.group(2))
+      else:
+        quoted_string = match.group(1)
+      rep += doc[pos:match.start(1)] + quoted_string
       pos = match.end(1)
     if rep:
       doc = rep + doc[pos:]

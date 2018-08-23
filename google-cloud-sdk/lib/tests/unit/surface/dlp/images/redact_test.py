@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """dlp images redact tests."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+import os
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.dlp import hooks
+from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import files
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.dlp import base
@@ -57,14 +63,14 @@ class RedactTest(base.DlpUnitTestBase):
     extension = extension or 'n_a'
     file_type = hooks.VALID_IMAGE_EXTENSIONS[extension]
     if min_likelihood:
-      likelyhood_enum_string = min_likelihood.replace('-', '_').upper()
+      likelihood_enum_string = min_likelihood.replace('-', '_').upper()
     else:
-      likelyhood_enum_string = 'POSSIBLE'
+      likelihood_enum_string = 'POSSIBLE'
 
     redact_request = self.MakeImageRedactRequest(
         file_type=file_type,
         info_types=info_types,
-        min_likelihood=likelyhood_enum_string,
+        min_likelihood=likelihood_enum_string,
         include_quote=include_quote,
         remove_text=remove_text,
         redact_color_string=redact_color_string)
@@ -120,6 +126,36 @@ class RedactTest(base.DlpUnitTestBase):
         'Please double-check your input and try again.'):
       self.Run('dlp images redact {} --info-types '
                'PHONE_NUMBER,PERSON_NAME'.format(test_file))
+
+  @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA,))
+  def testRedactWithOutputFile(self, track):
+    properties.VALUES.core.user_output_enabled.Set(True)
+    self.track = track
+    test_file = self.MakeTestTextFile(
+        file_name='tmp.jpeg', contents=self.TEST_IMG_CONTENT)
+    output_file = os.path.join(self.temp_path, 'output.jpeg')
+
+    redact_request = self.MakeImageRedactRequest(
+        file_type='IMAGE_JPEG',
+        info_types=['PHONE_NUMBER'],
+        min_likelihood='POSSIBLE',
+        include_quote=False)
+
+    redacted_content = b'redacted content'
+    redact_response = self.msg.GooglePrivacyDlpV2RedactImageResponse(
+        extractedText='Foo', redactedImage=redacted_content)
+    self.client.projects_image.Redact.Expect(request=redact_request,
+                                             response=redact_response)
+    self.assertEqual(
+        redact_response,
+        self.Run('dlp images redact {content_file} '
+                 '--info-types PHONE_NUMBER --output-file {output_file}'.format(
+                     content_file=test_file,
+                     output_file=output_file)))
+    self.AssertErrContains('The redacted contents can be viewed in [{}]'
+                           .format(output_file))
+    self.assertEqual(redacted_content,
+                     files.ReadBinaryFileContents(output_file))
 
 
 if __name__ == '__main__':

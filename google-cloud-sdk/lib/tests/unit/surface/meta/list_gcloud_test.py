@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """Tests for gcloud meta list-gcloud."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import cli_tree
@@ -35,6 +37,13 @@ class ListGCloudTest(calliope_test_base.CalliopeTestBase):
     """Test the list of a command branch via Run()."""
     self.Run('meta list-gcloud --branch=sdk.subgroup')
     self.AssertOutputIsGolden(self.test_data_dir, 'gcloud-branch.json')
+
+  def testListCompletionsBranch(self):
+    """Test the list of the static completion CLI tree for a command branch."""
+    self.Run('meta list-gcloud --completions --branch=sdk.subgroup')
+    self.AssertOutputIsGolden(
+        self.test_data_dir,
+        'gcloud_completions_branch.golden')
 
 
 if __name__ == '__main__':

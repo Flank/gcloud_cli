@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'operations describe' command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.datastore import operations
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.datastore import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.GA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.ALPHA)
 class DescribeTest(base.DatastoreCommandUnitTest):
   """Tests the datastore operations get command."""
 
-  def testGetRelativeResourceGetsTranslated(self):
+  def testGetRelativeResourceGetsTranslated(self, track):
+    self.track = track
     operation_name_relative = 'export_operation_name'
     operation_name_full = (
         'projects/my-test-project/operations/export_operation_name')
@@ -37,7 +47,8 @@ class DescribeTest(base.DatastoreCommandUnitTest):
         'operations describe %s' % operation_name_relative)
     self.assertEqual(operation_name_full, actual.name)
 
-  def testGetAbsoluteResource(self):
+  def testGetAbsoluteResource(self, track):
+    self.track = track
     operation_name_full = (
         'projects/my-test-project/operations/export_operation_name')
     request = self.GetMockGetRequest(operation_name_full)

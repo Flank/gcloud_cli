@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Base classes and helpers for all gcloud kms tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 
 from apitools.base.py.testing import mock
@@ -157,6 +160,9 @@ class KmsE2ETestBase(e2e_base.WithServiceAuth, cli_test_base.CliTestBase):
     return ['kms'] + list(command)
 
   # Helpers for running commands
+  def RunKmsAlpha(self, *command):
+    return self.Run(['alpha', 'kms'] + list(command))
+
   def RunKmsBeta(self, *command):
     return self.Run(['beta', 'kms'] + list(command))
 

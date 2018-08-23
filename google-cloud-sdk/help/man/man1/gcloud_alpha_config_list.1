@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha config list \- view Cloud SDK properties
+gcloud alpha config list \- list Cloud SDK properties for the currently active configuration
 
 
 
@@ -17,10 +17,11 @@ gcloud alpha config list \- view Cloud SDK properties
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Lists all properties in your active configuration. These include
-the account used to authorize access to the Cloud Platform, the current Cloud
-Platform project, and the default Compute Engine region and zone, if set. See
-\f5gcloud topic configurations\fR for more information.
+\fB(ALPHA)\fR gcloud alpha config list lists all properties of the active
+configuration. These include the account used to authorize access to the Cloud
+Platform, the current Cloud Platform project, and the default Compute Engine
+region and zone, if set. See \f5gcloud topic configurations\fR for more about
+configurations.
 
 
 
@@ -29,7 +30,7 @@ Platform project, and the default Compute Engine region and zone, if set. See
 .RS 2m
 .TP 2m
 [\fISECTION\fR/\fIPROPERTY\fR]
-The property to be listed. Note that SECTION/ is optional while referring to
+Property to be listed. Note that SECTION/ is optional while referring to
 properties in the core section.
 
 
@@ -53,22 +54,22 @@ List all set and unset properties that match the arguments.
 .TP 2m
 \fB\-\-filter\fR=\fIEXPRESSION\fR
 Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
-the expression evaluates True then that item is listed. For more details and
-examples of filter expressions run $ gcloud topic filters. This flag interacts
-with other flags that are applied in this order: \fB\-\-flatten\fR,
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-limit\fR=\fILIMIT\fR
-The maximum number of resources to list. The default is \fBunlimited\fR. This
-flag interacts with other flags that are applied in this order:
-\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
-A comma\-separated list of resource field key names to sort by. The default
-order is ascending. Prefix a field with ``~'' for descending order on that
-field. This flag interacts with other flags that are applied in this order:
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 
@@ -210,7 +211,7 @@ using the global \f5\-\-verbosity\fR flag. Supported verbosity levels:
 .TP 2m
 \fBcloud_build_timeout\fR
 Timeout, in seconds, to wait for Docker builds to complete during deployments.
-All Docker builds now use the Container Builder API.
+All Docker builds now use the Cloud Build API.
 
 
 .TP 2m
@@ -263,6 +264,17 @@ this property is unset.
 
 If you need to operate on one project, but need quota against a different
 project, you can use this property to specify the alternate project.
+
+
+.RE
+.sp
+.TP 2m
+\fIbuilds\fR
+
+.RS 2m
+.TP 2m
+\fBtimeout\fR
+Timeout, in seconds, to wait for builds to complete.
 
 
 .RE
@@ -366,26 +378,6 @@ If True, use the cluster's client certificate to authenticate to the cluster API
 server.
 
 
-.TP 2m
-\fBuse_v1_api\fR
-This property is DEPRECATED. If True, all \f5gcloud\fR Kubernetes Engine
-commands (regardless of release track) will use the v1 API; otherwise, \f5gcloud
-beta\fR track commands will use v1beta1 API and \f5gcloud alpha\fR track
-commands will use v1alpha1 API. By default, this property is set to false. The
-Kubernetes Engine v1alpha1 API is whitelist\-only at this time. Note: use_v1_api
-is an alias of use_v1_api_client.
-
-
-.TP 2m
-\fBuse_v1_api_client\fR
-This property is DEPRECATED. If True, all \f5gcloud\fR Kubernetes Engine
-commands (regardless of release track) will use the v1 API; otherwise, \f5gcloud
-beta\fR track commands will use v1beta1 API and \f5gcloud alpha\fR track
-commands will use v1alpha1 API. By default, this property is set to false. The
-Kubernetes Engine v1alpha1 API is whitelist\-only at this time. Note:
-use_v1_api_client is an alias of use_v1_api.
-
-
 .RE
 .sp
 .TP 2m
@@ -399,6 +391,31 @@ independent resource namespace constrained to deploying instances into Compute
 Engine zones inside the region. The default value of \f5global\fR is a special
 multi\-region namespace which is capable of deploying instances into all Compute
 Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+
+
+.RE
+.sp
+.TP 2m
+\fIdeployment_manager\fR
+
+.RS 2m
+.TP 2m
+\fBglob_imports\fR
+Enable import path globbing. Uses glob patterns to match multiple imports in a
+config file.
+
+
+.RE
+.sp
+.TP 2m
+\fIfilestore\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+Default location to use when working with Cloud Filestore locations. When a
+\f5\-\-location\fR flag is required but not provided, the command will fall back
+to this value, if set.
 
 
 .RE
@@ -565,9 +582,9 @@ Username to use when connecting, if the proxy requires authentication.
 .RS 2m
 .TP 2m
 \fBregion\fR
-The default region to use when working with Cloud Memorystore for Redis
-resources. When a \f5region\fR is required but not provided by a flag, the
-command will fall back to this value, if set.
+Default region to use when working with Cloud Memorystore for Redis resources.
+When a \f5region\fR is required but not provided by a flag, the command will
+fall back to this value, if set.
 
 
 .RE
@@ -607,17 +624,17 @@ To list all the properties, run:
 $ gcloud alpha config list \-\-all
 .RE
 
-Note you cannot specify both \-\-all and a property name.
+Note, you cannot specify both \-\-all and a property name.
 
 
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud config list

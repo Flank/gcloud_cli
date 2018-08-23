@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,31 +15,39 @@
 """Unit tests for service-management enable command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.services import exceptions
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
 
 
-class ConnectTest(unit_test_base.SNV1alphaUnitTestBase):
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
+class ConnectTest(unit_test_base.SNUnitTestBase):
   """Unit tests for services vpc-peerings operations wait command."""
   OPERATION_NAME = 'operations/abc.0000000000'
 
-  def testConnect(self):
+  def testConnect(self, track):
+    self.track = track
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    self.Run('alpha services vpc-peerings operations wait --name=%s' %
-             self.OPERATION_NAME)
+    self.Run(
+        'services vpc-peerings operations wait --name=%s' % self.OPERATION_NAME)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testConnectPermissionDenied(self):
+  def testConnectPermissionDenied(self, track):
+    self.track = track
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
     self.ExpectOperation(self.OPERATION_NAME, 3, server_error)
 
     with self.assertRaisesRegex(exceptions.OperationErrorException, r'Error.'):
-      self.Run('alpha services vpc-peerings operations wait --name=%s' %
+      self.Run('services vpc-peerings operations wait --name=%s' %
                self.OPERATION_NAME)
 
 

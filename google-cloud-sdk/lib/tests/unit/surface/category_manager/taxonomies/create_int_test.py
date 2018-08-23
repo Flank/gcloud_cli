@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +14,17 @@
 # limitations under the License.
 """Tests for 'gcloud category-manager taxonomies create'."""
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class TaxonomiesCreateIntTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
@@ -35,9 +40,8 @@ class TaxonomiesCreateIntTest(base.CategoryManagerUnitTestBase):
         displayName=self.taxonomy_display_name,
         description=self.taxonomy_description)
 
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testCreateProjectTaxonomyId(self):
+  def testCreateProjectTaxonomyId(self, track):
+    self.track = track
     self.ExpectCreateProjectTaxonomy(self.project_taxonomy.Parent(),
                                      self.expected_project_taxonomy)
     args = '--display-name "{}" --description "{}"'.format(

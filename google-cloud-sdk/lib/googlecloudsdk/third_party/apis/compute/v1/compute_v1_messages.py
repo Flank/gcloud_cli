@@ -460,6 +460,13 @@ class AccessConfig(_messages.Message):
   Only one access config per instance is supported.
 
   Enums:
+    NetworkTierValueValuesEnum: This signifies the networking tier used for
+      configuring this access configuration and can only take the following
+      values: PREMIUM, STANDARD.  If an AccessConfig is specified without a
+      valid external IP address, an ephemeral IP will be created with this
+      networkTier.  If an AccessConfig with a valid external IP address is
+      specified, it must match that of the networkTier associated with the
+      Address resource owning that IP.
     TypeValueValuesEnum: The type of configuration. The default and only
       option is ONE_TO_ONE_NAT.
 
@@ -474,6 +481,13 @@ class AccessConfig(_messages.Message):
       field undefined to use an IP from a shared ephemeral IP address pool. If
       you specify a static external IP address, it must live in the same
       region as the zone of the instance.
+    networkTier: This signifies the networking tier used for configuring this
+      access configuration and can only take the following values: PREMIUM,
+      STANDARD.  If an AccessConfig is specified without a valid external IP
+      address, an ephemeral IP will be created with this networkTier.  If an
+      AccessConfig with a valid external IP address is specified, it must
+      match that of the networkTier associated with the Address resource
+      owning that IP.
     publicPtrDomainName: The DNS domain name for the public PTR record. This
       field can only be set when the set_public_ptr field is enabled.
     setPublicPtr: Specifies whether a public DNS ?PTR? record should be
@@ -482,6 +496,21 @@ class AccessConfig(_messages.Message):
     type: The type of configuration. The default and only option is
       ONE_TO_ONE_NAT.
   """
+
+  class NetworkTierValueValuesEnum(_messages.Enum):
+    r"""This signifies the networking tier used for configuring this access
+    configuration and can only take the following values: PREMIUM, STANDARD.
+    If an AccessConfig is specified without a valid external IP address, an
+    ephemeral IP will be created with this networkTier.  If an AccessConfig
+    with a valid external IP address is specified, it must match that of the
+    networkTier associated with the Address resource owning that IP.
+
+    Values:
+      PREMIUM: <no description>
+      STANDARD: <no description>
+    """
+    PREMIUM = 0
+    STANDARD = 1
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""The type of configuration. The default and only option is
@@ -495,9 +524,10 @@ class AccessConfig(_messages.Message):
   kind = _messages.StringField(1, default=u'compute#accessConfig')
   name = _messages.StringField(2)
   natIP = _messages.StringField(3)
-  publicPtrDomainName = _messages.StringField(4)
-  setPublicPtr = _messages.BooleanField(5)
-  type = _messages.EnumField('TypeValueValuesEnum', 6, default=u'ONE_TO_ONE_NAT')
+  networkTier = _messages.EnumField('NetworkTierValueValuesEnum', 4)
+  publicPtrDomainName = _messages.StringField(5)
+  setPublicPtr = _messages.BooleanField(6)
+  type = _messages.EnumField('TypeValueValuesEnum', 7, default=u'ONE_TO_ONE_NAT')
 
 
 class Address(_messages.Message):
@@ -511,6 +541,10 @@ class Address(_messages.Message):
     IpVersionValueValuesEnum: The IP Version that will be used by this
       address. Valid options are IPV4 or IPV6. This can only be specified for
       a global address.
+    NetworkTierValueValuesEnum: This signifies the networking tier used for
+      configuring this Address and can only take the following values: PREMIUM
+      , STANDARD.  If this field is not specified, it is assumed to be
+      PREMIUM.
     StatusValueValuesEnum: [Output Only] The status of the address, which can
       be one of RESERVING, RESERVED, or IN_USE. An address that is RESERVING
       is currently in the process of being reserved. A RESERVED address is
@@ -538,6 +572,9 @@ class Address(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
+    networkTier: This signifies the networking tier used for configuring this
+      Address and can only take the following values: PREMIUM , STANDARD.  If
+      this field is not specified, it is assumed to be PREMIUM.
     region: [Output Only] URL of the region where the regional address
       resides. This field is not applicable to global addresses. You must
       specify this field as part of the HTTP request URL. You cannot set this
@@ -582,6 +619,18 @@ class Address(_messages.Message):
     IPV6 = 1
     UNSPECIFIED_VERSION = 2
 
+  class NetworkTierValueValuesEnum(_messages.Enum):
+    r"""This signifies the networking tier used for configuring this Address
+    and can only take the following values: PREMIUM , STANDARD.  If this field
+    is not specified, it is assumed to be PREMIUM.
+
+    Values:
+      PREMIUM: <no description>
+      STANDARD: <no description>
+    """
+    PREMIUM = 0
+    STANDARD = 1
+
   class StatusValueValuesEnum(_messages.Enum):
     r"""[Output Only] The status of the address, which can be one of
     RESERVING, RESERVED, or IN_USE. An address that is RESERVING is currently
@@ -606,11 +655,12 @@ class Address(_messages.Message):
   ipVersion = _messages.EnumField('IpVersionValueValuesEnum', 6)
   kind = _messages.StringField(7, default=u'compute#address')
   name = _messages.StringField(8)
-  region = _messages.StringField(9)
-  selfLink = _messages.StringField(10)
-  status = _messages.EnumField('StatusValueValuesEnum', 11)
-  subnetwork = _messages.StringField(12)
-  users = _messages.StringField(13, repeated=True)
+  networkTier = _messages.EnumField('NetworkTierValueValuesEnum', 9)
+  region = _messages.StringField(10)
+  selfLink = _messages.StringField(11)
+  status = _messages.EnumField('StatusValueValuesEnum', 12)
+  subnetwork = _messages.StringField(13)
+  users = _messages.StringField(14, repeated=True)
 
 
 class AddressAggregatedList(_messages.Message):
@@ -1164,8 +1214,12 @@ class AttachedDiskInitializeParams(_messages.Message):
       disks.
 
   Fields:
+    description: An optional description. Provide this property when creating
+      the disk.
     diskName: Specifies the disk name. If not specified, the default is to use
-      the name of the instance.
+      the name of the instance. If the disk with the instance name exists
+      already in the given zone/region, a new name will be automatically
+      generated.
     diskSizeGb: Specifies the size of the disk in base-2 GB.
     diskType: Specifies the disk type to use to create the instance. If not
       specified, the default is pd-standard, specified using the full URL. For
@@ -1184,10 +1238,10 @@ class AttachedDiskInitializeParams(_messages.Message):
       instance, one of initializeParams.sourceImage or disks.source is
       required except for local SSD.  To create a disk with one of the public
       operating system images, specify the image by its family name. For
-      example, specify family/debian-8 to use the latest Debian 8 image:
-      projects/debian-cloud/global/images/family/debian-8   Alternatively, use
+      example, specify family/debian-9 to use the latest Debian 9 image:
+      projects/debian-cloud/global/images/family/debian-9   Alternatively, use
       a specific version of a public operating system image: projects/debian-
-      cloud/global/images/debian-8-jessie-vYYYYMMDD   To create a disk with a
+      cloud/global/images/debian-9-stretch-vYYYYMMDD   To create a disk with a
       custom image that you created, specify the image name in the following
       format: global/images/my-custom-image   You can also specify a custom
       image by its image family, which returns the latest version of the image
@@ -1228,12 +1282,13 @@ class AttachedDiskInitializeParams(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  diskName = _messages.StringField(1)
-  diskSizeGb = _messages.IntegerField(2)
-  diskType = _messages.StringField(3)
-  labels = _messages.MessageField('LabelsValue', 4)
-  sourceImage = _messages.StringField(5)
-  sourceImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 6)
+  description = _messages.StringField(1)
+  diskName = _messages.StringField(2)
+  diskSizeGb = _messages.IntegerField(3)
+  diskType = _messages.StringField(4)
+  labels = _messages.MessageField('LabelsValue', 5)
+  sourceImage = _messages.StringField(6)
+  sourceImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 7)
 
 
 class Autoscaler(_messages.Message):
@@ -1951,7 +2006,7 @@ class BackendBucket(_messages.Message):
 
   Fields:
     bucketName: Cloud Storage bucket name.
-    cdnPolicy: Cloud CDN Coniguration for this BackendBucket.
+    cdnPolicy: Cloud CDN configuration for this BackendBucket.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: An optional textual description of the resource; provided by
@@ -1985,15 +2040,16 @@ class BackendBucketCdnPolicy(_messages.Message):
   r"""Message containing Cloud CDN configuration for a backend bucket.
 
   Fields:
-    signedUrlCacheMaxAgeSec: Number of seconds up to which the response to a
-      signed URL request will be cached in the CDN. After this time period,
-      the Signed URL will be revalidated before being served. Defaults to 1hr
-      (3600s). If this field is set, Cloud CDN will internally act as though
-      all responses from this bucket had a ?Cache-Control: public, max-
-      age=[TTL]? header, regardless of any existing Cache-Control header. The
-      actual headers served in responses will not be altered.
-    signedUrlKeyNames: [Output Only] Names of the keys currently configured
-      for Cloud CDN Signed URL on this backend bucket.
+    signedUrlCacheMaxAgeSec: Maximum number of seconds the response to a
+      signed URL request will be considered fresh. After this time period, the
+      response will be revalidated before being served. Defaults to 1hr
+      (3600s). When serving responses to signed URL requests, Cloud CDN will
+      internally behave as though all responses from this backend had a
+      ?Cache-Control: public, max-age=[TTL]? header, regardless of any
+      existing Cache-Control header. The actual headers served in responses
+      will not be altered.
+    signedUrlKeyNames: [Output Only] Names of the keys for signing request
+      URLs.
   """
 
   signedUrlCacheMaxAgeSec = _messages.IntegerField(1)
@@ -2202,6 +2258,8 @@ class BackendService(_messages.Message):
       resides. This field is not applicable to global backend services. You
       must specify this field as part of the HTTP request URL. It is not
       settable as a field in the request body.
+    securityPolicy: [Output Only] The resource URL for the security policy
+      associated with this backend service.
     selfLink: [Output Only] Server-defined URL for the resource.
     sessionAffinity: Type of session affinity to use. The default is NONE.
       When the load balancing scheme is EXTERNAL, can be NONE, CLIENT_IP, or
@@ -2284,9 +2342,10 @@ class BackendService(_messages.Message):
   portName = _messages.StringField(16)
   protocol = _messages.EnumField('ProtocolValueValuesEnum', 17)
   region = _messages.StringField(18)
-  selfLink = _messages.StringField(19)
-  sessionAffinity = _messages.EnumField('SessionAffinityValueValuesEnum', 20)
-  timeoutSec = _messages.IntegerField(21, variant=_messages.Variant.INT32)
+  securityPolicy = _messages.StringField(19)
+  selfLink = _messages.StringField(20)
+  sessionAffinity = _messages.EnumField('SessionAffinityValueValuesEnum', 21)
+  timeoutSec = _messages.IntegerField(22, variant=_messages.Variant.INT32)
 
 
 class BackendServiceAggregatedList(_messages.Message):
@@ -2444,15 +2503,16 @@ class BackendServiceCdnPolicy(_messages.Message):
 
   Fields:
     cacheKeyPolicy: The CacheKeyPolicy for this CdnPolicy.
-    signedUrlCacheMaxAgeSec: Number of seconds up to which the response to a
-      signed URL request will be cached in the CDN. After this time period,
-      the Signed URL will be revalidated before being served. Defaults to 1hr
-      (3600s). If this field is set, Cloud CDN will internally act as though
-      all responses from this backend had a ?Cache-Control: public, max-
-      age=[TTL]? header, regardless of any existing Cache-Control header. The
-      actual headers served in responses will not be altered.
-    signedUrlKeyNames: [Output Only] Names of the keys currently configured
-      for Cloud CDN Signed URL on this backend service.
+    signedUrlCacheMaxAgeSec: Maximum number of seconds the response to a
+      signed URL request will be considered fresh. After this time period, the
+      response will be revalidated before being served. Defaults to 1hr
+      (3600s). When serving responses to signed URL requests, Cloud CDN will
+      internally behave as though all responses from this backend had a
+      ?Cache-Control: public, max-age=[TTL]? header, regardless of any
+      existing Cache-Control header. The actual headers served in responses
+      will not be altered.
+    signedUrlKeyNames: [Output Only] Names of the keys for signing request
+      URLs.
   """
 
   cacheKeyPolicy = _messages.MessageField('CacheKeyPolicy', 1)
@@ -4190,6 +4250,33 @@ class ComputeBackendServicesPatchRequest(_messages.Message):
   backendServiceResource = _messages.MessageField('BackendService', 2)
   project = _messages.StringField(3, required=True)
   requestId = _messages.StringField(4)
+
+
+class ComputeBackendServicesSetSecurityPolicyRequest(_messages.Message):
+  r"""A ComputeBackendServicesSetSecurityPolicyRequest object.
+
+  Fields:
+    backendService: Name of the BackendService resource to which the security
+      policy should be set. The name should conform to RFC1035.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicyReference: A SecurityPolicyReference resource to be passed
+      as the request body.
+  """
+
+  backendService = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  securityPolicyReference = _messages.MessageField('SecurityPolicyReference', 4)
 
 
 class ComputeBackendServicesUpdateRequest(_messages.Message):
@@ -6072,11 +6159,39 @@ class ComputeInstanceGroupManagersListManagedInstancesRequest(_messages.Message)
   r"""A ComputeInstanceGroupManagersListManagedInstancesRequest object.
 
   Fields:
-    filter: A string attribute.
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
     instanceGroupManager: The name of the managed instance group.
-    maxResults: A integer attribute.
-    order_by: A string attribute.
-    pageToken: A string attribute.
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    order_by: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
     project: Project ID for this request.
     zone: The name of the zone where the managed instance group is located.
   """
@@ -7318,6 +7433,20 @@ class ComputeInstancesSetTagsRequest(_messages.Message):
   zone = _messages.StringField(5, required=True)
 
 
+class ComputeInstancesSimulateMaintenanceEventRequest(_messages.Message):
+  r"""A ComputeInstancesSimulateMaintenanceEventRequest object.
+
+  Fields:
+    instance: Name of the instance scoping this request.
+    project: Project ID for this request.
+    zone: The name of the zone for this request.
+  """
+
+  instance = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  zone = _messages.StringField(3, required=True)
+
+
 class ComputeInstancesStartRequest(_messages.Message):
   r"""A ComputeInstancesStartRequest object.
 
@@ -8290,6 +8419,566 @@ class ComputeNetworksSwitchToCustomModeRequest(_messages.Message):
   requestId = _messages.StringField(3)
 
 
+class ComputeNodeGroupsAddNodesRequest(_messages.Message):
+  r"""A ComputeNodeGroupsAddNodesRequest object.
+
+  Fields:
+    nodeGroup: Name of the NodeGroup resource to delete.
+    nodeGroupsAddNodesRequest: A NodeGroupsAddNodesRequest resource to be
+      passed as the request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  nodeGroup = _messages.StringField(1, required=True)
+  nodeGroupsAddNodesRequest = _messages.MessageField('NodeGroupsAddNodesRequest', 2)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  zone = _messages.StringField(5, required=True)
+
+
+class ComputeNodeGroupsAggregatedListRequest(_messages.Message):
+  r"""A ComputeNodeGroupsAggregatedListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+
+
+class ComputeNodeGroupsDeleteNodesRequest(_messages.Message):
+  r"""A ComputeNodeGroupsDeleteNodesRequest object.
+
+  Fields:
+    nodeGroup: Name of the NodeGroup resource to delete.
+    nodeGroupsDeleteNodesRequest: A NodeGroupsDeleteNodesRequest resource to
+      be passed as the request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  nodeGroup = _messages.StringField(1, required=True)
+  nodeGroupsDeleteNodesRequest = _messages.MessageField('NodeGroupsDeleteNodesRequest', 2)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  zone = _messages.StringField(5, required=True)
+
+
+class ComputeNodeGroupsDeleteRequest(_messages.Message):
+  r"""A ComputeNodeGroupsDeleteRequest object.
+
+  Fields:
+    nodeGroup: Name of the NodeGroup resource to delete.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  nodeGroup = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  zone = _messages.StringField(4, required=True)
+
+
+class ComputeNodeGroupsGetRequest(_messages.Message):
+  r"""A ComputeNodeGroupsGetRequest object.
+
+  Fields:
+    nodeGroup: Name of the node group to return.
+    project: Project ID for this request.
+    zone: The name of the zone for this request.
+  """
+
+  nodeGroup = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  zone = _messages.StringField(3, required=True)
+
+
+class ComputeNodeGroupsInsertRequest(_messages.Message):
+  r"""A ComputeNodeGroupsInsertRequest object.
+
+  Fields:
+    initialNodeCount: Initial count of nodes in the node group.
+    nodeGroup: A NodeGroup resource to be passed as the request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  initialNodeCount = _messages.IntegerField(1, required=True, variant=_messages.Variant.INT32)
+  nodeGroup = _messages.MessageField('NodeGroup', 2)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  zone = _messages.StringField(5, required=True)
+
+
+class ComputeNodeGroupsListNodesRequest(_messages.Message):
+  r"""A ComputeNodeGroupsListNodesRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    nodeGroup: Name of the NodeGroup resource whose nodes you want to list.
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+    zone: The name of the zone for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  nodeGroup = _messages.StringField(3, required=True)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
+  zone = _messages.StringField(7, required=True)
+
+
+class ComputeNodeGroupsListRequest(_messages.Message):
+  r"""A ComputeNodeGroupsListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+    zone: The name of the zone for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+  zone = _messages.StringField(6, required=True)
+
+
+class ComputeNodeGroupsSetNodeTemplateRequest(_messages.Message):
+  r"""A ComputeNodeGroupsSetNodeTemplateRequest object.
+
+  Fields:
+    nodeGroup: Name of the NodeGroup resource to delete.
+    nodeGroupsSetNodeTemplateRequest: A NodeGroupsSetNodeTemplateRequest
+      resource to be passed as the request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  nodeGroup = _messages.StringField(1, required=True)
+  nodeGroupsSetNodeTemplateRequest = _messages.MessageField('NodeGroupsSetNodeTemplateRequest', 2)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  zone = _messages.StringField(5, required=True)
+
+
+class ComputeNodeTemplatesAggregatedListRequest(_messages.Message):
+  r"""A ComputeNodeTemplatesAggregatedListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+
+
+class ComputeNodeTemplatesDeleteRequest(_messages.Message):
+  r"""A ComputeNodeTemplatesDeleteRequest object.
+
+  Fields:
+    nodeTemplate: Name of the NodeTemplate resource to delete.
+    project: Project ID for this request.
+    region: The name of the region for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  nodeTemplate = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeNodeTemplatesGetRequest(_messages.Message):
+  r"""A ComputeNodeTemplatesGetRequest object.
+
+  Fields:
+    nodeTemplate: Name of the node template to return.
+    project: Project ID for this request.
+    region: The name of the region for this request.
+  """
+
+  nodeTemplate = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+
+
+class ComputeNodeTemplatesInsertRequest(_messages.Message):
+  r"""A ComputeNodeTemplatesInsertRequest object.
+
+  Fields:
+    nodeTemplate: A NodeTemplate resource to be passed as the request body.
+    project: Project ID for this request.
+    region: The name of the region for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  nodeTemplate = _messages.MessageField('NodeTemplate', 1)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeNodeTemplatesListRequest(_messages.Message):
+  r"""A ComputeNodeTemplatesListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+    region: The name of the region for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+  region = _messages.StringField(6, required=True)
+
+
+class ComputeNodeTypesAggregatedListRequest(_messages.Message):
+  r"""A ComputeNodeTypesAggregatedListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+
+
+class ComputeNodeTypesGetRequest(_messages.Message):
+  r"""A ComputeNodeTypesGetRequest object.
+
+  Fields:
+    nodeType: Name of the node type to return.
+    project: Project ID for this request.
+    zone: The name of the zone for this request.
+  """
+
+  nodeType = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  zone = _messages.StringField(3, required=True)
+
+
+class ComputeNodeTypesListRequest(_messages.Message):
+  r"""A ComputeNodeTypesListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+    zone: The name of the zone for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+  zone = _messages.StringField(6, required=True)
+
+
 class ComputeProjectsDisableXpnHostRequest(_messages.Message):
   r"""A ComputeProjectsDisableXpnHostRequest object.
 
@@ -8404,10 +9093,38 @@ class ComputeProjectsGetXpnResourcesRequest(_messages.Message):
   r"""A ComputeProjectsGetXpnResourcesRequest object.
 
   Fields:
-    filter: A string attribute.
-    maxResults: A integer attribute.
-    order_by: A string attribute.
-    pageToken: A string attribute.
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    order_by: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
     project: Project ID for this request.
   """
 
@@ -8422,10 +9139,38 @@ class ComputeProjectsListXpnHostsRequest(_messages.Message):
   r"""A ComputeProjectsListXpnHostsRequest object.
 
   Fields:
-    filter: A string attribute.
-    maxResults: A integer attribute.
-    order_by: A string attribute.
-    pageToken: A string attribute.
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    order_by: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
     project: Project ID for this request.
     projectsListXpnHostsRequest: A ProjectsListXpnHostsRequest resource to be
       passed as the request body.
@@ -8507,6 +9252,31 @@ class ComputeProjectsSetCommonInstanceMetadataRequest(_messages.Message):
 
   metadata = _messages.MessageField('Metadata', 1)
   project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+
+
+class ComputeProjectsSetDefaultNetworkTierRequest(_messages.Message):
+  r"""A ComputeProjectsSetDefaultNetworkTierRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    projectsSetDefaultNetworkTierRequest: A
+      ProjectsSetDefaultNetworkTierRequest resource to be passed as the
+      request body.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  project = _messages.StringField(1, required=True)
+  projectsSetDefaultNetworkTierRequest = _messages.MessageField('ProjectsSetDefaultNetworkTierRequest', 2)
   requestId = _messages.StringField(3)
 
 
@@ -9425,11 +10195,39 @@ class ComputeRegionInstanceGroupManagersListManagedInstancesRequest(_messages.Me
   r"""A ComputeRegionInstanceGroupManagersListManagedInstancesRequest object.
 
   Fields:
-    filter: A string attribute.
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
     instanceGroupManager: The name of the managed instance group.
-    maxResults: A integer attribute.
-    order_by: A string attribute.
-    pageToken: A string attribute.
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    order_by: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
   """
@@ -10237,6 +11035,198 @@ class ComputeRoutesListRequest(_messages.Message):
   project = _messages.StringField(5, required=True)
 
 
+class ComputeSecurityPoliciesAddRuleRequest(_messages.Message):
+  r"""A ComputeSecurityPoliciesAddRuleRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    securityPolicy: Name of the security policy to update.
+    securityPolicyRule: A SecurityPolicyRule resource to be passed as the
+      request body.
+  """
+
+  project = _messages.StringField(1, required=True)
+  securityPolicy = _messages.StringField(2, required=True)
+  securityPolicyRule = _messages.MessageField('SecurityPolicyRule', 3)
+
+
+class ComputeSecurityPoliciesDeleteRequest(_messages.Message):
+  r"""A ComputeSecurityPoliciesDeleteRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to delete.
+  """
+
+  project = _messages.StringField(1, required=True)
+  requestId = _messages.StringField(2)
+  securityPolicy = _messages.StringField(3, required=True)
+
+
+class ComputeSecurityPoliciesGetRequest(_messages.Message):
+  r"""A ComputeSecurityPoliciesGetRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    securityPolicy: Name of the security policy to get.
+  """
+
+  project = _messages.StringField(1, required=True)
+  securityPolicy = _messages.StringField(2, required=True)
+
+
+class ComputeSecurityPoliciesGetRuleRequest(_messages.Message):
+  r"""A ComputeSecurityPoliciesGetRuleRequest object.
+
+  Fields:
+    priority: The priority of the rule to get from the security policy.
+    project: Project ID for this request.
+    securityPolicy: Name of the security policy to which the queried rule
+      belongs.
+  """
+
+  priority = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  project = _messages.StringField(2, required=True)
+  securityPolicy = _messages.StringField(3, required=True)
+
+
+class ComputeSecurityPoliciesInsertRequest(_messages.Message):
+  r"""A ComputeSecurityPoliciesInsertRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: A SecurityPolicy resource to be passed as the request
+      body.
+  """
+
+  project = _messages.StringField(1, required=True)
+  requestId = _messages.StringField(2)
+  securityPolicy = _messages.MessageField('SecurityPolicy', 3)
+
+
+class ComputeSecurityPoliciesListRequest(_messages.Message):
+  r"""A ComputeSecurityPoliciesListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+
+
+class ComputeSecurityPoliciesPatchRequest(_messages.Message):
+  r"""A ComputeSecurityPoliciesPatchRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to update.
+    securityPolicyResource: A SecurityPolicy resource to be passed as the
+      request body.
+  """
+
+  project = _messages.StringField(1, required=True)
+  requestId = _messages.StringField(2)
+  securityPolicy = _messages.StringField(3, required=True)
+  securityPolicyResource = _messages.MessageField('SecurityPolicy', 4)
+
+
+class ComputeSecurityPoliciesPatchRuleRequest(_messages.Message):
+  r"""A ComputeSecurityPoliciesPatchRuleRequest object.
+
+  Fields:
+    priority: The priority of the rule to patch.
+    project: Project ID for this request.
+    securityPolicy: Name of the security policy to update.
+    securityPolicyRule: A SecurityPolicyRule resource to be passed as the
+      request body.
+  """
+
+  priority = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  project = _messages.StringField(2, required=True)
+  securityPolicy = _messages.StringField(3, required=True)
+  securityPolicyRule = _messages.MessageField('SecurityPolicyRule', 4)
+
+
+class ComputeSecurityPoliciesRemoveRuleRequest(_messages.Message):
+  r"""A ComputeSecurityPoliciesRemoveRuleRequest object.
+
+  Fields:
+    priority: The priority of the rule to remove from the security policy.
+    project: Project ID for this request.
+    securityPolicy: Name of the security policy to update.
+  """
+
+  priority = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  project = _messages.StringField(2, required=True)
+  securityPolicy = _messages.StringField(3, required=True)
+
+
 class ComputeSnapshotsDeleteRequest(_messages.Message):
   r"""A ComputeSnapshotsDeleteRequest object.
 
@@ -10800,6 +11790,52 @@ class ComputeSubnetworksListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
   project = _messages.StringField(5, required=True)
   region = _messages.StringField(6, required=True)
+
+
+class ComputeSubnetworksListUsableRequest(_messages.Message):
+  r"""A ComputeSubnetworksListUsableRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      =, !=, >, or <.  For example, if you are filtering Compute Engine
+      instances, you can exclude instances named example-instance by
+      specifying name != example-instance.  You can also filter nested fields.
+      For example, you could specify scheduling.automaticRestart = false to
+      include instances only if they are not scheduled for automatic restarts.
+      You can use filtering on nested fields to filter based on resource
+      labels.  To filter on multiple expressions, provide each separate
+      expression within parentheses. For example, (scheduling.automaticRestart
+      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
+      an AND expression. However, you can include AND and OR expressions
+      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
+      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than maxResults,
+      Compute Engine returns a nextPageToken that can be used to get the next
+      page of results in subsequent list requests. Acceptable values are 0 to
+      500, inclusive. (Default: 500)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using orderBy="creationTimestamp desc". This sorts results based on the
+      creationTimestamp field in reverse chronological order (newest result
+      first). Use this to sort resources like operations so that the newest
+      operation is returned first.  Currently, only sorting by name or
+      creationTimestamp desc is supported.
+    pageToken: Specifies a page token to use. Set pageToken to the
+      nextPageToken returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
 
 
 class ComputeSubnetworksPatchRequest(_messages.Message):
@@ -12725,14 +13761,17 @@ class CustomerEncryptionKey(_messages.Message):
   r"""Represents a customer-supplied encryption key
 
   Fields:
+    kmsKeyName: The name of the encryption key that is stored in Google Cloud
+      KMS.
     rawKey: Specifies a 256-bit customer-supplied encryption key, encoded in
       RFC 4648 base64 to either encrypt or decrypt this resource.
     sha256: [Output only] The RFC 4648 base64 encoded SHA-256 hash of the
       customer-supplied encryption key that protects this resource.
   """
 
-  rawKey = _messages.StringField(1)
-  sha256 = _messages.StringField(2)
+  kmsKeyName = _messages.StringField(1)
+  rawKey = _messages.StringField(2)
+  sha256 = _messages.StringField(3)
 
 
 class CustomerEncryptionKeyProtectedDisk(_messages.Message):
@@ -12852,7 +13891,7 @@ class Disk(_messages.Message):
       format.
     licenseCodes: Integer license codes indicating which licenses are attached
       to this disk.
-    licenses: Any applicable publicly visible licenses.
+    licenses: A list of publicly visible licenses. Reserved for Google's use.
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
       Specifically, the name must be 1-63 characters long and match the
@@ -12879,10 +13918,10 @@ class Disk(_messages.Message):
     sourceImage: The source image used to create this disk. If the source
       image is deleted, this field will not be set.  To create a disk with one
       of the public operating system images, specify the image by its family
-      name. For example, specify family/debian-8 to use the latest Debian 8
-      image: projects/debian-cloud/global/images/family/debian-8
+      name. For example, specify family/debian-9 to use the latest Debian 9
+      image: projects/debian-cloud/global/images/family/debian-9
       Alternatively, use a specific version of a public operating system
-      image: projects/debian-cloud/global/images/debian-8-jessie-vYYYYMMDD
+      image: projects/debian-cloud/global/images/debian-9-stretch-vYYYYMMDD
       To create a disk with a custom image that you created, specify the image
       name in the following format: global/images/my-custom-image   You can
       also specify a custom image by its image family, which returns the
@@ -13971,6 +15010,10 @@ class Firewall(_messages.Message):
       INGRESS. Note: For INGRESS traffic, it is NOT supported to specify
       destinationRanges; For EGRESS traffic, it is NOT supported to specify
       sourceRanges OR sourceTags.
+    disabled: Denotes whether the firewall rule is disabled, i.e not applied
+      to the network it is associated with. When set to true, the firewall
+      rule is not enforced and the network behaves as if it did not exist. If
+      this is unspecified, the firewall rule will be enabled.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     kind: [Output Only] Type of the resource. Always compute#firewall for
@@ -14096,17 +15139,18 @@ class Firewall(_messages.Message):
   description = _messages.StringField(4)
   destinationRanges = _messages.StringField(5, repeated=True)
   direction = _messages.EnumField('DirectionValueValuesEnum', 6)
-  id = _messages.IntegerField(7, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(8, default=u'compute#firewall')
-  name = _messages.StringField(9)
-  network = _messages.StringField(10)
-  priority = _messages.IntegerField(11, variant=_messages.Variant.INT32)
-  selfLink = _messages.StringField(12)
-  sourceRanges = _messages.StringField(13, repeated=True)
-  sourceServiceAccounts = _messages.StringField(14, repeated=True)
-  sourceTags = _messages.StringField(15, repeated=True)
-  targetServiceAccounts = _messages.StringField(16, repeated=True)
-  targetTags = _messages.StringField(17, repeated=True)
+  disabled = _messages.BooleanField(7)
+  id = _messages.IntegerField(8, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(9, default=u'compute#firewall')
+  name = _messages.StringField(10)
+  network = _messages.StringField(11)
+  priority = _messages.IntegerField(12, variant=_messages.Variant.INT32)
+  selfLink = _messages.StringField(13)
+  sourceRanges = _messages.StringField(14, repeated=True)
+  sourceServiceAccounts = _messages.StringField(15, repeated=True)
+  sourceTags = _messages.StringField(16, repeated=True)
+  targetServiceAccounts = _messages.StringField(17, repeated=True)
+  targetTags = _messages.StringField(18, repeated=True)
 
 
 class FirewallList(_messages.Message):
@@ -14258,6 +15302,13 @@ class ForwardingRule(_messages.Message):
       of INTERNAL_SELF_MANAGED means that this will be used for Internal
       Global HTTP(S) LB. The value of EXTERNAL means that this will be used
       for External Load Balancing (HTTP(S) LB, External TCP/UDP LB, SSL Proxy)
+    NetworkTierValueValuesEnum: This signifies the networking tier used for
+      configuring this load balancer and can only take the following values:
+      PREMIUM , STANDARD.  For regional ForwardingRule, the valid values are
+      PREMIUM and STANDARD. For GlobalForwardingRule, the valid value is
+      PREMIUM.  If this field is not specified, it is assumed to be PREMIUM.
+      If IPAddress is specified, this value must be equal to the networkTier
+      of the Address.
 
   Fields:
     IPAddress: The IP address that this forwarding rule is serving on behalf
@@ -14318,6 +15369,12 @@ class ForwardingRule(_messages.Message):
       and INTERNAL_SELF_MANAGED load balancing, this field identifies the
       network that the load balanced IP should belong to for this Forwarding
       Rule. If this field is not specified, the default network will be used.
+    networkTier: This signifies the networking tier used for configuring this
+      load balancer and can only take the following values: PREMIUM ,
+      STANDARD.  For regional ForwardingRule, the valid values are PREMIUM and
+      STANDARD. For GlobalForwardingRule, the valid value is PREMIUM.  If this
+      field is not specified, it is assumed to be PREMIUM. If IPAddress is
+      specified, this value must be equal to the networkTier of the Address.
     portRange: This field is used along with the target field for
       TargetHttpProxy, TargetHttpsProxy, TargetSslProxy, TargetTcpProxy,
       TargetVpnGateway, TargetPool, TargetInstance.  Applicable only when
@@ -14407,6 +15464,21 @@ class ForwardingRule(_messages.Message):
     INTERNAL = 1
     INVALID = 2
 
+  class NetworkTierValueValuesEnum(_messages.Enum):
+    r"""This signifies the networking tier used for configuring this load
+    balancer and can only take the following values: PREMIUM , STANDARD.  For
+    regional ForwardingRule, the valid values are PREMIUM and STANDARD. For
+    GlobalForwardingRule, the valid value is PREMIUM.  If this field is not
+    specified, it is assumed to be PREMIUM. If IPAddress is specified, this
+    value must be equal to the networkTier of the Address.
+
+    Values:
+      PREMIUM: <no description>
+      STANDARD: <no description>
+    """
+    PREMIUM = 0
+    STANDARD = 1
+
   IPAddress = _messages.StringField(1)
   IPProtocol = _messages.EnumField('IPProtocolValueValuesEnum', 2)
   backendService = _messages.StringField(3)
@@ -14418,12 +15490,13 @@ class ForwardingRule(_messages.Message):
   loadBalancingScheme = _messages.EnumField('LoadBalancingSchemeValueValuesEnum', 9)
   name = _messages.StringField(10)
   network = _messages.StringField(11)
-  portRange = _messages.StringField(12)
-  ports = _messages.StringField(13, repeated=True)
-  region = _messages.StringField(14)
-  selfLink = _messages.StringField(15)
-  subnetwork = _messages.StringField(16)
-  target = _messages.StringField(17)
+  networkTier = _messages.EnumField('NetworkTierValueValuesEnum', 12)
+  portRange = _messages.StringField(13)
+  ports = _messages.StringField(14, repeated=True)
+  region = _messages.StringField(15)
+  selfLink = _messages.StringField(16)
+  subnetwork = _messages.StringField(17)
+  target = _messages.StringField(18)
 
 
 class ForwardingRuleAggregatedList(_messages.Message):
@@ -16045,10 +17118,11 @@ class Instance(_messages.Message):
       SUSPENDED, and TERMINATED.
     statusMessage: [Output Only] An optional, human-readable explanation of
       the status.
-    tags: A list of tags to apply to this instance. Tags are used to identify
-      valid sources or targets for network firewalls and are specified by the
-      client during instance creation. The tags can be later modified by the
-      setTags method. Each tag within the list must comply with RFC1035.
+    tags: Tags to apply to this instance. Tags are used to identify valid
+      sources or targets for network firewalls and are specified by the client
+      during instance creation. The tags can be later modified by the setTags
+      method. Each tag within the list must comply with RFC1035. Multiple tags
+      can be specified via the 'tags.items' field.
     zone: [Output Only] URL of the zone where the instance resides. You must
       specify this field as part of the HTTP request URL. It is not settable
       as a field in the request body.
@@ -19237,10 +20311,10 @@ class InterconnectLocation(_messages.Message):
   Fields:
     address: [Output Only] The postal address of the Point of Presence, each
       line in the address is separated by a newline character.
-    availabilityZone: [Output Only] Availability zone for this location.
-      Within a metropolitan area (metro), maintenance will not be
-      simultaneously scheduled in more than one availability zone. Example:
-      "zone1" or "zone2".
+    availabilityZone: [Output Only] Availability zone for this
+      InterconnectLocation. Within a metropolitan area (metro), maintenance
+      will not be simultaneously scheduled in more than one availability zone.
+      Example: "zone1" or "zone2".
     city: [Output Only] Metropolitan area designator that indicates which city
       an interconnect is located. For example: "Chicago, IL", "Amsterdam,
       Netherlands".
@@ -20811,6 +21885,1581 @@ class NetworksRemovePeeringRequest(_messages.Message):
   name = _messages.StringField(1)
 
 
+class NodeGroup(_messages.Message):
+  r"""A NodeGroup resource.
+
+  Enums:
+    StatusValueValuesEnum:
+
+  Fields:
+    creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+      format.
+    description: An optional description of this resource. Provide this
+      property when you create the resource.
+    id: [Output Only] The unique identifier for the resource. This identifier
+      is defined by the server.
+    kind: [Output Only] The type of the resource. Always compute#nodeGroup for
+      node group.
+    name: The name of the resource, provided by the client when initially
+      creating the resource. The resource name must be 1-63 characters long,
+      and comply with RFC1035. Specifically, the name must be 1-63 characters
+      long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which
+      means the first character must be a lowercase letter, and all following
+      characters must be a dash, lowercase letter, or digit, except the last
+      character, which cannot be a dash.
+    nodeTemplate: The URL of the node template to which this node group
+      belongs.
+    selfLink: [Output Only] Server-defined URL for the resource.
+    size: [Output Only] The total number of nodes in the node group.
+    status: A StatusValueValuesEnum attribute.
+    zone: [Output Only] The name of the zone where the node group resides,
+      such as us-central1-a.
+  """
+
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""StatusValueValuesEnum enum type.
+
+    Values:
+      CREATING: <no description>
+      DELETING: <no description>
+      INVALID: <no description>
+      READY: <no description>
+    """
+    CREATING = 0
+    DELETING = 1
+    INVALID = 2
+    READY = 3
+
+  creationTimestamp = _messages.StringField(1)
+  description = _messages.StringField(2)
+  id = _messages.IntegerField(3, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(4, default=u'compute#nodeGroup')
+  name = _messages.StringField(5)
+  nodeTemplate = _messages.StringField(6)
+  selfLink = _messages.StringField(7)
+  size = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  status = _messages.EnumField('StatusValueValuesEnum', 9)
+  zone = _messages.StringField(10)
+
+
+class NodeGroupAggregatedList(_messages.Message):
+  r"""A NodeGroupAggregatedList object.
+
+  Messages:
+    ItemsValue: A list of NodeGroupsScopedList resources.
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of NodeGroupsScopedList resources.
+    kind: [Output Only] Type of resource.Always
+      compute#nodeGroupAggregatedList for aggregated lists of node groups.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ItemsValue(_messages.Message):
+    r"""A list of NodeGroupsScopedList resources.
+
+    Messages:
+      AdditionalProperty: An additional property for a ItemsValue object.
+
+    Fields:
+      additionalProperties: [Output Only] Name of the scope containing this
+        set of node groups.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ItemsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A NodeGroupsScopedList attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('NodeGroupsScopedList', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('ItemsValue', 2)
+  kind = _messages.StringField(3, default=u'compute#nodeGroupAggregatedList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
+
+
+class NodeGroupList(_messages.Message):
+  r"""Contains a list of nodeGroups.
+
+  Messages:
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of NodeGroup resources.
+    kind: [Output Only] Type of resource.Always compute#nodeGroupList for
+      lists of node groups.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('NodeGroup', 2, repeated=True)
+  kind = _messages.StringField(3, default=u'compute#nodeGroupList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
+
+
+class NodeGroupNode(_messages.Message):
+  r"""A NodeGroupNode object.
+
+  Enums:
+    StatusValueValuesEnum:
+
+  Fields:
+    instances: Instances scheduled on this node.
+    name: The name of the node.
+    nodeType: The type of this node.
+    status: A StatusValueValuesEnum attribute.
+  """
+
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""StatusValueValuesEnum enum type.
+
+    Values:
+      CREATING: <no description>
+      DELETING: <no description>
+      INVALID: <no description>
+      READY: <no description>
+    """
+    CREATING = 0
+    DELETING = 1
+    INVALID = 2
+    READY = 3
+
+  instances = _messages.StringField(1, repeated=True)
+  name = _messages.StringField(2)
+  nodeType = _messages.StringField(3)
+  status = _messages.EnumField('StatusValueValuesEnum', 4)
+
+
+class NodeGroupsAddNodesRequest(_messages.Message):
+  r"""A NodeGroupsAddNodesRequest object.
+
+  Fields:
+    additionalNodeCount: Count of additional nodes to be added to the node
+      group.
+  """
+
+  additionalNodeCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
+class NodeGroupsDeleteNodesRequest(_messages.Message):
+  r"""A NodeGroupsDeleteNodesRequest object.
+
+  Fields:
+    nodes: A string attribute.
+  """
+
+  nodes = _messages.StringField(1, repeated=True)
+
+
+class NodeGroupsListNodes(_messages.Message):
+  r"""A NodeGroupsListNodes object.
+
+  Messages:
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of Node resources.
+    kind: [Output Only] The resource type, which is always
+      compute.nodeGroupsListNodes for the list of nodes in the specified node
+      group.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('NodeGroupNode', 2, repeated=True)
+  kind = _messages.StringField(3, default=u'compute#nodeGroupsListNodes')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
+
+
+class NodeGroupsScopedList(_messages.Message):
+  r"""A NodeGroupsScopedList object.
+
+  Messages:
+    WarningValue: [Output Only] An informational warning that appears when the
+      nodeGroup list is empty.
+
+  Fields:
+    nodeGroups: [Output Only] A list of node groups contained in this scope.
+    warning: [Output Only] An informational warning that appears when the
+      nodeGroup list is empty.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] An informational warning that appears when the nodeGroup
+    list is empty.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  nodeGroups = _messages.MessageField('NodeGroup', 1, repeated=True)
+  warning = _messages.MessageField('WarningValue', 2)
+
+
+class NodeGroupsSetNodeTemplateRequest(_messages.Message):
+  r"""A NodeGroupsSetNodeTemplateRequest object.
+
+  Fields:
+    nodeTemplate: Full or partial URL of the node template resource to be
+      updated for this node group.
+  """
+
+  nodeTemplate = _messages.StringField(1)
+
+
+class NodeTemplate(_messages.Message):
+  r"""A Node Template resource.
+
+  Enums:
+    StatusValueValuesEnum: [Output Only] The status of the node template. One
+      of the following values: CREATING, READY, and DELETING.
+
+  Messages:
+    NodeAffinityLabelsValue: Labels to use for node affinity, which will be
+      used in instance scheduling.
+
+  Fields:
+    creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+      format.
+    description: An optional description of this resource. Provide this
+      property when you create the resource.
+    id: [Output Only] The unique identifier for the resource. This identifier
+      is defined by the server.
+    kind: [Output Only] The type of the resource. Always compute#nodeTemplate
+      for node templates.
+    name: The name of the resource, provided by the client when initially
+      creating the resource. The resource name must be 1-63 characters long,
+      and comply with RFC1035. Specifically, the name must be 1-63 characters
+      long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which
+      means the first character must be a lowercase letter, and all following
+      characters must be a dash, lowercase letter, or digit, except the last
+      charaicter, which cannot be a dash.
+    nodeAffinityLabels: Labels to use for node affinity, which will be used in
+      instance scheduling.
+    nodeType: The node type to use for nodes group that are created from this
+      template.
+    nodeTypeFlexibility: The flexible properties of the desired node type.
+      Node groups that use this node template will create nodes of a type that
+      matches these properties.  This field is mutually exclusive with the
+      node_type property; you can only define one or the other, but not both.
+    region: [Output Only] The name of the region where the node template
+      resides, such as us-central1.
+    selfLink: [Output Only] Server-defined URL for the resource.
+    status: [Output Only] The status of the node template. One of the
+      following values: CREATING, READY, and DELETING.
+    statusMessage: [Output Only] An optional, human-readable explanation of
+      the status.
+  """
+
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""[Output Only] The status of the node template. One of the following
+    values: CREATING, READY, and DELETING.
+
+    Values:
+      CREATING: <no description>
+      DELETING: <no description>
+      INVALID: <no description>
+      READY: <no description>
+    """
+    CREATING = 0
+    DELETING = 1
+    INVALID = 2
+    READY = 3
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class NodeAffinityLabelsValue(_messages.Message):
+    r"""Labels to use for node affinity, which will be used in instance
+    scheduling.
+
+    Messages:
+      AdditionalProperty: An additional property for a NodeAffinityLabelsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        NodeAffinityLabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a NodeAffinityLabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  creationTimestamp = _messages.StringField(1)
+  description = _messages.StringField(2)
+  id = _messages.IntegerField(3, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(4, default=u'compute#nodeTemplate')
+  name = _messages.StringField(5)
+  nodeAffinityLabels = _messages.MessageField('NodeAffinityLabelsValue', 6)
+  nodeType = _messages.StringField(7)
+  nodeTypeFlexibility = _messages.MessageField('NodeTemplateNodeTypeFlexibility', 8)
+  region = _messages.StringField(9)
+  selfLink = _messages.StringField(10)
+  status = _messages.EnumField('StatusValueValuesEnum', 11)
+  statusMessage = _messages.StringField(12)
+
+
+class NodeTemplateAggregatedList(_messages.Message):
+  r"""A NodeTemplateAggregatedList object.
+
+  Messages:
+    ItemsValue: A list of NodeTemplatesScopedList resources.
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of NodeTemplatesScopedList resources.
+    kind: [Output Only] Type of resource.Always
+      compute#nodeTemplateAggregatedList for aggregated lists of node
+      templates.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ItemsValue(_messages.Message):
+    r"""A list of NodeTemplatesScopedList resources.
+
+    Messages:
+      AdditionalProperty: An additional property for a ItemsValue object.
+
+    Fields:
+      additionalProperties: [Output Only] Name of the scope containing this
+        set of node templates.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ItemsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A NodeTemplatesScopedList attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('NodeTemplatesScopedList', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('ItemsValue', 2)
+  kind = _messages.StringField(3, default=u'compute#nodeTemplateAggregatedList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
+
+
+class NodeTemplateList(_messages.Message):
+  r"""Contains a list of node templates.
+
+  Messages:
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of NodeTemplate resources.
+    kind: [Output Only] Type of resource.Always compute#nodeTemplateList for
+      lists of node templates.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('NodeTemplate', 2, repeated=True)
+  kind = _messages.StringField(3, default=u'compute#nodeTemplateList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
+
+
+class NodeTemplateNodeTypeFlexibility(_messages.Message):
+  r"""A NodeTemplateNodeTypeFlexibility object.
+
+  Fields:
+    cpus: A string attribute.
+    localSsd: A string attribute.
+    memory: A string attribute.
+  """
+
+  cpus = _messages.StringField(1)
+  localSsd = _messages.StringField(2)
+  memory = _messages.StringField(3)
+
+
+class NodeTemplatesScopedList(_messages.Message):
+  r"""A NodeTemplatesScopedList object.
+
+  Messages:
+    WarningValue: [Output Only] An informational warning that appears when the
+      node templates list is empty.
+
+  Fields:
+    nodeTemplates: [Output Only] A list of node templates contained in this
+      scope.
+    warning: [Output Only] An informational warning that appears when the node
+      templates list is empty.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] An informational warning that appears when the node
+    templates list is empty.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  nodeTemplates = _messages.MessageField('NodeTemplate', 1, repeated=True)
+  warning = _messages.MessageField('WarningValue', 2)
+
+
+class NodeType(_messages.Message):
+  r"""A Node Type resource.
+
+  Fields:
+    cpuPlatform: [Output Only] The CPU platform used by this node type.
+    creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+      format.
+    deprecated: [Output Only] The deprecation status associated with this node
+      type.
+    description: [Output Only] An optional textual description of the
+      resource.
+    guestCpus: [Output Only] The number of virtual CPUs that are available to
+      the node type.
+    id: [Output Only] The unique identifier for the resource. This identifier
+      is defined by the server.
+    kind: [Output Only] The type of the resource. Always compute#nodeType for
+      node types.
+    localSsdGb: [Output Only] Local SSD available to the node type, defined in
+      GB.
+    memoryMb: [Output Only] The amount of physical memory available to the
+      node type, defined in MB.
+    name: [Output Only] Name of the resource.
+    selfLink: [Output Only] Server-defined URL for the resource.
+    zone: [Output Only] The name of the zone where the node type resides, such
+      as us-central1-a.
+  """
+
+  cpuPlatform = _messages.StringField(1)
+  creationTimestamp = _messages.StringField(2)
+  deprecated = _messages.MessageField('DeprecationStatus', 3)
+  description = _messages.StringField(4)
+  guestCpus = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  id = _messages.IntegerField(6, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(7, default=u'compute#nodeType')
+  localSsdGb = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  memoryMb = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  name = _messages.StringField(10)
+  selfLink = _messages.StringField(11)
+  zone = _messages.StringField(12)
+
+
+class NodeTypeAggregatedList(_messages.Message):
+  r"""A NodeTypeAggregatedList object.
+
+  Messages:
+    ItemsValue: A list of NodeTypesScopedList resources.
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of NodeTypesScopedList resources.
+    kind: [Output Only] Type of resource.Always compute#nodeTypeAggregatedList
+      for aggregated lists of node types.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ItemsValue(_messages.Message):
+    r"""A list of NodeTypesScopedList resources.
+
+    Messages:
+      AdditionalProperty: An additional property for a ItemsValue object.
+
+    Fields:
+      additionalProperties: [Output Only] Name of the scope containing this
+        set of node types.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ItemsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A NodeTypesScopedList attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('NodeTypesScopedList', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('ItemsValue', 2)
+  kind = _messages.StringField(3, default=u'compute#nodeTypeAggregatedList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
+
+
+class NodeTypeList(_messages.Message):
+  r"""Contains a list of node types.
+
+  Messages:
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of NodeType resources.
+    kind: [Output Only] Type of resource.Always compute#nodeTypeList for lists
+      of node types.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('NodeType', 2, repeated=True)
+  kind = _messages.StringField(3, default=u'compute#nodeTypeList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
+
+
+class NodeTypesScopedList(_messages.Message):
+  r"""A NodeTypesScopedList object.
+
+  Messages:
+    WarningValue: [Output Only] An informational warning that appears when the
+      node types list is empty.
+
+  Fields:
+    nodeTypes: [Output Only] A list of node types contained in this scope.
+    warning: [Output Only] An informational warning that appears when the node
+      types list is empty.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] An informational warning that appears when the node
+    types list is empty.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  nodeTypes = _messages.MessageField('NodeType', 1, repeated=True)
+  warning = _messages.MessageField('WarningValue', 2)
+
+
 class Operation(_messages.Message):
   r"""An Operation resource, used to manage asynchronous API requests. (==
   resource_for v1.globalOperations ==) (== resource_for beta.globalOperations
@@ -21481,6 +24130,10 @@ class Project(_messages.Message):
   beta.projects ==)
 
   Enums:
+    DefaultNetworkTierValueValuesEnum: This signifies the default network tier
+      used for configuring resources of the project and can only take the
+      following values: PREMIUM, STANDARD. Initially the default network tier
+      is PREMIUM.
     XpnProjectStatusValueValuesEnum: [Output Only] The role this project has
       in a shared VPC configuration. Currently only HOST projects are
       differentiated.
@@ -21491,6 +24144,10 @@ class Project(_messages.Message):
       information.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
+    defaultNetworkTier: This signifies the default network tier used for
+      configuring resources of the project and can only take the following
+      values: PREMIUM, STANDARD. Initially the default network tier is
+      PREMIUM.
     defaultServiceAccount: [Output Only] Default service account used by VMs
       running in this project.
     description: An optional textual description of the resource.
@@ -21510,6 +24167,18 @@ class Project(_messages.Message):
       configuration. Currently only HOST projects are differentiated.
   """
 
+  class DefaultNetworkTierValueValuesEnum(_messages.Enum):
+    r"""This signifies the default network tier used for configuring resources
+    of the project and can only take the following values: PREMIUM, STANDARD.
+    Initially the default network tier is PREMIUM.
+
+    Values:
+      PREMIUM: <no description>
+      STANDARD: <no description>
+    """
+    PREMIUM = 0
+    STANDARD = 1
+
   class XpnProjectStatusValueValuesEnum(_messages.Enum):
     r"""[Output Only] The role this project has in a shared VPC configuration.
     Currently only HOST projects are differentiated.
@@ -21523,16 +24192,17 @@ class Project(_messages.Message):
 
   commonInstanceMetadata = _messages.MessageField('Metadata', 1)
   creationTimestamp = _messages.StringField(2)
-  defaultServiceAccount = _messages.StringField(3)
-  description = _messages.StringField(4)
-  enabledFeatures = _messages.StringField(5, repeated=True)
-  id = _messages.IntegerField(6, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(7, default=u'compute#project')
-  name = _messages.StringField(8)
-  quotas = _messages.MessageField('Quota', 9, repeated=True)
-  selfLink = _messages.StringField(10)
-  usageExportLocation = _messages.MessageField('UsageExportLocation', 11)
-  xpnProjectStatus = _messages.EnumField('XpnProjectStatusValueValuesEnum', 12)
+  defaultNetworkTier = _messages.EnumField('DefaultNetworkTierValueValuesEnum', 3)
+  defaultServiceAccount = _messages.StringField(4)
+  description = _messages.StringField(5)
+  enabledFeatures = _messages.StringField(6, repeated=True)
+  id = _messages.IntegerField(7, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(8, default=u'compute#project')
+  name = _messages.StringField(9)
+  quotas = _messages.MessageField('Quota', 10, repeated=True)
+  selfLink = _messages.StringField(11)
+  usageExportLocation = _messages.MessageField('UsageExportLocation', 12)
+  xpnProjectStatus = _messages.EnumField('XpnProjectStatusValueValuesEnum', 13)
 
 
 class ProjectsDisableXpnResourceRequest(_messages.Message):
@@ -21588,6 +24258,29 @@ class ProjectsListXpnHostsRequest(_messages.Message):
   organization = _messages.StringField(1)
 
 
+class ProjectsSetDefaultNetworkTierRequest(_messages.Message):
+  r"""A ProjectsSetDefaultNetworkTierRequest object.
+
+  Enums:
+    NetworkTierValueValuesEnum: Default network tier to be set.
+
+  Fields:
+    networkTier: Default network tier to be set.
+  """
+
+  class NetworkTierValueValuesEnum(_messages.Enum):
+    r"""Default network tier to be set.
+
+    Values:
+      PREMIUM: <no description>
+      STANDARD: <no description>
+    """
+    PREMIUM = 0
+    STANDARD = 1
+
+  networkTier = _messages.EnumField('NetworkTierValueValuesEnum', 1)
+
+
 class Quota(_messages.Message):
   r"""A quotas entry.
 
@@ -21613,6 +24306,7 @@ class Quota(_messages.Message):
       DISKS_TOTAL_GB: <no description>
       FIREWALLS: <no description>
       FORWARDING_RULES: <no description>
+      GPUS_ALL_REGIONS: <no description>
       HEALTH_CHECKS: <no description>
       IMAGES: <no description>
       INSTANCES: <no description>
@@ -21624,18 +24318,26 @@ class Quota(_messages.Message):
       INTERCONNECT_ATTACHMENTS_TOTAL_MBPS: <no description>
       INTERNAL_ADDRESSES: <no description>
       IN_USE_ADDRESSES: <no description>
+      IN_USE_BACKUP_SCHEDULES: <no description>
       LOCAL_SSD_TOTAL_GB: <no description>
       NETWORKS: <no description>
       NVIDIA_K80_GPUS: <no description>
       NVIDIA_P100_GPUS: <no description>
+      NVIDIA_P100_VWS_GPUS: <no description>
+      NVIDIA_P4_GPUS: <no description>
+      NVIDIA_P4_VWS_GPUS: <no description>
       NVIDIA_V100_GPUS: <no description>
       PREEMPTIBLE_CPUS: <no description>
       PREEMPTIBLE_LOCAL_SSD_GB: <no description>
       PREEMPTIBLE_NVIDIA_K80_GPUS: <no description>
       PREEMPTIBLE_NVIDIA_P100_GPUS: <no description>
+      PREEMPTIBLE_NVIDIA_P100_VWS_GPUS: <no description>
+      PREEMPTIBLE_NVIDIA_P4_GPUS: <no description>
+      PREEMPTIBLE_NVIDIA_P4_VWS_GPUS: <no description>
       PREEMPTIBLE_NVIDIA_V100_GPUS: <no description>
       REGIONAL_AUTOSCALERS: <no description>
       REGIONAL_INSTANCE_GROUP_MANAGERS: <no description>
+      RESOURCE_POLICIES: <no description>
       ROUTERS: <no description>
       ROUTES: <no description>
       SECURITY_POLICIES: <no description>
@@ -21664,47 +24366,56 @@ class Quota(_messages.Message):
     DISKS_TOTAL_GB = 6
     FIREWALLS = 7
     FORWARDING_RULES = 8
-    HEALTH_CHECKS = 9
-    IMAGES = 10
-    INSTANCES = 11
-    INSTANCE_GROUPS = 12
-    INSTANCE_GROUP_MANAGERS = 13
-    INSTANCE_TEMPLATES = 14
-    INTERCONNECTS = 15
-    INTERCONNECT_ATTACHMENTS_PER_REGION = 16
-    INTERCONNECT_ATTACHMENTS_TOTAL_MBPS = 17
-    INTERNAL_ADDRESSES = 18
-    IN_USE_ADDRESSES = 19
-    LOCAL_SSD_TOTAL_GB = 20
-    NETWORKS = 21
-    NVIDIA_K80_GPUS = 22
-    NVIDIA_P100_GPUS = 23
-    NVIDIA_V100_GPUS = 24
-    PREEMPTIBLE_CPUS = 25
-    PREEMPTIBLE_LOCAL_SSD_GB = 26
-    PREEMPTIBLE_NVIDIA_K80_GPUS = 27
-    PREEMPTIBLE_NVIDIA_P100_GPUS = 28
-    PREEMPTIBLE_NVIDIA_V100_GPUS = 29
-    REGIONAL_AUTOSCALERS = 30
-    REGIONAL_INSTANCE_GROUP_MANAGERS = 31
-    ROUTERS = 32
-    ROUTES = 33
-    SECURITY_POLICIES = 34
-    SECURITY_POLICY_RULES = 35
-    SNAPSHOTS = 36
-    SSD_TOTAL_GB = 37
-    SSL_CERTIFICATES = 38
-    STATIC_ADDRESSES = 39
-    SUBNETWORKS = 40
-    TARGET_HTTPS_PROXIES = 41
-    TARGET_HTTP_PROXIES = 42
-    TARGET_INSTANCES = 43
-    TARGET_POOLS = 44
-    TARGET_SSL_PROXIES = 45
-    TARGET_TCP_PROXIES = 46
-    TARGET_VPN_GATEWAYS = 47
-    URL_MAPS = 48
-    VPN_TUNNELS = 49
+    GPUS_ALL_REGIONS = 9
+    HEALTH_CHECKS = 10
+    IMAGES = 11
+    INSTANCES = 12
+    INSTANCE_GROUPS = 13
+    INSTANCE_GROUP_MANAGERS = 14
+    INSTANCE_TEMPLATES = 15
+    INTERCONNECTS = 16
+    INTERCONNECT_ATTACHMENTS_PER_REGION = 17
+    INTERCONNECT_ATTACHMENTS_TOTAL_MBPS = 18
+    INTERNAL_ADDRESSES = 19
+    IN_USE_ADDRESSES = 20
+    IN_USE_BACKUP_SCHEDULES = 21
+    LOCAL_SSD_TOTAL_GB = 22
+    NETWORKS = 23
+    NVIDIA_K80_GPUS = 24
+    NVIDIA_P100_GPUS = 25
+    NVIDIA_P100_VWS_GPUS = 26
+    NVIDIA_P4_GPUS = 27
+    NVIDIA_P4_VWS_GPUS = 28
+    NVIDIA_V100_GPUS = 29
+    PREEMPTIBLE_CPUS = 30
+    PREEMPTIBLE_LOCAL_SSD_GB = 31
+    PREEMPTIBLE_NVIDIA_K80_GPUS = 32
+    PREEMPTIBLE_NVIDIA_P100_GPUS = 33
+    PREEMPTIBLE_NVIDIA_P100_VWS_GPUS = 34
+    PREEMPTIBLE_NVIDIA_P4_GPUS = 35
+    PREEMPTIBLE_NVIDIA_P4_VWS_GPUS = 36
+    PREEMPTIBLE_NVIDIA_V100_GPUS = 37
+    REGIONAL_AUTOSCALERS = 38
+    REGIONAL_INSTANCE_GROUP_MANAGERS = 39
+    RESOURCE_POLICIES = 40
+    ROUTERS = 41
+    ROUTES = 42
+    SECURITY_POLICIES = 43
+    SECURITY_POLICY_RULES = 44
+    SNAPSHOTS = 45
+    SSD_TOTAL_GB = 46
+    SSL_CERTIFICATES = 47
+    STATIC_ADDRESSES = 48
+    SUBNETWORKS = 49
+    TARGET_HTTPS_PROXIES = 50
+    TARGET_HTTP_PROXIES = 51
+    TARGET_INSTANCES = 52
+    TARGET_POOLS = 53
+    TARGET_SSL_PROXIES = 54
+    TARGET_TCP_PROXIES = 55
+    TARGET_VPN_GATEWAYS = 56
+    URL_MAPS = 57
+    VPN_TUNNELS = 58
 
   limit = _messages.FloatField(1)
   metric = _messages.EnumField('MetricValueValuesEnum', 2)
@@ -23833,6 +26544,7 @@ class Scheduling(_messages.Message):
       instances. Preemptible instances cannot be automatically restarted.  By
       default, this is set to true so an instance is automatically restarted
       if it is terminated by Compute Engine.
+    nodeAffinities: A set of node affinity and anti-affinity.
     onHostMaintenance: Defines the maintenance behavior for this instance. For
       standard instances, the default behavior is MIGRATE. For preemptible
       instances, the default and only possible behavior is TERMINATE. For more
@@ -23856,8 +26568,290 @@ class Scheduling(_messages.Message):
     TERMINATE = 1
 
   automaticRestart = _messages.BooleanField(1)
-  onHostMaintenance = _messages.EnumField('OnHostMaintenanceValueValuesEnum', 2)
-  preemptible = _messages.BooleanField(3)
+  nodeAffinities = _messages.MessageField('SchedulingNodeAffinity', 2, repeated=True)
+  onHostMaintenance = _messages.EnumField('OnHostMaintenanceValueValuesEnum', 3)
+  preemptible = _messages.BooleanField(4)
+
+
+class SchedulingNodeAffinity(_messages.Message):
+  r"""Node Affinity: the configuration of desired nodes onto which this
+  Instance could be scheduled.
+
+  Enums:
+    OperatorValueValuesEnum: Defines the operation of node selection.
+
+  Fields:
+    key: Corresponds to the label key of Node resource.
+    operator: Defines the operation of node selection.
+    values: Corresponds to the label values of Node resource.
+  """
+
+  class OperatorValueValuesEnum(_messages.Enum):
+    r"""Defines the operation of node selection.
+
+    Values:
+      IN: <no description>
+      NOT_IN: <no description>
+      OPERATOR_UNSPECIFIED: <no description>
+    """
+    IN = 0
+    NOT_IN = 1
+    OPERATOR_UNSPECIFIED = 2
+
+  key = _messages.StringField(1)
+  operator = _messages.EnumField('OperatorValueValuesEnum', 2)
+  values = _messages.StringField(3, repeated=True)
+
+
+class SecurityPolicy(_messages.Message):
+  r"""A security policy is comprised of one or more rules. It can also be
+  associated with one or more 'targets'. (== resource_for v1.securityPolicies
+  ==) (== resource_for beta.securityPolicies ==)
+
+  Fields:
+    creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+      format.
+    description: An optional description of this resource. Provide this
+      property when you create the resource.
+    fingerprint: Specifies a fingerprint for this resource, which is
+      essentially a hash of the metadata's contents and used for optimistic
+      locking. The fingerprint is initially generated by Compute Engine and
+      changes after every request to modify or update metadata. You must
+      always provide an up-to-date fingerprint hash in order to update or
+      change metadata.  To see the latest fingerprint, make get() request to
+      the security policy.
+    id: [Output Only] The unique identifier for the resource. This identifier
+      is defined by the server.
+    kind: [Output only] Type of the resource. Always compute#securityPolicyfor
+      security policies
+    name: Name of the resource. Provided by the client when the resource is
+      created. The name must be 1-63 characters long, and comply with RFC1035.
+      Specifically, the name must be 1-63 characters long and match the
+      regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first
+      character must be a lowercase letter, and all following characters must
+      be a dash, lowercase letter, or digit, except the last character, which
+      cannot be a dash.
+    rules: A list of rules that belong to this policy. There must always be a
+      default rule (rule with priority 2147483647 and match "*"). If no rules
+      are provided when creating a security policy, a default rule with action
+      "allow" will be added.
+    selfLink: [Output Only] Server-defined URL for the resource.
+  """
+
+  creationTimestamp = _messages.StringField(1)
+  description = _messages.StringField(2)
+  fingerprint = _messages.BytesField(3)
+  id = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(5, default=u'compute#securityPolicy')
+  name = _messages.StringField(6)
+  rules = _messages.MessageField('SecurityPolicyRule', 7, repeated=True)
+  selfLink = _messages.StringField(8)
+
+
+class SecurityPolicyList(_messages.Message):
+  r"""A SecurityPolicyList object.
+
+  Messages:
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of SecurityPolicy resources.
+    kind: [Output Only] Type of resource. Always compute#securityPolicyList
+      for listsof securityPolicies
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    warning: [Output Only] Informational warning message.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('SecurityPolicy', 2, repeated=True)
+  kind = _messages.StringField(3, default=u'compute#securityPolicyList')
+  nextPageToken = _messages.StringField(4)
+  warning = _messages.MessageField('WarningValue', 5)
+
+
+class SecurityPolicyReference(_messages.Message):
+  r"""A SecurityPolicyReference object.
+
+  Fields:
+    securityPolicy: A string attribute.
+  """
+
+  securityPolicy = _messages.StringField(1)
+
+
+class SecurityPolicyRule(_messages.Message):
+  r"""Represents a rule that describes one or more match conditions along with
+  the action to be taken when traffic matches this condition (allow or deny).
+
+  Fields:
+    action: The Action to preform when the client connection triggers the
+      rule. Can currently be either "allow" or "deny()" where valid values for
+      status are 403, 404, and 502.
+    description: An optional description of this resource. Provide this
+      property when you create the resource.
+    kind: [Output only] Type of the resource. Always
+      compute#securityPolicyRule for security policy rules
+    match: A match condition that incoming traffic is evaluated against. If it
+      evaluates to true, the corresponding ?action? is enforced.
+    preview: If set to true, the specified action is not enforced.
+    priority: An integer indicating the priority of a rule in the list. The
+      priority must be a positive value between 0 and 2147483647. Rules are
+      evaluated in the increasing order of priority.
+  """
+
+  action = _messages.StringField(1)
+  description = _messages.StringField(2)
+  kind = _messages.StringField(3, default=u'compute#securityPolicyRule')
+  match = _messages.MessageField('SecurityPolicyRuleMatcher', 4)
+  preview = _messages.BooleanField(5)
+  priority = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+
+
+class SecurityPolicyRuleMatcher(_messages.Message):
+  r"""Represents a match condition that incoming traffic is evaluated against.
+  Exactly one field must be specified.
+
+  Enums:
+    VersionedExprValueValuesEnum: Preconfigured versioned expression. If this
+      field is specified, config must also be specified. Available
+      preconfigured expressions along with their requirements are: SRC_IPS_V1
+      - must specify the corresponding src_ip_range field in config.
+
+  Fields:
+    config: The configuration options available when specifying
+      versioned_expr. This field must be specified if versioned_expr is
+      specified and cannot be specified if versioned_expr is not specified.
+    versionedExpr: Preconfigured versioned expression. If this field is
+      specified, config must also be specified. Available preconfigured
+      expressions along with their requirements are: SRC_IPS_V1 - must specify
+      the corresponding src_ip_range field in config.
+  """
+
+  class VersionedExprValueValuesEnum(_messages.Enum):
+    r"""Preconfigured versioned expression. If this field is specified, config
+    must also be specified. Available preconfigured expressions along with
+    their requirements are: SRC_IPS_V1 - must specify the corresponding
+    src_ip_range field in config.
+
+    Values:
+      SRC_IPS_V1: <no description>
+    """
+    SRC_IPS_V1 = 0
+
+  config = _messages.MessageField('SecurityPolicyRuleMatcherConfig', 1)
+  versionedExpr = _messages.EnumField('VersionedExprValueValuesEnum', 2)
+
+
+class SecurityPolicyRuleMatcherConfig(_messages.Message):
+  r"""A SecurityPolicyRuleMatcherConfig object.
+
+  Fields:
+    srcIpRanges: CIDR IP address range.
+  """
+
+  srcIpRanges = _messages.StringField(1, repeated=True)
 
 
 class SerialPortOutput(_messages.Message):
@@ -27910,6 +30904,166 @@ class UrlMapsValidateResponse(_messages.Message):
   """
 
   result = _messages.MessageField('UrlMapValidationResult', 1)
+
+
+class UsableSubnetwork(_messages.Message):
+  r"""Subnetwork which the current user has compute.subnetworks.use permission
+  on.
+
+  Fields:
+    ipCidrRange: The range of internal addresses that are owned by this
+      subnetwork.
+    network: Network URL.
+    secondaryIpRanges: Secondary IP ranges.
+    subnetwork: Subnetwork URL.
+  """
+
+  ipCidrRange = _messages.StringField(1)
+  network = _messages.StringField(2)
+  secondaryIpRanges = _messages.MessageField('UsableSubnetworkSecondaryRange', 3, repeated=True)
+  subnetwork = _messages.StringField(4)
+
+
+class UsableSubnetworkSecondaryRange(_messages.Message):
+  r"""Secondary IP range of a usable subnetwork.
+
+  Fields:
+    ipCidrRange: The range of IP addresses belonging to this subnetwork
+      secondary range.
+    rangeName: The name associated with this subnetwork secondary range, used
+      when adding an alias IP range to a VM instance. The name must be 1-63
+      characters long, and comply with RFC1035. The name must be unique within
+      the subnetwork.
+  """
+
+  ipCidrRange = _messages.StringField(1)
+  rangeName = _messages.StringField(2)
+
+
+class UsableSubnetworksAggregatedList(_messages.Message):
+  r"""A UsableSubnetworksAggregatedList object.
+
+  Messages:
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] The unique identifier for the resource. This identifier
+      is defined by the server.
+    items: [Output] A list of usable subnetwork URLs.
+    kind: [Output Only] Type of resource. Always
+      compute#usableSubnetworksAggregatedList for aggregated lists of usable
+      subnetworks.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('UsableSubnetwork', 2, repeated=True)
+  kind = _messages.StringField(3, default=u'compute#usableSubnetworksAggregatedList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
 
 
 class UsageExportLocation(_messages.Message):

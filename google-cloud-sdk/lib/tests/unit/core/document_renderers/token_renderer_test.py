@@ -16,7 +16,9 @@
 """Tests for the token_renderer module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import io
 
 from googlecloudsdk.core.document_renderers import render_document

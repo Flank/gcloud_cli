@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +16,15 @@
 """Integration tests for Deployment Manager V2 examples."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
+
 import io
 import os
 import re
 
+from googlecloudsdk.core import properties
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
 from tests.lib import test_case
@@ -41,6 +45,10 @@ class IntegrationTest(e2e_base.WithServiceAuth):
 
   def testSingleVm(self):
     self.deployExample(['single_vm', 'vm.yaml'], 2)
+
+  def testSingleVmGlobImport(self):
+    properties.VALUES.deployment_manager.glob_imports.Set(True)
+    self.deployExample(['single_vm', 'vm_glob.yaml'], 2)
 
   def testContainerVm(self):
     self.deployExample(['container_vm', 'container_vm.yaml'], 1)

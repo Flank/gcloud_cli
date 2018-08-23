@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the instances add-access-config subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
@@ -571,6 +574,69 @@ class InstancesAddAccessConfigWithNetworkTierBetaTest(test_base.BaseTest):
         """)
 
     self.CheckRequests([(self.compute_beta.instances, 'AddAccessConfig',
+                         self.CreateRequestWithNetworkTier('STANDARD'))],)
+
+  def testNetworkTierNotSupported(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Invalid value for \[--network-tier\]: Invalid network tier '
+        r'\[RANDOM-NETWORK-TIER\]'):
+      self.Run("""
+          compute instances add-access-config instance-1
+            --zone central2-a
+            --network-tier random-network-tier
+          """)
+
+
+class InstancesAddAccessConfigWithNetworkTierGaTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
+
+  def CreateRequestWithNetworkTier(self, network_tier):
+    m = core_apis.GetMessagesModule('compute', 'v1')
+    if network_tier:
+      network_tier_enum = m.AccessConfig.NetworkTierValueValuesEnum(
+          network_tier)
+    else:
+      network_tier_enum = None
+    return m.ComputeInstancesAddAccessConfigRequest(
+        accessConfig=m.AccessConfig(
+            name='external-nat',
+            type=m.AccessConfig.TypeValueValuesEnum.ONE_TO_ONE_NAT,
+            networkTier=network_tier_enum),
+        instance='instance-1',
+        networkInterface='nic0',
+        project='my-project',
+        zone='central2-a')
+
+  def testWithDefaultNetworkTier(self):
+    self.Run("""
+        compute instances add-access-config instance-1
+          --zone central2-a
+        """)
+
+    self.CheckRequests([(self.compute.instances, 'AddAccessConfig',
+                         self.CreateRequestWithNetworkTier(None))],)
+
+  def testWithPremiumNetworkTier(self):
+    self.Run("""
+        compute instances add-access-config instance-1
+          --zone central2-a
+          --network-tier PREMIUM
+        """)
+
+    self.CheckRequests([(self.compute.instances, 'AddAccessConfig',
+                         self.CreateRequestWithNetworkTier('PREMIUM'))],)
+
+  def testWithStandardNetworkTier(self):
+    self.Run("""
+        compute instances add-access-config instance-1
+          --zone central2-a
+          --network-tier standard
+        """)
+
+    self.CheckRequests([(self.compute.instances, 'AddAccessConfig',
                          self.CreateRequestWithNetworkTier('STANDARD'))],)
 
   def testNetworkTierNotSupported(self):

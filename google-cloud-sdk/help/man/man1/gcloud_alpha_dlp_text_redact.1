@@ -11,7 +11,7 @@ gcloud alpha dlp text redact \- redact potentially sensitive data from text cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dlp text redact\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] (\fB\-\-content\fR=\fICONTENT\fR\ |\ \fB\-\-content\-file\fR=\fICONTENT_FILE\fR) (\fB\-\-remove\-findings\fR\ |\ \fB\-\-replace\-with\-info\-type\fR\ |\ \fB\-\-replacement\-text\fR=\fIREPLACEMENT_TEXT\fR) [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dlp text redact\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] (\fB\-\-content\fR=\fICONTENT\fR\ |\ \fB\-\-content\-file\fR=\fICONTENT_FILE\fR) (\fB\-\-remove\-findings\fR\ |\ \fB\-\-replace\-with\-info\-type\fR\ |\ \fB\-\-replacement\-text\fR=\fIREPLACEMENT_TEXT\fR) [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -79,6 +79,10 @@ Only return findings equal to or above this threshold. \fIMIN_LIKELIHOOD\fR must
 be one of: \fBlikely\fR, \fBpossible\fR, \fBunlikely\fR, \fBvery\-likely\fR,
 \fBvery\-unlikely\fR.
 
+.TP 2m
+\fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR
+Path to the file to write redacted contents to.
+
 
 .RE
 .sp
@@ -99,11 +103,24 @@ be found at: https://cloud.google.com/dlp/docs/
 
 
 
+.SH "EXAMPLES"
+
+To redact email addresses from a file named my\-data.csv and write the redacted
+contents to my\-redacted\-data.csv, run:
+
+.RS 2m
+$ gcloud alpha dlp text redact \-\-info\-types EMAIL_ADDRESS \e
+    \-\-replace\-with\-info\-type \e
+  \-\-content\-file my\-data.csv \-\-output\-file my\-redacted\-data.csv
+.RE
+
+
+
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
 

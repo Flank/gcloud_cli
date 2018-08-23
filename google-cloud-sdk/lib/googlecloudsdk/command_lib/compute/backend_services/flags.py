@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Flags and helpers for the compute backend-services commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers as compute_completers
@@ -125,16 +128,20 @@ GLOBAL_REGIONAL_MULTI_BACKEND_SERVICE_ARG = compute_flags.ResourceArgument(
     global_collection='compute.backendServices')
 
 
-def BackendServiceArgumentForUrlMap(required=True):
+def BackendServiceArgumentForUrlMap(required=True, include_alpha=False):
   return compute_flags.ResourceArgument(
       resource_name='backend service',
       name='--default-service',
       required=required,
       completer=BackendServicesCompleter,
       global_collection='compute.backendServices',
+      regional_collection='compute.regionBackendServices'
+      if include_alpha else None,
       short_help=(
           'A backend service that will be used for requests for which this '
-          'URL map has no mappings.'))
+          'URL map has no mappings.'),
+      region_explanation=('If not specified it will be set to the '
+                          'region of the URL map.'))
 
 
 def BackendServiceArgumentForUrlMapPathMatcher(required=True):
@@ -177,11 +184,12 @@ def BackendServiceArgumentForTargetTcpProxy(required=True):
         """)
 
 
-def AddLoadBalancingScheme(parser):
+def AddLoadBalancingScheme(parser, include_alpha=False):
   parser.add_argument(
       '--load-balancing-scheme',
-      choices=['INTERNAL', 'EXTERNAL'],
-      type=lambda x: x.upper(),
+      choices=['INTERNAL', 'EXTERNAL'] + (['INTERNAL_SELF_MANAGED']
+                                          if include_alpha else []),
+      type=lambda x: x.replace('-', '_').upper(),
       default='EXTERNAL',
       help='Specifies if this is internal or external load balancer.')
 
@@ -320,7 +328,7 @@ def AddCacheKeyQueryStringList(parser):
       """)
 
 
-def HealthCheckArgument(required=False):
+def HealthCheckArgument(required=False, include_alpha=False):
   return compute_flags.ResourceArgument(
       resource_name='health check',
       name='--health-checks',
@@ -328,11 +336,15 @@ def HealthCheckArgument(required=False):
       plural=True,
       required=required,
       global_collection='compute.healthChecks',
+      regional_collection='compute.regionHealthChecks'
+      if include_alpha else None,
       short_help="""\
       Specifies a list of health check objects for checking the health of
       the backend service. Health checks need not be for the same protocol
       as that of the backend service.
-      """)
+      """,
+      region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
+      if include_alpha else None)
 
 
 def HttpHealthCheckArgument(required=False):
@@ -500,13 +512,21 @@ def AddPortName(parser):
       """)
 
 
-def AddProtocol(parser, default='HTTP', choices=None):
+def AddProtocol(parser, default='HTTP'):
   parser.add_argument(
       '--protocol',
-      choices=choices or ['HTTP', 'HTTPS', 'SSL', 'TCP', 'UDP'],
       default=default,
       type=lambda x: x.upper(),
-      help='The protocol for incoming requests.')
+      help="""\
+      Protocol for incoming requests.
+
+      If the load-balancing-scheme is `INTERNAL`, the protocol must be one of:
+      `TCP`, `UDP`.
+
+      If the load-balancing-scheme is `EXTERNAL`, the protocol must be one of:
+      `HTTP`, `HTTPS`, `HTTP2`, `SSL`, `TCP`, `UDP`.
+      """
+  )
 
 
 def AddConnectionDrainOnFailover(parser, default):

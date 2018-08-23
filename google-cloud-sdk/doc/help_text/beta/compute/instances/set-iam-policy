@@ -1,0 +1,64 @@
+NAME
+    gcloud beta compute instances set-iam-policy - set IAM policy for an
+        instance
+
+SYNOPSIS
+    gcloud beta compute instances set-iam-policy INSTANCE_NAME POLICY_FILE
+        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute instances set-iam-policy sets the IAM Policy
+    associated with a Google Compute Engine instance in a project.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        Name of the instance to set the IAM policy of.
+
+     POLICY_FILE
+        JSON or YAML file containing the IAM policy.
+
+FLAGS
+     --zone=ZONE
+        Zone of the instance to set the IAM policy of. If not specified, you
+        may be prompted to select a zone. gcloud will attempt to identify the
+        zone by searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will read an IAM policy defined in a JSON file
+    'policy.json' and set it for an instance with identifier 'my-instance'
+
+        $ gcloud beta compute instances set-iam-policy my-instance \
+            policy.json
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute instances set-iam-policy
+

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,49 +15,57 @@
 """Tests for the instances set-iam-policy subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from apitools.base.py import encoding
 
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
-messages = core_apis.GetMessagesModule('compute', 'alpha')
 
+@parameterized.parameters(
+    (calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+    (calliope_base.ReleaseTrack.BETA, 'beta'))
+class SetIamPolicyTest(test_base.BaseTest,
+                       test_case.WithOutputCapture,
+                       parameterized.TestCase):
 
-class SetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def _SetUp(self, track, api_version):
+    self.SelectApi(api_version)
+    self.track = track
     json = encoding.MessageToJson(
-        test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag())
+        test_resources.IamPolicyWithOneBindingAndDifferentEtag(self.messages))
     self.temp_file = self.Touch(self.temp_path, 'good.json', contents=json)
 
-  def testSetIamPolicy(self):
+  def testSetIamPolicy(self, track, api_version):
+    self._SetUp(track, api_version)
 
     self.make_requests.side_effect = iter([
-        iter([test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag()]),
+        iter([test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+            self.messages)]),
     ])
 
     self.Run("""
         compute instances set-iam-policy resource --zone zone-1 {0}
         """.format(self.temp_file))
 
-    policy = test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag()
+    policy = test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+        self.messages)
     self.CheckRequests(
         [(self.compute.instances,
           'SetIamPolicy',
-          messages.ComputeInstancesSetIamPolicyRequest(
+          self.messages.ComputeInstancesSetIamPolicyRequest(
               resource='resource',
               project='my-project',
               zone='zone-1',
-              zoneSetPolicyRequest=messages.ZoneSetPolicyRequest(
+              zoneSetPolicyRequest=self.messages.ZoneSetPolicyRequest(
                   bindings=policy.bindings,
                   etag=policy.etag)))],
     )
@@ -70,7 +79,8 @@ class SetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
             etag: ZXRhZ1R3bw==
             """))
 
-  def testBadJsonOrYamlSetIamPolicyProject(self):
+  def testBadJsonOrYamlSetIamPolicyProject(self, track, api_version):
+    self._SetUp(track, api_version)
     temp_file = self.Touch(self.temp_path, 'bad', contents='bad')
 
     with self.assertRaises(exceptions.Error):
@@ -78,14 +88,16 @@ class SetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
           compute instances set-iam-policy resource --zone zone-1 {0}
           """.format(temp_file))
 
-  def testBadJsonSetIamPolicyProject(self):
+  def testBadJsonSetIamPolicyProject(self, track, api_version):
+    self._SetUp(track, api_version)
     temp_file = '/some/bad/path/doesnotexist'
     with self.assertRaises(exceptions.Error):
       self.Run("""
           compute instances set-iam-policy resource --zone zone-1 {0}
           """.format(temp_file))
 
-  def testNotFound(self):
+  def testNotFound(self, track, api_version):
+    self._SetUp(track, api_version)
     def MakeRequests(*_, **kwargs):
       if False:  # pylint: disable=using-constant-test
         yield
@@ -99,30 +111,6 @@ class SetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
       self.Run("""
           compute instances set-iam-policy my-resource {0} --zone zone-1
           """.format(self.temp_file))
-
-
-class SetIamPolicyTestBeta(test_base.BaseTest, test_case.WithOutputCapture):
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def testNotInGA(self):
-    with self.AssertRaisesArgumentErrorRegexp(
-        'Invalid choice:'):
-      self.Run("""
-          compute instances set-iam-policy my-resource --zone zone-1
-          """)
-
-
-class SetIamPolicyTestGa(test_base.BaseTest, test_case.WithOutputCapture):
-
-  def testNotInBeta(self):
-    with self.AssertRaisesArgumentErrorRegexp(
-        'Invalid choice: \'set-iam-policy\''):
-      self.Run("""
-          beta compute instances set-iam-policy my-resource --zone zone-1
-          """)
 
 
 if __name__ == '__main__':

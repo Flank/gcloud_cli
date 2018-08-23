@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """Unit tests for the resource_projector module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import collections
@@ -71,7 +73,7 @@ class ResourceProjectionTest(test_case.Base):
         'blob': '{"etag": "BwVCYLHABdU="}',
         'badBlob': '{"etag: BwVCYLHABdU="}',
     }
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
 
   def SameStructure(self, expression, expected, actual):
     # Roll-your-own assertSameStructure().
@@ -503,27 +505,30 @@ class ResourceProjectionTest(test_case.Base):
     class Scope(object):
       _SCOPE_TUPLE = collections.namedtuple('ScopeTuple',
                                             ('id', 'description'))
-      INSTALLATION = _SCOPE_TUPLE(
+      STATIC_VAR = 'Should not be serialized.'
+      _PRIVATE_STATIC_VAR = 'And in addition neither should this too also.'
+
+      installation = _SCOPE_TUPLE(
           id='installation',
           description='The installation.')
-      USER = _SCOPE_TUPLE(
+      user = _SCOPE_TUPLE(
           id='user',
           description='The user.')
-      WORKSPACE = _SCOPE_TUPLE(
+      workspace = _SCOPE_TUPLE(
           id='workspace',
           description='The workspace.')
 
     resource = Scope()
     expected = {
-        'INSTALLATION': {
+        'installation': {
             'id': 'installation',
             'description': 'The installation.',
             },
-        'USER': {
+        'user': {
             'id': 'user',
             'description': 'The user.',
             },
-        'WORKSPACE': {
+        'workspace': {
             'id': 'workspace',
             'description': 'The workspace.',
             }
@@ -1116,11 +1121,30 @@ class ResourceProjectionTest(test_case.Base):
     expected = ['ONE', 123, 4]
     self.assertEqual(expected, actual)
 
+  def testProjectSelfSerializingClass(self):
+    self.CheckProjection('', {'a': 'aaa'},
+                         resource=_SelfSerializingClass('aaa', 'bee'))
+
+  def testProjectSelfSerializingClassByColumns(self):
+    projector = resource_projector.Compile('(a, b)', by_columns=True)
+    actual = projector.Evaluate(_SelfSerializingClass('aaa', 'bee'))
+    self.assertEqual(actual, ['aaa', 'bee'])
+
   def testIdentityProjector(self):
     projector = resource_projector.IdentityProjector()
     resource = projector
     actual = projector.Evaluate(resource)
     self.assertTrue(actual is resource)
+
+
+class _SelfSerializingClass(object):
+
+  def __init__(self, a, b):
+    self.a = a
+    self.b = b
+
+  def MakeSerializable(self):
+    return {'a': self.a}
 
 
 class ResourceProjectorAttrTest(test_case.Base):
@@ -1227,23 +1251,39 @@ class ResourceProjectorAttrTest(test_case.Base):
     actual = projector.Projection().Labels()
     self.assertEqual(actual, ['A'])
 
+  def _Attr(self, align=None, label=None, sort=None):
+    attr = resource_projection_parser.Parser._Attribute(
+        resource_projection_spec.ProjectionSpec.PROJECT)
+    if align is not None:
+      attr.align = align
+    if label is not None:
+      attr.label = label
+    attr.optional = False
+    attr.reverse = False
+    if sort is not None:
+      attr.order = sort
+    attr.wrap = False
+    return attr
+
   def testAliasesWithDefaults(self):
 
+    self.maxDiff = None  # pylint: disable=invalid-name
     defaults = resource_projection_parser.Parse(
         '(a:sort=2, b.x:alias=bx:alias=xb:sort=1, x:sort=3, y:align=right,'
         ' z:alias=zzz:label=ZZZ)')
     projector = resource_projector.Compile('(a,bx,zzz)', defaults=defaults)
     actual = projector.Projection().Aliases()
     expected = {
-        'A': ['a'],
-        'bx': ['b', 'x'],
-        'xb': ['b', 'x'],
-        'X': ['b', 'x'],
-        'Y': ['y'],
-        'zzz': ['z'],
-        'ZZZ': ['z'],
+        'A': (['a'], self._Attr(label='A', sort=2)),
+        'bx': (['b', 'x'], self._Attr(label='X', sort=1)),
+        'xb': (['b', 'x'], self._Attr(label='X', sort=1)),
+        'X': (['b', 'x'], self._Attr(label='X', sort=1)),
+        'Y': (['y'], self._Attr(align='right', label='Y')),
+        'zzz': (['z'], self._Attr(label='ZZZ')),
+        'ZZZ': (['z'], self._Attr(label='ZZZ')),
         }
-    self.assertEqual(expected, actual)
+    self.assertEqual(resource_projector.MakeSerializable(expected),
+                     resource_projector.MakeSerializable(actual))
 
   def testNameWithDefaults(self):
 
@@ -1542,9 +1582,9 @@ class ResourceProjectionSpecCombineDefaultsTest(test_case.Base):
 
   def testCombineDefaultsOne(self):
     aliases_1 = {
-        'foo': 'bar',
-        'foo.bar': 'foobar',
-        'xyzzy': 'XYZZY',
+        'foo': ('bar',),
+        'foo.bar': ('foobar',),
+        'xyzzy': ('XYZZY',),
     }
     symbols_1 = {
         'hello': 'MockHello()',
@@ -1579,9 +1619,9 @@ class ResourceProjectionSpecCombineDefaultsTest(test_case.Base):
 
   def testCombineDefaultsWithAliasesAndSymbols(self):
     aliases_1 = {
-        'foo': 'bar',
-        'foo.bar': 'foobar',
-        'xyzzy': 'XYZZY',
+        'foo': ('bar',),
+        'foo.bar': ('foobar',),
+        'xyzzy': ('XYZZY',),
     }
     symbols_1 = {
         'hello': 'MockHello()',
@@ -1594,9 +1634,9 @@ class ResourceProjectionSpecCombineDefaultsTest(test_case.Base):
     )
 
     aliases_2 = {
-        'baz': 'BAZ',
-        'foo': 'foobar',
-        'foo.bar': 'bar',
+        'baz': ('BAZ',),
+        'foo': ('foobar',),
+        'foo.bar': ('bar',),
     }
     symbols_2 = {
         'color': 'MockColor()',
@@ -1607,10 +1647,10 @@ class ResourceProjectionSpecCombineDefaultsTest(test_case.Base):
     )
 
     aliases_expected = {
-        'baz': 'BAZ',
-        'foo': 'foobar',
-        'foo.bar': 'bar',
-        'xyzzy': 'XYZZY',
+        'baz': ('BAZ',),
+        'foo': ('foobar',),
+        'foo.bar': ('bar',),
+        'xyzzy': ('XYZZY',),
     }
     symbols_expected = {
         'color': 'MockColor()',

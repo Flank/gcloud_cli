@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Clone Google Cloud Platform git repository."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.source import git
 from googlecloudsdk.api_lib.source import sourcerepo
 from googlecloudsdk.calliope import base
@@ -75,7 +79,7 @@ class CloneGA(base.Command):
   def ActionIfMirror(self, project, repo, mirror_url):
     """Prints a warning if the repository is a mirror."""
     message = ('Repository "{repo}" in project "{prj}" is a mirror. Pushing to '
-               'this clone will have no effect.  Instead, directly clone the '
+               'this clone will have no effect.  Instead, clone the '
                'mirrored repository directly with \n$ git clone '
                '{url}'.format(repo=repo, prj=project, url=mirror_url))
     log.warning(message)

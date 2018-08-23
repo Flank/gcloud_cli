@@ -209,24 +209,24 @@ mode, a subnetwork must be specified.
 
 .TP 2m
 \fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR
-The region of the subnetwork to operate on. If not specified it will be set the
+Region of the subnetwork to operate on. If not specified it will be set the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
 \fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR
-The zone of the target instance to operate on. Overrides the default
+Zone of the target instance to operate on. Overrides the default
 \fBcompute/zone\fR property value for this command invocation.
 
 .TP 2m
 \fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR
-The region of the target pool to operate on. If not specified it will be set the
+Region of the target pool to operate on. If not specified it will be set the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
 \fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR
-The region of the VPN gateway to operate on. If not specified it will be set the
+Region of the VPN gateway to operate on. If not specified it will be set the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
@@ -295,8 +295,8 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-address\-region\fR=\fIADDRESS_REGION\fR
-The region of the address to operate on. If not specified, you may be prompted
-to select a region.
+Region of the address to operate on. If not specified, you may be prompted to
+select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -322,7 +322,7 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-global\-address\fR
-If provided, it is assumed the address is global.
+If set, the address is global.
 
 .RE
 .sp
@@ -333,13 +333,13 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR
-The region of the backend service to operate on. If not specified it will be set
-the region of the forwarding rule. Overrides the default \fBcompute/region\fR
+Region of the backend service to operate on. If not specified it will be set the
+region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
 \fB\-\-global\-backend\-service\fR
-If provided, it is assumed the backend service is global.
+If set, the backend service is global.
 
 .RE
 .sp
@@ -350,12 +350,12 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-global\fR
-If provided, it is assumed the forwarding rule is global.
+If set, the forwarding rule is global.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the forwarding rule to create. If not specified, you may be
-prompted to select a region.
+Region of the forwarding rule to create. If not specified, you may be prompted
+to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:

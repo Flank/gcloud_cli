@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +16,16 @@
 """Unit tests for the gcloud interactive application module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import os
 import sys
 
 from googlecloudsdk.calliope import cli_tree
+from googlecloudsdk.command_lib.interactive import application
 from googlecloudsdk.command_lib.meta import generate_cli_trees
+from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
@@ -240,3 +244,29 @@ class ApplicationTests(cli_test_base.CliTestBase):
 <CPR/><PASTE><HIDE></AUTOWRAP></ATTRIBUTE></ATTRIBUTE><ERASE_DOWN/><ATTRIBUTE>$ <LEFT count=2/><RIGHT count=2/></ATTRIBUTE></HIDE><HIDE><LEFT count=2/></ATTRIBUTE><ERASE_DOWN/><ATTRIBUTE>$                                                                              \r<RIGHT count=79/> \r<RIGHT count=0/></ATTRIBUTE>\r
 <RIGHT count=0/><ERASE_DOWN/><AUTOWRAP></ATTRIBUTE></HIDE></PASTE><CPR/><PASTE><HIDE></AUTOWRAP></ATTRIBUTE></ATTRIBUTE><ERASE_DOWN/><ATTRIBUTE>$ <LEFT count=2/><RIGHT count=2/></ATTRIBUTE></HIDE><HIDE><LEFT count=2/></ATTRIBUTE><ERASE_DOWN/><ATTRIBUTE>$                                                                              \r<RIGHT count=79/> \r<RIGHT count=0/></ATTRIBUTE>\r
 <RIGHT count=0/><ERASE_DOWN/><AUTOWRAP></ATTRIBUTE></HIDE></PASTE>""")
+
+  def _Main(self, args=None, config=None):
+    self.application = application.Application(args=args, config=config)
+
+  def testInteractiveDebugFlag(self):
+    self.StartObjectPatch(application, 'main', self._Main)
+    self.Run(['alpha', 'interactive', '--debug'])
+    self.assertTrue(self.application.config.debug)
+    self.assertEquals(('fake-project', '<NO ACCOUNT SET>'),
+                      self.application._GetProjectAndAccount())
+
+  def testInteractiveDebugProperty(self):
+    self.StartObjectPatch(application, 'main', self._Main)
+    properties.VALUES.interactive.debug.Set(True)
+    self.Run(['alpha', 'interactive'])
+    self.assertTrue(self.application.config.debug)
+    self.assertEquals(('fake-project', '<NO ACCOUNT SET>'),
+                      self.application._GetProjectAndAccount())
+
+  def testInteractiveObfuscateProperty(self):
+    self.StartObjectPatch(application, 'main', self._Main)
+    properties.VALUES.interactive.obfuscate.Set(True)
+    self.Run(['alpha', 'interactive'])
+    self.assertTrue(self.application.config.obfuscate)
+    self.assertEquals((u'me', u'myself@i'),
+                      self.application._GetProjectAndAccount())

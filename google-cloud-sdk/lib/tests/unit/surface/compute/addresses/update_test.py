@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,8 @@
 """Tests for addresses update."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
@@ -180,17 +181,9 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
         ],)
     self.WriteInput('2\n')
     self.Run('compute addresses update address-1 --remove-labels key0')
-    self.AssertErrEquals(
-        textwrap.dedent("""\
-            For the following address:
-             - [address-1]
-            choose a region or global:
-             [1] global
-             [2] region: us-central1
-             [3] region: us-central2
-            Please enter your numeric choice:{0}
-            """.format('  ')))
-
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains(
+        '"choices": ["global", "region: us-central1", "region: us-central2"]')
 
 if __name__ == '__main__':
   test_case.main()

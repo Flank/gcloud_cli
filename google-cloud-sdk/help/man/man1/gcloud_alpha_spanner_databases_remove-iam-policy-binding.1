@@ -26,7 +26,7 @@ gcloud alpha spanner databases remove\-iam\-policy\-binding \- remove an IAM pol
 .RS 2m
 .TP 2m
 
-Database resource \- The Cloud Spanner database to remove IAM policy binding
+Database resource \- The Cloud Spanner database to remove the IAM policy binding
 from. The arguments in this group can be used to specify the attributes of this
 resource. (NOTE) Some attributes are not given arguments in this group but can
 be set in other ways. To set the [project] attribute: provide the flag
@@ -43,7 +43,7 @@ specified.
 
 .TP 2m
 \fB\-\-instance\fR=\fIINSTANCE\fR
-The Cloud Spanner instance for the database.
+The name of the Cloud Spanner instance.
 
 
 .RE
@@ -92,13 +92,20 @@ help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBspanner/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/spanner/
+
+
+
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud spanner databases remove\-iam\-policy\-binding

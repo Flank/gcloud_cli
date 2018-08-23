@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Provide commands for managing SSL certificates of Cloud SQL instances."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 
@@ -25,7 +28,8 @@ _DEPRECATION_WARNING = (
 
 
 @base.Deprecate(is_removed=False, warning=_DEPRECATION_WARNING)
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.ALPHA)
 class SslCerts(base.Group):
   """Provide commands for managing SSL certificates of Cloud SQL instances.
 

@@ -27,12 +27,12 @@ OPTIONAL FLAGS
         An optional, textual description of the target instance.
 
      --instance-zone=INSTANCE_ZONE
-        The zone of the instance to operate on. If not specified, it will be
-        set to the same as zone. Overrides the default compute/zone property
-        value for this command invocation.
+        Zone of the instance to operate on. If not specified, it will be set to
+        the same as zone. Overrides the default compute/zone property value for
+        this command invocation.
 
      --zone=ZONE
-        The zone of the target instance to operate on. If not specified and the
+        Zone of the target instance to operate on. If not specified and the
         compute/zone property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the

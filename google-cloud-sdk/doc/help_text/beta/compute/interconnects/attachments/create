@@ -33,8 +33,8 @@ OPTIONAL FLAGS
         An optional, textual description for the interconnect attachment.
 
      --region=REGION
-        The region of the interconnect attachment to create. If not specified,
-        you may be prompted to select a region.
+        Region of the interconnect attachment to create. If not specified, you
+        may be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:

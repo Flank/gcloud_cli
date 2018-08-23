@@ -19,6 +19,9 @@ COMMANDS
      http
         (BETA) Update a HTTP health check.
 
+     http2
+        (BETA) Update a HTTP2 health check.
+
      https
         (BETA) Update a HTTPS health check.
 

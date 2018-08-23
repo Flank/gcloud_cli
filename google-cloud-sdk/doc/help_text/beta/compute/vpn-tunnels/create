@@ -48,7 +48,7 @@ OPTIONAL FLAGS
         strings. Example: 192.168.0.0/16,10.0.0.0/24.
 
      --region=REGION
-        The region of the VPN Tunnel to create. If not specified, you may be
+        Region of the VPN Tunnel to create. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
@@ -80,9 +80,9 @@ OPTIONAL FLAGS
         The Router to use for dynamic routing.
 
      --target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION
-        The region of the Target VPN Gateway to operate on. Should be the same
-        as region, if not specified, it will be automatically set. Overrides
-        the default compute/region property value for this command invocation.
+        Region of the Target VPN Gateway to operate on. Should be the same as
+        region, if not specified, it will be automatically set. Overrides the
+        default compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

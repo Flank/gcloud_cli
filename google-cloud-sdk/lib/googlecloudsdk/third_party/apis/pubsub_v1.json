@@ -151,7 +151,7 @@
       "type": "object",
       "properties": {
         "role": {
-          "description": "Role that is assigned to `members`.\nFor example, `roles\/viewer`, `roles\/editor`, or `roles\/owner`.\nRequired",
+          "description": "Role that is assigned to `members`.\nFor example, `roles\/viewer`, `roles\/editor`, or `roles\/owner`.",
           "type": "string"
         },
         "members": {
@@ -160,6 +160,33 @@
           "items": {
             "type": "string"
           }
+        },
+        "condition": {
+          "description": "Unimplemented. The condition that is associated with this binding.\nNOTE: an unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently.",
+          "$ref": "Expr"
+        }
+      }
+    },
+    "Expr": {
+      "id": "Expr",
+      "description": "Represents an expression text. Example:\n\n    title: \"User account presence\"\n    description: \"Determines whether the request has a user account\"\n    expression: \"size(request.user) > 0\"",
+      "type": "object",
+      "properties": {
+        "expression": {
+          "description": "Textual representation of an expression in\nCommon Expression Language syntax.\n\nThe application context of the containing message determines which\nwell-known feature set of CEL is supported.",
+          "type": "string"
+        },
+        "title": {
+          "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
+          "type": "string"
+        },
+        "description": {
+          "description": "An optional description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
+          "type": "string"
+        },
+        "location": {
+          "description": "An optional string indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
+          "type": "string"
         }
       }
     },
@@ -201,7 +228,7 @@
           "type": "string"
         },
         "labels": {
-          "description": "User labels.",
+          "description": "See <a href=\"\/pubsub\/docs\/labels\"> Creating and managing labels<\/a>.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -258,11 +285,11 @@
     },
     "PubsubMessage": {
       "id": "PubsubMessage",
-      "description": "A message data and its attributes. The message payload must not be empty;\nit must contain either a non-empty data field, or at least one attribute.",
+      "description": "A message that is published by publishers and consumed by subscribers. The\nmessage must contain either a non-empty data field or at least one attribute.",
       "type": "object",
       "properties": {
         "data": {
-          "description": "The message payload.",
+          "description": "The message data field. If this field is empty, the message must contain\nat least one attribute.",
           "type": "string",
           "format": "byte"
         },
@@ -391,7 +418,7 @@
           "format": "google-duration"
         },
         "labels": {
-          "description": "User labels.",
+          "description": "See <a href=\"\/pubsub\/docs\/labels\"> Creating and managing labels<\/a>.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -490,7 +517,7 @@
       "type": "object",
       "properties": {
         "returnImmediately": {
-          "description": "If this field set to true, the system will respond immediately even if\nit there are no messages available to return in the `Pull` response.\nOtherwise, the system may wait (for a bounded amount of time) until at\nleast one message is available, rather than returning no messages. The\nclient may cancel the request if it does not wish to wait any longer for\nthe response.",
+          "description": "If this field set to true, the system will respond immediately even if\nit there are no messages available to return in the `Pull` response.\nOtherwise, the system may wait (for a bounded amount of time) until at\nleast one message is available, rather than returning no messages.",
           "type": "boolean"
         },
         "maxMessages": {
@@ -506,7 +533,7 @@
       "type": "object",
       "properties": {
         "receivedMessages": {
-          "description": "Received Pub\/Sub messages. The Pub\/Sub system will return zero messages if\nthere are no more available in the backlog. The Pub\/Sub system may return\nfewer than the `maxMessages` requested even if there are more messages\navailable in the backlog.",
+          "description": "Received Pub\/Sub messages. The list will be empty if there are no more\nmessages available in the backlog. For JSON, the response can be entirely\nempty. The Pub\/Sub system may return fewer than the `maxMessages` requested\neven if there are more messages available in the backlog.",
           "type": "array",
           "items": {
             "$ref": "ReceivedMessage"
@@ -559,7 +586,7 @@
           "format": "google-datetime"
         },
         "labels": {
-          "description": "User labels.",
+          "description": "See <a href=\"\/pubsub\/docs\/labels\"> Creating and managing labels<\/a>.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -595,7 +622,7 @@
           "type": "string"
         },
         "labels": {
-          "description": "User labels.",
+          "description": "See <a href=\"\/pubsub\/docs\/labels\"> Creating and managing labels<\/a>.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -816,7 +843,7 @@
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/pubsub"
               ],
-              "description": "Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic\ndoes not exist. The message payload must not be empty; it must contain\n either a non-empty data field, or at least one attribute."
+              "description": "Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic\ndoes not exist."
             },
             "get": {
               "id": "pubsub.projects.topics.get",
@@ -851,7 +878,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "project": {
-                  "description": "The name of the cloud project that topics belong to.\nFormat is `projects\/{project}`.",
+                  "description": "The name of the project in which to list topics.\nFormat is `projects\/{project-id}`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -1171,7 +1198,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "project": {
-                  "description": "The name of the cloud project that subscriptions belong to.\nFormat is `projects\/{project}`.",
+                  "description": "The name of the project in which to list subscriptions.\nFormat is `projects\/{project-id}`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -1312,7 +1339,7 @@
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/pubsub"
               ],
-              "description": "Pulls messages from the server. Returns an empty list if there are no\nmessages available in the backlog. The server may return `UNAVAILABLE` if\nthere are too many concurrent pull requests pending for the given\nsubscription."
+              "description": "Pulls messages from the server. The server may return `UNAVAILABLE` if\nthere are too many concurrent pull requests pending for the given\nsubscription."
             },
             "modifyPushConfig": {
               "id": "pubsub.projects.subscriptions.modifyPushConfig",
@@ -1493,7 +1520,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "project": {
-                  "description": "The name of the cloud project that snapshots belong to.\nFormat is `projects\/{project}`.",
+                  "description": "The name of the project in which to list snapshots.\nFormat is `projects\/{project-id}`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",

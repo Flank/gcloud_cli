@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for the deps module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import re
 
 from googlecloudsdk.calliope.concepts import deps
@@ -110,37 +113,76 @@ class DepsTest(concepts_test_base.ConceptsTestBase,
     with self.assertRaises(deps.FallthroughNotFoundError):
       proj_fallthrough.GetValue(parsed_args)
 
-  def testDeps_ArgsGiven(self):
-    """Test the deps object can initialize attributes using ArgFallthrough."""
-    deps_object = deps.Deps(
-        {'name': [deps.ArgFallthrough('--myresource-name')],
-         'project': [deps.ArgFallthrough('--myresource-project'),
-                     deps.ArgFallthrough('--project'),
-                     deps.PropertyFallthrough(properties.VALUES.core.project)]},
-        parsed_args=self._GetMockNamespace(
-            myresource_name='example',
-            myresource_project='exampleproject'))
-    self.assertEqual('example', deps_object.Get('name'))
-    self.assertEqual('exampleproject', deps_object.Get('project'))
+  @parameterized.named_parameters(
+      ('ArgFallthroughFlag',
+       deps.ArgFallthrough('--resources', plural=True), ['xyz'], ['xyz']),
+      ('ArgFallthroughSingle',
+       deps.ArgFallthrough('--resources', plural=True), 'xyz', ['xyz']),
+      ('Property',
+       deps.PropertyFallthrough(properties.VALUES.compute.zone, plural=True),
+       'xyz', ['xyz']),
+      ('Fallthrough', deps.Fallthrough(lambda: 'xyz', hint='h', plural=True),
+       None, ['xyz']))
+  def testFallthroughsPlural(self, fallthrough, val, expected):
+    properties.VALUES.compute.zone.Set(val)
+    parsed_args = self._GetMockNamespace(resources=val)
+    self.assertEqual(expected, fallthrough.GetValue(parsed_args=parsed_args))
 
-  def testDeps_UseProperty(self):
+  @parameterized.named_parameters(
+      ('ArgFallthroughFlag',
+       [deps.ArgFallthrough('--resources', plural=True)], ['xyz'], ['xyz']),
+      ('ArgFallthroughSingle',
+       [deps.ArgFallthrough('--resources', plural=True)], 'xyz', ['xyz']),
+      ('Property',
+       [deps.PropertyFallthrough(properties.VALUES.compute.zone, plural=True)],
+       'xyz', ['xyz']),
+      ('Fallthrough', [deps.Fallthrough(lambda: 'xyz', hint='h', plural=True)],
+       None, ['xyz']))
+  def testGet_Plural(self, fallthroughs, val, expected):
+    properties.VALUES.compute.zone.Set(val)
+    result = deps.Get(
+        'resource',
+        {'resource': fallthroughs},
+        parsed_args=self._GetMockNamespace(
+            resources=val))
+    self.assertEqual(expected, result)
+
+  def testGet_ArgsGiven(self):
+    """Test the deps object can initialize attributes using ArgFallthrough."""
+    fallthroughs_map = {
+        'name': [deps.ArgFallthrough('--myresource-name')],
+        'project': [deps.ArgFallthrough('--myresource-project'),
+                    deps.ArgFallthrough('--project'),
+                    deps.PropertyFallthrough(properties.VALUES.core.project)]}
+    parsed_args = self._GetMockNamespace(
+        myresource_name='example',
+        myresource_project='exampleproject')
+    self.assertEqual(
+        'example',
+        deps.Get('name', fallthroughs_map, parsed_args=parsed_args))
+    self.assertEqual(
+        'exampleproject',
+        deps.Get('project', fallthroughs_map, parsed_args=parsed_args))
+
+  def testGet_UseProperty(self):
     """Test the deps object can initialize attributes using PropertyFallthrough.
     """
-    deps_object = deps.Deps(
+    result = deps.Get(
+        'project',
         {'project': [deps.ArgFallthrough('--myresource-project'),
                      deps.ArgFallthrough('--project'),
                      deps.PropertyFallthrough(properties.VALUES.core.project)]},
         parsed_args=self._GetMockNamespace(myresource_project=None))
-    self.assertEqual(self.Project(), deps_object.Get('project'))
+    self.assertEqual(self.Project(), result)
 
-  def testDeps_BothFail(self):
+  def testGet_BothFail(self):
     """Test the deps object raises an error if an attribute can't be found."""
     self.UnsetProject()
-    deps_object = deps.Deps(
-        {'project': [deps.ArgFallthrough('--myresource-project'),
-                     deps.ArgFallthrough('--project'),
-                     deps.PropertyFallthrough(properties.VALUES.core.project)]},
-        parsed_args=self._GetMockNamespace(myresource_project=None))
+    fallthroughs_map = {
+        'project': [deps.ArgFallthrough('--myresource-project'),
+                    deps.ArgFallthrough('--project'),
+                    deps.PropertyFallthrough(properties.VALUES.core.project)]}
+    parsed_args = self._GetMockNamespace(myresource_project=None)
     regex = re.escape(
         'Failed to find attribute [project]. The attribute can be set in the '
         'following ways: \n'
@@ -148,27 +190,28 @@ class DepsTest(concepts_test_base.ConceptsTestBase,
         '- provide the flag [--project] on the command line\n'
         '- set the property [core/project]')
     with self.assertRaisesRegex(deps.AttributeNotFoundError, regex):
-      deps_object.Get('project')
+      deps.Get('project', fallthroughs_map, parsed_args=parsed_args)
 
-  def testDeps_AnotherProperty(self):
+  def testGet_AnotherProperty(self):
     """Test the deps object handles non-project property.
     """
     properties.VALUES.compute.zone.Set('us-east1b')
-    deps_object = deps.Deps(
+    result = deps.Get(
+        'zone',
         {'zone': [deps.ArgFallthrough('--myresource-zone'),
                   deps.PropertyFallthrough(properties.VALUES.compute.zone)]},
         parsed_args=self._GetMockNamespace(myresource_zone=None))
-    self.assertEqual('us-east1b', deps_object.Get('zone'))
+    self.assertEqual('us-east1b', result)
 
-  def testDeps_BothFail_AnotherProperty(self):
+  def testGet_BothFail_AnotherProperty(self):
     """Test the deps error has the correct message for non-project properties.
     """
     properties.VALUES.compute.zone.Set(None)
-    deps_object = deps.Deps(
-        {'zone': [deps.ArgFallthrough('--myresource-zone'),
-                  deps.PropertyFallthrough(properties.VALUES.compute.zone),
-                  deps.Fallthrough(lambda: None, 'custom hint')]},
-        parsed_args=self._GetMockNamespace(myresource_zone=None))
+    fallthroughs_map = {
+        'zone': [deps.ArgFallthrough('--myresource-zone'),
+                 deps.PropertyFallthrough(properties.VALUES.compute.zone),
+                 deps.Fallthrough(lambda: None, 'custom hint')]}
+    parsed_args = self._GetMockNamespace(myresource_zone=None)
     regex = re.escape(
         'Failed to find attribute [zone]. The attribute can be set in the '
         'following ways: \n'
@@ -176,7 +219,7 @@ class DepsTest(concepts_test_base.ConceptsTestBase,
         '- set the property [compute/zone]\n'
         '- custom hint')
     with self.assertRaisesRegex(deps.AttributeNotFoundError, regex):
-      deps_object.Get('zone')
+      deps.Get('zone', fallthroughs_map, parsed_args=parsed_args)
 
 
 if __name__ == '__main__':

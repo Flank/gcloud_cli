@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,14 @@
 """Set cluster selector for workflow-template command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.dataproc import dataproc as dp
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.dataproc import flags
 from googlecloudsdk.command_lib.util.args import labels_util
-from googlecloudsdk.core import properties
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -30,7 +32,6 @@ class SetClusterSelector(base.UpdateCommand):
   @staticmethod
   def Args(parser):
     flags.AddTemplateResourceArg(parser, 'set cluster selector')
-    flags.AddZoneFlag(parser)
     parser.add_argument(
         '--cluster-labels',
         metavar='KEY=VALUE',
@@ -52,8 +53,7 @@ class SetClusterSelector(base.UpdateCommand):
     labels = labels_util.Diff(additions=args.cluster_labels).Apply(
         dataproc.messages.ClusterSelector.ClusterLabelsValue).GetOrNone()
 
-    cluster_selector = dataproc.messages.ClusterSelector(
-        clusterLabels=labels, zone=properties.VALUES.compute.zone.GetOrFail())
+    cluster_selector = dataproc.messages.ClusterSelector(clusterLabels=labels)
 
     workflow_template.placement = dataproc.messages.WorkflowTemplatePlacement(
         clusterSelector=cluster_selector)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,49 +16,55 @@
 
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
-messages = core_apis.GetMessagesModule('compute', 'alpha')
 
+@parameterized.parameters(
+    (calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+    (calliope_base.ReleaseTrack.BETA, 'beta'))
+class AddIamPolicyBindingTest(test_base.BaseTest,
+                              test_case.WithOutputCapture,
+                              parameterized.TestCase):
 
-class AddIamPolicyBindingTest(test_base.BaseTest, test_case.WithOutputCapture):
+  def _SetUp(self, track, api_version):
+    self.SelectApi(api_version)
+    self.track = track
 
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testAddOwnerToInstance(self):
+  def testAddOwnerToInstance(self, track, api_version):
+    self._SetUp(track, api_version)
     self.make_requests.side_effect = iter([
-        iter([test_resources.EmptyAlphaIamPolicy()]),
-        iter([test_resources.AlphaIamPolicyWithOneBinding()]),
+        iter([test_resources.EmptyIamPolicy(self.messages)]),
+        iter([test_resources.IamPolicyWithOneBinding(self.messages)]),
     ])
 
     self.Run("""
         compute instances add-iam-policy-binding resource --zone zone-1
         --member user:testuser@google.com --role owner
         """)
-    policy = test_resources.AlphaIamPolicyWithOneBinding()
+    policy = test_resources.IamPolicyWithOneBinding(self.messages)
     self.CheckRequests(
         [(self.compute.instances,
           'GetIamPolicy',
-          messages.ComputeInstancesGetIamPolicyRequest(
+          self.messages.ComputeInstancesGetIamPolicyRequest(
               resource='resource',
               project='my-project',
               zone='zone-1')),],
         [(self.compute.instances,
           'SetIamPolicy',
-          messages.ComputeInstancesSetIamPolicyRequest(
+          self.messages.ComputeInstancesSetIamPolicyRequest(
               resource='resource',
               project='my-project',
               zone='zone-1',
-              zoneSetPolicyRequest=messages.ZoneSetPolicyRequest(
+              zoneSetPolicyRequest=self.messages.ZoneSetPolicyRequest(
                   bindings=policy.bindings,
                   etag=policy.etag))),
         ]

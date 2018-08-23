@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ml-engine predict tests."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.ml_engine import predict
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import resources
@@ -82,7 +86,8 @@ class PredictTest(PredictTestBase):
     self._RunWithInstances(test_instances, 'json')
 
     self.mock_predict.assert_called_once_with(self.version_ref,
-                                              [{'images': [0, 1], 'key': 3}])
+                                              [{'images': [0, 1], 'key': 3}],
+                                              signature_name=None)
 
   def testPredictMultipleJsonInstances(self):
     self.mock_predict.return_value = self._PREDICTIONS_LIST
@@ -96,7 +101,8 @@ class PredictTest(PredictTestBase):
         self.version_ref,
         [{'images': [0, 1], 'key': 3},
          {'images': [3, 2], 'key': 2},
-         {'images': [2, 1], 'key': 1}])
+         {'images': [2, 1], 'key': 1}],
+        signature_name=None)
 
   def testPredictNoVersion(self):
     self.mock_predict.return_value = self._PREDICTIONS
@@ -108,7 +114,7 @@ class PredictTest(PredictTestBase):
                                           modelsId='my_model',
                                           projectsId=self.Project())
     self.mock_predict.assert_called_once_with(
-        model_ref, [{'images': [0, 1], 'key': 3}])
+        model_ref, [{'images': [0, 1], 'key': 3}], signature_name=None)
 
   def testPredictEmptyFile(self):
     with self.assertRaisesRegex(core_exceptions.Error,
@@ -130,7 +136,8 @@ class PredictTest(PredictTestBase):
 
     self._RunWithInstances('2, 3', 'text')
 
-    self.mock_predict.assert_called_once_with(self.version_ref, ['2, 3'])
+    self.mock_predict.assert_called_once_with(self.version_ref, ['2, 3'],
+                                              signature_name=None)
 
   def testPredictTextFileMultipleInstances(self):
     self.mock_predict.return_value = self._PREDICTIONS_LIST
@@ -138,7 +145,8 @@ class PredictTest(PredictTestBase):
     self._RunWithInstances('2, 3\n4, 5\n6, 7', 'text')
 
     self.mock_predict.assert_called_once_with(self.version_ref,
-                                              ['2, 3', '4, 5', '6, 7'])
+                                              ['2, 3', '4, 5', '6, 7'],
+                                              signature_name=None)
 
   def testPredictTextFileWithJson(self):
     self.mock_predict.return_value = self._PREDICTIONS_LIST
@@ -152,7 +160,20 @@ class PredictTest(PredictTestBase):
         self.version_ref,
         ['{"images": [0, 1], "key": 3}',
          '{"images": [3, 2], "key": 2}',
-         '{"images": [2, 1], "key": 1}'])
+         '{"images": [2, 1], "key": 1}'],
+        signature_name=None)
+
+  def testPredictSignatureName(self):
+    self.command = ('ml-engine predict --model my_model '
+                    '--signature-name my-custom-signature')
+    self.mock_predict.return_value = self._PREDICTIONS
+    test_instances = '{"images": [0, 1], "key": 3}'
+    self._RunWithInstances(test_instances, 'json')
+
+    self.mock_predict.assert_called_once_with(
+        self.version_ref,
+        [{'images': [0, 1], 'key': 3}],
+        signature_name='my-custom-signature')
 
   def testPredictNewlineOnlyJson(self):
     with self.assertRaisesRegex(core_exceptions.Error,
@@ -185,7 +206,8 @@ class PredictFormattingTestBase(PredictTestBase):
                                             versionsId='v1',
                                             modelsId='my_model',
                                             projectsId=self.Project())
-    self.mock_predict.assert_called_once_with(version_ref, [{}])
+    self.mock_predict.assert_called_once_with(version_ref, [{}],
+                                              signature_name=None)
 
   def testNoPredictions(self):
     self._RunWithResult([])

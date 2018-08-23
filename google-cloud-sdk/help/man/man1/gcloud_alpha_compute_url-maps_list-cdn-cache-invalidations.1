@@ -11,7 +11,7 @@ gcloud alpha compute url\-maps list\-cdn\-cache\-invalidations \- list Cloud CDN
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute url\-maps list\-cdn\-cache\-invalidations\fR \fIURLMAP\fR [\fB\-\-limit\fR=\fILIMIT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute url\-maps list\-cdn\-cache\-invalidations\fR \fIURL_MAP_NAME\fR [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,8 +27,8 @@ invalidations to check which have completed.
 
 .RS 2m
 .TP 2m
-\fIURLMAP\fR
-The name of the URL map.
+\fIURL_MAP_NAME\fR
+Name of the URL map to describe.
 
 
 .RE
@@ -38,8 +38,81 @@ The name of the URL map.
 
 .RS 2m
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the URL map is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the URL map to describe. If not specified, you may be prompted to
+select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
 \fB\-\-limit\fR=\fILIMIT\fR
-The maximum number of invalidations to list.
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-uri\fR
+Print a list of resource URIs instead of the default output.
 
 
 .RE
@@ -56,11 +129,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute url\-maps list\-cdn\-cache\-invalidations

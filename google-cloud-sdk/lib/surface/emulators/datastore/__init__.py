@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """The gcloud datastore emulator group."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
@@ -49,7 +51,7 @@ class Datastore(base.Group):
              ' API v1beta2.')
 
   def Filter(self, context, args):
-    java.RequireJavaInstalled(datastore_util.DATASTORE_TITLE)
+    java.RequireJavaInstalled(datastore_util.DATASTORE_TITLE, min_version=8)
     if args.legacy:
       util.EnsureComponentIsInstalled('gcd-emulator',
                                       datastore_util.DATASTORE_TITLE)

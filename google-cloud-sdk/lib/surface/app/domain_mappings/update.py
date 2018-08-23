@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Surface for updating an App Engine domain mapping."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.app.api import appengine_domains_api_client as api_client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.app import domains_util
@@ -58,7 +61,8 @@ class Update(base.UpdateCommand):
         (args.certificate_id or args.no_certificate_id)):
       args.certificate_management = 'manual'
 
-    if (args.certificate_management.upper() == 'manual' and
+    if (args.certificate_management and
+        args.certificate_management.lower() == 'manual' and
         not args.certificate_id and not args.no_certificate_id):
       args.no_certificate_id = True
 

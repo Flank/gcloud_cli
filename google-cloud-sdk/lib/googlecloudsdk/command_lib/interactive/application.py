@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """The gcloud interactive application."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -24,6 +26,7 @@ import sys
 from googlecloudsdk.calliope import cli_tree
 
 from googlecloudsdk.command_lib.interactive import bindings
+from googlecloudsdk.command_lib.interactive import bindings_vi
 from googlecloudsdk.command_lib.interactive import completer
 from googlecloudsdk.command_lib.interactive import coshell
 from googlecloudsdk.command_lib.interactive import layout
@@ -40,6 +43,7 @@ from prompt_toolkit import application as pt_application
 from prompt_toolkit import auto_suggest
 from prompt_toolkit import buffer as pt_buffer
 from prompt_toolkit import document
+from prompt_toolkit import enums
 from prompt_toolkit import filters
 from prompt_toolkit import history as pt_history
 from prompt_toolkit import interface
@@ -87,6 +91,28 @@ class CLI(interface.CommandLineInterface):
       self.renderer.erase()
     self.coshell.Run(text)
 
+  # Wraps the interface.CommandLineInterface method.
+  def add_buffer(self, name, buf, focus=False):
+    """MONKEYPATCH! Calls the async completer on delete before cursor."""
+    super(CLI, self).add_buffer(name, buf, focus)
+
+    def DeleteBeforeCursor(count=1):
+      deleted = buf.patch_real_delete_before_cursor(count=count)
+      # This call to the async completer refreshes the completion dropdown as
+      # characters are deleted.
+      buf.patch_completer_function()
+      return deleted
+
+    # Only needed in complete_while_typing mode, and only need to patch once.
+    if (buf.complete_while_typing() and
+        buf.delete_before_cursor != DeleteBeforeCursor):
+      # The async completer to call.
+      buf.patch_completer_function = self._async_completers[name]
+      # The real delete_before_cursor, always called.
+      buf.patch_real_delete_before_cursor = buf.delete_before_cursor
+      # Our monkeypatched delete_before_cursor.
+      buf.delete_before_cursor = DeleteBeforeCursor
+
 
 class Context(pt_layout.Processor):
   """Input processor that adds context."""
@@ -114,7 +140,7 @@ def _GetJustifiedTokens(labels, width=80, justify=True):
     if not label_count:
       return []
     elif label_count > 1:
-      separator_width = (width - used_width) / (label_count - 1)
+      separator_width = (width - used_width) // (label_count - 1)
       if separator_width < 1:
         separator_width = 1
     else:
@@ -154,14 +180,15 @@ class Application(object):
     coshell: The shell coprocess object.
     key_bindings: The key_bindings object holding the key binding list and
       toggle states.
+    key_bindings_registry: The key bindings registry.
   """
 
   def __init__(self, cosh=None, args=None, config=None):
     self.args = args
     self.coshell = cosh
     self.config = config
-    self.key_bindings = bindings.KeyBindings(
-        edit_mode=self.coshell.edit_mode == 'emacs')
+    self.key_bindings = bindings.KeyBindings()
+    self.key_bindings_registry = self.key_bindings.MakeRegistry()
 
     # Load the default CLI trees. On startup we ignore out of date trees. The
     # alternative is to regenerate them before the first prompt. This could be
@@ -235,6 +262,7 @@ class Application(object):
         output=shortcuts.create_output(),
     )
     self.key_bindings.Initialize(self.cli)
+    bindings_vi.LoadViBindings(self.key_bindings_registry)
 
   def _CreatePromptApplication(self, config, multiline):
     """Creates a shell prompt Application."""
@@ -258,7 +286,7 @@ class Application(object):
         clipboard=None,
         erase_when_done=False,
         get_title=None,
-        key_bindings_registry=self.key_bindings.MakeRegistry(),
+        key_bindings_registry=self.key_bindings_registry,
         mouse_support=False,
         reverse_vi_search_direction=True,
         style=interactive_style.GetDocumentStyle(),
@@ -266,6 +294,8 @@ class Application(object):
 
   def _GetProjectAndAccount(self):
     """Returns the current (project, account) tuple."""
+    if self.config.obfuscate:
+      return ('me', 'myself@i')
     if not self.args.IsSpecified('project'):
       named_configs.ActivePropertiesFile().Invalidate()
     project = properties.VALUES.core.project.Get() or '<NO PROJECT SET>'
@@ -298,6 +328,13 @@ class Application(object):
     doc = self.cli.run()
     return doc.text if doc else None
 
+  def SetModes(self):
+    """Called when coshell modes may have changed."""
+    if self.coshell.edit_mode == 'emacs':
+      self.cli.editing_mode = enums.EditingMode.EMACS
+    else:
+      self.cli.editing_mode = enums.EditingMode.VI
+
   def Run(self, text):
     """Runs the command(s) in text and waits for them to complete."""
     status = self.coshell.Run(text)
@@ -308,6 +345,7 @@ class Application(object):
 
   def Loop(self):
     """Loops Prompt-Run until ^D exit, or quit."""
+    self.coshell.SetModesCallback(self.SetModes)
     while True:
       try:
         text = self.Prompt()
@@ -316,7 +354,8 @@ class Application(object):
         self.Run(text)  # paradoxically ignored - coshell maintains $?
       except EOFError:
         # ctrl-d
-        break
+        if not self.coshell.ignore_eof:
+          break
       except KeyboardInterrupt:
         # ignore ctrl-c
         pass

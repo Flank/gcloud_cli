@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,13 +23,14 @@ import random
 import uuid
 
 from apitools.base.py.testing import mock
-from googlecloudsdk.api_lib.container import binauthz_util as binauthz_api_util
+from googlecloudsdk.api_lib.container.binauthz import containeranalysis
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 
 import six
 
@@ -46,6 +48,30 @@ def CreateUtcIsoNowTimestamp():
   # format doesn't matter here, but for consistency this is what the prod API
   # actually returns.
   return '{}Z'.format(datetime.datetime.utcnow().isoformat())
+
+
+class WithEarlyCleanup(test_case.TestCase):
+  """A mixin that provides a cleanup method that can make e.g. gcloud calls.
+
+  Functions registered with the normal addCleanup method will after all other
+  TearDown calls have been invoked. Among the normal TearDown side-effects are
+  closing the std I/O handles which makes many cleanup tasks impossible.
+  Notably, one cannot use SdkBase.Run in a standard addCleanup context.
+
+  This class provides an AddEarlyCleanup method to execute cleanup tasks before
+  the I/O closing occurs.
+  """
+
+  def SetUp(self):
+    self._cleanup_calls = []
+
+  def TearDown(self):
+    while self._cleanup_calls:
+      func, args, kwargs = self._cleanup_calls.pop()
+      func(*args, **kwargs)
+
+  def AddEarlyCleanup(self, func, *args, **kwargs):
+    self._cleanup_calls.append((func, args, kwargs))
 
 
 class BinauthzUnitTestBase(sdk_test_base.SdkBase):
@@ -78,8 +104,8 @@ class BinauthzUnitTestBase(sdk_test_base.SdkBase):
   def SetUp(self):
     self.track = base.ReleaseTrack.ALPHA
     self.containeranalysis_messages = apis.GetMessagesModule(
-        'containeranalysis',
-        binauthz_api_util.DEFAULT_CONTAINERANALYSIS_API_VERSION)
+        containeranalysis.API_NAME,
+        containeranalysis.DEFAULT_VERSION)
     self.note_id_generator = e2e_utils.GetResourceNameGenerator(
         prefix='test-aa-note')
     # Convenience aliases for commonly used messages.
@@ -122,12 +148,31 @@ class BinauthzUnitTestBase(sdk_test_base.SdkBase):
 class BinauthzMockedPolicyClientUnitTest(sdk_test_base.WithFakeAuth,
                                          BinauthzUnitTestBase,
                                          cli_test_base.CliTestBase):
+  """Base class for BinAuthz unit tests with mocked policy service."""
 
   def SetUp(self):
     self.client = mock.Client(
-        apis.GetClientClass('binaryauthorization', 'v1alpha1'),
+        apis.GetClientClass('binaryauthorization', 'v1alpha2'),
         real_client=apis.GetClientInstance(
-            'binaryauthorization', 'v1alpha1', no_http=True),
+            'binaryauthorization', 'v1alpha2', no_http=True),
+    )
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+
+    self.messages = self.client.MESSAGES_MODULE
+
+
+class BinauthzMockedBetaPolicyClientUnitTest(sdk_test_base.WithFakeAuth,
+                                             BinauthzUnitTestBase,
+                                             cli_test_base.CliTestBase):
+  """Base class for BinAuthz unit tests with mocked beta policy service."""
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.BETA
+    self.client = mock.Client(
+        apis.GetClientClass('binaryauthorization', 'v1beta1'),
+        real_client=apis.GetClientInstance(
+            'binaryauthorization', 'v1beta1', no_http=True),
     )
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
@@ -266,7 +311,7 @@ class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
   """Base class for BinAuthz unit tests with mocked CA client."""
 
   def SetUp(self):
-    self.ca_client = binauthz_api_util.ContainerAnalysisClient()
+    self.ca_client = containeranalysis.Client()
 
   def CreateRequestOccurrence(
       self,

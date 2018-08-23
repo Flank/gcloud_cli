@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,10 @@
 """Tests for the instance-groups managed create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import exceptions
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -147,6 +151,31 @@ class InstanceGroupManagersCreateZonalTest(test_base.BaseTest):
     NAME     LOCATION  SCOPE  BASE_INSTANCE_NAME    SIZE  TARGET_SIZE  INSTANCE_TEMPLATE  AUTOSCALED
     group-1  zone-1    zone   test-instance-name-1  0     1            template-1         yes
     """, normalize_space=True)
+
+  def testZonal(self):
+    self.Run("""
+        compute instance-groups managed create group-1
+          --zone central2-a
+          --template template-1
+          --size 3
+        """)
+
+    self.CheckRequests(
+        self.zone_1_get_request,
+        [(self.compute.instanceGroupManagers, 'Insert',
+          self.messages.ComputeInstanceGroupManagersInsertRequest(
+              instanceGroupManager=self.messages.InstanceGroupManager(
+                  name='group-1',
+                  zone='central2-a',
+                  baseInstanceName='group-1',
+                  instanceTemplate=self.template_1_uri,
+                  targetSize=3,
+              ),
+              project='my-project',
+              zone='central2-a'))],
+        self.zone_ig_list_request,
+        self.zone_as_list_request,
+    )
 
   def testWithDescription(self):
     self.Run("""
@@ -318,6 +347,9 @@ class InstanceGroupManagersCreateRegionalTest(test_base.BaseTest):
 
   def SetUp(self):
     SetUpRegional(self, API_VERSION)
+
+  def _ZoneUrl(self, zone):
+    return '{}/projects/my-project/zones/{}'.format(self.compute_uri, zone)
 
   def testWithRequiredOptions(self):
     self.Run("""
@@ -513,6 +545,179 @@ class InstanceGroupManagersCreateRegionalTest(test_base.BaseTest):
             --template template-1
             --size -1
           """)
+
+  def testWithUnaffixedZone(self):
+    self.Run("""
+        compute instance-groups managed create group-1
+          --zones us-central2-a
+          --template template-1
+          --size 3
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Insert',
+          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
+              instanceGroupManager=self.messages.InstanceGroupManager(
+                  name='group-1',
+                  region=self.region_uri,
+                  baseInstanceName='group-1',
+                  instanceTemplate=self.template_1_uri,
+                  targetSize=3,
+                  distributionPolicy=self.messages.DistributionPolicy(zones=[
+                      self.messages.DistributionPolicyZoneConfiguration(
+                          zone=self._ZoneUrl('us-central2-a')),
+                  ])),
+              project='my-project',
+              region='us-central2'))],
+        self.region_ig_list_request,
+        self.region_as_list_request,
+    )
+
+  def testWithUnaffixedZoneByUrl(self):
+    self.Run("""
+        compute instance-groups managed create group-1
+          --zones {}/projects/my-project/zones/us-central2-a
+          --template template-1
+          --size 3
+        """.format(self.compute_uri))
+
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Insert',
+          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
+              instanceGroupManager=self.messages.InstanceGroupManager(
+                  name='group-1',
+                  region=self.region_uri,
+                  baseInstanceName='group-1',
+                  instanceTemplate=self.template_1_uri,
+                  targetSize=3,
+                  distributionPolicy=self.messages.DistributionPolicy(zones=[
+                      self.messages.DistributionPolicyZoneConfiguration(
+                          zone=self._ZoneUrl('us-central2-a')),
+                  ])),
+              project='my-project',
+              region='us-central2'))],
+        self.region_ig_list_request,
+        self.region_as_list_request,
+    )
+
+  def testWithSelectedZones(self):
+    self.Run("""
+        compute instance-groups managed create group-1
+          --zones us-central2-a,us-central2-b
+          --template template-1
+          --size 3
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Insert',
+          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
+              instanceGroupManager=self.messages.InstanceGroupManager(
+                  name='group-1',
+                  region=self.region_uri,
+                  baseInstanceName='group-1',
+                  instanceTemplate=self.template_1_uri,
+                  targetSize=3,
+                  distributionPolicy=self.messages.DistributionPolicy(zones=[
+                      self.messages.DistributionPolicyZoneConfiguration(
+                          zone=self._ZoneUrl('us-central2-a')),
+                      self.messages.DistributionPolicyZoneConfiguration(
+                          zone=self._ZoneUrl('us-central2-b')),
+                  ])),
+              project='my-project',
+              region='us-central2'))],
+        self.region_ig_list_request,
+        self.region_as_list_request,
+    )
+
+  def testWithSelectedZonesAndRegion(self):
+    self.Run("""
+        compute instance-groups managed create group-1
+          --zones us-central2-a,us-central2-b
+          --region us-central2
+          --template template-1
+          --size 3
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Insert',
+          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
+              instanceGroupManager=self.messages.InstanceGroupManager(
+                  name='group-1',
+                  region=self.region_uri,
+                  baseInstanceName='group-1',
+                  instanceTemplate=self.template_1_uri,
+                  targetSize=3,
+                  distributionPolicy=self.messages.DistributionPolicy(zones=[
+                      self.messages.DistributionPolicyZoneConfiguration(
+                          zone=self._ZoneUrl('us-central2-a')),
+                      self.messages.DistributionPolicyZoneConfiguration(
+                          zone=self._ZoneUrl('us-central2-b')),
+                  ])),
+              project='my-project',
+              region='us-central2'))],
+        self.region_ig_list_request,
+        self.region_as_list_request,
+    )
+
+  def testWithSelectedZonesAndRegionByUri(self):
+    self.Run("""
+        compute instance-groups managed create group-1
+          --zones us-central2-a,us-central2-b
+          --region {}/projects/my-project/regions/us-central2
+          --template template-1
+          --size 3
+        """.format(self.compute_uri))
+
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Insert',
+          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
+              instanceGroupManager=self.messages.InstanceGroupManager(
+                  name='group-1',
+                  region=self.region_uri,
+                  baseInstanceName='group-1',
+                  instanceTemplate=self.template_1_uri,
+                  targetSize=3,
+                  distributionPolicy=self.messages.DistributionPolicy(zones=[
+                      self.messages.DistributionPolicyZoneConfiguration(
+                          zone=self._ZoneUrl('us-central2-a')),
+                      self.messages.DistributionPolicyZoneConfiguration(
+                          zone=self._ZoneUrl('us-central2-b')),
+                  ])),
+              project='my-project',
+              region='us-central2'))],
+        self.region_ig_list_request,
+        self.region_as_list_request,
+    )
+
+  def testRegionZonesConflict(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run("""
+        compute instance-groups managed create group-1
+          --zones us-central1-a
+          --region us-central2
+          --template template-1
+          --size 3
+        """)
+
+  def testZonesZoneConflict(self):
+    with self.assertRaises(exceptions.ConflictingArgumentsException):
+      self.Run("""
+        compute instance-groups managed create group-1
+          --zone us-central1-a
+          --zones us-central1-a,us-central1-b
+          --template template-1
+          --size 3
+        """)
+
+  def testZonesFromDifferentRegions(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run("""
+        compute instance-groups managed create group-1
+          --zones us-central1-a,us-central2-b
+          --template template-1
+          --size 3
+        """)
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,14 @@
 """Tests for the table module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import os
+import sys
 
-from googlecloudsdk.calliope import cli_tree
+from googlecloudsdk.command_lib.static_completion import generate
 from googlecloudsdk.command_lib.static_completion import lookup
-from googlecloudsdk.core import config
 from googlecloudsdk.core.util import files
 from tests.lib import calliope_test_base
 
@@ -124,16 +126,24 @@ class LookupCompletionTest(calliope_test_base.CalliopeTestBase):
       def write(s):
         self.completions_value = s
 
-    self.StartPropertyPatch(
-        config.Paths, 'sdk_root', return_value=self.temp_path)
-    files.MakeDir(os.path.join(self.temp_path, 'data', 'cli'))
+    cli_dir = os.path.join(self.temp_path, 'data', 'cli')
+    files.MakeDir(cli_dir)
     self.WalkTestCli('sdk4')
-    self.root = cli_tree.Load(cli=self.test_cli)
-
+    with files.FileWriter(os.path.join(cli_dir, 'gcloud_completions.py')) as f:
+      self.root = generate.ListCompletionTree(cli=self.test_cli, out=f)
     self.completions_closed = False
     self.completions_value = None
     self.StartObjectPatch(lookup, '_OpenCompletionsOutputStream',
                           return_value=_FakeStream())
+    if 'gcloud_completions' in sys.modules:
+      # At least one test exercises the real import in the lookup module. That
+      # one skips this branch, but it poisons sys.modules and hangs around for
+      # the remaining tests. This mocks the subsequent tests to return the test
+      # CLI tree generated above.
+      self.StartObjectPatch(lookup, '_LoadCompletionCliTree',
+                            return_value=self.root)
+    self.StartObjectPatch(lookup, '_GetInstallationRootDir',
+                          return_value=self.temp_path)
     self.env = {lookup.IFS_ENV_VAR: ' '}
 
   def _SetCompletionContext(self, line, point):
@@ -142,11 +152,9 @@ class LookupCompletionTest(calliope_test_base.CalliopeTestBase):
 
   def testCompleteCallsFindCompletionsWithCorrectArgs(self):
     self._SetCompletionContext('gcloud fruits man', '17')
-    self.find_completions_mock = self.StartObjectPatch(
-        lookup, '_FindCompletions')
+    find_completions_mock = self.StartObjectPatch(lookup, '_FindCompletions')
     lookup.Complete()
-    self.find_completions_mock.assert_called_with(self.root,
-                                                  'gcloud fruits man')
+    find_completions_mock.assert_called_with(self.root, 'gcloud fruits man')
 
   def testCompleteWritesCompletionsToStream(self):
     self._SetCompletionContext('gcloud alpha int', '16')

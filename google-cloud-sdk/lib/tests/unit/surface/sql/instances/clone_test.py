@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -25,7 +28,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class InstancesCloneTest(base.SqlMockTestBeta):
+class _BaseInstancesCloneTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   messages = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
@@ -650,6 +653,18 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -        RUNNABLE
                --bin-log-position 1111
                clone-instance-7 clone-instance-7a
                """)
+
+
+class InstancesCloneGATest(_BaseInstancesCloneTest, base.SqlMockTestGA):
+  pass
+
+
+class InstancesCloneBetaTest(_BaseInstancesCloneTest, base.SqlMockTestBeta):
+  pass
+
+
+class InstancesCloneAlphaTest(_BaseInstancesCloneTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

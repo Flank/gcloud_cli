@@ -28,8 +28,11 @@ COMMANDS
         (BETA) List existing Bigtable clusters.
 
      update
-        (BETA) Update a Bigtable cluster's friendly name and serving nodes.
+        (BETA) Update a Bigtable cluster's number of nodes.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha bigtable clusters
 

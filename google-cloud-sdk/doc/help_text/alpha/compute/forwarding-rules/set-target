@@ -18,6 +18,8 @@ SYNOPSIS
         [--target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION]
         [--backend-service-region=BACKEND_SERVICE_REGION
           | --global-backend-service] [--global | --region=REGION]
+        [--global-target-http-proxy
+          | --target-http-proxy-region=TARGET_HTTP_PROXY_REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -130,9 +132,13 @@ OPTIONAL FLAGS
             --target-instance.
          INTERNAL
             Internal load balancing or forwarding, used with --backend-service.
+         INTERNAL_SELF_MANAGED
+            Traffic director load balancing or forwarding, used with
+            --target-http-proxy, --target-https-proxy.
 
      --network=NETWORK
-        (Only for --load-balancing-scheme=INTERNAL) The network that this
+        (Only for --load-balancing-scheme=INTERNAL or
+        --load-balancing-scheme=INTERNAL_SELF_MANAGED) The network that this
         forwarding rule applies to. If this field is not specified, the default
         network will be used. In the absence of the default network, this field
         must be specified.
@@ -146,42 +152,67 @@ OPTIONAL FLAGS
         specified.
 
      --subnet-region=SUBNET_REGION
-        The region of the subnetwork to operate on. If not specified it will be
-        set the region of the forwarding rule. Overrides the default
-        compute/region property value for this command invocation.
+        Region of the subnetwork to operate on. If not specified it will be set
+        the region of the forwarding rule. Overrides the default compute/region
+        property value for this command invocation.
 
      --target-instance-zone=TARGET_INSTANCE_ZONE
-        The zone of the target instance to operate on. Overrides the default
+        Zone of the target instance to operate on. Overrides the default
         compute/zone property value for this command invocation.
 
      --target-pool-region=TARGET_POOL_REGION
-        The region of the target pool to operate on. If not specified it will
-        be set the region of the forwarding rule. Overrides the default
+        Region of the target pool to operate on. If not specified it will be
+        set the region of the forwarding rule. Overrides the default
         compute/region property value for this command invocation.
 
      --target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION
-        The region of the VPN gateway to operate on. If not specified it will
-        be set the region of the forwarding rule. Overrides the default
+        Region of the VPN gateway to operate on. If not specified it will be
+        set the region of the forwarding rule. Overrides the default
         compute/region property value for this command invocation.
 
      At most one of these may be specified:
 
        --backend-service-region=BACKEND_SERVICE_REGION
-          The region of the backend service to operate on. If not specified it
-          will be set the region of the forwarding rule. Overrides the default
+          Region of the backend service to operate on. If not specified it will
+          be set the region of the forwarding rule. Overrides the default
           compute/region property value for this command invocation.
 
        --global-backend-service
-          If provided, it is assumed the backend service is global.
+          If set, the backend service is global.
 
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the forwarding rule is global.
+          If set, the forwarding rule is global.
 
        --region=REGION
-          The region of the forwarding rule to operate on. If not specified,
-          you may be prompted to select a region.
+          Region of the forwarding rule to operate on. If not specified, you
+          may be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+     At most one of these may be specified:
+
+       --global-target-http-proxy
+          If set, the http proxy is global.
+
+       --target-http-proxy-region=TARGET_HTTP_PROXY_REGION
+          Region of the http proxy to operate on. If not specified, you may be
+          prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -205,11 +236,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute forwarding-rules set-target
         $ gcloud beta compute forwarding-rules set-target

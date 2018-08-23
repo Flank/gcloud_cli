@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.container import binauthz_util as binauthz_api_util
+from googlecloudsdk.api_lib.container.binauthz import containeranalysis
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
@@ -68,28 +69,30 @@ class BinauthzTest(
     e2e_base.WithServiceAuth,
     sdk_test_base.WithTempCWD,
     cli_test_base.CliTestBase,
+    binauthz_test_base.WithEarlyCleanup,
     binauthz_test_base.BinauthzUnitTestBase,
 ):
 
   def SetUp(self):
     # We don't get our track from the base binauthz test because `CliTestBase`
     # clobbers it in its SetUp.
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     # CliTestBase sets this to True in its SetUp, but we only need to consume
     # the result of calling self.Run in their structured format.
     properties.VALUES.core.user_output_enabled.Set(False)
     self.containeranalysis_client = apis.GetClientInstance(
-        'containeranalysis',
-        binauthz_api_util.DEFAULT_CONTAINERANALYSIS_API_VERSION)
-    self.client = binauthz_api_util.ContainerAnalysisClient(
-        client=self.containeranalysis_client,
-        messages=self.containeranalysis_messages)
+        containeranalysis.API_NAME,
+        containeranalysis.DEFAULT_VERSION)
+    self.client = containeranalysis.Client()
     self.artifact_url = self.GenerateArtifactUrl()
     self.project_ref = resources.REGISTRY.Parse(
         self.Project(), collection='cloudresourcemanager.projects')
     self.note_id = next(self.note_id_generator)
     self.note_relative_name = 'projects/{}/notes/{}'.format(
         self.Project(), self.note_id)
+    self.attestor_id = self.note_id
+    self.attestor_relative_name = 'projects/{}/attestors/{}'.format(
+        self.Project(), self.attestor_id)
 
   def RunAndUnwindWithRetry(self, cmd, result_predicate=bool):
     # TODO(b/63455376): Listing Notes/Occurrences immediately after creation
@@ -100,19 +103,24 @@ class BinauthzTest(
     return _ReRunUntilResultPredicate(
         run_fn=RunAndUnwind, result_predicate=result_predicate)
 
-  def CleanUpAttestationAuthority(self, note):
+  def CleanUpAttestor(self, note_name, attestor_id):
     self.containeranalysis_client.projects_notes.Delete(
         self.containeranalysis_messages.
-        ContaineranalysisProjectsNotesDeleteRequest(name=note.name))
+        ContaineranalysisProjectsNotesDeleteRequest(name=note_name))
 
-  def CleanUpAttestation(self, occurrence):
+    self.RunBinauthz([
+        'attestors',
+        'delete',
+        attestor_id,
+    ])
+
+  def CleanUpAttestation(self, occurrence_name):
     self.containeranalysis_client.projects_occurrences.Delete(
         self.containeranalysis_messages.
-        ContaineranalysisProjectsOccurrencesDeleteRequest(name=occurrence.name))
+        ContaineranalysisProjectsOccurrencesDeleteRequest(name=occurrence_name))
 
-  def CreateAttestationAuthority(self, note_id):
-    """There is no surface to do this, so we use the client directly."""
-
+  def CreateAttestor(self, note_id, attestor_id):
+    # There is no surface to create the note so we use the client directly.
     request = self.ProjectsNotesCreateRequest(
         parent=self.project_ref.RelativeName(),
         noteId=note_id,
@@ -123,7 +131,20 @@ class BinauthzTest(
         ),
     )
     note = self.containeranalysis_client.projects_notes.Create(request)
-    self.addCleanup(self.CleanUpAttestationAuthority, note=note)
+
+    self.RunBinauthz([
+        'attestors',
+        'create',
+        '--attestation-authority-note',
+        note_id,
+        '--attestation-authority-note-project',
+        self.Project(),
+        attestor_id,
+    ])
+
+    self.AddEarlyCleanup(self.CleanUpAttestor,
+                         note_name=note.name,
+                         attestor_id=attestor_id)
 
   def GetOccurrence(self, occurrence_name):
     return self.containeranalysis_client.projects_occurrences.Get(
@@ -132,58 +153,50 @@ class BinauthzTest(
 
   def CreateAttestation(
       self,
-      note_ref,
+      attestor_ref,
       pgp_key_fingerprint,
       signature,
-      artifact_url=None,
+      artifact_url,
   ):
     signature_path = self.Touch(directory=self.cwd_path, contents=signature)
     occurrence = self.RunBinauthz([
         'attestations',
         'create',
         '--artifact-url',
-        artifact_url or self.artifact_url,
-        '--attestation-authority-note',
-        note_ref,
+        artifact_url,
+        '--attestor',
+        attestor_ref,
         '--pgp-key-fingerprint',
         pgp_key_fingerprint,
         '--signature-file',
         signature_path,
     ])
-    self.addCleanup(self.CleanUpAttestation, occurrence=occurrence)
+    self.AddEarlyCleanup(self.CleanUpAttestation,
+                         occurrence_name=occurrence.name)
     return occurrence
 
-  def testAttestationsCreate(self):
-    pgp_key_fingerprint = 'AAAABBBB'
-    signature = 'bogus_sig_contents'
-    self.CreateAttestationAuthority(note_id=self.note_id)
+  # TODO(b/112087150): Split into several tests when quota is more forgiving.
+  def testAttestations(self):
+    self.CreateAttestor(self.note_id, self.attestor_id)
 
-    create_result = self.CreateAttestation(
-        note_ref=self.note_relative_name,
-        pgp_key_fingerprint=pgp_key_fingerprint,
-        signature=signature,
-    )
-    occurrence = self.GetOccurrence(create_result.name)
-
-    self.assertEqual(occurrence.attestation.pgpSignedAttestation.pgpKeyId,
-                     pgp_key_fingerprint)
-    self.assertEqual(occurrence.attestation.pgpSignedAttestation.signature,
-                     signature)
-
-  def testAttestationsList(self):
-    self.CreateAttestationAuthority(note_id=self.note_id)
-
-    self.CreateAttestation(
-        note_ref=self.note_relative_name,
+    attestation = self.CreateAttestation(
+        attestor_ref=self.attestor_relative_name,
         pgp_key_fingerprint='bogus_pk_id',
         signature='bogus_sig',
         artifact_url=self.artifact_url,
     )
 
+    # Verify the generated Occurrence.
+    occurrence = self.GetOccurrence(attestation.name)
+    self.assertEqual(occurrence.attestation.pgpSignedAttestation.pgpKeyId,
+                     'bogus_pk_id')
+    self.assertEqual(occurrence.attestation.pgpSignedAttestation.signature,
+                     'bogus_sig')
+
     # Create an attestation with a different artifact URL.
     artifact_url2 = self.GenerateArtifactUrl()
     self.CreateAttestation(
-        note_ref=self.note_relative_name,
+        attestor_ref=self.attestor_relative_name,
         pgp_key_fingerprint='bogus_pk_id2',
         signature='bogus_sig2',
         artifact_url=artifact_url2,
@@ -192,32 +205,39 @@ class BinauthzTest(
     def HasAtLeastTwoElements(result):
       return len(result) >= 2
 
-    self.assertEqual(
-        set(self.RunAndUnwindWithRetry(
-            [
-                'container',
-                'binauthz',
-                'attestations',
-                'list',
-                '--attestation-authority-note',
-                self.note_relative_name,
-            ],
-            result_predicate=HasAtLeastTwoElements)),
-        set([self.artifact_url, artifact_url2]),
-    )
-    self.assertEqual(
-        set(self.RunAndUnwindWithRetry([
+    # Verify that the bare listing gets attestations for both the artifacts.
+    occurrences = self.RunAndUnwindWithRetry(
+        [
             'container',
             'binauthz',
             'attestations',
             'list',
-            '--attestation-authority-note',
-            self.note_relative_name,
+            '--attestor',
+            self.attestor_id,
+        ],
+        result_predicate=HasAtLeastTwoElements)
+    self.assertEqual(
+        set(occ.resourceUrl for occ in occurrences),
+        set([self.artifact_url, artifact_url2]),
+    )
+
+    # Verify that artifact-based filtering works.
+    occurrences = list(self.RunAndUnwindWithRetry(
+        [
+            'container',
+            'binauthz',
+            'attestations',
+            'list',
+            '--attestor',
+            self.attestor_id,
             '--artifact-url',
             self.artifact_url,
-        ])),
-        set([('bogus_pk_id', 'bogus_sig')]),
-    )
+        ]))
+    self.assertEqual(1, len(occurrences))
+    self.assertEqual(occurrences[0].attestation.pgpSignedAttestation.pgpKeyId,
+                     'bogus_pk_id')
+    self.assertEqual(occurrences[0].attestation.pgpSignedAttestation.signature,
+                     'bogus_sig')
 
 
 if __name__ == '__main__':

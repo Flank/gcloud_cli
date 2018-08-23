@@ -7,8 +7,8 @@ SYNOPSIS
         [--accelerator=[count=COUNT],[type=TYPE]] [--no-boot-disk-auto-delete]
         [--boot-disk-device-name=BOOT_DISK_DEVICE_NAME]
         [--boot-disk-size=BOOT_DISK_SIZE] [--boot-disk-type=BOOT_DISK_TYPE]
-        [--can-ip-forward] [--create-disk=[PROPERTY=VALUE,...]]
-        [--description=DESCRIPTION]
+        [--can-ip-forward] [--configure-disk=[PROPERTY=VALUE,...]]
+        [--create-disk=[PROPERTY=VALUE,...]] [--description=DESCRIPTION]
         [--disk=[auto-delete=AUTO-DELETE],
           [boot=BOOT],[device-name=DEVICE-NAME],[mode=MODE],[name=NAME]]
         [--labels=[KEY=VALUE,...]]
@@ -17,13 +17,17 @@ SYNOPSIS
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
-        [--network-interface=[PROPERTY=VALUE,...]] [--preemptible]
-        [--region=REGION] [--no-restart-on-failure] [--subnet=SUBNET]
+        [--network-interface=[PROPERTY=VALUE,...]]
+        [--network-tier=NETWORK_TIER] [--preemptible] [--region=REGION]
+        [--no-restart-on-failure] [--source-instance=SOURCE_INSTANCE]
+        [--source-instance-zone=SOURCE_INSTANCE_ZONE] [--subnet=SUBNET]
         [--tags=TAG,[TAG,...]] [--address=ADDRESS | --no-address]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
           : --custom-extensions]
         [--image-project=IMAGE_PROJECT --image=IMAGE
-          | --image-family=IMAGE_FAMILY] [--scopes=[SCOPE,...] | --no-scopes]
+          | --image-family=IMAGE_FAMILY]
+        [--node=NODE | --node-affinity-file=NODE_AFFINITY_FILE
+          | --node-group=NODE_GROUP] [--scopes=[SCOPE,...] | --no-scopes]
         [--service-account=SERVICE_ACCOUNT | --no-service-account]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -72,7 +76,8 @@ FLAGS
         unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB for
         terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB.
+        multiple of 1 GB. Limit your boot disk size to 2TB to account for MBR
+        partition table limitations.
 
      --boot-disk-type=BOOT_DISK_TYPE
         The type of the boot disk. This option can only be specified if a new
@@ -83,6 +88,30 @@ FLAGS
      --can-ip-forward
         If provided, allows the instances to send and receive packets with
         non-matching destination or source IP addresses.
+
+     --configure-disk=[PROPERTY=VALUE,...]
+        This option has effect only when used with --source-instance. It allows
+        you to override how the source-instance's disks are defined in the
+        template.
+
+         auto-delete
+            If true, this persistent disk will be automatically deleted when
+            the instance is deleted. However, if the disk is later detached
+            from the instance, this option won't apply. If not provided, the
+            setting is copied from the source instance. Allowed values of the
+            flag are: false, no, true, and yes.
+
+         device-name
+            Name of the device.
+
+         instantiate-from
+            Specifies whether to include the disk and which image to use. Valid
+            values are: attach-read-only, blank, custom-image, do-not-include,
+            source-image, source-image-family
+
+         custom-image
+            The custom image to use if custom-image is specified for
+            instantiate-from.
 
      --create-disk=[PROPERTY=VALUE,...]
         Creates and attaches persistent disks to the instances.
@@ -181,7 +210,7 @@ FLAGS
             is no.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -290,6 +319,10 @@ FLAGS
             exclusive with address. If neither key is present the instance will
             get an ephemeral IP.
 
+         network-tier
+            Specifies the network tier of the interface. NETWORK_TIER must be
+            one of: PREMIUM, STANDARD. The default value is PREMIUM.
+
          subnet
             Specifies the subnet that the interface will be part of. If network
             key is also specified this must be a subnetwork of the specified
@@ -312,6 +345,11 @@ FLAGS
             will pick an available range with the specified netmask and
             allocate it to this network interface.
 
+     --network-tier=NETWORK_TIER
+        Specifies the network tier that will be used to configure the instance.
+        NETWORK_TIER must be one of: PREMIUM, STANDARD. The default value is
+        PREMIUM.
+
      --preemptible
         If provided, instances will be preemptible and time-limited. Instances
         may be preempted to free up resources for standard VM instances, and
@@ -319,7 +357,7 @@ FLAGS
         instances can not be restarted and will not migrate.
 
      --region=REGION
-        The region of the subnetwork to attach. If not specified, you may be
+        Region of the subnetwork to attach. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
@@ -342,6 +380,17 @@ FLAGS
         The instances will be restarted if they are terminated by Compute
         Engine. This does not affect terminations performed by the user.
         Enabled by default, use --no-restart-on-failure to disable.
+
+     --source-instance=SOURCE_INSTANCE
+        The name of the source instance that the instance template will be
+        created from.
+
+        You can override machine type and labels. Values of other flags will be
+        ignored and values from the source instance will be used instead.
+
+     --source-instance-zone=SOURCE_INSTANCE_ZONE
+        Zone of the instance to operate on. Overrides the default compute/zone
+        property value for this command invocation.
 
      --subnet=SUBNET
         Specifies the subnet that the instances will be part of. If --network
@@ -421,6 +470,33 @@ FLAGS
           needed.
 
           By default, debian-9 is assumed for this flag.
+
+     Sole Tenancy At most one of these may be specified:
+
+       --node=NODE
+          The name of the node to schedule this instance on.
+
+       --node-affinity-file=NODE_AFFINITY_FILE
+          The JSON/YAML file containing the configuration of desired nodes onto
+          which this instance could be scheduled. These rules filter the nodes
+          according to their node affinity labels. A node's affinity labels
+          come from the node template of the group the node is in.
+
+          The file should contain a list of a JSON/YAML objects with the
+          following fields:
+
+       key
+          Corresponds to the node affinity label keys of the Node resource.
+       operator
+          Specifies the node selection type. Must be one of: IN: Requires
+          Compute Engine to seek for matched nodes. NOT_IN: Requires Compute
+          Engine to avoid certain nodes.
+       values
+          Optional. A list of values which correspond to the node affinity
+          label values of the Node resource.
+
+       --node-group=NODE_GROUP
+          The name of the node group to schedule this instance on.
 
      At most one of these may be specified:
 

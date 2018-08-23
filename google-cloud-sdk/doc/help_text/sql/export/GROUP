@@ -22,7 +22,8 @@ COMMANDS
         Exports data from a Cloud SQL instance to a SQL file.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql export
         $ gcloud beta sql export
 

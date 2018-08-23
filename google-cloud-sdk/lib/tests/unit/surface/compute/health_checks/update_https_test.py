@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 """Tests for the health-checks update https subcommand."""
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -808,6 +811,9 @@ class HealthChecksCreateHttpsBetaTest(test_base.BaseTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
+  def global_flag(self):
+    return ''
+
   def testResponseOption(self):
     self.make_requests.side_effect = iter([
         [self.messages.HealthCheck(
@@ -823,7 +829,7 @@ class HealthChecksCreateHttpsBetaTest(test_base.BaseTest):
     self.Run("""
         compute health-checks update https my-health-check
           --response new-response
-        """)
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -860,8 +866,9 @@ class HealthChecksCreateHttpsBetaTest(test_base.BaseTest):
     ])
 
     self.Run("""
-        compute health-checks update https my-health-check --response ''
-        """)
+        compute health-checks update https my-health-check
+          --response ''
+        """ + self.global_flag())
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -882,6 +889,104 @@ class HealthChecksCreateHttpsBetaTest(test_base.BaseTest):
                       requestPath='/testpath')),
               project='my-project'))],
     )
+
+
+class HealthChecksCreateHttpsAlphaTest(HealthChecksCreateHttpsBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+  def global_flag(self):
+    return ' --global'
+
+
+class RegionHealthChecksCreateHttpsTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+  def testUriSupport(self):
+    # This is the same as testHostOption, but uses a full URI.
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update https
+          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          --host www.google.com
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                  httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                      host='www.google.com', port=80, requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testHostOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                    host='www.google.com', port=80, requestPath='/testpath'))
+        ],
+    ])
+
+    self.Run("""
+        compute health-checks update https my-health-check
+          --host www.google.com --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                  httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                      host='www.google.com', port=80, requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+    # By default, the resource should not be displayed
+    self.assertFalse(self.GetOutput())
 
 
 if __name__ == '__main__':

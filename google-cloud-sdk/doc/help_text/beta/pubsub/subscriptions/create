@@ -45,7 +45,7 @@ OPTIONAL FLAGS
         acknowledge receiving a message before re-attempting delivery.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must

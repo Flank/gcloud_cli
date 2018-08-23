@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -24,7 +27,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class InstancesPromoteReplicaTest(base.SqlMockTestBeta):
+class _BaseInstancesPromoteReplicaTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def _ExpectPromoteReplica(self):
@@ -137,6 +140,21 @@ class InstancesPromoteReplicaTest(base.SqlMockTestBeta):
     self.WriteInput('n\n')
     with self.assertRaises(console_io.OperationCancelledError):
       self.Run('sql instances promote-replica replica-1')
+
+
+class InstancesPromoteReplicaGATest(_BaseInstancesPromoteReplicaTest,
+                                    base.SqlMockTestGA):
+  pass
+
+
+class InstancesPromoteReplicaBetaTest(_BaseInstancesPromoteReplicaTest,
+                                      base.SqlMockTestBeta):
+  pass
+
+
+class InstancesPromoteReplicaAlphaTest(_BaseInstancesPromoteReplicaTest,
+                                       base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

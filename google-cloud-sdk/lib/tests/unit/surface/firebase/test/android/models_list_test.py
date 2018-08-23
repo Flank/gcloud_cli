@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests that exercise listing of Android models in the device catalog."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_attr
 from tests.lib import test_case
@@ -43,7 +46,7 @@ class TestAndroidModelsListTest(unit_base.AndroidMockClientTest):
     self.Run(commands.ANDROID_MODELS_LIST)
     self.AssertOutputContains(
         """\
-        | Nexus2099 | MegaCorp | Nexus 2099 | VIRTUAL | 800 x 600 | v98,v99 | |
+        | Nexus2099 | MegaCorp | Nexus 2099 | VIRTUAL | 800 x 600 | F,P | |
         | Universe3 | Sungsam | Universe T3 | PHYSICAL | 2000 x 1000 | C,F \
         | youreit, default |""",
         normalize_space=True)
@@ -54,7 +57,7 @@ class TestAndroidModelsListTest(unit_base.AndroidMockClientTest):
     self.AssertOutputContains(
         """\
         | EsperiaXYZ | Genuine Panaphonics | Esperia XYZ | PHYSICAL | 7 x 10 \
-        | 0,1,2 | deprecated=1,2 |""",
+        | C,F,P | deprecated=C,F |""",
         normalize_space=True)
     self.AssertErrContains('Some devices are deprecated. Learn more')
 

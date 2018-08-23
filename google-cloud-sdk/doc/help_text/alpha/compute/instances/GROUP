@@ -28,6 +28,9 @@ COMMANDS
         (ALPHA) Create a Google Compute Engine virtual machine access
         configuration.
 
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding for an instance.
+
      add-labels
         (ALPHA) Add labels to Google Compute Engine virtual machine instances.
 
@@ -63,6 +66,9 @@ COMMANDS
      detach-disk
         (ALPHA) Detach disks from Compute Engine virtual machine instances.
 
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a Google Compute Engine instance.
+
      get-serial-port-output
         (ALPHA) Read output from a virtual machine instance's serial port.
 
@@ -72,6 +78,9 @@ COMMANDS
      move
         (ALPHA) Move an instance and its attached persistent disks between
         zones.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove IAM policy binding for an instance.
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine virtual machine
@@ -95,6 +104,9 @@ COMMANDS
 
      set-disk-auto-delete
         (ALPHA) Set auto-delete behavior for disks.
+
+     set-iam-policy
+        (ALPHA) Set IAM policy for an instance.
 
      set-machine-type
         (ALPHA) Set machine type for Google Compute Engine virtual machines.
@@ -139,11 +151,11 @@ COMMANDS
         container images.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute instances
         $ gcloud beta compute instances

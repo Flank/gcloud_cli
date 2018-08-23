@@ -134,14 +134,14 @@ class ComposerProjectsLocationsEnvironmentsPatchRequest(_messages.Message):
       Apache Airflow config overrides. If a replacement config  overrides map
       is not included in `environment`, all config overrides  are cleared.  It
       is an error to provide both this mask and a mask specifying one or  more
-      individual config overrides.</td>  </tr>  <tr>
-      <td>config.softwareConfig.properties.<var>section</var>-<var>name
-      </var></td>  <td>Override the Apache Airflow property <var>name</var> in
-      the section  named <var>section</var>, preserving other properties. To
-      delete the  property override, include it in `updateMask` and omit its
-      mapping  in `environment.config.softwareConfig.properties`.  It is an
+      individual config overrides.</td>  </tr>  <tr>  <td>config.softwareConfi
+      g.airflowConfigOverrides.<var>section</var>-<var>name  </var></td>
+      <td>Override the Apache Airflow config property <var>name</var> in the
+      section named <var>section</var>, preserving other properties. To delete
+      the property override, include it in `updateMask` and omit its mapping
+      in `environment.config.softwareConfig.airflowConfigOverrides`.  It is an
       error to provide both a mask of this form and the
-      "config.softwareConfig.properties" mask.</td>  </tr>  <tr>
+      "config.softwareConfig.airflowConfigOverrides" mask.</td>  </tr>  <tr>
       <td>config.softwareConfig.envVariables</td>  <td>Replace all environment
       variables. If a replacement environment  variable map is not included in
       `environment`, all custom environment  variables  are cleared.  It is an
@@ -328,7 +328,7 @@ class ListEnvironmentsResponse(_messages.Message):
     environments: The list of environments returned by a
       ListEnvironmentsRequest.
     nextPageToken: The page token used to query for the next page if one
-      exists
+      exists.
   """
 
   environments = _messages.MessageField('Environment', 1, repeated=True)
@@ -385,15 +385,16 @@ class NodeConfig(_messages.Message):
     network: Optional. The Compute Engine network to be used for machine
       communications, specified as a [relative resource
       name](/apis/design/resource_names#relative_resource_name). For example:
-      "projects/{projectId}/global/networks/{networkId}".  [Shared
-      VPC](/vpc/docs/shared-vpc) is not currently supported. The network must
-      belong to the environment's project. If unspecified, the "default"
-      network ID in the environment's project is used.  If a [Custom Subnet
-      Network]((/vpc/docs/vpc#vpc_networks_and_subnets) is provided,
-      `nodeConfig.subnetwork` must also be provided.
+      "projects/{projectId}/global/networks/{networkId}".  If unspecified, the
+      default network in the environment's project is used. If a [Custom
+      Subnet Network]((/vpc/docs/vpc#vpc_networks_and_subnets) is provided,
+      `nodeConfig.subnetwork` must also be provided. For [Shared
+      VPC](/vpc/docs/shared-vpc) subnetwork requirements, see
+      `nodeConfig.subnetwork`.
     oauthScopes: Optional. The set of Google API scopes to be made available
-      on all node VMs. If `oauth_scopes` is empty, defaults to
-      ["https://www.googleapis.com/auth/cloud-platform"]. Cannot be updated.
+      on all node VMs. Defaults to ["https://www.googleapis.com/auth/cloud-
+      platform"] and must be included in the list of specified scopes. Cannot
+      be updated.
     serviceAccount: Optional. The Google Cloud Platform Service Account to be
       used by the node VMs. If a service account is not specified, the
       "default" Compute Engine service account is used. Cannot be updated.
@@ -402,8 +403,10 @@ class NodeConfig(_messages.Message):
       name](/apis/design/resource_names#relative_resource_name). For example:
       "projects/{projectId}/regions/{regionId}/subnetworks/{subnetworkId}"  If
       a subnetwork is provided, `nodeConfig.network` must also be provided,
-      and the subnetwork must belong to the enclosing environment's project
-      and location.
+      and the subnetwork must belong to the same project as the network.  For
+      Shared VPC, you must configure the subnetwork with secondary ranges
+      named <strong>composer-pods</strong> and <strong>composer-
+      services</strong> to support Alias IPs.
     tags: Optional. The list of instance tags applied to all node VMs. Tags
       are used to identify valid sources or targets for network firewalls.
       Each tag within the list must comply with

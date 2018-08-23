@@ -31,6 +31,9 @@ COMMANDS
      list
         List Google Compute Engine subnetworks.
 
+     list-usable
+        List Google Compute Engine subnetworks permitted for use.
+
      update
         Updates properties of an existing Google Compute Engine subnetwork.
 

@@ -66,7 +66,8 @@ must be a whole number followed by a size unit of \f5\fIKB\fR\fR for kilobyte,
 \f5\fIMB\fR\fR for megabyte, \f5\fIGB\fR\fR for gigabyte, or \f5\fITB\fR\fR for
 terabyte. For example, \f5\fI10GB\fR\fR will produce a 10 gigabyte disk. The
 minimum size a boot disk can have is 10 GB. Disk size must be a multiple of 1
-GB.
+GB. Limit your boot disk size to 2TB to account for MBR partition table
+limitations.
 
 .TP 2m
 \fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR
@@ -322,7 +323,7 @@ region as the instance. The default value for this is \f5\fIzonal\fR\fR.
 .sp
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -462,6 +463,11 @@ If specified the interface will have no external IP. Mutually exclusive with
 address. If neither key is present the instance will get an ephemeral IP.
 
 .TP 2m
+\fBnetwork\-tier\fR
+Specifies the network tier of the interface. \f5\fINETWORK_TIER\fR\fR must be
+one of: \f5PREMIUM\fR, \f5STANDARD\fR. The default value is \f5PREMIUM\fR.
+
+.TP 2m
 \fBprivate\-network\-ip\fR
 Assigns the given RFC1918 IP address to the interface.
 
@@ -552,8 +558,8 @@ $ gcloud compute instances list \-\-filter='tags:tag1'
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-The zone of the instances to create. If not specified, you may be prompted to
-select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
+Zone of the instances to create. If not specified, you may be prompted to select
+a zone. \f5gcloud\fR will attempt to identify the zone by searching for
 resources in your project. If the zone cannot be determined, you will then be
 prompted with all Google Cloud Platform zones.
 

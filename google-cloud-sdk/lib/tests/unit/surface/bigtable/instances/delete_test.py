@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,18 @@
 """Test of the 'delete' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class DeleteCommandTest(base.BigtableV2TestBase,
                         sdk_test_base.WithOutputCapture,
                         test_case.WithInput):
@@ -32,20 +39,22 @@ class DeleteCommandTest(base.BigtableV2TestBase,
     self.other_msg = self.msgs.BigtableadminProjectsInstancesDeleteRequest(
         name='projects/{0}/instances/theotherinstance'.format(self.Project()))
 
-  def _RunSuccessTest(self):
+  def _RunSuccessTest(self, track):
+    self.track = track
     self.svc.Expect(request=self.msg, response=self.msgs.Empty())
     self.Run(self.cmd)
 
-  def testDelete(self):
-    self._RunSuccessTest()
+  def testDelete(self, track):
+    self._RunSuccessTest(track)
 
-  def testDeleteByUri(self):
+  def testDeleteByUri(self, track):
     self.cmd = (
         'bigtable instances delete https://bigtableadmin.googleapis.com/v2/'
         'projects/{0}/instances/theinstance'.format(self.Project()))
-    self._RunSuccessTest()
+    self._RunSuccessTest(track)
 
-  def testDeleteWarning(self):
+  def testDeleteWarning(self, track):
+    self.track = track
     self.cmd = 'bigtable instances delete theinstance theotherinstance'
     # Confirm the deletion of both instances.
     self.WriteInput('y\n')
@@ -54,13 +63,15 @@ class DeleteCommandTest(base.BigtableV2TestBase,
     self.svc.Expect(request=self.other_msg, response=self.msgs.Empty())
     self.Run(self.cmd)
 
-  def testDeleteNoConfirmation(self):
+  def testDeleteNoConfirmation(self, track):
+    self.track = track
     self.cmd = 'bigtable instances delete theinstance'
     # Reject the deletion of the instance.
     self.WriteInput('n\n')
     self.Run(self.cmd)
 
-  def testErrorResponse(self):
+  def testErrorResponse(self, track):
+    self.track = track
     with self.AssertHttpResponseError(self.svc, self.msg):
       self.Run(self.cmd)
 

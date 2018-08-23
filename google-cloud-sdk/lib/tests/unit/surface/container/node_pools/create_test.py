@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'node-pools create' command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 
 from googlecloudsdk.api_lib.container import util as c_util
@@ -25,7 +29,7 @@ from tests.lib import test_case
 from tests.lib.surface.container import base
 
 
-class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
+class CreateTestGA(parameterized.TestCase, base.GATestBase,
                    base.NodePoolsTestBase):
   """gcloud GA track using container v1 API."""
 
@@ -50,8 +54,11 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, location,
                                                 self.PROJECT_ID))
     kwargs = {'zone': location}
+    pool_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
     self.ExpectCreateNodePool(
-        self._MakeNodePool(),
+        self._MakeNodePool(**pool_kwargs),
         self._MakeNodePoolOperation(**kwargs),
         zone=location)
     self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done,
@@ -86,8 +93,11 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testCreateDefaultsJsonOutput(self):
     self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
                                                 self.PROJECT_ID))
-    self.ExpectCreateNodePool(self._MakeNodePool(),
-                              self._MakeNodePoolOperation())
+    pool_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs), self._MakeNodePoolOperation())
     self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
     pool = self._MakeNodePool(nodeVersion=self.VERSION)
     self.ExpectGetNodePool(pool.name, response=pool)
@@ -233,11 +243,41 @@ Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
                    cluster_name=self.CLUSTER_NAME,
                    flags=flags))
 
+  @parameterized.parameters(
+      ('', '', True),
+      ('--image-type', 'COS', True),
+      ('--image-type', 'UBUNTU', False),
+  )
+  def testAutoRepairDefaults(
+      self, image_flag, image_value, expect_autorepair):
+    pool_kwargs = {
+        'management': self.messages.NodeManagement(
+            autoRepair=expect_autorepair,),
+        'imageType': image_value if image_value else None,
+    }
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} {flag} {value} '
+             '--quiet --cluster {clusterName}'.format(
+                 base=self.node_pools_command_base.format(self.ZONE),
+                 name=self.NODE_POOL_NAME,
+                 flag=image_flag,
+                 value=image_value,
+                 clusterName=self.CLUSTER_NAME))
+
   def testServiceAccountCloudPlatformScope(self):
     pool_kwargs = {
-        'serviceAccount': 'my-sa',
-        'oauthScopes': ['https://www.googleapis.com/auth/cloud-platform',
-                        'https://www.googleapis.com/auth/userinfo.email'],
+        'serviceAccount':
+            'my-sa',
+        'oauthScopes': [
+            'https://www.googleapis.com/auth/cloud-platform',
+            'https://www.googleapis.com/auth/userinfo.email'
+        ],
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
     }
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
         pool_kwargs)
@@ -258,6 +298,7 @@ Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     pool_kwargs = {
         # Sort the scopes to assert equality of the lists
         'oauthScopes': sorted(scopes),
+        'management': self.messages.NodeManagement(autoRepair=True),
     }
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
         pool_kwargs)
@@ -296,7 +337,8 @@ Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     pool_kwargs = {
         'name': 'my-custom-pool',
         'clusterId': self.CLUSTER_NAME,
-        'nodeTaints': taints
+        'nodeTaints': taints,
+        'management': self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateNodePool(
         self._MakeNodePool(**pool_kwargs),
@@ -343,7 +385,11 @@ Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
   def testCreateHttpError(self):
     self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
                                                 self.PROJECT_ID))
-    self.ExpectCreateNodePool(self._MakeNodePool(), exception=self.HttpError())
+    pool_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs), exception=self.HttpError())
 
     with self.assertRaises(exceptions.HttpException):
       self.Run(self.node_pools_command_base.format(self.ZONE) +
@@ -401,9 +447,11 @@ Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
         'clusterId':
             self.CLUSTER_NAME,
         'accelerators': [
-            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
-                                acceleratorCount=int(2))
+            m.AcceleratorConfig(
+                acceleratorType='nvidia-tesla-k80', acceleratorCount=int(2))
         ],
+        'management':
+            m.NodeManagement(autoRepair=True),
     }
 
     self.ExpectCreateNodePool(
@@ -438,9 +486,11 @@ Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
         'clusterId':
             self.CLUSTER_NAME,
         'accelerators': [
-            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
-                                acceleratorCount=int(1))
+            m.AcceleratorConfig(
+                acceleratorType='nvidia-tesla-k80', acceleratorCount=int(1))
         ],
+        'management':
+            m.NodeManagement(autoRepair=True),
     }
 
     self.ExpectCreateNodePool(
@@ -709,11 +759,8 @@ class CreateTestGAOnly(CreateTestGA):
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
+class CreateTestBeta(base.BetaTestBase, CreateTestGA):
+  """gcloud Beta track using container v1beta1 API."""
 
   def testCreateMinCpuPlatform(self):
     self.assertIsNone(
@@ -723,6 +770,7 @@ class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
         'name': 'my-custom-pool',
         'clusterId': self.CLUSTER_NAME,
         'minCpuPlatform': 'Skylake',
+        'management': self.messages.NodeManagement(autoRepair=True),
     }
 
     self.ExpectCreateNodePool(
@@ -790,14 +838,6 @@ class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
   def testScopes(self, flags, scopes):
     self._testScopes(flags, scopes)
 
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
-  """gcloud Beta track using container v1beta1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-
   def testCreateBetaFeatures(self):
     m = self.messages
     self.assertIsNone(
@@ -811,6 +851,8 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
         'workloadMetadataConfig':
             m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig.
                                      NodeMetadataValueValuesEnum.SECURE),
+        'management':
+            m.NodeManagement(autoRepair=True),
     }
 
     self.ExpectCreateNodePool(
@@ -836,19 +878,8 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestAlphaV1API(base.AlphaTestBase, CreateTestBetaV1API):
-  """gcloud Alpha track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API):
+class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
 
   def testCreateAlphaFeatures(self):
     m = self.messages
@@ -869,11 +900,15 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API):
             m.LocalSsdVolumeConfig(
                 count=1, type='scsi', format=format_enum.BLOCK),
         ],
+        'sandboxConfig':
+            m.SandboxConfig(sandboxType='gvisor'),
         'autoscaling':
             m.NodePoolAutoscaling(
                 enabled=True, maxNodeCount=6, autoprovisioned=True),
         'maxPodsConstraint':
-            m.MaxPodsConstraint(maxPodsPerNode=30)
+            m.MaxPodsConstraint(maxPodsPerNode=30),
+        'management':
+            m.NodeManagement(autoRepair=True),
     }
 
     self.ExpectCreateNodePool(
@@ -895,7 +930,8 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API):
         ' --local-ssd-volumes count=1,type=scsi,format=block'
         ' --enable-autoscaling --enable-autoprovisioning --max-nodes 6'
         ' --workload-metadata-from-node=secure'
-        ' --max-pods-per-node=30'.format(**pool_kwargs))
+        ' --max-pods-per-node=30'
+        ' --sandbox type=gvisor'.format(**pool_kwargs))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),
@@ -925,6 +961,22 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API):
               self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.AssertErrContains('argument --local-ssd-volumes')
 
+  def testCreateInvalidSandboxConfig(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --sandbox '
+          'type={2}'.format(self.NODE_POOL_NAME,
+                            self.CLUSTER_NAME, 'notatype'))
+    self.AssertErrContains('argument --sandbox')
+
+  def testCreateEmptySandboxConfig(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --sandbox'.format(self.NODE_POOL_NAME,
+                                                       self.CLUSTER_NAME))
+    self.AssertErrContains('argument --sandbox')
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for Spanner write util lib."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from collections import OrderedDict
 import re
 from apitools.base.py import extra_types
@@ -326,9 +330,14 @@ class RowDataParserTest(base.SpannerTestBase, parameterized.TestCase):
     data_str = 'eventId=2, user=abc, test=[2,4,5], date=[]'
     self.assertEqual(expected_dict, util.RowDataParser(data_str))
 
-  def testRowWithInvalidValue(self):
-    invalid_data_str = 'eventId=2, user='
-    error_message = re.escape('Missing column value in column: user.')
+  def testRowWithEmptyString(self):
+    expected_dict = OrderedDict([('eventId', '2'), ('user', ''),
+                                 ('test', ['2', '4', '5']),
+                                 ('date', ['test date', 'test2'])])
+    data_str = 'eventId=2, user="", test=[2,4,5], date=["test date",test2]'
+    self.assertEqual(expected_dict, util.RowDataParser(data_str))
 
-    with self.assertRaisesRegex(ValueError, error_message):
-      util.RowDataParser(invalid_data_str)
+  def testRowWithEmptyStringInLastColumn(self):
+    expected_dict = OrderedDict([('eventId', '2'), ('user', '')])
+    data_str = 'eventId=2, user=""'
+    self.assertEqual(expected_dict, util.RowDataParser(data_str))

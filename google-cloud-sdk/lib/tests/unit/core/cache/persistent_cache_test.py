@@ -16,7 +16,9 @@
 """Unit tests for the core persistent cache implementation module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.core.cache import exceptions

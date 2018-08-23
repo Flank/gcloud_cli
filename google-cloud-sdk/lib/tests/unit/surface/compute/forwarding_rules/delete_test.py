@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the forwarding-rules delete subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.command_lib.compute import flags as compute_flags
 from tests.lib import test_case
@@ -81,13 +83,11 @@ class GlobalForwardingRulesDeleteTest(test_base.BaseTest):
           ))],
     )
 
-    self.AssertErrContains(textwrap.dedent("""\
-        The following global forwarding rules will be deleted:
-         - [forwarding-rule-1]
-         - [forwarding-rule-2]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following global forwarding rules will be deleted:\n'
+        r' - [forwarding-rule-1]\n'
+        r' - [forwarding-rule-2]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testGlobalPrompting(self):
     self.StartPatch(
@@ -138,12 +138,10 @@ class RegionalForwardingRulesDeleteTest(test_base.BaseTest):
               region='us-central2',
           ))],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following forwarding rules will be deleted:
-         - [forwarding-rule-1] in [us-central2]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following forwarding rules will be deleted:\n'
+        r' - [forwarding-rule-1] in [us-central2]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testUriSupport(self):
     self.Run("""

@@ -28,8 +28,8 @@ FLAGS
         Only show subnetworks of a specific network.
 
      --regexp=REGEXP, -r REGEXP
-        (DEPRECATED) A regular expression to filter the names of the results
-        on. Any names that do not match the entire regular expression will be
+        (DEPRECATED) Regular expression to filter the names of the results on.
+        Any names that do not match the entire regular expression will be
         filtered out.
 
         Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
@@ -44,13 +44,13 @@ FLAGS
 LIST COMMAND FLAGS
      --filter=EXPRESSION
         Apply a Boolean filter EXPRESSION to each resource item to be listed.
-        If the expression evaluates True then that item is listed. For more
-        details and examples of filter expressions run $ gcloud topic filters.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
         This flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
      --limit=LIMIT
-        The maximum number of resources to list. The default is unlimited. This
+        Maximum number of resources to list. The default is unlimited. This
         flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
@@ -62,7 +62,7 @@ LIST COMMAND FLAGS
         and --limit depending on the service.
 
      --sort-by=[FIELD,...]
-        A comma-separated list of resource field key names to sort by. The
+        Comma-separated list of resource field key names to sort by. The
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
@@ -87,7 +87,7 @@ EXAMPLES
     To list all subnetworks in the us-central1 and europe-west1 regions, run:
 
         $ gcloud beta compute networks subnets list \
-            --filter="region( us-central1 europe-west1 )"
+            --filter="region:( us-central1 europe-west1 )"
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -16,6 +16,7 @@
 """Test assertions for the subtests module. We must dig deeper."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import re

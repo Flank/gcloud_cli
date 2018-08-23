@@ -105,9 +105,9 @@ tokens (RFC7518 (https://www.ietf.org/rfc/rfc7518.txt)).
 .IP "\(em" 2m
 \f5rs256\fR: Deprecated name for \f5rsa\-x509\-pem\fR
 .IP "\(em" 2m
-\f5es256\-x509\-pem\fR: (As ES256_PEM, but wrapped in an X.509v3 certificate
-([RFC5280]( https://www.ietf.org/rfc/rfc5280.txt)), encoded in base64, and
-wrapped by \f5\-\-\-\-\-BEGIN CERTIFICATE\-\-\-\-\-\fR and \f5\-\-\-\-\-END
+\f5es256\-x509\-pem\fR: As ES256_PEM, but wrapped in an X.509v3 certificate
+(RFC5280 (https://www.ietf.org/rfc/rfc5280.txt)), encoded in base64, and wrapped
+by \f5\-\-\-\-\-BEGIN CERTIFICATE\-\-\-\-\-\fR and \f5\-\-\-\-\-END
 CERTIFICATE\-\-\-\-\-\fR.
 .IP "\(em" 2m
 \f5es256\-pem\fR: Public key for the ECDSA algorithm using P\-256 and SHA\-256,
@@ -166,11 +166,11 @@ can be found at: https://cloud.google.com/iot
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud iot devices create

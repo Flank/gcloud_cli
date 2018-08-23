@@ -106,6 +106,9 @@ GROUPS
      snapshots
         List, describe, and delete Google Compute Engine snapshots.
 
+     sole-tenancy
+        Read and manage Google Compute Engine sole-tenancy resources.
+
      ssl-certificates
         List, create, and delete Google Compute Engine SSL certificates.
 
@@ -132,6 +135,9 @@ GROUPS
 
      target-vpn-gateways
         Read and manipulate Google Compute Engine VPN Gateways.
+
+     tpus
+        List, create, and delete Cloud TPUs.
 
      url-maps
         List, create, and delete URL maps.
@@ -163,6 +169,9 @@ COMMANDS
 
      scp
         Copy files to and from Google Compute Engine virtual machines via scp.
+
+     sign-url
+        Sign specified URL for use with Cloud CDN Signed URLs.
 
      ssh
         SSH into a virtual machine instance.

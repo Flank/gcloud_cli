@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
@@ -16,6 +17,7 @@
 
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import sys

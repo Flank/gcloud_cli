@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,13 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ml-engine versions create tests."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.api_lib.ml_engine import versions_api
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.ml_engine import versions_util
 from googlecloudsdk.core import exceptions
@@ -49,11 +54,19 @@ class CreateTestBase(object):
           response=self.msgs.GoogleLongrunningOperation(
               name='opName', done=True))
 
-  def _ExpectCreate(self, runtime_version=None,
+  def _ExpectCreate(self,
+                    runtime_version=None,
                     deployment_uri='gs://path/to/file',
-                    description=None, manual_scaling=None, auto_scaling=None,
-                    labels=None, machine_type=None, framework=None,
-                    python_version=None):
+                    description=None,
+                    manual_scaling=None,
+                    auto_scaling=None,
+                    labels=None,
+                    machine_type=None,
+                    framework=None,
+                    python_version=None,
+                    model_class=None,
+                    package_uris=None,
+                    response=None):
     if framework:
       framework = self.short_msgs.Version.FrameworkValueValuesEnum(framework)
     op = self.msgs.GoogleLongrunningOperation(name='opId')
@@ -70,9 +83,10 @@ class CreateTestBase(object):
                 labels=labels,
                 machineType=machine_type,
                 framework=framework,
-                pythonVersion=python_version
-            )),
-        response=op)
+                modelClass=model_class,
+                packageUris=package_uris or [],
+                pythonVersion=python_version)),
+        response=response or op)
 
   def testCreate(self):
     self._ExpectCreate()
@@ -238,6 +252,29 @@ class CreateTestBase(object):
              '--config {}'.format(yaml_path))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
+  def testPythonVersionFlag(self):
+    self._ExpectCreate(python_version='2.7')
+    self._ExpectOperationPolling()
+    self.Run('ml-engine versions create versionId --model modelId '
+             '--origin gs://path/to/file --python-version 2.7')
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  def testPythonVersionFromConfig(self):
+    yaml_contents = """\
+        description: dummy description
+        deploymentUri: gs://foo/bar
+        runtimeVersion: '1.0'
+        pythonVersion: '3.4'
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
+                       description='dummy description',
+                       python_version='3.4')
+    self._ExpectOperationPolling()
+    self.Run('ml-engine versions create versionId --model modelId '
+             '--config {}'.format(yaml_path))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
 
 class CreateGaTest(CreateTestBase, base.MlGaPlatformTestBase):
 
@@ -252,28 +289,29 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
     super(CreateBetaTest, self).SetUp()
     self.track = calliope_base.ReleaseTrack.BETA
 
-  def testythonVersionFlag(self):
-    self._ExpectCreate(python_version='2.7')
+  def testCreateMachineTypeFlag(self):
+    self._ExpectCreate(machine_type='mls1-c1-m2')
     self._ExpectOperationPolling()
     self.Run('ml-engine versions create versionId --model modelId '
-             '--origin gs://path/to/file --python-version 2.7')
+             '--origin gs://path/to/file --machine-type=mls1-c1-m2')
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
-  def testythonVersionFromConfig(self):
-    yaml_contents = """\
-        description: dummy description
-        deploymentUri: gs://foo/bar
-        runtimeVersion: '1.0'
-        pythonVersion: '3.4'
-    """
-    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
-    self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
-                       description='dummy description',
-                       python_version='3.4')
-    self._ExpectOperationPolling()
-    self.Run('ml-engine versions create versionId --model modelId '
-             '--config {}'.format(yaml_path))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
+  def testCreateInvalidMachineType(self):
+
+    class ErrorResponse(object):
+
+      class Error(object):
+        message = 'Invalid machine_type: mls1-c1-m4'
+
+      done = True
+      response = ''
+      error = Error
+
+    self._ExpectCreate(machine_type='mls1-c1-m4', response=ErrorResponse)
+    error_msg = r'Invalid machine_type: mls1-c1-m4'
+    with self.assertRaisesRegex(waiter.OperationError, error_msg):
+      self.Run('ml-engine versions create versionId --model modelId '
+               '--origin gs://path/to/file --machine-type=mls1-c1-m4')
 
 
 class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
@@ -283,10 +321,10 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testCreateMachineTypeFlag(self):
-    self._ExpectCreate(machine_type='mls1-highmem-1')
+    self._ExpectCreate(machine_type='mls1-c1-m2')
     self._ExpectOperationPolling()
     self.Run('ml-engine versions create versionId --model modelId '
-             '--origin gs://path/to/file --machine-type=mls1-highmem-1')
+             '--origin gs://path/to/file --machine-type=mls1-c1-m2')
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
   def testCreateMachineTypeFromConfig(self):
@@ -294,25 +332,27 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
         description: dummy description
         deploymentUri: gs://foo/bar
         runtimeVersion: '1.0'
-        machineType: 'mls1-highcpu-4'
+        machineType: 'mls1-c1-m2'
     """
     yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
-    self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
-                       description='dummy description',
-                       machine_type='mls1-highcpu-4')
+    self._ExpectCreate(
+        runtime_version='1.0',
+        deployment_uri='gs://foo/bar',
+        description='dummy description',
+        machine_type='mls1-c1-m2')
     self._ExpectOperationPolling()
     self.Run('ml-engine versions create versionId --model modelId '
              '--config {}'.format(yaml_path))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
-  def testythonVersionFlag(self):
+  def testPythonVersionFlag(self):
     self._ExpectCreate(python_version='2.7')
     self._ExpectOperationPolling()
     self.Run('ml-engine versions create versionId --model modelId '
              '--origin gs://path/to/file --python-version 2.7')
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
-  def testythonVersionFromConfig(self):
+  def testPythonVersionFromConfig(self):
     yaml_contents = """\
         description: dummy description
         deploymentUri: gs://foo/bar
@@ -327,6 +367,47 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
     self.Run('ml-engine versions create versionId --model modelId '
              '--config {}'.format(yaml_path))
     self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  def testCreateInvalidMachineType(self):
+
+    class ErrorResponse(object):
+
+      class Error(object):
+        message = 'Invalid machine_type: mls1-c1-m4'
+
+      done = True
+      response = ''
+      error = Error
+
+    self._ExpectCreate(machine_type='mls1-c1-m4', response=ErrorResponse)
+    error_msg = r'Invalid machine_type: mls1-c1-m4'
+    with self.assertRaisesRegex(waiter.OperationError, error_msg):
+      self.Run('ml-engine versions create versionId --model modelId '
+               '--origin gs://path/to/file --machine-type=mls1-c1-m4')
+
+  def testUserCode(self):
+    self._ExpectCreate(model_class='my_package.SequenceModel',
+                       package_uris=['gs://path/to/file', 'gs://path/to/file2'])
+    self._ExpectOperationPolling()
+    self.Run('ml-engine versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--model-class my_package.SequenceModel '
+             '--package-uris gs://path/to/file,gs://path/to/file2')
+
+  def testUserCode_ConfigFile(self):
+    yaml_contents = """\
+        modelClass: my_package.SequenceModel
+        packageUris:
+        - gs://path/to/file
+        - gs://path/to/file2
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectCreate(model_class='my_package.SequenceModel',
+                       package_uris=['gs://path/to/file', 'gs://path/to/file2'])
+    self._ExpectOperationPolling()
+    self.Run(('ml-engine versions create versionId --model modelId '
+              '--origin gs://path/to/file '
+              '--config {}').format(yaml_path))
 
 
 if __name__ == '__main__':

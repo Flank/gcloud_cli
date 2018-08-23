@@ -1,0 +1,99 @@
+
+.TH "GCLOUD_ALPHA_BIGTABLE_CLUSTERS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha bigtable clusters create \- create a bigtable cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha bigtable clusters create\fR (\fICLUSTER\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-zone\fR=\fIZONE\fR [\fB\-\-async\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a bigtable cluster.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Cluster resource \- The cluster to describe. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the flag [cluster] on the command line with a fully specified
+name; provide the flag [\-\-project] on the command line; set the property
+[core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fICLUSTER\fR
+The ID of the cluster or a fully qualified identifier for the cluster. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+The Cloud Bigtable instance for the cluster.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+ID of the zone where the cluster is located. Supported zones are listed at
+https://cloud.google.com/bigtable/docs/locations.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for operation to complete.
+
+.TP 2m
+\fB\-\-num\-nodes\fR=\fINUM_NODES\fR; default=3
+Number of nodes to serve.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta bigtable clusters create
+.RE
+

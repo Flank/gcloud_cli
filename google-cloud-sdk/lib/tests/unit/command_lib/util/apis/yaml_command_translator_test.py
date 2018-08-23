@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for the yaml command translator."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import time
 
 from apitools.base.py.testing import mock as apitools_mock
@@ -43,7 +46,8 @@ class CommandBuilderTests(base.Base):
   """Tests of the command builder."""
 
   def SetUp(self):
-    self.MockGetListCreateMethods(('foo.instances', False))
+    self.MockGetListCreateMethods(('foo.instances', False),
+                                  ('foo.zones', False))
 
   def MakeCommandData(self, collection='foo.instances'):
     data = {
@@ -145,8 +149,13 @@ class CommandTestsBase(sdk_test_base.WithFakeAuth,
     # Wait for the ProgressTracker ticker thread to end.
     self.JoinAllThreads(timeout=2)
 
-  def MakeCommandData(self, collection='compute.instances', is_create=False,
-                      is_list=False, is_async=None):
+  def MakeCommandData(self,
+                      collection='compute.instances',
+                      is_create=False,
+                      is_list=False,
+                      is_async=None,
+                      brief=None,
+                      description=None):
     if is_list:
       spec = {'name': 'zone', 'collection': 'compute.zones', 'attributes': [
           {'parameter_name': 'zone',
@@ -162,17 +171,96 @@ class CommandTestsBase(sdk_test_base.WithFakeAuth,
                    'attribute_name': 'instance',
                    'help': 'the instance'}]}
     data = {
-        'help_text': {'brief': 'brief help'},
-        'request': {'collection': collection},
+        'help_text': {
+            'brief': brief or 'brief help'
+        },
+        'request': {
+            'collection': collection
+        },
         'arguments': {
             'resource': {
                 'help_text': 'help',
-                'spec': spec}}
+                'spec': spec
+            }
+        }
     }
     if is_async:
       data['async'] = {
           'collection':
           '.'.join(collection.split('.')[:-1]) + '.zoneOperations'}
+    return data
+
+  @classmethod
+  def _GetIoTSpec(cls):
+    return {
+        'name':
+            'registry',
+        'collection':
+            'cloudiot.projects.locations.registries',
+        'attributes': [
+            {
+                'parameter_name': 'locationsId',
+                'attribute_name': 'region',
+                'help': 'The name of the Cloud IoT region.',
+            },
+            {
+                'parameter_name': 'registriesId',
+                'attribute_name': 'registry',
+                'help': 'The name of the Cloud IoT registry.',
+            },
+        ],
+    }
+
+  @classmethod
+  def _GetMLSpec(cls):
+    return {
+        'name':
+            'model',
+        'collection':
+            'ml.projects.models',
+        'attributes': [{
+            'parameter_name': 'projectsId',
+            'attribute_name': 'project',
+            'help': 'The name of the Project.',
+        }, {
+            'parameter_name': 'modelsId',
+            'attribute_name': 'model',
+            'help': 'The name of the Model.',
+        }],
+    }
+
+  @classmethod
+  def MakeIAMCommandData(cls,
+                         help_text,
+                         brief=None,
+                         description=None,
+                         notes=None,
+                         params=None,
+                         another_collection=False):
+    spec = cls._GetIoTSpec()
+    collection = 'cloudiot.projects.locations.registries'
+    if another_collection:
+      collection = 'ml.projects.models'
+      spec = cls._GetMLSpec()
+    data = {
+        'help_text': {
+            'brief': brief or '<brief>',
+            'DESCRIPTION': description or '<DESCRIPTION>',
+            'NOTES': notes,
+        },
+        'request': {
+            'collection': collection,
+        },
+        'arguments': {
+            'resource': {
+                'help_text': 'The {resource} for which ' + help_text,
+                'spec': spec,
+            },
+        },
+    }
+    if params is not None:
+      data['arguments']['params'] = params
+
     return data
 
   def MakeCLI(self, spec, name='describe'):
@@ -226,6 +314,39 @@ class CommandTestsBase(sdk_test_base.WithFakeAuth,
     self.assertEqual(actual_positionals, positionals)
     self.assertEqual(actual_flags, flags)
 
+  def AssertErrorHandlingWithResponse(self,
+                                      expect_func,
+                                      command_data,
+                                      execute_params=None):
+
+    class Good(object):
+      c = 2
+      d = 3
+
+    class Error(object):
+      code = 10
+      message = 'message'
+
+    class Bad(object):
+      error = Error
+
+    class Response(object):
+      a = 1
+      b = [Good, Bad]
+
+    expect_func(response=Response)
+    command_data.response = yaml_command_schema.Response({
+        'error': {
+            'field': 'b.error',
+            'code': 'code',
+            'message': 'message'
+        }
+    })
+    cli = self.MakeCLI(command_data)
+    with self.assertRaises(SystemExit):
+      cli.Execute(execute_params or [])
+    self.AssertErrContains('Code: [10] Message: [message]')
+
 
 class DescribeCommandTests(CommandTestsBase):
 
@@ -271,7 +392,7 @@ class DescribeCommandTests(CommandTestsBase):
     result = cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
     self.assertEqual(result, {'foo': 'bar'})
     self.AssertOutputEquals('foo: bar\n')
-    self.AssertErrContains('PROMPT!\n')
+    self.AssertErrEquals('{"ux": "PROMPT_CONTINUE", "message": "PROMPT!"}\n')
 
   def testRunWithModifyRequestHooks(self):
     self.Expect(instance='iiiiiii')
@@ -298,6 +419,24 @@ class DescribeCommandTests(CommandTestsBase):
         str(modify_request_mock2.call_args[0][0]),
         'https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
     self.assertEqual(modify_request_mock2.call_args[0][1].instance, 'i')
+
+  def testRunWithParseResourceFalse(self):
+    self.Expect(instance=None)
+    command_data = self.MakeCommandData()
+    command_data['request']['parse_resource_into_request'] = False
+    d = yaml_command_schema.CommandData('describe', command_data)
+    modify_request_mock1 = mock.MagicMock()
+    def augment(unused_ref, args, req):
+      req.project = args.project
+      req.zone = args.zone
+      return req
+    modify_request_mock1.side_effect = augment
+    d.request.modify_request_hooks = [modify_request_mock1]
+
+    cli = self.MakeCLI(d)
+    result = cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
+    self.assertEqual(result, {'foo': 'bar'})
+    self.AssertOutputEquals('foo: bar\n')
 
   def testRunWithCreateRequestHook(self):
     self.Expect(instance='CHANGED')
@@ -578,6 +717,21 @@ class DeleteCommandTests(CommandTestsBase):
     self.AssertErrContains('Deleted instance [i]')
     self.assertEqual(result, running_response)
 
+  def testDisplayName(self):
+    self.Expect()
+    d = yaml_command_schema.CommandData(
+        'delete', self.MakeCommandData(is_async='zoneOperations'))
+    d.arguments.resource.display_name_hook = lambda x, y: 'display name'
+    d.async.response_name_field = 'selfLink'
+    d.async.state.field = 'status'
+    d.async.state.success_values = ['DONE']
+    cli = self.MakeCLI(d)
+    self.WriteInput('y\n')
+    cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
+    self.AssertErrContains('You are about to delete instance [display name]')
+    self.AssertErrContains('Delete request issued for: [display name]')
+    self.AssertErrContains('Deleted instance [display name]')
+
 
 class CreateCommandTests(CommandTestsBase):
 
@@ -645,6 +799,95 @@ class CreateCommandTests(CommandTestsBase):
     self.AssertErrNotContains('Created instance [i]')
     self.assertEqual(result, running_response)
 
+  def testRunMultitype_ParseResourceFalse_DisplayName(self):
+    # This is a long test, but it tests the expected use case of a multitype
+    # resource in a create command: the resource could either be a child or
+    # the parent. Thus, we need a hook for parsing the resource into the
+    # request (and parse_resource_into_request=False); and a hook for the
+    # display name so the log messages make sense.
+    running_response, _ = self.OperationResponses()
+    self.mocked_client.instances.Insert.Expect(
+        self.messages.ComputeInstancesInsertRequest(
+            zone='z', project='p'),
+        response=running_response)
+    running_response, done_response = self.OperationResponses()
+    done_response.targetLink = 'projects/p/zones/z/instances/i'
+    self.mocked_client.zoneOperations.Get.Expect(
+        self.messages.ComputeZoneOperationsGetRequest(
+            operation='operation-12345', project='p', zone='z'),
+        response=running_response)
+    self.mocked_client.zoneOperations.Get.Expect(
+        self.messages.ComputeZoneOperationsGetRequest(
+            operation='operation-12345', project='p', zone='z'),
+        response=done_response)
+
+    command_data = self.MakeCommandData(
+        is_create=True,
+        is_async='zoneOperations')
+    command_data['request']['parse_resource_into_request'] = False
+    command_data['request']['request_string'] = 'Create request issued'
+    sub_resources = [
+        {'name': 'zone',
+         'collection': 'compute.zones',
+         'attributes': [
+             {'parameter_name': 'project',
+              'attribute_name': 'project',
+              'help': 'help1'},
+             {'parameter_name': 'zone',
+              'attribute_name': 'zone',
+              'help': 'help2'}]},
+        {'name': 'instance',
+         'collection': 'compute.instances',
+         'attributes': [
+             {'parameter_name': 'project',
+              'attribute_name': 'project',
+              'help': 'help1'},
+             {'parameter_name': 'zone',
+              'attribute_name': 'zone',
+              'help': 'help2'},
+             {'parameter_name': 'instance',
+              'attribute_name': 'instance',
+              'help': 'help3'}]}]
+    command_data['arguments']['resource'] = {
+        'arg_name': 'instance',
+        'help_text': 'group help',
+        'spec': {'name': 'zone-or-instance', 'resources': sub_resources}}
+
+    d = yaml_command_schema.CommandData(
+        'create', command_data)
+    modify_request_mock1 = mock.MagicMock()
+
+    def augment(ref, args, req):
+      instance_or_zone = args.CONCEPTS.instance.Parse()
+      if instance_or_zone.type_.name == 'instance':
+        req.instance.name = ref.Name()
+      req.project = ref.project
+      req.zone = ref.zone
+      return req
+
+    modify_request_mock1.side_effect = augment
+    d.request.modify_request_hooks = [modify_request_mock1]
+    d.request.method = 'insert'
+    d.async.response_name_field = 'selfLink'
+    d.async.state.field = 'status'
+    d.async.state.success_values = ['DONE']
+    d.async.extract_resource_result = False
+    d.async.result_attribute = 'targetLink'
+
+    def get_name(resource_ref, args):
+      if args.CONCEPTS.instance.Parse().type_.name == 'zone':
+        return 'name not specified'
+      return resource_ref.Name()
+    d.arguments.resource.display_name_hook = get_name
+
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'INSTANCE', '--zone', '--async', '--no-async')
+    result = cli.Execute(
+        ['command', '--project', 'p', '--zone', 'z'])
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Create request issued for: [name not specified]\n')
+    self.assertEqual(result, 'projects/p/zones/z/instances/i')
+
   def testRunNoOperationMethod(self):
     """Test for when the API doesn't return an LRO."""
     running_response, _ = self.Expect(is_async=True)
@@ -657,6 +900,21 @@ class CreateCommandTests(CommandTestsBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Created instance [i]')
     self.assertEqual(result, running_response)
+
+  def testDisplayName(self):
+    self.Expect()
+    d = yaml_command_schema.CommandData(
+        'create', self.MakeCommandData(is_create=True,
+                                       is_async='zoneOperations'))
+    d.request.method = 'insert'
+    d.async.response_name_field = 'selfLink'
+    d.async.state.field = 'status'
+    d.async.state.success_values = ['DONE']
+    d.arguments.resource.display_name_hook = lambda x, y: 'display name'
+    cli = self.MakeCLI(d)
+    cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
+    self.AssertErrContains('Create request issued for: [display name]')
+    self.AssertErrContains('Created instance [display name]')
 
 
 class WaitCommandTests(CommandTestsBase):
@@ -1021,7 +1279,13 @@ class AsyncPollerTests(CommandTestsBase):
 
 class GetIamPolicyCommandTests(CommandTestsBase):
 
-  def Expect(self, instance='i', response=None):
+  def GetIamPolicyCLI(self):
+    command_data = yaml_command_schema.CommandData(
+        'get_iam_policy',
+        self.MakeIAMCommandData(help_text='to get IAM policy of'))
+    return self.MakeCLI(command_data)
+
+  def Expect(self, response=None):
     client = apis.GetClientClass('cloudiot', 'v1')
     mocked_client = apitools_mock.Client(client)
     mocked_client.Mock()
@@ -1032,75 +1296,42 @@ class GetIamPolicyCommandTests(CommandTestsBase):
             resource='projects/p/locations/r/registries/i'),
         response=response or {'etag': 'ACAB'})
 
-  def MakeCommandData(self, brief=None, description=None, notes=None):
-    collection = 'cloudiot.projects.locations.registries'
-    spec = {
-        'name': 'registry',
-        'collection': collection,
-        'attributes': [
-            {
-                'parameter_name': 'locationsId',
-                'attribute_name': 'region',
-                'help': 'The name of the Cloud IoT region.',
-            },
-            {
-                'parameter_name': 'registriesId',
-                'attribute_name': 'registry',
-                'help': 'The name of the Cloud IoT registry.',
-            },
-        ],
-    }
-    data = {
-        'help_text': {
-            'brief': brief or '<brief>',
-            'DESCRIPTION': description or '<DESCRIPTION>',
-            'NOTES': notes,
-        },
-        'request': {
-            'collection': collection,
-        },
-        'arguments': {
-            'resource': {
-                'help_text': 'The {resource} for which to get the IAM policy.',
-                'spec': spec,
-            },
-        },
-    }
-    return data
-
   def testGenerationExplicitHelp(self):
     brief = 'explicit brief'
     description = 'explicit description'
     command = yaml_command_translator.Translator().Translate(
         ['foo', 'get_iam_policy'],
-        self.MakeCommandData(brief=brief, description=description))
+        self.MakeIAMCommandData(
+            help_text='to get IAM policy of',
+            brief=brief,
+            description=description))
     self.assertTrue(issubclass(command, calliope_base.ListCommand))
     self.assertEqual(brief, command.detailed_help.get('brief'))
     self.assertEqual(description, command.detailed_help.get('DESCRIPTION'))
 
   def testGenerationDefaultHelp(self):
     command = yaml_command_translator.Translator().Translate(
-        ['foo', 'get_iam_policy'], self.MakeCommandData())
+        ['foo', 'get_iam_policy'],
+        self.MakeIAMCommandData(help_text='to get IAM policy of'))
     self.assertTrue(issubclass(command, calliope_base.ListCommand))
     self.assertEqual('<brief>', command.detailed_help.get('brief'))
     self.assertEqual('<DESCRIPTION>', command.detailed_help.get('DESCRIPTION'))
 
   def testAdditionalArgsHook(self):
-    d = yaml_command_schema.CommandData(
-        'get_iam_policy', self.MakeCommandData())
+    command_data = yaml_command_schema.CommandData(
+        'get_iam_policy',
+        self.MakeIAMCommandData(help_text='to get IAM policy of'))
     additional_args_mock = mock.MagicMock()
     side_effect = [calliope_base.Argument('--foo', help='Auxilio aliis.')]
     additional_args_mock.side_effect = lambda: side_effect
-    d.arguments.additional_arguments_hook = additional_args_mock
-    cli = self.MakeCLI(d)
+    command_data.arguments.additional_arguments_hook = additional_args_mock
+    cli = self.MakeCLI(command_data)
     self.AssertArgs(cli, 'REGISTRY', '--region', '--filter', '--sort-by',
                     '--page-size', '--limit', '--foo')
 
   def testRun(self):
     self.Expect()
-    d = yaml_command_schema.CommandData(
-        'get_iam_policy', self.MakeCommandData())
-    cli = self.MakeCLI(d)
+    cli = self.GetIamPolicyCLI()
     self.AssertArgs(cli, 'REGISTRY', '--region', '--filter', '--sort-by',
                     '--page-size', '--limit')
     result = cli.Execute(['command', '--project', 'p', '--region', 'r', 'i'])
@@ -1108,32 +1339,12 @@ class GetIamPolicyCommandTests(CommandTestsBase):
     self.AssertOutputEquals('etag: ACAB\n')
 
   def testRunWithResponseErrorHandler(self):
-    class Good(object):
-      c = 2
-      d = 3
-
-    class Error(object):
-      code = 10
-      message = 'message'
-
-    class Bad(object):
-      error = Error
-
-    class Response(object):
-      a = 1
-      b = [Good, Bad]
-
-    self.Expect(response=Response)
-    d = yaml_command_schema.CommandData(
-        'get_iam_policy', self.MakeCommandData())
-    d.response = yaml_command_schema.Response(
-        {'error': {'field': 'b.error',
-                   'code': 'code',
-                   'message': 'message'}})
-    cli = self.MakeCLI(d)
-    with self.assertRaises(SystemExit):
-      cli.Execute(['command', '--project', 'p', '--region', 'r', 'i'])
-    self.AssertErrContains('Code: [10] Message: [message]')
+    command_data = yaml_command_schema.CommandData(
+        'get_iam_policy',
+        self.MakeIAMCommandData(help_text='to get IAM policy of'))
+    execute_params = ['command', '--project', 'p', '--region', 'r', 'i']
+    self.AssertErrorHandlingWithResponse(self.Expect, command_data,
+                                         execute_params)
 
 
 class SetIamPolicyCommandTests(CommandTestsBase):
@@ -1150,7 +1361,7 @@ class SetIamPolicyCommandTests(CommandTestsBase):
     self.messages = self.client.MESSAGES_MODULE
     self.policy = self._MakePolicy()
 
-  def Expect(self, instance='i', response=None):
+  def Expect(self, response=None):
     set_iam_policy_request = self.messages.SetIamPolicyRequest(
         policy=self.policy)
     self.mocked_client.projects_locations_registries.SetIamPolicy.Expect(
@@ -1158,46 +1369,6 @@ class SetIamPolicyCommandTests(CommandTestsBase):
             resource='projects/p/locations/r/registries/i',
             setIamPolicyRequest=set_iam_policy_request),
         response=response or self.policy)
-
-  def MakeCommandData(self, brief=None, description=None, notes=None,
-                      params=None):
-    collection = 'cloudiot.projects.locations.registries'
-    spec = {
-        'name': 'registry',
-        'collection': collection,
-        'attributes': [
-            {
-                'parameter_name': 'locationsId',
-                'attribute_name': 'region',
-                'help': 'The name of the Cloud IoT region.',
-            },
-            {
-                'parameter_name': 'registriesId',
-                'attribute_name': 'registry',
-                'help': 'The name of the Cloud IoT registry.',
-            },
-        ],
-    }
-    data = {
-        'help_text': {
-            'brief': brief or '<brief>',
-            'DESCRIPTION': description or '<DESCRIPTION>',
-            'NOTES': notes,
-        },
-        'request': {
-            'collection': collection,
-        },
-        'arguments': {
-            'resource': {
-                'help_text': 'The {resource} for which to set the IAM policy.',
-                'spec': spec,
-            },
-        },
-    }
-    if params:
-      data['arguments']['params'] = params
-
-    return data
 
   def MakeProjectCommandData(self, brief=None, description=None, notes=None,
                              params=None):
@@ -1234,53 +1405,26 @@ class SetIamPolicyCommandTests(CommandTestsBase):
 
     return data
 
-  def MakeMlCommandData(self, brief=None, description=None, notes=None,
-                        params=None):
-    collection = 'ml.projects.models'
-    spec = {
-        'name': 'model',
-        'collection': collection,
-        'attributes': [
-            {
-                'parameter_name': 'projectsId',
-                'attribute_name': 'project',
-                'help': 'The name of the Project.',
-            },
-            {
-                'parameter_name': 'modelsId',
-                'attribute_name': 'model',
-                'help': 'The name of the Model.',
-            }
-        ],
-    }
-    data = {
-        'help_text': {
-            'brief': brief or '<brief>',
-            'DESCRIPTION': description or '<DESCRIPTION>',
-            'NOTES': notes,
-        },
-        'request': {
-            'collection': collection,
-        },
-        'arguments': {
-            'resource': {
-                'help_text': 'The {resource} for which to set the IAM policy.',
-                'spec': spec,
-            },
-        },
-    }
-    if params:
-      data['arguments']['params'] = params
+  @classmethod
+  def SetIamPolicyTranslator(cls, brief=None, description=None):
+    return yaml_command_translator.Translator().Translate(
+        ['foo', 'set_iam_policy'],
+        cls.MakeIAMCommandData(
+            help_text='to set IAM policy to',
+            brief=brief,
+            description=description))
 
-    return data
+  def GetSetIamPolicyCLI(self):
+    command_data = yaml_command_schema.CommandData(
+        'set_iam_policy',
+        self.MakeIAMCommandData(help_text='to set IAM policy to'))
+    return self.MakeCLI(command_data)
 
   def testRun(self):
     self.StartObjectPatch(iam_util, 'ParsePolicyFileWithUpdateMask',
                           return_value=(self.policy, 'bindings,etag,version'))
     self.Expect()
-    d = yaml_command_schema.CommandData(
-        'set_iam_policy', self.MakeCommandData())
-    cli = self.MakeCLI(d)
+    cli = self.GetSetIamPolicyCLI()
     self.AssertArgs(cli, 'REGISTRY', '--region', 'POLICY_FILE')
     result = cli.Execute(['command', '--project', 'p', '--region', 'r', 'i',
                           'myfile'])
@@ -1302,9 +1446,7 @@ class SetIamPolicyCommandTests(CommandTestsBase):
     self.StartObjectPatch(iam_util, 'ParsePolicyFileWithUpdateMask',
                           return_value=(self.policy, 'bindings,etag,version'))
     self.Expect()
-    d = yaml_command_schema.CommandData(
-        'set_iam_policy', self.MakeCommandData())
-    cli = self.MakeCLI(d)
+    cli = self.GetSetIamPolicyCLI()
     self.AssertArgs(cli, 'REGISTRY', '--region', 'POLICY_FILE')
     result = cli.Execute(['command', '--project', 'p', '--region', 'r', 'i',
                           'myfile'])
@@ -1369,9 +1511,7 @@ class SetIamPolicyCommandTests(CommandTestsBase):
     self.StartObjectPatch(iam_util, 'ParsePolicyFileWithUpdateMask',
                           side_effect=gcloud_exceptions.BadFileException(
                               'Bad Policy File'))
-    d = yaml_command_schema.CommandData(
-        'set_iam_policy', self.MakeCommandData())
-    cli = self.MakeCLI(d)
+    cli = self.GetSetIamPolicyCLI()
     with self.assertRaises(SystemExit):
       cli.Execute(['command', '--project', 'p', '--region', 'r', 'i', 'myfile'])
     self.AssertErrContains('Bad Policy File')
@@ -1399,17 +1539,18 @@ class SetIamPolicyCommandTests(CommandTestsBase):
             resource='projects/p/models/m',
             googleIamV1SetIamPolicyRequest=set_iam_policy_request),
         policy)
-    d = yaml_command_schema.CommandData(
-        'set_iam_policy', self.MakeMlCommandData())
-    o = yaml_command_schema.IamData({
+    command_data = yaml_command_schema.CommandData(
+        'set_iam_policy',
+        self.MakeIAMCommandData(
+            help_text='to set IAM policy to', another_collection=True))
+    command_data.iam = yaml_command_schema.IamData({
         'set_iam_policy_request_path': 'googleIamV1SetIamPolicyRequest',
         'message_type_overrides': {
             'policy': 'GoogleIamV1Policy',
             'set_iam_policy_request': 'GoogleIamV1SetIamPolicyRequest'
         }
     })
-    d.iam = o
-    cli = self.MakeCLI(d)
+    cli = self.MakeCLI(command_data)
     self.AssertArgs(cli, 'MODEL', 'POLICY_FILE')
     result = cli.Execute(['command', '--project', 'p', 'm', 'myfile'])
     self.assertEqual(result, policy)
@@ -1429,11 +1570,14 @@ class SetIamPolicyCommandTests(CommandTestsBase):
 
   def testRunBadOverride(self):
     d = yaml_command_schema.CommandData(
-        'set_iam_policy', self.MakeCommandData())
+        'set_iam_policy',
+        self.MakeIAMCommandData(help_text='to set IAM policy to'))
 
-    o = yaml_command_schema.IamData(
-        {'message_type_overrides': {'policy': 'FuBarPolicy'}})
-    d.iam = o
+    d.iam = yaml_command_schema.IamData({
+        'message_type_overrides': {
+            'policy': 'FuBarPolicy'
+        }
+    })
     cli = self.MakeCLI(d)
     with self.assertRaisesRegex(ValueError,
                                 r'Policy type \[FuBarPolicy\] not found.'):
@@ -1443,49 +1587,36 @@ class SetIamPolicyCommandTests(CommandTestsBase):
     brief = 'explicit brief'
     description = 'explicit description'
     command = yaml_command_translator.Translator().Translate(
-        ['foo', 'get_iam_policy'],
-        self.MakeCommandData(brief=brief, description=description))
+        ['foo', 'set_iam_policy'],
+        self.MakeIAMCommandData(
+            help_text='to set IAM policy to',
+            brief=brief,
+            description=description))
     self.assertTrue(issubclass(command, calliope_base.Command))
     self.assertEqual(brief, command.detailed_help.get('brief'))
     self.assertEqual(description, command.detailed_help.get('DESCRIPTION'))
 
   def testGenerationDefaultHelp(self):
     command = yaml_command_translator.Translator().Translate(
-        ['foo', 'get_iam_policy'], self.MakeCommandData())
+        ['foo', 'set_iam_policy'],
+        self.MakeIAMCommandData(help_text='to set IAM policy to'))
     self.assertTrue(issubclass(command, calliope_base.Command))
     self.assertEqual('<brief>', command.detailed_help.get('brief'))
     self.assertEqual('<DESCRIPTION>', command.detailed_help.get('DESCRIPTION'))
 
   def testRunWithResponseErrorHandler(self):
-    self.StartObjectPatch(iam_util, 'ParsePolicyFileWithUpdateMask',
-                          return_value=(self.policy, 'bindings,etag,version'))
-
-    class Good(object):
-      c = 2
-      d = 3
-
-    class Error(object):
-      code = 10
-      message = 'message'
-
-    class Bad(object):
-      error = Error
-
-    class Response(object):
-      a = 1
-      b = [Good, Bad]
-
-    self.Expect(response=Response)
-    d = yaml_command_schema.CommandData(
-        'set_iam_policy', self.MakeCommandData())
-    d.response = yaml_command_schema.Response(
-        {'error': {'field': 'b.error',
-                   'code': 'code',
-                   'message': 'message'}})
-    cli = self.MakeCLI(d)
-    with self.assertRaises(SystemExit):
-      cli.Execute(['command', '--project', 'p', '--region', 'r', 'i', 'myfile'])
-    self.AssertErrContains('Code: [10] Message: [message]')
+    self.StartObjectPatch(
+        iam_util,
+        'ParsePolicyFileWithUpdateMask',
+        return_value=(self.policy, 'bindings,etag,version'))
+    command_data = yaml_command_schema.CommandData(
+        'set_iam_policy',
+        self.MakeIAMCommandData(help_text='to set IAM policy to'))
+    execute_params = [
+        'command', '--project', 'p', '--region', 'r', 'i', 'myfile'
+    ]
+    self.AssertErrorHandlingWithResponse(self.Expect, command_data,
+                                         execute_params)
 
 
 class AddIamPolicyBindingCommandTests(CommandTestsBase):
@@ -1524,160 +1655,43 @@ class AddIamPolicyBindingCommandTests(CommandTestsBase):
             setIamPolicyRequest=req),
         response=response or self.updated_policy)
 
-  def Expect(self, instance='i', response=None):
+  def Expect(self, response=None):
     self._ExpectGetIamPolicy()
     self._ExpectSetUpdatedIamPolicy(response=response)
 
-  def MakeCommandData(self,
-                      brief=None,
-                      description=None,
-                      notes=None,
-                      params=None):
-    collection = 'cloudiot.projects.locations.registries'
-    spec = {
-        'name':
-            'registry',
-        'collection':
-            collection,
-        'attributes': [
-            {
-                'parameter_name': 'locationsId',
-                'attribute_name': 'region',
-                'help': 'The name of the Cloud IoT region.',
-            },
-            {
-                'parameter_name': 'registriesId',
-                'attribute_name': 'registry',
-                'help': 'The name of the Cloud IoT registry.',
-            },
-        ],
-    }
-    data = {
-        'help_text': {
-            'brief': brief or '<brief>',
-            'DESCRIPTION': description or '<DESCRIPTION>',
-            'NOTES': notes,
-        },
-        'request': {
-            'collection': collection,
-        },
-        'arguments': {
-            'resource': {
-                'help_text': (
-                    'The {resource} for which to add the IAM policy binding '
-                    'to.'),
-                'spec':
-                    spec,
-            },
-        },
-    }
-    if params:
-      data['arguments']['params'] = params
+  @classmethod
+  def GetAddIamPolicyBindingCommandTranslator(cls, brief=None,
+                                              description=None):
+    return yaml_command_translator.Translator().Translate(
+        ['foo', 'add_iam_policy_binding'],
+        cls.MakeIAMCommandData(
+            help_text='to add IAM policy binding to',
+            brief=brief,
+            description=description))
 
-    return data
-
-  def MakeProjectCommandData(self,
-                             brief=None,
-                             description=None,
-                             notes=None,
-                             params=None):
-    collection = 'cloudresourcemanager.projects'
-    spec = {
-        'name':
-            'project',
-        'collection':
-            collection,
-        'attributes': [{
-            'parameter_name': 'projectId',
-            'attribute_name': 'project_id',
-            'help': 'The name of the Project.',
-        }],
-    }
-    data = {
-        'help_text': {
-            'brief': brief or '<brief>',
-            'DESCRIPTION': description or '<DESCRIPTION>',
-            'NOTES': notes,
-        },
-        'request': {
-            'collection': collection,
-        },
-        'arguments': {
-            'resource': {
-                'help_text': 'The {resource} for which to set the IAM policy.',
-                'spec': spec,
-            },
-        },
-    }
-    if params:
-      data['arguments']['params'] = params
-
-    return data
-
-  def MakeMlCommandData(self,
-                        brief=None,
-                        description=None,
-                        notes=None,
-                        params=None):
-    collection = 'ml.projects.models'
-    spec = {
-        'name':
-            'model',
-        'collection':
-            collection,
-        'attributes': [{
-            'parameter_name': 'projectsId',
-            'attribute_name': 'project',
-            'help': 'The name of the Project.',
-        }, {
-            'parameter_name': 'modelsId',
-            'attribute_name': 'model',
-            'help': 'The name of the Model.',
-        }],
-    }
-    data = {
-        'help_text': {
-            'brief': brief or '<brief>',
-            'DESCRIPTION': description or '<DESCRIPTION>',
-            'NOTES': notes,
-        },
-        'request': {
-            'collection': collection,
-        },
-        'arguments': {
-            'resource': {
-                'help_text': 'The {resource} for which to set the IAM policy.',
-                'spec': spec,
-            },
-        },
-    }
-    if params:
-      data['arguments']['params'] = params
-
-    return data
+  def GetAddIamPolicyBindingCLI(self):
+    command_data = yaml_command_schema.CommandData(
+        'add_iam_policy_binding',
+        self.MakeIAMCommandData(help_text='to add IAM policy binding to'))
+    return self.MakeCLI(command_data)
 
   def testGenerationExplicitHelp(self):
     brief = 'explicit brief'
     description = 'explicit description'
-    command = yaml_command_translator.Translator().Translate(
-        ['foo', 'add_iam_policy_binding'],
-        self.MakeCommandData(brief=brief, description=description))
+    command = self.GetAddIamPolicyBindingCommandTranslator(brief, description)
     self.assertTrue(issubclass(command, calliope_base.Command))
     self.assertEqual(brief, command.detailed_help.get('brief'))
     self.assertEqual(description, command.detailed_help.get('DESCRIPTION'))
 
   def testGenerationDefaultHelp(self):
-    command = yaml_command_translator.Translator().Translate(
-        ['foo', 'add_iam_policy_binding'], self.MakeCommandData())
+    command = self.GetAddIamPolicyBindingCommandTranslator()
     self.assertTrue(issubclass(command, calliope_base.Command))
     self.assertEqual('<brief>', command.detailed_help.get('brief'))
     self.assertEqual('<DESCRIPTION>', command.detailed_help.get('DESCRIPTION'))
 
   def testRun(self):
     self.Expect()
-    d = yaml_command_schema.CommandData('add_iam_policy_binding',
-                                        self.MakeCommandData())
-    cli = self.MakeCLI(d)
+    cli = self.GetAddIamPolicyBindingCLI()
     self.AssertArgs(cli, 'REGISTRY', '--region', '--member', '--role')
     result = cli.Execute([
         'command', '--project', 'p', '--region', 'r', 'i', '--role',
@@ -1734,17 +1748,18 @@ class AddIamPolicyBindingCommandTests(CommandTestsBase):
             resource='projects/p/models/m',
             googleIamV1SetIamPolicyRequest=set_iam_policy_request),
         updated_policy)
-    d = yaml_command_schema.CommandData('add_iam_policy_binding',
-                                        self.MakeMlCommandData())
-    o = yaml_command_schema.IamData({
+    command_data = yaml_command_schema.CommandData(
+        'add_iam_policy_binding',
+        self.MakeIAMCommandData(
+            help_text='to add IAM policy binding to', another_collection=True))
+    command_data.iam = yaml_command_schema.IamData({
         'set_iam_policy_request_path': 'googleIamV1SetIamPolicyRequest',
         'message_type_overrides': {
             'policy': 'GoogleIamV1Policy',
             'set_iam_policy_request': 'GoogleIamV1SetIamPolicyRequest'
         }
     })
-    d.iam = o
-    cli = self.MakeCLI(d)
+    cli = self.MakeCLI(command_data)
     self.AssertArgs(cli, 'MODEL', '--member', '--role')
     result = cli.Execute([
         'command', '--project', 'p', '--project', 'p', 'm', '--role',
@@ -1764,39 +1779,340 @@ class AddIamPolicyBindingCommandTests(CommandTestsBase):
         normalize_space=True)
 
   def testRunWithResponseErrorHandler(self):
+    command_data = yaml_command_schema.CommandData(
+        'add_iam_policy_binding',
+        self.MakeIAMCommandData(help_text='to add IAM policy binding to'))
+    execute_params = [
+        'command', '--project', 'p', '--region', 'r', 'i', '--role',
+        'roles/viewer', '--member', 'user:admin@foo.com'
+    ]
+    self.AssertErrorHandlingWithResponse(self.Expect, command_data,
+                                         execute_params)
 
-    class Good(object):
-      c = 2
-      d = 3
 
-    class Error(object):
-      code = 10
-      message = 'message'
+class RemoveIamPolicyBindingCommandTests(CommandTestsBase):
 
-    class Bad(object):
-      error = Error
+  def _MakePolicy(self, bindings=None, etag=b'ACAB', messages=None):
+    msgs = messages or self.messages
+    return msgs.Policy(bindings=bindings or [], etag=etag)
 
-    class Response(object):
-      a = 1
-      b = [Good, Bad]
+  def _MakeBinding(self, role, members=None, messages=None):
+    msgs = messages or self.messages
+    return msgs.Binding(role=role, members=members)
 
-    self.Expect(response=Response)
-    d = yaml_command_schema.CommandData('add_iam_policy_binding',
-                                        self.MakeCommandData())
-    d.response = yaml_command_schema.Response({
-        'error': {
-            'field': 'b.error',
-            'code': 'code',
-            'message': 'message'
+  def SetUp(self):
+    self.client = apis.GetClientClass('cloudiot', 'v1')
+    self.mocked_client = apitools_mock.Client(self.client)
+    self.mocked_client.Mock()
+    self.addCleanup(self.mocked_client.Unmock)
+    self.messages = self.client.MESSAGES_MODULE
+    self.start_policy = self._MakePolicy(
+        [self._MakeBinding('roles/viewer', ['user:admin@foo.com'])])
+    self.updated_policy = self._MakePolicy()
+
+  def _ExpectGetIamPolicy(self):
+    req = self.messages.CloudiotProjectsLocationsRegistriesGetIamPolicyRequest(
+        resource='projects/p/locations/r/registries/i')
+
+    self.mocked_client.projects_locations_registries.GetIamPolicy.Expect(
+        request=req, response=self.start_policy)
+
+  def _ExpectSetUpdatedIamPolicy(self, response=None):
+    req = self.messages.SetIamPolicyRequest(policy=self.updated_policy)
+    self.mocked_client.projects_locations_registries.SetIamPolicy.Expect(
+        request=self.messages.
+        CloudiotProjectsLocationsRegistriesSetIamPolicyRequest(
+            resource='projects/p/locations/r/registries/i',
+            setIamPolicyRequest=req),
+        response=response or self.updated_policy)
+
+  def Expect(self, response=None):
+    self._ExpectGetIamPolicy()
+    self._ExpectSetUpdatedIamPolicy(response=response)
+
+  @classmethod
+  def GetRemoveIamPolicyBindingCommandTranslator(cls,
+                                                 brief=None,
+                                                 description=None):
+    return yaml_command_translator.Translator().Translate(
+        ['foo', 'remove_iam_policy_binding'],
+        cls.MakeIAMCommandData(
+            help_text='to remove IAM policy binding from',
+            brief=brief,
+            description=description))
+
+  def GetRemoveIamPolicyBindingCLI(self):
+    command_data = yaml_command_schema.CommandData(
+        'remove_iam_policy_binding',
+        self.MakeIAMCommandData(help_text='to remove IAM policy binding from'))
+    return self.MakeCLI(command_data)
+
+  def testGenerationExplicitHelp(self):
+    brief = 'explicit brief'
+    description = 'explicit description'
+    translator = self.GetRemoveIamPolicyBindingCommandTranslator(
+        brief, description)
+    self.assertTrue(issubclass(translator, calliope_base.Command))
+    self.assertEqual(brief, translator.detailed_help.get('brief'))
+    self.assertEqual(description, translator.detailed_help.get('DESCRIPTION'))
+
+  def testGenerationDefaultHelp(self):
+    translator = self.GetRemoveIamPolicyBindingCommandTranslator()
+    self.assertTrue(issubclass(translator, calliope_base.Command))
+    self.assertEqual('<brief>', translator.detailed_help.get('brief'))
+    self.assertEqual('<DESCRIPTION>',
+                     translator.detailed_help.get('DESCRIPTION'))
+
+  def testRun(self):
+    self.Expect()
+    cli = self.GetRemoveIamPolicyBindingCLI()
+    self.AssertArgs(cli, 'REGISTRY', '--region', '--member', '--role')
+    result = cli.Execute([
+        'command', '--project', 'p', '--region', 'r', 'i', '--role',
+        'roles/viewer', '--member', 'user:admin@foo.com'
+    ])
+    self.assertEqual(result, self.updated_policy)
+    self.AssertErrContains(
+        """
+    Updated IAM policy for registry [i].
+    """.lstrip('\n'),
+        normalize_space=True)
+    self.AssertOutputEquals(
+        """
+    etag: QUNBQg==
+    """.lstrip('\n'), normalize_space=True)
+
+  def testRunWithOverrides(self):
+    client = apis.GetClientClass('ml', 'v1')
+    mocked_client = apitools_mock.Client(client)
+    mocked_client.Mock()
+    self.addCleanup(mocked_client.Unmock)
+    messages = client.MESSAGES_MODULE
+    policy = messages.GoogleIamV1Policy(bindings=[{
+        'role': 'roles/owner',
+        'members': [
+            'user:mike@example.com',
+            'group:admins@example.com',
+        ]
+    }])
+    updated_policy = messages.GoogleIamV1Policy(bindings=[{
+        'role': 'roles/owner',
+        'members': ['user:mike@example.com']
+    }])
+    self.StartObjectPatch(
+        iam_util,
+        'ParsePolicyFileWithUpdateMask',
+        return_value=(updated_policy, 'bindings,etag,version'))
+
+    mocked_client.projects_models.GetIamPolicy.Expect(
+        messages.MlProjectsModelsGetIamPolicyRequest(
+            resource='projects/p/models/m'),
+        policy)
+
+    set_iam_policy_request = messages.GoogleIamV1SetIamPolicyRequest(
+        policy=updated_policy)
+    mocked_client.projects_models.SetIamPolicy.Expect(
+        messages.MlProjectsModelsSetIamPolicyRequest(
+            resource='projects/p/models/m',
+            googleIamV1SetIamPolicyRequest=set_iam_policy_request),
+        updated_policy)
+    command_data = yaml_command_schema.CommandData(
+        'remove_iam_policy_binding',
+        self.MakeIAMCommandData(
+            help_text='to remove IAM policy binding from',
+            another_collection=True))
+    command_data.iam = yaml_command_schema.IamData({
+        'set_iam_policy_request_path': 'googleIamV1SetIamPolicyRequest',
+        'message_type_overrides': {
+            'policy': 'GoogleIamV1Policy',
+            'set_iam_policy_request': 'GoogleIamV1SetIamPolicyRequest'
         }
     })
+    cli = self.MakeCLI(command_data)
+    self.AssertArgs(cli, 'MODEL', '--member', '--role')
+    result = cli.Execute([
+        'command', '--project', 'p', '--project', 'p', 'm', '--role',
+        'roles/owner', '--member', 'group:admins@example.com'
+    ])
+    self.assertEqual(result, policy)
+    self.AssertErrContains(
+        'Updated IAM policy for model [m].', normalize_space=True)
+    self.AssertOutputEquals(
+        """
+      bindings:
+      - members:
+      - user:mike@example.com
+      role: roles/owner
+      """.lstrip('\n'),
+        normalize_space=True)
+
+  def testRunWithResponseErrorHandler(self):
+    command_data = yaml_command_schema.CommandData(
+        'remove_iam_policy_binding',
+        self.MakeIAMCommandData(help_text='to remove IAM policy binding from'))
+    execute_params = [
+        'command', '--project', 'p', '--region', 'r', 'i', '--role',
+        'roles/viewer', '--member', 'user:admin@foo.com'
+    ]
+    self.AssertErrorHandlingWithResponse(self.Expect, command_data,
+                                         execute_params)
+
+
+class UpdateCommandTests(CommandTestsBase):
+
+  def SetUp(self):
+    self.client = apis.GetClientClass('spanner', 'v1')
+    self.mocked_client = apitools_mock.Client(self.client)
+    self.mocked_client.Mock()
+    self.addCleanup(self.mocked_client.Unmock)
+    self.messages = self.client.MESSAGES_MODULE
+
+  def _OperationResponses(self):
+    running_response = self.messages.Operation(
+        done=False, name='projects/p/instances/i/operations/o')
+    done_response = self.messages.Operation(
+        done=True, name='projects/p/instances/i/operations/o')
+
+    return running_response, done_response
+
+  def _MakeUpdateCommandData(self):
+    spec = {
+        'name':
+            'instance',
+        'collection':
+            'spanner.projects.instances',
+        'attributes': [{
+            'parameter_name': 'instancesId',
+            'attribute_name': 'instance',
+            'help': 'The name of Cloud Spanner instance.'
+        }]
+    }
+
+    return {
+        'help_text': {
+            'brief': '<brief>',
+            'DESCRIPTION': '<DESCRIPTION>',
+            'NOTES': '<NOTES>'
+        },
+        'request': {
+            'collection': 'spanner.projects.instances'
+        },
+        'arguments': {
+            'resource': {
+                'help_text': 'The {resource} to update.',
+                'spec': spec,
+            }
+        }
+    }
+
+  def _ExpectUpdate(self, is_async=False):
+    running_response, _ = self._OperationResponses()
+    req = self.messages.SpannerProjectsInstancesPatchRequest(
+        name='projects/p/instances/i',
+        updateInstanceRequest=self.messages.UpdateInstanceRequest(
+            instance=self.messages.Instance(nodeCount=2)))
+    self.mocked_client.projects_instances.Patch.Expect(
+        request=req, response=running_response)
+
+    updated_instance = self.messages.Instance(
+        name='projects/p/instances/i', nodeCount=2)
+
+    if not is_async:
+      self._ExpectOperation()
+      self.mocked_client.projects_instances.Get.Expect(
+          request=self.messages.SpannerProjectsInstancesGetRequest(
+              name='projects/p/instances/i'),
+          response=updated_instance)
+
+    return running_response, updated_instance
+
+  def _ExpectOperation(self):
+    running_response, done_response = self._OperationResponses()
+    self.mocked_client.projects_instances_operations.Get.Expect(
+        self.messages.SpannerProjectsInstancesOperationsGetRequest(
+            name='projects/p/instances/i/operations/o'),
+        response=running_response)
+    self.mocked_client.projects_instances_operations.Get.Expect(
+        self.messages.SpannerProjectsInstancesOperationsGetRequest(
+            name='projects/p/instances/i/operations/o'),
+        response=done_response)
+
+  def testGeneration(self):
+    global_mock = self.StartObjectPatch(yaml_command_translator.CommandBuilder,
+                                        '_ConfigureGlobalAttributes')
+    command = yaml_command_translator.Translator().Translate(
+        ['foo', 'delete'], self.MakeCommandData())
+    self.assertTrue(issubclass(command, calliope_base.Command))
+    global_mock.assert_called_once_with(command)
+
+  def testRunAsync(self):
+    self._ExpectUpdate(is_async=True)
+    data = self._MakeUpdateCommandData()
+    data['async'] = {'collection': 'spanner.projects.instances.operations'}
+    data['request']['method'] = 'patch'
+    data['arguments']['params'] = [{
+        'api_field': 'updateInstanceRequest.instance.nodeCount',
+        'arg_name': 'nodes',
+        'help_text': 'the number of the nodes of the instance to update'
+    }]
+    d = yaml_command_schema.CommandData('update', data)
+    d.request.method = 'patch'
+    d.async.state.field = 'done'
+    d.async.state.success_values = [True]
     cli = self.MakeCLI(d)
-    with self.assertRaises(SystemExit):
-      cli.Execute([
-          'command', '--project', 'p', '--region', 'r', 'i', '--role',
-          'roles/viewer', '--member', 'user:admin@foo.com'
-      ])
-    self.AssertErrContains('Code: [10] Message: [message]')
+    self.AssertArgs(cli, 'INSTANCE', '--nodes', '--async', '--no-async')
+    cli.Execute(['command', 'i', '--project', 'p', '--async', '--nodes', '2'])
+    self.AssertOutputEquals(
+        """
+done: false
+name: projects/p/instances/i/operations/o
+""".lstrip('\n'),
+        normalize_space=True)
+    self.AssertErrContains('Request issued for: [i]')
+    self.AssertErrContains('Check operation [o] for status.')
+
+  def testRunSync(self):
+    _, done_response = self._ExpectUpdate(is_async=False)
+    data = self._MakeUpdateCommandData()
+    data['async'] = {'collection': 'spanner.projects.instances.operations'}
+    data['request']['method'] = 'patch'
+    data['arguments']['params'] = [{
+        'api_field': 'updateInstanceRequest.instance.nodeCount',
+        'arg_name': 'nodes',
+        'help_text': 'the number of the nodes of the instance to update'
+    }]
+    d = yaml_command_schema.CommandData('update', data)
+    d.request.method = 'patch'
+    d.async.state.field = 'done'
+    d.async.state.success_values = [True]
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'INSTANCE', '--nodes', '--async', '--no-async')
+    result = cli.Execute(['command', 'i', '--project', 'p', '--nodes', '2'])
+    self.AssertErrContains('Request issued for: [i]')
+    self.assertEqual(result, done_response)
+
+  def testRunNoOperationMethod(self):
+    """Test for when the API doesn't return an LRO."""
+    self.mocked_client.projects_instances.Patch.Expect(
+        request=(self.messages.SpannerProjectsInstancesPatchRequest(
+            name='projects/p/instances/i',
+            updateInstanceRequest=self.messages.UpdateInstanceRequest(
+                instance=self.messages.Instance(nodeCount=2)))),
+        response='new instance')
+
+    data = self._MakeUpdateCommandData()
+    data['request']['method'] = 'patch'
+    data['arguments']['params'] = [{
+        'api_field': 'updateInstanceRequest.instance.nodeCount',
+        'arg_name': 'nodes',
+        'help_text': 'the number of the nodes of the instance to update'
+    }]
+    d = yaml_command_schema.CommandData('update', data)
+    d.request.method = 'patch'
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'INSTANCE', '--nodes')
+    result = cli.Execute(['command', 'i', '--project', 'p', '--nodes', '2'])
+    self.assertEqual(result, 'new instance')
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +21,7 @@ as listing the contents. We use the API for checking ACLs.
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import io
@@ -321,29 +323,3 @@ class StorageClient(object):
     """
     self.client.buckets.Delete(
         self.messages.StorageBucketsDeleteRequest(bucket=bucket_ref.bucket))
-
-
-def Rsync(source_dir, dest_dir, exclude_pattern=None):
-  """Copies files from the specified file system directory to a GCS bucket.
-
-  Args:
-    source_dir: The source directory for the rsync.
-    dest_dir: The destination directory for the rsync.
-    exclude_pattern: A string representation of a Python regular expression.
-      If provided, this is passed as the '-x' argument for the rsync command.
-
-  Returns:
-    The exit code of the call to "gsutil rsync".
-  """
-
-  # -m Allows concurrent uploads
-  # -c Causes gsutil to compute checksums when comparing files.
-  # -R recursively copy all files
-  # -x Ignore files using the specified pattern.
-  command_args = ['-R', '-c']
-  if exclude_pattern:
-    command_args += ['-x', exclude_pattern]
-
-  command_args += [source_dir, dest_dir]
-  return storage_util.RunGsutilCommand('rsync', command_args,
-                                       run_concurrent=True)

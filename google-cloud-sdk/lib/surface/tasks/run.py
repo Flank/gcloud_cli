@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,15 @@
 """`gcloud tasks run` command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.tasks import tasks
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.tasks import flags
 from googlecloudsdk.command_lib.tasks import parsers
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Run(base.Command):
   """Force a task to run now."""
 

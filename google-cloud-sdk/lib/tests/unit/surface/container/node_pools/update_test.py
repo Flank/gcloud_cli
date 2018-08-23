@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,22 +16,20 @@
 """Tests for 'node-pools delete' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.container import base
 
 
-class UpdateTestV1API(base.TestBaseV1,
-                      base.GATestBase,
-                      base.NodePoolsTestBase):
+class UpdateTestGA(base.GATestBase, base.NodePoolsTestBase):
   """gcloud GA track using container v1 API."""
 
   def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
     self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
                                                 self.PROJECT_ID))
     self.api_adapter = api_adapter.NewAPIAdapter(self.API_VERSION)
@@ -255,52 +254,16 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
         'and you should feel bad.')
 
   def testNoFlagsError(self):
-    with self.AssertRaisesArgumentErrorRegexp('^argument'):
+    with self.AssertRaisesArgumentErrorRegexp('[Mm]ust be specified'):
       self.Run(self.node_pools_command_base.format(self.ZONE) +
                ' update {0} --cluster={1}'
                .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
-    self.AssertErrContains('Must be specified')
 
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestBetaV1API(base.BetaTestBase, UpdateTestV1API):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-
-
-# TODO(b/64575339): switch to use parameterized testing.
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestBetaV1Beta1API(base.TestBaseV1Beta1, UpdateTestBetaV1API):
+class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
   """gcloud Beta track using container v1beta1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestAlphaV1API(base.AlphaTestBase, UpdateTestBetaV1API):
-  """gcloud Alpha track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-
-  def testNoFlagsError(self):
-    with self.AssertRaisesArgumentErrorRegexp('^Exactly one of '):
-      self.Run(self.node_pools_command_base.format(self.ZONE) +
-               ' update {0} --cluster={1}'
-               .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
-                                 UpdateTestBetaV1Beta1API):
-  """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
 
   def testEnableAutoscaling(self):
     pool_kwargs = {}
@@ -386,6 +349,11 @@ class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
                .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.AssertErrContains('--enable-autoupgrade')
     self.AssertErrContains('--enable-autoprovisioning')
+
+
+# Mixin class must come in first to have the correct multi-inheritance behavior.
+class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
+  """gcloud Alpha track using container v1alpha1 API."""
 
 
 if __name__ == '__main__':

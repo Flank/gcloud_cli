@@ -11,7 +11,7 @@ gcloud alpha compute routers create \- create a Google Compute Engine router
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute routers create\fR \fINAME\fR \fB\-\-asn\fR=\fIASN\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-advertisement\-mode\fR=\fIMODE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-set\-advertisement\-groups\fR=[\fIGROUP\fR,...]] [\fB\-\-set\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute routers create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-advertisement\-mode\fR=\fIMODE\fR] [\fB\-\-asn\fR=\fIASN\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-set\-advertisement\-groups\fR=[\fIGROUP\fR,...]] [\fB\-\-set\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,11 +36,6 @@ Name of the router to create.
 .SH "REQUIRED FLAGS"
 
 .RS 2m
-.TP 2m
-\fB\-\-asn\fR=\fIASN\fR
-The BGP autonomous system number (ASN) for this router. For more information
-see: https://tools.ietf.org/html/rfc6996.
-
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
 The network for this router
@@ -67,6 +62,11 @@ Default (Google\-managed) BGP advertisements.
 .RE
 .sp
 .TP 2m
+\fB\-\-asn\fR=\fIASN\fR
+The optional BGP autonomous system number (ASN) for this router. For more
+information see: https://tools.ietf.org/html/rfc6996.
+
+.TP 2m
 \fB\-\-async\fR
 Display information about the operation in progress, without waiting for the
 operation to complete.
@@ -77,8 +77,8 @@ An optional description of this router.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the router to create. If not specified, you may be prompted to
-select a region.
+Region of the router to create. If not specified, you may be prompted to select
+a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -141,11 +141,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute routers create

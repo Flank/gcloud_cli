@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +14,10 @@
 # limitations under the License.
 
 """Test of the 'jobs delete' command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.console import console_io
@@ -51,10 +53,9 @@ class JobsDeleteUnitTest(jobs_unit_base.JobsUnitTestBase):
     self.WriteInput('y\n')
     result = self.RunDataproc('jobs delete ' + self.JOB_ID)
     self.assertIsNone(result)
-    self.AssertErrContains(textwrap.dedent("""\
-        The job 'dbf5f287-f332-470b-80b2-c94b49358c45' will be deleted.
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        "The job 'dbf5f287-f332-470b-80b2-c94b49358c45' will be deleted.")
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDeleteJobDecline(self):
     self.WriteInput('n\n')
@@ -62,10 +63,9 @@ class JobsDeleteUnitTest(jobs_unit_base.JobsUnitTestBase):
         console_io.OperationCancelledError,
         'Deletion aborted by user.'):
       self.RunDataproc('jobs delete ' + self.JOB_ID)
-    self.AssertErrContains(textwrap.dedent("""\
-      The job 'dbf5f287-f332-470b-80b2-c94b49358c45' will be deleted.
-
-      Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        "The job 'dbf5f287-f332-470b-80b2-c94b49358c45' will be deleted.")
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDeleteJobNotFound(self):
     self.ExpectDeleteJob(exception=self.MakeHttpError(404))

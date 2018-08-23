@@ -8,7 +8,9 @@ SYNOPSIS
         (--weekly-schedule-from-file=WEEKLY_CYCLE_FROM_FILE
           | --start-time=START_TIME (--daily-schedule | --hourly-schedule=HOURS
           | --weekly-schedule=WEEKLY_CYCLE)) [--description=DESCRIPTION]
-        [--region=REGION] [--guest-flush --snapshot-labels=[KEY=VALUE,...]]
+        [--region=REGION]
+        [--guest-flush
+          --snapshot-labels=[KEY=VALUE,...] --storage-location=LOCATION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -63,8 +65,8 @@ OPTIONAL FLAGS
         An optional, textual description for the backend.
 
      --region=REGION
-        The region of the resource policy to operate on. If not specified, you
-        may be prompted to select a region.
+        Region of the resource policy to operate on. If not specified, you may
+        be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:
@@ -89,7 +91,7 @@ OPTIONAL FLAGS
           prepare for the snapshot process.
 
        --snapshot-labels=[KEY=VALUE,...]
-          A list of label KEY=VALUE pairs to add.
+          List of label KEY=VALUE pairs to add.
 
           Keys must start with a lowercase character and contain only hyphens
           (-), underscores (_), lowercase characters, and numbers. Values must
@@ -98,15 +100,20 @@ OPTIONAL FLAGS
 
           These will be added to the disk snapshots on creation.
 
+       --storage-location=LOCATION
+          Google Cloud Storage location, either regional or multi-regional,
+          where snapshot content is to be stored. If absent, a nearby regional
+          or multi-regional location is chosen automatically.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
 

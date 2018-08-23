@@ -30,7 +30,8 @@ Engine zones in a project.
 (DEPRECATED) If provided, show details for the specified names and/or URIs of
 resources.
 
-Argument NAME is deprecated. Use \-\-filter="name=( 'NAME' ... )" instead.
+Argument \f5NAME\fR is deprecated. Use \f5\-\-filter="name=( 'NAME' ... )"\fR
+instead.
 
 
 .RE
@@ -41,10 +42,11 @@ Argument NAME is deprecated. Use \-\-filter="name=( 'NAME' ... )" instead.
 .RS 2m
 .TP 2m
 \fB\-\-regexp\fR=\fIREGEXP\fR, \fB\-r\fR \fIREGEXP\fR
-(DEPRECATED) A regular expression to filter the names of the results on. Any
-names that do not match the entire regular expression will be filtered out.
+(DEPRECATED) Regular expression to filter the names of the results on. Any names
+that do not match the entire regular expression will be filtered out.
 
-Flag \-\-regexp is deprecated. Use \-\-filter="name~'REGEXP'" instead.
+Flag \f5\-\-regexp\fR is deprecated. Use \f5\-\-filter="name~'REGEXP'"\fR
+instead.
 
 
 .RE
@@ -56,16 +58,16 @@ Flag \-\-regexp is deprecated. Use \-\-filter="name~'REGEXP'" instead.
 .TP 2m
 \fB\-\-filter\fR=\fIEXPRESSION\fR
 Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
-the expression evaluates True then that item is listed. For more details and
-examples of filter expressions run $ gcloud topic filters. This flag interacts
-with other flags that are applied in this order: \fB\-\-flatten\fR,
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-limit\fR=\fILIMIT\fR
-The maximum number of resources to list. The default is \fBunlimited\fR. This
-flag interacts with other flags that are applied in this order:
-\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
@@ -77,9 +79,9 @@ service.
 
 .TP 2m
 \fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
-A comma\-separated list of resource field key names to sort by. The default
-order is ascending. Prefix a field with ``~'' for descending order on that
-field. This flag interacts with other flags that are applied in this order:
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m

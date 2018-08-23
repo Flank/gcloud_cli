@@ -1,0 +1,127 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_IMAGES_ADD\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute images add\-iam\-policy\-binding \- add IAM policy binding for an image
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute images add\-iam\-policy\-binding\fR \fIIMAGE_NAME\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute images add\-iam\-policy\-binding\fR adds
+an IAM policy binding to a Google Compute Engine image's access policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE_NAME\fR
+Name of the disk image to add the IAM policy binding to.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to add the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- anyone who is on the internet, with or without a Google
+account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
+or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+Define the role of the member.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will add an IAM policy binding for the role of
+\'roles/compute.securityAdmin' for the user 'test\-user@gmail.com' on an image
+with identifier 'my\-image'
+
+.RS 2m
+$ gcloud alpha compute images add\-iam\-policy\-binding my\-image \e
+    \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/compute.securityAdmin'
+.RE
+
+For a service account \f5test\-proj1@example.domain.com\fR, the following
+command will add an IAM policy binding for the role of
+\'roles/compute.securityAdmin' to the given service account:
+
+.RS 2m
+$ gcloud alpha compute images add\-iam\-policy\-binding \e
+    test\-proj1@example.domain.com \e
+    \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
+    \-\-role='roles/compute.securityAdmin'
+.RE
+
+The following command will add an IAM policy binding for the role of
+\'roles/compute.securityAdmin' for all authenticated users on an image with
+identifier 'my\-image':
+
+.RS 2m
+$ gcloud alpha compute images add\-iam\-policy\-binding my\-image \e
+    \-\-member='allAuthenticatedUsers' \e
+    \-\-role='roles/compute.securityAdmin'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute images add\-iam\-policy\-binding
+.RE
+

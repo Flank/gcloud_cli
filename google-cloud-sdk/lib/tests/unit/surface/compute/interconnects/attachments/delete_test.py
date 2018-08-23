@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,8 @@
 """Tests for the interconnect attachments delete subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
@@ -92,14 +93,11 @@ class InterconnectAttachmentDeleteTest(test_base.BaseTest):
                              region='us-central1',
                              interconnectAttachment='my-attachment3'))],)
     self.AssertErrContains(
-        textwrap.dedent("""\
-        The following interconnect attachments will be deleted:
-         - [my-attachment1] in [us-central1]
-         - [my-attachment2] in [us-central1]
-         - [my-attachment3] in [us-central1]
-
-
-        Do you want to continue (Y/n)? """))
+        r'The following interconnect attachments will be deleted:\n'
+        r' - [my-attachment1] in [us-central1]\n'
+        r' - [my-attachment2] in [us-central1]\n'
+        r' - [my-attachment3] in [us-central1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.WriteInput('n\n')
@@ -148,15 +146,8 @@ class InterconnectAttachmentDeleteTest(test_base.BaseTest):
               region='region-2',
               interconnectAttachment='my-attachment'))],
     )
-    self.AssertErrContains(
-        textwrap.dedent("""\
-          For the following interconnect attachment:
-           - [my-attachment]
-          choose a region:
-           [1] region-1
-           [2] region-2
-           [3] region-3
-          Please enter your numeric choice:  """))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains('"choices": ["region-1", "region-2", "region-3"]')
     self.AssertOutputEquals('')
 
   if __name__ == '__main__':

@@ -54,7 +54,7 @@ OPTIONAL FLAGS
         address belonging to the range 169.254.0.0/16.
 
      --region=REGION
-        The region of the router to operate on. If not specified, you may be
+        Region of the router to operate on. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the

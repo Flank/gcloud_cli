@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for 'node-pools rollback' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import time
 
 from googlecloudsdk.api_lib.container import util
@@ -25,9 +28,7 @@ from tests.lib import test_case
 from tests.lib.surface.container import base
 
 
-class RollbackTestGA(base.TestBaseV1,
-                     base.GATestBase,
-                     base.NodePoolsTestBase):
+class RollbackTestGA(base.GATestBase, base.NodePoolsTestBase):
   """gcloud GA track using container v1 API."""
 
   def _TestRollbackNodePool(self, location):
@@ -111,7 +112,7 @@ class RollbackTestGA(base.TestBaseV1,
       tv[0] += 75  # make sure only 1 loop happens
       return tv[0]
 
-    self.clock_mock = self.StartObjectPatch(time, 'clock')
+    self.clock_mock = self.StartObjectPatch(time, 'time')
     self.clock_mock.side_effect = fake_clock
 
     with self.assertRaises(util.Error):
@@ -125,37 +126,13 @@ class RollbackTestGA(base.TestBaseV1,
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class RollbackTestBetaV1API(base.BetaTestBase, RollbackTestGA):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class RollbackTestBetaV1Beta1API(
-    base.TestBaseV1Beta1, RollbackTestBetaV1API):
+class RollbackTestBeta(base.BetaTestBase, RollbackTestGA):
   """gcloud Beta track using container v1beta1 API."""
 
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class RollbackTestAlphaV1API(base.AlphaTestBase, RollbackTestBetaV1API):
-  """gcloud Alpha track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class RollbackTestAlphaV1Alpha1API(
-    base.TestBaseV1Alpha1, RollbackTestAlphaV1API, RollbackTestBetaV1Beta1API):
+class RollbackTestAlpha(base.AlphaTestBase, RollbackTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
 
 
 if __name__ == '__main__':

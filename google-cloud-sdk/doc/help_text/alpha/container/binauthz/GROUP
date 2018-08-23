@@ -21,7 +21,7 @@ GROUPS
      attestations
         (ALPHA) Create and manage Google Binary Authorization attestations.
 
-     authorities
+     attestors
         (ALPHA) Create and manage Google Binary Authorization Attestation
         Authorities.
 
@@ -37,14 +37,14 @@ COMMANDS
 EXAMPLES
     This example assumes that you have created a keypair using gpg, usually by
     running gpg --gen-key ..., with Name-Email set to
-    attesting_user@example.com for your attesting authority.
+    attesting_user@example.com for your attestor.
 
     First, some convenience variables for brevity:
 
         ATTESTING_USER="attesting_user@example.com"
         DIGEST="000000000000000000000000000000000000000000000000000000000000abcd"
         ARTIFACT_URL="gcr.io/example-project/example-image@sha256:${DIGEST}"
-        AUTHORITY_NAME="projects/example-project/attestationAuthorities/canary"
+        ATTESTOR_NAME="projects/example-project/attestors/canary"
 
     Export your key's fingerprint (note this may differ based on version and
     implementations of gpg):
@@ -81,7 +81,7 @@ EXAMPLES
           --pgp-key-fingerprint=${KEY_FINGERPRINT} \
           --signature-file=example_signature.pgp \
           --artifact-url="${ARTIFACT_URL}" \
-          --attestation-authority=${AUTHORITY_NAME}
+          --attestor=${ATTESTOR_NAME}
 
     List the attestation by artifact URL. --format can be passed to output the
     attestations as json or another supported format:
@@ -116,20 +116,21 @@ EXAMPLES
           ...
 
     Listing also works for kind=ATTESTATION_AUTHORITY attestations, just pass
-    the attestation authority note:
+    the attestor:
 
         gcloud alpha container binauthz attestations list \
           --artifact-url="${ARTIFACT_URL}" \
-          --attestation-authority=${AUTHORITY_NAME} \
+          --attestor=${ATTESTOR_NAME} \
           --format=yaml
 
           ...
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. Usually, users of ALPHA commands and flags need to apply
-    for access, agree to applicable terms, and have their projects whitelisted.
-    Contact Google or sign up on a product's page for ALPHA access. Product
-    pages can be found at https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta container binauthz
 

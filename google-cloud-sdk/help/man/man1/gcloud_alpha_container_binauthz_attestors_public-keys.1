@@ -1,0 +1,214 @@
+
+.TH "GCLOUD_ALPHA_CONTAINER_BINAUTHZ_ATTESTORS_PUBLIC\-KEYS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha container binauthz attestors public\-keys \- create and manage public keys associated with Attestation Authorities
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha container binauthz attestors public\-keys\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBadd\fR
+\fB(ALPHA)\fR Add a public key to an Attestor.
+
+.TP 2m
+\fBremove\fR
+\fB(ALPHA)\fR Remove a public key from an Attestor.
+
+.TP 2m
+\fBupdate\fR
+\fB(ALPHA)\fR Update a public key on an Attestor.
+
+
+.RE
+.sp
+
+.SH "BACKGROUND"
+
+PGP is an encryption standard used by Binary Authorization to create and verify
+attestations. A PGP identity is encapsulated by a "key" which can be used to
+sign arbitrary data and/or verify signatures to be valid. As with other
+asymmetric key cryptosystems, PGP keys have a "public" part and a "private"
+part.
+
+
+
+.SH "PGP KEY STRUCTURE"
+
+An important feature of PGP keys is that they are hierarchical: Every "PGP key"
+is composed of a "master" key pair and zero or more "subkey" pairs certified by
+the master. These key pairs are collectively known as the "PGP key." The
+"public" part of this PGP key contains the public keys of all the constituent
+keys as well as all associated metadata (e.g. an email address). And, as might
+be expected, the "private" part of the PGP key contains all constituent private
+keys and metadata.
+
+One property of subkeys is that they may be marked as "revoked" if they are
+compromised or otherwise need to be retired. This does not remove the subkey
+from the PGP key but simply adds metadata indicating this revocation. The master
+key pair cannot be revoked by this same mechanism.
+
+
+.SH "COMMON KEY STRUCTURE"
+
+The most common key structure is to have the master key pair only used to
+certify subkey pairs while the subkeys are used to encrypt and sign as
+necessary. This allows the PGP key as a whole to act as a durable identity even
+if an encryption key is used improperly or a signing key is compromised.
+
+
+
+.SH "USAGE IN BINARY AUTHORIZATION"
+
+.RS 2m
+.IP "\(bu" 2m
+Authorities hold a set of PGP public keys that are used to verify attestations.
+.RS 2m
+.IP "\(em" 2m
+These must be submitted in ASCII\-armored format. With GPG, this is accomplished
+by adding the \f5\-\-armor\fR flag to the export command.
+.RE
+.sp
+.IP "\(bu" 2m
+If any of the public keys held by an attestor verify a given attestation, then
+the attestor considers that attestation to be valid (see gcloud alpha container
+binauthz attestations create help for more details).
+.RS 2m
+.IP "\(em" 2m
+As a result, the compromise of any constituent private key means that the
+attestor is at risk. The compromised subkey should be revoked and the PGP key
+re\-uploaded or removed from the attestor.
+.RE
+.RE
+.sp
+
+
+
+.SH "EXAMPLES"
+
+GPG is a common tool that implements the PGP standard.
+.RS 2m
+.IP "\(bu" 2m
+For general \f5gpg\fR usage examples, see gcloud alpha container binauthz help.
+.IP "\(bu" 2m
+For more detailed and complete documentation, see the GPG manual:
+https://gnupg.org/documentation/manuals.html
+.RE
+.sp
+
+To get the fingerprint of the public key:
+
+.RS 2m
+$ gpg \e
+      \-\-with\-colons \e
+      \-\-with\-fingerprint \e
+      \-\-force\-v4\-certs \e
+      \-\-list\-keys \e
+      "${ATTESTING_USER}" | grep fpr | cut \-\-delimiter=':' \-\-fields 10
+.RE
+
+To export a public key:
+
+.RS 2m
+$ gpg \e
+      \-\-armor \e
+      \-\-export "${FINGERPRINT}" \e
+      \-\-output public_key1.pgp
+.RE
+
+To add your new key to the attestor:
+
+.RS 2m
+$ gcloud alpha container binauthz attestors public\-keys add \e
+      \-\-attestor my_attestor \e
+      \-\-public\-key\-file=public_key1.pgp
+.RE
+
+To add a subkey to your PGP key:
+
+.RS 2m
+$ gpg \e
+      \-\-quick\-add\-key ${FINGERPRINT} \e
+      default \e
+      sign
+... FOLLOW PROMPTS ...
+.RE
+
+To revoke a subkey from your PGP key:
+
+.RS 2m
+$ gpg \e
+      \-\-edit\-key ${FINGERPRINT}
+... SNIP ...
+.RE
+
+.RS 2m
+sec  rsa2048/8C124F0F782DA097
+     created: 2018\-01\-01  expires: never       usage: SCEA
+     trust: ultimate      validity: ultimate
+ssb  rsa3072/C9597E8F28359AE3
+     created: 2018\-01\-01  expires: never       usage: E
+[ultimate] (1). User <attesting_user@example.com>
+.RE
+
+.RS 2m
+gpg> key C9597E8F28359AE3
+... SNIP ...
+gpg> revkey
+... FOLLOW PROMPTS ...
+.RE
+
+
+To update the modified PGP key on the attestor:
+
+.RS 2m
+$ gcloud alpha container binauthz attestors public\-keys update \e
+      ${FINGERPRINT} \e
+      \-\-attestor=my_attestor \e
+      \-\-public\-key\-file=public_key1_updated.pgp
+.RE
+
+To remove this new key to the attestor:
+
+.RS 2m
+$ gcloud alpha container binauthz attestors public\-keys remove \e
+      ${FINGERPRINT} \e
+      \-\-attestor my_attestor
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta container binauthz attestors public\-keys
+.RE
+

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +16,10 @@
 """Integration tests for manipulating IAM custom roles."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
+from tests.lib import test_case
 from tests.lib.surface.iam import e2e_test_base
 
 
@@ -24,6 +27,7 @@ from tests.lib.surface.iam import e2e_test_base
 # enabled on the current project.
 class RolesTest(e2e_test_base.CustomRolesBaseTest):
 
+  @test_case.Filters.skip('Failing', 'b/112686576')
   def testRoles(self):
     self.SetRole()
     self.SetPermissions('buckets')

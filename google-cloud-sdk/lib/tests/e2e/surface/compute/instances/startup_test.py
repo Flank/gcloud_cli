@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,15 @@
 """Integration tests for startup scripts."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import logging
 import os
 import textwrap
 import time
 
 from tests.lib import e2e_utils
-from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 
@@ -54,7 +56,6 @@ class StartupTest(e2e_test_base.BaseTest):
     with open(self.startup_script_file, 'w') as f:
       f.write(self.startup_script)
 
-  @test_case.Filters.skip('Failing', 'b/110083648')
   def testStartup(self):
     self.GetInstanceName()
     self._TestCreateInstanceWithStartup()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +14,7 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firebase.test import exceptions
@@ -31,8 +33,8 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
     mgr = catalog_manager.IosCatalogManager(catalog)
     self.assertEqual(mgr.GetDefaultModel(), 'iPen2')
     self.assertEqual(mgr.GetDefaultVersion(), '6.0')
-    self.assertEqual(mgr.GetDefaultLocale(), 'en')
-    self.assertEqual(mgr.GetDefaultOrientation(), 'portrait')
+    self.assertEqual(mgr.GetDefaultLocale(), 'ro')
+    self.assertEqual(mgr.GetDefaultOrientation(), 'askew')
 
   def testModelDefaultIsMissing(self):
     empty_catalog = fake_catalogs.EmptyIosCatalog()
@@ -48,11 +50,19 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
       mgr.GetDefaultVersion()
     self.assertIn('version', six.text_type(ex_ctx.exception))
 
-  def testLocaleDefaultIsEnglish(self):
+  def testLocaleDefaultIsMissing(self):
     empty_catalog = fake_catalogs.EmptyIosCatalog()
     mgr = catalog_manager.IosCatalogManager(empty_catalog)
-    locale = mgr.GetDefaultLocale()
-    self.assertEqual(locale, 'en')
+    with self.assertRaises(exceptions.DefaultDimensionNotFoundError) as ex_ctx:
+      mgr.GetDefaultLocale()
+    self.assertIn('locale', six.text_type(ex_ctx.exception))
+
+  def testOrientationDefaultIsMissing(self):
+    empty_catalog = fake_catalogs.EmptyIosCatalog()
+    mgr = catalog_manager.IosCatalogManager(empty_catalog)
+    with self.assertRaises(exceptions.DefaultDimensionNotFoundError) as ex_ctx:
+      mgr.GetDefaultOrientation()
+    self.assertIn('orientation', six.text_type(ex_ctx.exception))
 
   def testValidateModels(self):
     catalog = fake_catalogs.FakeIosCatalog()
@@ -70,21 +80,17 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
     self.assertEqual(ver1, '5.1')
     self.assertEqual(ver2, '7.2')
 
-  # TODO(b/78015882): add more locales/orientations when supported for iOS.
-
-  @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testValidateLocales(self):
     catalog = fake_catalogs.FakeIosCatalog()
     mgr = catalog_manager.IosCatalogManager(catalog)
-    l1 = mgr.ValidateDimensionAndValue('locale', 'en')
-    self.assertEqual(l1, 'en')
+    l1 = mgr.ValidateDimensionAndValue('locale', 'ro')
+    self.assertEqual(l1, 'ro')
 
-  @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testValidateOrientation(self):
     catalog = fake_catalogs.FakeIosCatalog()
     mgr = catalog_manager.IosCatalogManager(catalog)
-    o1 = mgr.ValidateDimensionAndValue('orientation', 'portrait')
-    self.assertEqual(o1, 'portrait')
+    o1 = mgr.ValidateDimensionAndValue('orientation', 'askew')
+    self.assertEqual(o1, 'askew')
 
   def testValidateModel_InvalidValue(self):
     catalog = fake_catalogs.FakeIosCatalog()
@@ -102,7 +108,6 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
     self.assertIn("'99' is not a valid OS version",
                   six.text_type(ex_ctx.exception))
 
-  @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testValidateLocale_InvalidValuel(self):
     catalog = fake_catalogs.FakeIosCatalog()
     mgr = catalog_manager.IosCatalogManager(catalog)
@@ -111,19 +116,18 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
     self.assertIn("'mtv' is not a valid locale",
                   six.text_type(ex_ctx.exception))
 
-  @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testValidateOrientation_InvalidValue(self):
     catalog = fake_catalogs.FakeIosCatalog()
     mgr = catalog_manager.IosCatalogManager(catalog)
     with self.assertRaises(exceptions.OrientationNotFoundError) as ex_ctx:
-      mgr.ValidateDimensionAndValue('orientation', 'diagonal')
-    self.assertIn("'diagonal' is not a valid device orientation",
+      mgr.ValidateDimensionAndValue('orientation', 'slanted')
+    self.assertIn("'slanted' is not a valid device orientation",
                   six.text_type(ex_ctx.exception))
 
   def testValidateDimension_InvalidDimensionName(self):
     catalog = fake_catalogs.FakeIosCatalog()
     mgr = catalog_manager.IosCatalogManager(catalog)
-    with self.assertRaises(exceptions.InvalidIosDimensionNameError) as ex_ctx:
+    with self.assertRaises(exceptions.InvalidDimensionNameError) as ex_ctx:
       mgr.ValidateDimensionAndValue('clone', 'iPear')
     self.assertIn("'clone' is not a valid dimension",
                   six.text_type(ex_ctx.exception))

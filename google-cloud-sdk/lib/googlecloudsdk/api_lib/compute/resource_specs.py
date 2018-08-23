@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Annotates the resource types with extra information."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import collections
 
 from apitools.base.protorpclite import messages
@@ -139,7 +143,7 @@ def _MachineTypeMemoryToCell(machine_type):
   """Returns the memory of the given machine type in GB."""
   memory = machine_type.get('memoryMb')
   if memory:
-    return '{0:5.2f}'.format(memory / 2.0 ** 10)
+    return '{0:5.2f}'.format(float(memory) / 2**10)
   else:
     return ''
 
@@ -159,7 +163,7 @@ def _FormatCustomMachineTypeName(mt):
   custom_cpu, custom_ram = instance_utils.GetCpuRamFromCustomName(mt)
   if custom_cpu and custom_ram:
     # Restricting output to 2 decimal places
-    custom_ram_gb = '{0:.2f}'.format(float(custom_ram) / (2 ** 10))
+    custom_ram_gb = '{0:.2f}'.format(custom_ram / (2**10))
     mt = 'custom ({0} vCPU, {1} GiB)'.format(custom_cpu, custom_ram_gb)
   return mt
 

@@ -11,7 +11,7 @@ gcloud compute backend\-services create \- create a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -134,8 +134,13 @@ compute instance\-groups set\-named\-ports \-\-help\fR.
 
 .TP 2m
 \fB\-\-protocol\fR=\fIPROTOCOL\fR
-The protocol for incoming requests. \fIPROTOCOL\fR must be one of: \fBHTTP\fR,
-\fBHTTPS\fR, \fBSSL\fR, \fBTCP\fR, \fBUDP\fR.
+Protocol for incoming requests.
+
+If the load\-balancing\-scheme is \f5INTERNAL\fR, the protocol must be one of:
+\f5TCP\fR, \f5UDP\fR.
+
+If the load\-balancing\-scheme is \f5EXTERNAL\fR, the protocol must be one of:
+\f5HTTP\fR, \f5HTTPS\fR, \f5HTTP2\fR, \f5SSL\fR, \f5TCP\fR, \f5UDP\fR.
 
 .TP 2m
 \fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR
@@ -156,6 +161,21 @@ Session affinity is disabled.
 
 .RE
 .sp
+.TP 2m
+\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR
+The amount of time up to which the response to a signed URL request will be
+cached in the CDN. After this time period, the Signed URL will be revalidated
+before being served. Cloud CDN will internally act as though all responses from
+this backend had a \f5Cache\-Control: public, max\-age=[TTL]\fR header,
+regardless of any existing Cache\-Control header. The actual headers served in
+responses will not be altered. If unspecified, the default value is 3600s.
+
+For example, specifying \f512h\fR will cause the responses to signed URL
+requests to be cached in the CDN up to 12 hours. See $ gcloud topic datetimes
+for information on duration formats.
+
+This flag only affects signed URL requests.
+
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="30s"
 The amount of time to wait for a backend to return a full response for the
@@ -200,11 +220,11 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-global\fR
-If provided, it is assumed the backend service is global.
+If set, the backend service is global.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the backend service to create. Overrides the default
+Region of the backend service to create. Overrides the default
 \fBcompute/region\fR property value for this command invocation.
 
 

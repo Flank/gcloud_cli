@@ -25,6 +25,7 @@ SYNOPSIS
         [--network=NETWORK] [--node-labels=[NODE_LABEL,...]]
         [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
         [--num-nodes=NUM_NODES; default=3] [--preemptible]
+        [--resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET]
         [--services-ipv4-cidr=CIDR] [--services-secondary-range-name=NAME]
         [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
         [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
@@ -75,7 +76,7 @@ FLAGS
         are additional Kubernetes cluster components. Addons specified by this
         flag will be enabled. The others will be disabled. ADDON must be one
         of: HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-        Istio, NetworkPolicy.
+        Istio, NetworkPolicy, Serverless.
 
      --allow-route-overlap
         Allows the provided cluster CIDRs to overlap with existing routes that
@@ -166,12 +167,16 @@ FLAGS
         be one of: pd-standard, pd-ssd.
 
      --enable-autorepair
-        Sets autorepair feature for a cluster's default node-pool(s).
+        Enable node autorepair feature for a cluster's default node-pool(s).
 
             $ gcloud alpha container clusters create example-cluster \
                 --enable-autorepair
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-auto-repair
+        Node autorepair is enabled by default for clusters using COS as a base
+        image.
+
+        See
+        https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
         for more info.
 
      --enable-autoupgrade
@@ -180,7 +185,7 @@ FLAGS
             $ gcloud alpha container clusters create example-cluster \
                 --enable-autoupgrade
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-managament for
+        See https://cloud.google.com/kubernetes-engine/docs/node-management for
         more info.
 
      --enable-cloud-logging
@@ -255,14 +260,13 @@ FLAGS
         Enabled by default, use --no-issue-client-certificate to disable.
 
      --istio-config=[auth=NONE,...]
-        Configurations for Istio addon, requires --addons contains Istio for
-        create, or --update-addons Istio=ENABLED for update.
+        Configurations for Istio addon, requires --addons contains Istio.
 
          auth
             Optional Type of auth NONE or MUTUAL_TLS Example:
 
                 $ gcloud alpha container clusters create example-cluster \
-                    --istio-config=auth=NONE
+                    --addons=Istio --istio-config=auth=NONE
 
      --labels=[KEY=VALUE,...]
         Labels to apply to the Google Cloud resources in use by the Kubernetes
@@ -376,6 +380,20 @@ FLAGS
         preemptible VM instances. See
         https://cloud.google.com/kubernetes-engine/docs/preemptible-vm for more
         information on how to use Preemptible VMs with Kubernetes Engine.
+
+     Exports cluster's usage of cloud resources
+
+       --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
+          The name of the BigQuery dataset to which the cluster's usage of
+          cloud resources is exported. A table will be created in the specified
+          dataset to store cluster resource usage. The resulting table can be
+          joined with BigQuery Billing Export to produce a fine-grained cost
+          breakdown.
+
+          Example:
+
+              $ gcloud alpha container clusters create example-cluster \
+                  --resource-usage-bigquery-dataset=example_bigquery_dataset_name
 
      --services-ipv4-cidr=CIDR
         Set the IP range for the services IPs.
@@ -684,10 +702,10 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
      Options to specify the node identity. At most one of these may be
@@ -792,11 +810,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud container clusters create
         $ gcloud beta container clusters create

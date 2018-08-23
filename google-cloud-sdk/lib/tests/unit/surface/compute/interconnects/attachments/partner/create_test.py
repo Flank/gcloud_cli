@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the interconnect attachment partner create subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import parser_errors
@@ -132,15 +134,8 @@ class InterconnectAttachmentsPartnerCreateTest(test_base.BaseTest):
                   adminEnabled=True),
           ))],
     )
-    self.AssertErrContains(
-        textwrap.dedent("""\
-          For the following interconnect attachment:
-           - [my-attachment]
-          choose a region:
-           [1] region-1
-           [2] region-2
-           [3] region-3
-          Please enter your numeric choice:  """))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains('"choices": ["region-1", "region-2", "region-3"]')
     self.AssertOutputEquals('')
 
 

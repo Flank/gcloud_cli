@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """Tests for `gcloud iot registries credentials delete`."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -52,7 +54,7 @@ class CredentialsDeleteTest(base.CloudIotRegistryBase):
         id='my-registry', credentials=self.registry_credentials[1:])
     self.assertEqual(results, expected_registry)
     self.AssertErrContains('This will delete the following credential:')
-    self.AssertErrContains(self.CERTIFICATE_CONTENTS.replace('\n', '\\n'))
+    self.AssertErrContains(self.CERTIFICATE_CONTENTS.replace('\n', r'\\n'))
     self.AssertLogContains('Deleted credential at index [0] for registry '
                            '[my-registry].')
 
@@ -102,7 +104,7 @@ class CredentialsDeleteTest(base.CloudIotRegistryBase):
         id='my-registry', credentials=self.registry_credentials[1:])
     self.assertEqual(results, expected_registry)
     self.AssertErrContains('This will delete the following credential:')
-    self.AssertErrContains(self.CERTIFICATE_CONTENTS.replace('\n', '\\n'))
+    self.AssertErrContains(self.CERTIFICATE_CONTENTS.replace('\n', r'\\n'))
 
 
 if __name__ == '__main__':

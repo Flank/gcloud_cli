@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """gcloud interactive shell configurable styles."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.core import properties
@@ -49,12 +51,14 @@ class Config(object):
       bottom_status_line=None,
       completion_menu_lines=None,
       context=None,
+      debug=None,
       fixed_prompt_position=None,
       help_lines=None,
       hidden=None,
       justify_bottom_lines=None,
       manpage_generator=None,
       multi_column_completion_menu=None,
+      obfuscate=None,
       prompt=None,
       show_help=None,
       suggest=None,
@@ -77,6 +81,10 @@ class Config(object):
     if context is None:
       context = interactive.context.Get()
     self.context = six.text_type(context)
+
+    if debug is None:
+      debug = interactive.debug.GetBool()
+    self.debug = debug
 
     if fixed_prompt_position is None:
       fixed_prompt_position = interactive.fixed_prompt_position.GetBool()
@@ -102,6 +110,10 @@ class Config(object):
       multi_column_completion_menu = (
           interactive.multi_column_completion_menu.GetBool())
     self.multi_column_completion_menu = multi_column_completion_menu
+
+    if obfuscate is None:
+      obfuscate = interactive.obfuscate.GetBool()
+    self.obfuscate = obfuscate
 
     if prompt is None:
       prompt = interactive.prompt.Get()

@@ -1,0 +1,35 @@
+NAME
+    gcloud alpha compute networks vpc-access - manage VPC Access Service
+        resources
+
+SYNOPSIS
+    gcloud alpha compute networks vpc-access GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for managing Google VPC Access Service resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     connectors
+        (ALPHA) Manage connectors resource for VPC Access Service.
+
+     locations
+        (ALPHA) Manage locations resource for VPC Access Service.
+
+     operations
+        (ALPHA) Manage operations resource for VPC Access Service.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,6 +36,13 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/addresses/{address}',
       {},
       [u'project', u'region', u'address'],
+      True
+  )
+  ALLOCATIONS = (
+      'allocations',
+      'projects/{project}/zones/{zone}/allocations/{allocation}',
+      {},
+      [u'project', u'zone', u'allocation'],
       True
   )
   AUTOSCALERS = (
@@ -112,20 +120,6 @@ class Collections(enum.Enum):
       'projects/{project}/global/healthChecks/{healthCheck}',
       {},
       [u'project', u'healthCheck'],
-      True
-  )
-  HOSTTYPES = (
-      'hostTypes',
-      'projects/{project}/zones/{zone}/hostTypes/{hostType}',
-      {},
-      [u'project', u'zone', u'hostType'],
-      True
-  )
-  HOSTS = (
-      'hosts',
-      'projects/{project}/zones/{zone}/hosts/{host}',
-      {},
-      [u'project', u'zone', u'host'],
       True
   )
   HTTPHEALTHCHECKS = (
@@ -212,6 +206,13 @@ class Collections(enum.Enum):
       'projects/{project}/global/licenses/{license}',
       {},
       [u'project', u'license'],
+      True
+  )
+  MACHINEIMAGES = (
+      'machineImages',
+      'projects/{project}/global/machineImages/{machineImage}',
+      {},
+      [u'project', u'machineImage'],
       True
   )
   MACHINETYPES = (

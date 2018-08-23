@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,57 +15,121 @@
 """Tests for the target-http-proxies update subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
+
 from __future__ import unicode_literals
-from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-
-messages = core_apis.GetMessagesModule('compute', 'v1')
 
 
 class TargetHTTPProxiesUpdateTest(test_base.BaseTest):
 
+  def SetUp(self):
+    self._api = 'v1'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_v1.targetHttpProxies
+
+  def RunUpdate(self, command):
+    self.Run('compute target-http-proxies update ' + command)
+
   def testSimpleCase(self):
-    self.Run("""
-        compute target-http-proxies update target-http-proxy-1
-          --url-map my-map
-        """)
+    self.RunUpdate('target-http-proxy-1 --url-map my-map')
 
     self.CheckRequests(
-        [(self.compute_v1.targetHttpProxies,
-          'SetUrlMap',
-          messages.ComputeTargetHttpProxiesSetUrlMapRequest(
+        [(self._target_http_proxies_api, 'SetUrlMap',
+          self.messages.ComputeTargetHttpProxiesSetUrlMapRequest(
               project='my-project',
               targetHttpProxy='target-http-proxy-1',
-              urlMapReference=messages.UrlMapReference(
-                  urlMap=('https://www.googleapis.com/compute/v1/projects/'
-                          'my-project/global/urlMaps/my-map'))))],
-    )
+              urlMapReference=self.messages.UrlMapReference(
+                  urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                          'my-project/global/urlMaps/my-map' % {
+                              'api': self._api
+                          }))))],)
 
   def testUriSupport(self):
-    self.Run("""
-        compute target-http-proxies update
-          https://www.googleapis.com/compute/v1/projects/my-project/global/targetHttpProxies/target-http-proxy-1
-          --url-map https://www.googleapis.com/compute/v1/projects/my-project/global/urlMaps/my-map
-        """)
+    self.RunUpdate("""
+          https://www.googleapis.com/compute/%(api)s/projects/my-project/global/targetHttpProxies/target-http-proxy-1
+          --url-map https://www.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/my-map
+        """ % {'api': self._api})
 
     self.CheckRequests(
-        [(self.compute_v1.targetHttpProxies,
-          'SetUrlMap',
-          messages.ComputeTargetHttpProxiesSetUrlMapRequest(
+        [(self._target_http_proxies_api, 'SetUrlMap',
+          self.messages.ComputeTargetHttpProxiesSetUrlMapRequest(
               project='my-project',
               targetHttpProxy='target-http-proxy-1',
-              urlMapReference=messages.UrlMapReference(
-                  urlMap=('https://www.googleapis.com/compute/v1/projects/'
-                          'my-project/global/urlMaps/my-map'))))],
-    )
+              urlMapReference=self.messages.UrlMapReference(
+                  urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                          'my-project/global/urlMaps/my-map' % {
+                              'api': self._api
+                          }))))],)
 
   def testWithoutURLMap(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --url-map: Must be specified.'):
-      self.Run("""
-          compute target-http-proxies update my-proxy
-          """)
+      self.RunUpdate('my-proxy')
+
+    self.CheckRequests()
+
+
+class TargetHTTPProxiesUpdateAlphaTest(TargetHTTPProxiesUpdateTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_alpha.targetHttpProxies
+
+  def RunUpdate(self, command):
+    self.Run('alpha compute target-http-proxies update --global ' + command)
+
+
+class RegionTargetHTTPProxiesUpdateTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_alpha.regionTargetHttpProxies
+
+  def RunUpdate(self, command):
+    self.Run('alpha compute target-http-proxies update --region us-west-1 ' +
+             command)
+
+  def testSimpleCase(self):
+    self.RunUpdate('target-http-proxy-1 --url-map my-map')
+
+    self.CheckRequests(
+        [(self._target_http_proxies_api, 'SetUrlMap',
+          self.messages.ComputeRegionTargetHttpProxiesSetUrlMapRequest(
+              project='my-project',
+              region='us-west-1',
+              targetHttpProxy='target-http-proxy-1',
+              urlMapReference=self.messages.UrlMapReference(
+                  urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                          'my-project/regions/us-west-1/urlMaps/my-map' % {
+                              'api': self._api
+                          }))))],)
+
+  def testUriSupport(self):
+    self.RunUpdate("""
+          https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/targetHttpProxies/target-http-proxy-1
+          --url-map https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-map
+        """ % {'api': self._api})
+
+    self.CheckRequests(
+        [(self._target_http_proxies_api, 'SetUrlMap',
+          self.messages.ComputeRegionTargetHttpProxiesSetUrlMapRequest(
+              project='my-project',
+              region='us-west-1',
+              targetHttpProxy='target-http-proxy-1',
+              urlMapReference=self.messages.UrlMapReference(
+                  urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                          'my-project/regions/us-west-1/urlMaps/my-map' % {
+                              'api': self._api
+                          }))))],)
+
+  def testWithoutURLMap(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --url-map: Must be specified.'):
+      self.RunUpdate('my-proxy')
 
     self.CheckRequests()
 

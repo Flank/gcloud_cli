@@ -1,0 +1,89 @@
+NAME
+    gcloud beta compute instances remove-iam-policy-binding - remove IAM policy
+        binding for an instance
+
+SYNOPSIS
+    gcloud beta compute instances remove-iam-policy-binding INSTANCE_NAME
+        --member=MEMBER --role=ROLE [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute instances remove-iam-policy-binding removes an
+    IAM policy binding from a Google Compute Engine instance's access policy.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        Name of the instance to remove the IAM policy binding from.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:test123@example.domain.com, or
+        domain:example.domain.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+OPTIONAL FLAGS
+     --zone=ZONE
+        Zone of the instance to remove the IAM policy binding from. If not
+        specified, you may be prompted to select a zone. gcloud will attempt to
+        identify the zone by searching for resources in your project. If the
+        zone cannot be determined, you will then be prompted with all Google
+        Cloud Platform zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will remove an IAM policy binding for the role of
+    'roles/compute.securityAdmin' for the user 'test-user@gmail.com' on
+    instance with identifier 'my-instance'
+
+        $ gcloud beta compute instances remove-iam-policy-binding \
+            my-instance --member='user:test-user@gmail.com' \
+            --role='roles/compute.securityAdmin'
+
+    The following command will remove an IAM policy binding for the role of
+    'roles/compute.securityAdmin' from all authenticated users on instance
+    'my-instance':
+
+        $ gcloud beta compute instances remove-iam-policy-binding \
+            my-instance --member='allAuthenticatedUsers' \
+            --role='roles/compute.securityAdmin'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute instances remove-iam-policy-binding
+

@@ -5,8 +5,9 @@ NAME
 SYNOPSIS
     gcloud container node-pools create NAME
         [--accelerator=[type=TYPE,[count=COUNT],...]] [--cluster=CLUSTER]
-        [--disk-size=DISK_SIZE] [--enable-autorepair] [--enable-autoupgrade]
-        [--image-type=IMAGE_TYPE] [--local-ssd-count=LOCAL_SSD_COUNT]
+        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
+        [--enable-autoupgrade] [--image-type=IMAGE_TYPE]
+        [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--min-cpu-platform=PLATFORM] [--node-labels=[NODE_LABEL,...]]
         [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
@@ -47,13 +48,21 @@ FLAGS
      --disk-size=DISK_SIZE
         Size in GB for node VM boot disks. Defaults to 100GB.
 
+     --disk-type=DISK_TYPE
+        Type of the node VM boot disk. Defaults to pd-standard. DISK_TYPE must
+        be one of: pd-standard, pd-ssd.
+
      --enable-autorepair
-        Sets autorepair feature for a node-pool.
+        Enable node autorepair feature for a node-pool.
 
             $ gcloud container node-pools create node-pool-1 \
                 --cluster=example-cluster --enable-autorepair
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-auto-repair
+        Node autorepair is enabled by default for node pools using COS as a
+        base image.
+
+        See
+        https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
         for more info.
 
      --enable-autoupgrade
@@ -62,7 +71,7 @@ FLAGS
             $ gcloud container node-pools create node-pool-1 \
                 --cluster=example-cluster --enable-autoupgrade
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-managament for
+        See https://cloud.google.com/kubernetes-engine/docs/node-management for
         more info.
 
      --image-type=IMAGE_TYPE
@@ -211,10 +220,10 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
      Options to specify the node identity. At most one of these may be

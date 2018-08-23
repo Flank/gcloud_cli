@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Test of the 'workflow template remove-job' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk import calliope
 
 from tests.lib.surface.dataproc import compute_base
@@ -59,7 +62,10 @@ class WorkflowTemplateRemoveJobUnitTestBeta(WorkflowTemplateRemoveJobUnitTest):
         hadoopJob=self.HADOOP_JOB,
         labels=labels)
     workflow_template.jobs = [ordered_job]
-    self.ExpectGetWorkflowTemplate(workflow_template=workflow_template)
+    self.ExpectGetWorkflowTemplate(
+        name=workflow_template.name,
+        version=workflow_template.version,
+        response=workflow_template)
     result = self.RunDataproc('workflow-templates remove-job {0} '
                               '--step-id 12'.format(self.WORKFLOW_TEMPLATE))
     self.AssertMessagesEqual(None, result)

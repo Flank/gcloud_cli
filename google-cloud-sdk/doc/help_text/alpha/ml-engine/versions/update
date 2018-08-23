@@ -1,13 +1,17 @@
 NAME
-    gcloud alpha ml-engine versions update - update a Cloud ML Engine model
+    gcloud alpha ml-engine versions update - update a Cloud ML Engine version
 
 SYNOPSIS
     gcloud alpha ml-engine versions update (VERSION : --model=MODEL)
         [--description=DESCRIPTION] [--update-labels=[KEY=VALUE,...]]
+        [--add-package-uris=[PACKAGE-URIS,...] | --clear-package-uris
+          | --remove-package-uris=[PACKAGE-URIS,...]
+          | --set-package-uris=[PACKAGE-URIS,...] --clear-model-class
+          | --model-class=MODEL_CLASS]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Update a Cloud ML Engine model.
+    (ALPHA) Update a Cloud ML Engine version.
 
 POSITIONAL ARGUMENTS
      Version resource - The Cloud ML Engine model to update. The arguments in
@@ -39,6 +43,39 @@ FLAGS
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
 
+     Configure user code in prediction. Cloud ML Engine allows a model to have
+     user-provided prediction code; these options configure that code.
+
+       These flags modify the member user-supplied packages to use for
+       prediction of this version. The values should be given as a
+       comma-separated list of Google Cloud Storage URIs (gs://...). At most
+       one of these may be specified:
+
+         --add-package-uris=[PACKAGE-URIS,...]
+            Append the given values to the current user-supplied packages to
+            use for prediction.
+
+         --clear-package-uris
+            Empty the current user-supplied packages to use for prediction.
+
+         --remove-package-uris=[PACKAGE-URIS,...]
+            Remove the given values from the current user-supplied packages to
+            use for prediction.
+
+         --set-package-uris=[PACKAGE-URIS,...]
+            Completely replace the current user-supplied packages to use for
+            prediction with the given values.
+
+       The fully-qualified name of the custom Model class in the package
+       provided for custom prediction. For example, my_package.SequenceModel.
+       At most one of these may be specified:
+
+         --clear-model-class
+            Clear the custom Model class from the version.
+
+         --model-class=MODEL_CLASS
+            Set the custom Model class for the version.
+
      At most one of these may be specified:
 
        --clear-labels
@@ -64,11 +101,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud ml-engine versions update
         $ gcloud beta ml-engine versions update

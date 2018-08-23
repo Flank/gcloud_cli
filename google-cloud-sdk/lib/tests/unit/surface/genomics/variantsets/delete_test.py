@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for genomics variantsets delete command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 from googlecloudsdk.api_lib.genomics.exceptions import GenomicsError
 from googlecloudsdk.calliope import exceptions
@@ -48,7 +51,7 @@ class DeleteTest(base.GenomicsUnitTest):
     with self.assertRaisesRegex(GenomicsError, 'Deletion aborted by user.'):
       self.RunGenomics(['variantsets', 'delete', '500'])
     self.AssertErrContains(
-        'Deleting variant set 500: "foo" will also delete all')
+        r'Deleting variant set 500: \"foo\" will also delete all')
 
   def testDatasetsDeleteQuiet(self):
     self.mocked_client.variantsets.Get.Expect(

@@ -74,7 +74,7 @@ help\fR for details.
 
 .TP 2m
 \fBlist\fR
-\fB(BETA)\fR View Cloud SDK properties.
+\fB(BETA)\fR List Cloud SDK properties for the currently active configuration.
 
 .TP 2m
 \fBset\fR
@@ -214,7 +214,7 @@ using the global \f5\-\-verbosity\fR flag. Supported verbosity levels:
 .TP 2m
 \fBcloud_build_timeout\fR
 Timeout, in seconds, to wait for Docker builds to complete during deployments.
-All Docker builds now use the Container Builder API.
+All Docker builds now use the Cloud Build API.
 
 
 .TP 2m
@@ -267,6 +267,17 @@ this property is unset.
 
 If you need to operate on one project, but need quota against a different
 project, you can use this property to specify the alternate project.
+
+
+.RE
+.sp
+.TP 2m
+\fIbuilds\fR
+
+.RS 2m
+.TP 2m
+\fBtimeout\fR
+Timeout, in seconds, to wait for builds to complete.
 
 
 .RE
@@ -370,26 +381,6 @@ If True, use the cluster's client certificate to authenticate to the cluster API
 server.
 
 
-.TP 2m
-\fBuse_v1_api\fR
-This property is DEPRECATED. If True, all \f5gcloud\fR Kubernetes Engine
-commands (regardless of release track) will use the v1 API; otherwise, \f5gcloud
-beta\fR track commands will use v1beta1 API and \f5gcloud alpha\fR track
-commands will use v1alpha1 API. By default, this property is set to false. The
-Kubernetes Engine v1alpha1 API is whitelist\-only at this time. Note: use_v1_api
-is an alias of use_v1_api_client.
-
-
-.TP 2m
-\fBuse_v1_api_client\fR
-This property is DEPRECATED. If True, all \f5gcloud\fR Kubernetes Engine
-commands (regardless of release track) will use the v1 API; otherwise, \f5gcloud
-beta\fR track commands will use v1beta1 API and \f5gcloud alpha\fR track
-commands will use v1alpha1 API. By default, this property is set to false. The
-Kubernetes Engine v1alpha1 API is whitelist\-only at this time. Note:
-use_v1_api_client is an alias of use_v1_api.
-
-
 .RE
 .sp
 .TP 2m
@@ -403,6 +394,31 @@ independent resource namespace constrained to deploying instances into Compute
 Engine zones inside the region. The default value of \f5global\fR is a special
 multi\-region namespace which is capable of deploying instances into all Compute
 Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+
+
+.RE
+.sp
+.TP 2m
+\fIdeployment_manager\fR
+
+.RS 2m
+.TP 2m
+\fBglob_imports\fR
+Enable import path globbing. Uses glob patterns to match multiple imports in a
+config file.
+
+
+.RE
+.sp
+.TP 2m
+\fIfilestore\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+Default location to use when working with Cloud Filestore locations. When a
+\f5\-\-location\fR flag is required but not provided, the command will fall back
+to this value, if set.
 
 
 .RE
@@ -569,9 +585,9 @@ Username to use when connecting, if the proxy requires authentication.
 .RS 2m
 .TP 2m
 \fBregion\fR
-The default region to use when working with Cloud Memorystore for Redis
-resources. When a \f5region\fR is required but not provided by a flag, the
-command will fall back to this value, if set.
+Default region to use when working with Cloud Memorystore for Redis resources.
+When a \f5region\fR is required but not provided by a flag, the command will
+fall back to this value, if set.
 
 
 .RE

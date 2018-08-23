@@ -3,21 +3,24 @@ NAME
 
 SYNOPSIS
     gcloud dataproc clusters create NAME [--async] [--bucket=BUCKET]
-        [--image-version=VERSION]
         [--initialization-action-timeout=TIMEOUT; default="10m"]
         [--initialization-actions=CLOUD_STORAGE_URI,[...]]
         [--labels=[KEY=VALUE,...]]
         [--master-boot-disk-size=MASTER_BOOT_DISK_SIZE]
+        [--master-boot-disk-type=MASTER_BOOT_DISK_TYPE]
         [--master-machine-type=MASTER_MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--num-master-local-ssds=NUM_MASTER_LOCAL_SSDS]
         [--num-masters=NUM_MASTERS]
         [--num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS]
         [--preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE]
+        [--preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE]
         [--properties=[PREFIX:PROPERTY=VALUE,...]] [--region=REGION]
         [--scopes=SCOPE,[SCOPE,...]] [--service-account=SERVICE_ACCOUNT]
         [--tags=TAG,[TAG,...]] [--worker-boot-disk-size=WORKER_BOOT_DISK_SIZE]
+        [--worker-boot-disk-type=WORKER_BOOT_DISK_TYPE]
         [--worker-machine-type=WORKER_MACHINE_TYPE] [--zone=ZONE, -z ZONE]
+        [--image=IMAGE | --image-version=VERSION]
         [--network=NETWORK | --subnet=SUBNET]
         [--single-node | --num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS
           --num-workers=NUM_WORKERS] [GCLOUD_WIDE_FLAG ...]
@@ -39,10 +42,6 @@ FLAGS
         connector. A bucket is auto created when this parameter is not
         specified.
 
-     --image-version=VERSION
-        The image version to use for the cluster. Defaults to the latest
-        version.
-
      --initialization-action-timeout=TIMEOUT; default="10m"
         The maximum duration of each initialization action. See $ gcloud topic
         datetimes for information on duration formats.
@@ -52,7 +51,7 @@ FLAGS
         in the cluster.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -65,6 +64,9 @@ FLAGS
         for terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
         multiple of 1 GB.
+
+     --master-boot-disk-type=MASTER_BOOT_DISK_TYPE
+        The type of the boot disk. The value must be pd-standard or pd-ssd.
 
      --master-machine-type=MASTER_MACHINE_TYPE
         The type of machine to use for the master. Defaults to
@@ -93,6 +95,9 @@ FLAGS
         for terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
         multiple of 1 GB.
+
+     --preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE
+        The type of the boot disk. The value must be pd-standard or pd-ssd.
 
      --properties=[PREFIX:PROPERTY=VALUE,...]
         Specifies configuration properties for installed packages, such as
@@ -225,6 +230,9 @@ FLAGS
         minimum size a boot disk can have is 10 GB. Disk size must be a
         multiple of 1 GB.
 
+     --worker-boot-disk-type=WORKER_BOOT_DISK_TYPE
+        The type of the boot disk. The value must be pd-standard or pd-ssd.
+
      --worker-machine-type=WORKER_MACHINE_TYPE
         The type of machine to use for workers. Defaults to server-specified.
 
@@ -233,6 +241,16 @@ FLAGS
         --region is set to a value other than 'global', the server will pick a
         zone in the region. Overrides the default compute/zone property value
         for this command invocation.
+
+     At most one of these may be specified:
+
+       --image=IMAGE
+          The full custom image URI or the custom image name that will be used
+          to create a cluster.
+
+       --image-version=VERSION
+          The image version to use for the cluster. Defaults to the latest
+          version.
 
      At most one of these may be specified:
 

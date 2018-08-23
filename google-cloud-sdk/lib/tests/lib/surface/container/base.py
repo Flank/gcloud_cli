@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +16,11 @@
 """Base classes for container tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 import json
-import logging
 import os
 
 from apitools.base.py import encoding
@@ -31,6 +33,7 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import config as core_config
 from googlecloudsdk.core import exceptions as core_exceptions
+from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.util import files as file_utils
@@ -249,7 +252,7 @@ class TestBase(cli_test_base.CliTestBase):
       kwargs['nodePools'] = [pool]
       kwargs['instanceGroupUrls'] = pool.instanceGroupUrls
 
-    return self.messages.Cluster(
+    c = self.messages.Cluster(
         masterAuth=self.messages.MasterAuth(
             password=kwargs.get('password'),
             username=kwargs.get('username', self.AUTH_USER),
@@ -287,6 +290,9 @@ class TestBase(cli_test_base.CliTestBase):
         resourceLabels=kwargs.get('labels'),
         maintenancePolicy=kwargs.get('maintenancePolicy'),
     )
+    if kwargs.get('conditions'):
+      c.conditions.extend(kwargs.get('conditions'))
+    return c
 
   def _MakeClusterWithAutoscaling(self, **kwargs):
     pool = self.messages.NodePool(
@@ -347,11 +353,6 @@ class TestBase(cli_test_base.CliTestBase):
     if 'servicesSecondaryRangeName' in kwargs:
       policy.servicesSecondaryRangeName = kwargs['servicesSecondaryRangeName']
     return policy
-
-  def _MakeNetworkConfig(self, **kwargs):
-    return self.messages.NetworkConfig(
-        enableSharedNetwork=kwargs.get('enableSharedNetwork'),
-    )
 
   def _ServerConfig(self):
     return self.messages.ServerConfig(defaultClusterVersion=self.VERSION)
@@ -513,13 +514,27 @@ class TestBase(cli_test_base.CliTestBase):
                                  response=None):
     raise NotImplementedError('ExpectSetMaintenanceWindow is not overridden')
 
-  def ExpectGetServerConfig(self, location):
+  def ExpectGetServerConfig(self, location, exception=None):
     raise NotImplementedError('ExpectGetServerConfig is not overridden')
 
 
-class TestBaseV1(TestBase):
+class GATestBase(TestBase):
   """Mixin class for testing v1."""
   API_VERSION = 'v1'
+
+  # Sort the scopes to assert equality of the lists
+  _DEFAULT_SCOPES = sorted([
+      'gke-version-default',
+      'https://www.googleapis.com/auth/devstorage.read_only',
+      'https://www.googleapis.com/auth/logging.write',
+      'https://www.googleapis.com/auth/monitoring',
+      'https://www.googleapis.com/auth/service.management.readonly',
+      'https://www.googleapis.com/auth/servicecontrol',
+      'https://www.googleapis.com/auth/trace.append',
+  ])
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def ExpectCreateCluster(self, cluster, response=None,
                           exception=None, zone=None):
@@ -816,57 +831,79 @@ class TestBaseV1(TestBase):
             maintenancePolicy=policy),
         response=response)
 
-  def ExpectGetServerConfig(self, location):
-    response = self.messages.ServerConfig(
-        buildClientInfo='changelist 12345', defaultClusterVersion='1.2.3',
-        validMasterVersions=['1.3.2'])
+  def ExpectGetServerConfig(self, location, exception=None):
+    if exception:
+      response = None
+    else:
+      response = self.messages.ServerConfig(
+          buildClientInfo='changelist 12345', defaultClusterVersion='1.2.3',
+          validMasterVersions=['1.3.2'])
     self.mocked_client.projects_locations.GetServerConfig.Expect(
         self.messages.ContainerProjectsLocationsGetServerConfigRequest(
             name=api_adapter.ProjectLocation(self.PROJECT_ID, location)),
-        response=response)
+        response=response,
+        exception=exception)
 
 
-class TestBaseV1Beta1(TestBaseV1):
+class BetaTestBase(GATestBase):
   """Mixin class for testing v1beta1."""
   API_VERSION = 'v1beta1'
 
+  # Sort the scopes to assert equality of the lists
+  _DEFAULT_SCOPES = sorted([
+      'https://www.googleapis.com/auth/devstorage.read_only',
+      'https://www.googleapis.com/auth/logging.write',
+      'https://www.googleapis.com/auth/monitoring',
+      'https://www.googleapis.com/auth/service.management.readonly',
+      'https://www.googleapis.com/auth/servicecontrol',
+      'https://www.googleapis.com/auth/trace.append',
+  ])
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
   def _MakeCluster(self, **kwargs):
-    cluster = TestBaseV1._MakeCluster(self, **kwargs)
+    cluster = GATestBase._MakeCluster(self, **kwargs)
     cluster.auditConfig = kwargs.get('auditConfig')
     cluster.binaryAuthorization = kwargs.get('binaryAuthorization')
     cluster.enableTpu = kwargs.get('enableTpu')
+    cluster.autoscaling = kwargs.get('clusterAutoscaling')
+    cluster.verticalPodAutoscaling = kwargs.get('verticalPodAutoscaling')
     return cluster
 
   def _MakeNodePool(self, **kwargs):
-    node_pool = TestBaseV1._MakeNodePool(self, **kwargs)
+    node_pool = GATestBase._MakeNodePool(self, **kwargs)
     node_pool.config.workloadMetadataConfig = kwargs.get(
         'workloadMetadataConfig')
     return node_pool
 
   def _MakeIPAllocationPolicy(self, **kwargs):
-    policy = TestBaseV1._MakeIPAllocationPolicy(self, **kwargs)
+    policy = GATestBase._MakeIPAllocationPolicy(self, **kwargs)
     if 'allowRouteOverlap' in kwargs:
       policy.allowRouteOverlap = kwargs.get('allowRouteOverlap')
     return policy
 
 
-class TestBaseV1Alpha1(TestBaseV1Beta1):
+class AlphaTestBase(BetaTestBase):
   """Mixin class for testing v1alpha1."""
   API_VERSION = 'v1alpha1'
 
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
   def _MakeCluster(self, **kwargs):
-    cluster = super(TestBaseV1Alpha1, self)._MakeCluster(**kwargs)
-    cluster.autoscaling = kwargs.get('clusterAutoscaling')
+    cluster = super(AlphaTestBase, self)._MakeCluster(**kwargs)
     cluster.enableTpu = kwargs.get('enableTpu')
     cluster.defaultMaxPodsConstraint = kwargs.get('defaultMaxPodsConstraint')
     return cluster
 
   def _MakeNodePool(self, **kwargs):
-    node_pool = TestBaseV1Beta1._MakeNodePool(self, **kwargs)
+    node_pool = BetaTestBase._MakeNodePool(self, **kwargs)
     if kwargs.get('localSsdVolumeConfigs') is not None:
       node_pool.config.localSsdVolumeConfigs = kwargs.get(
           'localSsdVolumeConfigs')
     node_pool.maxPodsConstraint = kwargs.get('maxPodsConstraint')
+    node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
     return node_pool
 
   def _MakeUsableSubnet(self, **kwargs):
@@ -905,76 +942,33 @@ class TestBaseV1Alpha1(TestBaseV1Beta1):
         req, response=response, exception=exception)
 
 
-class GATestBase(cli_test_base.CliTestBase):
-  """Mixin class for testing GA commands."""
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
-
-  # Sort the scopes to assert equality of the lists
-  _DEFAULT_SCOPES = sorted([
-      'gke-version-default',
-      'https://www.googleapis.com/auth/devstorage.read_only',
-      'https://www.googleapis.com/auth/logging.write',
-      'https://www.googleapis.com/auth/monitoring',
-      'https://www.googleapis.com/auth/service.management.readonly',
-      'https://www.googleapis.com/auth/servicecontrol',
-      'https://www.googleapis.com/auth/trace.append',
-  ])
-
-
-class BetaTestBase(cli_test_base.CliTestBase):
-  """Mixin class for testing beta commands."""
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  # Sort the scopes to assert equality of the lists
-  _DEFAULT_SCOPES = sorted([
-      'https://www.googleapis.com/auth/devstorage.read_only',
-      'https://www.googleapis.com/auth/logging.write',
-      'https://www.googleapis.com/auth/monitoring',
-      'https://www.googleapis.com/auth/service.management.readonly',
-      'https://www.googleapis.com/auth/servicecontrol',
-      'https://www.googleapis.com/auth/trace.append',
-  ])
-
-
-class AlphaTestBase(cli_test_base.CliTestBase):
-  """Mixin class for testing alpha commands."""
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-
-class IntegrationTestBase(e2e_base.WithServiceAuth):
+class IntegrationTestBase(
+    e2e_base.WithServiceAuth,
+    sdk_test_base.WithOutputCapture):
   """Base class for container integration tests."""
 
   REGION = 'us-central1'
   ZONE = 'us-central1-f'
-  # If you want to change the timeout here,
-  # you will also want to change the minmum age of a leaked cluster,
-  # i.e. leaked_cluster_min_age
-  # LINT.IfChange
-  TIMEOUT = 1080  # 1080s timeout for create/delete operations
-
-  # LINT.ThenChange(../../../e2e/surface/container/clusters_test.py)
 
   def TearDown(self):
     if not hasattr(self, 'cluster_name'):
       return
     try:
-      logging.info('Attempting to cleaning up %s', self.cluster_name)
-      self.Run('container clusters delete {0} --zone={1} -q'
+      log.status.Print('Attempting to cleaning up %s', self.cluster_name)
+      # Make cluster deletion asynchronized until gcloud can allow a timeout
+      # longer than 20 minutes.
+      self.Run('container clusters delete {0} --zone={1} --async -q'
                .format(self.cluster_name, self.ZONE))
     except core_exceptions.Error as error:
-      logging.warning('Failed to delete %s:\n%s', self.cluster_name, error)
+      log.status.Print('Failed to delete %s:\n%s', self.cluster_name, error)
     try:
-      logging.info('Attempting to cleaning up %s', self.cluster_name)
-      self.Run('container clusters delete {0} --region={1} -q'
+      log.status.Print('Attempting to cleaning up %s', self.cluster_name)
+      # Make cluster deletion asynchronized until gcloud can allow a timeout
+      # longer than 20 minutes.
+      self.Run('container clusters delete {0} --region={1} --async -q'
                .format(self.cluster_name, self.REGION))
     except core_exceptions.Error as error:
-      logging.warning('Failed to delete %s:\n%s', self.cluster_name, error)
+      log.status.Print('Failed to delete %s:\n%s', self.cluster_name, error)
 
   def _GetLocationFlag(self, location):
     """Produce location flag for a given location."""
@@ -1008,7 +1002,7 @@ class IntegrationTestBase(e2e_base.WithServiceAuth):
             'container clusters delete {0} {1} -q --async'.format(
                 cluster['name'], self._GetLocationFlag(location)),
             track=track)
-        logging.warning('Deleting a leaked cluster: %s', cluster['name'])
+        log.status.Print('Deleting a leaked cluster: %s', cluster['name'])
 
 
 class ClustersTestBase(UnitTestBase):

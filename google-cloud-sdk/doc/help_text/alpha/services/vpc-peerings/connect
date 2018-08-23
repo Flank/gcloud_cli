@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha services vpc-peerings connect --network=NETWORK
-        --reserved-ranges=RESERVED_RANGES --service=SERVICE [--async]
+        --reserved-ranges=RESERVED_RANGES [--async]
+        [--service=SERVICE; default="servicenetworking.googleapis.com"]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -18,13 +19,13 @@ REQUIRED FLAGS
      --reserved-ranges=RESERVED_RANGES
         The reserved IP CIDR ranges for service to use
 
-     --service=SERVICE
-        The service to connect to
-
 OPTIONAL FLAGS
      --async
         Display information about the operation in progress, without waiting
         for the operation to complete.
+
+     --service=SERVICE; default="servicenetworking.googleapis.com"
+        The service to connect to
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -47,9 +48,11 @@ EXAMPLES
             --reserved-ranges 10.197.0.0/20,10.198.0.0/20 --async
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta services vpc-peerings connect
 

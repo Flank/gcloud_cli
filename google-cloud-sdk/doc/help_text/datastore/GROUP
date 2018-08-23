@@ -25,6 +25,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     indexes
+        Manage Cloud Datastore indexes.
+
      operations
         Manage Long Running Operations for Cloud Datastore.
 
@@ -32,11 +35,12 @@ COMMANDS
     COMMAND is one of the following:
 
      cleanup-indexes
-        Remove unused datastore indexes based on your local index
+        (DEPRECATED) Remove unused datastore indexes based on your local index
         configuration.
 
      create-indexes
-        Create new datastore indexes based on your local index configuration.
+        (DEPRECATED) Create new datastore indexes based on your local index
+        configuration.
 
      export
         Export Cloud Datastore entities to Google Cloud Storage.
@@ -54,7 +58,8 @@ EXAMPLES
         $ gcloud datastore cleanup-indexes index.yaml
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha datastore
         $ gcloud beta datastore
 

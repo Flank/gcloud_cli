@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the health-checks update http subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -877,6 +881,850 @@ class HealthChecksCreateHttpBetaTest(test_base.BaseTest):
                       portName='happy-port',
                       requestPath='/testpath')),
               project='my-project'))],
+    )
+
+
+class RegionHealthChecksCreateHttpTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+  def testNoArgs(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        'At least one property must be modified.'):
+      self.Run("""
+          compute health-checks update http my-health-check --region us-west-1
+      """)
+    self.CheckRequests()
+
+  def testUriSupport(self):
+    # This is the same as testHostOption, but uses a full URI.
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http
+          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          --host www.google.com
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.google.com', port=80, requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testNoChange(self):
+    self.make_requests.side_effect = [
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+    ]
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --host www.example.com --region us-west-1
+        """)
+
+    self.CheckRequests([(self.compute.regionHealthChecks, 'Get',
+                         self.messages.ComputeRegionHealthChecksGetRequest(
+                             healthCheck='my-health-check',
+                             project='my-project',
+                             region='us-west-1'))],)
+
+    self.AssertErrEquals(
+        'No change requested; skipping update for [my-health-check].\n',
+        normalize_space=True)
+
+  def testHostOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.google.com', port=80, requestPath='/testpath'))
+        ],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --host www.google.com --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.google.com', port=80, requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+    # By default, the resource should not be displayed
+    self.assertFalse(self.GetOutput())
+
+  def testJsonOutput(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.google.com', port=80, requestPath='/testpath'))
+        ],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --host www.google.com
+          --format json --region us-west-1
+        """)
+
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+            [
+              {
+                "httpHealthCheck": {
+                  "host": "www.google.com",
+                  "port": 80,
+                  "requestPath": "/testpath"
+                },
+                "name": "my-health-check",
+                "type": "HTTP"
+              }
+            ]
+            """))
+
+  def testTextOutput(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.google.com', port=80, requestPath='/testpath'))
+        ],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --host www.google.com
+          --format text --region us-west-1
+        """)
+
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+            ---
+            httpHealthCheck.host:        www.google.com
+            httpHealthCheck.port:        80
+            httpHealthCheck.requestPath: /testpath
+            name:                        my-health-check
+            type:                        HTTP
+            """))
+
+  def testYamlOutput(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.google.com', port=80, requestPath='/testpath'))
+        ],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --host www.google.com
+          --format yaml --region us-west-1
+        """)
+
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+            ---
+            httpHealthCheck:
+              host: www.google.com
+              port: 80
+              requestPath: /testpath
+            name: my-health-check
+            type: HTTP
+            """))
+
+  def testUnsetHostOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check --host ''
+        --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      port=80, requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testPortOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --port 8888 --region us-west-1
+    """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com',
+                      port=8888,
+                      requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testPortNameOptionWithPreexistingPortName(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', portName='old-port'))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update http my-health-check '
+             '--port-name new-port --region us-west-1')
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com', portName='new-port')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testPortNameOptionWithoutPreexistingPortName(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com'))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update http my-health-check '
+             '--port-name new-port --region us-west-1')
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com', portName='new-port')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testUnsetPortNameOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    portName='happy-port', requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check --port-name ''
+        --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testRequestPathOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --request-path /newpath --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com', port=80, requestPath='/newpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testCheckIntervalOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --check-interval 30s --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com', port=80, requestPath='/testpath'),
+                  checkIntervalSec=30),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testCheckIntervalBadValue(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        'must not be less than 1 second or greater than 300 seconds'):
+      self.Run("""
+          compute health-checks update http my-health-check
+            --check-interval 0 --region us-west-1
+          """)
+    self.CheckRequests()
+
+  def testTimeoutSecOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --timeout 2m --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com', port=80, requestPath='/testpath'),
+                  timeoutSec=120),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testTimeoutBadValue(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        'must not be less than 1 second or greater than 300 seconds'):
+      self.Run("""
+          compute health-checks update http my-health-check
+             --timeout 0 --region us-west-1
+          """)
+    self.CheckRequests()
+
+  def testHealthyThresholdOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --healthy-threshold 7 --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com', port=80, requestPath='/testpath'),
+                  healthyThreshold=7),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testHealthyThresholdBadValue(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        'must be an integer between 1 and 10'):
+      self.Run("""
+          compute health-checks update http my-health-check
+            --healthy-threshold 0 --region us-west-1
+          """)
+    self.CheckRequests()
+
+  def testUnhealthyThresholdOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --unhealthy-threshold 8 --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com', port=80, requestPath='/testpath'),
+                  unhealthyThreshold=8),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testUnhealthyThresholdBadValue(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'\[--unhealthy-threshold\] must be an integer between 1 and 10, '
+        r'inclusive; received \[0\].'):
+      self.Run("""
+          compute health-checks update http my-health-check
+            --unhealthy-threshold 0 --region us-west-1
+          """)
+    self.CheckRequests()
+
+  def testDescriptionOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --description 'Circulation, Airway, Breathing' --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com', port=80, requestPath='/testpath'),
+                  description='Circulation, Airway, Breathing'),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testUnsetDescriptionOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'),
+                description='Short Description')
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --description '' --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com', port=80,
+                      requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testUpdatingDifferentProtocol(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.TCP,
+                tcpHealthCheck=self.messages.TCPHealthCheck(port=80))
+        ],
+        [],
+    ])
+
+    with self.assertRaisesRegex(
+        core_exceptions.Error,
+        'update http subcommand applied to health check with protocol TCP'):
+      self.Run("""
+          compute health-checks update http my-health-check
+            --port 8888 --region us-west-1""")
+
+  def testProxyHeaderOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --proxy-header PROXY_V1 --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com',
+                      port=80,
+                      requestPath='/testpath',
+                      proxyHeader=(self.messages.HTTPHealthCheck.
+                                   ProxyHeaderValueValuesEnum.PROXY_V1))),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testProxyHeaderBadValue(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+    with self.AssertRaisesArgumentErrorRegexp(
+        'argument --proxy-header: Invalid choice: \'bad_value\''):
+      self.Run("""
+          compute health-checks update http my-health-check
+            --proxy-header bad_value --region us-west-1
+          """)
+
+  def testResponseOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --response new-response --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com',
+                      port=80,
+                      requestPath='/testpath',
+                      response='new-response')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testUnsetResponseOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    portName='happy-port',
+                    requestPath='/testpath',
+                    response='Hello'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check
+          --response '' --region us-west-1
+        """)
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      portName='happy-port', requestPath='/testpath')),
+              project='my-project',
+              region='us-west-1'))],
     )
 
 

@@ -2,8 +2,8 @@ NAME
     gcloud beta sql users delete - deletes a Cloud SQL user in a given instance
 
 SYNOPSIS
-    gcloud beta sql users delete USERNAME HOST --instance=INSTANCE, -i INSTANCE
-        [--async] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta sql users delete USERNAME --instance=INSTANCE, -i INSTANCE
+        [--async] [--host=HOST] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Deletes a Cloud SQL user in a given instance specified by username
@@ -12,9 +12,6 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      USERNAME
         Cloud SQL username.
-
-     HOST
-        Cloud SQL user's host.
 
 REQUIRED FLAGS
      --instance=INSTANCE, -i INSTANCE
@@ -25,14 +22,24 @@ OPTIONAL FLAGS
         Display information about the operation in progress, without waiting
         for the operation to complete.
 
+     --host=HOST
+        Cloud SQL user's host name expressed as a specific IP address or
+        address range. % denotes an unrestricted host name. Applicable flag for
+        MySQL instances; ignored for PostgreSQL instances. Note, if you connect
+        to your instance using IP addresses, you must add your client IP
+        address as an Authorized Address, even if your host name is
+        unrestricted. For help on how to do so, read:
+        https://cloud.google.com/sql/docs/mysql/configure-ip
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud sql users delete
+        $ gcloud alpha sql users delete
 

@@ -26,7 +26,8 @@ EXAMPLES
         $ gcloud sql connect my-instance --user=root
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql connect
         $ gcloud beta sql connect
 

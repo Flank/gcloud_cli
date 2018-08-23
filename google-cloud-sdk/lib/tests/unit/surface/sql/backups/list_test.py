@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -23,7 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class BackupsListTest(base.SqlMockTestBeta):
+class _BaseBackupsListTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testBackupsList(self):
@@ -191,6 +194,18 @@ ID  WINDOW_START_TIME              ERROR  STATUS
 4   2015-03-29T02:00:00.451+00:00  -      SKIPPED
 """,
         normalize_space=True)
+
+
+class BackupsListGATest(_BaseBackupsListTest, base.SqlMockTestGA):
+  pass
+
+
+class BackupsListBetaTest(_BaseBackupsListTest, base.SqlMockTestBeta):
+  pass
+
+
+class BackupsListAlphaTest(_BaseBackupsListTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

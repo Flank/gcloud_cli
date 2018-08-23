@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for genomics datasets restore command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.genomics.exceptions import GenomicsError
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
@@ -33,13 +36,10 @@ class RestoreTest(base.GenomicsUnitTest):
                                        name='dataset-name',))
     self.RunGenomics(['datasets', 'restore', '1000'])
     self.AssertOutputEquals('')
-    self.AssertErrEquals("""\
-Restoring dataset 1000 will restore all objects in the dataset.
-
-Do you want to continue (Y/n)?  \
-
-Restored dataset [dataset-name, id: 1000].
-""")
+    self.AssertErrContains(
+        'Restoring dataset 1000 will restore all objects in the dataset.')
+    self.AssertErrContains('PROMPT_CONTINUE')
+    self.AssertErrContains('Restored dataset [dataset-name, id: 1000].')
 
   def testDatasetsRestoreCancel(self):
     self.WriteInput('n\n')

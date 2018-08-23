@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
@@ -15,7 +16,9 @@
 """Base for tests to make sure that checked in apitools clients are uptodate."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import difflib
 import os
 import shutil

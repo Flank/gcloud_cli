@@ -16,7 +16,9 @@
 """Unit tests for api_lib.compute.operations.poller module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.compute import client_adapter
 from googlecloudsdk.api_lib.compute.operations import poller as compute_poller

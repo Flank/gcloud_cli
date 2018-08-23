@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,16 @@
 """Integration tests for creating/using/deleting snapshots."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 
 from googlecloudsdk.calliope import base
 from tests.lib import e2e_utils
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
+from tests.lib.surface.compute import utils
 
 
 class _SnapshotsTestBase(e2e_test_base.BaseTest):
@@ -32,8 +37,9 @@ class _SnapshotsTestBase(e2e_test_base.BaseTest):
   def _CreateDisk(self):
     disk_name = self.GetResourceName()
     try:
-      self.Run('compute disks create {0} --image debian-8 --zone {1}'
-               .format(disk_name, self.zone))
+      self.Run('compute disks create {0} --image-family {1} '
+               '--image-project debian-cloud --zone {2}'
+               .format(disk_name, utils.DEBIAN_IMAGE_FAMILY, self.zone))
       yield disk_name
     finally:
       self.Run('compute disks delete {0} --zone {1} --quiet'
@@ -219,4 +225,4 @@ class SnapshotsLabelsTest(_SnapshotsTestBase):
 
 
 if __name__ == '__main__':
-  e2e_test_base.main()
+  test_case.main()

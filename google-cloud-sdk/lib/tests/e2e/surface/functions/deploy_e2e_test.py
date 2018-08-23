@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """End to End tests for the 'functions deploy' command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import base64
 import contextlib
 import os
@@ -167,6 +171,15 @@ class DeployE2ETestBase(e2e_base.WithServiceAuth,
 
     return labels
 
+  def _ParseEnvVars(self, function_resource):
+    if not function_resource or not function_resource.environmentVariables:
+      return {}
+    env_vars = {}
+    for prop in function_resource.environmentVariables.additionalProperties:
+      env_vars[prop.key] = prop.value
+
+    return env_vars
+
 
 class TriggerTest(DeployE2ETestBase):
   """Deploy Trigger Tests."""
@@ -316,6 +329,39 @@ class RedeployTest(DeployE2ETestBase):
       call_retryer.RetryOnException(self._RunAndCheckErr,
                                     [function_name, 'Hello Bob!'],
                                     sleep_ms=1000)
+
+
+class EnvVarRedeployTest(DeployE2ETestBase):
+  """Environment Variable Redeploy Tests."""
+
+  def _RunAndCheckErr(self, function_name, output):
+    self.ClearOutput()
+    self.Run('functions call {}'.format(function_name))
+    self.AssertOutputContains(output)
+
+  def testRedeployEnvVarUpdate(self):
+    """Test redeploy with no source change, just environment variable changes.
+    """
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    with self._DeployFunction('--trigger-http', source=self.function_path,
+                              set_env_vars='FOO=bar') as function_name:
+      self.AssertOutputContains(function_name)
+      self.Run('functions call {}'.format(function_name))
+      self.AssertOutputContains('Hello World!')
+
+      # Update env vars and redeploy
+      self.ClearOutput()
+      new_env_vars = 'BAZ=boo'
+      self.Run(
+          'functions deploy {name} --source {source} '
+          '--trigger-http --update-env-vars {env_vars}'.format(
+              name=function_name, source=self.function_path,
+              env_vars=new_env_vars))
+      describe_result = self.Run('functions describe {}'.format(
+          function_name))
+      updated_env_vars = self._ParseEnvVars(describe_result)
+      self.assertEquals('bar', updated_env_vars.get('FOO'))
+      self.assertEquals('boo', updated_env_vars.get('BAZ'))
 
 
 class MiscWorkflowTest(DeployE2ETestBase):

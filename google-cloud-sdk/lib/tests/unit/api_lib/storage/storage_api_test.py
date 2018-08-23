@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.storage.storage_api."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import io
+
 import os
 import re
-import subprocess
 
 from apitools.base.py.testing import mock as api_mock
 
@@ -25,12 +27,10 @@ from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.core.util import files as files_util
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.app import cloud_storage_util
-import mock
 
 
 class GetObjectTest(sdk_test_base.SdkBase):
@@ -287,39 +287,3 @@ class DeleteBucketTest(test_case.TestCase):
     )
 
     self.storage_client.DeleteBucket(bucket)
-
-
-class RsyncTest(test_case.TestCase):
-
-  def _MockPopen(self):
-    popen_mock = mock.Mock(spec=subprocess.Popen)
-    popen_mock.stdin = io.StringIO()
-    popen_mock.communicate.return_value = ('[]\n', '')
-    popen_mock.returncode = 0
-    return self.StartObjectPatch(subprocess, 'Popen',
-                                 return_value=popen_mock, autospec=True)
-
-  def _MockFindExecutableOnPath(self):
-    return self.StartObjectPatch(files_util, 'FindExecutableOnPath',
-                                 return_value='/usr/bin/gsutil')
-
-  def testRsyncMakesCorrectGcloudCall(self):
-    popen_mock = self._MockPopen()
-    self._MockFindExecutableOnPath()
-    storage_api.Rsync('./sourcedir', 'gs://bucket/destdir')
-    self.assertEqual(popen_mock.call_count, 1)
-    args, _ = popen_mock.call_args
-    self.assertEqual(
-        args[0][-5:],
-        ['rsync', '-R', '-c', './sourcedir', 'gs://bucket/destdir'])
-
-  def testRsyncMakesCorrectGcloudCallWithExcludePattern(self):
-    popen_mock = self._MockPopen()
-    self._MockFindExecutableOnPath()
-    storage_api.Rsync('./sourcedir', 'gs://bucket/destdir', 'excludeme.*')
-    self.assertEqual(popen_mock.call_count, 1)
-    args, _ = popen_mock.call_args
-    self.assertEqual(
-        args[0][-7:], ['rsync', '-R', '-c', '-x', 'excludeme.*',
-                       './sourcedir', 'gs://bucket/destdir'])
-

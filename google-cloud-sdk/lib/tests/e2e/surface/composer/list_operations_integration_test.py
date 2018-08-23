@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,20 @@
 """Integration test for the 'composer operations list' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import re
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.composer import base
 
 
-class ListOperationsIntegrationTest(base.ComposerE2ETestBase):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class ListOperationsIntegrationTest(base.ComposerE2ETestBase,
+                                    parameterized.TestCase):
   """Integration test for the 'composer operations list' command.
 
   Composer gcloud e2e tests are run against a project with existing operations
@@ -28,7 +36,8 @@ class ListOperationsIntegrationTest(base.ComposerE2ETestBase):
   operations are started before testing list.
   """
 
-  def testListOperations(self):
+  def testListOperations(self, track):
+    self.SetTrack(track)
     ops = list(
         self.Run(
             'composer operations list --locations=us-central1 --limit=2 '

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +16,10 @@
 """Test for the gcloud init."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
+import json
 import os
 import re
 import sys
@@ -27,6 +30,7 @@ from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.configurations import named_configs
+from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.credentials import store as c_store
 from googlecloudsdk.core.diagnostics import network_diagnostics
 from googlecloudsdk.core.util import files
@@ -58,6 +62,7 @@ def _GetCurrentSettings(config_name, log_http=False):
       '  disable_update_check: \'True\'',
       'core:',
       '  account: fake_account',
+      '  allow_py3: \'True\'',
       '  check_gce_metadata: \'False\'',
       '  disable_usage_reporting: \'True\'',
       '  interactive_ux_style: TESTING']
@@ -79,36 +84,28 @@ def _GetPickAccount(accounts, preselected_account=None):
               .format(preselected_account))
     return ('\n[{}] is not one of your credentialed accounts [{}].\n'
             .format(preselected_account, ','.join(accounts)))
-  lines = [
-      'Choose the account you would like to use to perform operations '
-      'for this configuration:'
-  ]
-  i = 0
-  for i, account in enumerate(accounts):
-    lines.append(' [{}] {}'.format(i + 1, account))
-  lines.append(' [{}] Log in with a new account'.format(i + 2))
-  lines.append('Please enter your numeric choice:  \n')
-
-  return '\n'.join(lines)
+  return ('{{"ux": "PROMPT_CHOICE", "message": "Choose the account you would '
+          'like to use to perform operations for this configuration:", '
+          '"choices": {}}}\n'
+          .format(json.dumps(accounts + ['Log in with a new account'])))
 
 
 def _GetPickConfigurationMessage(inactive_configs, current_config=None,
                                  new_config=True):
-  lines = ['Pick configuration to use:']
-  step = 0
+  choices = []
   if current_config:
-    lines.append(
-        ' [1] Re-initialize this configuration [{}] with new settings '
+    choices.append(
+        'Re-initialize this configuration [{}] with new settings '
         .format(current_config))
-    step += 1
-  lines.append(' [{}] Create a new configuration'.format(step + 1))
-  step += 1
-  i = 0
-  for i, c in enumerate(inactive_configs):
-    lines.append(' [{}] Switch to and re-initialize existing configuration: '
-                 '[{}]'.format(i + 1 + step, c))
+  choices.append('Create a new configuration')
+  for c in inactive_configs:
+    choices.append(
+        'Switch to and re-initialize existing configuration: [{}]'.format(c))
 
-  lines.append('Please enter your numeric choice:  ')
+  lines = [console_io.JsonUXStub(
+      console_io.UXElementType.PROMPT_CHOICE,
+      message='Pick configuration to use:',
+      choices=choices)]
   if new_config:
     lines.append('Enter configuration name. Names start with a lower case '
                  'letter and contain only lower case letters a-z, digits 0-9, '
@@ -123,8 +120,9 @@ def _GetDiagnosticsMessage(errors=False, exit_diagnostic=True):
   result = ('You can skip diagnostics next time by using the following flag:\n'
             '  gcloud init --skip-diagnostics\n\n')
   if errors:
-    result += ('Network errors detected.\n\n'
-               'Would you like to continue anyway (y/N)?  \n')
+    result += (
+        '{"ux": "PROMPT_CONTINUE", "message": "Network errors detected.", '
+        '"prompt_string": "Would you like to continue anyway"}\n')
     if exit_diagnostic:
       result += ('You can re-run diagnostics with the following command:\n'
                  '  gcloud info --run-diagnostics\n\n')
@@ -132,7 +130,8 @@ def _GetDiagnosticsMessage(errors=False, exit_diagnostic=True):
 
 
 def _GetLoginPromptMessage():
-  return 'You must log in to continue. Would you like to log in (Y/n)?  \n'
+  return ('{"ux": "PROMPT_CONTINUE", "prompt_string": "You must log in to '
+          'continue. Would you like to log in"}\n')
 
 
 def _GetLoggedInAsMessage(account):
@@ -140,8 +139,8 @@ def _GetLoggedInAsMessage(account):
 
 
 def _GetNoProjectsMessage():
-  return ('This account has no projects.\n\n'
-          'Would you like to create one? (Y/n)?  \n')
+  return ('{"ux": "PROMPT_CONTINUE", "message": "This account has no projects."'
+          ', "prompt_string": "Would you like to create one?"}\n')
 
 
 def _GetEnterProjectMessage():
@@ -153,39 +152,26 @@ def _GetEnterProjectMessage():
 
 def _GetPickProjectMessage(projects, created=None,
                            preselected_project=None,
-                           selected_project=None,
-                           suggested_project=None,
                            create_error=None):
   lines = []
   if preselected_project and preselected_project not in projects:
     lines.extend([
-        '[{}] is not one of your projects [{}]. '
+        '{{"ux": "PROMPT_CONTINUE", "message": "[{}] is not one of your '
+        'projects [{}]. ", "prompt_string": "Would you like to create it?"}}'
         .format(preselected_project, ','.join(projects)),
-        '',
-        'Would you like to create it? (Y/n)?  Please enter \'y\' or \'n\':  ',
         '',
     ])
     return '\n'.join(lines)
 
   if projects:
-    lines.append('Pick cloud project to use: ')
-    i = 0
-    for i, p in enumerate(sorted(projects)):
-      lines.append(' [{}] {}'.format(i + 1, p))
-    lines.append(' [{}] {}'.format(i + 2, 'Create a new project'))
-    lines.append('Please enter numeric choice or text value '
-                 '(must exactly match list item):  ')
-    if selected_project and selected_project not in projects:
-      lines[-1] += ('[{}] not in list. Did you mean [{}]?'
-                    .format(selected_project, suggested_project))
-      lines.append('Please enter a value between 1 and 3, or a value present '
-                   'in the list:  Please enter a value between 1 and 3, '
-                   'or a value present in the list:  ')
+    lines.append(
+        '{{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
+        '"choices": {}}}'
+        .format(json.dumps(sorted(projects) + ['Create a new project'])))
   else:
     lines.extend([
-        'This account has no projects.',
-        '',
-        'Would you like to create it? (Y/n)?  Please enter \'y\' or \'n\':  '
+        '{"ux": "PROMPT_CONTINUE", "message": "This account has no projects.", '
+        '"prompt_string": "Would you like to create it?"}'
     ])
   if created:
     lines.extend([
@@ -213,8 +199,6 @@ def _GetCurrentProjectMessage(project):
 
 
 def _GetComputeMessage(skip=False, zone=None, region=None, zones=None,
-                       selected_zone=None,
-                       suggested_zone=None,
                        regions=None):
   if skip:
     return (
@@ -232,37 +216,22 @@ def _GetComputeMessage(skip=False, zone=None, region=None, zones=None,
   lines = []
   if zones:
     lines.append(
-        'Do you want to configure a default Compute Region and Zone? (Y/n)?  ')
-    lines.append('Which Google Compute Engine zone would you like to use '
-                 'as project default?')
-    lines.append('If you do not specify a zone via a command line flag while '
-                 'working with Compute Engine resources, '
-                 'the default is assumed.')
-    i = 0
-    for i, z in enumerate(zones):
-      lines.append(' [{}] {}'.format(i + 1, z))
-    lines.append(' [{}] Do not set default zone'.format(i + 2))
-    lines.append('Please enter numeric choice or text value '
-                 '(must exactly match list item):  '
-                 'Please enter a value between 1 and {}, '
-                 'or a value present in the list:  '.format(i +2))
-    if selected_zone:
-      lines[-1] += ('[{}] not in list. Did you mean [{}]?'
-                    .format(selected_zone, suggested_zone))
+        '{"ux": "PROMPT_CONTINUE", "prompt_string": "Do you want to configure '
+        'a default Compute Region and Zone?"}')
+    lines.append(
+        r'{{"ux": "PROMPT_CHOICE", "message": "Which Google Compute Engine '
+        r'zone would you like to use as project default?\nIf you do not '
+        r'specify a zone via a command line flag while working with Compute '
+        r'Engine resources, the default is assumed.", "choices": {}}}'
+        .format(json.dumps(zones + ['Do not set default zone'])))
   if regions:
-    lines.append('Please enter a value between 1 and {}, '
-                 'or a value present in the list:  '.format(len(regions) + 1))
-    lines.append('Which Google Compute Engine region would you like to use '
-                 'as project default?')
-    lines.append('If you do not specify a region via a command line flag while '
-                 'working with Compute Engine resources, '
-                 'the default is assumed.')
-    i = 0
-    for i, r in enumerate(regions):
-      lines.append(' [{}] {}'.format(i + 1, r))
-    lines.append(' [{}] Do not set default region'.format(i + 2))
-    lines.append('Please enter numeric choice or text value '
-                 '(must exactly match list item):  \n')
+    lines.append(
+        r'{{"ux": "PROMPT_CHOICE", "message": "Which Google Compute Engine '
+        r'region would you like to use as project default?\nIf you do not '
+        r'specify a region via a command line flag while working with Compute '
+        r'Engine resources, the default is assumed.", "choices": {}}}'
+        .format(json.dumps(regions + ['Do not set default region'])))
+    lines.append('')
     return '\n'.join(lines)
 
   if zone and region:
@@ -277,8 +246,8 @@ def _GetComputeMessage(skip=False, zone=None, region=None, zones=None,
     ])
   else:
     lines.append(
-        'Do you want to configure a default Compute Region and Zone? '
-        '(Y/n)?  \n')
+        '{"ux": "PROMPT_CONTINUE", "prompt_string": "Do you want to configure '
+        'a default Compute Region and Zone?"}\n')
 
   return '\n'.join(lines)
 
@@ -1072,10 +1041,7 @@ class InitNoAuthTest(
         _GetDiagnosticsMessage() +
         _GetLoginPromptMessage() +
         _GetLoggedInAsMessage('foo@google.com') +
-        _GetPickProjectMessage(
-            projects,
-            selected_project=selected_project,
-            suggested_project=projects[0]),
+        _GetPickProjectMessage(projects),
         self.GetErr()
     )
 
@@ -1413,8 +1379,6 @@ class InitNoAuthTest(
         _GetCurrentProjectMessage('golden-project') +
         _GetComputeMessage(zone='good-zone', region='bad-region',
                            zones=['A-zone', 'B-zone'],
-                           selected_zone='B-zonf',
-                           suggested_zone='B-zone',
                            regions=['AAA', 'BBB']) +
         _GetBotoMessage() +
         _GetReadyToUseMessage(

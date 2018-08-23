@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +13,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud compute shared-vpc list-associated-resources`."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import xpn_test_base
 
 
+@parameterized.parameters(
+    base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class ListHostProjectsTest(xpn_test_base.XpnTestBase):
 
-  def testListHostProjects_ProjectUnset(self):
+  def testListHostProjects_ProjectUnset(self, track):
+    self._SetUp(track)
     properties.PersistProperty(properties.VALUES.core.project, None)
     with self.assertRaises(properties.RequiredPropertyError):
       self.Run('compute shared-vpc organizations list-host-projects 12345')
 
-  def testListHostProjects_OrganizationId(self):
+  def testListHostProjects_OrganizationId(self, track):
+    self._SetUp(track)
     self._testListHostProjects_OrganizationId('shared-vpc')
 
-  def testListHostProjects_OrganizationId_xpn(self):
+  def testListHostProjects_OrganizationId_xpn(self, track):
+    self._SetUp(track)
     self._testListHostProjects_OrganizationId('xpn')
 
   def _testListHostProjects_OrganizationId(self, module_name):
@@ -48,6 +59,7 @@ class ListHostProjectsTest(xpn_test_base.XpnTestBase):
         """, normalize_space=True)
     self.xpn_client.ListOrganizationHostProjects.assert_called_once_with(
         'myproject', organization_id='12345')
+    self.get_xpn_client_mock.assert_called_once_with(self.track)
 
 
 if __name__ == '__main__':

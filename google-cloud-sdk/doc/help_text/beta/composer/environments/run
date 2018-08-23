@@ -28,7 +28,7 @@ POSITIONAL ARGUMENTS
           arguments in this group are specified.
 
        --location=LOCATION
-          Compute Engine zone in which to create the environment.
+          Compute Engine region in which to create the environment.
 
      SUBCOMMAND
         The Airflow CLI subcommand to run. (see
@@ -59,5 +59,8 @@ EXAMPLES
         airflow trigger_dag some_dag --run_id=foo
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud composer environments run
 

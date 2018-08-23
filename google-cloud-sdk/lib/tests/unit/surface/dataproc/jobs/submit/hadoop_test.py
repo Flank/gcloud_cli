@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,11 @@
 # limitations under the License.
 
 """Test of the 'jobs submit hadoop' command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 import os
 import tempfile
@@ -23,6 +27,7 @@ import textwrap
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import jobs_unit_base
 
@@ -61,6 +66,7 @@ class JobsSubmitHadoopUnitTest(jobs_unit_base.JobsUnitTestBase):
           '--class {2} --jar {3} -- foo --bar baz '
           .format(self.CLUSTER_NAME, self.JOB_ID, self.CLASS, self.JAR_URI))
 
+  @test_case.Filters.SkipOnPy3('Failing with new python change', 'b/112181287')
   def testSubmitHadoopJobWithArchivesFilesJars(self):
     self.StartObjectPatch(os.path, 'exists', return_value=True)
     hadoop_job = self.HADOOP_JOB

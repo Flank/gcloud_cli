@@ -62,10 +62,10 @@ FLAGS
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the address is global.
+          If set, the address is global.
 
        --region=REGION
-          The region of the address to operate on. Overrides the default
+          Region of the address to operate on. Overrides the default
           compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS

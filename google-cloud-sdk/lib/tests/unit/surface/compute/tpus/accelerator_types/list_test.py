@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """tpus accelerator-types list tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
@@ -25,7 +28,8 @@ from six.moves import range
 
 
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA])
+                           calliope_base.ReleaseTrack.BETA,
+                           calliope_base.ReleaseTrack.GA])
 class ListTest(base.TpuUnitTestBase):
 
   def _GetListResponse(self, num=3):

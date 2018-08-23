@@ -1,0 +1,67 @@
+
+.TH "GCLOUD_ALPHA_SQL_SSL_CLIENT\-CERTS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha sql ssl client\-certs describe \- retrieve information about a client cert for a Cloud SQL instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha sql ssl client\-certs describe\fR \fICOMMON_NAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Retrieve information about a client cert for a Cloud SQL instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fICOMMON_NAME\fR
+User supplied name. Constrained to \f5[a\-zA\-Z.\-_ ]+\fR.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR
+Cloud SQL instance ID.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud sql ssl client\-certs describe
+$ gcloud beta sql ssl client\-certs describe
+.RE
+

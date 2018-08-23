@@ -1,0 +1,76 @@
+
+.TH "GCLOUD_ALPHA_FILESTORE_LOCATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha filestore locations describe \- describe a Cloud Filestore location
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha filestore locations describe\fR \fILOCATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Describe a Cloud Filestore location.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Location resource \- The location to describe. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the flag [location] on the
+command line with a fully specified name; provide the flag [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fILOCATION\fR
+The ID of the location or a fully qualified identifier for the location.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command shows the details for the Cloud Filestore location named
+NAME.
+
+.RS 2m
+$ gcloud alpha filestore locations describe NAME
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta filestore locations describe
+.RE
+

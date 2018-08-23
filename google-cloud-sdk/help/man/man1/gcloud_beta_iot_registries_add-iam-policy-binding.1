@@ -1,0 +1,110 @@
+
+.TH "GCLOUD_BETA_IOT_REGISTRIES_ADD\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta iot registries add\-iam\-policy\-binding \- add an IAM policy binding to a device registry
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta iot registries add\-iam\-policy\-binding\fR (\fIREGISTRY\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Add an IAM policy binding to a device registry.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Registry resource \- The device registry for which to add IAM policy binding to.
+The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the flag
+[registry] on the command line with a fully specified name; provide the flag
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fIREGISTRY\fR
+The ID of the registry or a fully qualified identifier for the registry. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Cloud IoT region.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to add the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- anyone who is on the internet, with or without a Google
+account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
+or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+Define the role of the member.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudiot/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/iot
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha iot registries add\-iam\-policy\-binding
+.RE
+

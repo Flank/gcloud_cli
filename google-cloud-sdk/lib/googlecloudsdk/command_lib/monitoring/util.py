@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Util methods for Stackdriver Monitoring Surface."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 from googlecloudsdk.calliope import exceptions as calliope_exc
 from googlecloudsdk.command_lib.util.args import labels_util
@@ -350,6 +354,10 @@ def GetNotificationChannelFromArgs(args, messages):
     channel = MessageFromString(channel_string, messages.NotificationChannel,
                                 'NotificationChannel',
                                 field_remappings=CHANNELS_FIELD_REMAPPINGS)
+    # Without this, labels will be in a random order every time.
+    if channel.labels:
+      channel.labels.additionalProperties = sorted(
+          channel.labels.additionalProperties, key=lambda prop: prop.key)
   else:
     channel = messages.NotificationChannel()
 

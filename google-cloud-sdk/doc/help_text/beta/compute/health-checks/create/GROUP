@@ -19,6 +19,9 @@ COMMANDS
      http
         (BETA) Create a HTTP health check to monitor load balanced instances.
 
+     http2
+        (BETA) Create a HTTP2 health check to monitor load balanced instances.
+
      https
         (BETA) Create a HTTPS health check to monitor load balanced instances.
 

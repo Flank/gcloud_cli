@@ -171,22 +171,14 @@ FLAGS
 
        --trigger-event=EVENT_TYPE
           Specifies which action should trigger the function. For a list of
-          acceptable values, call functions event_types list. EVENT_TYPE must
-          be one of: google.pubsub.topic.publish,
-          google.storage.object.archive, google.storage.object.delete,
-          google.storage.object.finalize, google.storage.object.metadataUpdate,
-          providers/cloud.pubsub/eventTypes/topic.publish,
-          providers/cloud.storage/eventTypes/object.change,
-          providers/firebase.auth/eventTypes/data.write,
-          providers/firebase.auth/eventTypes/user.create,
-          providers/firebase.auth/eventTypes/user.delete.
+          acceptable values, call functions event-types list.
 
        --trigger-resource=RESOURCE
           Specifies which resource from --trigger-event is being observed. E.g.
           if --trigger-event is
           providers/cloud.storage/eventTypes/object.change, --trigger-resource
           must be a bucket name. For a list of expected resources, call
-          functions event_types list.
+          functions event-types list.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -194,8 +186,7 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. These variants are also available:
+    These variants are also available:
 
         $ gcloud alpha functions deploy
         $ gcloud beta functions deploy

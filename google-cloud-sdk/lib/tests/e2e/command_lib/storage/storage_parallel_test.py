@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,8 +30,11 @@ to upload, subclass FewSmallFilesTest and change NUM_FILES/FILE_SIZE. To add a
 case for a different type of parallelism (e.g. number of threads), add
 a new test method to FewSmallFilesTest that invokes _RunTest().
 """
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import itertools
 
 from googlecloudsdk.api_lib.storage import storage_api

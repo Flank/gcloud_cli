@@ -33,8 +33,8 @@ OPTIONAL FLAGS
         for the operation to complete.
 
      --zone=ZONE
-        The zone of the disk to operate on. If not specified and the
-        compute/zone property isn't set, you may be prompted to select a zone.
+        Zone of the disk to operate on. If not specified and the compute/zone
+        property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:

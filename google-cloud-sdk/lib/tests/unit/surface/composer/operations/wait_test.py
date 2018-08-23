@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,12 @@
 """Unit tests for operations wait."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import util as command_util
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
@@ -23,9 +28,12 @@ from tests.lib.surface.composer import base
 ERROR_DESCRIPTION = 'ERROR_DESCRIPTION'
 
 
-class OperationsWaitTest(base.OperationsUnitTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class OperationsWaitTest(base.OperationsUnitTest, parameterized.TestCase):
 
-  def SetUp(self):
+  # Must be called after self.SetTrack() for self.messages to be present
+  def _SetTestMessages(self):
     self.running_op = self.MakeOperation(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -43,7 +51,9 @@ class OperationsWaitTest(base.OperationsUnitTest):
         done=True,
         error=self.messages.Status(message=ERROR_DESCRIPTION))
 
-  def testSuccessfulOperation(self):
+  def testSuccessfulOperation(self, track):
+    self.SetTrack(track)
+    self._SetTestMessages()
     for response in [self.running_op, self.successful_op]:
       self.ExpectOperationGet(
           self.TEST_PROJECT,
@@ -53,7 +63,9 @@ class OperationsWaitTest(base.OperationsUnitTest):
     self.RunOperations('wait', '--project', self.TEST_PROJECT, '--location',
                        self.TEST_LOCATION, self.TEST_OPERATION_UUID)
 
-  def testErroredOperation(self):
+  def testErroredOperation(self, track):
+    self.SetTrack(track)
+    self._SetTestMessages()
     for response in [self.running_op, self.errored_op]:
       self.ExpectOperationGet(
           self.TEST_PROJECT,
@@ -66,12 +78,16 @@ class OperationsWaitTest(base.OperationsUnitTest):
       self.RunOperations('wait', '--project', self.TEST_PROJECT, '--location',
                          self.TEST_LOCATION, self.TEST_OPERATION_UUID)
 
-  def testOperationNotFound(self):
+  def testOperationNotFound(self, track):
+    self.SetTrack(track)
+    self._SetTestMessages()
     self._testHttpError(
         http_error.MakeHttpError(code=404, message='NOT_FOUND'),
         'Resource not found API reason: NOT_FOUND')
 
-  def testOperationInsufficientPermissions(self):
+  def testOperationInsufficientPermissions(self, track):
+    self.SetTrack(track)
+    self._SetTestMessages()
     self._testHttpError(
         http_error.MakeHttpError(code=403, message='PERMISSION_DENIED'),
         'Permission denied API reason: PERMISSION_DENIED')

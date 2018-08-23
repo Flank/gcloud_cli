@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud monitoring channels delete`."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
@@ -38,7 +42,7 @@ class ChannelsDeleteTest(base.MonitoringTestBase):
     self.Run('monitoring channels delete channel-id')
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_Force(self):
     self._ExpectDelete(force=True)
@@ -46,7 +50,7 @@ class ChannelsDeleteTest(base.MonitoringTestBase):
     self.Run('monitoring channels delete channel-id --force')
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_Cancel(self):
     self.WriteInput('n')
@@ -55,7 +59,7 @@ class ChannelsDeleteTest(base.MonitoringTestBase):
       self.Run('monitoring channels delete channel-id')
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_Uri(self):
     self._ExpectDelete()
@@ -68,7 +72,7 @@ class ChannelsDeleteTest(base.MonitoringTestBase):
     self.Run('monitoring channels delete ' + url)
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDescribe_RelativeNameOverridesProjectProperty(self):
     self._ExpectDelete()
@@ -81,7 +85,7 @@ class ChannelsDeleteTest(base.MonitoringTestBase):
     self.Run('monitoring channels delete ' + relative_name)
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
 
 if __name__ == '__main__':

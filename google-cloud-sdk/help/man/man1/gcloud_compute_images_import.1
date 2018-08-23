@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud compute images import \- import a Google Compute Engine image
+gcloud compute images import \- import an image into Google Compute Engine
 
 
 
@@ -35,6 +35,10 @@ the input arguments specified by the user.
 
 This command uses the \f5\-\-os\fR flag to choose the appropriate translation.
 You can omit the translation step using the \f5\-\-data\-disk\fR flag.
+
+If you exported your disk from Google Compute Engine then you do not need to
+re\-import it. Instead, use the \f5create\fR command to create further images
+from it.
 
 Files stored on Cloud Storage and images in Compute Engine incur charges. See
 https://cloud.google.com/compute/docs/images/importing\-virtual\-disks#resource_cleanup.
@@ -117,9 +121,9 @@ topic datetimes for information on duration formats.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-The zone of the image to import. The zone in which to do the work of importing
-the image. Overrides the default \fBcompute/zone\fR property value for this
-command invocation.
+Zone of the image to import. The zone in which to do the work of importing the
+image. Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
 
 
 .RE

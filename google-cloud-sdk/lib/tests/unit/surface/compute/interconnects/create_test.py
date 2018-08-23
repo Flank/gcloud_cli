@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the interconnect create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
@@ -83,6 +86,21 @@ class InterconnectsCreateGATest(test_base.BaseTest):
         'how to activate your Interconnect. See also https://cloud.google.com/'
         'interconnect/docs/how-to/dedicated/retrieving-loas for more detailed '
         'help.')
+
+  def testCreatePartnerInterconnect(self):
+    self.ExpectInterconnectRequest(description='this is my interconnect')
+
+    self.Run('compute interconnects create my-interconnect '
+             '--interconnect-type PARTNER --admin-enabled '
+             '--location my-location --link-type LINK_TYPE_ETHERNET_10G_LR '
+             '--requested-link-count 5 --description "this is my interconnect" '
+             '--customer-name customer-name')
+
+    self.CheckInterconnectRequest(
+        description='this is my interconnect',
+        interconnectType=self.messages.Interconnect.
+        InterconnectTypeValueValuesEnum.PARTNER)
+    self.AssertOutputEquals('')
 
   def testDescription(self):
     self.ExpectInterconnectRequest(description='this is my interconnect')

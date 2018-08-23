@@ -28,17 +28,17 @@ REQUIRED FLAGS
           The interconnect attachment of the interface being added.
 
        --interconnect-attachment-region=INTERCONNECT_ATTACHMENT_REGION
-          The region of the interconnectAttachment to operate on. If not
-          specified it will be set to the region of the router. Overrides the
-          default compute/region property value for this command invocation.
+          Region of the interconnectAttachment to operate on. If not specified
+          it will be set to the region of the router. Overrides the default
+          compute/region property value for this command invocation.
 
        --vpn-tunnel=VPN_TUNNEL
           The tunnel of the interface being added.
 
        --vpn-tunnel-region=VPN_TUNNEL_REGION
-          The region of the vpn tunnel to operate on. If not specified it will
-          be set to the region of the router. Overrides the default
-          compute/region property value for this command invocation.
+          Region of the vpn tunnel to operate on. If not specified it will be
+          set to the region of the router. Overrides the default compute/region
+          property value for this command invocation.
 
 OPTIONAL FLAGS
      --ip-address=IP_ADDRESS
@@ -48,8 +48,8 @@ OPTIONAL FLAGS
         The mask for network used for the server IP address.
 
      --region=REGION
-        The region of the router to update. If not specified, you may be
-        prompted to select a region.
+        Region of the router to update. If not specified, you may be prompted
+        to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:

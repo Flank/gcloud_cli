@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud compute instances add-access-config INSTANCE_NAME
         [--access-config-name=ACCESS_CONFIG_NAME; default="external-nat"]
         [--address=ADDRESS]
-        [--network-interface=NETWORK_INTERFACE; default="nic0"] [--zone=ZONE]
+        [--network-interface=NETWORK_INTERFACE; default="nic0"]
+        [--network-tier=NETWORK_TIER] [--zone=ZONE]
         [--public-ptr | --no-public-ptr]
         [--public-ptr-domain=PUBLIC_PTR_DOMAIN | --no-public-ptr-domain]
         [GCLOUD_WIDE_FLAG ...]
@@ -40,8 +41,12 @@ FLAGS
         configuration. If this is not provided, then "nic0" is used as the
         default.
 
+     --network-tier=NETWORK_TIER
+        Specifies the network tier of the access configuration. NETWORK_TIER
+        must be one of: PREMIUM, STANDARD. The default value is PREMIUM.
+
      --zone=ZONE
-        The zone of the instance to operate on. If not specified, you may be
+        Zone of the instance to operate on. If not specified, you may be
         prompted to select a zone. gcloud will attempt to identify the zone by
         searching for resources in your project. If the zone cannot be
         determined, you will then be prompted with all Google Cloud Platform

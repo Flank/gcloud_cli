@@ -16,6 +16,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding for an image.
+
      add-labels
         (BETA) Add labels to Google Compute Engine images.
 
@@ -37,14 +40,23 @@ COMMANDS
      export
         (BETA) Export a Google Compute Engine image.
 
+     get-iam-policy
+        (BETA) Get the IAM policy for a Google Compute Engine image.
+
      import
-        (BETA) Import a Google Compute Engine image.
+        (BETA) Import an image into Google Compute Engine.
 
      list
         (BETA) List Google Compute Engine images.
 
+     remove-iam-policy-binding
+        (BETA) Remove IAM policy binding for an image.
+
      remove-labels
         (BETA) Remove labels from Google Compute Engine images.
+
+     set-iam-policy
+        (BETA) Set IAM policy for a disk image.
 
      update
         (BETA) Update a Google Compute Engine image.

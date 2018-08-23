@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +16,12 @@
 """Tests for the concepts.concept_parsers module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
-import re
-
 from googlecloudsdk.calliope import arg_parsers
-from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
+from googlecloudsdk.calliope.concepts import multitype
 from googlecloudsdk.command_lib.util.concepts import info_holders
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
@@ -35,11 +35,6 @@ import six
 class InfoHoldersTests(concepts_test_base.ConceptsTestBase,
                        parameterized.TestCase):
   """Test for info_holders module."""
-
-  def SetUp(self):
-    def Fallthrough():
-      return '!'
-    self.fallthrough = deps.Fallthrough(Fallthrough, hint='hint')
 
   @parameterized.named_parameters(
       ('Positional', 'book', False, False, True, False),
@@ -502,49 +497,274 @@ class InfoHoldersTests(concepts_test_base.ConceptsTestBase,
 
     self.assertEqual(expected_book_fallthroughs, result['book'])
 
-  @parameterized.named_parameters(
-      ('Flag', '--book', 'book'),
-      ('Positional', 'BOOK', 'BOOK'))
-  def testParse(self, name, namespace_name):
-    """Tests Parse method correctly parses with different anchor names."""
-    info = info_holders.ResourceInfo(
-        name,
-        self.resource_spec,
-        'The book to act upon.',
-        {'book': name, 'shelf': '--shelf', 'project': '--book-project'},
-        {},
-        required=True)
-    args_dict = {namespace_name: 'examplebook',
-                 'shelf': 'exampleshelf',
-                 'book_project': 'exampleproject'}
-    parsed_args = self._GetMockNamespace(**args_dict)
 
-    parsed = info.Parse(parsed_args)
+class MultitypeTest(concepts_test_base.MultitypeTestBase,
+                    parameterized.TestCase):
+  """Tests for functionality specific to multitype resource info holders."""
 
-    self.assertEqual(
-        'projects/exampleproject/shelves/exampleshelf/books/examplebook',
-        parsed.RelativeName())
+  def SetUp(self):
+    self.project_book_resource = concepts_util.GetBookResource(
+        name='projectbook')
+    self.organization_book_resource = concepts_util.GetOrgShelfBookResource(
+        name='orgbook')
+    self.project_case_book_resource = concepts_util.GetProjCaseBookResource(
+        name='casebook')
+    self.proj_org_resource = multitype.MultitypeResourceSpec(
+        'book',
+        self.project_book_resource,
+        self.organization_book_resource)
+    self.shelf_case_resource = multitype.MultitypeResourceSpec(
+        'book',
+        self.project_book_resource,
+        self.project_case_book_resource)
 
   @parameterized.named_parameters(
-      ('MissingProject',
-       {'book': 'examplebook', 'shelf': 'exampleshelf'}, '[project]'),
-      ('MissingShelf',
-       {'book': 'examplebook', 'book_project': 'exampleproject'}, '[shelf]'))
-  def testParseError(self, args_dict, error_msg):
-    """Tests that Parse method raises InitializationError when necessary."""
-    self.UnsetProject()
-    info = info_holders.ResourceInfo(
+      ('NoHidden', '--book-project', ''),
+      ('Hidden', '',
+       '(NOTE) Some attributes are not given arguments in this group '
+       'but can be set in other ways. To set the [project] attribute: '
+       'provide the flag [--book] on the command line with a fully '
+       'specified name; provide the flag [--project] on the command '
+       'line; set the property [core/project]. '))
+  def testGroupHelp(self, project_flag, additional_message):
+    info = info_holders.MultitypeResourceInfo(
         '--book',
-        self.resource_spec,
+        self.proj_org_resource,
         'The book to act upon.',
-        {'book': '--book', 'shelf': '--shelf', 'project': '--book-project'},
-        {},
+        {'book': '--book', 'shelf': '--shelf', 'project': project_flag,
+         'organization': '--organization'},
+        {'project': [
+            deps.ArgFallthrough('--project'),
+            deps.PropertyFallthrough(properties.VALUES.core.project)]},
         required=True)
-    parsed_args = self._GetMockNamespace(**args_dict)
+    expected = ('Book resource - The book to act upon. The arguments in this '
+                'group can be used to specify the attributes of this resource. '
+                '{}This resource can be one of the following types: '
+                '[projectbook, orgbook].'.format(additional_message))
+    self.assertEqual(expected, info.GetGroupHelp())
 
-    with self.assertRaisesRegex(concepts.InitializationError,
-                                re.escape(error_msg)):
-      info.Parse(parsed_args)
+  def testGroupHelpEliminatesDupeHints(self):
+    info = info_holders.MultitypeResourceInfo(
+        '--book',
+        self.shelf_case_resource,
+        'The book to act upon.',
+        {'book': '--book', 'shelf': '--shelf', 'project': '',
+         'case': '--case'},
+        {'project': [
+            deps.ArgFallthrough('--project'),
+            deps.PropertyFallthrough(properties.VALUES.core.project)]},
+        required=True)
+    expected = ('Book resource - The book to act upon. The arguments in this '
+                'group can be used to specify the attributes of this resource. '
+                '(NOTE) Some attributes are not given arguments in this group '
+                'but can be set in other ways. To set the [project] attribute: '
+                'provide the flag [--book] on the command line with a fully '
+                'specified name; provide the flag [--project] on the command '
+                'line; set the property [core/project]. This resource can be '
+                'one of the following types: [projectbook, casebook].')
+    self.assertEqual(expected, info.GetGroupHelp())
+
+  @parameterized.named_parameters(
+      ('NoExtraFallthroughs', {}, []),
+      ('PropertyFallthroughsAtEnd',
+       {'project': [deps.PropertyFallthrough(properties.VALUES.core.project)]},
+       [deps.PropertyFallthrough(properties.VALUES.core.project)]))
+  def testBuildFullFallthroughsMap(self, given_fallthroughs,
+                                   additional_project_fallthroughs):
+    info = info_holders.MultitypeResourceInfo(
+        '--book',
+        self.proj_org_resource,
+        'The book to act upon.',
+        {'book': '--book', 'shelf': '--shelf', 'project': '--book-project',
+         'organization': '--organization'},
+        given_fallthroughs)
+    fallthroughs_map = info.BuildFullFallthroughsMap()
+    project_fallthroughs = [
+        deps.FullySpecifiedAnchorFallthrough(
+            deps.ArgFallthrough('--book'),
+            self.project_book_resource.collection_info,
+            'projectsId'),
+        deps.ArgFallthrough('--book-project')]
+    expected = {
+        'book': [
+            deps.ArgFallthrough('--book')],
+        'shelf': [
+            deps.FullySpecifiedAnchorFallthrough(
+                deps.ArgFallthrough('--book'),
+                self.project_book_resource.collection_info,
+                'shelvesId'),
+            deps.FullySpecifiedAnchorFallthrough(
+                deps.ArgFallthrough('--book'),
+                self.organization_book_resource.collection_info,
+                'shelvesId'),
+            deps.ArgFallthrough('--shelf')],
+        'project': project_fallthroughs + additional_project_fallthroughs,
+        'organization': [
+            deps.FullySpecifiedAnchorFallthrough(
+                deps.ArgFallthrough('--book'),
+                self.organization_book_resource.collection_info,
+                'organizationsId'),
+            deps.ArgFallthrough('--organization')]}
+
+    self.assertEqual(expected, fallthroughs_map)
+
+  def testAttributeHelpAddsTypes(self):
+    info = info_holders.MultitypeResourceInfo(
+        '--book',
+        self.proj_org_resource,
+        'The book to act upon.',
+        {'book': '--book', 'shelf': '--shelf', 'project': '--book-project',
+         'organization': '--organization'},
+        {})
+    help_text = sorted([
+        arg.kwargs.get('help', None)
+        for arg in info.GetAttributeArgs()])
+    self.assertEqual(
+        ['The Cloud Organization of the book. This argument is used for the '
+         'following types: [orgbook].',
+         'The Cloud Project of the book. This argument is used for the '
+         'following types: [projectbook].',
+         'The ID of the book or a fully qualified identifier for the book. '
+         'This argument is used for the following types: [projectbook,'
+         ' orgbook].',
+         'The shelf of the book. Shelves hold books. This argument is used for '
+         'the following types: [projectbook, orgbook].'],
+        help_text)
+
+  @parameterized.named_parameters(
+      ('True', [], True, True, True),
+      ('False', [], False, False, True),
+      ('Fallthroughs',
+       [deps.PropertyFallthrough(properties.VALUES.core.project)],
+       True, False, False))
+  def testArgsRequired_SingleAnchor(self, book_fallthroughs, info_required,
+                                    expected_args_required,
+                                    expected_anchor_required):
+    info = info_holders.MultitypeResourceInfo(
+        '--book',
+        self.proj_org_resource,
+        'The book to act upon.',
+        {'book': '--book', 'shelf': '--shelf', 'project': '--book-project',
+         'organization': '--organization'},
+        {'book': book_fallthroughs},
+        required=info_required)
+    self.assertEqual(expected_args_required, info.args_required)
+
+    anchor_arg = [
+        arg for arg in info.GetAttributeArgs() if arg.name == '--book'][0]
+    self.assertEqual(expected_anchor_required,
+                     anchor_arg.kwargs.get('required', False))
+
+  @parameterized.named_parameters(
+      ('Required', True, False, False),
+      ('NotRequired', False, False, False))
+  def testArgsRequired_MultiAnchor(self, info_required, expected_book_required,
+                                   expected_shelf_required):
+    info = info_holders.MultitypeResourceInfo(
+        'BOOK',
+        self.parent_child_resource,
+        'The book or shelf to act upon.',
+        {'book': 'BOOK', 'shelf': '--shelf', 'project': '--book-project'},
+        {},
+        required=info_required)
+    # If there are multiple anchors, it's always false.
+    self.assertFalse(info.args_required)
+
+    book_arg = [
+        arg for arg in info.GetAttributeArgs() if arg.name == 'BOOK'][0]
+    self.assertEqual(expected_book_required,
+                     book_arg.kwargs.get('required', False))
+    shelf_arg = [
+        arg for arg in info.GetAttributeArgs() if arg.name == '--shelf'][0]
+    self.assertEqual(expected_shelf_required,
+                     shelf_arg.kwargs.get('required', False))
+
+  @parameterized.named_parameters(
+      ('NotRequired', False,
+       {'book': '--books', 'shelf': '--shelf',
+        'organization': '--organization'}),
+      ('Required', True,
+       {'book': '--books', 'shelf': '--shelf',
+        'organization': '--organization'}),
+      ('NotRequiredSingleArg', False,
+       {'book': '--books'}),
+      ('RequiredSingleArg', True,
+       {'book': '--books'}))
+  def testArgsFlagWithPlural(self, required, attribute_to_arg_names):
+    """Tests that presentation spec correctly creates plural flag args."""
+    info = info_holders.MultitypeResourceInfo(
+        '--books',
+        self.two_way_resource,
+        'The book to act upon.',
+        attribute_to_arg_names,
+        {},
+        plural=True,
+        required=required)
+
+    args = info.GetAttributeArgs()
+    arg = [a for a in args if a.name == '--books'][0]
+    actual_type = arg.kwargs.pop('type')
+    self.assertIsInstance(actual_type, arg_parsers.ArgList)
+    expected = {
+        'help': ('IDs of the books or fully qualified identifiers for the '
+                 'books. This argument is used for the following types: '
+                 '[projectbook, orgbook].'),
+        'completer': None,
+        'metavar': 'BOOKS',
+        # Anchor argument is always required within the group.
+        'required': True}
+    self.assertEqual(expected, arg.kwargs)
+
+  @parameterized.named_parameters(
+      ('NotRequired', False, {'book': 'BOOKS', 'shelf': '--shelf',
+                              'organization': '--organization'}),
+      ('Required', True, {'book': 'BOOKS', 'shelf': '--shelf',
+                          'organization': '--organization'}),
+      ('NotRequiredSingleArg', False, {'book': 'BOOKS'}),
+      ('RequiredSingleArg', True, {'book': 'BOOKS'}))
+  def testArgsPositionalWithPlural(self, required, attribute_to_arg_names):
+    """Tests that presentation spec correctly creates plural positional args."""
+    info = info_holders.MultitypeResourceInfo(
+        'BOOKS',
+        self.two_way_resource,
+        'The book to act upon.',
+        attribute_to_arg_names,
+        {},
+        plural=True,
+        required=required)
+
+    expected = {
+        'help': ('IDs of the books or fully qualified identifiers for the '
+                 'books. This argument is used for the following types: '
+                 '[projectbook, orgbook].'),
+        'completer': None,
+        # Anchor argument is always required within the group.
+        'nargs': '+',
+        'type': six.text_type}
+    name = 'BOOKS'
+    arg = [a for a in info.GetAttributeArgs() if a.name == name][0]
+    self.assertEqual(expected, arg.kwargs)
+
+  def testArgsFlagWithPluralParentChild(self):
+    """Tests that presentation spec correctly creates plural flag args."""
+    info = info_holders.MultitypeResourceInfo(
+        '--books',
+        self.parent_child_resource,
+        'The book to act upon.',
+        {'book': '--books', 'shelf': '--shelf',
+         'organization': '--organization'},
+        {},
+        plural=True)
+
+    args = info.GetAttributeArgs()
+    child_anchor = [a for a in args if a.name == '--books'][0]
+    child_type = child_anchor.kwargs.pop('type')
+    self.assertIsInstance(child_type, arg_parsers.ArgList)
+
+    # Only the child anchor should be plural.
+    parent_anchor = [a for a in args if a.name == '--shelf'][0]
+    parent_type = parent_anchor.kwargs.pop('type')
+    self.assertFalse(isinstance(parent_type, arg_parsers.ArgList))
 
 
 if __name__ == '__main__':

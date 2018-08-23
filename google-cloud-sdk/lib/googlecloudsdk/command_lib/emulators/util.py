@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """Utility functions for gcloud emulators datastore group."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import abc
@@ -33,6 +35,7 @@ from googlecloudsdk.core import yaml
 from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.updater import local_state
 from googlecloudsdk.core.updater import update_manager
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 import portpicker
@@ -285,7 +288,8 @@ def PrefixOutput(process, prefix):
   """
   output_line = process.stdout.readline()
   while output_line:
-    log.status.Print('[{0}] {1}'.format(prefix, output_line.rstrip()))
+    log.status.Print('[{0}] {1}'.format(prefix,
+                                        encoding.Decode(output_line.rstrip())))
     log.status.flush()
     output_line = process.stdout.readline()
 

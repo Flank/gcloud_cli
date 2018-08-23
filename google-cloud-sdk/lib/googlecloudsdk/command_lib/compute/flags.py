@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Flags and helpers for the compute related commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import functools
 import enum  # pylint: disable=unused-import, for pytype
 
@@ -122,7 +125,7 @@ def AddZoneFlag(parser, resource_type, operation_type, flag_prefix=None,
                         resource types, otherwise resource_types will be
                         pluralized by appending 's'.
   """
-  short_help = 'The zone of the {0} to {1}.'.format(
+  short_help = 'Zone of the {0} to {1}.'.format(
       text.Pluralize(
           int(plural) + 1, resource_type or '', custom_plural), operation_type)
   flag_name = 'zone'
@@ -156,7 +159,7 @@ def AddRegionFlag(parser, resource_type, operation_type,
                         resource types, otherwise resource_types will be
                         pluralized by appending 's'.
   """
-  short_help = 'The region of the {0} to {1}.'.format(
+  short_help = 'Region of the {0} to {1}.'.format(
       text.Pluralize(
           int(plural) + 1, resource_type or '', custom_plural), operation_type)
   flag_name = 'region'
@@ -712,7 +715,7 @@ class ResourceArgument(object):
           self.scopes[compute_scope.ScopeEnum.GLOBAL].flag,
           action='store_true',
           default=None,
-          help='If provided, it is assumed the {0} global.'
+          help='If set, the {0} global.'
           .format(resource_mention))
 
   def ResolveAsResource(self, args,

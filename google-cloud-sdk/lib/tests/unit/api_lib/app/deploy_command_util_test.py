@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Unit tests for deploy_command_util."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import io
 import json
 import logging
@@ -44,10 +47,8 @@ from googlecloudsdk.api_lib.services import services_util
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.api_lib.util import exceptions as api_lib_exceptions
-from googlecloudsdk.command_lib.app import exceptions as app_exc
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.credentials import creds
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
@@ -261,7 +262,7 @@ class PushTestRuntimeBuilders(PushTestBase):
         project='fakeproject')
     self.upload_mock.assert_called_once_with(
         self.source_dir, mock.ANY,
-        skip_files=mock.ANY,
+        info=mock.ANY,
         gen_files={
             checksum_path: 'yaml contents'
         }
@@ -309,13 +310,13 @@ class PushTestRuntimeBuilders(PushTestBase):
         project='fakeproject')
     self.upload_mock.assert_called_once_with(
         self.source_dir, mock.ANY,
-        skip_files=mock.ANY,
+        info=mock.ANY,
         gen_files={
             checksum_path: 'yaml contents'
         }
     )
-    self.assertTrue(
-        self.upload_mock.call_args[1]['skip_files'].match('bar/app.yaml'))
+    skip_files = self.upload_mock.call_args[1]['info'].parsed.skip_files.regex
+    self.assertTrue(skip_files.match('bar/app.yaml'))
 
   def testModuleBuildUseRuntimeBuilders_CustomRuntimeDockerfile(self):
     """Tests the scenario when the runtime_builder_strategy flag is turned on.
@@ -710,7 +711,7 @@ class PushTestSourceContexts(PushTestBase):
     # Check that source context file is sent correctly for upload
     self.upload_mock.assert_called_once_with(
         self.source_dir, mock.ANY,
-        skip_files=mock.ANY,
+        info=mock.ANY,
         gen_files={
             'source-context.json': mock.ANY
         }
@@ -740,7 +741,7 @@ class PushTestGenerateConfigs(PushTestBase):
 
     self.upload_mock.assert_called_once_with(
         self.source_dir, mock.ANY,
-        skip_files=mock.ANY,
+        info=mock.ANY,
         gen_files={
             'Dockerfile': (python_compat.PYTHON27_DOCKERFILE_PREAMBLE +
                            python_compat.DOCKERFILE_INSTALL_APP),
@@ -767,7 +768,7 @@ class PushTestGenerateConfigs(PushTestBase):
 
     self.upload_mock.assert_called_once_with(
         self.source_dir, mock.ANY,
-        skip_files=mock.ANY,
+        info=mock.ANY,
         gen_files={
             'Dockerfile': go.DOCKERFILE,
             '.dockerignore': go.DOCKERIGNORE
@@ -795,7 +796,7 @@ class PushTestGenerateConfigs(PushTestBase):
         ruby.DOCKERFILE_ENTRYPOINT.format(ruby.ENTRYPOINT_FOREMAN)])
     self.upload_mock.assert_called_once_with(
         self.source_dir, mock.ANY,
-        skip_files=mock.ANY,
+        info=mock.ANY,
         gen_files={
             'Dockerfile': dockerfile,
             '.dockerignore': ruby.DOCKERIGNORE_CONTENTS
@@ -814,7 +815,7 @@ class PushTestGenerateConfigs(PushTestBase):
     self.context_mock.assert_called_once_with(self.source_dir)
     self.upload_mock.assert_called_once_with(
         self.source_dir, mock.ANY,
-        skip_files=mock.ANY,
+        info=mock.ANY,
         gen_files={
             'source-context.json': mock.ANY,
             'Dockerfile': mock.ANY,
@@ -919,52 +920,6 @@ class HostnameTest(sdk_test_base.SdkBase, test_case.WithOutputCapture):
                      'https://{0}.{1}.{2}.appspot.com'.format(self.version_id,
                                                               self.service_id,
                                                               self.app_id))
-
-
-class YamlGenTest(sdk_test_base.SdkBase, test_case.WithInput):
-
-  def SetUp(self):
-    self.fingerprint_mock = self.StartPatch(
-        'googlecloudsdk.api_lib.app.runtimes.fingerprinter.IdentifyDirectory')
-
-  def testAnswerNo(self):
-    self.WriteInput('n\n')
-    with self.assertRaises(console_io.OperationCancelledError):
-      deploy_command_util.CreateAppYamlForAppDirectory(self.temp_path)
-    self.fingerprint_mock.assert_not_called()
-
-  def testNoMatch(self):
-    self.fingerprint_mock.return_value = None
-    self.WriteInput('y\n')
-    with self.assertRaises(app_exc.NoAppIdentifiedError):
-      deploy_command_util.CreateAppYamlForAppDirectory(self.temp_path)
-    self.fingerprint_mock.assert_called_once()
-
-  def testNoGenerateYaml(self):
-    configurator_mock = mock.MagicMock()
-    self.fingerprint_mock.return_value = configurator_mock
-    self.WriteInput('y\n')
-    with self.assertRaises(app_exc.NoAppIdentifiedError):
-      deploy_command_util.CreateAppYamlForAppDirectory(self.temp_path)
-    self.fingerprint_mock.assert_called_once()
-    configurator_mock.MaybeWriteAppYaml.assert_called_once()
-
-  def testGenerate(self):
-    configurator_mock = mock.MagicMock()
-
-    def WriteYaml():
-      self.Touch(self.temp_path, deploy_command_util.DEFAULT_DEPLOYABLE)
-
-    configurator_mock.MaybeWriteAppYaml.side_effect = WriteYaml
-
-    self.fingerprint_mock.return_value = configurator_mock
-    self.WriteInput('y\n')
-    yaml_path = deploy_command_util.CreateAppYamlForAppDirectory(self.temp_path)
-    self.fingerprint_mock.assert_called_once()
-    self.assertEqual(yaml_path,
-                     os.path.join(self.temp_path,
-                                  deploy_command_util.DEFAULT_DEPLOYABLE))
-    self.assertTrue(os.path.isfile(yaml_path))
 
 
 class DoPrepareManagedVmsTest(sdk_test_base.WithOutputCapture,

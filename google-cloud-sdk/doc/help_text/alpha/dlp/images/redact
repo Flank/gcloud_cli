@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha dlp images redact IMAGE --info-types=[INFOTYPE,...]
         [--include-quote] [--min-likelihood=MIN_LIKELIHOOD; default="possible"]
-        [--redact-all-text] [--redact-color=REDACT_COLOR]
-        [GCLOUD_WIDE_FLAG ...]
+        [--output-file=OUTPUT_FILE] [--redact-all-text]
+        [--redact-color=REDACT_COLOR] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Redact potentially sensitive data from image content.
@@ -33,6 +33,9 @@ OPTIONAL FLAGS
         Only return findings equal to or above this threshold. MIN_LIKELIHOOD
         must be one of: likely, possible, unlikely, very-likely, very-unlikely.
 
+     --output-file=OUTPUT_FILE
+        Path to the file to write redacted contents to.
+
      --redact-all-text
         If specified, all text info in the image will be removed, whether it is
         detected as sensitive or not.
@@ -53,10 +56,18 @@ API REFERENCE
     This command uses the dlp/v2 API. The full documentation for this API can
     be found at: https://cloud.google.com/dlp/docs/
 
+EXAMPLES
+    To redact phone numbers from an image named my-image.jpg and write the
+    redacted image to my-redacted-image.jpg, run:
+
+        $ gcloud alpha dlp images redact my-image.jpg \
+            --info-types PHONE_NUMBER \
+            --output-file my-redacted-image.jpg
+
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
 

@@ -11,7 +11,7 @@ gcloud beta tasks \- manage Cloud Tasks queues and tasks
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta tasks\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta tasks\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,8 +36,41 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBlocations\fR
+\fB(BETA)\fR Get information about Cloud Tasks locations.
+
+.TP 2m
 \fBqueues\fR
 \fB(BETA)\fR Manage Cloud Tasks queues.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\-app\-engine\-task\fR
+\fB(BETA)\fR Create and add a task to an App Engine queue.
+
+.TP 2m
+\fBdelete\fR
+\fB(BETA)\fR Delete a task from a queue.
+
+.TP 2m
+\fBdescribe\fR
+\fB(BETA)\fR Show details about a task.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR List tasks.
+
+.TP 2m
+\fBrun\fR
+\fB(BETA)\fR Force a task to run now.
 
 
 .RE

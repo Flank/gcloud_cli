@@ -47,7 +47,8 @@ FLAGS
           The Cloud Armor rules language expression to match for this rule.
 
        --src-ip-ranges=[SRC_IP_RANGE,...]
-          The source IP ranges to match for this rule.
+          The source IPs/IP ranges to match for this rule. To match all IPs
+          specify *.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

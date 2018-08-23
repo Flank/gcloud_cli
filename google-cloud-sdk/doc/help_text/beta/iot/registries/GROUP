@@ -21,6 +21,9 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) add an IAM policy binding to a device registry.
+
      create
         (BETA) Create a new device registry.
 
@@ -35,6 +38,9 @@ COMMANDS
 
      list
         (BETA) List device registries.
+
+     remove-iam-policy-binding
+        (BETA) Remove an IAM policy binding from a device registry.
 
      set-iam-policy
         (BETA) Set IAM policy for a device registry.

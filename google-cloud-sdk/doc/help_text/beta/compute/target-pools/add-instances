@@ -23,9 +23,9 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --instances-zone=INSTANCES_ZONE
-        The zone of the instances to add to the target pool. If not specified
-        and the compute/zone property isn't set, you may be prompted to select
-        a zone.
+        Zone of the instances to add to the target pool. If not specified and
+        the compute/zone property isn't set, you may be prompted to select a
+        zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:
@@ -44,12 +44,12 @@ OPTIONAL FLAGS
         CLOUDSDK_COMPUTE_ZONE.
 
      --region=REGION
-        The region of the target pool to operate on. If not specified it will
-        be set the region of the instances. Overrides the default
+        Region of the target pool to operate on. If not specified, it will be
+        set to the region of the instances. Overrides the default
         compute/region property value for this command invocation.
 
      --zone=ZONE
-        The zone of the instances to add to the target pool. DEPRECATED, use
+        Zone of the instances to add to the target pool. DEPRECATED, use
         --instances-zone. If not specified, you will be prompted to select a
         zone. Overrides the default compute/zone property value for this
         command invocation.

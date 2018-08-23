@@ -13,6 +13,16 @@ from apitools.base.py import extra_types
 package = 'redis'
 
 
+class Empty(_messages.Message):
+  r"""A generic empty message that you can re-use to avoid defining duplicated
+  empty messages in your APIs. A typical example is to use it as the request
+  or the response type of an API method. For instance:      service Foo {
+  rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);     }  The
+  JSON representation for `Empty` is empty JSON object `{}`.
+  """
+
+
+
 class GoogleCloudCommonOperationMetadata(_messages.Message):
   r"""Represents the metadata of the long-running operation.
 
@@ -327,20 +337,23 @@ class Location(_messages.Message):
   Messages:
     LabelsValue: Cross-service attributes for the location. For example
       {"cloud.googleapis.com/region": "us-east1"}
-    MetadataValue: Service-specific metadata. For example the available
-      capacity at the given location.
+    MetadataValue: Output only. The set of available zones in the location.
+      The map is keyed by the lowercase ID of each zone, as defined by Compute
+      Engine. These keys can be specified in `location_id` or
+      `alternative_location_id` fields when creating a Redis instance.
 
   Fields:
     displayName: The friendly name for this location, typically a nearby city
       name. For example, "Tokyo".
     labels: Cross-service attributes for the location. For example
       {"cloud.googleapis.com/region": "us-east1"}
-    locationId: The canonical id for this location. For example: `"us-east1"`.
-    metadata: Service-specific metadata. For example the available capacity at
-      the given location.
-    name: Resource name for the location, which may vary between
-      implementations. For example: `"projects/example-project/locations/us-
-      east1"`
+    locationId: Resource ID for the region. For example: "us-east1".
+    metadata: Output only. The set of available zones in the location. The map
+      is keyed by the lowercase ID of each zone, as defined by Compute Engine.
+      These keys can be specified in `location_id` or
+      `alternative_location_id` fields when creating a Redis instance.
+    name: Full resource name for the region. For example: "projects/example-
+      project/locations/us-east1".
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -370,8 +383,10 @@ class Location(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class MetadataValue(_messages.Message):
-    r"""Service-specific metadata. For example the available capacity at the
-    given location.
+    r"""Output only. The set of available zones in the location. The map is
+    keyed by the lowercase ID of each zone, as defined by Compute Engine.
+    These keys can be specified in `location_id` or `alternative_location_id`
+    fields when creating a Redis instance.
 
     Messages:
       AdditionalProperty: An additional property for a MetadataValue object.
@@ -401,66 +416,20 @@ class Location(_messages.Message):
   name = _messages.StringField(5)
 
 
-class LocationMetadata(_messages.Message):
-  r"""This location metadata represents additional configuration options for a
-  given location where a Redis instance may be created. All fields are output
-  only. It is returned as content of the
-  `google.cloud.location.Location.metadata` field.
-
-  Messages:
-    AvailableZonesValue: Output only. The set of available zones in the
-      location. The map is keyed by the lowercase ID of each zone, as defined
-      by GCE. These keys can be specified in `location_id` or
-      `alternative_location_id` fields when creating a Redis instance.
-
-  Fields:
-    availableZones: Output only. The set of available zones in the location.
-      The map is keyed by the lowercase ID of each zone, as defined by GCE.
-      These keys can be specified in `location_id` or
-      `alternative_location_id` fields when creating a Redis instance.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class AvailableZonesValue(_messages.Message):
-    r"""Output only. The set of available zones in the location. The map is
-    keyed by the lowercase ID of each zone, as defined by GCE. These keys can
-    be specified in `location_id` or `alternative_location_id` fields when
-    creating a Redis instance.
-
-    Messages:
-      AdditionalProperty: An additional property for a AvailableZonesValue
-        object.
-
-    Fields:
-      additionalProperties: Additional properties of type AvailableZonesValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a AvailableZonesValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A ZoneMetadata attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.MessageField('ZoneMetadata', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  availableZones = _messages.MessageField('AvailableZonesValue', 1)
-
-
 class Operation(_messages.Message):
   r"""This resource represents a long-running operation that is the result of
   a network API call.
 
   Messages:
-    MetadataValue: Service-specific metadata associated with the operation.
-      It typically contains progress information and common metadata such as
-      create time. Some services might not provide such metadata.  Any method
-      that returns a long-running operation should document the metadata type,
-      if any.
+    MetadataValue: {  `createTime`: The time the operation was created.
+      `endTime`: The time the operation finished running.  `target`: Server-
+      defined resource path for the target of the operation.  `verb`: Name of
+      the verb executed by the operation.  `statusDetail`: Human-readable
+      status of the operation, if any.  `cancelRequested`: Identifies whether
+      the user has requested cancellation of the operation. Operations that
+      have successfully been cancelled have Operation.error value with a
+      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+      `apiVersion`: API version used to start the operation.  }
     ResponseValue: The normal response of the operation in case of success.
       If the original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -475,11 +444,15 @@ class Operation(_messages.Message):
       `response` is available.
     error: The error result of the operation in case of failure or
       cancellation.
-    metadata: Service-specific metadata associated with the operation.  It
-      typically contains progress information and common metadata such as
-      create time. Some services might not provide such metadata.  Any method
-      that returns a long-running operation should document the metadata type,
-      if any.
+    metadata: {  `createTime`: The time the operation was created.  `endTime`:
+      The time the operation finished running.  `target`: Server-defined
+      resource path for the target of the operation.  `verb`: Name of the verb
+      executed by the operation.  `statusDetail`: Human-readable status of the
+      operation, if any.  `cancelRequested`: Identifies whether the user has
+      requested cancellation of the operation. Operations that have
+      successfully been cancelled have Operation.error value with a
+      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+      `apiVersion`: API version used to start the operation.  }
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
       the `name` should have the format of `operations/some/unique/name`.
@@ -494,10 +467,15 @@ class Operation(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class MetadataValue(_messages.Message):
-    r"""Service-specific metadata associated with the operation.  It typically
-    contains progress information and common metadata such as create time.
-    Some services might not provide such metadata.  Any method that returns a
-    long-running operation should document the metadata type, if any.
+    r"""{  `createTime`: The time the operation was created.  `endTime`: The
+    time the operation finished running.  `target`: Server-defined resource
+    path for the target of the operation.  `verb`: Name of the verb executed
+    by the operation.  `statusDetail`: Human-readable status of the operation,
+    if any.  `cancelRequested`: Identifies whether the user has requested
+    cancellation of the operation. Operations that have successfully been
+    cancelled have Operation.error value with a google.rpc.Status.code of 1,
+    corresponding to `Code.CANCELLED`.  `apiVersion`: API version used to
+    start the operation.  }
 
     Messages:
       AdditionalProperty: An additional property for a MetadataValue object.
@@ -556,82 +534,6 @@ class Operation(_messages.Message):
   metadata = _messages.MessageField('MetadataValue', 3)
   name = _messages.StringField(4)
   response = _messages.MessageField('ResponseValue', 5)
-
-
-class OperationMetadata(_messages.Message):
-  r"""This operation metadata represents the state of operations that may have
-  happened or are happening on the instance. All fields are output only. It is
-  returned as content of the `google.longrunning.Operation.metadata` field.
-  The `google.longrunning.Operation.name` field will be of the form
-  `projects/{project_id}/locations/{location_id}/operations/{operation_id}`
-  and the name for a `ListOperations` request will be of the form
-  `projects/{project_id}/locations/{location_id}`  On a ListOperations request
-  where {location_id} is "-", all regions available to the {project_id} are
-  queried and the results aggregated. If a location is not available, a dummy
-  `google.longrunning.Operation` entry will be included in the `operations`
-  field of the response, with the `name` field set to a value of the form
-  `projects/{project_id}/locations/{location_id}/operations/-` and the `done`
-  field will be set and the `result.error` field set with the `code` field set
-  to `google.rpc.Code.DEADLINE_EXCEEDED` and the `message` field set to
-  `location unavailable for ListOperations`. The Operation metadata` field
-  will not be set for such a dummy operation.
-
-  Enums:
-    OperationTypeValueValuesEnum: Output only. The operation type.
-    StateValueValuesEnum: Output only. The current state of the operation.
-
-  Fields:
-    createTime: Output only. The time the operation was created.
-    detail: Output only. Detailed operation progress, if available.
-    endTime: Output only. The time the operation was completed.
-    operationType: Output only. The operation type.
-    startTime: Output only. The time the operation was started.
-    state: Output only. The current state of the operation.
-    target: Output only. Server-defined resource path for the target of the
-      operation.
-  """
-
-  class OperationTypeValueValuesEnum(_messages.Enum):
-    r"""Output only. The operation type.
-
-    Values:
-      TYPE_UNSPECIFIED: Not set.
-      CREATE_REDIS_INSTANCE: Redis instance is being created.
-      UPDATE_REDIS_INSTANCE: Redis instance is being updated.
-      DELETE_REDIS_INSTANCE: Redis instance is being deleted.
-      REPAIR_REDIS_INSTANCE: Redis instance is being repaired.
-      MAINTENANCE_FOR_REDIS_INSTANCE: Redis instance is being in maintenance.
-    """
-    TYPE_UNSPECIFIED = 0
-    CREATE_REDIS_INSTANCE = 1
-    UPDATE_REDIS_INSTANCE = 2
-    DELETE_REDIS_INSTANCE = 3
-    REPAIR_REDIS_INSTANCE = 4
-    MAINTENANCE_FOR_REDIS_INSTANCE = 5
-
-  class StateValueValuesEnum(_messages.Enum):
-    r"""Output only. The current state of the operation.
-
-    Values:
-      STATUS_UNSPECIFIED: Not set.
-      PENDING: The operation has been created.
-      RUNNING: The operation is currently running.
-      FAILED: The operation has failed or was cancelled.
-      DONE: The operation completed successfully.
-    """
-    STATUS_UNSPECIFIED = 0
-    PENDING = 1
-    RUNNING = 2
-    FAILED = 3
-    DONE = 4
-
-  createTime = _messages.StringField(1)
-  detail = _messages.StringField(2)
-  endTime = _messages.StringField(3)
-  operationType = _messages.EnumField('OperationTypeValueValuesEnum', 4)
-  startTime = _messages.StringField(5)
-  state = _messages.EnumField('StateValueValuesEnum', 6)
-  target = _messages.StringField(7)
 
 
 class RedisProjectsLocationsGetRequest(_messages.Message):
@@ -747,6 +649,26 @@ class RedisProjectsLocationsListRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
+
+
+class RedisProjectsLocationsOperationsCancelRequest(_messages.Message):
+  r"""A RedisProjectsLocationsOperationsCancelRequest object.
+
+  Fields:
+    name: The name of the operation resource to be cancelled.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class RedisProjectsLocationsOperationsDeleteRequest(_messages.Message):
+  r"""A RedisProjectsLocationsOperationsDeleteRequest object.
+
+  Fields:
+    name: The name of the operation resource to be deleted.
+  """
+
+  name = _messages.StringField(1, required=True)
 
 
 class RedisProjectsLocationsOperationsGetRequest(_messages.Message):
@@ -914,13 +836,6 @@ class Status(_messages.Message):
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   details = _messages.MessageField('DetailsValueListEntry', 2, repeated=True)
   message = _messages.StringField(3)
-
-
-class ZoneMetadata(_messages.Message):
-  r"""Defines specific information for a particular zone. Currently empty and
-  reserved for future use only.
-  """
-
 
 
 encoding.AddCustomJsonFieldMapping(

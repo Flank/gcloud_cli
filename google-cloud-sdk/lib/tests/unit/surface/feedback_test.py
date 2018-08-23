@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """Tests for [gcloud feedback] command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import datetime
@@ -334,8 +336,7 @@ class FeedbackTest(FeedbackTestBase):
 
     # This constant indicates the number of recent log files to show. We want
     # one more, as that will be the "None of these" choice.
-    none_choice = info_holder.LogsInfo.NUM_RECENT_LOG_FILES + 1
-    self.AssertErrContains('[{0}] None of these'.format(none_choice))
+    self.AssertErrContains('None of these')
 
   def _AssertPromptNotDisplayed(self):
     """Assert that the "select log file" prompt is not displayed."""

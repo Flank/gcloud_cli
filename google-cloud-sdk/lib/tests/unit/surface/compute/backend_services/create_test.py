@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the backend services create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute.backend_services import backend_services_utils
@@ -22,7 +25,30 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class HttpBackendServiceCreateTest(test_base.BaseTest):
+class BackendServiceCreateTestBase(test_base.BaseTest):
+
+  def _GetApiName(self, release_track):
+    """Returns the API name for the specified release track."""
+    if release_track == calliope_base.ReleaseTrack.ALPHA:
+      return 'alpha'
+    elif release_track == calliope_base.ReleaseTrack.BETA:
+      return 'beta'
+    return 'v1'
+
+  def _SetUp(self, release_track):
+    """Setup common test components.
+
+    Args:
+      release_track: Release track the test is targeting.
+    """
+    self.SelectApi(self._GetApiName(release_track))
+    self.track = release_track
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.GA)
+
+
+class HttpBackendServiceCreateTest(BackendServiceCreateTestBase):
 
   def testSimpleCase(self):
     messages = self.messages
@@ -448,14 +474,14 @@ class HttpBackendServiceCreateTest(test_base.BaseTest):
             project='my-project'))],)
 
 
-class BetaBackendServiceCreateTest(test_base.BaseTest):
+class BetaBackendServiceCreateTest(BackendServiceCreateTestBase):
 
   def SetUp(self):
-    self.SelectApi('beta')
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
   def testEnableCdnNotSpecified(self):
     self.Run("""
-        beta compute backend-services create my-backend-service
+        compute backend-services create my-backend-service
           --http-health-checks my-health-check
           --global
         """)
@@ -480,7 +506,7 @@ class BetaBackendServiceCreateTest(test_base.BaseTest):
 
   def testEnableCdn(self):
     self.Run("""
-        beta compute backend-services create my-backend-service
+        compute backend-services create my-backend-service
           --http-health-checks my-health-check
           --enable-cdn
           --global
@@ -506,7 +532,7 @@ class BetaBackendServiceCreateTest(test_base.BaseTest):
     )
 
 
-class WithSessionAffinityApiTest(test_base.BaseTest):
+class WithSessionAffinityApiTest(BackendServiceCreateTestBase):
 
   # Tests that default settings are applied to affinity and cookie TTL
   # if not specified
@@ -632,21 +658,19 @@ class WithSessionAffinityApiTest(test_base.BaseTest):
             project='my-project'))],)
 
 
-class WithSessionAffinityApiAlphaTest(WithSessionAffinityApiTest):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-
 class WithSessionAffinityApiBetaTest(WithSessionAffinityApiTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
-class WithConnectionDrainingTimeoutApiTest(test_base.BaseTest):
+class WithSessionAffinityApiAlphaTest(WithSessionAffinityApiBetaTest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+
+
+class WithConnectionDrainingTimeoutApiTest(BackendServiceCreateTestBase):
 
   def testConnectionDrainingTimeout(self):
     messages = self.messages
@@ -733,7 +757,125 @@ class WithConnectionDrainingTimeoutApiTest(test_base.BaseTest):
             project='my-project'))],)
 
 
-class WithHealthcheckApiTest(test_base.BaseTest):
+class WithHealthcheckApiAlphaTest(BackendServiceCreateTestBase):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+
+  def testGlobalBackendServiceWithGlobalHealthCheck(self):
+    messages = self.messages
+    self.Run("""
+          compute backend-services create my-backend-service
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+          --global --global-health-checks
+        """)
+
+    self.CheckRequests([(
+        self.compute.backendServices, 'Insert',
+        messages.ComputeBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                description='My backend service',
+                healthChecks=[
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-1'),
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-2')
+                ],
+                name='my-backend-service',
+                portName='http',
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                timeoutSec=30),
+            project='my-project'))],)
+
+  def testGlobalBackendServiceWithRegionalHealthCheck(self):
+    messages = self.messages
+    self.Run("""
+          compute backend-services create my-backend-service
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+          --global --health-checks-region region1
+        """)
+
+    self.CheckRequests([(
+        self.compute.backendServices, 'Insert',
+        messages.ComputeBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                description='My backend service',
+                healthChecks=[
+                    (self.compute_uri + '/projects/my-project/'
+                     'regions/region1/healthChecks/my-health-check-1'),
+                    (self.compute_uri + '/projects/my-project/'
+                     'regions/region1/healthChecks/my-health-check-2')
+                ],
+                name='my-backend-service',
+                portName='http',
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                timeoutSec=30),
+            project='my-project'))],)
+
+  def testRegionalBackendServiceWithRegionalHealthCheck(self):
+    messages = self.messages
+    self.Run("""
+           compute backend-services create my-backend-service
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+          --region region1 --health-checks-region region1
+        """)
+
+    self.CheckRequests([
+        (self.compute.regionBackendServices, 'Insert',
+         messages.ComputeRegionBackendServicesInsertRequest(
+             backendService=messages.BackendService(
+                 backends=[],
+                 loadBalancingScheme=messages.BackendService.
+                 LoadBalancingSchemeValueValuesEnum.EXTERNAL,
+                 description='My backend service',
+                 healthChecks=[
+                     (self.compute_uri + '/projects/my-project/'
+                      'regions/region1/healthChecks/my-health-check-1'),
+                     (self.compute_uri + '/projects/my-project/'
+                      'regions/region1/healthChecks/my-health-check-2')
+                 ],
+                 name='my-backend-service',
+                 protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
+                 timeoutSec=30),
+             project='my-project',
+             region='region1'))
+    ],)
+
+  def testRegionalBackendServiceWithGlobalHealthCheck(self):
+    messages = self.messages
+    self.Run("""
+           compute backend-services create my-backend-service
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+          --region region1 --global-health-checks
+        """)
+
+    self.CheckRequests([
+        (self.compute.regionBackendServices, 'Insert',
+         messages.ComputeRegionBackendServicesInsertRequest(
+             backendService=messages.BackendService(
+                 backends=[],
+                 loadBalancingScheme=messages.BackendService.
+                 LoadBalancingSchemeValueValuesEnum.EXTERNAL,
+                 description='My backend service',
+                 healthChecks=[(self.compute_uri + '/projects/my-project/'
+                                'global/healthChecks/my-health-check-1'),
+                               (self.compute_uri + '/projects/my-project/'
+                                'global/healthChecks/my-health-check-2')],
+                 name='my-backend-service',
+                 protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
+                 timeoutSec=30),
+             project='my-project',
+             region='region1'))
+    ],)
+
+
+class WithHealthcheckApiTest(BackendServiceCreateTestBase):
 
   def testSimpleCase(self):
     messages = self.messages
@@ -1024,8 +1166,44 @@ class WithHealthcheckApiTest(test_base.BaseTest):
         )
     )],)
 
+  def testWithRegionalHealthCheck(self):
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+    messages = self.messages
 
-class WithCustomCacheKeyApiTest(test_base.BaseTest):
+    self.Run("""compute backend-services create backend-service-25
+                --load-balancing-scheme=internal
+                --region=alaska
+                --health-checks=my-health-check-1
+                --health-checks-region us-central1
+                --protocol TCP
+                --connection-draining-timeout=120""")
+
+    self.CheckRequests(
+        [(self.compute_alpha.regionBackendServices, 'Insert',
+          messages.ComputeRegionBackendServicesInsertRequest(
+              backendService=messages.BackendService(
+                  backends=[],
+                  healthChecks=[
+                      ('https://www.googleapis.com/compute/alpha/projects/'
+                       'my-project/regions/us-central1/healthChecks/'
+                       'my-health-check-1'),
+                  ],
+                  name='backend-service-25',
+                  loadBalancingScheme=(
+                      messages.BackendService.
+                      LoadBalancingSchemeValueValuesEnum.INTERNAL),
+                  protocol=(
+                      messages.BackendService.ProtocolValueValuesEnum('TCP')),
+                  connectionDraining=messages.ConnectionDraining(
+                      drainingTimeoutSec=120),
+                  timeoutSec=30,
+              ),
+              project='my-project',
+              region='alaska',
+          ))],)
+
+
+class WithCustomCacheKeyApiTest(BackendServiceCreateTestBase):
 
   # When no custom cache keys flags are specified, no custom cache key flags
   # should appear in the request.
@@ -1244,7 +1422,7 @@ class WithCustomCacheKeyApiTest(test_base.BaseTest):
     self.CheckRequests()
 
 
-class WithIAPApiTest(test_base.BaseTest):
+class WithIAPApiTest(BackendServiceCreateTestBase):
 
   def SetUp(self):
     self._create_service_cmd_line = (
@@ -1421,6 +1599,146 @@ class WithIAPApiTest(test_base.BaseTest):
         self.Run,
         self._create_service_cmd_line +
         ' --iap enabled,invalid-arg1=VAL1,invalid-arg2=VAL2')
+
+
+class WithCdnSignedUrlApiTest(BackendServiceCreateTestBase):
+
+  def CheckRequestMadeWithCdnPolicy(self, expected_message):
+    """Verifies the request was made with the expected CDN policy."""
+    messages = self.messages
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Insert',
+          messages.ComputeBackendServicesInsertRequest(
+              backendService=messages.BackendService(
+                  backends=[],
+                  cdnPolicy=expected_message,
+                  description='My backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check-1'),
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  timeoutSec=30),
+              project='my-project'))])
+
+  def testCreateWithoutCacheMaxAge(self):
+    """Tests creating backend service without cache max age."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        """)
+    self.CheckRequestMadeWithCdnPolicy(None)
+
+  def testCreateWithCacheMaxAgeZero(self):
+    """Tests creating backend service with cache max age of 0."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 0
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=0))
+
+  def testCreateWithCacheMaxAgeSeconds(self):
+    """Tests creating backend service with cache max age in seconds."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 7890s
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=7890))
+
+  def testCreateWithCacheMaxAgeMinutes(self):
+    """Tests creating backend service with cache max age in minutes."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 234m
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=234 * 60))
+
+  def testCreateWithCacheMaxAgeHours(self):
+    """Tests creating backend service with cache max age in hours."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 38h
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=38 * 60 *
+                                              60))
+
+  def testCreateWithCacheMaxAgeDays(self):
+    """Tests creating backend service with cache max age in days."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 99d
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=99 * 24 *
+                                              60 * 60))
+
+  def testSetInvalidCacheMaxAge(self):
+    """Tests creating backend service with an invalid cache max age."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --signed-url-cache-max-age: given value must be of the form '
+        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: '
+        r'invalid-value'):
+      self.Run("""
+          compute backend-services create backend-service-1
+          --global
+          --http-health-checks my-health-check-1
+          --signed-url-cache-max-age invalid-value
+          """)
+
+  def testSetCacheMaxAgeNegative(self):
+    """Tests creating backend service with a negative cache max age."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --signed-url-cache-max-age: given value must be of the form '
+        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: -1'):
+      self.Run("""
+          compute backend-services create backend-service-1
+          --global
+          --http-health-checks my-health-check-1
+          --description "My backend service"
+          --signed-url-cache-max-age -1
+          """)
+
+  def testWithCacheMaxAgeAndCacheKeyPolicy(self):
+    """Tests creating backend service with both cache max age and cache keys."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 1234
+        --cache-key-query-string-whitelist=foo,bar,baz
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(
+            signedUrlCacheMaxAgeSec=1234,
+            cacheKeyPolicy=self.messages.CacheKeyPolicy(
+                includeHost=True,
+                includeProtocol=True,
+                includeQueryString=True,
+                queryStringWhitelist=['foo', 'bar', 'baz'])))
 
 
 if __name__ == '__main__':

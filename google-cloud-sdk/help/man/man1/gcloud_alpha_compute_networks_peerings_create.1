@@ -11,7 +11,7 @@ gcloud alpha compute networks peerings create \- create a Google Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-auto\-create\-routes\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-auto\-create\-routes\fR] [\fB\-\-export\-custom\-routes\fR] [\fB\-\-import\-custom\-routes\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -57,6 +57,16 @@ If set, will automatically create routes for the network peering. Note that a
 backend error will be returned if this is not set.
 
 .TP 2m
+\fB\-\-export\-custom\-routes\fR
+If set, the network will export custom routes to peer network. Use
+\-\-no\-export\-custom\-routes to disable it.
+
+.TP 2m
+\fB\-\-import\-custom\-routes\fR
+If set, the network will import custom routes from peer network. Use
+\-\-no\-import\-custom\-routes to disable it.
+
+.TP 2m
 \fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR
 The name of the project for the peer network. If not specified, defaults to
 current project.
@@ -76,11 +86,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute networks peerings create

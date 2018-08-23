@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,18 @@
 """Unit tests for Composer storage util."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import posixpath
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util as gcs_util
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import parsers
 from googlecloudsdk.command_lib.composer import storage_util
 from googlecloudsdk.command_lib.composer import util as command_util
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
@@ -31,11 +36,14 @@ import six
 from six.moves import range
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class StorageUtilTest(base.StorageApiCallingUnitTest,
-                      base.GsutilShellingUnitTest):
+                      base.GsutilShellingUnitTest, parameterized.TestCase):
 
-  def testListSuccessful(self):
+  def testListSuccessful(self, track):
     """Tests successful List call."""
+    self.SetTrack(track)
     responses = [
         self.storage_messages.Objects(
             items=[
@@ -61,16 +69,21 @@ class StorageUtilTest(base.StorageApiCallingUnitTest,
 
     self.ExpectObjectList(self.test_gcs_bucket, 'subdir/', responses=responses)
 
-    actual_list_response = storage_util.List(env_ref, 'subdir')
+    actual_list_response = storage_util.List(
+        env_ref, 'subdir', release_track=self.track)
     six.assertCountEqual(self, expected_list_response, actual_list_response)
 
-  def testListEnvironmentGetFails(self):
+  def testListEnvironmentGetFails(self, track):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.List(env_ref, 'subdir')
+      storage_util.List(env_ref, 'subdir', release_track=self.track)
+
     self._EnvironmentGetFailsHelper(_Callback)
 
-  def testListStorageListFails(self):
+  def testListStorageListFails(self, track):
+    self.SetTrack(track)
     env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
 
     self.ExpectEnvironmentGet(
@@ -86,17 +99,21 @@ class StorageUtilTest(base.StorageApiCallingUnitTest,
             code=403, message='PERMISSION_DENIED'))
 
     with self.AssertRaisesExceptionMatches(storage_api.UploadError, ''):
-      list(storage_util.List(env_ref, 'subdir'))
+      list(storage_util.List(env_ref, 'subdir', release_track=self.track))
 
-  def testListEnvironmentWithoutGcsBucket(self):
+  def testListEnvironmentWithoutGcsBucket(self, track):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.List(env_ref, 'subdir')
+      storage_util.List(env_ref, 'subdir', release_track=self.track)
+
     self._EnvironmentWithoutGcsBucketHelper(_Callback)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testImportSuccessful(self, exec_mock):
+  def testImportSuccessful(self, track, exec_mock):
     """Tests successful Import call."""
+    self.SetTrack(track)
     sources = ['c/d']
     env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
 
@@ -116,34 +133,44 @@ class StorageUtilTest(base.StorageApiCallingUnitTest,
             + sources
             + [self.test_gcs_bucket_path + '/subdir/']))
 
-    storage_util.Import(env_ref, sources, 'subdir/')
+    storage_util.Import(env_ref, sources, 'subdir/', release_track=self.track)
     fake_exec.Verify()
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testImportEnvironmentGetFails(self, exec_mock):
+  def testImportEnvironmentGetFails(self, track, exec_mock):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Import(env_ref, [], 'subdir')
+      storage_util.Import(env_ref, [], 'subdir', release_track=self.track)
+
     self._EnvironmentGetFailsHelper(_Callback, exec_mock)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testImportGsutilFails(self, exec_mock):
+  def testImportGsutilFails(self, track, exec_mock):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Import(env_ref, [], 'subdir')
+      storage_util.Import(env_ref, [], 'subdir', release_track=self.track)
+
     self._GsutilFailsHelper(_Callback, exec_mock)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testImportEnvironmentWithoutGcsBucket(self, exec_mock):
+  def testImportEnvironmentWithoutGcsBucket(self, track, exec_mock):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Import(env_ref, [], 'subdir')
+      storage_util.Import(env_ref, [], 'subdir', release_track=self.track)
+
     self._EnvironmentWithoutGcsBucketHelper(_Callback, exec_mock)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   @mock.patch('os.path.isdir', return_value=True)
-  def testExportSuccessful(self, isdir_mock, exec_mock):
+  def testExportSuccessful(self, isdir_mock, track, exec_mock):
     """Tests successful Export call."""
+    self.SetTrack(track)
     sources = ['a', 'b', 'c/d']
     env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
 
@@ -164,13 +191,14 @@ class StorageUtilTest(base.StorageApiCallingUnitTest,
                for source in sources]
             + ['subdir']))
 
-    storage_util.Export(env_ref, sources, 'subdir')
+    storage_util.Export(env_ref, sources, 'subdir', release_track=self.track)
     fake_exec.Verify()
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   @mock.patch('os.path.isdir', return_value=True)
-  def testExportGcsDestinationHasSlashAdded(self, isdir_mock, exec_mock):
+  def testExportGcsDestinationHasSlashAdded(self, track, isdir_mock, exec_mock):
     """Tests that a trailing slash is automatically added to gs:// dests."""
+    self.SetTrack(track)
     sources = ['a', 'b', 'c/d']
     env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
 
@@ -191,36 +219,51 @@ class StorageUtilTest(base.StorageApiCallingUnitTest,
                for source in sources]
             + ['gs://subdir/']))
 
-    storage_util.Export(env_ref, sources, 'gs://subdir')
+    storage_util.Export(
+        env_ref, sources, 'gs://subdir', release_track=self.track)
     fake_exec.Verify()
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   @mock.patch('os.path.isdir', return_value=True)
-  def testExportEnvironmentGetFails(self, isdir_mock, exec_mock):
+  def testExportEnvironmentGetFails(self, track, isdir_mock, exec_mock):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Export(env_ref, ['subdir/*'], 'subdir')
+      storage_util.Export(
+          env_ref, ['subdir/*'], 'subdir', release_track=self.track)
+
     self._EnvironmentGetFailsHelper(_Callback, exec_mock)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   @mock.patch('os.path.isdir', return_value=True)
-  def testExportGsutilFails(self, isdir_mock, exec_mock):
+  def testExportGsutilFails(self, track, isdir_mock, exec_mock):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Export(env_ref, ['subdir/*'], 'subdir')
+      storage_util.Export(
+          env_ref, ['subdir/*'], 'subdir', release_track=self.track)
+
     self._GsutilFailsHelper(_Callback, exec_mock)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   @mock.patch('os.path.isdir', return_value=True)
-  def testExportEnvironmentWithoutGcsBucket(self, isdir_mock, exec_mock):
+  def testExportEnvironmentWithoutGcsBucket(self, track, isdir_mock, exec_mock):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Export(env_ref, ['subdir/*'], 'subdir')
+      storage_util.Export(
+          env_ref, ['subdir/*'], 'subdir', release_track=self.track)
+
     self._EnvironmentWithoutGcsBucketHelper(_Callback, exec_mock)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   @mock.patch('os.path.isdir', return_value=False)
-  def testExportLocalDestinationIsNotDirectory(self, isdir_mock, exec_mock):
+  def testExportLocalDestinationIsNotDirectory(self, track, isdir_mock,
+                                               exec_mock):
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -230,11 +273,13 @@ class StorageUtilTest(base.StorageApiCallingUnitTest,
     with self.AssertRaisesExceptionMatches(
         command_util.Error, 'must be a directory'):
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Export(env_ref, ['subdir/*'], 'subdir')
+      storage_util.Export(
+          env_ref, ['subdir/*'], 'subdir', release_track=self.track)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testDeleteSuccessful(self, exec_mock):
+  def testDeleteSuccessful(self, track, exec_mock):
     """Tests successful Delete call."""
+    self.SetTrack(track)
     target = 'c/d'
     env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
 
@@ -256,28 +301,37 @@ class StorageUtilTest(base.StorageApiCallingUnitTest,
     self.ExpectObjectGet(
         gcs_util.ObjectReference(self.test_gcs_bucket, 'subdir/'))
 
-    storage_util.Delete(env_ref, target, 'subdir')
+    storage_util.Delete(env_ref, target, 'subdir', release_track=self.track)
     fake_exec.Verify()
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testDeleteEnvironmentGetFails(self, exec_mock):
+  def testDeleteEnvironmentGetFails(self, track, exec_mock):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Delete(env_ref, 'file', 'subdir')
+      storage_util.Delete(env_ref, 'file', 'subdir', release_track=self.track)
+
     self._EnvironmentGetFailsHelper(_Callback, exec_mock)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testDeleteGsutilFails(self, exec_mock):
+  def testDeleteGsutilFails(self, track, exec_mock):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Delete(env_ref, 'file', 'subdir')
+      storage_util.Delete(env_ref, 'file', 'subdir', release_track=self.track)
+
     self._GsutilFailsHelper(_Callback, exec_mock)
 
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testDeleteEnvironmentWithoutGcsBucket(self, exec_mock):
+  def testDeleteEnvironmentWithoutGcsBucket(self, track, exec_mock):
+    self.SetTrack(track)
+
     def _Callback():
       env_ref = parsers.ParseEnvironment(self.TEST_ENVIRONMENT_NAME)
-      storage_util.Delete(env_ref, 'file', 'subdir')
+      storage_util.Delete(env_ref, 'file', 'subdir', release_track=self.track)
+
     self._EnvironmentWithoutGcsBucketHelper(_Callback, exec_mock)
 
   def _EnvironmentGetFailsHelper(self, callback, exec_mock=None):

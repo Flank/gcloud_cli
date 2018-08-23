@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,29 +13,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud compute shared-vpc disable`."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import xpn_test_base
 
 
+@parameterized.parameters(
+    base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class DisableTest(xpn_test_base.XpnTestBase):
 
-  def testDisable_NoProject(self):
+  def testDisable_NoProject(self, track):
+    self._SetUp(track)
     with self.AssertRaisesArgumentErrorMatches(
         'argument PROJECT_ID: Must be specified.'):
       self.Run('compute shared-vpc disable')
     self.xpn_client.DisableHost.assert_not_called()
 
-  def testDisableHost(self):
+  def testDisableHost(self, track):
+    self._SetUp(track)
     self._testDisableHost('shared-vpc')
 
-  def testDisableHost_xpn(self):
+  def testDisableHost_xpn(self, track):
+    self._SetUp(track)
     self._testDisableHost('xpn')
 
   def _testDisableHost(self, module_name):
     self.Run('compute {} disable foo'.format(module_name))
     self.xpn_client.DisableHost.assert_called_once_with('foo')
+    self.get_xpn_client_mock.assert_called_once_with(self.track)
 
 
 if __name__ == '__main__':

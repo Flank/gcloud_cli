@@ -88,6 +88,8 @@ definitions:
           additionalProperties: false
           properties:
 
+            repeatable: {type: boolean}
+
             expect_request:
               required: [uri, method]
               additionalProperties: false
@@ -116,7 +118,33 @@ definitions:
                 # will assert that it is present under the given key. No
                 # assertions are made about any values in the body, not included
                 # in the value of the assertion.
+                body:
+                  additionalProperties: false
+                  properties:
+                    json: {$ref: "#/definitions/value_types/dict_substructure"}
+                    text: {$ref: "#/definitions/value_types/complex"}
+
+            # This mimics expect_request except the assertions are validated
+            # against the response data (instead of the request data). It is
+            # checked against the canned data in return_response if tests are
+            # running in LOCAL mode and against real API responses if running
+            # in REMOTE mode.
+            expect_response:
+              additionalProperties: false
+              properties:
+
+                headers: {$ref: "#/definitions/value_types/dict"}
+
                 body: {$ref: "#/definitions/value_types/dict_substructure"}
+
+                extract_references:
+                  type: array
+                  items:
+                    additionalProperties: false
+                    required: [field, reference]
+                    properties:
+                      field: {type: string}
+                      reference: {type: string}
 
             # This is the canned data that should be returned as the response to
             # this API request.
@@ -145,10 +173,15 @@ definitions:
         expect_stdout: {type: string}
 
     # Sets expectation that the command exited with the given code.
-    expect_exit_code:
+    expect_exit:
       additionalProperties: false
       properties:
-        expect_exit_code: {type: number}
+        expect_exit:
+          additionalProperties: false
+          required: [code]
+          properties:
+            code: {type: number}
+            message: {$ref: "#/definitions/value_types/complex"}
 
     user_input:
       additionalProperties: false
@@ -177,19 +210,19 @@ definitions:
             message: {type: string}
             status: {type: string}
 
-    # TODO(b/80185776): Implement this.
     expect_prompt_continue:
       additionalProperties: false
       properties:
         expect_prompt_continue:
           additionalProperties: false
-          required: [message]
+          required: [user_input]
           properties:
             message: {type: string}
             prompt_string: {type: string}
             cancel_string: {type: string}
+            user_input: {type: string}
 
-    # TODO(b/80185776): Implement this.
+    # TODO(b/110364447): Implement this.
     expect_prompt_response:
       additionalProperties: false
       properties:
@@ -202,19 +235,39 @@ definitions:
               type: array
               items: {type: string}
 
-    # TODO(b/80185776): Implement this.
     expect_prompt_choice:
       additionalProperties: false
       properties:
         expect_prompt_choice:
           additionalProperties: false
-          required: [choices]
+          required: [choices, user_input]
           properties:
             message: {type: string}
             prompt_string: {type: string}
             choices:
               type: array
               items: {type: string}
+            user_input: {type: string}
+
+    expect_file_written:
+      additionalProperties: false
+      properties:
+        expect_file_written:
+          additionalProperties: false
+          oneOf:
+          # Path and contents required, binary_contents not specified.
+          - required: [path, contents]
+            not:
+              required: [binary_contents]
+          # Path and binary_contents required, contents not specified.
+          - required: [path, binary_contents]
+            not:
+              required: [contents]
+          properties:
+            path: {type: string}
+            contents: {type: string}
+            binary_contents: {type: string}
+            is_private: {type: boolean}
 
 
   #############################################################################
@@ -229,16 +282,43 @@ definitions:
         patternProperties:
           "\\w+/\\w+": {type: [string, number, boolean]}
 
-  # TODO(b/79436436): Implement this.
-  create_file:
+  write_file:
     additionalProperties: false
     properties:
-      create_file:
+      write_file:
         additionalProperties: false
+        oneOf:
+          # Path and contents required, binary_contents not specified.
+          - required: [path, contents]
+            not:
+              required: [binary_contents]
+          # Path and binary_contents required, contents not specified.
+          - required: [path, binary_contents]
+            not:
+              required: [contents]
         properties:
-          name: {type: string}
-          additional_temp_path: {type: boolean}
+          path: {type: string}
           contents: {type: string}
+          binary_contents: {type: string}
+
+  load_resource:
+    additionalProperties: false
+    properties:
+      load_resource:
+        additionalProperties: false
+        required: [path]
+        properties:
+          path: {type: string}
+
+  generate_resource_id:
+    additionalProperties: false
+    properties:
+      generate_resource_id:
+        additionalProperties: false
+        required: [reference, prefix]
+        properties:
+          reference: {type: string}
+          prefix: {type: string}
 
   execute_command:
     additionalProperties: false
@@ -251,6 +331,9 @@ definitions:
           # The full command line you want to run (excluding 'gcloud' and the
           # release track). (ex 'iot registries describe my-registry')
           command: {type: string}
+          # The reference of the generated resource id that this command is the
+          # cleanup step for.
+          cleanup_for: {type: string}
 
           events:
             type: array
@@ -259,12 +342,13 @@ definitions:
               - {$ref: "#/definitions/events/api_call"}
               - {$ref: "#/definitions/events/expect_stderr"}
               - {$ref: "#/definitions/events/expect_stdout"}
-              - {$ref: "#/definitions/events/expect_exit_code"}
+              - {$ref: "#/definitions/events/expect_exit"}
               - {$ref: "#/definitions/events/expect_progress_bar"}
               - {$ref: "#/definitions/events/expect_progress_tracker"}
               - {$ref: "#/definitions/events/expect_prompt_continue"}
               - {$ref: "#/definitions/events/expect_prompt_response"}
               - {$ref: "#/definitions/events/expect_prompt_choice"}
+              - {$ref: "#/definitions/events/expect_file_written"}
               - {$ref: "#/definitions/events/user_input"}
 
 
@@ -281,6 +365,16 @@ properties:
 
   description: {type: string}
 
+  # The section is the equivalent of the @skip() decorator.
+  skip:
+    additionalProperties: false
+    required: [reason, bug]
+    properties:
+      reason: {type: string}
+      bug:
+        type: string
+        pattern: "b/\\d+"
+
   release_tracks:
     type: array
     items: {enum: [ALPHA, BETA, GA]}
@@ -290,5 +384,7 @@ properties:
     items:
       oneOf:
         - {$ref: "#/definitions/set_property"}
-        - {$ref: "#/definitions/create_file"}
+        - {$ref: "#/definitions/write_file"}
+        - {$ref: "#/definitions/load_resource"}
+        - {$ref: "#/definitions/generate_resource_id"}
         - {$ref: "#/definitions/execute_command"}

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Integration tests for creating/deleting firewalls."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import subprocess
 import time
@@ -60,6 +63,7 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
                                            name))
 
   def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
     self.backend_bucket_names_used = []
     self.backend_service_names_used = []
     self.gcs_bucket_names_used = []
@@ -148,17 +152,20 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
              '--gcs-bucket-name {1} '.format(self.backend_bucket_name,
                                              gcs_bucket_name))
 
+    global_flag = (' --global'
+                   if self.track == calliope_base.ReleaseTrack.ALPHA else '')
     self.Run('compute url-maps create {0} '
-             '--default-service {1}'.format(self.url_map_name,
-                                            self.backend_service_name))
+             '--default-service {1} {2}'.format(
+                 self.url_map_name, self.backend_service_name, global_flag))
 
+    global_flag = (' --global'
+                   if self.track == calliope_base.ReleaseTrack.ALPHA else '')
     self.Run('compute url-maps add-path-matcher {0} '
              '--default-service {1} '
              '--path-matcher-name bucket-matcher '
-             '--backend-bucket-path-rules=/static/*={2}'.format(
-                 self.url_map_name,
-                 self.backend_service_name,
-                 self.backend_bucket_name))
+             '--backend-bucket-path-rules=/static/*={2} {3}'.format(
+                 self.url_map_name, self.backend_service_name,
+                 self.backend_bucket_name, global_flag))
 
     self.Run('compute target-https-proxies create {0} '
              '--url-map {1}  --ssl-certificates {2} --ssl-policy {3}'.format(
@@ -308,24 +315,26 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
     self.assertEqual(987654, result.cdnPolicy.signedUrlCacheMaxAgeSec)
 
   def CacheInvalidationTests(self):
-    self.Run('compute url-maps invalidate-cdn-cache {0} --path /a --async'.
-             format(self.url_map_name))
+    global_flag = ('--global '
+                   if self.track == calliope_base.ReleaseTrack.ALPHA else '')
+    self.Run('compute url-maps invalidate-cdn-cache {0} --path /a --async {1}'.
+             format(self.url_map_name, global_flag))
     time.sleep(2)  # need invalidations to be at least 1 second apart.
     self.Run(
         'compute url-maps invalidate-cdn-cache {0} --host example.com --path '
-        '/b --async'.format(self.url_map_name))
+        '/b --async {1}'.format(self.url_map_name, global_flag))
     result = list(
         self.Run('compute url-maps list-cdn-cache-invalidations {0} '
-                 '--format=disable'.format(self.url_map_name)))
+                 '--format=disable {1}'.format(self.url_map_name, global_flag)))
     self.assertEqual(len(result), 2)
     self.assertEqual(result[0]['description'], 'example.com/b')
     self.assertEqual(result[1]['description'], '/a')
     time.sleep(2)  # need invalidations to be at least 1 second apart.
-    self.Run('compute url-maps invalidate-cdn-cache {0} --path /c --async'.
-             format(self.url_map_name))
+    self.Run('compute url-maps invalidate-cdn-cache {0} --path /c --async {1}'.
+             format(self.url_map_name, global_flag))
     result = list(
         self.Run('compute url-maps list-cdn-cache-invalidations {0} --limit 2 '
-                 '--format=disable'.format(self.url_map_name)))
+                 '--format=disable {1}'.format(self.url_map_name, global_flag)))
     self.assertEqual(len(result), 2)
     self.assertEqual(result[0]['description'], '/c')
     self.assertEqual(result[1]['description'], 'example.com/b')
@@ -335,7 +344,10 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
         self.https_rule_name))
     self.Run('compute target-https-proxies delete {0} '.format(
         self.web_https_proxy_name))
-    self.Run('compute url-maps delete {0} '.format(self.url_map_name))
+    global_flag = ('--global '
+                   if self.track == calliope_base.ReleaseTrack.ALPHA else '')
+    self.Run('compute url-maps delete {0} {1}'.format(self.url_map_name,
+                                                      global_flag))
     self.Run('compute backend-services delete --global {0}'.format(
         self.backend_service_name))
     self.Run('compute backend-buckets delete {0}'.format(
@@ -365,8 +377,12 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
       self.CleanUpResource(name, 'target-https-proxies',
                            scope=e2e_test_base.GLOBAL)
     for name in self.url_map_names_used:
-      self.CleanUpResource(name, 'url-maps',
-                           scope=e2e_test_base.GLOBAL)
+      self.CleanUpResource(
+          name,
+          'url-maps',
+          scope=e2e_test_base.EXPLICIT_GLOBAL
+          if (self.track == calliope_base.ReleaseTrack.ALPHA) else
+          e2e_test_base.GLOBAL)
     for name in self.backend_service_names_used:
       self.CleanUpResource(name, 'backend-services',
                            scope=e2e_test_base.EXPLICIT_GLOBAL)
@@ -393,6 +409,8 @@ class HttpsLoadBalancingTestGA(HttpsLoadBalancingTestBase):
     self.HttpsLbCreateTests()
     self.EnableCdnTests()
     self.CacheInvalidationTests()
+    self.CdnSignedUrlTestsBackendServices()
+    self.CdnSignedUrlTestsBackendBuckets()
     self.HttpsLbDeleteTests()
 
 

@@ -15,9 +15,9 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --zone=ZONE
-        The zone of the instance to set metadata on. If not specified, you may
-        be prompted to select a zone. gcloud will attempt to identify the zone
-        by searching for resources in your project. If the zone cannot be
+        Zone of the instance to set metadata on. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
         determined, you will then be prompted with all Google Cloud Platform
         zones.
 

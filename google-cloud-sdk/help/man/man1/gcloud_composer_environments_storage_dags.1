@@ -1,0 +1,66 @@
+
+.TH "GCLOUD_COMPOSER_ENVIRONMENTS_STORAGE_DAGS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud composer environments storage dags \- manage DAGs for Cloud Composer environments
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud composer environments storage dags\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+The gcloud composer environments storage dags command group lets you import,
+export, list, and delete DAGs for your Cloud Composer environment.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdelete\fR
+Delete DAG files from an Cloud Composer environment's Cloud Storage bucket.
+
+.TP 2m
+\fBexport\fR
+Export DAGs from an environment into local storage or Cloud Storage.
+
+.TP 2m
+\fBimport\fR
+Import DAGs from local storage or Cloud Storage into an environment.
+
+.TP 2m
+\fBlist\fR
+List the DAG files for a Cloud Composer environment.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta composer environments storage dags
+.RE
+

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,15 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class DatabasesListsTest(base.SqlMockTestBeta):
+class _BaseDatabasesListTest(object):
 
   def testDatabasesList(self):
     sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
@@ -65,6 +68,18 @@ NAME CHARSET COLLATION
 mock-db-1 utf-8 some-collation
 mock-db-2 utf-8 some-collation
 """, normalize_space=True)
+
+
+class DatabasesListGATest(_BaseDatabasesListTest, base.SqlMockTestGA):
+  pass
+
+
+class DatabasesListBetaTest(_BaseDatabasesListTest, base.SqlMockTestBeta):
+  pass
+
+
+class DatabasesListAlphaTest(_BaseDatabasesListTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Unit tests for the compute scope prompter module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import collections
 
 from googlecloudsdk.command_lib.compute import scope as compute_scope
@@ -47,15 +50,10 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
         resource_name, underspecified_names,
         scopes, default_scope, scope_lister=ScopeLister)
 
-    self.AssertErrEquals("""\
-        For the following forwarding rules:
-          - [herring]
-          - [salmon]
-        choose a region:
-          [1] baltic
-          [2] north-sea
-        Please enter your numeric choice:
-        """, normalize_space=True)
+    self.AssertErrEquals(
+        r'{"ux": "PROMPT_CHOICE", "message": "For the following forwarding '
+        r'rules:\n - [herring]\n - [salmon]\nchoose a region:", "choices": '
+        '["baltic", "north-sea"]}\n')
     self.assertEqual((compute_scope.ScopeEnum.REGION, 'baltic'), result)
 
   def testMultiScope(self):
@@ -82,16 +80,10 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
         resource_name, underspecified_names,
         scopes, default_scope, scope_lister=ScopeLister)
 
-    self.AssertErrEquals("""\
-        For the following forwarding rules:
-          - [herring]
-          - [salmon]
-        choose a region or global:
-          [1] global
-          [2] region: atlantic
-          [3] region: indian
-        Please enter your numeric choice:
-        """, normalize_space=True)
+    self.AssertErrEquals(
+        r'{"ux": "PROMPT_CHOICE", "message": "For the following forwarding '
+        r'rules:\n - [herring]\n - [salmon]\nchoose a region or global:", '
+        '"choices": ["global", "region: atlantic", "region: indian"]}\n')
 
     self.assertEqual((compute_scope.ScopeEnum.GLOBAL, ''), result)
 
@@ -112,10 +104,9 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
     result = scope_prompter.PromptForScope(
         resource_name, underspecified_names,
         scopes, default_scope, scope_lister=None)
-    self.AssertErrEquals("""\
-         Did you mean region [{0}] for forwarding rule: \
-         [salmon, herring] (Y/n)?
-         """.format(region), normalize_space=True)
+    self.AssertErrContains(
+        'Did you mean region [{0}] for forwarding rule: [salmon, herring]'
+        .format(region))
     self.assertEqual((compute_scope.ScopeEnum.REGION, region), result)
 
   def testSingleScope_WithZoneGce(self):
@@ -135,10 +126,9 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
     result = scope_prompter.PromptForScope(
         resource_name, underspecified_names,
         scopes, default_scope, scope_lister=None)
-    self.AssertErrEquals("""\
-         Did you mean zone [{0}] for forwarding rule: \
-         [salmon, herring] (Y/n)?
-         """.format(zone), normalize_space=True)
+    self.AssertErrContains(
+        'Did you mean zone [{0}] for forwarding rule: [salmon, herring]'
+        .format(zone))
     self.assertEqual((compute_scope.ScopeEnum.ZONE, zone), result)
 
   def testSingleScope_WithNoGceResolution(self):

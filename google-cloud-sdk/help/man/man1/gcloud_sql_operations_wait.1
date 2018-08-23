@@ -11,7 +11,7 @@ gcloud sql operations wait \- waits for one or more operations to complete
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud sql operations wait\fR \fIOPERATION\fR [\fIOPERATION\fR\ ...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud sql operations wait\fR \fIOPERATION\fR [\fIOPERATION\fR\ ...] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default=300] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -32,6 +32,18 @@ An identifier that uniquely identifies the operation.
 .RE
 .sp
 
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-timeout\fR=\fITIMEOUT\fR; default=300
+Maximum number of seconds to wait for an operation to complete. By default, wait
+for 300s. Set to \fBunlimited\fR to wait indefinitely.
+
+
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
@@ -43,9 +55,10 @@ help\fR for details.
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
+$ gcloud alpha sql operations wait
 $ gcloud beta sql operations wait
 .RE
 

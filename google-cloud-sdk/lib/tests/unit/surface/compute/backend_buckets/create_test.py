@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,10 @@
 """Tests for the backend buckets create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -22,12 +26,41 @@ from tests.lib.surface.compute import test_base
 
 class BackendBucketCreateGaTest(test_base.BaseTest):
 
+  def _GetApiName(self, release_track):
+    """Returns the API name for the specified release track."""
+    if release_track == calliope_base.ReleaseTrack.ALPHA:
+      return 'alpha'
+    elif release_track == calliope_base.ReleaseTrack.BETA:
+      return 'beta'
+    return 'v1'
+
+  def _SetUp(self, release_track):
+    """Setup common test components.
+
+    Args:
+      release_track: Release track the test is targeting.
+    """
+    self.SelectApi(self._GetApiName(release_track))
+    self.track = release_track
+
   def SetUp(self):
-    self.SelectApi('v1')
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def RunCreate(self, command):
     """Runs the compute backend-buckets create command with the arguments."""
     self.Run('compute backend-buckets create ' + command)
+
+  def CheckRequestMadeWithCdnPolicy(self, expected_cdn_policy):
+    """Verifies the request was made with the expected CDN policy."""
+    messages = self.messages
+    self.CheckRequests([(self.compute.backendBuckets, 'Insert',
+                         messages.ComputeBackendBucketsInsertRequest(
+                             backendBucket=messages.BackendBucket(
+                                 bucketName='gcs-bucket-1',
+                                 cdnPolicy=expected_cdn_policy,
+                                 enableCdn=False,
+                                 name='my-backend-bucket'),
+                             project='my-project'))])
 
   def testSimpleCase(self):
     messages = self.messages
@@ -104,28 +137,6 @@ class BackendBucketCreateGaTest(test_base.BaseTest):
                   name='my-backend-bucket'),
               project='my-project'))])
 
-
-class BackendBucketCreateBetaTest(BackendBucketCreateGaTest):
-
-  def SetUp(self):
-    self.SelectApi('beta')
-
-  def RunCreate(self, command):
-    """Runs the compute backend-buckets create command with the arguments."""
-    self.Run('beta compute backend-buckets create ' + command)
-
-  def CheckRequestMadeWithCdnPolicy(self, expected_cdn_policy):
-    """Verifies the request was made with the expected CDN policy."""
-    messages = self.messages
-    self.CheckRequests([(self.compute.backendBuckets, 'Insert',
-                         messages.ComputeBackendBucketsInsertRequest(
-                             backendBucket=messages.BackendBucket(
-                                 bucketName='gcs-bucket-1',
-                                 cdnPolicy=expected_cdn_policy,
-                                 enableCdn=False,
-                                 name='my-backend-bucket'),
-                             project='my-project'))])
-
   def testCreateWithoutCacheMaxAge(self):
     """Tests creating backend bucket without cache max age."""
     self.RunCreate('my-backend-bucket --gcs-bucket-name gcs-bucket-1')
@@ -179,14 +190,16 @@ class BackendBucketCreateBetaTest(BackendBucketCreateGaTest):
                      '--signed-url-cache-max-age -1')
 
 
+class BackendBucketCreateBetaTest(BackendBucketCreateGaTest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
+
+
 class BackendBucketCreateAlphaTest(BackendBucketCreateBetaTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-
-  def RunCreate(self, command):
-    """Runs the compute backend-buckets create command with the arguments."""
-    self.Run('alpha compute backend-buckets create ' + command)
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

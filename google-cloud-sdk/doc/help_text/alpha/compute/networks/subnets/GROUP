@@ -35,8 +35,7 @@ COMMANDS
         (ALPHA) List Google Compute Engine subnetworks.
 
      list-usable
-        (ALPHA) List Google Compute Engine subnetworks in a project that the
-        user has permission to use.
+        (ALPHA) List Google Compute Engine subnetworks permitted for use.
 
      set-iam-policy
         (ALPHA) Set the IAM Policy for a Google Compute Engine subnetwork.
@@ -46,11 +45,11 @@ COMMANDS
         subnetwork.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute networks subnets
         $ gcloud beta compute networks subnets

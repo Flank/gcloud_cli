@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,20 +16,27 @@
 """Unit tests for the interactive command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
+import os
+
 from googlecloudsdk.calliope import base
-from googlecloudsdk.calliope import cli_tree
 from googlecloudsdk.command_lib.interactive import application
-from googlecloudsdk.core.util import files
 from tests.lib import calliope_test_base
 
 
 class InteractiveTest(calliope_test_base.CalliopeTestBase):
 
+  def _MockMain(self, *args, **kwargs):
+    self.metrics_environment = os.environ.get('CLOUDSDK_METRICS_ENVIRONMENT',
+                                              '')
+    return None
+
   def SetUp(self):
+    self.metrics_environment = ''
     self.track = base.ReleaseTrack.ALPHA
-    self.StartObjectPatch(application, 'main', return_value=None)
+    self.StartObjectPatch(application, 'main', side_effect=self._MockMain)
 
   def testInteractiveSplash(self):
     self.Run('interactive')
@@ -37,50 +45,24 @@ Welcome to the gcloud interactive shell environment.
 
     Tips:
 
-      o start by typing "gcloud " to get auto-suggestions
-      o run gcloud alpha interactive --update-cli-trees to enable
-        autocompletion for gsutil and kubectl
+      o start by typing commands to get auto-suggestions and inline help
+      o use tab, up-arrow, or down-arrow to navigate completion dropdowns
+      o use space or / to accept the highlighted dropdown item
       o run gcloud alpha interactive --help for more info
 
     Run $ gcloud feedback to report bugs or request new features.
 
 """)
     self.AssertErrEquals('')
+
+  def testInteractiveMetricsEnvironment(self):
+    self.Run('interactive --quiet')
+    self.assertTrue(self.metrics_environment.endswith('interactive_shell'))
 
   def testInteractiveSplashQuiet(self):
     self.Run('interactive --quiet')
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
-
-  def testInteractiveSplashUpdateCliTrees(self):
-    self.StartObjectPatch(
-        files,
-        'FindExecutableOnPath',
-        return_value=False)
-    self.StartObjectPatch(
-        cli_tree,
-        'CliTreeDir',
-        return_value='.')
-    self.Run('interactive --update-cli-trees')
-    self.AssertOutputEquals("""\
-Welcome to the gcloud interactive shell environment.
-
-    Tips:
-
-      o start by typing "gcloud " to get auto-suggestions
-      o run gcloud alpha interactive --update-cli-trees to enable
-        autocompletion for gsutil and kubectl
-      o run gcloud alpha interactive --help for more info
-
-    Run $ gcloud feedback to report bugs or request new features.
-
-""")
-    self.AssertErrEquals("""\
-Command [bq] not found.
-Command [gsutil] not found.
-Command [kubectl] not found.
-WARNING: No CLI tree generators for [bq, gsutil, kubectl].
-""")
 
   def testInteractiveHelp(self):
     with self.assertRaises(SystemExit):
@@ -89,10 +71,6 @@ WARNING: No CLI tree generators for [bq, gsutil, kubectl].
          F2:help:STATE
             Toggles the active help section, ON when enabled, OFF when
             disabled.
-
-         F3:EDIT-MODE
-            Toggles the command line edit mode, either emacs or vi. The default
-            is determined by the bash(1) set -o vi|emacs setting.
 
          F7:context
             Sets the context for command input, so you won't have to re-type
@@ -106,7 +84,7 @@ WARNING: No CLI tree generators for [bq, gsutil, kubectl].
             Hit ^C and F7 to clear the context, or edit a command line and/or
             move the cursor and hit F7 to set a different context.
 
-         F8:browse
+         F8:web-help
             Opens a web browser tab/window to display the complete man page
             help for the current command. If there is no active web browser
             (running in ssh(1) for example), then command specific help or
@@ -129,6 +107,9 @@ WARNING: No CLI tree generators for [bq, gsutil, kubectl].
      context
         Command context string. The default value is "".
 
+     debug
+        If True, enable the debugging display. The default value is false.
+
      fixed_prompt_position
         If True, display the prompt at the same position. The default value is
         false.
@@ -150,6 +131,9 @@ WARNING: No CLI tree generators for [bq, gsutil, kubectl].
      multi_column_completion_menu
         If True, display the completions as a multi-column menu. The default
         value is false.
+
+     obfuscate
+        If True, obfuscate status PII. The default value is false.
 
      prompt
         Command prompt string. The default value is "$ ".

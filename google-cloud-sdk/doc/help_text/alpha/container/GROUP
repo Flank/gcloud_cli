@@ -16,8 +16,12 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     binauthz
+        (ALPHA) Manage attestations for Binary Authorization on Google Cloud
+        Platform.
+
      builds
-        (ALPHA) Create and manage container builds.
+        (ALPHA) (DEPRECATED) Create and manage builds.
 
      clusters
         (ALPHA) Deploy and teardown Google Kubernetes Engine clusters.
@@ -32,6 +36,9 @@ GROUPS
      operations
         (ALPHA) Get and list operations for Google Kubernetes Engine clusters.
 
+     policy
+        (ALPHA) Manage Kubernetes Policies.
+
      subnets
         (ALPHA) Manage subnets to be used by Google Kubernetes Engine clusters.
 
@@ -42,11 +49,11 @@ COMMANDS
         (ALPHA) Get Kubernetes Engine server config.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud container
         $ gcloud beta container

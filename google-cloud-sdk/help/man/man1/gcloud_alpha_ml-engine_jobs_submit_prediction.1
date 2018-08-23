@@ -11,7 +11,7 @@ gcloud alpha ml\-engine jobs submit prediction \- start a Cloud ML Engine batch 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml\-engine jobs submit prediction\fR \fIJOB\fR \fB\-\-data\-format\fR=\fIDATA_FORMAT\fR \fB\-\-input\-paths\fR=\fIINPUT_PATH\fR,[\fIINPUT_PATH\fR,...] \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR \fB\-\-region\fR=\fIREGION\fR (\fB\-\-model\fR=\fIMODEL\fR\ |\ \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR) [\fB\-\-batch\-size\fR=\fIBATCH_SIZE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-max\-worker\-count\fR=\fIMAX_WORKER_COUNT\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml\-engine jobs submit prediction\fR \fIJOB\fR \fB\-\-data\-format\fR=\fIDATA_FORMAT\fR \fB\-\-input\-paths\fR=\fIINPUT_PATH\fR,[\fIINPUT_PATH\fR,...] \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR \fB\-\-region\fR=\fIREGION\fR (\fB\-\-model\fR=\fIMODEL\fR\ |\ \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR) [\fB\-\-batch\-size\fR=\fIBATCH_SIZE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-max\-worker\-count\fR=\fIMAX_WORKER_COUNT\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -111,7 +111,7 @@ records in memory before invoking TensorFlow. Defaults to 64 if not specified.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -125,10 +125,17 @@ if not specified.
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-The Google Cloud ML Engine runtime version for this job. Defaults to a stable
-version, which is defined in the documentation along with the list of supported
+Google Cloud ML Engine runtime version for this job. Defaults to a stable
+version, which is defined in documentation along with the list of supported
 versions:
 https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
+
+.TP 2m
+\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR
+The name of the signature defined in the SavedModel to use for this job.
+Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
+https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+which is "serving_default". Only applies to TensorFlow models.
 
 .TP 2m
 \fB\-\-version\fR=\fIVERSION\fR
@@ -179,11 +186,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud ml\-engine jobs submit prediction

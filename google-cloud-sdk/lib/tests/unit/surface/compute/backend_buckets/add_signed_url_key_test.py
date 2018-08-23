@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,16 @@
 """Tests for the backend buckets add-signed-url-key alpha command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.surface.compute import backend_buckets_test_base
 
 
-class BackendBucketAddSignedUrlKeyTestBeta(
+class BackendBucketAddSignedUrlKeyTestGA(
     backend_buckets_test_base.BackendBucketsTestBase):
 
   # Arbitrary base64url encoded 128-bit key.
@@ -29,14 +32,14 @@ class BackendBucketAddSignedUrlKeyTestBeta(
   # base64.urlsafe_b64encode(bytearray(os.urandom(16)))
   KEY = '1KKDjXtxmwHrltVtXJPoLQ=='
 
-  def SetUp(self):
-    self._SetUpReleaseTrack()
+  def _KeyFileSetUp(self):
     self.key_file = self.Touch(self.temp_path, 'test.key', contents=self.KEY)
     self.key_file_with_new_line = self.Touch(
         self.temp_path, 'test2.key', contents=self.KEY + '\n\n\r\n')
 
-  def _SetUpReleaseTrack(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.GA)
+    self._KeyFileSetUp()
 
   def testValidKey(self):
     """Tests adding a valid key is successful."""
@@ -108,11 +111,19 @@ class BackendBucketAddSignedUrlKeyTestBeta(
                              '--key-file non-existent-file')
 
 
+class BackendBucketAddSignedUrlKeyTestBeta(BackendBucketAddSignedUrlKeyTestGA):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._KeyFileSetUp()
+
+
 class BackendBucketAddSignedUrlKeyTestAlpha(
     BackendBucketAddSignedUrlKeyTestBeta):
 
-  def _SetUpReleaseTrack(self):
+  def SetUp(self):
     self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+    self._KeyFileSetUp()
 
 
 if __name__ == '__main__':

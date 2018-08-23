@@ -16,7 +16,9 @@
 """Tests for `gcloud app logs` command group."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import extra_types
 
 from googlecloudsdk.api_lib.util import apis

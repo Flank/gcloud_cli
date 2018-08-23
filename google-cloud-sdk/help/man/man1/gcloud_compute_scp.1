@@ -40,28 +40,6 @@ local.
 .RE
 .sp
 
-To copy a remote directory, \f5~/narnia\fR, from \f5\fIexample\-instance\fR\fR
-to the \f5~/wardrobe\fR directory of your local host, run:
-
-.RS 2m
-$ gcloud compute scp \-\-recurse example\-instance:~/narnia ~/wardrobe
-.RE
-
-Conversely, files from your local computer can be copied to a virtual machine:
-
-.RS 2m
-$ gcloud compute scp ~/localtest.txt ~/localtest2.txt \e
-    example\-instance:~/narnia
-.RE
-
-If the zone cannot be determined, you will be prompted for it. Use the
-\f5\-\-zone\fR flag to avoid being prompted:
-
-.RS 2m
-$ gcloud compute scp \-\-recurse example\-instance:~/narnia \e
-    ~/wardrobe \-\-zone us\-central1\-a
-.RE
-
 Under the covers, \fBscp(1)\fR is used to facilitate the transfer.
 
 
@@ -171,6 +149,32 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To copy a remote directory, \f5~/narnia\fR, from \f5\fIexample\-instance\fR\fR
+to the \f5~/wardrobe\fR directory of your local host, run:
+
+.RS 2m
+$ gcloud compute scp \-\-recurse example\-instance:~/narnia ~/wardrobe
+.RE
+
+Conversely, files from your local computer can be copied to a virtual machine:
+
+.RS 2m
+$ gcloud compute scp ~/localtest.txt ~/localtest2.txt \e
+    example\-instance:~/narnia
+.RE
+
+If the zone cannot be determined, you will be prompted for it. Use the
+\f5\-\-zone\fR flag to avoid being prompted:
+
+.RS 2m
+$ gcloud compute scp \-\-recurse example\-instance:~/narnia \e
+    ~/wardrobe \-\-zone us\-central1\-a
+.RE
 
 
 

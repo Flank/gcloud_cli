@@ -16,7 +16,7 @@ COMMANDS
     COMMAND is one of the following:
 
      delete
-        (BETA) Deletes one or more completed Cloud Composer operations.
+        (BETA) Delete one or more completed Cloud Composer operations.
 
      describe
         (BETA) Get details about an asynchronous operation.
@@ -28,5 +28,8 @@ COMMANDS
         (BETA) Wait for asynchronous operation to complete.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud composer operations
 

@@ -37,7 +37,7 @@ COMMANDS
         model.
 
      update
-        (BETA) Update a Cloud ML Engine model.
+        (BETA) Update a Cloud ML Engine version.
 
 NOTES
     This command is currently in BETA and may change without notice. These

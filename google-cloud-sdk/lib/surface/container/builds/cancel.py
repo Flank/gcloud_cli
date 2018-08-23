@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Cancel build command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.builds import flags
@@ -22,7 +25,12 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 
+DEPRECATED_WARNING_MESSAGE = """\
+This command is deprecated and will be removed on or after 2018-10-31. Please
+use `gcloud builds cancel` instead."""
 
+
+@base.Deprecate(is_removed=False, warning=DEPRECATED_WARNING_MESSAGE)
 class Cancel(base.Command):
   """Cancel an ongoing build."""
 
@@ -57,8 +65,7 @@ class Cancel(base.Command):
           collection='cloudbuild.projects.builds')
       cancelled_build = client.projects_builds.Cancel(
           messages.CloudbuildProjectsBuildsCancelRequest(
-              projectId=build_ref.projectId,
-              id=build_ref.id))
+              projectId=build_ref.projectId, id=build_ref.id))
       log.status.write('Cancelled [{r}].\n'.format(r=str(build_ref)))
       cancelled.append(cancelled_build)
     return cancelled

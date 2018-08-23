@@ -16,7 +16,8 @@ DESCRIPTION
     periodically upgraded automatically as new releases are available.
 
     If desired cluster version is omitted, node upgrades default to the current
-    master version and master upgrades default to the latest supported version.
+    master version and master upgrades default to the default cluster version,
+    which can be found in the server config.
 
     By running this command, all of the cluster's nodes will be deleted and
     recreated one at a time. While persistent Kubernetes resources, such as
@@ -40,16 +41,9 @@ FLAGS
      --cluster-version=CLUSTER_VERSION
         The Kubernetes release version to which to upgrade the cluster's nodes.
 
-        When upgrading nodes, the minor version (X.Y.Z) must be no greater than
-        the cluster master's minor version (i.e. if the master's version is
-        1.2.34, the nodes cannot be upgraded to 1.3.45). For any minor version,
-        only the latest patch version (X.Y.Z) is allowed (i.e. if there exists
-        a version 1.2.34, the nodes cannot be upgraded to 1.2.33). Omit to
-        upgrade to the same version as the master.
-
-        When upgrading master, the only valid value is the latest supported
-        version. Omit to have the server automatically select the latest
-        version.
+        If desired cluster version is omitted, node upgrades default to the
+        current master version and master upgrades default to the default
+        cluster version, which can be found in the server config.
 
         You can find the list of allowed versions for upgrades by running:
 
@@ -81,10 +75,10 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
@@ -103,7 +97,7 @@ EXAMPLES
         $ gcloud container clusters upgrade <cluster> \
             --cluster-version "x.y.z"
 
-    Upgrade the master of <cluster> to the latest supported version:
+    Upgrade the master of <cluster> to the default cluster version:
 
         $ gcloud container clusters upgrade <cluster> --master"
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,8 @@
 # limitations under the License.
 """Test of the 'workflow template delete' command."""
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk import calliope
 from googlecloudsdk.core import properties
@@ -56,10 +57,9 @@ class WorkflowTemplateDeleteTestBeta(WorkflowTemplateDeleteUnitTest):
     result = self.RunDataproc(
         'workflow-templates delete {0}'.format(self.WORKFLOW_TEMPLATE))
     self.AssertErrContains(
-        textwrap.dedent("""\
-        The workflow template '[test-workflow-template]' will be deleted.
+        "The workflow template '[test-workflow-template]' will be deleted.")
+    self.AssertErrContains('PROMPT_CONTINUE')
 
-        Do you want to continue (Y/n)?"""))
     self.AssertMessagesEqual(None, result)
 
   def testDeleteWorkflowTemplatesDecline(self):
@@ -69,10 +69,8 @@ class WorkflowTemplateDeleteTestBeta(WorkflowTemplateDeleteUnitTest):
       self.RunDataproc(
           'workflow-templates delete {0}'.format(self.WORKFLOW_TEMPLATE))
       self.AssertErrContains(
-          textwrap.dedent("""\
-        The workflow template '[test-workflow-template]' will be deleted.
-
-        Do you want to continue (Y/n)?"""))
+          "The workflow template '[test-workflow-template]' will be deleted.")
+      self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDeleteWorkflowTemplatesRegion(self):
     properties.VALUES.dataproc.region.Set('us-west1-a')
@@ -82,10 +80,8 @@ class WorkflowTemplateDeleteTestBeta(WorkflowTemplateDeleteUnitTest):
     result = self.RunDataproc(
         'workflow-templates delete {0}'.format(self.WORKFLOW_TEMPLATE))
     self.AssertErrContains(
-        textwrap.dedent("""\
-        The workflow template '[test-workflow-template]' will be deleted.
-
-        Do you want to continue (Y/n)?"""))
+        "The workflow template '[test-workflow-template]' will be deleted.")
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertMessagesEqual(None, result)
 
 

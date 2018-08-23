@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """A shared library for processing and validating iOS test arguments."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.firebase.test import arg_file
 from googlecloudsdk.api_lib.firebase.test import arg_util
 from googlecloudsdk.api_lib.firebase.test import arg_validate
@@ -129,7 +132,7 @@ class IosArgsManager(object):
     arg_validate.ValidateArgsForTestType(args, test_type, self._typed_arg_rules,
                                          self._shared_arg_rules,
                                          all_test_args_set)
-    arg_validate.ValidateIosDeviceList(args, self._catalog_mgr)
+    arg_validate.ValidateDeviceList(args, self._catalog_mgr)
     arg_validate.ValidateResultsBucket(args)
     arg_validate.ValidateResultsDir(args)
 

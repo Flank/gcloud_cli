@@ -67,7 +67,8 @@ must be a whole number followed by a size unit of \f5\fIKB\fR\fR for kilobyte,
 \f5\fIMB\fR\fR for megabyte, \f5\fIGB\fR\fR for gigabyte, or \f5\fITB\fR\fR for
 terabyte. For example, \f5\fI10GB\fR\fR will produce a 10 gigabyte disk. The
 minimum size a boot disk can have is 10 GB. Disk size must be a multiple of 1
-GB.
+GB. Limit your boot disk size to 2TB to account for MBR partition table
+limitations.
 
 .TP 2m
 \fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR
@@ -316,7 +317,7 @@ this option won't apply. The default value for this is \f5\fIno\fR\fR.
 .sp
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -440,6 +441,11 @@ If specified the interface will have no external IP. Mutually exclusive with
 address. If neither key is present the instance will get an ephemeral IP.
 
 .TP 2m
+\fBnetwork\-tier\fR
+Specifies the network tier of the interface. \f5\fINETWORK_TIER\fR\fR must be
+one of: \f5PREMIUM\fR, \f5STANDARD\fR. The default value is \f5PREMIUM\fR.
+
+.TP 2m
 \fBsubnet\fR
 Specifies the subnet that the interface will be part of. If network key is also
 specified this must be a subnetwork of the specified network.
@@ -480,8 +486,8 @@ and will not migrate.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the instance template to create. If not specified, you may be
-prompted to select a region.
+Region of the instance template to create. If not specified, you may be prompted
+to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -841,11 +847,11 @@ $ gcloud alpha compute instance\-templates create\-with\-container \e
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. This variant is also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
 
 .RS 2m
 $ gcloud beta compute instance\-templates create\-with\-container

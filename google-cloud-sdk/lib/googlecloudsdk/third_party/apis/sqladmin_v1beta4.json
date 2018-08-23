@@ -5,9 +5,9 @@
  "name": "sqladmin",
  "canonicalName": "SQL Admin",
  "version": "v1beta4",
- "revision": "20180608",
- "title": "Cloud SQL Administration API",
- "description": "Creates and configures Cloud SQL instances, which provide fully-managed MySQL databases.",
+ "revision": "20180813",
+ "title": "Cloud SQL Admin API",
+ "description": "Cloud SQL provides the Cloud SQL Admin API, a REST API for administering your instances programmatically.",
  "ownerDomain": "google.com",
  "ownerName": "Google",
  "icons": {
@@ -244,7 +244,7 @@
    "properties": {
     "binLogCoordinates": {
      "$ref": "BinLogCoordinates",
-     "description": "Binary log coordinates, if specified, indentify the the position up to which the source instance should be cloned. If not specified, the source instance is cloned up to the most recent binary log coordintes."
+     "description": "Binary log coordinates, if specified, identify the position up to which the source instance should be cloned. If not specified, the source instance is cloned up to the most recent binary log coordinates."
     },
     "destinationInstanceName": {
      "type": "string",
@@ -277,7 +277,7 @@
     },
     "etag": {
      "type": "string",
-     "description": "HTTP 1.1 Entity tag for the resource."
+     "description": "This field is deprecated and will be removed from a future version of the API."
     },
     "instance": {
      "type": "string",
@@ -339,7 +339,7 @@
    "properties": {
     "backendType": {
      "type": "string",
-     "description": "FIRST_GEN: Basic Cloud SQL instance that runs in a Google-managed container.\nSECOND_GEN: A newer Cloud SQL backend that runs in a Compute Engine VM.\nEXTERNAL: A MySQL server that is not managed by Google."
+     "description": "FIRST_GEN: First Generation instance. MySQL only.\nSECOND_GEN: Second Generation instance or PostgreSQL instance.\nEXTERNAL: A database server that is not managed by Google.\nThis property is read-only; use the tier property in the settings object to determine the database type and Second or First Generation."
     },
     "connectionName": {
      "type": "string",
@@ -347,7 +347,7 @@
     },
     "currentDiskSize": {
      "type": "string",
-     "description": "The current disk usage of the instance in bytes. This property has been deprecated. Users should use the \"cloudsql.googleapis.com/database/disk/bytes_used\" metric in Cloud Monitoring API instead. Please see https://groups.google.com/d/msg/google-cloud-sql-announce/I_7-F9EBhT0/BtvFtdFeAgAJ for details.",
+     "description": "The current disk usage of the instance in bytes. This property has been deprecated. Users should use the \"cloudsql.googleapis.com/database/disk/bytes_used\" metric in Cloud Monitoring API instead. Please see this announcement for details.",
      "format": "int64"
     },
     "databaseVersion": {
@@ -356,7 +356,7 @@
     },
     "etag": {
      "type": "string",
-     "description": "HTTP 1.1 Entity tag for the resource."
+     "description": "This field is deprecated and will be removed from a future version of the API. Use the settings.settingsVersion field instead."
     },
     "failoverReplica": {
      "type": "object",
@@ -570,7 +570,7 @@
    "properties": {
     "csvExportOptions": {
      "type": "object",
-     "description": "Options for exporting data as CSV.",
+     "description": "Options for exporting data as CSV.\nExporting in CSV format using the Cloud SQL Admin API is not supported for PostgreSQL instances.",
      "properties": {
       "selectQuery": {
        "type": "string",
@@ -580,14 +580,14 @@
     },
     "databases": {
      "type": "array",
-     "description": "Databases (for example, guestbook) from which the export is made. If fileType is SQL and no database is specified, all databases are exported. If fileType is CSV, you can optionally specify at most one database to export. If csvExportOptions.selectQuery also specifies the database, this field will be ignored.",
+     "description": "Databases to be exported.\nMySQL instances: If fileType is SQL and no database is specified, all databases are exported, except for the mysql system database. If fileType is CSV, you can specify one database, either by using this property or by using the csvExportOptions.selectQuery property, which takes precedence over this property.\nPostgreSQL instances: If fileType is SQL, you must specify one database to be exported. A fileType of CSV is not supported for PostgreSQL instances.",
      "items": {
       "type": "string"
      }
     },
     "fileType": {
      "type": "string",
-     "description": "The file type for the specified uri.\nSQL: The file contains SQL statements.\nCSV: The file contains CSV data."
+     "description": "The file type for the specified uri.\nSQL: The file contains SQL statements.\nCSV: The file contains CSV data.\nCSV is not supported for PostgreSQL instances."
     },
     "kind": {
      "type": "string",
@@ -604,7 +604,7 @@
       },
       "tables": {
        "type": "array",
-       "description": "Tables to export, or that were exported, from the specified database. If you specify tables, specify one and only one database.",
+       "description": "Tables to export, or that were exported, from the specified database. If you specify tables, specify one and only one database. For PostgreSQL instances, you can specify only one table.",
        "items": {
         "type": "string"
        }
@@ -708,7 +708,7 @@
    "properties": {
     "csvImportOptions": {
      "type": "object",
-     "description": "Options for importing data as CSV.",
+     "description": "Options for importing data as CSV.\nImporting CSV data using the Cloud SQL Admin API is not supported for PostgreSQL instances.",
      "properties": {
       "columns": {
        "type": "array",
@@ -725,15 +725,15 @@
     },
     "database": {
      "type": "string",
-     "description": "The database (for example, guestbook) to which the import is made. If fileType is SQL and no database is specified, it is assumed that the database is specified in the file to be imported. If fileType is CSV, it must be specified."
+     "description": "The target database for the import. If fileType is SQL, this field is required only if the import file does not specify a database, and is overridden by any database specification in the import file. If fileType is CSV, one database must be specified."
     },
     "fileType": {
      "type": "string",
-     "description": "The file type for the specified uri.\nSQL: The file contains SQL statements.\nCSV: The file contains CSV data."
+     "description": "The file type for the specified uri.\nSQL: The file contains SQL statements.\nCSV: The file contains CSV data.\nImporting CSV data using the Cloud SQL Admin API is not supported for PostgreSQL instances."
     },
     "importUser": {
      "type": "string",
-     "description": "The PostgreSQL user for this import operation. Defaults to cloudsqlsuperuser. Used only for PostgreSQL instances."
+     "description": "The PostgreSQL user for this import operation. Defaults to cloudsqlsuperuser. PostgreSQL instances only."
     },
     "kind": {
      "type": "string",
@@ -742,7 +742,7 @@
     },
     "uri": {
      "type": "string",
-     "description": "A path to the file in Google Cloud Storage from which the import is made. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are supported when fileType is SQL."
+     "description": "Path to the import file in Cloud Storage, in the form gs://bucketName/fileName. Compressed gzip files (.gz) are supported when fileType is SQL. The instance must have write permissions to the bucket and read access to the file."
     }
    }
   },
@@ -941,7 +941,7 @@
     },
     "zone": {
      "type": "string",
-     "description": "The preferred Compute Engine zone (e.g. us-centra1-a, us-central1-b, etc.)."
+     "description": "The preferred Compute Engine zone (e.g. us-central1-a, us-central1-b, etc.)."
     }
    }
   },
@@ -1044,7 +1044,7 @@
   "Operation": {
    "id": "Operation",
    "type": "object",
-   "description": "An Operations resource contains information about database instance operations such as create, delete, and restart. Operations resources are created in response to operations that were initiated; you never create them directly.",
+   "description": "An Operation resource. For successful operations that return an Operation resource, only the fields relevant to the operation are populated in the resource.",
    "properties": {
     "endTime": {
      "type": "string",
@@ -1246,7 +1246,7 @@
     },
     "authorizedGaeApplications": {
      "type": "array",
-     "description": "The App Engine app IDs that can access this instance. This property is only applicable to First Generation instances.",
+     "description": "The App Engine app IDs that can access this instance. First Generation instances only.",
      "items": {
       "type": "string"
      }
@@ -1329,7 +1329,7 @@
     },
     "tier": {
      "type": "string",
-     "description": "The tier of service for this instance, for example D1, D2. For more information, see pricing.",
+     "description": "The tier (or machine type) for this instance, for example db-n1-standard-1 (MySQL instances) or db-custom-1-3840 (PostgreSQL instances). For MySQL instances, this property determines whether the instance is First or Second Generation. For more information, see Instance Settings.",
      "annotations": {
       "required": [
        "sql.instances.insert",
@@ -1426,7 +1426,7 @@
    "properties": {
     "commonName": {
      "type": "string",
-     "description": "User supplied name. Must be a distinct name from the other certificates for this instance. New certificates will not be usable until the instance is restarted."
+     "description": "User supplied name. Must be a distinct name from the other certificates for this instance."
     }
    }
   },
@@ -1502,7 +1502,7 @@
     },
     "tier": {
      "type": "string",
-     "description": "An identifier for the service tier, for example D1, D2 etc. For related information, see Pricing."
+     "description": "An identifier for the machine type, for example, db-n1-standard-1. For related information, see Pricing."
     }
    }
   },
@@ -1548,7 +1548,7 @@
    "properties": {
     "etag": {
      "type": "string",
-     "description": "HTTP 1.1 Entity tag for the resource."
+     "description": "This field is deprecated and will be removed from a future version of the API."
     },
     "host": {
      "type": "string",
@@ -1565,7 +1565,7 @@
     },
     "name": {
      "type": "string",
-     "description": "The name of the user in the Cloud SQL instance. Can be omitted for update since it is already specified on the URL."
+     "description": "The name of the user in the Cloud SQL instance. Can be omitted for update since it is already specified in the URL."
     },
     "password": {
      "type": "string",
@@ -1886,7 +1886,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Project ID of the project for which to list Cloud SQL instances.",
+       "description": "Project ID of the project that contains the instance.",
        "required": true,
        "location": "path"
       }
@@ -1993,7 +1993,7 @@
      "id": "sql.flags.list",
      "path": "flags",
      "httpMethod": "GET",
-     "description": "List all available database flags for Google Cloud SQL instances.",
+     "description": "List all available database flags for Cloud SQL instances.",
      "parameters": {
       "databaseVersion": {
        "type": "string",
@@ -2048,7 +2048,7 @@
      "id": "sql.instances.clone",
      "path": "projects/{project}/instances/{instance}/clone",
      "httpMethod": "POST",
-     "description": "Creates a Cloud SQL instance as a clone of the source instance. The API is not ready for Second Generation instances yet.",
+     "description": "Creates a Cloud SQL instance as a clone of the source instance.",
      "parameters": {
       "instance": {
        "type": "string",
@@ -2113,7 +2113,7 @@
      "id": "sql.instances.demoteMaster",
      "path": "projects/{project}/instances/{instance}/demoteMaster",
      "httpMethod": "POST",
-     "description": "Demotes the standalone instance to be a Cloud SQL read replica for an external database server.",
+     "description": "Demotes the stand-alone instance to be a Cloud SQL read replica for an external database server.",
      "parameters": {
       "instance": {
        "type": "string",
@@ -2147,7 +2147,7 @@
      "id": "sql.instances.export",
      "path": "projects/{project}/instances/{instance}/export",
      "httpMethod": "POST",
-     "description": "Exports data from a Cloud SQL instance to a Google Cloud Storage bucket as a MySQL dump file.",
+     "description": "Exports data from a Cloud SQL instance to a Cloud Storage bucket as a SQL dump or CSV file.",
      "parameters": {
       "instance": {
        "type": "string",
@@ -2245,7 +2245,7 @@
      "id": "sql.instances.import",
      "path": "projects/{project}/instances/{instance}/import",
      "httpMethod": "POST",
-     "description": "Imports data into a Cloud SQL instance from a MySQL dump file in Google Cloud Storage.",
+     "description": "Imports data into a Cloud SQL instance from a SQL dump or CSV file in Cloud Storage.",
      "parameters": {
       "instance": {
        "type": "string",
@@ -2441,7 +2441,7 @@
      "id": "sql.instances.resetSslConfig",
      "path": "projects/{project}/instances/{instance}/resetSslConfig",
      "httpMethod": "POST",
-     "description": "Deletes all client certificates and generates a new server SSL certificate for the instance. The changes will not take effect until the instance is restarted. Existing instances without a server certificate will need to call this once to set a server certificate.",
+     "description": "Deletes all client certificates and generates a new server SSL certificate for the instance.",
      "parameters": {
       "instance": {
        "type": "string",
@@ -2817,7 +2817,7 @@
      "id": "sql.sslCerts.delete",
      "path": "projects/{project}/instances/{instance}/sslCerts/{sha1Fingerprint}",
      "httpMethod": "DELETE",
-     "description": "Deletes the SSL certificate. The change will not take effect until the instance is restarted.",
+     "description": "Deletes the SSL certificate. For First Generation instances, the certificate remains valid until the instance is restarted.",
      "parameters": {
       "instance": {
        "type": "string",
@@ -2827,7 +2827,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Project ID of the project that contains the instance to be deleted.",
+       "description": "Project ID of the project that contains the instance.",
        "required": true,
        "location": "path"
       },
@@ -2903,7 +2903,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Project ID of the project to which the newly created Cloud SQL instances should belong.",
+       "description": "Project ID of the project that contains the instance.",
        "required": true,
        "location": "path"
       }
@@ -2937,7 +2937,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Project ID of the project for which to list Cloud SQL instances.",
+       "description": "Project ID of the project that contains the instance.",
        "required": true,
        "location": "path"
       }
@@ -2962,7 +2962,7 @@
      "id": "sql.tiers.list",
      "path": "projects/{project}/tiers",
      "httpMethod": "GET",
-     "description": "Lists all available service tiers for Google Cloud SQL, for example D1, D2. For related information, see Pricing.",
+     "description": "Lists all available machine types (tiers) for Cloud SQL, for example, db-n1-standard-1. For related information, see Pricing.",
      "parameters": {
       "project": {
        "type": "string",

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +16,15 @@
 """Tests for the concepts.concept_parsers module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+import copy
 import re
 
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
+from googlecloudsdk.calliope.concepts import multitype
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import properties
@@ -198,9 +203,27 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
       self.parser.parser.parse_args(['example', '--other', 'otherexample'])
 
 
-class ParsingTests(concepts_test_base.ConceptsTestBase,
+class ParsingTests(concepts_test_base.MultitypeTestBase,
                    parameterized.TestCase):
   """Tests of the entire parsing mechanism."""
+
+  def AssertParsedResultEquals(self, expected, actual, is_multitype=False):
+    if is_multitype:
+      actual = actual.result
+    if expected is None:
+      self.assertIsNone(actual)
+    else:
+      self.assertEqual(expected, actual.RelativeName())
+
+  def AssertParsedListEquals(self, expected, actual, is_multitype=False):
+    if is_multitype:
+      actual = [item.result for item in actual]
+    self.assertEqual(expected, [resource.RelativeName() for resource in actual])
+
+  def PresentationSpecType(self, is_multitype=False):
+    if is_multitype:
+      return presentation_specs.MultitypeResourcePresentationSpec
+    return presentation_specs.ResourcePresentationSpec
 
   def testSingleParameter(self):
     """Test a resource with only 1 parameter that doesn't get generated."""
@@ -376,83 +399,425 @@ class ParsingTests(concepts_test_base.ConceptsTestBase,
         'projects/{}/shelves/exampleshelf/books/example'.format(self.Project()),
         namespace.CONCEPTS.book.Parse().RelativeName())
 
-  def testTwoResourceArgs(self):
+  @parameterized.named_parameters(
+      ('Names', False,
+       ['example', '--book-shelf', 'exampleshelf', '--other', 'otherbook',
+        '--other-shelf', 'othershelf'],
+       'projects/fake-project/shelves/exampleshelf/books/example',
+       'projects/fake-project/shelves/othershelf/books/otherbook'),
+      ('FullySpecified', False,
+       ['projects/p1/shelves/s1/books/b1',
+        '--other', 'projects/p2/shelves/s2/books/b2'],
+       'projects/p1/shelves/s1/books/b1', 'projects/p2/shelves/s2/books/b2'),
+      ('MultitypeNames', True,
+       ['example', '--book-shelf', 'exampleshelf', '--other', 'otherbook',
+        '--other-shelf', 'othershelf'],
+       'projects/fake-project/shelves/exampleshelf/books/example',
+       'projects/fake-project/shelves/othershelf/books/otherbook'),
+      ('MultitypeFullySpecified', True,
+       ['projects/p1/shelves/s1/books/b1',
+        '--other', 'projects/p2/shelves/s2/books/b2'],
+       'projects/p1/shelves/s1/books/b1', 'projects/p2/shelves/s2/books/b2'),
+      ('MultitypeNamesDiffTypes', True,
+       ['example', '--book-shelf', 'exampleshelf', '--other', 'otherbook',
+        '--other-case', 'othercase'],
+       'projects/fake-project/shelves/exampleshelf/books/example',
+       'projects/fake-project/cases/othercase/books/otherbook'),
+      ('MultitypeFullySpecifiedDiffTypes', True,
+       ['projects/p1/shelves/s1/books/b1',
+        '--other', 'projects/p2/cases/c2/books/b2'],
+       'projects/p1/shelves/s1/books/b1', 'projects/p2/cases/c2/books/b2'))
+  def testTwoResourceArgs(self, is_multitype, args, first_expected,
+                          second_expected):
     """Test a concept parser with two resource args."""
-    resource = presentation_specs.ResourcePresentationSpec(
+    resource_spec = (
+        self.two_way_shelf_case_book if is_multitype else self.resource_spec)
+    resource = self.PresentationSpecType(is_multitype=is_multitype)(
         'book',
-        self.resource_spec,
+        resource_spec,
         'The book to act upon.',
         prefixes=True)
-    other_resource = presentation_specs.ResourcePresentationSpec(
+    other_resource = self.PresentationSpecType(is_multitype=is_multitype)(
         '--other',
-        self.resource_spec,
+        resource_spec,
         'The second book to act upon.',
         prefixes=True)
     concept_parser = concept_parsers.ConceptParser([resource, other_resource])
     concept_parser.AddToParser(self.parser)
 
-    namespace = self.parser.parser.parse_args([
-        'example',
-        '--book-shelf', 'exampleshelf',
-        '--other', 'otherbook',
-        '--other-shelf', 'othershelf'])
-    self.assertEqual(
-        'projects/{}/shelves/exampleshelf/books/example'.format(self.Project()),
-        namespace.CONCEPTS.book.Parse().RelativeName())
-    self.assertEqual(
-        'projects/{}/shelves/othershelf/books/otherbook'.format(self.Project()),
-        namespace.CONCEPTS.other.Parse().RelativeName())
+    namespace = self.parser.parser.parse_args(args)
+    self.AssertParsedResultEquals(
+        first_expected,
+        namespace.CONCEPTS.book.Parse(),
+        is_multitype=is_multitype)
+    self.AssertParsedResultEquals(
+        second_expected,
+        namespace.CONCEPTS.other.Parse(),
+        is_multitype=is_multitype)
 
   @parameterized.named_parameters(
-      ('Nonrequired', '--book', False),
-      ('Required', '--book', True),
-      ('NonrequiredPositional', 'book', False),
-      ('RequiredPositional', 'book', True))
-  def testParseAnchorFallthrough(self, name, rsrc_required):
-    """Tests resource can be parsed when there are fallthroughs for anchor."""
-    resource = presentation_specs.ResourcePresentationSpec(
+      ('Names', False, '--book', False,
+       ['--book', 'b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('Full', False, '--book', False,
+       ['--book', 'projects/p1/shelves/s1/books/b1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('Positional', False, 'book', False,
+       ['b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('PositionalRequired', False, 'book', True,
+       ['b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('MultitypeNames', True, '--book', False,
+       ['--book', 'b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('MultitypeFull', True, '--book', False,
+       ['--book', 'projects/p1/shelves/s1/books/b1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('MultitypeDiffType', True, '--book', False,
+       ['--book', 'organizations/o1/shelves/s1/books/b1'],
+       'organizations/o1/shelves/s1/books/b1'),
+      ('MultitypeRequired', True, '--book', True,
+       ['--book', 'projects/p1/shelves/s1/books/b1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('MultitypePositional', True, 'book', False,
+       ['b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('MultitypePositionalRequired', True, 'book', True,
+       ['b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('MultitypePositionalRequiredDiffType', True, 'book', True,
+       ['organizations/o1/shelves/s1/books/b1'],
+       'organizations/o1/shelves/s1/books/b1'))
+  def testParse(self, is_multitype, name, required, args, expected):
+    resource_spec = (self.two_way_resource if is_multitype
+                     else self.resource_spec)
+    resource = self.PresentationSpecType(is_multitype=is_multitype)(
         name,
-        self.SetUpFallthroughSpec('!'),
+        resource_spec,
         'Group Help',
+        flag_name_overrides={'project': '--book-project'},
         prefixes=False,
-        required=rsrc_required
-    )
+        required=required,
+        plural=False)
+    concept_parsers.ConceptParser([resource]).AddToParser(self.parser)
+
+    namespace = self.parser.parser.parse_args(args)
+
+    self.AssertParsedResultEquals(
+        expected, namespace.CONCEPTS.book.Parse(), is_multitype=is_multitype)
+
+  @parameterized.named_parameters(
+      ('Names', '--book', False,
+       ['--book', 'b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('Full', '--book', False,
+       ['--book', 'projects/p1/shelves/s1/books/b1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('Parent', '--book', False,
+       ['--book-project', 'p1', '--shelf', 's1'], 'projects/p1/shelves/s1'),
+      ('Empty', '--book', False,
+       [], None),
+      ('Required', '--book', True,
+       ['--book', 'projects/p1/shelves/s1/books/b1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('Positional', 'book', False,
+       ['b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('PositionalRequired', 'book', True,
+       ['b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'))
+  def testParseParentChild(self, name, required, args, expected):
+    resource_spec = self.parent_child_resource
+    resource = self.PresentationSpecType(is_multitype=True)(
+        name,
+        resource_spec,
+        'Group Help',
+        flag_name_overrides={'project': '--book-project'},
+        prefixes=False,
+        required=required,
+        plural=False)
+    concept_parsers.ConceptParser([resource]).AddToParser(self.parser)
+
+    namespace = self.parser.parser.parse_args(args)
+
+    self.AssertParsedResultEquals(
+        expected, namespace.CONCEPTS.book.Parse(), is_multitype=True)
+
+  @parameterized.named_parameters(
+      ('Names', False, '--books', False,
+       ['--books', 'b1,b2', '--shelf', 's1', '--book-project', 'p1'],
+       ['projects/p1/shelves/s1/books/b1', 'projects/p1/shelves/s1/books/b2']),
+      ('Full', False, '--books', False,
+       ['--books',
+        'projects/p1/shelves/s1/books/b1,projects/p2/shelves/s2/books/b2'],
+       ['projects/p1/shelves/s1/books/b1', 'projects/p2/shelves/s2/books/b2']),
+      ('Positional', False, 'books', False,
+       ['b1', 'b2', '--shelf', 's1', '--book-project', 'p1'],
+       ['projects/p1/shelves/s1/books/b1', 'projects/p1/shelves/s1/books/b2']),
+      ('PositionalRequired', False, 'books', True,
+       ['b1', 'b2', '--shelf', 's1', '--book-project', 'p1'],
+       ['projects/p1/shelves/s1/books/b1', 'projects/p1/shelves/s1/books/b2']),
+      ('MultitypeNames', True, '--books', False,
+       ['--books', 'b1,b2', '--shelf', 's1', '--book-project', 'p1'],
+       ['projects/p1/shelves/s1/books/b1', 'projects/p1/shelves/s1/books/b2']),
+      ('MultitypeFull', True, '--books', False,
+       ['--books',
+        'projects/p1/shelves/s1/books/b1,projects/p2/shelves/s2/books/b2'],
+       ['projects/p1/shelves/s1/books/b1', 'projects/p2/shelves/s2/books/b2']),
+      ('MultitypeDiffTypes', True, '--books', False,
+       ['--books',
+        'projects/p1/shelves/s1/books/b1,'
+        'organizations/o1/shelves/s2/books/b2'],
+       ['projects/p1/shelves/s1/books/b1',
+        'organizations/o1/shelves/s2/books/b2']),
+      ('MultitypeRequiredDiffTypes', True, '--books', True,
+       ['--books',
+        'projects/p1/shelves/s1/books/b1,'
+        'organizations/o1/shelves/s2/books/b2'],
+       ['projects/p1/shelves/s1/books/b1',
+        'organizations/o1/shelves/s2/books/b2']),
+      ('MultitypePositional', True, 'books', False,
+       ['b1', 'b2', '--shelf', 's1', '--book-project', 'p1'],
+       ['projects/p1/shelves/s1/books/b1', 'projects/p1/shelves/s1/books/b2']),
+      ('MultitypePositionalRequired', True, 'books', True,
+       ['b1', 'b2', '--shelf', 's1', '--book-project', 'p1'],
+       ['projects/p1/shelves/s1/books/b1', 'projects/p1/shelves/s1/books/b2']),
+      ('MultitypePositionalDiffTypes', True, 'books', False,
+       ['projects/p1/shelves/s1/books/b1',
+        'organizations/o1/shelves/s2/books/b2'],
+       ['projects/p1/shelves/s1/books/b1',
+        'organizations/o1/shelves/s2/books/b2']),
+      ('MultitypePositionalRequiredDiffTypes', True, 'books', True,
+       ['projects/p1/shelves/s1/books/b1',
+        'organizations/o1/shelves/s2/books/b2'],
+       ['projects/p1/shelves/s1/books/b1',
+        'organizations/o1/shelves/s2/books/b2']))
+  def testParsePlural(self, is_multitype, name, required, args, expected):
+    resource_spec = (self.two_way_resource if is_multitype
+                     else self.resource_spec)
+    resource = self.PresentationSpecType(is_multitype=is_multitype)(
+        name,
+        resource_spec,
+        'Group Help',
+        flag_name_overrides={'project': '--book-project'},
+        prefixes=False,
+        required=required,
+        plural=True)
+    concept_parsers.ConceptParser([resource]).AddToParser(self.parser)
+
+    namespace = self.parser.parser.parse_args(args)
+
+    self.AssertParsedListEquals(
+        expected, namespace.CONCEPTS.books.Parse(), is_multitype=is_multitype)
+
+  @parameterized.named_parameters(
+      ('Nonrequired', False, '--book', False, []),
+      ('Required', False, '--book', True, []),
+      ('NonrequiredPositional', False, 'book', False, []),
+      ('RequiredPositional', False, 'book', True, []),
+      ('MultitypeNonrequired', True, '--book', False, ['--book-project', '!']),
+      ('MultitypeRequired', True, '--book', True, ['--book-project', '!']),
+      ('MultitypeNonrequiredPositional', True, 'book', False,
+       ['--book-project', '!']),
+      ('MultitypeRequiredPositional', True, 'book', True,
+       ['--book-project', '!']))
+  def testParseAnchorFallthrough(self, is_multitype, name, rsrc_required, args):
+    """Tests resource can be parsed when there are fallthroughs for anchor."""
+    resource_spec = self.SetUpFallthroughSpec(is_multitype=is_multitype)
+    resource = self.PresentationSpecType(is_multitype=is_multitype)(
+        name,
+        resource_spec,
+        'Group Help',
+        flag_name_overrides={'project': '--book-project'},
+        prefixes=False,
+        required=rsrc_required)
     concept_parser = concept_parsers.ConceptParser([resource])
     concept_parser.AddToParser(self.parser)
 
-    namespace = self.parser.parser.parse_args([])
-    self.assertEqual('projects/!/shelves/!/books/!',
-                     namespace.CONCEPTS.book.Parse().RelativeName())
+    namespace = self.parser.parser.parse_args(args)
+    self.AssertParsedResultEquals('projects/!/shelves/!/books/!',
+                                  namespace.CONCEPTS.book.Parse(),
+                                  is_multitype=is_multitype)
 
   @parameterized.named_parameters(
-      ('Nonrequired', '--books', False),
-      ('Required', '--books', True),
-      ('NonrequiredPositional', 'books', False),
-      ('RequiredPositional', 'books', True))
-  def testParsePluralAnchorFallthrough(self, name, rsrc_required):
-    """Tests plural resource args parse when there's an anchor fallthorugh."""
-    resource = presentation_specs.ResourcePresentationSpec(
+      ('Nonrequired', False, '--books', False,
+       deps.Fallthrough(lambda: ['xyz'], hint='h'), []),
+      ('Required', False, '--books', True,
+       deps.Fallthrough(lambda: ['xyz'], hint='h'), []),
+      ('NonrequiredPositional', False, 'books', False,
+       deps.Fallthrough(lambda: ['xyz'], hint='h'), []),
+      ('RequiredPositional', False, 'books', True,
+       deps.Fallthrough(lambda: ['xyz'], hint='h'), []),
+      ('PropertyFallthrough', False, '--books', False,
+       deps.PropertyFallthrough(properties.VALUES.core.project), []),
+      ('ArgFallthrough', False, '--books', False,
+       deps.ArgFallthrough('--other'), ['--other', 'xyz']),
+      ('MultitypeNonrequired', True, '--books', False,
+       deps.Fallthrough(lambda: ['xyz'], hint='h'), ['--book-project', 'xyz']),
+      ('MultitypeRequired', True, '--books', True,
+       deps.Fallthrough(lambda: ['xyz'], hint='h'), ['--book-project', 'xyz']),
+      ('MultitypeNonrequiredPositional', True, 'books', False,
+       deps.Fallthrough(lambda: ['xyz'], hint='h'), ['--book-project', 'xyz']),
+      ('MultitypeRequiredPositional', True, 'books', True,
+       deps.Fallthrough(lambda: ['xyz'], hint='h'), ['--book-project', 'xyz']),
+      ('MultitypePropertyFallthrough', True, '--books', False,
+       deps.PropertyFallthrough(properties.VALUES.core.project),
+       ['--book-project', 'xyz']))
+  def testParsePluralAnchorFallthrough(self, is_multitype, name, rsrc_required,
+                                       fallthrough, args):
+    """Tests plural resource args parse when there's an anchor fallthrough."""
+    properties.VALUES.core.project.Set('xyz')
+    resource_spec = self.SetUpFallthroughSpec(fallthrough=fallthrough,
+                                              is_multitype=is_multitype)
+    resource = self.PresentationSpecType(is_multitype=is_multitype)(
         name,
-        self.SetUpFallthroughSpec(['!']),
+        resource_spec,
         'Group Help',
         prefixes=False,
         required=rsrc_required,
-        plural=True
+        plural=True,
+        flag_name_overrides={'project': '--book-project'}
+    )
+    concept_parser = concept_parsers.ConceptParser([resource])
+    concept_parser.AddToParser(self.parser)
+    self.parser.add_argument('--other', help='h')
+
+    namespace = self.parser.parser.parse_args(args)
+    self.AssertParsedListEquals(
+        ['projects/xyz/shelves/xyz/books/xyz'],
+        namespace.CONCEPTS.books.Parse(),
+        is_multitype=is_multitype)
+
+  def testParsePluralAnchorFallthroughMultitypeArgFallthrough(self):
+    properties.VALUES.core.project.Set('xyz')
+    fallthrough = deps.ArgFallthrough('--other')
+    resource_spec = self.SetUpFallthroughSpec(fallthrough=fallthrough,
+                                              is_multitype=True)
+    # Remove the fallthrough for the organization.
+    for attribute in resource_spec.attributes:
+      if attribute.name == 'organization':
+        attribute.fallthroughs = []
+    resource = self.PresentationSpecType(is_multitype=True)(
+        '--books',
+        resource_spec,
+        'Group Help',
+        prefixes=False,
+        required=False,
+        plural=True,
+        flag_name_overrides={'project': '--book-project'}
+    )
+    concept_parser = concept_parsers.ConceptParser([resource])
+    concept_parser.AddToParser(self.parser)
+    self.parser.add_argument('--other', help='h')
+
+    namespace = self.parser.parser.parse_args(['--other', 'xyz'])
+    self.AssertParsedListEquals(
+        ['projects/xyz/shelves/xyz/books/xyz'],
+        namespace.CONCEPTS.books.Parse(),
+        is_multitype=True)
+
+  @parameterized.named_parameters(
+      ('Full', False,
+       ['projects/abc/shelves/abc/books/abc',
+        'projects/def/shelves/def/books/def'], [],
+       ['projects/abc/shelves/abc/books/abc',
+        'projects/def/shelves/def/books/def']),
+      ('Name', False,
+       ['abc', 'def'], [],
+       ['projects/xyz/shelves/xyz/books/abc',
+        'projects/xyz/shelves/xyz/books/def']),
+      ('MultitypeFull', True,
+       ['projects/abc/shelves/abc/books/abc',
+        'projects/def/shelves/def/books/def'], [],
+       ['projects/abc/shelves/abc/books/abc',
+        'projects/def/shelves/def/books/def']),
+      ('MultitypeFullDiffCollections', True,
+       ['projects/abc/shelves/abc/books/abc',
+        'organizations/def/shelves/def/books/def'], [],
+       ['projects/abc/shelves/abc/books/abc',
+        'organizations/def/shelves/def/books/def'])
+  )
+  def testParsePluralAnchorFallthroughMultiple(
+      self, is_multitype, fallthrough_value, args, expected):
+    """Tests plural resource args parse when there's an anchor fallthrough."""
+    spec = copy.deepcopy(
+        self.SetUpFallthroughSpec(
+            deps.Fallthrough(lambda: ['xyz'], hint='h'),
+            is_multitype=is_multitype))
+    fallthrough = deps.Fallthrough(lambda: fallthrough_value, hint='h',
+                                   active=True)
+    for attribute in spec.attributes:
+      if attribute.name == 'book':
+        attribute.fallthroughs = [fallthrough] + attribute.fallthroughs
+    resource = self.PresentationSpecType(is_multitype=is_multitype)(
+        '--books',
+        spec,
+        'Group Help',
+        prefixes=False,
+        plural=True,
+        flag_name_overrides={'project': '--book-project'}
     )
     concept_parser = concept_parsers.ConceptParser([resource])
     concept_parser.AddToParser(self.parser)
 
-    namespace = self.parser.parser.parse_args([])
-    self.assertEqual(
-        ['projects/!/shelves/!/books/!'],
-        [b.RelativeName() for b in namespace.CONCEPTS.books.Parse()])
+    namespace = self.parser.parser.parse_args(args)
+    self.AssertParsedListEquals(
+        expected,
+        namespace.CONCEPTS.books.Parse(),
+        is_multitype=is_multitype)
 
-  def testResourceArgParsedInGroup(self):
+  @parameterized.named_parameters(
+      ('Overridden', 'examplebook', False,
+       'projects/exampleproject/shelves/exampleshelf/books/examplebook'),
+      ('NotOverridden', '', False,
+       'projects/junk/shelves/junk/books/junk'),
+      ('OverriddenPlural', 'examplebook,projects/p1/shelves/s1/books/b1', True,
+       ['projects/exampleproject/shelves/exampleshelf/books/examplebook',
+        'projects/p1/shelves/s1/books/b1']),
+      ('NotOverriddenPlural', '', True,
+       ['projects/junk/shelves/junk/books/junk']))
+  def testParseFullySpecifiedAnchorFallthrough(self, book_arg, plural,
+                                               expected_value):
+    """Only get values from a parsed anchor if that anchor is being used."""
+    fallthroughs = [
+        deps.Fallthrough(
+            lambda: 'projects/junk/shelves/junk/books/junk', hint='h')]
+    spec = copy.deepcopy(self.resource_spec)
+    spec.attributes[-1].fallthroughs = fallthroughs
+    # These should be used as fallthroughs unless the anchor fallthrough comes
+    # from the fully specified fallthrough.
+    spec.attributes[0].fallthroughs = [
+        deps.Fallthrough(lambda: 'exampleproject', hint='h')]
+    spec.attributes[1].fallthroughs = [
+        deps.Fallthrough(lambda: 'exampleshelf', hint='h')]
+    concept_parser = concept_parsers.ConceptParser.ForResource(
+        '--book',
+        spec,
+        'The book to act upon.',
+        plural=plural)
+    concept_parser.AddToParser(self.parser)
+
+    parsed_args = self.parser.parser.parse_args(['--book', book_arg])
+
+    if plural:
+      result = [book.RelativeName()
+                for book in parsed_args.CONCEPTS.book.Parse()]
+    else:
+      result = parsed_args.CONCEPTS.book.Parse().RelativeName()
+    self.assertEqual(expected_value, result)
+
+  @parameterized.named_parameters(
+      ('', False),
+      ('Multitype', True))
+  def testResourceArgParsedInGroup(self, is_multitype):
     """Test a concept parser with two resource args."""
     group = self.parser.add_group('A group')
-    resource = presentation_specs.ResourcePresentationSpec(
+    resource_spec = (
+        self.resource_spec if not is_multitype else self.two_way_resource)
+    resource = self.PresentationSpecType(is_multitype=is_multitype)(
         'book',
-        self.resource_spec,
+        resource_spec,
         'The book to act upon.',
         group=group,
         prefixes=False,
@@ -461,11 +826,12 @@ class ParsingTests(concepts_test_base.ConceptsTestBase,
     namespace = self.parser.parser.parse_args(
         ['example', '--shelf', 'exampleshelf', '--book-project',
          'example-project'])
-    self.assertEqual(
+    self.AssertParsedResultEquals(
         'projects/example-project/shelves/exampleshelf/books/example',
-        namespace.CONCEPTS.book.Parse().RelativeName())
+        namespace.CONCEPTS.book.Parse(),
+        is_multitype=is_multitype)
 
-  def testConceptParserAndCommandFallthroughs(self):
+  def testConceptParserForResourceAndCommandFallthroughs(self):
     """Tests that command level fallthroughs are prioritized over others."""
     concept_parser = concept_parsers.ConceptParser.ForResource(
         '--book',
@@ -484,16 +850,49 @@ class ParsingTests(concepts_test_base.ConceptsTestBase,
         'projects/otherproject/shelves/exampleshelf/books/examplebook',
         parsed_args.CONCEPTS.book.Parse().RelativeName())
 
-  def testConceptParserAndCommandFallthroughsNotUsed(self):
-    """Tests that primary arguments are favored over command level fallthroughs.
-    """
-    concept_parser = concept_parsers.ConceptParser.ForResource(
+  @parameterized.named_parameters(
+      ('OF', False),
+      ('Multitype', True))
+  def testCommandFallthroughs(self, is_multitype):
+    """Tests that command level fallthroughs are prioritized over others."""
+    resource_spec = (
+        self.resource_spec if not is_multitype else self.two_way_resource)
+    resource = self.PresentationSpecType(is_multitype=is_multitype)(
         '--book',
-        self.resource_spec,
+        resource_spec,
+        'The book to act upon.')
+    concept_parsers.ConceptParser(
+        [resource],
+        command_level_fallthroughs={'--book.project': ['--other-project']}
+    ).AddToParser(self.parser)
+    self.parser.add_argument('--other-project', help='h')
+
+    parsed_args = self.parser.parser.parse_args(
+        ['--book', 'examplebook',
+         '--shelf', 'exampleshelf',
+         '--other-project', 'otherproject'])
+
+    self.AssertParsedResultEquals(
+        'projects/otherproject/shelves/exampleshelf/books/examplebook',
+        parsed_args.CONCEPTS.book.Parse(),
+        is_multitype=is_multitype)
+
+  @parameterized.named_parameters(
+      ('OF', False),
+      ('Multitype', True))
+  def testCommandFallthroughsNotUsed(self, is_multitype):
+    """Tests that command level fallthroughs are prioritized over others."""
+    resource_spec = (
+        self.resource_spec if not is_multitype else self.two_way_resource)
+    resource = self.PresentationSpecType(is_multitype=is_multitype)(
+        '--book',
+        resource_spec,
         'The book to act upon.',
-        flag_name_overrides={'project': '--book-project'},
-        command_level_fallthroughs={'project': ['--other-project']})
-    concept_parser.AddToParser(self.parser)
+        flag_name_overrides={'project': '--book-project'})
+    concept_parsers.ConceptParser(
+        [resource],
+        command_level_fallthroughs={'--book.project': ['--other-project']}
+    ).AddToParser(self.parser)
     self.parser.add_argument('--other-project', help='h')
 
     parsed_args = self.parser.parser.parse_args(
@@ -502,30 +901,41 @@ class ParsingTests(concepts_test_base.ConceptsTestBase,
          '--book-project', 'exampleproject',
          '--other-project', 'otherproject'])
 
-    self.assertEqual(
+    self.AssertParsedResultEquals(
         'projects/exampleproject/shelves/exampleshelf/books/examplebook',
-        parsed_args.CONCEPTS.book.Parse().RelativeName())
+        parsed_args.CONCEPTS.book.Parse(),
+        is_multitype=is_multitype)
 
   @parameterized.named_parameters(
-      ('Used',
+      ('Used', False,
        ['--book', 'examplebook', '--shelf', 'exampleshelf', '--other-book',
         'otherexample'],
        'shelves/exampleshelf/books/otherexample'),
-      ('NotUsed',
+      ('NotUsed', False,
+       ['--book', 'examplebook', '--shelf', 'exampleshelf', '--other-book',
+        'otherexample', '--other-book-shelf', 'othershelf'],
+       'shelves/othershelf/books/otherexample'),
+      ('MultitypeUsed', True,
+       ['--book', 'examplebook', '--shelf', 'exampleshelf', '--other-book',
+        'otherexample'],
+       'shelves/exampleshelf/books/otherexample'),
+      ('MultitypeNotUsed', True,
        ['--book', 'examplebook', '--shelf', 'exampleshelf', '--other-book',
         'otherexample', '--other-book-shelf', 'othershelf'],
        'shelves/othershelf/books/otherexample'))
-  def testConceptParserAndCommandFallthroughsOtherResource(
-      self, args_to_parse, expected_name):
+  def testCommandFallthroughsOtherResource(
+      self, is_multitype, args_to_parse, expected):
     """Tests that command level fallthroughs are prioritized over others."""
+    resource_spec = (
+        self.two_way_shelf_case_book if is_multitype else self.resource_spec)
     concept_parser = concept_parsers.ConceptParser(
-        [presentation_specs.ResourcePresentationSpec(
+        [self.PresentationSpecType(is_multitype=is_multitype)(
             '--book',
-            self.resource_spec,
+            resource_spec,
             'The book to act upon.'),
-         presentation_specs.ResourcePresentationSpec(
+         self.PresentationSpecType(is_multitype=is_multitype)(
              '--other-book',
-             self.resource_spec,
+             resource_spec,
              'The other book',
              prefixes=True)],
         command_level_fallthroughs={'--other-book.shelf': ['--book.shelf']})
@@ -533,50 +943,80 @@ class ParsingTests(concepts_test_base.ConceptsTestBase,
 
     parsed_args = self.parser.parser.parse_args(args_to_parse)
 
-    self.assertEqual(
+    self.AssertParsedResultEquals(
         'projects/{}/shelves/exampleshelf/books/examplebook'.format(
             self.Project()),
-        parsed_args.CONCEPTS.book.Parse().RelativeName())
-    self.assertEqual(
-        'projects/{}/{}'.format(self.Project(), expected_name),
-        parsed_args.CONCEPTS.other_book.Parse().RelativeName())
+        parsed_args.CONCEPTS.book.Parse(),
+        is_multitype=is_multitype)
+    self.AssertParsedResultEquals(
+        'projects/{}/{}'.format(self.Project(), expected),
+        parsed_args.CONCEPTS.other_book.Parse(),
+        is_multitype=is_multitype)
 
   @parameterized.named_parameters(
-      ('FormattingOfValue', {'--other-book.shelf': ['--book.x.y']},
+      ('FormattingOfValue', False, {'--other-book.shelf': ['--book.x.y']},
        'invalid fallthrough value: [--book.x.y]. Must be in the form BAR.b or '
        '--baz'),
-      ('FormattingOfKey', {'shelf': ['--book.shelf']},
+      ('FormattingOfKey', False, {'shelf': ['--book.shelf']},
        'invalid fallthrough key: [shelf]. Must be in format "FOO.a" where FOO '
        'is the presentation spec name and a is the attribute name.'),
-      ('KeySpecNotFound', {'FOO.shelf': ['--book.shelf']},
+      ('KeySpecNotFound', False, {'FOO.shelf': ['--book.shelf']},
        'invalid fallthrough key: [FOO.shelf]. Spec name is not present in the '
        'presentation specs. Available names: [--book, --other-book]'),
-      ('KeyAttributeNotFound', {'--other-book.case': ['--book.shelf']},
+      ('KeyAttributeNotFound', False, {'--other-book.case': ['--book.shelf']},
        'invalid fallthrough key: [--other-book.case]. spec named '
        '[--other-book] has no attribute named [case]'),
-      ('ValueSpecNotFound', {'--other-book.shelf': ['FOO.shelf']},
+      ('ValueSpecNotFound', False, {'--other-book.shelf': ['FOO.shelf']},
        'invalid fallthrough value: [FOO.shelf]. Spec name is not present in '
        'the presentation specs. Available names: [--book, --other-book]'),
-      ('ValueAttributeNotFound', {'--other-book.shelf': ['--book.case']},
+      ('ValueAttributeNotFound', False,
+       {'--other-book.shelf': ['--book.case']},
        'invalid fallthrough value: [--book.case]. spec named [--book] '
-       'has no attribute named [case]'))
-  def testConceptParserAndCommandFallthroughInvalid(self, fallthroughs,
-                                                    expected):
+       'has no attribute named [case]'),
+      ('MultitypeAttributeNotFound', True,
+       {'--other-book.shelf': ['--book.junk']},
+       'invalid fallthrough value: [--book.junk]. spec named [--book] '
+       'has no attribute named [junk]'))
+  def testCommandFallthroughInvalid(self, is_multitype, fallthroughs, expected):
+    resource_spec = (
+        self.two_way_shelf_case_book if is_multitype else self.resource_spec)
     with self.assertRaisesRegexp(ValueError,
                                  re.escape(expected)):
       concept_parsers.ConceptParser(
-          [presentation_specs.ResourcePresentationSpec(
+          [self.PresentationSpecType(is_multitype=is_multitype)(
               '--book',
-              self.resource_spec,
+              resource_spec,
               'The book to act upon.'),
-           presentation_specs.ResourcePresentationSpec(
+           self.PresentationSpecType(is_multitype=is_multitype)(
                '--other-book',
-               self.resource_spec,
+               resource_spec,
                'The other book',
                prefixes=True)],
           command_level_fallthroughs=fallthroughs)
 
-  def testConceptParserAndCommandFallthroughsArgNotFound(self):
+  def testCommandFallthroughMultitypeError(self):
+    """If a conflicting arg fallthrough is given, error out."""
+    resource_spec = self.two_way_shelf_case_book
+    concept_parsers.ConceptParser(
+        [presentation_specs.MultitypeResourcePresentationSpec(
+            '--book',
+            resource_spec,
+            'The book to act upon.'),
+         presentation_specs.MultitypeResourcePresentationSpec(
+             '--other-book',
+             resource_spec,
+             'The other book',
+             prefixes=True)],
+        command_level_fallthroughs={'--other-book.shelf': ['--book.shelf']}
+    ).AddToParser(self.parser)
+    namespace = self.parser.parser.parse_args(
+        ['--book', 'b1', '--shelf', 's1', '--other-book', 'b1',
+         '--other-book-case', 'c1'])
+    with self.assertRaisesRegex(multitype.ConflictingTypesError,
+                                re.escape('[shelf, book, case]')):
+      namespace.CONCEPTS.other_book.Parse()
+
+  def testCommandFallthroughsArgNotFound(self):
     specs = [
         presentation_specs.ResourcePresentationSpec(
             '--book',

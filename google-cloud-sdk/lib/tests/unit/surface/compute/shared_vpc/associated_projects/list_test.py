@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +13,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud compute shared-vpc associated-projects list."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import xpn_test_base
 
 
+@parameterized.parameters(
+    (base.ReleaseTrack.ALPHA, 'alpha'),
+    (base.ReleaseTrack.BETA, 'beta'),
+    (base.ReleaseTrack.GA, 'v1'))
 class ListTest(xpn_test_base.XpnApitoolsTestBase):
 
-  def testList_NoProject(self):
+  def testList_NoProject(self, track, api_version):
+    self._SetUp(track, api_version)
     with self.AssertRaisesArgumentErrorMatches(
         'argument PROJECT_ID: Must be specified.'):
       self.Run('compute shared-vpc associated-projects list')
 
-  def testList(self):
+  def testList(self, track, api_version):
+    self._SetUp(track, api_version)
     self._testList('shared-vpc')
 
-  def testList_xpn(self):
+  def testList_xpn(self, track, api_version):
+    self._SetUp(track, api_version)
     self._testList('xpn')
 
   def _testList(self, module_name):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -187,6 +188,12 @@ def AddBaseArgs(parser):
             'Instance will be restarted.'))
 
 
+def AddBetaArgs(parser):
+  """Adds beta args and flags to the parser."""
+  flags.AddInstanceResizeLimit(parser)
+  labels_util.AddUpdateLabelsFlags(parser, enable_clear=True)
+
+
 def RunBasePatchCommand(args, release_track):
   """Updates settings of a Cloud SQL instance using the patch api method.
 
@@ -283,12 +290,25 @@ class PatchBeta(base.UpdateCommand):
   """Updates the settings of a Cloud SQL instance."""
 
   def Run(self, args):
-    # Validate labels flags
     return RunBasePatchCommand(args, self.ReleaseTrack())
 
   @staticmethod
   def Args(parser):
     """Args is called by calliope to gather arguments for this command."""
     AddBaseArgs(parser)
-    flags.AddInstanceResizeLimit(parser)
-    labels_util.AddUpdateLabelsFlags(parser, enable_clear=True)
+    AddBetaArgs(parser)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class PatchAlpha(base.UpdateCommand):
+  """Updates the settings of a Cloud SQL instance."""
+
+  def Run(self, args):
+    return RunBasePatchCommand(args, self.ReleaseTrack())
+
+  @staticmethod
+  def Args(parser):
+    """Args is called by calliope to gather arguments for this command."""
+    AddBaseArgs(parser)
+    AddBetaArgs(parser)
+    flags.AddNetwork(parser)

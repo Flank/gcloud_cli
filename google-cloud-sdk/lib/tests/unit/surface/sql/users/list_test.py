@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,16 @@
 """Tests that exercise user list."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class UsersListTest(base.SqlMockTestBeta):
+class _BaseUsersListTest(object):
 
   def testList(self):
     msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
@@ -39,6 +42,18 @@ class UsersListTest(base.SqlMockTestBeta):
     result = self.Run('sql users list --instance my_instance')
     self.assertEqual(result[0].name, 'my_username')
     self.assertEqual(result[0].host, 'my_host')
+
+
+class UsersListGATest(_BaseUsersListTest, base.SqlMockTestGA):
+  pass
+
+
+class UsersListBetaTest(_BaseUsersListTest, base.SqlMockTestBeta):
+  pass
+
+
+class UsersListAlphaTest(_BaseUsersListTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

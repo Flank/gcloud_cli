@@ -1,0 +1,106 @@
+
+.TH "GCLOUD_ALPHA_BIGTABLE_INSTANCES_REMOVE\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha bigtable instances remove\-iam\-policy\-binding \- remove an IAM policy binding from a Cloud Bigtable instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha bigtable instances remove\-iam\-policy\-binding\fR \fIINSTANCE\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Remove an IAM policy binding from a Cloud Bigtable instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- The Cloud Bigtable instance to remove the IAM policy
+binding from. This represents a Cloud resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the flag [instance] on the command line with a fully
+specified name; provide the flag [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+The ID of the instance or a fully qualified identifier for the instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to remove the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- anyone who is on the internet, with or without a Google
+account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
+or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+The role to remove the member from.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBbigtableadmin/v2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/bigtable/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta bigtable instances remove\-iam\-policy\-binding
+.RE
+

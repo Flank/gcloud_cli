@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Unit tests for http proxy properties setup."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.core import http_proxy
@@ -80,12 +83,10 @@ class DisplayGcloudProxyInfoTests(cli_test_base.CliTestBase):
 
 class ChangeGcloudProxySettingsTests(cli_test_base.CliTestBase):
 
-  _CHANGE_EXISTING_MENU = textwrap.dedent("""\
-      What would you like to do?
-       [1] Change Cloud SDK network proxy properties
-       [2] Clear all gcloud proxy properties
-       [3] Exit
-      Please enter your numeric choice:""")
+  _CHANGE_EXISTING_MENU = (
+      '{"ux": "PROMPT_CHOICE", "message": "What would you like to do?", '
+      '"choices": ["Change Cloud SDK network proxy properties", '
+      '"Clear all gcloud proxy properties", "Exit"]}')
 
   _ADD_NEW_PROXY_PROMPT = (
       'Do you have a network proxy you would like to set in gcloud')

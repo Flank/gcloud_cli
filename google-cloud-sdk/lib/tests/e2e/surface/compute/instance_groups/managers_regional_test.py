@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,9 @@
 """Integration tests for regional instance group managers."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base as calliope_base
+
 from tests.lib.surface.compute import e2e_managers_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -45,7 +47,6 @@ class ManagedRegionalTest(e2e_managers_test_base.ManagedTestBase):
     self.RunNamedPortsTest()
 
   def testInstanceGroupManagerCreationRegionalWithZoneSelection(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.RunInstanceGroupManagerCreationTest(scope_flag='--zones ' + self.zone)
 
 if __name__ == '__main__':

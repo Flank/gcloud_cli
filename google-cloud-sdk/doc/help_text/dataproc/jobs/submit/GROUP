@@ -56,17 +56,17 @@ EXAMPLES
     To submit a Hadoop MapReduce job, run:
 
         $ gcloud dataproc jobs submit hadoop --cluster my_cluster \
-            --jar my_jar.jar arg1 arg2
+            --jar my_jar.jar -- arg1 arg2
 
     To submit a Spark Scala or Java job, run:
 
         $ gcloud dataproc jobs submit spark --cluster my_cluster \
-            --jar my_jar.jar arg1 arg2
+            --jar my_jar.jar -- arg1 arg2
 
     To submit a PySpark job, run:
 
         $ gcloud dataproc jobs submit pyspark --cluster my_cluster \
-            my_script.py arg1 arg2
+            my_script.py -- arg1 arg2
 
     To submit a Spark SQL job, run:
 

@@ -2,7 +2,7 @@ NAME
     gcloud alpha tasks queues create-pull-queue - create a pull queue
 
 SYNOPSIS
-    gcloud alpha tasks queues create-pull-queue PULL_QUEUE_ID
+    gcloud alpha tasks queues create-pull-queue QUEUE
         [--max-attempts=MAX_ATTEMPTS] [--max-retry-duration=MAX_RETRY_DURATION]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -16,8 +16,8 @@ DESCRIPTION
     here: https://goo.gl/Ya0AZd
 
 POSITIONAL ARGUMENTS
-     PULL_QUEUE_ID
-        ID of the pull queue to create.
+     QUEUE
+        The queue to create.
 
 FLAGS
      --max-attempts=MAX_ATTEMPTS
@@ -37,9 +37,9 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
 

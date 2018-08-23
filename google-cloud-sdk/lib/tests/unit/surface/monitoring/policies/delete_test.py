@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud monitoring policies delete`."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
@@ -37,7 +41,7 @@ class MonitoringDeleteTest(base.MonitoringTestBase):
     self.Run('monitoring policies delete policy-id')
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_Cancel(self):
     self.WriteInput('n')
@@ -46,7 +50,7 @@ class MonitoringDeleteTest(base.MonitoringTestBase):
       self.Run('monitoring policies delete policy-id')
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_Uri(self):
     self._ExpectDelete()
@@ -59,7 +63,7 @@ class MonitoringDeleteTest(base.MonitoringTestBase):
     self.Run('monitoring policies delete ' + url)
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_RelativeName(self):
     self._ExpectDelete()
@@ -72,7 +76,7 @@ class MonitoringDeleteTest(base.MonitoringTestBase):
     self.Run('monitoring policies delete ' + relative_name)
 
     self.AssertOutputEquals('')
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
 
 if __name__ == '__main__':

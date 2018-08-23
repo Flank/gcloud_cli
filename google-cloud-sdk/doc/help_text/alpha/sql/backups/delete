@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha sql backups delete - delete a backup of a Cloud SQL instance
+
+SYNOPSIS
+    gcloud alpha sql backups delete ID --instance=INSTANCE, -i INSTANCE
+        [--async] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Delete a backup of a Cloud SQL instance.
+
+POSITIONAL ARGUMENTS
+     ID
+        The ID of the backup run. You can find the ID by running $ gcloud beta
+        sql backups list.
+
+REQUIRED FLAGS
+     --instance=INSTANCE, -i INSTANCE
+        Cloud SQL instance ID.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud sql backups delete
+        $ gcloud beta sql backups delete
+

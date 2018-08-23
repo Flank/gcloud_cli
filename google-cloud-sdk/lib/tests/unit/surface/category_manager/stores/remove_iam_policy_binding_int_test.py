@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +15,16 @@
 """Tests for 'category-manager taxonomies remove-iam-policy-binding' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class RemoveIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
   """Tests for category-manager stores remove-iam-policy-binding."""
 
@@ -45,7 +51,8 @@ class RemoveIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
             members=['user:user1@gmail.com', 'user:user2@gmail.com'])
     ])
 
-  def testRemoveIamPolicyBindingWithOrganizationResource(self):
+  def testRemoveIamPolicyBindingWithOrganizationResource(self, track):
+    self.track = track
     self.ExpectGetTaxonomyStore(org_id='1', taxonomy_store_id='2')
     self.mock_client.taxonomyStores.GetIamPolicy.Expect(
         self.messages.CategorymanagerTaxonomyStoresGetIamPolicyRequest(
@@ -57,13 +64,14 @@ class RemoveIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
             resource='taxonomyStores/2',
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
                 policy=self.new_policy)), self.new_policy)
-    result = self.Run('alpha category-manager stores remove-iam-policy-binding '
+    result = self.Run('category-manager stores remove-iam-policy-binding '
                       '--organization=organizations/1 '
                       '--role=roles/categorymanager.admin '
                       '--member=user:admin@gmail.com')
     self.assertEqual(self.new_policy, result)
 
-  def testRemoveIamPolicyBindingWithOrganizationId(self):
+  def testRemoveIamPolicyBindingWithOrganizationId(self, track):
+    self.track = track
     self.ExpectGetTaxonomyStore(org_id='1', taxonomy_store_id='2')
     self.mock_client.taxonomyStores.GetIamPolicy.Expect(
         self.messages.CategorymanagerTaxonomyStoresGetIamPolicyRequest(
@@ -75,7 +83,7 @@ class RemoveIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
             resource='taxonomyStores/2',
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
                 policy=self.new_policy)), self.new_policy)
-    result = self.Run('alpha category-manager stores remove-iam-policy-binding '
+    result = self.Run('category-manager stores remove-iam-policy-binding '
                       '--organization=1 '
                       '--role=roles/categorymanager.admin '
                       '--member=user:admin@gmail.com')

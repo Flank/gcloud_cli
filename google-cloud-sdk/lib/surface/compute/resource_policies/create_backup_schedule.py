@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Create resource policy command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import base_classes
@@ -39,6 +42,7 @@ class CreateBackupSchedule(base.CreateCommand):
         flag_suffix='schedule',
         start_time_help='Start time for the disk snapshot schedule to start.',
         cadence_help='Snapshot schedule',
+        supports_weekly=True,
         supports_hourly=True)
     flags.AddBackupScheduleArgs(parser)
     parser.display_info.AddCacheUpdater(None)

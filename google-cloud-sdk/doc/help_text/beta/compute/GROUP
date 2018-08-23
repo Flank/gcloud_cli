@@ -84,6 +84,10 @@ GROUPS
      machine-types
         (BETA) Read Google Compute Engine virtual machine types.
 
+     network-endpoint-groups
+        (BETA) Read and manipulate Google Compute Engine network endpoint
+        groups.
+
      networks
         (BETA) List, create, and delete Google Compute Engine networks.
 

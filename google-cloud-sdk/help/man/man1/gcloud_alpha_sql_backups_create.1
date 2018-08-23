@@ -1,0 +1,71 @@
+
+.TH "GCLOUD_ALPHA_SQL_BACKUPS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha sql backups create \- creates a backup of a Cloud SQL instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha sql backups create\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Creates a backup of a Cloud SQL instance.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR
+Cloud SQL instance ID.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Do not wait for the operation to complete.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A friendly description of the backup.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud sql backups create
+$ gcloud beta sql backups create
+.RE
+

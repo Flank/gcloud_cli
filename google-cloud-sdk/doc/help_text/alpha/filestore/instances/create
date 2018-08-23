@@ -1,0 +1,106 @@
+NAME
+    gcloud alpha filestore instances create - create a Cloud Filestore instance
+
+SYNOPSIS
+    gcloud alpha filestore instances create (INSTANCE : --location=LOCATION)
+        --file-share=[capacity=CAPACITY],[name=NAME]
+        --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE] [--async]
+        [--description=DESCRIPTION] [--labels=[KEY=VALUE,...]]
+        [--tier=TIER; default="STANDARD"] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a Cloud Filestore instance.
+
+POSITIONAL ARGUMENTS
+     Instance resource - The instance to create. The arguments in this group
+     can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the flag [instance] on the
+     command line with a fully specified name; provide the flag [--project] on
+     the command line; set the property [core/project]. This must be specified.
+
+       INSTANCE
+          The ID of the instance or a fully qualified identifier for the
+          instance. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          The location of the instance.
+
+REQUIRED FLAGS
+     --file-share=[capacity=CAPACITY],[name=NAME]
+        File share configuration for an instance. Specifying both name and
+        capacity is required.
+
+         capacity
+            The desired size of the volume. The capacity must be a whole number
+            followed by a size unit such as TB for terabyte. If no size unit is
+            specified, GB is assumed. The minimum size for a standard instance
+            is 1TB. The minimum size for a premium instance is 2.5TB.
+
+         name
+            The desired logical name of the volume.
+
+     --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE]
+        Network configuration for a Cloud Filestore instance. Specifying
+        reserved-ip-range is optional.
+
+         name
+            The name of the Google Compute Engine VPC network to which the
+            instance is connected.
+
+         reserved-ip-range
+            A /29 CIDR block in one of the [internal IP address
+            ranges(https://www.arin.net/knowledge/address_filters.html) that
+            identifies the range of IP addresses reserved for this instance.
+            For example, 10.0.0.0/29 or 192.168.0.0/29. The range you specify
+            can't overlap with either existing subnets or assigned IP address
+            ranges for other Cloud Filestore instances in the selected VPC
+            network.
+
+OPTIONAL FLAGS
+     --async
+        Do not wait for the create operation to complete.
+
+     --description=DESCRIPTION
+        A description of the Cloud Filestore instance.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --tier=TIER; default="STANDARD"
+        The service tier for the Cloud Filestore instance. TIER must be one of:
+
+         premium
+            Premium Filestore instance.
+         standard
+            Standard Filestore instance.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command creates a Cloud Filestore instance named NAME with a
+    single volume.
+
+        $ gcloud alpha filestore instances create NAME \
+            --description=DESCRIPTION --tier=TIER \
+            --file-share=name=VOLUME_NAME,capacity=CAPACITY \
+            --network=name=NETWORK_NAME,reserved-ip-range=RESERVED-IP-RANGE
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta filestore instances create
+

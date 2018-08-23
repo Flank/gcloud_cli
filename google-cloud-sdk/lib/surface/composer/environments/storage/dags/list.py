@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """Command to list Airflow DAGs for a Cloud Composer environment."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
@@ -27,9 +29,9 @@ class List(base.Command):
   @staticmethod
   def Args(parser):
     resource_args.AddEnvironmentResourceArg(
-        parser, 'for which to list DAGs.', positional=False)
+        parser, 'for which to list DAGs', positional=False)
     parser.display_info.AddFormat('table(name)')
 
   def Run(self, args):
     env_ref = args.CONCEPTS.environment.Parse()
-    return storage_util.List(env_ref, 'dags')
+    return storage_util.List(env_ref, 'dags', release_track=self.ReleaseTrack())

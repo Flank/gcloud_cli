@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Unit tests for the compute flags module wrt scope_prompter."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import client_adapter
 from googlecloudsdk.api_lib.compute import scope_prompter
 from googlecloudsdk.calliope import actions
@@ -189,9 +192,9 @@ class EquivalenceTest(test_base.BaseTest):
     self.WriteInput('Y')
     resource_refs = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.ZONE)
-    self.AssertErrEquals(
-        'Did you mean zone [{0}] for operation: '
-        '[viking, norse, inuit] (Y/n)?  \n'.format(zone))
+    self.AssertErrContains(
+        'Did you mean zone [{0}] for operation: [viking, norse, inuit]'
+        .format(zone))
     self.ClearErr()
     for operation_name, resource_ref in zip(operation_names, resource_refs):
       self.assertEqual(
@@ -209,10 +212,9 @@ class EquivalenceTest(test_base.BaseTest):
       self.assertEqual(resource_ref, prompter_ref)
 
     self.AssertOutputEquals('')
-    self.AssertErrEquals(
-        'Did you mean zone [{0}] for zone operations: '
-        '[viking, norse, inuit]?\n\n'
-        'Do you want to continue (Y/n)?  \n'.format(zone))
+    self.AssertErrContains(
+        'Did you mean zone [{0}] for zone operations: [viking, norse, inuit]?'
+        .format(zone))
 
 if __name__ == '__main__':
   test_case.main()

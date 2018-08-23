@@ -97,8 +97,9 @@ EXAMPLES
             --version '1.1'
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute tpus create
         $ gcloud alpha compute tpus create
 

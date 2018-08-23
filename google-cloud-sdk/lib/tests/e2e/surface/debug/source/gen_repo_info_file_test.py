@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Integration test for the 'debug source gen-repo-info-file' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 import os
 import subprocess
@@ -45,6 +48,7 @@ class GenRepoInfoFileTest(base.DebugTest):
     with self.assertRaises(properties.RequiredPropertyError):
       self.RunDebug(['snapshots', 'create', 'foo.bar:123'])
 
+  @test_case.Filters.SkipOnPy3('Relies on appengine code', 'b/109938420')
   @sdk_test_base.Filters.RunOnlyIfExecutablePresent('git')
   def testRepoInfo(self):
     git_dir = os.path.join(self.test_dir, 'git_dir')

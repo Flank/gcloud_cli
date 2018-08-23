@@ -11,7 +11,7 @@ gcloud compute forwarding\-rules create \- create a forwarding rule to direct ne
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute forwarding\-rules create\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ip\-protocol\fR=\fIIP_PROTOCOL\fR] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-address\-region\fR=\fIADDRESS_REGION\fR\ |\ \fB\-\-global\-address\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-port\-range\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR]\ |\ \fB\-\-ports\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR],[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute forwarding\-rules create\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ip\-protocol\fR=\fIIP_PROTOCOL\fR] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-address\-region\fR=\fIADDRESS_REGION\fR\ |\ \fB\-\-global\-address\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-port\-range\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR]\ |\ \fB\-\-ports\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR],[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -185,6 +185,12 @@ rule applies to. If this field is not specified, the default network will be
 used. In the absence of the default network, this field must be specified.
 
 .TP 2m
+\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR
+The network tier to assign to the forwarding rules. \f5\fINETWORK_TIER\fR\fR
+must be one of: \f5PREMIUM\fR, \f5STANDARD\fR. The default value is
+\f5PREMIUM\fR.
+
+.TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
 (Only for \-\-load\-balancing\-scheme=INTERNAL) The subnetwork that this
 forwarding rule applies to. If the network configured for this forwarding rule
@@ -194,24 +200,24 @@ mode, a subnetwork must be specified.
 
 .TP 2m
 \fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR
-The region of the subnetwork to operate on. If not specified it will be set the
+Region of the subnetwork to operate on. If not specified it will be set the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
 \fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR
-The zone of the target instance to operate on. Overrides the default
+Zone of the target instance to operate on. Overrides the default
 \fBcompute/zone\fR property value for this command invocation.
 
 .TP 2m
 \fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR
-The region of the target pool to operate on. If not specified it will be set the
+Region of the target pool to operate on. If not specified it will be set the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
 \fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR
-The region of the VPN gateway to operate on. If not specified it will be set the
+Region of the VPN gateway to operate on. If not specified it will be set the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
@@ -280,8 +286,8 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-address\-region\fR=\fIADDRESS_REGION\fR
-The region of the address to operate on. If not specified, you may be prompted
-to select a region.
+Region of the address to operate on. If not specified, you may be prompted to
+select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -307,7 +313,7 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-global\-address\fR
-If provided, it is assumed the address is global.
+If set, the address is global.
 
 .RE
 .sp
@@ -318,13 +324,13 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR
-The region of the backend service to operate on. If not specified it will be set
-the region of the forwarding rule. Overrides the default \fBcompute/region\fR
+Region of the backend service to operate on. If not specified it will be set the
+region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
 \fB\-\-global\-backend\-service\fR
-If provided, it is assumed the backend service is global.
+If set, the backend service is global.
 
 .RE
 .sp
@@ -335,12 +341,12 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-global\fR
-If provided, it is assumed the forwarding rule is global.
+If set, the forwarding rule is global.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the forwarding rule to create. If not specified, you may be
-prompted to select a region.
+Region of the forwarding rule to create. If not specified, you may be prompted
+to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:

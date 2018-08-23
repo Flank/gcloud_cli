@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for projects create."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.resource_manager import operations
@@ -169,7 +172,7 @@ class ProjectsCreateTest(base.ProjectsUnitTestBase):
         'the new project'):
       self.RunProjects('create', '--name', 'foobar')
     self.AssertOutputEquals('')
-    self.AssertErrContains('as project id (Y/n)?')
+    self.AssertErrContains('as project id')
     # we don't know the exact project id prompted, since this changes by date
 
   def testCreateProjectWithRejectedIdPromptFromLongName(self):
@@ -180,9 +183,8 @@ class ProjectsCreateTest(base.ProjectsUnitTestBase):
         'the new project'):
       self.RunProjects('create', '--name', 'foo1234567890123456789012345')
     self.AssertOutputEquals('')
-    self.AssertErrContains("""No project id provided.
-
-Use [foo1234567890123456789012345] as project id (Y/n)?""")
+    self.AssertErrContains('No project id provided.')
+    self.AssertErrContains('Use [foo1234567890123456789012345] as project id')
     # the very long name means we do know the exact project id prompted
 
   def testCreateProjectWithAcceptedIdPromptFromLongName(self):
@@ -192,16 +194,18 @@ Use [foo1234567890123456789012345] as project id (Y/n)?""")
     self._expectServiceEnableCall(test_project.projectId)
     self.RunProjects('create', '--name', test_project.name)
     self.AssertOutputEquals('')
-    self.AssertErrEquals("""No project id provided.
-
-Use [{}] as project id (Y/n)?  """
+    self.AssertErrEquals("""\
+{"ux": "PROMPT_CONTINUE", """
+                         """"message": "No project id provided.", """
+                         """"prompt_string": "Use [abcdefghijklmnopqrstuvwxyz"""
+                         """] as project id"}"""
                          """
 Create in progress for [https://cloudresourcemanager.googleapis.com"""
                          """/v1/projects/abcdefghijklmnopqrstuvwxyz].
-{{"ux": "PROGRESS_TRACKER", """
+{"ux": "PROGRESS_TRACKER", """
                          """"message": "Waiting for [operations/pc.1234] """
-                         """to finish", "status": "SUCCESS"}}
-""".format(test_project.projectId))
+                         """to finish", "status": "SUCCESS"}
+""")
 
   def createProjectWithBothFolderAndOrganizationSpecifiedHelper(
       self, run, name):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,8 @@
 """Tests for the security policies delete subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
@@ -97,14 +98,12 @@ class SecurityPoliciesDeleteTestAlpha(test_base.BaseTest):
               project='my-project',
               securityPolicy='my-policy3'))],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following security policies will be deleted:
-         - [my-policy1]
-         - [my-policy2]
-         - [my-policy3]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following security policies will be deleted:\n'
+        r' - [my-policy1]\n'
+        r' - [my-policy2]\n'
+        r' - [my-policy3]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.WriteInput('n\n')

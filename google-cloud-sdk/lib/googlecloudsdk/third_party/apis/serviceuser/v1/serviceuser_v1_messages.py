@@ -797,6 +797,10 @@ class HttpRule(_messages.Message):
     patch: Used for updating a resource.
     post: Used for creating a resource.
     put: Used for updating a resource.
+    responseBody: Optional. The name of the response field whose value is
+      mapped to the HTTP body of response. Other response fields are ignored.
+      When not set, the response message will be used as HTTP body of
+      response.
     selector: Selects methods to which this rule applies.  Refer to selector
       for syntax details.
   """
@@ -811,7 +815,8 @@ class HttpRule(_messages.Message):
   patch = _messages.StringField(8)
   post = _messages.StringField(9)
   put = _messages.StringField(10)
-  selector = _messages.StringField(11)
+  responseBody = _messages.StringField(11)
+  selector = _messages.StringField(12)
 
 
 class LabelDescriptor(_messages.Message):
@@ -1054,14 +1059,18 @@ class MetricDescriptor(_messages.Message):
       `appengine.googleapis.com/http/server/response_latencies` metric type
       has a label for the HTTP response code, `response_code`, so you can look
       at latencies for successful responses or just for responses that failed.
+    metadata: Optional. Metadata which can be used to guide usage of the
+      metric.
     metricKind: Whether the metric records instantaneous values, changes to a
       value, etc. Some combinations of `metric_kind` and `value_type` might
       not be supported.
     name: The resource name of the metric descriptor.
     type: The metric type, including its DNS name prefix. The type is not URL-
-      encoded.  All user-defined custom metric types have the DNS name
-      `custom.googleapis.com`.  Metric types should use a natural hierarchical
-      grouping. For example:      "custom.googleapis.com/invoice/paid/amount"
+      encoded.  All user-defined metric types have the DNS name
+      `custom.googleapis.com` or `external.googleapis.com`.  Metric types
+      should use a natural hierarchical grouping. For example:
+      "custom.googleapis.com/invoice/paid/amount"
+      "external.googleapis.com/prometheus/up"
       "appengine.googleapis.com/http/server/response_latencies"
     unit: The unit in which the metric value is reported. It is only
       applicable if the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`.
@@ -1140,11 +1149,73 @@ class MetricDescriptor(_messages.Message):
   description = _messages.StringField(1)
   displayName = _messages.StringField(2)
   labels = _messages.MessageField('LabelDescriptor', 3, repeated=True)
-  metricKind = _messages.EnumField('MetricKindValueValuesEnum', 4)
-  name = _messages.StringField(5)
-  type = _messages.StringField(6)
-  unit = _messages.StringField(7)
-  valueType = _messages.EnumField('ValueTypeValueValuesEnum', 8)
+  metadata = _messages.MessageField('MetricDescriptorMetadata', 4)
+  metricKind = _messages.EnumField('MetricKindValueValuesEnum', 5)
+  name = _messages.StringField(6)
+  type = _messages.StringField(7)
+  unit = _messages.StringField(8)
+  valueType = _messages.EnumField('ValueTypeValueValuesEnum', 9)
+
+
+class MetricDescriptorMetadata(_messages.Message):
+  r"""Additional annotations that can be used to guide the usage of a metric.
+
+  Enums:
+    LaunchStageValueValuesEnum: The launch stage of the metric definition.
+
+  Fields:
+    ingestDelay: The delay of data points caused by ingestion. Data points
+      older than this age are guaranteed to be ingested and available to be
+      read, excluding data loss due to errors.
+    launchStage: The launch stage of the metric definition.
+    samplePeriod: The sampling period of metric data points. For metrics which
+      are written periodically, consecutive data points are stored at this
+      time interval, excluding data loss due to errors. Metrics with a higher
+      granularity have a smaller sampling period.
+  """
+
+  class LaunchStageValueValuesEnum(_messages.Enum):
+    r"""The launch stage of the metric definition.
+
+    Values:
+      LAUNCH_STAGE_UNSPECIFIED: Do not use this default value.
+      EARLY_ACCESS: Early Access features are limited to a closed group of
+        testers. To use these features, you must sign up in advance and sign a
+        Trusted Tester agreement (which includes confidentiality provisions).
+        These features may be unstable, changed in backward-incompatible ways,
+        and are not guaranteed to be released.
+      ALPHA: Alpha is a limited availability test for releases before they are
+        cleared for widespread use. By Alpha, all significant design issues
+        are resolved and we are in the process of verifying functionality.
+        Alpha customers need to apply for access, agree to applicable terms,
+        and have their projects whitelisted. Alpha releases don't have to be
+        feature complete, no SLAs are provided, and there are no technical
+        support obligations, but they will be far enough along that customers
+        can actually use them in test environments or for limited-use tests --
+        just like they would in normal production cases.
+      BETA: Beta is the point at which we are ready to open a release for any
+        customer to use. There are no SLA or technical support obligations in
+        a Beta release. Products will be complete from a feature perspective,
+        but may have some open outstanding issues. Beta releases are suitable
+        for limited production use cases.
+      GA: GA features are open to all developers and are considered stable and
+        fully qualified for production use.
+      DEPRECATED: Deprecated features are scheduled to be shut down and
+        removed. For more information, see the "Deprecation Policy" section of
+        our [Terms of Service](https://cloud.google.com/terms/) and the
+        [Google Cloud Platform Subject to the Deprecation
+        Policy](https://cloud.google.com/terms/deprecation) documentation.
+    """
+    LAUNCH_STAGE_UNSPECIFIED = 0
+    EARLY_ACCESS = 1
+    ALPHA = 2
+    BETA = 3
+    GA = 4
+    DEPRECATED = 5
+
+  ingestDelay = _messages.StringField(1)
+  launchStage = _messages.EnumField('LaunchStageValueValuesEnum', 2)
+  samplePeriod = _messages.StringField(3)
 
 
 class MetricRule(_messages.Message):
@@ -1844,8 +1915,8 @@ class ServiceuserProjectsServicesDisableRequest(_messages.Message):
     projectsId: Part of `name`. Name of the consumer and the service to
       disable for that consumer.  The Service User implementation accepts the
       following forms for consumer: - "project:<project_id>"  A valid path
-      would be: - /v1/projects/my-
-      project/services/servicemanagement.googleapis.com:disable
+      would be: - projects/my-
+      project/services/servicemanagement.googleapis.com
     servicesId: Part of `name`. See documentation of `projectsId`.
   """
 
@@ -1861,8 +1932,8 @@ class ServiceuserProjectsServicesEnableRequest(_messages.Message):
     enableServiceRequest: A EnableServiceRequest resource to be passed as the
       request body.
     projectsId: Part of `name`. Name of the consumer and the service to enable
-      for that consumer.  A valid path would be: - /v1/projects/my-
-      project/services/servicemanagement.googleapis.com:enable
+      for that consumer.  A valid path would be: - projects/my-
+      project/services/servicemanagement.googleapis.com
     servicesId: Part of `name`. See documentation of `projectsId`.
   """
 

@@ -5,8 +5,8 @@ SYNOPSIS
     gcloud ml-engine versions create VERSION --model=MODEL [--async]
         [--config=CONFIG] [--description=DESCRIPTION] [--framework=FRAMEWORK]
         [--labels=[KEY=VALUE,...]] [--origin=ORIGIN]
-        [--runtime-version=RUNTIME_VERSION] [--staging-bucket=STAGING_BUCKET]
-        [GCLOUD_WIDE_FLAG ...]
+        [--python-version=PYTHON_VERSION] [--runtime-version=RUNTIME_VERSION]
+        [--staging-bucket=STAGING_BUCKET] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Creates a new version of a Cloud ML Engine model.
@@ -65,7 +65,7 @@ OPTIONAL FLAGS
         scikit-learn, tensorflow, xgboost.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -83,10 +83,16 @@ OPTIONAL FLAGS
         prefix). In the latter case the files will be uploaded to Google Cloud
         Storage and a --staging-bucket argument is required.
 
+     --python-version=PYTHON_VERSION
+        Version of Python used when creating the version. If not set, the
+        default version is 2.7. Python 3.5 is available when runtime_version is
+        set to 1.4 and above. Python 2.7 works with all supported runtime
+        versions.
+
      --runtime-version=RUNTIME_VERSION
-        The Google Cloud ML Engine runtime version for this job. Defaults to a
-        stable version, which is defined in the documentation along with the
-        list of supported versions:
+        Google Cloud ML Engine runtime version for this job. Defaults to a
+        stable version, which is defined in documentation along with the list
+        of supported versions:
         https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
 
      --staging-bucket=STAGING_BUCKET

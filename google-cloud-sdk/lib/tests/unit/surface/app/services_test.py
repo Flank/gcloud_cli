@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for gcloud app services."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import re
 
 from googlecloudsdk.api_lib.app import service_util
@@ -132,7 +135,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
 
     self.AssertErrContains(
         'Deleting service [{}/service1].'.format(self.Project()))
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_OneService_Default(self):
     """Test `services delete` command where there is one default."""
@@ -168,7 +171,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
 
     self.AssertErrContains('Deleting services [{0}/service1, '
                            '{0}/service2].'.format(self.Project()))
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_MultipleServicesOneError(self):
     """Test `services delete` command where one service results in an error."""
@@ -242,7 +245,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
 
     self.AssertErrContains('Deleting version [version1] of service '
                            '[{}/service1].'.format(self.Project()))
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_VersionOneServiceError(self):
     """Test `services delete` command with --version where error is returned."""
@@ -271,7 +274,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
     self.AssertErrContains('Deleting version [version1] of services '
                            '[{0}/service1, {0}/service2].'
                            .format(self.Project()))
-    self.AssertErrContains('Do you want to continue')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDelete_VersionMultiServiceOneError(self):
     """Test delete command with --version where one service fails."""

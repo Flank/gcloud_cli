@@ -15,6 +15,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding for a disk.
+
      add-labels
         (BETA) Add labels to Google Compute Engine persistent disks.
 
@@ -27,17 +30,26 @@ COMMANDS
      describe
         (BETA) Describe a Google Compute Engine disk.
 
+     get-iam-policy
+        (BETA) Get the IAM policy for a Google Compute Engine disk.
+
      list
         (BETA) List Google Compute Engine disks.
 
      move
         (BETA) Move a disk between zones.
 
+     remove-iam-policy-binding
+        (BETA) Remove IAM policy binding for a disk.
+
      remove-labels
         (BETA) Remove labels from Google Compute Engine persistent disks.
 
      resize
         (BETA) Resize a disk or disks.
+
+     set-iam-policy
+        (BETA) Set IAM policy for a disk.
 
      snapshot
         (BETA) Create snapshots of Google Compute Engine persistent disks.

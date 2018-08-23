@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """Unit tests for the resource_transform module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.core.console import console_attr
@@ -445,18 +447,18 @@ class ResourceTransformTest(test_case.Base):
              ['%Y-%m-%dT%H:%M:%S.%f%z'], expected, kwargs)
 
   def testTransformDateFromDateTimeTzDefaultUTCTzUsPacific(self):
-    strings = ['2016-01-19T10:51:11.941-08:00',
-               '2016-01-19T10:51:11.941-0800',
-               '2016-01-19T10:51:11.941',
+    strings = ['2016-01-19T10:51:11.265-08:00',
+               '2016-01-19T10:51:11.265-0800',
+               '2016-01-19T10:51:11.265',
                'February 11, 2015 12:00:00 EST']
     resource = [times.ParseDateTime(x, tzinfo=times.UTC) for x in strings]
     kwargs = {
         'tz_default': 'UTC',
         'tz': 'US/Pacific'
     }
-    expected = ['2016-01-19T10:51:11.941000-0800',
-                '2016-01-19T10:51:11.941000-0800',
-                '2016-01-19T02:51:11.941000-0800',
+    expected = ['2016-01-19T10:51:11.265000-0800',
+                '2016-01-19T10:51:11.265000-0800',
+                '2016-01-19T02:51:11.265000-0800',
                 '2015-02-11T09:00:00.000000-0800']
     self.Run(resource, None, resource_transform.TransformDate,
              ['%Y-%m-%dT%H:%M:%S.%f%z'], expected, kwargs)
@@ -480,9 +482,9 @@ class ResourceTransformTest(test_case.Base):
              ['%Y-%m-%dT%H:%M:%S.%f%z'], expected, kwargs)
 
   def testTransformDateFromSerializedDateTimeTzDefaultUTCTzUsPacific(self):
-    strings = ['2016-01-19T10:51:11.941-08:00',
-               '2016-01-19T10:51:11.941-0800',
-               '2016-01-19T10:51:11.941',
+    strings = ['2016-01-19T10:51:11.265-08:00',
+               '2016-01-19T10:51:11.265-0800',
+               '2016-01-19T10:51:11.265',
                'February 11, 2015 12:00:00 EST']
     serialize = resource_projector.Compile().Evaluate
     resource = [serialize(times.ParseDateTime(x, tzinfo=times.UTC))
@@ -491,9 +493,9 @@ class ResourceTransformTest(test_case.Base):
         'tz_default': 'UTC',
         'tz': 'US/Pacific'
     }
-    expected = ['2016-01-19T10:51:11.941000-0800',
-                '2016-01-19T10:51:11.941000-0800',
-                '2016-01-19T02:51:11.941000-0800',
+    expected = ['2016-01-19T10:51:11.265000-0800',
+                '2016-01-19T10:51:11.265000-0800',
+                '2016-01-19T02:51:11.265000-0800',
                 '2015-02-11T09:00:00.000000-0800']
     self.Run(resource, None, resource_transform.TransformDate,
              ['%Y-%m-%dT%H:%M:%S.%f%z'], expected, kwargs)

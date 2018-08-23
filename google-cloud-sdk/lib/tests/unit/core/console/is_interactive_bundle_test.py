@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for the core.util.keyboard_interrupt module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import io
 import os
 import subprocess
@@ -64,11 +67,14 @@ class IsInteractiveBundle(cli_test_base.CliTestBase):
     env = os.environ.copy()
     python_path = encoding.GetEncodedValue(env, 'PYTHONPATH')
     python_path = os.pathsep.join(
-        ([python_path] if python_path else []) + [sdk_path] + sys.path)
+        ([python_path] if python_path else []) + [sdk_path])
     encoding.SetEncodedValue(env, 'PYTHONPATH', python_path)
+    # Prevent gcloud wrapper script fallback to a python different from the one
+    # running this test.
+    encoding.SetEncodedValue(env, 'CLOUDSDK_PYTHON', sys.executable)
 
     # Subprocess stderr=X redirection requires file streams, not buffers.
-    # stderr=subprocess.PIPE only works resliably with p=subprocess.Popen() and
+    # stderr=subprocess.PIPE only works reliably with p=subprocess.Popen() and
     # p.communicate(), but that messes up meta test signal delivery by absorbing
     # it -- we would never see it here.
     try:

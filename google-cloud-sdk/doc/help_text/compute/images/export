@@ -6,7 +6,7 @@ SYNOPSIS
         (--image=IMAGE | --image-family=IMAGE_FAMILY) [--async]
         [--export-format=EXPORT_FORMAT] [--image-project=IMAGE_PROJECT]
         [--log-location=LOG_LOCATION] [--network=NETWORK]
-        [--timeout=TIMEOUT; default="2h"] [GCLOUD_WIDE_FLAG ...]
+        [--timeout=TIMEOUT; default="2h"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute images export exports Virtual Disk images from Google
@@ -66,6 +66,11 @@ OPTIONAL FLAGS
         Maximum time a build can last before it is failed as "TIMEOUT". For
         example, specifying 2h will fail the process after 2 hours. See $
         gcloud topic datetimes for information on duration formats.
+
+     --zone=ZONE
+        Zone of the image to export. The zone to use when exporting the image.
+        Overrides the default compute/zone property value for this command
+        invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

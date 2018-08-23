@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """The CreateSignaturePayload command for Binary Authorization signatures."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
@@ -36,8 +38,8 @@ class CreateSignaturePayload(base.Command):
           --artifact-url="gcr.io/example-project/example-image@sha256:abcd"
   """
 
-  @staticmethod
-  def Args(parser):
+  @classmethod
+  def Args(cls, parser):
     binauthz_flags.AddArtifactUrlFlag(parser)
     parser.display_info.AddFormat('json')
 

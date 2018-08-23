@@ -3,7 +3,7 @@ NAME
         project
 
 SYNOPSIS
-    gcloud alpha services disable [SERVICE ...] [--async]
+    gcloud alpha services disable [SERVICE ...] [--async] [--force]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -15,9 +15,8 @@ DESCRIPTION
         $ gcloud alpha services list
 
     More information on listing services can be found at:
-    https://cloud.google.com/service-management/list-services and on disabling
-    a service at:
-    https://cloud.google.com/service-management/enable-disable#disabling_services
+    https://cloud.google.com/service-usage/docs/list-services and on disabling
+    a service at: https://cloud.google.com/service-usage/docs/enable-disable
 
 POSITIONAL ARGUMENTS
      [SERVICE ...]
@@ -27,6 +26,12 @@ FLAGS
      --async
         Display information about the operation in progress, without waiting
         for the operation to complete.
+
+     --force
+        If specified, the disable call will proceed even if there are enabled
+        services which depend on the service to be disabled. Forcing the call
+        means that the services which depend on the service to be disabled will
+        also be disabled.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -44,11 +49,11 @@ EXAMPLES
         $ gcloud alpha services disable my-consumed-service --async
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud services disable
         $ gcloud beta services disable

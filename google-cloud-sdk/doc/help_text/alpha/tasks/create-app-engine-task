@@ -3,7 +3,7 @@ NAME
         Engine queue
 
 SYNOPSIS
-    gcloud alpha tasks create-app-engine-task (--id=TASK_ID --queue=QUEUE)
+    gcloud alpha tasks create-app-engine-task [TASK_ID] --queue=QUEUE
         [--header=HEADER_FIELD: HEADER_VALUE] [--method=METHOD]
         [--routing=KEY:VALUE,[...]] [--schedule-time=SCHEDULE_TIME] [--url=URL]
         [--payload-content=PAYLOAD_CONTENT | --payload-file=PAYLOAD_FILE]
@@ -12,24 +12,23 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) Create and add a task to an App Engine queue.
 
+POSITIONAL ARGUMENTS
+     [TASK_ID]
+        The task to create.
+
+        If not specified then the system will generate a random unique task ID.
+        Explicitly specifying a task ID enables task de-duplication. If a
+        task's ID is identical to that of an existing task or a task that was
+        deleted or completed recently then the call will fail.
+
+        Because there is an extra lookup cost to identify duplicate task names,
+        tasks created with IDs have significantly increased latency. Using
+        hashed strings for the task ID or for the prefix of the task ID is
+        recommended.
+
 REQUIRED FLAGS
-     At least one of these must be specified:
-
-       --id=TASK_ID
-          The ID of the task to create.
-
-          If not specified then the system will generate a random unique task
-          ID. Explicitly specifying a task ID enables task de-duplication. If a
-          task's ID is identical to that of an existing task or a task that was
-          deleted or completed recently then the call will fail.
-
-          Because there is an extra lookup cost to identify duplicate task
-          names, tasks created with IDs have significantly increased latency.
-          Using hashed strings for the task ID or for the prefix of the task ID
-          is recommended.
-
-       --queue=QUEUE
-          The queue the task belongs to.
+     --queue=QUEUE
+        The queue the task belongs to.
 
 OPTIONAL FLAGS
      --header=HEADER_FIELD: HEADER_VALUE
@@ -58,13 +57,11 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --payload-content=PAYLOAD_CONTENT
-          Data payload to be consumed by the task worker to process the task.
+          Data payload used by the task worker to process the task.
 
        --payload-file=PAYLOAD_FILE
-          File containing data payload to be consumed by the task worker to
-          execute the task. The payload will be sent as the HTTP message body.
-          A message body, and thus a payload, is allowed only if the HTTP
-          method is "POST" or "PUT".
+          File containing data payload used by the task worker to process the
+          task.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -72,9 +69,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta tasks create-app-engine-task
 

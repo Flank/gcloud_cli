@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Integration tests for forwarding rules."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import resources
 from tests.lib import e2e_resource_managers
@@ -73,6 +76,7 @@ class FailoverTest(e2e_test_base.BaseTest):
   def _GetBackendServiceParameters(self, health_check):
     extra_backend_service_creation_flags = [
         ('--health-checks', health_check),
+        ('--global-health-checks', ''),
         ('--load-balancing-scheme', 'INTERNAL'),
         ('--protocol', 'TCP'),
     ]
@@ -83,6 +87,7 @@ class FailoverTest(e2e_test_base.BaseTest):
   def _GetBackendServiceParametersWithFailoverPolicy(self, health_check):
     extra_backend_service_creation_flags = [
         ('--health-checks', health_check),
+        ('--global-health-checks', ''),
         ('--load-balancing-scheme', 'INTERNAL'),
         ('--protocol', 'TCP'),
         ('--no-connection-drain-on-failover', ''),

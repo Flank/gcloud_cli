@@ -1,20 +1,22 @@
 NAME
-    gcloud config list - view Cloud SDK properties
+    gcloud config list - list Cloud SDK properties for the currently active
+        configuration
 
 SYNOPSIS
     gcloud config list [SECTION/PROPERTY] [--all] [--filter=EXPRESSION]
         [--limit=LIMIT] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Lists all properties in your active configuration. These include the
-    account used to authorize access to the Cloud Platform, the current Cloud
-    Platform project, and the default Compute Engine region and zone, if set.
-    See gcloud topic configurations for more information.
+    gcloud config list lists all properties of the active configuration. These
+    include the account used to authorize access to the Cloud Platform, the
+    current Cloud Platform project, and the default Compute Engine region and
+    zone, if set. See gcloud topic configurations for more about
+    configurations.
 
 POSITIONAL ARGUMENTS
      [SECTION/PROPERTY]
-        The property to be listed. Note that SECTION/ is optional while
-        referring to properties in the core section.
+        Property to be listed. Note that SECTION/ is optional while referring
+        to properties in the core section.
 
 FLAGS
      --all
@@ -23,18 +25,18 @@ FLAGS
 LIST COMMAND FLAGS
      --filter=EXPRESSION
         Apply a Boolean filter EXPRESSION to each resource item to be listed.
-        If the expression evaluates True then that item is listed. For more
-        details and examples of filter expressions run $ gcloud topic filters.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
         This flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
      --limit=LIMIT
-        The maximum number of resources to list. The default is unlimited. This
+        Maximum number of resources to list. The default is unlimited. This
         flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
      --sort-by=[FIELD,...]
-        A comma-separated list of resource field key names to sort by. The
+        Comma-separated list of resource field key names to sort by. The
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
@@ -121,7 +123,7 @@ AVAILABLE PROPERTIES
      app
          cloud_build_timeout
             Timeout, in seconds, to wait for Docker builds to complete during
-            deployments. All Docker builds now use the Container Builder API.
+            deployments. All Docker builds now use the Cloud Build API.
 
          promote_by_default
             If True, when deploying a new version of a service, that version
@@ -158,6 +160,10 @@ AVAILABLE PROPERTIES
             If you need to operate on one project, but need quota against a
             different project, you can use this property to specify the
             alternate project.
+
+     builds
+         timeout
+            Timeout, in seconds, to wait for builds to complete.
 
      component_manager
          additional_repositories
@@ -221,24 +227,6 @@ AVAILABLE PROPERTIES
             If True, use the cluster's client certificate to authenticate to
             the cluster API server.
 
-         use_v1_api
-            This property is DEPRECATED. If True, all gcloud Kubernetes Engine
-            commands (regardless of release track) will use the v1 API;
-            otherwise, gcloud beta track commands will use v1beta1 API and
-            gcloud alpha track commands will use v1alpha1 API. By default, this
-            property is set to false. The Kubernetes Engine v1alpha1 API is
-            whitelist-only at this time. Note: use_v1_api is an alias of
-            use_v1_api_client.
-
-         use_v1_api_client
-            This property is DEPRECATED. If True, all gcloud Kubernetes Engine
-            commands (regardless of release track) will use the v1 API;
-            otherwise, gcloud beta track commands will use v1beta1 API and
-            gcloud alpha track commands will use v1alpha1 API. By default, this
-            property is set to false. The Kubernetes Engine v1alpha1 API is
-            whitelist-only at this time. Note: use_v1_api_client is an alias of
-            use_v1_api.
-
      dataproc
          region
             Cloud Dataproc region to use. Each Cloud Dataproc region
@@ -247,6 +235,17 @@ AVAILABLE PROPERTIES
             The default value of global is a special multi-region namespace
             which is capable of deploying instances into all Compute Engine
             zones globally, and is disjoint from other Cloud Dataproc regions.
+
+     deployment_manager
+         glob_imports
+            Enable import path globbing. Uses glob patterns to match multiple
+            imports in a config file.
+
+     filestore
+         location
+            Default location to use when working with Cloud Filestore
+            locations. When a --location flag is required but not provided, the
+            command will fall back to this value, if set.
 
      functions
          region
@@ -338,9 +337,9 @@ AVAILABLE PROPERTIES
 
      redis
          region
-            The default region to use when working with Cloud Memorystore for
-            Redis resources. When a region is required but not provided by a
-            flag, the command will fall back to this value, if set.
+            Default region to use when working with Cloud Memorystore for Redis
+            resources. When a region is required but not provided by a flag,
+            the command will fall back to this value, if set.
 
      spanner
          instance
@@ -361,7 +360,7 @@ EXAMPLES
 
         $ gcloud config list --all
 
-    Note you cannot specify both --all and a property name.
+    Note, you cannot specify both --all and a property name.
 
 NOTES
     These variants are also available:

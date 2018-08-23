@@ -3,7 +3,7 @@ NAME
         for a given operation name
 
 SYNOPSIS
-    gcloud beta services operations describe OPERATION [--full]
+    gcloud beta services operations describe OPERATION [--full=FULL]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -22,9 +22,11 @@ POSITIONAL ARGUMENTS
         The name of the operation to describe.
 
 FLAGS
-     --full
-        Print the entire operation resource, which could be large. By default,
-        a summary will be printed instead.
+     --full=FULL
+        (DEPRECATED) Print the entire operation resource, which could be large.
+        By default, a summary will be printed instead.
+
+        This flag is deprecated.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

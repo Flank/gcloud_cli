@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +15,17 @@
 """services vpc-peering helper functions."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.services import exceptions
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core.util import retry
 
 
-def PeerApiCall(project_number, service, network, reserved_ranges):
-  """Make API call to peer a specific service.
+def CreateConnection(project_number, service, network, reserved_ranges):
+  """Make API call to create a connection a specific service.
 
   Args:
     project_number: The number of the project for which to peer the service.
@@ -31,7 +34,8 @@ def PeerApiCall(project_number, service, network, reserved_ranges):
     reserved_ranges: The IP CIDR ranges for peering service to use.
 
   Raises:
-    exceptions.PeerServicePermissionDeniedException: when the peering API fails.
+    exceptions.CreateConnectionsPermissionDeniedException: when the create
+        connection API fails.
     apitools_exceptions.HttpError: Another miscellaneous error with the peering
         service.
 
@@ -41,16 +45,51 @@ def PeerApiCall(project_number, service, network, reserved_ranges):
   client = _GetClientInstance()
   messages = client.MESSAGES_MODULE
 
-  request = messages.ServicenetworkingServicesPeerRequest(
-      name='services/' + service,
-      peerSharedNetworkRequest=messages.PeerSharedNetworkRequest(
+  # the API only takes project number, so we cannot use resource parser.
+  request = messages.ServicenetworkingServicesConnectionsCreateRequest(
+      parent='services/' + service,
+      connection=messages.Connection(
           network='projects/%s/global/networks/%s' % (project_number, network),
           reservedPeeringRanges=reserved_ranges))
   try:
-    return client.services.Peer(request)
+    return client.services_connections.Create(request)
   except (apitools_exceptions.HttpForbiddenError,
           apitools_exceptions.HttpNotFoundError) as e:
-    exceptions.ReraiseError(e, exceptions.PeerServicePermissionDeniedException)
+    exceptions.ReraiseError(
+        e, exceptions.CreateConnectionsPermissionDeniedException)
+
+
+def ListConnections(project_number, service, network):
+  """Make API call to list connections of a network for a specific service.
+
+  Args:
+    project_number: The number of the project for which to peer the service.
+    service: The name of the service to peer with.
+    network: The network in consumer project to peer with.
+
+  Raises:
+    exceptions.ListConnectionsPermissionDeniedException: when the list
+    connections API fails.
+    apitools_exceptions.HttpError: Another miscellaneous error with the peering
+        service.
+
+  Returns:
+    The result of the peering operation
+  """
+  client = _GetClientInstance()
+  messages = client.MESSAGES_MODULE
+
+  # The API only takes project number, so we cannot use resource parser.
+  request = messages.ServicenetworkingServicesConnectionsListRequest(
+      parent='services/' + service,
+      network='projects/{0}/global/networks/{1}'.format(project_number,
+                                                        network))
+  try:
+    return client.services_connections.List(request).connections
+  except (apitools_exceptions.HttpForbiddenError,
+          apitools_exceptions.HttpNotFoundError) as e:
+    exceptions.ReraiseError(e,
+                            exceptions.ListConnectionsPermissionDeniedException)
 
 
 def GetOperation(name):
@@ -114,4 +153,4 @@ def WaitOperation(name):
 
 
 def _GetClientInstance():
-  return apis.GetClientInstance('servicenetworking', 'v1alpha', no_http=False)
+  return apis.GetClientInstance('servicenetworking', 'v1beta', no_http=False)

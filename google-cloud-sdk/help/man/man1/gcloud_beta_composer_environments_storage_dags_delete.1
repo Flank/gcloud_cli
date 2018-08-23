@@ -40,7 +40,7 @@ subdirectory will be deleted.
 .RS 2m
 .TP 2m
 
-Environment resource \- The environment whose DAGs to delete.. The arguments in
+Environment resource \- The environment whose DAGs to delete. The arguments in
 this group can be used to specify the attributes of this resource. (NOTE) Some
 attributes are not given arguments in this group but can be set in other ways.
 To set the [project] attribute: provide the flag [\-\-environment] on the
@@ -56,7 +56,7 @@ specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the environment.
+Compute Engine region in which to create the environment.
 
 
 .RE
@@ -74,5 +74,10 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud composer environments storage dags delete
+.RE
 

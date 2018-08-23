@@ -111,7 +111,7 @@ server include the WINDOWS parameter to indicate that it is a Windows image.
 .RS 2m
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -144,15 +144,18 @@ to disable.
 
 .TP 2m
 \fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]
-A list of resource policy names to be added to the instance. The policies must
-exist in the same region as the instance.
+A list of resource policy names to be added to the disk. The policies must exist
+in the same region as the disk.
 
 .TP 2m
 \fB\-\-size\fR=\fISIZE\fR
-Indicates the size of the disks. The value must be a whole number followed by a
-size unit of \f5\fIGB\fR\fR for gigabyte, or \f5\fITB\fR\fR for terabyte. If no
-size unit is specified, GB is assumed. For example, \f5\fI10GB\fR\fR will
-produce 10 gigabyte disks. Disk size must be a multiple of 1 GB.
+Size of the disks. The value must be a whole number followed by a size unit of
+\f5\fIGB\fR\fR for gigabyte, or \f5\fITB\fR\fR for terabyte. If no size unit is
+specified, GB is assumed. For example, \f5\fI10GB\fR\fR will produce 10 gigabyte
+disks. Disk size must be a multiple of 1 GB. Limit your boot disk size to 2TB to
+account for MBR partition table limitations. If disk size is not specified, the
+default size of 500GB for standard disks and 100GB for pd\-ssd disks will be
+used.
 
 .TP 2m
 \fB\-\-type\fR=\fITYPE\fR
@@ -199,9 +202,9 @@ with that family is used.
 
 .TP 2m
 \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR
-A source snapshot used to create the disks. It is safe to delete a snapshot
-after a disk has been created from the snapshot. In such cases, the disks will
-no longer reference the deleted snapshot. To get a list of snapshots in your
+Source snapshot used to create the disks. It is safe to delete a snapshot after
+a disk has been created from the snapshot. In such cases, the disks will no
+longer reference the deleted snapshot. To get a list of snapshots in your
 current project, run \f5gcloud compute snapshots list\fR. A snapshot from an
 existing disk can be created using the \f5gcloud compute disks snapshot\fR
 command. This flag is mutually exclusive with \fB\-\-image\fR.
@@ -244,8 +247,8 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the disks to create. If not specified, you may be prompted to
-select a region.
+Region of the disks to create. If not specified, you may be prompted to select a
+region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -271,9 +274,8 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-The zone of the disks to create. If not specified and the
-\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
-zone.
+Zone of the disks to create. If not specified and the \f5\fIcompute/zone\fR\fR
+property isn't set, you may be prompted to select a zone.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/zone\fR\fR property:
@@ -313,11 +315,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute disks create

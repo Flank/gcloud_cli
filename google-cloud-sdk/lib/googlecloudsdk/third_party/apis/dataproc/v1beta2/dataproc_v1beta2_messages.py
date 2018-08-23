@@ -38,6 +38,10 @@ class Binding(_messages.Message):
   r"""Associates members with a role.
 
   Fields:
+    condition: Unimplemented. The condition that is associated with this
+      binding. NOTE: an unsatisfied condition will not allow user access via
+      current binding. Different bindings, including their conditions, are
+      examined independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. members can have the following values: allUsers: A special
       identifier that represents anyone who is  on the internet; with or
@@ -52,11 +56,12 @@ class Binding(_messages.Message):
       that represents all the  users of that domain. For example, google.com
       or example.com.
     role: Role that is assigned to members. For example, roles/viewer,
-      roles/editor, or roles/owner. Required
+      roles/editor, or roles/owner.
   """
 
-  members = _messages.StringField(1, repeated=True)
-  role = _messages.StringField(2)
+  condition = _messages.MessageField('Expr', 1)
+  members = _messages.StringField(2, repeated=True)
+  role = _messages.StringField(3)
 
 
 class CancelJobRequest(_messages.Message):
@@ -88,9 +93,9 @@ class Cluster(_messages.Message):
       if present, must contain 1 to 63 characters, and must conform to RFC
       1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can
       be associated with a cluster.
-    metrics: Contains cluster daemon metrics such as HDFS and YARN stats.Beta
-      Feature: This report is available for testing purposes only. It may be
-      changed before final release.
+    metrics: Output only. Contains cluster daemon metrics such as HDFS and
+      YARN stats.Beta Feature: This report is available for testing purposes
+      only. It may be changed before final release.
     projectId: Required. The Google Cloud Platform project ID that the cluster
       belongs to.
     status: Output only. Cluster status.
@@ -1303,6 +1308,30 @@ class EncryptionConfig(_messages.Message):
   gcePdKmsKeyName = _messages.StringField(1)
 
 
+class Expr(_messages.Message):
+  r"""Represents an expression text. Example: title: "User account presence"
+  description: "Determines whether the request has a user account" expression:
+  "size(request.user) > 0"
+
+  Fields:
+    description: An optional description of the expression. This is a longer
+      text which describes the expression, e.g. when hovered over it in a UI.
+    expression: Textual representation of an expression in Common Expression
+      Language syntax.The application context of the containing message
+      determines which well-known feature set of CEL is supported.
+    location: An optional string indicating the location of the expression for
+      error reporting, e.g. a file name and a position in the file.
+    title: An optional title for the expression, i.e. a short string
+      describing its purpose. This can be used e.g. in UIs which allow to
+      enter the expression.
+  """
+
+  description = _messages.StringField(1)
+  expression = _messages.StringField(2)
+  location = _messages.StringField(3)
+  title = _messages.StringField(4)
+
+
 class GceClusterConfig(_messages.Message):
   r"""Common config settings for resources of Compute Engine cluster
   instances, applicable to all instances in the cluster.
@@ -1586,8 +1615,9 @@ class InstanceGroupConfig(_messages.Message):
       these instances.Beta Feature: This feature is still under development.
       It may be changed before final release.
     diskConfig: Optional. Disk option config settings.
-    imageUri: Output only. The Compute Engine image resource used for cluster
-      instances. Inferred from SoftwareConfig.image_version.
+    imageUri: Optional. The Compute Engine image resource used for cluster
+      instances. It can be specified or may be inferred from
+      SoftwareConfig.image_version.
     instanceNames: Output only. The list of instance names. Cloud Dataproc
       derives the names from cluster_name, num_instances, and the instance
       group.
@@ -1629,15 +1659,16 @@ class InstantiateWorkflowTemplateRequest(_messages.Message):
       be used for those parameters.
 
   Fields:
-    instanceId: Optional. A tag that prevents multiple concurrent workflow
+    instanceId: Deprecated. Please use request_id field instead.
+    parameters: Optional. Map from parameter names to values that should be
+      used for those parameters.
+    requestId: Optional. A tag that prevents multiple concurrent workflow
       instances with the same tag from running. This mitigates risk of
       concurrent instances started due to retries.It is recommended to always
       set this value to a UUID
       (https://en.wikipedia.org/wiki/Universally_unique_identifier).The tag
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
-    parameters: Optional. Map from parameter names to values that should be
-      used for those parameters.
     version: Optional. The version of workflow template to instantiate. If
       specified, the workflow will be instantiated only if the current version
       of the workflow template has the supplied version.This option cannot be
@@ -1671,7 +1702,8 @@ class InstantiateWorkflowTemplateRequest(_messages.Message):
 
   instanceId = _messages.StringField(1)
   parameters = _messages.MessageField('ParametersValue', 2)
-  version = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  requestId = _messages.StringField(3)
+  version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
 class Job(_messages.Message):
@@ -1710,6 +1742,7 @@ class Job(_messages.Message):
       <code>job_id</code>.
     scheduling: Optional. Job scheduling configuration.
     sparkJob: Job is a Spark job.
+    sparkRJob: Job is a SparkR job.
     sparkSqlJob: Job is a SparkSql job.
     status: Output only. The job status. Additional application-specific
       status information may be contained in the <code>type_job</code> and
@@ -1760,10 +1793,11 @@ class Job(_messages.Message):
   reference = _messages.MessageField('JobReference', 9)
   scheduling = _messages.MessageField('JobScheduling', 10)
   sparkJob = _messages.MessageField('SparkJob', 11)
-  sparkSqlJob = _messages.MessageField('SparkSqlJob', 12)
-  status = _messages.MessageField('JobStatus', 13)
-  statusHistory = _messages.MessageField('JobStatus', 14, repeated=True)
-  yarnApplications = _messages.MessageField('YarnApplication', 15, repeated=True)
+  sparkRJob = _messages.MessageField('SparkRJob', 12)
+  sparkSqlJob = _messages.MessageField('SparkSqlJob', 13)
+  status = _messages.MessageField('JobStatus', 14)
+  statusHistory = _messages.MessageField('JobStatus', 15, repeated=True)
+  yarnApplications = _messages.MessageField('YarnApplication', 16, repeated=True)
 
 
 class JobPlacement(_messages.Message):
@@ -2255,6 +2289,7 @@ class OrderedJob(_messages.Message):
     pysparkJob: Job is a Pyspark job.
     scheduling: Optional. Job scheduling configuration.
     sparkJob: Job is a Spark job.
+    sparkRJob: Job is a SparkR job.
     sparkSqlJob: Job is a SparkSql job.
     stepId: Required. The step id. The id must be unique among all jobs within
       the template.The step id is used as prefix for job id, as job goog-
@@ -2301,8 +2336,9 @@ class OrderedJob(_messages.Message):
   pysparkJob = _messages.MessageField('PySparkJob', 6)
   scheduling = _messages.MessageField('JobScheduling', 7)
   sparkJob = _messages.MessageField('SparkJob', 8)
-  sparkSqlJob = _messages.MessageField('SparkSqlJob', 9)
-  stepId = _messages.StringField(10)
+  sparkRJob = _messages.MessageField('SparkRJob', 9)
+  sparkSqlJob = _messages.MessageField('SparkSqlJob', 10)
+  stepId = _messages.StringField(11)
 
 
 class ParameterValidation(_messages.Message):
@@ -2538,8 +2574,8 @@ class RegexValidation(_messages.Message):
 
   Fields:
     regexes: Required. RE2 regular expressions used to validate the
-      parameter's value. The provided value must match the regexes in its
-      entirety, e.g. substring matches are not enough.
+      parameter's value. The value must match the regex in its entirety
+      (substring matches are not sufficient).
   """
 
   regexes = _messages.StringField(1, repeated=True)
@@ -2561,6 +2597,9 @@ class SetIamPolicyRequest(_messages.Message):
 class SoftwareConfig(_messages.Message):
   r"""Specifies the selection and config of software inside the cluster.
 
+  Enums:
+    OptionalComponentsValueListEntryValuesEnum:
+
   Messages:
     PropertiesValue: Optional. The properties to set on daemon config
       files.Property keys are specified in prefix:property format, such as
@@ -2575,6 +2614,8 @@ class SoftwareConfig(_messages.Message):
       must be one of the supported Cloud Dataproc Versions, such as "1.2"
       (including a subminor version, such as "1.2.29"), or the "preview"
       version. If unspecified, it defaults to the latest version.
+    optionalComponents: The set of optional components to activate on the
+      cluster.
     properties: Optional. The properties to set on daemon config
       files.Property keys are specified in prefix:property format, such as
       core:fs.defaultFS. The following are supported prefixes and their
@@ -2583,6 +2624,22 @@ class SoftwareConfig(_messages.Message):
       mapred: mapred-site.xml pig: pig.properties spark: spark-defaults.conf
       yarn: yarn-site.xmlFor more information, see Cluster properties.
   """
+
+  class OptionalComponentsValueListEntryValuesEnum(_messages.Enum):
+    r"""OptionalComponentsValueListEntryValuesEnum enum type.
+
+    Values:
+      COMPONENT_UNSPECIFIED: <no description>
+      JUPYTER: <no description>
+      HIVE_WEBHCAT: <no description>
+      ZEPPELIN: <no description>
+      ANACONDA: <no description>
+    """
+    COMPONENT_UNSPECIFIED = 0
+    JUPYTER = 1
+    HIVE_WEBHCAT = 2
+    ZEPPELIN = 3
+    ANACONDA = 4
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class PropertiesValue(_messages.Message):
@@ -2615,7 +2672,8 @@ class SoftwareConfig(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   imageVersion = _messages.StringField(1)
-  properties = _messages.MessageField('PropertiesValue', 2)
+  optionalComponents = _messages.EnumField('OptionalComponentsValueListEntryValuesEnum', 2, repeated=True)
+  properties = _messages.MessageField('PropertiesValue', 3)
 
 
 class SparkJob(_messages.Message):
@@ -2686,6 +2744,70 @@ class SparkJob(_messages.Message):
   mainClass = _messages.StringField(6)
   mainJarFileUri = _messages.StringField(7)
   properties = _messages.MessageField('PropertiesValue', 8)
+
+
+class SparkRJob(_messages.Message):
+  r"""A Cloud Dataproc job for running Apache SparkR
+  (https://spark.apache.org/docs/latest/sparkr.html) applications on YARN.
+
+  Messages:
+    PropertiesValue: Optional. A mapping of property names to values, used to
+      configure SparkR. Properties that conflict with values set by the Cloud
+      Dataproc API may be overwritten. Can include properties set in
+      /etc/spark/conf/spark-defaults.conf and classes in user code.
+
+  Fields:
+    archiveUris: Optional. HCFS URIs of archives to be extracted in the
+      working directory of Spark drivers and tasks. Supported file types:
+      .jar, .tar, .tar.gz, .tgz, and .zip.
+    args: Optional. The arguments to pass to the driver. Do not include
+      arguments, such as --conf, that can be set as job properties, since a
+      collision may occur that causes an incorrect job submission.
+    fileUris: Optional. HCFS URIs of files to be copied to the working
+      directory of R drivers and distributed tasks. Useful for naively
+      parallel tasks.
+    loggingConfig: Optional. The runtime log config for job execution.
+    mainRFileUri: Required. The HCFS URI of the main R file to use as the
+      driver. Must be a .R file.
+    properties: Optional. A mapping of property names to values, used to
+      configure SparkR. Properties that conflict with values set by the Cloud
+      Dataproc API may be overwritten. Can include properties set in
+      /etc/spark/conf/spark-defaults.conf and classes in user code.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class PropertiesValue(_messages.Message):
+    r"""Optional. A mapping of property names to values, used to configure
+    SparkR. Properties that conflict with values set by the Cloud Dataproc API
+    may be overwritten. Can include properties set in /etc/spark/conf/spark-
+    defaults.conf and classes in user code.
+
+    Messages:
+      AdditionalProperty: An additional property for a PropertiesValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type PropertiesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a PropertiesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  archiveUris = _messages.StringField(1, repeated=True)
+  args = _messages.StringField(2, repeated=True)
+  fileUris = _messages.StringField(3, repeated=True)
+  loggingConfig = _messages.MessageField('LoggingConfig', 4)
+  mainRFileUri = _messages.StringField(5)
+  properties = _messages.MessageField('PropertiesValue', 6)
 
 
 class SparkSqlJob(_messages.Message):
@@ -2932,44 +3054,43 @@ class SubmitJobRequest(_messages.Message):
 
 class TemplateParameter(_messages.Message):
   r"""A configurable parameter that replaces one or more fields in the
-  template.
+  template. Parameterizable fields: - Labels - File uris - Job properties -
+  Job arguments - Script variables - Main class (in HadoopJob and SparkJob) -
+  Zone (in ClusterSelector)
 
   Fields:
-    description: Optional. User-friendly description of the parameter. Must
-      not exceed 1024 characters.
-    fields: Required. Paths to all fields that this parameter replaces. Each
-      field may appear in at most one Parameter's fields list.Field path
-      syntax:A field path is similar to a FieldMask. For example, a field path
-      that references the zone field of the template's cluster selector would
-      look like:placement.clusterSelector.zoneThe only differences between
-      field paths and standard field masks are that: Values in maps can be
-      referenced by key.Example: placement.clusterSelector.clusterLabels'key'
-      Jobs in the jobs list can be referenced by step id.Example: jobs'step-
-      id'.hadoopJob.mainJarFileUri Items in repeated fields can be referenced
-      by zero-based index.Example: jobs'step-id'.sparkJob.args0NOTE: Maps and
-      repeated fields may not be parameterized in their entirety. Only
-      individual map values and items in repeated fields may be referenced.
-      For example, the following field paths are invalid: -
-      placement.clusterSelector.clusterLabels - jobs'step-
-      id'.sparkJob.argsParameterizable fields:Only certain types of fields may
-      be parameterized, specifically: - Labels - File uris - Job properties -
-      Job arguments - Script variables - Main class (in HadoopJob and
-      SparkJob) - Zone (in ClusterSelector)Examples of parameterizable
-      fields:Labels:labels'key' placement.managedCluster.labels'key'
-      placement.clusterSelector.clusterLabels'key' jobs'step-
-      id'.labels'key'File uris:jobs'step-id'.hadoopJob.mainJarFileUri jobs
-      'step-id'.hiveJob.queryFileUri jobs'step-
-      id'.pySparkJob.mainPythonFileUri jobs'step-id'.hadoopJob.jarFileUris0
-      jobs'step-id'.hadoopJob.archiveUris0 jobs'step-id'.hadoopJob.fileUris0
-      jobs'step-id'.pySparkJob.pythonFileUris0Other:jobs'step-
-      id'.hadoopJob.properties'key' jobs'step-id'.hadoopJob.args0 jobs'step-
-      id'.hiveJob.scriptVariables'key' jobs'step-id'.hadoopJob.mainJarFileUri
-      placement.clusterSelector.zone
-    name: Required. User-friendly parameter name. This name is used as a key
-      when providing a value for this parameter when the template is
-      instantiated. Must contain only capital letters (A-Z), numbers (0-9),
-      and underscores (_), and must not start with a number. The maximum
-      length is 40 characters.
+    description: Optional. Brief description of the parameter. Must not exceed
+      1024 characters.
+    fields: Required. Paths to all fields that the parameter replaces. A field
+      is allowed to appear in at most one parameter's list of field paths.A
+      field path is similar in syntax to a google.protobuf.FieldMask. For
+      example, a field path that references the zone field of a workflow
+      template's cluster selector would be specified as
+      <code>placement.clusterSelector.zone</code>.Also, field paths can
+      reference fields using the following syntax: Values in maps can be
+      referenced by key. Examples<br> labels'key'
+      placement.clusterSelector.clusterLabels'key'
+      placement.managedCluster.labels'key'
+      placement.clusterSelector.clusterLabels'key' jobsstep-id.labels'key'
+      Jobs in the jobs list can be referenced by step-id. Examples:<br>
+      jobsstep-id.hadoopJob.mainJarFileUri jobsstep-id.hiveJob.queryFileUri
+      jobsstep-id.pySparkJob.mainPythonFileUri jobsstep-
+      id.hadoopJob.jarFileUris0 jobsstep-id.hadoopJob.archiveUris0 jobsstep-
+      id.hadoopJob.fileUris0 jobsstep-id.pySparkJob.pythonFileUris0 Items in
+      repeated fields can be referenced by a zero-based index. Example:<br>
+      jobsstep-id.sparkJob.args0 Other examples: jobsstep-
+      id.hadoopJob.properties'key' jobsstep-id.hadoopJob.args0 jobsstep-
+      id.hiveJob.scriptVariables'key' jobsstep-id.hadoopJob.mainJarFileUri
+      placement.clusterSelector.zoneIt may not be possible to parameterize
+      maps and repeated fields in their entirety since only individual map
+      values and individual items in repeated fields can be referenced. For
+      example, the following field paths are invalid:
+      placement.clusterSelector.clusterLabels jobsstep-id.sparkJob.args
+    name: Required. Parameter name. The parameter name is used as the key, and
+      paired with the parameter value, which are passed to the template when
+      the template is instantiated. The name must contain only capital letters
+      (A-Z), numbers (0-9), and underscores (_), and must not start with a
+      number. The maximum length is 40 characters.
     validation: Optional. Validation rules to be applied to this parameter's
       value.
   """
@@ -3008,7 +3129,7 @@ class ValueValidation(_messages.Message):
   r"""Validation based on a list of allowed values.
 
   Fields:
-    values: Required. List of allowed values for this parameter.
+    values: Required. List of allowed values for the parameter.
   """
 
   values = _messages.StringField(1, repeated=True)
@@ -3166,7 +3287,7 @@ class WorkflowTemplate(_messages.Message):
       https://cloud.google.com/apis/design/resource_names of the form
       projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
     parameters: Optional. Template parameters whose values are substituted
-      into the template. Values for these parameters must be provided when the
+      into the template. Values for parameters must be provided when the
       template is instantiated.
     placement: Required. WorkflowTemplate scheduling information.
     updateTime: Output only. The time template was last updated.

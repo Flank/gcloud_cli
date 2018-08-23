@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the addresses delete subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
@@ -128,12 +130,10 @@ class AddressesDeleteTest(test_base.BaseTest):
     self.AssertErrContains('region-1')
     self.AssertErrContains('region-2')
     self.AssertErrContains('region-3')
-    self.AssertErrContains(textwrap.dedent("""\
-        The following addresses will be deleted:
-         - [address-1] in [region-1]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following addresses will be deleted:\n'
+        r' - [address-1] in [region-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithYes(self):
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
@@ -166,14 +166,12 @@ class AddressesDeleteTest(test_base.BaseTest):
               project='my-project',
               region='us-central2'))],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following addresses will be deleted:
-         - [address-1] in [us-central2]
-         - [address-2] in [us-central2]
-         - [address-3] in [us-central2]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following addresses will be deleted:\n'
+        r' - [address-1] in [us-central2]\n'
+        r' - [address-2] in [us-central2]\n'
+        r' - [address-3] in [us-central2]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
@@ -187,14 +185,12 @@ class AddressesDeleteTest(test_base.BaseTest):
           """)
 
     self.CheckRequests()
-    self.AssertErrContains(textwrap.dedent("""\
-        The following addresses will be deleted:
-         - [address-1] in [us-central2]
-         - [address-2] in [us-central2]
-         - [address-3] in [us-central2]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following addresses will be deleted:\n'
+        r' - [address-1] in [us-central2]\n'
+        r' - [address-2] in [us-central2]\n'
+        r' - [address-3] in [us-central2]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
 
 class GlobalAddressesDeleteTest(test_base.BaseTest):
@@ -235,13 +231,11 @@ class GlobalAddressesDeleteTest(test_base.BaseTest):
               address='address-2',
               project='my-project'))],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following global addresses will be deleted:
-         - [address-1]
-         - [address-2]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following global addresses will be deleted:\n'
+        r' - [address-1]\n'
+        r' - [address-2]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testUriSupport(self):
     self.Run("""\
@@ -256,12 +250,10 @@ class GlobalAddressesDeleteTest(test_base.BaseTest):
               address='address-1',
               project='my-project'))],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following global addresses will be deleted:
-         - [address-1]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following global addresses will be deleted:\n'
+        r' - [address-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
 
 if __name__ == '__main__':

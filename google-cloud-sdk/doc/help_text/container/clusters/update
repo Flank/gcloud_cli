@@ -88,7 +88,7 @@ REQUIRED FLAGS
           basic auth password, keeping the existing username.
 
        --logging-service=LOGGING_SERVICE
-          The logging service to use for the cluster. Options are:
+          Logging service to use for the cluster. Options are:
           "logging.googleapis.com" (the Google Cloud Logging service), "none"
           (logs will not be exported from the cluster)
 
@@ -104,7 +104,7 @@ REQUIRED FLAGS
           use '--maintenance-window=None'
 
        --monitoring-service=MONITORING_SERVICE
-          The monitoring service to use for the cluster. Options are:
+          Monitoring service to use for the cluster. Options are:
           "monitoring.googleapis.com" (the Google Cloud Monitoring service),
           "none" (no metrics will be exported from the cluster)
 
@@ -226,10 +226,10 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS

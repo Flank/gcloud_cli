@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,21 @@
 """List builds command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.cloudbuild import filter_rewrite
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 
+DEPRECATED_WARNING_MESSAGE = """\
+This command is deprecated and will be removed on or after 2018-10-31. Please
+use `gcloud builds list` instead."""
 
+
+@base.Deprecate(is_removed=False, warning=DEPRECATED_WARNING_MESSAGE)
 class List(base.ListCommand):
   """List builds."""
 

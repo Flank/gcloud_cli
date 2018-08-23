@@ -5,8 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta dataproc workflow-templates set-cluster-selector
         (TEMPLATE : --region=REGION)
-        [--cluster-labels=KEY=VALUE,[KEY=VALUE,...]] [--zone=ZONE, -z ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--cluster-labels=KEY=VALUE,[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Set cluster selector for the workflow template.
@@ -38,12 +37,6 @@ POSITIONAL ARGUMENTS
 FLAGS
      --cluster-labels=KEY=VALUE,[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
-
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. If empty, and
-        --region is set to a value other than 'global', the server will pick a
-        zone in the region. Overrides the default compute/zone property value
-        for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +18,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
-
-import json
 
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -80,11 +79,11 @@ class AssertionTests(test_case.TestCase, parameterized.TestCase):
   ])
   def testAssertion(self, assertion, actual, matches):
     if matches:
-      with assertions.FailureCollector() as f:
+      with assertions.FailureCollector([]) as f:
         f.AddAll(assertion.Check(updates.Context.Empty(), actual))
     else:
       with self.assertRaises(assertions.Error):
-        with assertions.FailureCollector() as f:
+        with assertions.FailureCollector([]) as f:
           f.AddAll(assertion.Check(updates.Context.Empty(), actual))
 
   @parameterized.parameters([
@@ -138,26 +137,25 @@ class AssertionTests(test_case.TestCase, parameterized.TestCase):
             {'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}
         ]}
     }
-    actual_str = json.dumps(actual)
     if matches:
-      with assertions.FailureCollector() as f:
-        f.AddAll(assertion.Check(updates.Context.Empty(), actual_str))
+      with assertions.FailureCollector([]) as f:
+        f.AddAll(assertion.Check(updates.Context.Empty(), actual))
     else:
       with self.assertRaises(assertions.Error):
-        with assertions.FailureCollector() as f:
-          f.AddAll(assertion.Check(updates.Context.Empty(), actual_str))
+        with assertions.FailureCollector([]) as f:
+          f.AddAll(assertion.Check(updates.Context.Empty(), actual))
 
 
 class FailureCollectionTests(test_case.TestCase):
 
   def testBasic(self):
     # No errors is OK.
-    with assertions.FailureCollector():
+    with assertions.FailureCollector([]):
       pass
 
     # Error is an error
     with self.assertRaises(assertions.Error):
-      with assertions.FailureCollector() as f:
+      with assertions.FailureCollector([]) as f:
         f.Add(assertions.Failure.ForScalar(
             updates.Context.Empty(), 'expected', 'actual'))
 
@@ -166,12 +164,11 @@ class FailureCollectionTests(test_case.TestCase):
 
     # Fail if not in update mode.
     with self.assertRaises(assertions.Error):
-      with assertions.FailureCollector(update_modes=[]) as f:
+      with assertions.FailureCollector([]) as f:
         f.Add(assertions.Failure.ForScalar(context, 'expected', 'actual'))
 
     # Updates without failures
-    with assertions.FailureCollector(
-        update_modes=[updates.Mode.RESULT]) as f:
+    with assertions.FailureCollector([updates.Mode.RESULT]) as f:
       f.Add(assertions.Failure.ForScalar(context, 'expected', 'actual'))
 
 

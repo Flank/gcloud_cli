@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -379,7 +380,7 @@ class InstancesPatchGATest(_BaseInstancePatchTest, base.SqlMockTestGA):
   pass
 
 
-class InstancesPatchBetaTest(_BaseInstancePatchTest, base.SqlMockTestBeta):
+class _BaseInstancePatchBetaTest(_BaseInstancePatchTest):
 
   def testSetAutoIncreaseLimitToUnlimited(self):
     diff = {
@@ -594,6 +595,53 @@ class InstancesPatchBetaTest(_BaseInstancePatchTest, base.SqlMockTestBeta):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.Run('sql instances patch custom-instance '
                '--remove-labels=foo --clear-labels')
+
+
+class InstancesPatchBetaTest(_BaseInstancePatchBetaTest, base.SqlMockTestBeta):
+  pass
+
+
+class InstancesPatchAlphaTest(_BaseInstancePatchBetaTest,
+                              base.SqlMockTestAlpha):
+
+  def testAddPrivateNetwork(self):
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    diff = {
+        'name': 'patch-instance3',
+        'settings': {
+            'ipConfiguration':
+                self.messages.IpConfiguration(
+                    authorizedNetworks=[],
+                    ipv4Enabled=False,
+                    requireSsl=False,
+                    privateNetwork=None)
+        }
+    }
+    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+    diff.update({
+        'settings': {
+            'ipConfiguration':
+                self.messages.IpConfiguration(
+                    authorizedNetworks=[],
+                    ipv4Enabled=None,
+                    requireSsl=None,
+                    privateNetwork=('https://www.googleapis.com/compute/v1/'
+                                    'projects/fake-project/global/networks/'
+                                    'somenetwork'))
+        }
+    })
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
+    self.ExpectDoneUpdateOperationGet()
+    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+
+    self.Run('sql instances patch patch-instance3 --quiet '
+             '--network=somenetwork --diff')
+    self.assertEqual(prompt_mock.call_count, 0)
+    self.AssertErrContains(
+        '{"ipConfiguration": {"privateNetwork": "https://www.googleapis.com/'
+        'compute/v1/projects/fake-project/global/networks/somenetwork"}}')
+
 
 if __name__ == '__main__':
   test_case.main()

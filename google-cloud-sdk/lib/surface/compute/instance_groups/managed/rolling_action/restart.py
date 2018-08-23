@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Command for restarting instances of managed instance group."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
@@ -54,5 +57,8 @@ StartUpdate.detailed_help = {
         'Restarts instances in a managed instance group',
     'DESCRIPTION':
         """\
-        *{command}* restarts instances in a managed instance group."""
+        *{command}* restarts instances in a managed instance group, effectively
+        performing a stop and start request. Note, if your request
+        requires that the instance be replaced to pick up changes, a forced
+        `replace` will be performed instead."""
 }

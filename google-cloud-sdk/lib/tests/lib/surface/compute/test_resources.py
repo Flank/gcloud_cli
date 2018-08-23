@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Resources that are shared by two or more tests."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -35,6 +38,13 @@ _BACKEND_SERVICES_ALPHA_URI_PREFIX = (
 _BACKEND_SERVICES_BETA_URI_PREFIX = (
     _BETA_URI_PREFIX + 'global/backendServices/')
 
+_REGION_BACKEND_SERVICES_URI_PREFIX = (
+    _V1_URI_PREFIX + 'regions/us-west-1/backendServices/')
+_REGION_BACKEND_SERVICES_ALPHA_URI_PREFIX = (
+    _ALPHA_URI_PREFIX + 'regions/us-west-1/backendServices/')
+_REGION_BACKEND_SERVICES_BETA_URI_PREFIX = (
+    _BETA_URI_PREFIX + 'regions/us-west-1/backendServices/')
+
 _BACKEND_BUCKETS_URI_PREFIX = _V1_URI_PREFIX + 'global/backendBuckets/'
 _BACKEND_BUCKETS_ALPHA_URI_PREFIX = (
     _ALPHA_URI_PREFIX + 'global/backendBuckets/')
@@ -42,8 +52,14 @@ _BACKEND_BUCKETS_BETA_URI_PREFIX = (
     _BETA_URI_PREFIX + 'global/backendBuckets/')
 
 _URL_MAPS_URI_PREFIX = _V1_URI_PREFIX + 'global/urlMaps/'
-_URL_MAPS_ALPHA_URI_PREFIX = (_ALPHA_URI_PREFIX + 'global/urlMaps/')
+_URL_MAPS_ALPHA_URI_PREFIX = _ALPHA_URI_PREFIX + 'global/urlMaps/'
 _URL_MAPS_BETA_URI_PREFIX = (_BETA_URI_PREFIX + 'global/urlMaps/')
+
+_REGION_URL_MAPS_URI_PREFIX = _V1_URI_PREFIX + 'regions/us-west-1/urlMaps/'
+_REGION_URL_MAPS_ALPHA_URI_PREFIX = (
+    _ALPHA_URI_PREFIX + 'regions/us-west-1/urlMaps/')
+_REGION_URL_MAPS_BETA_URI_PREFIX = (
+    _BETA_URI_PREFIX + 'regions/us-west-1/urlMaps/')
 
 
 # TODO(b/35952682): Convert all the fixtures here to use this common method.
@@ -746,31 +762,20 @@ def MakeIamPolicy(msgs, etag, bindings=None):
     return msgs.Policy(etag=etag)
 
 
-def EmptyAlphaIamPolicy():
-  return MakeIamPolicy(alpha_messages, b'test')
+def EmptyIamPolicy(msgs):
+  return MakeIamPolicy(msgs, b'test')
 
 
-def AlphaIamPolicyWithOneBinding():
-  return MakeIamPolicy(alpha_messages, b'test',
-                       bindings=[alpha_messages.Binding(
+def IamPolicyWithOneBinding(msgs):
+  return MakeIamPolicy(msgs, b'test',
+                       bindings=[msgs.Binding(
                            role='owner',
                            members=['user:testuser@google.com'])])
 
 
-def AlphaIamPolicyWithOneBindingAndDifferentEtag():
-  return MakeIamPolicy(alpha_messages, b'etagTwo',
-                       bindings=[alpha_messages.Binding(
-                           role='owner',
-                           members=['user:testuser@google.com'])])
-
-
-def EmptyBetaIamPolicy():
-  return MakeIamPolicy(beta_messages, b'test')
-
-
-def BetaIamPolicyWithOneBindingAndDifferentEtag():
-  return MakeIamPolicy(beta_messages, b'etagTwo',
-                       bindings=[beta_messages.Binding(
+def IamPolicyWithOneBindingAndDifferentEtag(msgs):
+  return MakeIamPolicy(msgs, b'etagTwo',
+                       bindings=[msgs.Binding(
                            role='owner',
                            members=['user:testuser@google.com'])])
 
@@ -804,6 +809,7 @@ def MakeForwardingRules(msgs, api):
   ]
 
 
+FORWARDING_RULES_ALPHA = MakeForwardingRules(alpha_messages, 'alpha')
 FORWARDING_RULES_BETA = MakeForwardingRules(beta_messages, 'beta')
 FORWARDING_RULES_V1 = MakeForwardingRules(messages, 'v1')
 
@@ -833,6 +839,8 @@ def MakeGlobalForwardingRules(msgs, api):
   ]
 
 
+GLOBAL_FORWARDING_RULES_ALPHA = MakeGlobalForwardingRules(
+    alpha_messages, 'alpha')
 GLOBAL_FORWARDING_RULES_BETA = MakeGlobalForwardingRules(messages, 'beta')
 GLOBAL_FORWARDING_RULES_V1 = MakeGlobalForwardingRules(messages, 'v1')
 
@@ -940,7 +948,7 @@ def MakeHealthChecks(msgs, api):
                     'my-project/global/healthChecks/health-check-ssl'))]
 
 
-def MakeHealthCheckAlpha(msgs, api):
+def MakeHealthCheckBeta(msgs, api):
   prefix = _COMPUTE_PATH + '/' + api
   return [
       msgs.HealthCheck(
@@ -958,7 +966,7 @@ def MakeHealthCheckAlpha(msgs, api):
   ]
 
 HEALTH_CHECKS = MakeHealthChecks(messages, 'v1')
-HEALTH_CHECKS_ALPHA = MakeHealthCheckAlpha(alpha_messages, 'alpha')
+HEALTH_CHECKS_BETA = MakeHealthCheckBeta(beta_messages, 'beta')
 
 HTTP_HEALTH_CHECKS = [
     messages.HttpHealthCheck(
@@ -992,106 +1000,6 @@ def MakeHttpsHealthChecks(msgs, api):
           selfLink=(prefix + '/projects/my-project/'
                     'global/httpsHealthChecks/https-health-check-2'))]
 
-
-def MakeHosts(msgs, api):
-  """Creates a set of Host messages for the given API version.
-
-  Args:
-    msgs: The compute messages API handle.
-    api: The API version for which to create the instances.
-
-  Returns:
-    A list of message objects representing sole tenancy hosts.
-  """
-  prefix = _COMPUTE_PATH + '/' + api
-  return [
-      msgs.Host(
-          name='host-1',
-          description='Host 1',
-          hostType='n1-host-64-208',
-          instances=[
-              prefix + '/projects/my-project/zones/zone-1/'
-              'instances/instance-1',
-              prefix + '/projects/my-project/zones/zone-1/'
-              'instances/instance-2',
-          ],
-          status=msgs.Host.StatusValueValuesEnum.READY,
-          statusMessage='Host has room.',
-          selfLink=(prefix + '/projects/my-project/'
-                    'zones/zone-1/hosts/host-1'),
-          zone=(prefix + '/projects/my-project/zones/zone-1')),
-
-      msgs.Host(
-          name='host-2',
-          description='Host Two',
-          instances=[
-              prefix + '/projects/my-project/zones/zone-1/'
-              'instances/instance-3',
-          ],
-          status=msgs.Host.StatusValueValuesEnum.READY,
-          statusMessage='Host is full.',
-          selfLink=(prefix + '/projects/my-project/'
-                    'zones/zone-1/hosts/host-2'),
-          zone=(prefix + '/projects/my-project/zones/zone-1')),
-
-      msgs.Host(
-          name='host-3',
-          description='Host III',
-          status=msgs.Host.StatusValueValuesEnum.REPAIR,
-          statusMessage='Host is unavailable.',
-          selfLink=(prefix + '/projects/my-project/'
-                    'zones/zone-1/hosts/host-3'),
-          zone=(prefix + '/projects/my-project/zones/zone-1')),
-  ]
-
-HOSTS_ALPHA = MakeHosts(alpha_messages, 'alpha')
-HOSTS = HOSTS_ALPHA
-
-
-def MakeHostTypes(msgs, api):
-  """Creates a set of Host Type messages for the given API version.
-
-  Args:
-    msgs: The compute messages API handle.
-    api: The API version for which to create the instances.
-
-  Returns:
-    A list of message objects representing sole tenancy host types.
-  """
-  prefix = _COMPUTE_PATH + '/' + api
-  return [
-      msgs.HostType(
-          cpuPlatform='80286',
-          creationTimestamp='1982-02-01T10:00:00.0Z',
-          deprecated=msgs.DeprecationStatus(
-              state=msgs.DeprecationStatus.StateValueValuesEnum.OBSOLETE),
-          description='oldie but goodie',
-          guestCpus=1,
-          id=159265359,
-          kind='compute#hostType',
-          localSsdGb=0,
-          memoryMb=256,
-          name='iAPX-286',
-          selfLink=(prefix + '/projects/my-project/'
-                    'zones/zone-1/hostTypes/iAPX-286'),
-          zone='zone-1'),
-      msgs.HostType(
-          cpuPlatform='broadwell',
-          creationTimestamp='2014-12-12T10:00:00.0Z',
-          description='',
-          guestCpus=64,
-          id=159265360,
-          kind='compute#hostType',
-          localSsdGb=46,
-          memoryMb=416000,
-          name='n1-host-64-416',
-          selfLink=(prefix + '/projects/my-project/'
-                    'zones/zone-1/hostTypes/n1-host-64-416'),
-          zone='zone-1'),
-  ]
-
-HOST_TYPES_ALPHA = MakeHostTypes(alpha_messages, 'alpha')
-HOST_TYPES = HOST_TYPES_ALPHA
 
 HTTPS_HEALTH_CHECKS_V1 = MakeHttpsHealthChecks(messages, 'v1')
 HTTPS_HEALTH_CHECKS_BETA = MakeHttpsHealthChecks(beta_messages, 'beta')
@@ -1494,9 +1402,14 @@ MACHINE_TYPES = [
 ]
 
 
-def MakeInstanceGroupManagersWithActions(
-    api, scope_type, scope_name, current_actions=None, pending_actions=None):
-  """Creates instance group manages with actions tests resources."""
+def MakeInstanceGroupManagersWithCurrentActions(
+    api,
+    current_actions_count,
+    scope_type='zone',
+    scope_name='zone-1',
+    current_actions_state='creating',
+    is_stable=None):
+  """Creates instance group manages with current actions tests resources."""
   used_messages = _GetMessagesForApi(api)
   igm = used_messages.InstanceGroupManager(
       name='group-1',
@@ -1517,41 +1430,19 @@ def MakeInstanceGroupManagersWithActions(
                         .format(api)),
       targetPools=[],
       targetSize=1)
-  if current_actions:
-    igm.currentActions = current_actions
-  if pending_actions:
-    igm.pendingActions = pending_actions
+  igm.currentActions = used_messages.InstanceGroupManagerActionsSummary(
+      **{
+          current_actions_state: current_actions_count,
+          'none': (10 - current_actions_count)
+      })
+
+  if is_stable is not None:
+    igm.status = used_messages.InstanceGroupManagerStatus(isStable=is_stable)
 
   setattr(igm, scope_type,
           'https://www.googleapis.com/compute/{0}/projects/my-project/{1}/{2}'
           .format(api, scope_type + 's', scope_name))
   return igm
-
-
-def MakeInstanceGroupManagersWithCurrentActions(
-    api, current_actions_count, scope_type='zone', scope_name='zone-1',
-    current_actions_state='creating'):
-  """Creates instance group manages with current actions tests resources."""
-  used_messages = _GetMessagesForApi(api)
-  current_actions = used_messages.InstanceGroupManagerActionsSummary(
-      **{current_actions_state: current_actions_count,
-         'none': (10 - current_actions_count)})
-  return MakeInstanceGroupManagersWithActions(
-      api, scope_type, scope_name, current_actions=current_actions)
-
-
-def MakeInstanceGroupManagersWithPendingActions(
-    api, pending_actions_count, current_actions_count=0, scope_type='zone',
-    scope_name='zone-1', pending_actions_state='creating',
-    current_actions_state='creating'):
-  """Creates instance group manages with pending actions tests resources."""
-  used_messages = _GetMessagesForApi(api)
-  pending_actions = used_messages.InstanceGroupManagerPendingActionsSummary(
-      **{pending_actions_state: pending_actions_count})
-  current_actions = used_messages.InstanceGroupManagerActionsSummary(
-      **{current_actions_state: current_actions_count})
-  return MakeInstanceGroupManagersWithActions(
-      api, scope_type, scope_name, current_actions, pending_actions)
 
 
 def MakeInstanceGroupManagers(api, scope_name='zone-1', scope_type='zone'):
@@ -1825,6 +1716,32 @@ NETWORK_PEERINGS_V1 = [
 ]
 
 
+def MakeNodesInNodeGroup(msgs, api):
+  prefix = '{0}/{1}/'.format(_COMPUTE_PATH, api)
+  return [
+      msgs.NodeGroupNode(
+          name='node-1',
+          status=msgs.NodeGroupNode.StatusValueValuesEnum.READY,
+          instances=[
+              prefix + '/projects/my-project/zones/zone-1/'
+              'instances/instance-1',
+              prefix + '/projects/my-project/zones/zone-1/'
+              'instances/instance-2'
+          ],
+          nodeType=prefix +
+          '/projects/my-project/zones/zone-1/nodeTypes/iAPX-286'),
+      msgs.NodeGroupNode(
+          name='node-2',
+          status=msgs.NodeGroupNode.StatusValueValuesEnum.READY,
+          instances=[
+              prefix + '/projects/my-project/zones/zone-1/'
+              'instances/instance-3'
+          ],
+          nodeType=prefix +
+          '/projects/my-project/zones/zone-1/nodeTypes/iAPX-286')
+  ]
+
+
 def MakeNodeGroups(msgs, api):
   """Creates a set of Node Group messages for the given API version.
 
@@ -1844,24 +1761,7 @@ def MakeNodeGroups(msgs, api):
           name='group-1',
           nodeTemplate=(prefix + '/projects/my-project/'
                         'regions/region-1/nodeTemplates/template-1'),
-          nodes=[
-              msgs.NodeGroupNode(
-                  name='node-1',
-                  instances=[
-                      prefix + '/projects/my-project/zones/zone-1/'
-                      'instances/instance-1',
-                      prefix + '/projects/my-project/zones/zone-1/'
-                      'instances/instance-2'
-                  ],
-                  nodeType='iAPX-286'),
-              msgs.NodeGroupNode(
-                  name='node-2',
-                  instances=[
-                      prefix + '/projects/my-project/zones/zone-1/'
-                      'instances/instance-3'
-                  ],
-                  nodeType='iAPX-286')
-          ],
+          size=2,
           selfLink=(prefix + '/projects/my-project/'
                     'zones/zone-1/nodeGroups/group-1'),
           zone='zone-1'),
@@ -1872,25 +1772,14 @@ def MakeNodeGroups(msgs, api):
           name='group-2',
           nodeTemplate=(prefix + '/projects/my-project/'
                         'regions/region-1/nodeTemplates/template-2'),
-          nodes=[
-              msgs.NodeGroupNode(
-                  name='node-123',
-                  instances=[
-                      prefix + '/projects/my-project/zones/zone-1/'
-                      'instances/instance-4',
-                      prefix + '/projects/my-project/zones/zone-1/'
-                      'instances/instance-5'
-                  ],
-                  nodeType='n1-node-96-624')
-          ],
           selfLink=(prefix + '/projects/my-project/'
                     'zones/zone-1/nodeGroups/group-2'),
+          size=1,
           zone='zone-1'),
   ]
 
 
-NODE_GROUPS_BETA = MakeNodeGroups(beta_messages, 'beta')
-NODE_GROUPS = NODE_GROUPS_BETA
+NODE_GROUPS = MakeNodeGroups(messages, 'v1')
 
 
 def MakeNodeTemplates(msgs, api):
@@ -1943,8 +1832,7 @@ def MakeNodeTemplates(msgs, api):
   ]
 
 
-NODE_TEMPLATES_BETA = MakeNodeTemplates(beta_messages, 'beta')
-NODE_TEMPLATES = NODE_TEMPLATES_BETA
+NODE_TEMPLATES = MakeNodeTemplates(messages, 'v1')
 
 
 def MakeNodeTypes(msgs, api):
@@ -1990,8 +1878,7 @@ def MakeNodeTypes(msgs, api):
   ]
 
 
-NODE_TYPES_BETA = MakeNodeTypes(beta_messages, 'beta')
-NODE_TYPES = NODE_TYPES_BETA
+NODE_TYPES = MakeNodeTypes(messages, 'v1')
 
 
 def MakeNetworkEndpointGroups(msgs, api):
@@ -2006,7 +1893,6 @@ def MakeNetworkEndpointGroups(msgs, api):
   """
   prefix = _COMPUTE_PATH + '/' + api
   neg_type_enum = msgs.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum
-  type_enum = msgs.NetworkEndpointGroup.TypeValueValuesEnum
   return [
       msgs.NetworkEndpointGroup(
           description='My NEG 1',
@@ -2019,8 +1905,7 @@ def MakeNetworkEndpointGroups(msgs, api):
           networkEndpointType=neg_type_enum.GCE_VM_IP_PORT,
           selfLink=(prefix + '/projects/my-project/zones/zone-1/'
                     'networkEndpointGroups/my-neg1'),
-          size=5,
-          type=type_enum.LOAD_BALANCING),
+          size=5),
       msgs.NetworkEndpointGroup(
           description='My NEG Too',
           kind='compute#networkEndpointGroup',
@@ -2032,14 +1917,12 @@ def MakeNetworkEndpointGroups(msgs, api):
           networkEndpointType=neg_type_enum.GCE_VM_IP_PORT,
           selfLink=(prefix + '/projects/my-project/zones/zone-2/'
                     'networkEndpointGroups/my-neg2'),
-          size=2,
-          type=type_enum.LOAD_BALANCING),
+          size=2),
   ]
 
 
-NETWORK_ENDPOINT_GROUPS_ALPHA = MakeNetworkEndpointGroups(alpha_messages,
-                                                          'alpha')
-NETWORK_ENDPOINT_GROUPS = NETWORK_ENDPOINT_GROUPS_ALPHA
+NETWORK_ENDPOINT_GROUPS_BETA = MakeNetworkEndpointGroups(beta_messages, 'beta')
+NETWORK_ENDPOINT_GROUPS = NETWORK_ENDPOINT_GROUPS_BETA
 
 
 def MakeOsloginClient(version, use_extended_profile=False):
@@ -2521,6 +2404,7 @@ ALPHA_SSL_CERTIFICATES = [
                 v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
                 -----END CERTIFICATE-----"""))),
         creationTimestamp='2017-12-18T11:11:11.000-07:00',
+        expireTime='2018-12-18T11:11:11.000-07:00',
         description='Self-managed certificate.',
         selfLink=_ALPHA_URI_PREFIX + 'global/sslCertificates/ssl-cert-1',
     ),
@@ -2557,6 +2441,7 @@ ALPHA_SSL_CERTIFICATES = [
                     ),
                 ])),
         creationTimestamp='2017-12-17T10:00:00.000-07:00',
+        expireTime='2018-12-17T10:00:00.000-07:00',
         description='Managed certificate.',
         selfLink=_ALPHA_URI_PREFIX +
         'global/sslCertificates/ssl-cert-2',
@@ -2789,20 +2674,26 @@ TARGET_VPN_GATEWAYS_BETA = MakeTargetVpnGateways(beta_messages, 'beta')
 TARGET_VPN_GATEWAYS_V1 = MakeTargetVpnGateways(beta_messages, 'v1')
 
 
-def MakeUrlMaps(msgs, api):
+def MakeUrlMaps(msgs, api, regional):
   """Create url map resources."""
-  if api == 'alpha':
-    backend_services_prefix = _BACKEND_SERVICES_ALPHA_URI_PREFIX
-    backend_buckets_prefix = _BACKEND_BUCKETS_ALPHA_URI_PREFIX
-    url_maps_prefix = _URL_MAPS_ALPHA_URI_PREFIX
-  elif api == 'beta':
-    backend_services_prefix = _BACKEND_SERVICES_BETA_URI_PREFIX
-    backend_buckets_prefix = _BACKEND_BUCKETS_BETA_URI_PREFIX
-    url_maps_prefix = _URL_MAPS_BETA_URI_PREFIX
-  elif api == 'v1':
-    backend_services_prefix = _BACKEND_SERVICES_URI_PREFIX
-    backend_buckets_prefix = _BACKEND_BUCKETS_URI_PREFIX
-    url_maps_prefix = _URL_MAPS_URI_PREFIX
+  (backend_services_prefix, backend_buckets_prefix, url_maps_prefix) = {
+      ('alpha',
+       False): (_BACKEND_SERVICES_ALPHA_URI_PREFIX,
+                _BACKEND_BUCKETS_ALPHA_URI_PREFIX, _URL_MAPS_ALPHA_URI_PREFIX),
+      ('alpha', True): (_REGION_BACKEND_SERVICES_ALPHA_URI_PREFIX,
+                        _BACKEND_BUCKETS_ALPHA_URI_PREFIX,
+                        _REGION_URL_MAPS_ALPHA_URI_PREFIX),
+      ('beta',
+       False): (_BACKEND_SERVICES_BETA_URI_PREFIX,
+                _BACKEND_BUCKETS_BETA_URI_PREFIX, _URL_MAPS_BETA_URI_PREFIX),
+      ('beta', True): (_REGION_BACKEND_SERVICES_BETA_URI_PREFIX,
+                       _BACKEND_BUCKETS_BETA_URI_PREFIX,
+                       _REGION_URL_MAPS_BETA_URI_PREFIX),
+      ('v1', False): (_BACKEND_SERVICES_URI_PREFIX, _BACKEND_BUCKETS_URI_PREFIX,
+                      _URL_MAPS_URI_PREFIX),
+      ('v1', True): (_REGION_BACKEND_SERVICES_URI_PREFIX,
+                     _BACKEND_BUCKETS_URI_PREFIX, _REGION_URL_MAPS_URI_PREFIX)
+  }[(api, regional)]
 
   url_maps = [
       msgs.UrlMap(
@@ -2900,9 +2791,13 @@ def MakeUrlMaps(msgs, api):
 
   return url_maps
 
-URL_MAPS_ALPHA = MakeUrlMaps(messages, 'alpha')
-URL_MAPS_BETA = MakeUrlMaps(messages, 'beta')
-URL_MAPS = MakeUrlMaps(messages, 'v1')
+
+URL_MAPS_ALPHA = MakeUrlMaps(messages, 'alpha', regional=False)
+URL_MAPS_BETA = MakeUrlMaps(messages, 'beta', regional=False)
+URL_MAPS = MakeUrlMaps(messages, 'v1', regional=False)
+REGION_URL_MAPS_ALPHA = MakeUrlMaps(messages, 'alpha', regional=True)
+REGION_URL_MAPS_BETA = MakeUrlMaps(messages, 'beta', regional=True)
+REGION_URL_MAPS = MakeUrlMaps(messages, 'v1', regional=True)
 
 
 def MakeVpnTunnels(msgs, api):

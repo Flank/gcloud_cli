@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the ML Predict library."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 
 from googlecloudsdk.api_lib.ml_engine import predict
@@ -163,6 +166,23 @@ class PredictTestBase(object):
     with self.assertRaisesRegex(core_exceptions.Error,
                                 'Instances cannot be JSON encoded'):
       predict.Predict(self.version_ref, [b'\x89PNG'])
+
+  def testPredictionSignatureName(self):
+    self.mock_http.request.return_value = [self.http_response, self.http_body]
+
+    result = predict.Predict(self.version_ref, ['2, 3'],
+                             signature_name='my-custom-signature')
+
+    url = (self._BASE_URL + 'projects/fake-project/'
+           'models/my_model/versions/v1:predict')
+    method = 'POST'
+    headers = {'Content-Type': 'application/json'}
+
+    self.mock_http.request.assert_called_once_with(
+        uri=url, method=method,
+        body='{"instances": ["2, 3"], "signature_name": "my-custom-signature"}',
+        headers=headers)
+    self.assertEqual(json.loads(self.http_body), result)
 
 
 class PredictGaTest(PredictTestBase, base.MlGaPlatformTestBase):

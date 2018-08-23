@@ -21,6 +21,9 @@ COMMANDS
      list
         List the proto messages for an API.
 
+     list-export-schema
+        List a YAML export schema for a message in a given API.
+
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice.

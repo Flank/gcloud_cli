@@ -8,7 +8,7 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Lists environments that not have been successfully deleted. Prints a
+    (BETA) List environments that not have been successfully deleted. Prints a
     table with the following columns:
       o name
       o location
@@ -31,13 +31,13 @@ FLAGS
 LIST COMMAND FLAGS
      --filter=EXPRESSION
         Apply a Boolean filter EXPRESSION to each resource item to be listed.
-        If the expression evaluates True then that item is listed. For more
-        details and examples of filter expressions run $ gcloud topic filters.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
         This flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
      --limit=LIMIT
-        The maximum number of resources to list. The default is unlimited. This
+        Maximum number of resources to list. The default is unlimited. This
         flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
@@ -49,7 +49,7 @@ LIST COMMAND FLAGS
         and --limit depending on the service.
 
      --sort-by=[FIELD,...]
-        A comma-separated list of resource field key names to sort by. The
+        Comma-separated list of resource field key names to sort by. The
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
@@ -63,5 +63,8 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud composer environments list
 

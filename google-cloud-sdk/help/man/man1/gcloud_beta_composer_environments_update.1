@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta composer environments update \- updates properties of an environment
+gcloud beta composer environments update \- update properties of a Cloud Composer environment
 
 
 
@@ -17,7 +17,7 @@ gcloud beta composer environments update \- updates properties of an environment
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Updates properties of an environment.
+\fB(BETA)\fR Update properties of a Cloud Composer environment.
 
 
 
@@ -42,7 +42,7 @@ are specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the environment.
+Compute Engine region in which to create the environment.
 
 
 .RE
@@ -245,5 +245,10 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud composer environments update
+.RE
 

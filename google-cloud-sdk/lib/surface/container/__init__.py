@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """The main command group for cloud container."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.calliope import actions
@@ -91,11 +94,7 @@ class ContainerBeta(Container):
       The refined command context.
     """
     base.DisableUserProjectQuota()
-    if container_command_util.GetUseV1APIProperty():
-      api_version = 'v1'
-    else:
-      api_version = 'v1beta1'
-    context['api_adapter'] = api_adapter.NewAPIAdapter(api_version)
+    context['api_adapter'] = api_adapter.NewAPIAdapter('v1beta1')
     return context
 
 
@@ -116,9 +115,5 @@ class ContainerAlpha(Container):
       The refined command context.
     """
     base.DisableUserProjectQuota()
-    if container_command_util.GetUseV1APIProperty():
-      api_version = 'v1'
-    else:
-      api_version = 'v1alpha1'
-    context['api_adapter'] = api_adapter.NewAPIAdapter(api_version)
+    context['api_adapter'] = api_adapter.NewAPIAdapter('v1alpha1')
     return context

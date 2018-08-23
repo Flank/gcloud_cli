@@ -17,12 +17,18 @@ gcloud compute disks snapshot \- create snapshots of Google Compute Engine persi
 
 .SH "DESCRIPTION"
 
-Create snapshots of Google Compute Engine persistent disks.
-
 \fBgcloud compute disks snapshot\fR creates snapshots of persistent disks.
-Snapshots are useful for backing up data or copying a persistent disk. Once
-created, snapshots may be managed (listed, deleted, etc.) via \f5\fIgcloud
-compute snapshots\fR\fR.
+Snapshots are useful for backing up data, copying a persistent disk, and even,
+creating a custom image. Snapshots can be created from persistent disks even
+while they are attached to running instances. Once created, snapshots may be
+managed (listed, deleted, resized etc.) via \f5gcloud compute snapshots\fR.
+
+For best practices regarding managing snapshots, refer to this guide:
+https://cloud.google.com/compute/docs/disks/create\-snapshots#best_practices.
+
+gcloud compute disks snapshot waits until the operation returns a status of
+\f5READY\fR or \f5FAILED\fR, or reaches the maximum timeout, and returns the
+last known details of the snapshot.
 
 
 
@@ -57,7 +63,7 @@ more details.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
-An optional, textual description for the snapshots being created.
+Text to describe the snapshots being created.
 
 .TP 2m
 \fB\-\-guest\-flush\fR
@@ -67,22 +73,21 @@ Shadow Copy Service (VSS).
 
 .TP 2m
 \fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]
-Names to assign to the snapshots. Without this option, the name of each snapshot
-will be a random, 16\-character hexadecimal number that starts with a letter.
-The values of this option run parallel to the disks specified. For example,
+Names to assign to the created snapshots. Without this option, the name of each
+snapshot will be a random 16\-character hexadecimal number that starts with a
+letter. The values of this option run parallel to the disks specified. For
+example,
 
 .RS 2m
-$ gcloud compute disks snapshot my\-disk\-1 my\-disk\-2 my\-disk\-3 \e
-    \-\-snapshot\-names snapshot\-1,snapshot\-2,snapshot\-3
+gcloud compute disks snapshot my\-disk\-1 my\-disk\-2 my\-disk\-3 \-\-snapshot\-names snapshot\-1,snapshot\-2,snapshot\-3
 .RE
 
-will result in \f5\fImy\-disk\-1\fR\fR being snapshotted as
-\f5\fIsnapshot\-1\fR\fR, \f5\fImy\-disk\-2\fR\fR as \f5\fIsnapshot\-2\fR\fR, and
-so on.
+will result in \f5my\-disk\-1\fR being snapshotted as \f5snapshot\-1\fR,
+\f5my\-disk\-2\fR as \f5snapshot\-2\fR, and so on.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-The zone of the disks to operate on. If not specified and the
+Zone of the disks to operate on. If not specified and the
 \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
 zone.
 
@@ -118,6 +123,19 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a snapshot named \f5snapshot\-test\fR of a persistent disk named
+\f5test\fR in zone \f5us\-central1\-a\fR, run:
+
+.RS 2m
+$ gcloud compute disks snapshot test \-\-zone=us\-central1\-a \e
+    \-\-snapshot\-names=snapshot\-test \e
+    \-\-description="This is an example snapshot"
+.RE
 
 
 

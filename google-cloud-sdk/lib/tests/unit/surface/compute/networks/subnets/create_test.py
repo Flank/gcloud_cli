@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,8 @@
 # limitations under the License.
 """Tests for the instances move subcommand."""
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
@@ -95,14 +96,9 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
               region='region-2'))],
     )
 
-    self.AssertErrContains(textwrap.dedent("""\
-        For the following subnetwork:
-         - [my-subnet]
-        choose a region:
-         [1] region-1 (DEPRECATED)
-         [2] region-2
-         [3] region-3
-        Please enter your numeric choice:  \n"""))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains(
+        '"choices": ["region-1 (DEPRECATED)", "region-2", "region-3"]')
 
   def testCreateWithGoogleAccessEnabled(self):
     """Test creating a subnet with privateIpGoogleAccess enabled."""
@@ -232,11 +228,89 @@ class SubnetsCreateTestBeta(SubnetsCreateTest):
     self.SelectApi('beta')
 
 
-class SubnetsCreateTestAlpha(SubnetsCreateTestBeta):
+class SubnetsCreateTestAlpha(SubnetsCreateTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
+
+  def testCreateWithFlowLogsAggregationAndSampling(self):
+    """Test creating a subnet with enableFlowLogs in various states."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1 --enable-flow-logs
+        --aggregation-interval interval-10-min --flow-sampling 0.7
+        --metadata exclude-all-metadata
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  enableFlowLogs=True,
+                  aggregationInterval=(
+                      self.messages.Subnetwork.
+                      AggregationIntervalValueValuesEnum.INTERVAL_10_MIN),
+                  flowSampling=0.7,
+                  metadata=(self.messages.Subnetwork.MetadataValueValuesEnum.
+                            EXCLUDE_ALL_METADATA)),
+              region='us-central1',
+              project='my-project'))],)
+
+
+class SubnetsCreateInternalHttpsLoadBalancerTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+
+  def testCreateWithPurposeAndRole(self):
+    """Test creating a subnet with privateIpGoogleAccess disabled."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1
+        --purpose internal-https-load-balancer --role active
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  purpose=self.messages.Subnetwork.PurposeValueValuesEnum.
+                  INTERNAL_HTTPS_LOAD_BALANCER,
+                  role=self.messages.Subnetwork.RoleValueValuesEnum.ACTIVE),
+              region='us-central1',
+              project='my-project'))],)
+
+  def testCreateWithPurposeAndNoRole(self):
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1
+        --purpose private-rfc-1918
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  purpose=self.messages.Subnetwork.PurposeValueValuesEnum.
+                  PRIVATE_RFC_1918),
+              region='us-central1',
+              project='my-project'))],)
 
 
 if __name__ == '__main__':

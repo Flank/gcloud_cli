@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import re
 import tempfile
@@ -93,7 +96,7 @@ class StagerRegistryTest(sdk_test_base.WithLogCapture):
     for key, value in expected.items():
       self.assertEqual(registry.Get(*key), value)
 
-  def testRegistry_GoRegexp(self):
+  def testRegistry_FlexGoRegexp(self):
     """Tests that the regexp for the Go staging entry does the right thing."""
     registry = staging.GetRegistry()
 
@@ -112,6 +115,41 @@ class StagerRegistryTest(sdk_test_base.WithLogCapture):
     Good('go1.9')
     Good('go1.10')
     Good('go1.abc')
+    Bad('go1')
+    Bad('go2')
+    Bad('go2.')
+    Bad('go10')
+    Bad('go1.')
+    Bad('something-ends-with-go1.8')
+    Bad('gs://my-bucket/go1.8')
+
+  def testRegistry_StandardGoRegexp(self):
+    """Tests that the regexp for the Go staging entry does the right thing."""
+    registry = staging.GetRegistry()
+
+    def Good(runtime):
+      command = registry.Get(runtime, env.STANDARD)
+      self.assertFalse(
+          isinstance(command, staging.NoopCommand),
+          '\'%s\' should be valid' % runtime)
+    def Bad(runtime):
+      command = registry.Get(runtime, env.STANDARD)
+      self.assertTrue(
+          isinstance(command, staging.NoopCommand),
+          '\'%s\' should be invalid' % runtime)
+
+    Good('go')
+    Good('go1.7')
+    Good('go1.8')
+    Good('go1.8.9')
+    Good('go1.8a')
+    Good('go1.9')
+    Good('go1.10')
+    Good('go1.abc')
+    Good('go110')
+    Good('go111')
+    Good('go111beta1')
+    Good('go111rc2')
     Bad('go1')
     Bad('go2')
     Bad('go2.')

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the firewall-rules create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import firewalls_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
@@ -469,16 +472,6 @@ class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
         disabled=False,
         sourceRanges=[])
 
-
-class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
-
-  def SetUp(self):
-    self.api_version = 'alpha'
-    self.SelectApi(self.api_version)
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-
   def testEnableLogging(self):
     self.Run("""
         compute firewall-rules create firewall-1
@@ -494,6 +487,16 @@ class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
         enableLogging=True,
         direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
         sourceRanges=[])
+
+
+class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
+
+  def SetUp(self):
+    self.api_version = 'alpha'
+    self.SelectApi(self.api_version)
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
 
   def testDefaultOptions(self):
     self.make_requests.side_effect = [[

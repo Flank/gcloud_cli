@@ -113,7 +113,7 @@ OPTIONAL FLAGS
     UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -135,7 +135,7 @@ OPTIONAL FLAGS
         to disable.
 
      --source-disk-zone=SOURCE_DISK_ZONE
-        The zone of the source disk to operate on. If not specified and the
+        Zone of the source disk to operate on. If not specified and the
         compute/zone property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the

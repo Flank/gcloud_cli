@@ -29,7 +29,8 @@ COMMANDS
         List pending Cloud Datastore admin operations and their status.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha datastore operations
         $ gcloud beta datastore operations
 

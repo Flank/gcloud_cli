@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +16,10 @@
 """Tests that ensure setting an IAM policy works properly."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import base64
-import textwrap
 
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
@@ -27,10 +28,10 @@ from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
 
-_ETAG_CONFIRM_PROMPT = textwrap.dedent("""\
-    The specified policy does not contain an "etag" field identifying a specific version to replace. Changing a policy without an "etag" can overwrite concurrent policy changes.
-
-    Replace existing policy (Y/n)? """)
+_ETAG_CONFIRM_PROMPT = (r'The specified policy does not contain an \"etag\" '
+                        r'field identifying a specific version to replace. '
+                        r'Changing a policy without an \"etag\" can overwrite '
+                        r'concurrent policy changes.')
 
 
 class SetIamPolicy(unit_test_base.BaseTest):

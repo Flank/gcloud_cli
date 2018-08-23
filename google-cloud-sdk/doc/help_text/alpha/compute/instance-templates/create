@@ -24,6 +24,10 @@ SYNOPSIS
         [--source-instance=SOURCE_INSTANCE]
         [--source-instance-zone=SOURCE_INSTANCE_ZONE] [--subnet=SUBNET]
         [--tags=TAG,[TAG,...]] [--address=ADDRESS | --no-address]
+        [--boot-disk-kms-key=BOOT_DISK_KMS_KEY
+          : --boot-disk-kms-keyring=BOOT_DISK_KMS_KEYRING
+          --boot-disk-kms-location=BOOT_DISK_KMS_LOCATION
+          --boot-disk-kms-project=BOOT_DISK_KMS_PROJECT]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
           : --custom-extensions]
         [--image-project=IMAGE_PROJECT --image=IMAGE
@@ -81,7 +85,8 @@ FLAGS
         unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB for
         terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB.
+        multiple of 1 GB. Limit your boot disk size to 2TB to account for MBR
+        partition table limitations.
 
      --boot-disk-type=BOOT_DISK_TYPE
         The type of the boot disk. This option can only be specified if a new
@@ -178,6 +183,40 @@ FLAGS
             the instance, this option won't apply. The default value for this
             is no.
 
+         kms-key
+            Fully qualified Cloud KMS cryptokey name that will protect the
+            disk. This can either be the fully qualified path or the name. The
+            fully qualified Cloud KMS cryptokey name format is:
+            projects/<kms-project>/locations/<kms-location>/keyRings/<kms-keyring>/
+            cryptoKeys/<key-name>. If the value is not fully qualified then
+            kms-location, kms-keyring, and optionally kms-project are required.
+            See
+            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+            for more details.
+
+         kms-project
+            Project that contains the Cloud KMS cryptokey that will protect the
+            disk. If the project is not specified then the project where the
+            disk is being created will be used. If this flag is set then
+            key-location, kms-keyring, and kms-key are required. See
+            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+            for more details.
+
+         kms-location
+            Location of the Cloud KMS cryptokey to be used for protecting the
+            disk. All Cloud KMS cryptokeys are reside in a 'location'. To get a
+            list of possible locations run 'gcloud kms locations list'. If this
+            flag is set then kms-keyring and kms-key are required. See
+            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+            for more details.
+
+         kms-keyring
+            The keyring which contains the Cloud KMS cryptokey that will
+            protect the disk. If this flag is set then kms-location and kms-key
+            are required. See
+            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+            for more details.
+
      --description=DESCRIPTION
         Specifies a textual description for the instance template.
 
@@ -214,7 +253,7 @@ FLAGS
             is no.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -356,7 +395,7 @@ FLAGS
         instances can not be restarted and will not migrate.
 
      --region=REGION
-        The region of the subnetwork to attach. If not specified, you may be
+        Region of the subnetwork to attach. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
@@ -403,8 +442,8 @@ FLAGS
         ignored and values from the source instance will be used instead.
 
      --source-instance-zone=SOURCE_INSTANCE_ZONE
-        The zone of the instance to operate on. Overrides the default
-        compute/zone property value for this command invocation.
+        Zone of the instance to operate on. Overrides the default compute/zone
+        property value for this command invocation.
 
      --subnet=SUBNET
         Specifies the subnet that the instances will be part of. If --network
@@ -435,6 +474,24 @@ FLAGS
        --no-address
           If provided, the instances will not be assigned external IP
           addresses.
+
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the disk. The arguments in this group can be used to
+     specify the attributes of this resource.
+
+       --boot-disk-kms-key=BOOT_DISK_KMS_KEY
+          The ID of the key or a fully qualified identifier for the key. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
+
+       --boot-disk-kms-keyring=BOOT_DISK_KMS_KEYRING
+          The KMS keyring of the key.
+
+       --boot-disk-kms-location=BOOT_DISK_KMS_LOCATION
+          The Cloud location for the key.
+
+       --boot-disk-kms-project=BOOT_DISK_KMS_PROJECT
+          The Cloud project for the key.
 
      Custom machine type extensions.
 
@@ -639,11 +696,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute instance-templates create
         $ gcloud beta compute instance-templates create

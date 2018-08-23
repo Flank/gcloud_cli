@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for `gcloud tasks create`."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from apitools.base.py import encoding
@@ -73,7 +76,7 @@ class CreatePullTaskTest(CreateTestBase):
         response=expected_task)
 
     actual_task = self.Run('tasks create-pull-task --queue my-queue '
-                           '--id my-task --schedule-time={} --tag=tag '
+                           'my-task --schedule-time={} --tag=tag '
                            '--payload-content=payload'.format(
                                self.schedule_time))
 
@@ -100,10 +103,9 @@ class CreatePullTaskTest(CreateTestBase):
         response=expected_task)
 
     actual_task = self.Run('tasks create-pull-task --queue my-queue '
-                           '--id my-task --schedule-time={} --tag=tag '
+                           'my-task --schedule-time={} --tag=tag '
                            '--payload-content=payload '
-                           '--location=us-central2'.format(
-                               self.schedule_time))
+                           '--location=us-central2'.format(self.schedule_time))
 
     self.assertEqual(actual_task, expected_task)
 
@@ -122,7 +124,7 @@ class CreatePullTaskTest(CreateTestBase):
       self.Touch(tmp_dir, 'payload.txt', contents='payload')
       payload_file = os.path.join(tmp_dir, 'payload.txt')
       actual_task = self.Run('tasks create-pull-task --queue my-queue '
-                             '--id my-task --schedule-time={} --tag=tag '
+                             'my-task --schedule-time={} --tag=tag '
                              '--payload-file={}'.format(self.schedule_time,
                                                         payload_file))
 
@@ -165,7 +167,7 @@ class CreateAppEngineTaskTest(CreateTestBase):
         response=expected_task)
 
     actual_task = self.Run('tasks create-app-engine-task --queue my-queue '
-                           '--id my-task --schedule-time={} '
+                           'my-task --schedule-time={} '
                            '--payload-content=payload --method=POST '
                            '--url=/paths/a/ --header=header1:value1 '
                            '--header=header2:value2 --routing=service:abc'
@@ -193,7 +195,7 @@ class CreateAppEngineTaskTest(CreateTestBase):
         response=expected_task)
 
     actual_task = self.Run('tasks create-app-engine-task --queue my-queue '
-                           '--id my-task --schedule-time={} '
+                           'my-task --schedule-time={} '
                            '--payload-content=payload --method=POST '
                            '--url=/paths/a/ --header=header1:value1 '
                            '--header=header2:value2 --routing=service:abc'
@@ -224,11 +226,11 @@ class CreateAppEngineTaskTest(CreateTestBase):
       self.Touch(tmp_dir, 'payload.txt', contents='payload')
       payload_file = os.path.join(tmp_dir, 'payload.txt')
       actual_task = self.Run('tasks create-app-engine-task --queue my-queue '
-                             '--id my-task --schedule-time={} '
+                             'my-task --schedule-time={} '
                              '--payload-file={} --method=POST --url=/paths/a/ '
                              '--header=header1:value1 --header=header2:value2 '
-                             '--routing=service:abc'.format(self.schedule_time,
-                                                            payload_file))
+                             '--routing=service:abc'.format(
+                                 self.schedule_time, payload_file))
 
       self.assertEqual(actual_task, expected_task)
 
@@ -252,4 +254,3 @@ class CreateAppEngineTaskTest(CreateTestBase):
 
 if __name__ == '__main__':
   test_case.main()
-

@@ -63,16 +63,6 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
-\fBcleanup\-indexes\fR
-\fB(BETA)\fR Remove unused datastore indexes based on your local index
-configuration.
-
-.TP 2m
-\fBcreate\-indexes\fR
-\fB(BETA)\fR Create new datastore indexes based on your local index
-configuration.
-
-.TP 2m
 \fBexport\fR
 \fB(BETA)\fR Export Cloud Datastore entities to Google Cloud Storage.
 
@@ -102,10 +92,11 @@ $ gcloud beta datastore cleanup\-indexes index.yaml
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud datastore
+$ gcloud alpha datastore
 .RE
 

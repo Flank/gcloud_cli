@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,18 @@
 """Test of the 'delete' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.bigtable import app_profiles
 from googlecloudsdk.api_lib.bigtable import util
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class AppProfileDeleteTests(base.BigtableV2TestBase):
 
   def SetUp(self):
@@ -28,7 +35,8 @@ class AppProfileDeleteTests(base.BigtableV2TestBase):
     self.app_profile_ref = util.GetAppProfileRef('my-instance',
                                                  'my-app-profile')
 
-  def testDelete(self):
+  def testDelete(self, track):
+    self.track = track
     self.WriteInput('y\n')
     self.Run('bigtable app-profiles delete my-app-profile '
              '--instance my-instance')

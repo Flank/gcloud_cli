@@ -23,6 +23,16 @@ COMMANDS
         (BETA) Create new datastore indexes based on your local index
         configuration.
 
+     describe
+        (BETA) Show details about an Cloud Datastore index.
+
+     list
+        (BETA) List Cloud Datastore indexes.
+
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud datastore indexes
+        $ gcloud alpha datastore indexes
 

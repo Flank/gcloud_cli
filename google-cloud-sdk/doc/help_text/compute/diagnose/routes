@@ -65,7 +65,7 @@ FLAGS
         specific ssh/scp features.
 
      --regexp=REGEXP, -r REGEXP
-        A regular expression to filter the names of the results on. Any names
+        Regular expression to filter the names of the results on. Any names
         that do not match the entire regular expression will be filtered out.
 
      --reverse-traceroute

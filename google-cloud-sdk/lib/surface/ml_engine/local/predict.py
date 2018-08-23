@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """ml-engine local predict command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import local_utils
@@ -54,6 +57,7 @@ def _AddLocalPredictArgs(parser):
 
       This flag accepts "-" for stdin.
       """)
+  flags.SIGNATURE_NAME.AddToParser(parser)
 
 
 class Predict(base.Command):
@@ -67,10 +71,12 @@ class Predict(base.Command):
     framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
     framework_flag = framework.name.lower() if framework else 'tensorflow'
 
-    results = local_utils.RunPredict(args.model_dir,
-                                     args.json_instances,
-                                     args.text_instances,
-                                     framework=framework_flag)
+    results = local_utils.RunPredict(
+        args.model_dir,
+        json_instances=args.json_instances,
+        text_instances=args.text_instances,
+        framework=framework_flag,
+        signature_name=args.signature_name)
     if not args.IsSpecified('format'):
       # default format is based on the response.
       if isinstance(results, list):

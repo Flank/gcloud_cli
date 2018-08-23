@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for 'clusters delete' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from apitools.base.py import exceptions as api_exceptions
@@ -30,9 +33,7 @@ from tests.lib.surface.container import base
 from six.moves import zip  # pylint: disable=redefined-builtin
 
 
-class DeleteTestGA(base.TestBaseV1,
-                   base.GATestBase,
-                   base.ClustersTestBase):
+class DeleteTestGA(base.GATestBase, base.ClustersTestBase):
   """gcloud GA track using container v1 API."""
 
   def SetUp(self):
@@ -330,40 +331,13 @@ class DeleteTestGA(base.TestBaseV1,
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class DeleteTestBetaV1API(base.BetaTestBase, DeleteTestGA):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class DeleteTestBetaV1Beta1API(base.TestBaseV1Beta1, DeleteTestBetaV1API):
+class DeleteTestBeta(base.BetaTestBase, DeleteTestGA):
   """gcloud Beta track using container v1beta1 API."""
 
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
-
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class DeleteTestAlphaV1API(base.AlphaTestBase, DeleteTestBetaV1API):
-  """gcloud Alpha track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class DeleteTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, DeleteTestAlphaV1API,
-                                 DeleteTestBetaV1Beta1API):
+class DeleteTestAlpha(base.AlphaTestBase, DeleteTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
 
 
 if __name__ == '__main__':

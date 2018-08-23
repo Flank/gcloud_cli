@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise client cert listing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -23,7 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class ClientCertsListTest(base.SqlMockTestBeta):
+class _BaseClientCertsListTest(object):
 
   def testClientCertsList(self):
     self.mocked_client.sslCerts.List.Expect(
@@ -69,6 +72,19 @@ class ClientCertsListTest(base.SqlMockTestBeta):
 NAME  SHA1_FINGERPRINT                          EXPIRATION
 cert  77299aad4c8136911c1f0b07dd9802a9a72124e8  2024-02-02T21:10:29.402000+00:00
 """, normalize_space=True)
+
+
+class ClientCertsListGATest(_BaseClientCertsListTest, base.SqlMockTestGA):
+  pass
+
+
+class ClientCertsListBetaTest(_BaseClientCertsListTest, base.SqlMockTestBeta):
+  pass
+
+
+class ClientCertsListAlphaTest(_BaseClientCertsListTest, base.SqlMockTestAlpha):
+  pass
+
 
 if __name__ == '__main__':
   test_case.main()

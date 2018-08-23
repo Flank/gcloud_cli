@@ -6,7 +6,7 @@ SYNOPSIS
         (--image=IMAGE | --image-family=IMAGE_FAMILY) [--async]
         [--export-format=EXPORT_FORMAT] [--image-project=IMAGE_PROJECT]
         [--log-location=LOG_LOCATION] [--network=NETWORK]
-        [--timeout=TIMEOUT; default="2h"] [GCLOUD_WIDE_FLAG ...]
+        [--timeout=TIMEOUT; default="2h"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute images export exports Virtual Disk images from
@@ -67,17 +67,22 @@ OPTIONAL FLAGS
         example, specifying 2h will fail the process after 2 hours. See $
         gcloud topic datetimes for information on duration formats.
 
+     --zone=ZONE
+        Zone of the image to export. The zone to use when exporting the image.
+        Overrides the default compute/zone property value for this command
+        invocation.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute images export
         $ gcloud beta compute images export

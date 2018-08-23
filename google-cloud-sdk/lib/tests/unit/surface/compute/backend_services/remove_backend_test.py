@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the backend services remove-backend subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -407,13 +410,6 @@ class RemoveBackendBetaTest(RemoveBackendTest):
     self.SelectApi('beta')
     self.track = base.ReleaseTrack.BETA
 
-
-class RemoveBackendAlphaTest(RemoveBackendBetaTest):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = base.ReleaseTrack.ALPHA
-
   def testWithExistingBackendNetworkEndpointGroup(self):
     messages = self.messages
     self.make_requests.side_effect = [
@@ -465,6 +461,14 @@ class RemoveBackendAlphaTest(RemoveBackendBetaTest):
                   timeoutSec=120),
               project='my-project'))],
     )
+
+
+class RemoveBackendAlphaTest(RemoveBackendBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

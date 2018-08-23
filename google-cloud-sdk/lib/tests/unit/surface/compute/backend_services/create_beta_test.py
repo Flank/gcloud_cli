@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for the backend services beta create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute.backend_services import backend_services_utils
@@ -292,6 +295,35 @@ class WithHealthcheckApiTest(CreateTestBase):
             region='alaska',
         )
     )],)
+
+  def testSimpleHttp2Case(self):
+    messages = self.messages
+    self.RunCreate("""
+          my-backend-service
+          --global
+          --protocol HTTP2
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Insert',
+          messages.ComputeBackendServicesInsertRequest(
+              backendService=messages.BackendService(
+                  backends=[],
+                  description='My backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/healthChecks/my-health-check-1'),
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/healthChecks/my-health-check-2')
+                  ],
+                  name='my-backend-service',
+                  portName='http2',
+                  protocol=(
+                      messages.BackendService.ProtocolValueValuesEnum.HTTP2),
+                  timeoutSec=30),
+              project='my-project'))],)
 
   def testSimpleCaseWithHeader(self):
     messages = self.messages

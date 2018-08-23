@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,25 +19,26 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.core import properties
+from collections import OrderedDict
+import json
+import re
+import sys
+
+from apitools.base.py import encoding
+from apitools.base.py import exceptions as apitools_exceptions
+from apitools.base.py.testing import mock
 from googlecloudsdk.core import yaml
+from googlecloudsdk.core.util import files
+from googlecloudsdk.core.util import retry
 from tests.lib import cli_test_base
-from tests.lib import e2e_base
 from tests.lib import sdk_test_base
+from tests.lib import test_case
+from tests.lib.scenario import assertions
 from tests.lib.scenario import schema
 from tests.lib.scenario import session
-from tests.lib.scenario import updates
 
-
-class _LocalOnly(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
-  pass
-
-
-class _MakeAPICalls(e2e_base.WithServiceAuth):
-
-  def SetUp(self):
-    properties.VALUES.core.project.Set('cloudsdktest')
+from ruamel.yaml import comments
+import six
 
 
 def CreateStreamMocker(test_base_instance):
@@ -58,33 +60,200 @@ def CreateStreamMocker(test_base_instance):
   return session.StreamMocker(_GetStdout, _GetStderr, _WriteStdin)
 
 
-def LoadTracksFromFile(spec_path):
-  full_spec_path = sdk_test_base.SdkBase.Resource(spec_path)
-  spec_data = yaml.load_path(full_spec_path, round_trip=True)
-  return [calliope_base.ReleaseTrack.FromId(t)
-          for t in spec_data.get('release_tracks') or ['GA']]
-
-
-class ScenarioTestBase(
-    _MakeAPICalls if updates.Mode.MakesApiCalls() else _LocalOnly):
+class ScenarioTestBase(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD):
   """A base class for all scenario tests."""
 
-  def RunScenario(self, spec_path, track, update_modes=None):
+  def RunScenario(self, spec_path, track, execution_mode, update_modes):
     full_spec_path = sdk_test_base.SdkBase.Resource(spec_path)
     spec_data = yaml.load_path(full_spec_path, round_trip=True)
     validator = schema.Validator(spec_data)
     self.assertTrue(validator.Validate())
 
     spec = schema.Scenario.FromData(spec_data)
+    if spec.skip:
+      # pylint: disable=protected-access, This is part of our testing framework.
+      self.skipTest(
+          test_case.Filters._GetSkipString(spec.skip[0], spec.skip[1]))
 
     self.track = track
     stream_mocker = CreateStreamMocker(self)
 
     scenario_context = schema.ScenarioContext(
-        full_spec_path, spec_data, update_modes, stream_mocker, self.Run)
+        spec_path, full_spec_path, spec_data, execution_mode, update_modes,
+        stream_mocker, self.Run)
+    if execution_mode == session.ExecutionMode.LOCAL:
+      self.StartObjectPatch(retry, '_SleepMs')
 
-    for a in spec.actions:
-      a.Execute(scenario_context)
+    actions = spec.LoadActions()
+    for a in actions:
+      try:
+        a.Execute(scenario_context)
+      except assertions.Error:
+        if execution_mode == session.ExecutionMode.REMOTE:
+          for c in actions:
+            # Iterates over the remaining actions because it is a generator.
+            c.ExecuteCleanup(scenario_context)
+        # Continue raising the original error.
+        raise
+
+
+# pylint: disable=protected-access, This is really dirty stuff, but it's ok,
+# (see class comment).
+class Interceptor(sdk_test_base.SdkBase):
+  """A temporary helper shim to convert existing Python tests to scenarios.
+
+  There is nothing best practice about any of the code in here, but this it not
+  actually used as part of tests. It is only a helper to help people manually
+  convert existing tests into scenario yaml files. Each test class becomes a
+  scenario file, with each test corresponding to a command_execution event
+  in the scenario.
+
+  The basic usage is:
+    - On the test class you want to convert, extend this class (in addition
+      to whatever is there already). For apitools unit tests, use the
+      ApiToolsInterceptor below.
+    - Remove any release track paramterization.
+    - Run the test
+
+  For each test class you modify, a new YAML file will be generated next to
+  the Python module.
+
+  This tool does not necessarily capture everything about the test, and you
+  should manually edit the test for correctness, but also to ensure that it
+  makes sense as a scenario.
+
+  After the test is generated, run the scenario update tool to have it fill in
+  the rest of the information. In cases were data is missing, commands might
+  error out that you don't intend to (and the assertions will be replaced with
+  error assertions). It is recommended that you snapshot the generated file
+  before you run the update tool, so you can see the diff after the update to
+  make sure it makes sense.
+
+  You should also rename the file, the scenario title, and the comments to
+  describe what it is actually doing.
+  """
+  SCENARIO_DATA = OrderedDict()
+  PATH = None
+
+  @staticmethod
+  def SetUpClass():
+    data = Interceptor.SCENARIO_DATA
+    data['title'] = ''
+    data['actions'] = []
+
+  def SetUp(self):
+    class_name = self.__class__.__name__
+    path_parts = self.__module__.split('.')
+    # Trim off leading 'googlecloudsdk' and the name of the test file itself
+    Interceptor.PATH = (
+        self.Resource(*path_parts[1:]) + '.' + class_name + '.scenario.yaml')
+    Interceptor.SCENARIO_DATA['title'] = class_name
+
+    self.current_action = None
+    self.file_replacements = {}
+
+    # Intercept command execution so we know what command was run.
+    original_run = cli_test_base.CliTestBase.Run
+    def InterceptRun(self_, cmd, *args, **kwargs):
+      """An override for when self.Run() gets called."""
+      self._StartNewCommandExecution()
+      command = cmd
+      if isinstance(command, list):
+        command = ' '.join(command)
+      command = re.sub(r'\s+', ' ', command)
+      command = command.replace('\n', ' ').strip()
+      for full_path, name in self.file_replacements.items():
+        command = command.replace(full_path, name)
+
+      if self.current_action['execute_command']['command']:
+        raise ValueError('This test already ran a command')
+      self.current_action['execute_command']['command'] = command
+      # Add the name of the test as a comment above the action.
+      self.current_action['execute_command'].yaml_set_comment_before_after_key(
+          'command', before=self._testMethodName, indent=4)
+      return original_run.__call__(self_, cmd, *args, **kwargs)
+    self.StartObjectPatch(cli_test_base.CliTestBase, 'Run', autospec=True,
+                          side_effect=InterceptRun)
+
+    # Intercept file touch to set up files for test input.
+    original_touch = test_case.Base.Touch
+    def InterceptTouch(self_, directory, name=None, contents='',
+                       makedirs=False):
+      """An override for when self.Touch() gets called."""
+      Interceptor.SCENARIO_DATA['actions'].append({
+          'write_file': OrderedDict([('path', name), ('contents', contents)])})
+      full_path = original_touch.__call__(
+          self_, directory, name, contents, makedirs)
+      # Tests need to operate on the full path name, but in the scenario we
+      # assume relative paths to CWD. Save the mapping of full path to name so
+      # we can sanitize the command arguments later.
+      self.file_replacements[full_path] = name
+      return full_path
+    self.StartObjectPatch(test_case.Base, 'Touch', autospec=True,
+                          side_effect=InterceptTouch)
+
+  def _StartNewCommandExecution(self):
+    if self.current_action:
+      yaml.convert_to_block_text(self.current_action)
+      Interceptor.SCENARIO_DATA['actions'].append(self.current_action)
+    self.current_action = {'execute_command': comments.CommentedMap(
+        [('command', ''), ('events', [])])}
+
+  def TearDown(self):
+    self._StartNewCommandExecution()
+
+  @staticmethod
+  def TearDownClass():
+    # Write the entire scenario file when the entire test class is done.
+    yaml.convert_to_block_text(Interceptor.SCENARIO_DATA)
+    data = yaml.dump(Interceptor.SCENARIO_DATA, round_trip=True)
+    sys.__stderr__.write(data.encode('utf-8') if six.PY2 else data)
+    files.WriteFileContents(Interceptor.PATH, data)
+
+
+class ApiToolsInterceptor(Interceptor):
+  """Interceptor that also populates mock responses for calls to apitools mocks.
+  """
+
+  def SetUp(self):
+    # Intercept apitools mock requests/responses.
+    original_call = mock._MockedMethod.__call__
+    def InterceptAPI(self_, request, *args, **kwargs):
+      """An override for when a apitools mocked method gets called."""
+      data = OrderedDict(
+          [('api_call', OrderedDict(
+              [('expect_request', OrderedDict(
+                  [('uri', ''), ('method', ''), ('body', None)])),
+               ('return_response', OrderedDict(
+                   [('headers', {'status': '200'}), ('body', None)]))]))])
+
+      parts = self_._MockedMethod__key.split('.')
+      # Key looks like: CloudIOTv1.projects_location_registries.Create
+      real_client = self_._MockedMethod__mocked_client._Client__real_client
+      service_name, method_name = parts[1], parts[2]
+      method_config = getattr(real_client, service_name).GetMethodConfig(
+          method_name)
+      request_field = method_config.request_field
+      request_body = json.loads(encoding.MessageToJson(request))[request_field]
+
+      data['api_call']['expect_request']['body'] = request_body
+      try:
+        response = original_call.__call__(self_, request, *args, **kwargs)
+      except apitools_exceptions.HttpError as e:
+        # Test was returning an http error.
+        data['api_call']['return_response']['headers'] = {
+            'status': e.response['status'], 'reason': e.response['reason']}
+        data['api_call']['return_response']['body'] = json.loads(e.content)
+        raise
+      else:
+        # Test returned a non-error response payload.
+        response_body = json.loads(encoding.MessageToJson(response))
+        data['api_call']['return_response']['body'] = response_body
+        return response
+      finally:
+        self.current_action['execute_command']['events'].append(data)
+    self.StartObjectPatch(
+        mock._MockedMethod, '__call__', autospec=True, side_effect=InterceptAPI)
 
 
 def main():

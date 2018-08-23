@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +19,9 @@ Based on the runtime and environment, this can entail generating a new
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.api_lib.app import env
@@ -41,6 +44,12 @@ _PHP_GCLOUDIGNORE = '\n'.join([
     'vendor/'
 ])
 
+_PYTHON_GCLOUDIGNORE = '\n'.join([
+    gcloudignore.DEFAULT_IGNORE_FILE,
+    '# Python pycache:',
+    '__pycache__/'
+])
+
 
 _GCLOUDIGNORE_REGISTRY = {
     runtime_registry.RegistryEntry(
@@ -48,8 +57,7 @@ _GCLOUDIGNORE_REGISTRY = {
     runtime_registry.RegistryEntry(
         env.PHP_TI_RUNTIME_EXPR, {env.STANDARD}): _PHP_GCLOUDIGNORE,
     runtime_registry.RegistryEntry(
-        env.PYTHON_TI_RUNTIME_EXPR, {env.STANDARD}):
-    gcloudignore.DEFAULT_IGNORE_FILE,
+        env.PYTHON_TI_RUNTIME_EXPR, {env.STANDARD}): _PYTHON_GCLOUDIGNORE,
 }
 
 

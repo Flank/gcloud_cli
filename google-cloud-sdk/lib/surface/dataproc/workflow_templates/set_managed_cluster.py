@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Set managed cluster for workflow template command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.dataproc import compute_helpers
 from googlecloudsdk.api_lib.dataproc import dataproc as dp
 from googlecloudsdk.calliope import arg_parsers
@@ -32,7 +35,10 @@ class SetManagedCluster(base.UpdateCommand):
   def Args(parser):
     flags.AddTemplateResourceArg(parser, 'set managed cluster')
     parser.add_argument(
-        '--cluster-name', help='The name of the managed dataproc cluster.')
+        '--cluster-name',
+        help="""\
+        The name of the managed dataproc cluster.
+        If unspecified, the workflow template ID will be used.""")
     clusters.ArgsForClusterRef(parser, beta=True)
     flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.BETA)
 
@@ -105,7 +111,10 @@ class SetManagedCluster(base.UpdateCommand):
     workflow_template = dataproc.GetRegionsWorkflowTemplate(
         template_ref, args.version)
 
-    cluster_name = template_ref.workflowTemplatesId
+    if args.cluster_name:
+      cluster_name = args.cluster_name
+    else:
+      cluster_name = template_ref.workflowTemplatesId
 
     compute_resources = compute_helpers.GetComputeResources(
         self.ReleaseTrack(), cluster_name)

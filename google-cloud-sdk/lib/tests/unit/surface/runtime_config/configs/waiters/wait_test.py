@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for surface.runtime_config.configs.waiters.wait."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.runtime_config import exceptions as rtc_exceptions
 from googlecloudsdk.api_lib.runtime_config import util
 from googlecloudsdk.calliope import exceptions as sdk_exceptions

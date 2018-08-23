@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -23,7 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class OperationsDescribeTest(base.SqlMockTestBeta):
+class _BaseOperationsDescribeTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testOperationsDescribe(self):
@@ -95,6 +98,21 @@ targetLink: https://www.googleapis.com/sql/v1beta4/projects/fake-project/instanc
 targetProject: fake-project
 user: 170350250316@developer.gserviceaccount.com
 """, normalize_space=True)
+
+
+class OperationsDescribeGATest(_BaseOperationsDescribeTest, base.SqlMockTestGA):
+  pass
+
+
+class OperationsDescribeBetaTest(_BaseOperationsDescribeTest,
+                                 base.SqlMockTestBeta):
+  pass
+
+
+class OperationsDescribeAlphaTest(_BaseOperationsDescribeTest,
+                                  base.SqlMockTestAlpha):
+  pass
+
 
 if __name__ == '__main__':
   test_case.main()

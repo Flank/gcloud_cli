@@ -119,11 +119,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: The condition that is associated with this binding. NOTE: an
-      unsatisfied condition will not allow user access via current binding.
-      Different bindings, including their conditions, are examined
-      independently. This field is only visible as GOOGLE_INTERNAL or
-      CONDITION_TRUSTED_TESTER.
+    condition: Unimplemented. The condition that is associated with this
+      binding. NOTE: an unsatisfied condition will not allow user access via
+      current binding. Different bindings, including their conditions, are
+      examined independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -138,7 +137,7 @@ class Binding(_messages.Message):
       * `domain:{domain}`: A Google Apps domain name that represents all the
       users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
-      `roles/editor`, or `roles/owner`. Required
+      `roles/editor`, or `roles/owner`.
   """
 
   condition = _messages.MessageField('Expr', 1)
@@ -228,10 +227,12 @@ class Condition(_messages.Message):
       SECURITY_REALM: Any of the security realms in the IAMContext (go
         /security-realms). When used with IN, the condition indicates "any of
         the request's realms match one of the given values; with NOT_IN, "none
-        of the realms match any of the given values". It is not permitted to
-        grant access based on the *absence* of a realm, so realm conditions
-        can only be used in a "positive" context (e.g., ALLOW/IN or
-        DENY/NOT_IN).
+        of the realms match any of the given values". Note that a value can be
+        either a realm or a realm group (go/realm-groups). A match is
+        determined by a realm group membership check performed by a
+        RealmAclRep object (go/realm-acl-howto). It is not permitted to grant
+        access based on the *absence* of a realm, so realm conditions can only
+        be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
       APPROVER: An approver (distinct from the requester) that has authorized
         this request. When used with IN, the condition indicates that one of
         the approvers associated with the request matches the specified
@@ -1270,14 +1271,14 @@ class Variable(_messages.Message):
 class Waiter(_messages.Message):
   r"""A Waiter resource waits for some end condition within a RuntimeConfig
   resource to be met before it returns. For example, assume you have a
-  distributed system where each node writes to a Variable resource
-  indidicating the node's readiness as part of the startup process.  You then
-  configure a Waiter resource with the success condition set to wait until
-  some number of nodes have checked in. Afterwards, your application runs some
-  arbitrary code after the condition has been met and the waiter returns
-  successfully.  Once created, a Waiter resource is immutable.  To learn more
-  about using waiters, read the [Creating a Waiter](/deployment-manager
-  /runtime-configurator/creating-a-waiter) documentation.
+  distributed system where each node writes to a Variable resource indicating
+  the node's readiness as part of the startup process.  You then configure a
+  Waiter resource with the success condition set to wait until some number of
+  nodes have checked in. Afterwards, your application runs some arbitrary code
+  after the condition has been met and the waiter returns successfully.  Once
+  created, a Waiter resource is immutable.  To learn more about using waiters,
+  read the [Creating a Waiter](/deployment-manager/runtime-
+  configurator/creating-a-waiter) documentation.
 
   Fields:
     createTime: Output only. The instant at which this Waiter resource was

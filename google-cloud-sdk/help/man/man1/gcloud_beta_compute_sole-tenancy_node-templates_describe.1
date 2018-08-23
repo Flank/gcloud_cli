@@ -37,7 +37,7 @@ Name of the node templates to operate on.
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the node templates to operate on. If not specified, you may be
+Region of the node templates to operate on. If not specified, you may be
 prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
@@ -77,5 +77,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute sole\-tenancy node\-templates describe
+$ gcloud alpha compute sole\-tenancy node\-templates describe
+.RE
 

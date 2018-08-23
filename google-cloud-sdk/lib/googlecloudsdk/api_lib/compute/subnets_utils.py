@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Code that's shared between multiple subnets subcommands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import exceptions
 import six
 
@@ -24,7 +27,12 @@ def MakeSubnetworkUpdateRequest(client,
                                 enable_private_ip_google_access=None,
                                 add_secondary_ranges=None,
                                 remove_secondary_ranges=None,
-                                enable_flow_logs=None):
+                                enable_flow_logs=None,
+                                aggregation_interval=None,
+                                flow_sampling=None,
+                                metadata=None,
+                                set_role_active=None,
+                                drain_timeout_seconds=None):
   """Make the appropriate update request for the args.
 
   Args:
@@ -37,10 +45,17 @@ def MakeSubnetworkUpdateRequest(client,
     remove_secondary_ranges: List of secondary ranges to remove from the
       subnetwork.
     enable_flow_logs: Enable/disable flow logging for this subnet.
+    aggregation_interval: The internal at which to aggregate flow logs.
+    flow_sampling: The sampling rate for flow logging in this subnet.
+    metadata: Whether metadata fields should be added reported flow logs.
+    set_role_active: Updates the role of a BACKUP subnet to ACTIVE.
+    drain_timeout_seconds: The maximum amount of time to drain connections from
+      the active subnet to the backup subnet with set_role_active=True.
 
   Returns:
     response, result of sending the update request for the subnetwork
   """
+  convert_to_enum = lambda x: x.replace('-', '_').upper()
   if enable_private_ip_google_access is not None:
     google_access = (
         client.messages.SubnetworksSetPrivateIpGoogleAccessRequest())
@@ -101,6 +116,51 @@ def MakeSubnetworkUpdateRequest(client,
     subnetwork.enableFlowLogs = enable_flow_logs
     return client.MakeRequests(
         [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
+  elif aggregation_interval is not None:
+    subnetwork = client.MakeRequests([
+        (client.apitools_client.subnetworks, 'Get',
+         client.messages.ComputeSubnetworksGetRequest(**subnet_ref.AsDict()))
+    ])[0]
+
+    subnetwork.aggregationInterval = (
+        client.messages.Subnetwork.AggregationIntervalValueValuesEnum(
+            convert_to_enum(aggregation_interval)))
+    return client.MakeRequests(
+        [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
+  elif flow_sampling is not None:
+    subnetwork = client.MakeRequests([
+        (client.apitools_client.subnetworks, 'Get',
+         client.messages.ComputeSubnetworksGetRequest(**subnet_ref.AsDict()))
+    ])[0]
+
+    subnetwork.flowSampling = flow_sampling
+    return client.MakeRequests(
+        [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
+  elif metadata is not None:
+    subnetwork = client.MakeRequests([
+        (client.apitools_client.subnetworks, 'Get',
+         client.messages.ComputeSubnetworksGetRequest(**subnet_ref.AsDict()))
+    ])[0]
+
+    subnetwork.metadata = client.messages.Subnetwork.MetadataValueValuesEnum(
+        convert_to_enum(metadata))
+    return client.MakeRequests(
+        [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
+  elif set_role_active is not None:
+    subnetwork = client.MakeRequests([
+        (client.apitools_client.subnetworks, 'Get',
+         client.messages.ComputeSubnetworksGetRequest(**subnet_ref.AsDict()))
+    ])[0]
+
+    subnetwork.role = client.messages.Subnetwork.RoleValueValuesEnum.ACTIVE
+    patch_request = client.messages.ComputeSubnetworksPatchRequest(
+        project=subnet_ref.project,
+        subnetwork=subnet_ref.subnetwork,
+        region=subnet_ref.region,
+        subnetworkResource=subnetwork,
+        drainTimeoutSeconds=drain_timeout_seconds)
+    return client.MakeRequests([(client.apitools_client.subnetworks, 'Patch',
+                                 patch_request)])
 
   return client.MakeRequests([])
 

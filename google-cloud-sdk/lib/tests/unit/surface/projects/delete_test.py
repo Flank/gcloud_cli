@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for projects delete."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import test_case
@@ -38,7 +41,6 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     }], resource_projector.MakeSerializable(list(result)))
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
-    self.AssertErrContains('Do you want to continue (Y/n)?')
     self.AssertErrContains(
         'You can undo this operation for a limited period by running:\n'
         '  $ gcloud projects undelete {0}'.format(test_project_id))
@@ -50,7 +52,6 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     self.assertEqual([], list(result))
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
-    self.AssertErrContains('Do you want to continue (Y/n)?')
     self.AssertErrNotContains(
         'You can undo this operation for a limited period by running:\n'
         '  $ gcloud projects undelete {0}'.format(test_project_id))
@@ -65,7 +66,6 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     self.RunProjectsBeta('delete', '--format=default', test_project_id)
     self.AssertOutputContains('projectId: {0}'.format(test_project_id))
     self.AssertErrContains('Your project will be deleted')
-    self.AssertErrContains('Do you want to continue (Y/n)?')
 
   def testDeleteValidProjectWithFormatDisabled(self):
     test_project_id = util.GetTestActiveProject().projectId
@@ -80,7 +80,6 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     }], resource_projector.MakeSerializable(list(result)))
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
-    self.AssertErrContains('Do you want to continue (Y/n)?')
 
   def testDeleteFails400(self):
     exception = http_error.MakeDetailedHttpError(
@@ -108,10 +107,7 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     self.WriteInput('y\n')
     with self.assertRaises(api_exceptions.HttpException):
       self.RunProjects('delete', test_project_id)
-    self.AssertErrEquals("""\
-Your project will be deleted.
-
-Do you want to continue (Y/n)?
+    self.AssertErrContains("""\
 ERROR: (gcloud.projects.delete) FAILED_PRECONDITION: Precondition check failed.
 - '@type': type.googleapis.com/google.rpc.PreconditionFailure
   violations:
@@ -119,8 +115,7 @@ ERROR: (gcloud.projects.delete) FAILED_PRECONDITION: Precondition check failed.
       the lien to allow deletion.
     subject: liens/p123-l4c552089-e37c-4db7-bfee-cfaf268f1038
     type: LIEN
-""",
-                         normalize_space=True)
+""", normalize_space=True)
 
 
 if __name__ == '__main__':

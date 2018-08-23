@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +19,11 @@ The fact that this is a directory with
 an __init__.py in it makes it a command group. The methods written below will
 all be called by calliope (though they are all optional).
 """
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
 import os
 import re
@@ -74,7 +78,7 @@ class SQL(base.Group):
     base.DisableUserProjectQuota()
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class SQLBeta(base.Group):
   """Create and manage Google Cloud SQL databases."""
   detailed_help = DETAILED_HELP

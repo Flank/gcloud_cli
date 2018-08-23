@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Command for creating firewall rules."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import firewalls_utils
 from googlecloudsdk.calliope import base
@@ -137,9 +140,11 @@ class BetaCreate(Create):
         with_service_account=True,
         with_disabled=cls.with_disabled)
     firewalls_utils.AddArgsForServiceAccount(parser, for_update=False)
+    flags.AddEnableLogging(parser, default=None)
 
   def _CreateFirewall(self, holder, args):
     firewall, project = super(BetaCreate, self)._CreateFirewall(holder, args)
+    firewall.enableLogging = args.enable_logging
     if args.disabled is not None:
       firewall.disabled = args.disabled
 
@@ -165,12 +170,6 @@ class AlphaCreate(BetaCreate):
         with_disabled=cls.with_disabled)
     firewalls_utils.AddArgsForServiceAccount(parser, for_update=False)
     flags.AddEnableLogging(parser, default=None)
-
-  def _CreateFirewall(self, holder, args):
-    firewall, project = super(AlphaCreate, self)._CreateFirewall(holder, args)
-    firewall.enableLogging = args.enable_logging
-
-    return firewall, project
 
 
 Create.detailed_help = {

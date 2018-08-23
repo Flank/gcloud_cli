@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -140,14 +141,18 @@ class _BaseInstancesExportCsvTest(object):
              '--query="SELECT * FROM table" gs://speckletest/testinstance.gz')
 
 
+class InstancesExportCsvGATest(_BaseInstancesExportCsvTest, base.SqlMockTestGA):
+  pass
+
+
 class InstancesExportCsvBetaTest(_BaseInstancesExportCsvTest,
                                  base.SqlMockTestBeta):
   pass
 
 
-class InstancesExportCsvGATest(_BaseInstancesExportCsvTest, base.SqlMockTestGA):
+class InstancesExportCsvAlphaTest(_BaseInstancesExportCsvTest,
+                                  base.SqlMockTestAlpha):
   pass
-
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -27,7 +30,7 @@ from tests.lib.surface.sql import base
 sqladmin_v1beta3 = core_apis.GetMessagesModule('sqladmin', 'v1beta3')
 
 
-class InstancesRestoreBackupTest(base.SqlMockTestBeta):
+class _BaseInstancesRestoreBackupTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def _ExpectRestoreBackup(self):
@@ -271,6 +274,21 @@ class InstancesRestoreBackupTest(base.SqlMockTestBeta):
             state='DONE',
             userEmailAddress='170350250316@developer.gserviceaccount.com',
         ))
+
+
+class InstancesRestoreBackupGATest(_BaseInstancesRestoreBackupTest,
+                                   base.SqlMockTestGA):
+  pass
+
+
+class InstancesRestoreBackupBetaTest(_BaseInstancesRestoreBackupTest,
+                                     base.SqlMockTestBeta):
+  pass
+
+
+class InstancesRestoreBackupAlphaTest(_BaseInstancesRestoreBackupTest,
+                                      base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

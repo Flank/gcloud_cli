@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Unit test to check sanity of grpc setup."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from tests.lib import test_case
 
 
@@ -25,7 +28,7 @@ class GrpcTest(test_case.TestCase):
     # pylint: disable=g-import-not-at-top
     from grpc._cython import cygrpc
     # This code doesn't do much but makes sure the native extension is loaded.
-    metadata = cygrpc.Metadata(())
+    metadata = cygrpc.Operation()
     del metadata
 
   @test_case.Filters.RunOnlyOnWindows('crcmod extension is only available on '

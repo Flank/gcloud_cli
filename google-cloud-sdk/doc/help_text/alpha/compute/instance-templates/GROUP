@@ -20,6 +20,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (ALPHA) Add an IAM policy binding to an instance template.
+
      create
         (ALPHA) Create a Compute Engine virtual machine instance template.
 
@@ -34,15 +37,26 @@ COMMANDS
      describe
         (ALPHA) Describe a virtual machine instance template.
 
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a Google Compute Engine instance
+        template.
+
      list
         (ALPHA) List Google Compute Engine instance templates.
 
+     remove-iam-policy-binding
+        (ALPHA) Remove an IAM policy binding from an instance template.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for a Google Compute Engine instance
+        template.
+
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute instance-templates
         $ gcloud beta compute instance-templates

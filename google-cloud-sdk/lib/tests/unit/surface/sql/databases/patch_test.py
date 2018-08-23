@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,15 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class DatabasesPatchTest(base.SqlMockTestBeta):
+class _BaseDatabasesPatchTest(object):
 
   def testDatabasesPatch(self):
     sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
@@ -163,6 +166,18 @@ selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-ins
 +charset: another-charset
 +collation: another-collation
 """, normalize_space=True)
+
+
+class DatabasesPatchGATest(_BaseDatabasesPatchTest, base.SqlMockTestGA):
+  pass
+
+
+class DatabasesPatchBetaTest(_BaseDatabasesPatchTest, base.SqlMockTestBeta):
+  pass
+
+
+class DatabasesPatchAlphaTest(_BaseDatabasesPatchTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

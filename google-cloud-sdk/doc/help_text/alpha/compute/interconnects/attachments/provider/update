@@ -71,8 +71,8 @@ FLAGS
         Human-readable plain-text description of attachment.
 
      --region=REGION
-        The region of the interconnect attachment to patch. If not specified,
-        you may be prompted to select a region.
+        Region of the interconnect attachment to patch. If not specified, you
+        may be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:
@@ -143,8 +143,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change
-    without notice. Usually, users of ALPHA commands and flags need to apply
-    for access, agree to applicable terms, and have their projects whitelisted.
-    Contact Google or sign up on a product's page for ALPHA access. Product
-    pages can be found at https://cloud.google.com/products/.
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
 

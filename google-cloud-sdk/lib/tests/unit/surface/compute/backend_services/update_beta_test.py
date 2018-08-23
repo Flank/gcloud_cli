@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for the backend services update beta command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -263,6 +266,38 @@ class WithHealthcheckApiTest(BetaUpdateTestBase):
         '--https-health-checks is not supported.'):
       self.RunUpdate('my-backend-service --health-checks foo '
                      '--https-health-checks bar')
+
+  def testWithHttp2Protocol(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._http_backend_services_with_health_check[0]],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-3 --protocol http2')
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-3', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
+              backendService='backend-service-3',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  healthChecks=[(self.compute_uri + '/projects/'
+                                 'my-project/global/healthChecks/'
+                                 'orig-health-check')],
+                  name='backend-service-3',
+                  portName='http',
+                  protocol=(
+                      messages.BackendService.ProtocolValueValuesEnum.HTTP2),
+                  selfLink=(self.compute_uri +
+                            '/projects/my-project/global/backendServices/'
+                            'backend-service-3'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
 
   def testWithUpdateCustomRequestHeaders(self):
     messages = self.messages

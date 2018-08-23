@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Command for removing a backend from a backend service."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.compute import base_classes
@@ -132,28 +135,8 @@ class RemoveBackend(base.UpdateCommand):
         [self.GetSetRequest(client, backend_service_ref, new_object)])
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class RemoveBackendBeta(RemoveBackend):
-  """Remove a backend from a backend service.
-
-  *{command}* is used to remove a backend from a backend
-  service.
-
-  Before removing a backend, it is a good idea to "drain" the
-  backend first. A backend can be drained by setting its
-  capacity scaler to zero through 'gcloud compute
-  backend-services edit'.
-  """
-
-  @classmethod
-  def Args(cls, parser):
-    flags.GLOBAL_REGIONAL_BACKEND_SERVICE_ARG.AddArgument(parser)
-    flags.MULTISCOPE_INSTANCE_GROUP_ARG.AddArgument(
-        parser, operation_type='remove from the backend service')
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class RemoveBackendAlpha(RemoveBackendBeta):
   """Remove a backend from a backend service.
 
   *{command}* is used to remove a backend from a backend

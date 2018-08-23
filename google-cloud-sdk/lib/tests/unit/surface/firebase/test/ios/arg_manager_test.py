@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
 import datetime
 
@@ -68,51 +71,22 @@ class IosArgsTests(unit_base.IosMockClientTest):
     arg_mgr.Prepare(args)
     # We should get one sparse-matrix device with all default dimension values.
     self.assertEqual(len(args.device), 1)
-    self.assertDictEqual(
-        args.device[0],
-        {
-            'model': 'iPen2',
-            'version': '6.0',
-            # TODO(b/78015882): add proper support for locales and orientations
-            # 'locale': 'en',
-            # 'orientation': 'portrait'
-        })
+    self.assertDictEqual(args.device[0], {
+        'model': 'iPen2',
+        'version': '6.0',
+        'locale': 'ro',
+        'orientation': 'askew'
+    })
 
-  # TODO(b/78015882): eventually replace this test with the one below
-  def testPrepareArgs_SparseMatrixFillsInModelVersionDefaultsWhereNeeded(self):
-    args = self.NewTestArgs(
-        test='a', device=[{
-            'model': 'iPencil1'
-        }, {
-            'version': '5.1'
-        }])
-    arg_mgr = _IosArgManagerWithFakeCatalog()
-    arg_mgr.Prepare(args)
-    # We should get two sparse-matrix devices with "gaps" filled by defaults.
-    self.assertEqual(len(args.device), 2)
-    self.assertDictEqual(
-        args.device[0],
-        {
-            'model': 'iPencil1',
-            'version': '6.0',  # default value
-        })
-    self.assertDictEqual(
-        args.device[1],
-        {
-            'model': 'iPen2',  # default value
-            'version': '5.1',
-        })
-
-  @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testPrepareArgs_SparseMatrixFillsInDimensionDefaultsWhereNeeded(self):
     args = self.NewTestArgs(
         test='a',
         device=[{
             'model': 'iPencil1',
-            'locale': 'en'
+            'locale': 'kl'
         }, {
             'version': '5.1',
-            'orientation': 'landscape'
+            'orientation': 'diagonal'
         }])
     arg_mgr = _IosArgManagerWithFakeCatalog()
     arg_mgr.Prepare(args)
@@ -123,16 +97,16 @@ class IosArgsTests(unit_base.IosMockClientTest):
         {
             'model': 'iPencil1',
             'version': '6.0',  # default value
-            'locale': 'en',
-            'orientation': 'portrait'  # default value
+            'locale': 'kl',
+            'orientation': 'askew'  # default value
         })
     self.assertDictEqual(
         args.device[1],
         {
             'model': 'iPen2',  # default value
             'version': '5.1',
-            'locale': 'en',  # default value
-            'orientation': 'landscape'
+            'locale': 'ro',  # default value
+            'orientation': 'diagonal'
         })
 
   def testPrepareArgs_SparseMatrix_InvalidModel(self):
@@ -151,7 +125,6 @@ class IosArgsTests(unit_base.IosMockClientTest):
     self.assertIn("'v9' is not a valid OS version",
                   six.text_type(ex_ctx.exception))
 
-  @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testPrepareArgs_SparseMatrix_InvalidLocale(self):
     args = self.NewTestArgs(test='a', device=[{'locale': 'here'}])
     arg_mgr = _IosArgManagerWithFakeCatalog()
@@ -160,7 +133,6 @@ class IosArgsTests(unit_base.IosMockClientTest):
     self.assertIn("'here' is not a valid locale",
                   six.text_type(ex_ctx.exception))
 
-  @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testPrepareArgs_SparseMatrix_InvalidOrientation(self):
     args = self.NewTestArgs(test='a', device=[{'orientation': 'down'}])
     arg_mgr = _IosArgManagerWithFakeCatalog()
@@ -172,7 +144,7 @@ class IosArgsTests(unit_base.IosMockClientTest):
   def testPrepareArgs_SparseMatrix_InvalidDimensionName(self):
     args = self.NewTestArgs(test='a', device=[{'ver': '5'}])
     arg_mgr = _IosArgManagerWithFakeCatalog()
-    with self.assertRaises(exceptions.InvalidIosDimensionNameError) as ex_ctx:
+    with self.assertRaises(exceptions.InvalidDimensionNameError) as ex_ctx:
       arg_mgr.Prepare(args)
     msg = six.text_type(ex_ctx.exception)
     self.assertIn("'ver' is not a valid dimension name", msg)

@@ -267,9 +267,7 @@ response:
     x-xss-protection: 1; mode=block
 ---
 output:
-  stderr: "For the following forwarding rule:\n - [rule1]\nchoose a region or global:\n\
-    \ [1] global\n [2] region: europe-west2\n [3] region: us-central1\nPlease enter\
-    \ your numeric choice:  \n"
+  stderr: "{\"ux\": \"PROMPT_CHOICE\", \"message\": \"For the following forwarding rule:\\n - [rule1]\\nchoose a region or global:\", \"choices\": [\"global\", \"region: europe-west2\", \"region: us-central1\"]}\n"
   stdout: |
     IPAddress: 104.198.52.141
     IPProtocol: TCP

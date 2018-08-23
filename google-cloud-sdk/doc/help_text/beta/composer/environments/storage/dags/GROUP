@@ -24,16 +24,19 @@ COMMANDS
         Storage bucket.
 
      export
-        (BETA) Exports DAGs from an environment into local storage or Cloud
+        (BETA) Export DAGs from an environment into local storage or Cloud
         Storage.
 
      import
-        (BETA) Imports DAGs from local storage or Cloud Storage into an
+        (BETA) Import DAGs from local storage or Cloud Storage into an
         environment.
 
      list
         (BETA) List the DAG files for a Cloud Composer environment.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud composer environments storage dags
 

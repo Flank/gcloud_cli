@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +15,20 @@
 """Tests for 'gcloud category-manager taxonomies annotations list'."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class AnnotationsListIntTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.taxonomy_id = '123'
     self.parent_annotation_id = '456'
 
@@ -65,7 +69,8 @@ class AnnotationsListIntTest(base.CategoryManagerUnitTestBase):
     self.ExpectProjectAnnotationsList(self.project_taxonomy_resource,
                                       self.expected_annotations_list)
 
-  def testListingAnnotations(self):
+  def testListingAnnotations(self, track):
+    self.track = track
     args = '--taxonomy {}'.format(self.taxonomy_id)
     self.Run('category-manager taxonomies annotations list ' + args)
 
@@ -81,7 +86,8 @@ class AnnotationsListIntTest(base.CategoryManagerUnitTestBase):
       for child_id in annotations.childAnnotationIds:
         self.assertIn(child_id, output)
 
-  def testListingAnnotationFormat(self):
+  def testListingAnnotationFormat(self, track):
+    self.track = track
     args = '--taxonomy {}'.format(self.taxonomy_id)
     self.Run('category-manager taxonomies annotations list ' + args)
     # pylint: disable=line-too-long

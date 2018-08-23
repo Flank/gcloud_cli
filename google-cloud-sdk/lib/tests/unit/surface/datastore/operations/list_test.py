@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'operations list' command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.datastore import operations
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.datastore import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.GA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.ALPHA)
 class ListTest(base.DatastoreCommandUnitTest):
   """Tests the datastore operations list command."""
 
-  def testList(self):
+  def testList(self, track):
+    self.track = track
     request = self.GetMockListRequest()
 
     operation_name = 'export operation name'
@@ -42,7 +52,8 @@ class ListTest(base.DatastoreCommandUnitTest):
     self.assertEqual(1, len(actual))
     self.assertEqual(operation_name, actual[0].name)
 
-  def testListWithLabelGetsTranslated(self):
+  def testListWithLabelGetsTranslated(self, track):
+    self.track = track
     expected_filter = 'metadata.common.labels.k=v'
     request = self.GetMockListRequest(operation_filter=expected_filter)
 
@@ -64,7 +75,8 @@ class ListTest(base.DatastoreCommandUnitTest):
     self.assertEqual(1, len(actual))
     self.assertEqual(operation_name, actual[0].name)
 
-  def testListWithLabelCorrectUsageGetsTranslated(self):
+  def testListWithLabelCorrectUsageGetsTranslated(self, track):
+    self.track = track
     expected_filter = 'metadata.common.labels.k=v'
     request = self.GetMockListRequest(operation_filter=expected_filter)
 
@@ -86,7 +98,8 @@ class ListTest(base.DatastoreCommandUnitTest):
     self.assertEqual(1, len(actual))
     self.assertEqual(operation_name, actual[0].name)
 
-  def testListWithNamespaceGetsTranslated(self):
+  def testListWithNamespaceGetsTranslated(self, track):
+    self.track = track
     expected_filter = 'metadata.entity_filter.namespace_id=n'
     request = self.GetMockListRequest(operation_filter=expected_filter)
 
@@ -108,7 +121,8 @@ class ListTest(base.DatastoreCommandUnitTest):
     self.assertEqual(1, len(actual))
     self.assertEqual(operation_name, actual[0].name)
 
-  def testListWithDefaultNamespaceIdGetsTranslated(self):
+  def testListWithDefaultNamespaceIdGetsTranslated(self, track):
+    self.track = track
     expected_filter = 'metadata.entity_filter.namespace_id=testnamespace'
     request = self.GetMockListRequest(operation_filter=expected_filter)
 
@@ -131,7 +145,8 @@ class ListTest(base.DatastoreCommandUnitTest):
     self.assertEqual(1, len(actual))
     self.assertEqual(operation_name, actual[0].name)
 
-  def testListWithDefaultNamespaceGetsTranslated(self):
+  def testListWithDefaultNamespaceGetsTranslated(self, track):
+    self.track = track
     expected_filter = 'metadata.entity_filter.namespace_id=""'
     request = self.GetMockListRequest(operation_filter=expected_filter)
 
@@ -154,7 +169,8 @@ class ListTest(base.DatastoreCommandUnitTest):
     self.assertEqual(1, len(actual))
     self.assertEqual(operation_name, actual[0].name)
 
-  def testListWithOperationTypeGetsTranslated(self):
+  def testListWithOperationTypeGetsTranslated(self, track):
+    self.track = track
     expected_filter = 'metadata.common.operation_type=IMPORT_ENTITIES'
     request = self.GetMockListRequest(operation_filter=expected_filter)
 
@@ -177,7 +193,8 @@ class ListTest(base.DatastoreCommandUnitTest):
     self.assertEqual(1, len(actual))
     self.assertEqual(operation_name, actual[0].name)
 
-  def testListWithTypeGetsTranslated(self):
+  def testListWithTypeGetsTranslated(self, track):
+    self.track = track
     expected_filter = 'metadata.common.operation_type=IMPORT_ENTITIES'
     request = self.GetMockListRequest(operation_filter=expected_filter)
 
@@ -200,7 +217,8 @@ class ListTest(base.DatastoreCommandUnitTest):
     self.assertEqual(1, len(actual))
     self.assertEqual(operation_name, actual[0].name)
 
-  def testListWithKindGetsTranslated(self):
+  def testListWithKindGetsTranslated(self, track):
+    self.track = track
     expected_filter = 'metadata.entity_filter.kind=k'
     request = self.GetMockListRequest(operation_filter=expected_filter)
 
@@ -221,7 +239,8 @@ class ListTest(base.DatastoreCommandUnitTest):
     self.assertEqual(1, len(actual))
     self.assertEqual(operation_name, actual[0].name)
 
-  def testMultipleFiltersGetTranslated(self):
+  def testMultipleFiltersGetTranslated(self, track):
+    self.track = track
     expected_filter = ('metadata.common.operation_type=IMPORT_ENTITIES '
                        'AND (metadata.entity_filter.namespace_id=n '
                        'AND (metadata.common.labels.k=v '

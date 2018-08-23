@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,15 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class DatabasesDescribeTest(base.SqlMockTestBeta):
+class _BaseDatabasesDescribeTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testDatabasesDescribe(self):
@@ -57,6 +60,20 @@ project: {0}
 selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db
 """.format(self.Project()),
         normalize_space=True)
+
+
+class DatabasesDescribeGATest(_BaseDatabasesDescribeTest, base.SqlMockTestGA):
+  pass
+
+
+class DatabasesDescribeBetaTest(_BaseDatabasesDescribeTest,
+                                base.SqlMockTestBeta):
+  pass
+
+
+class DatabasesDescribeAlphaTest(_BaseDatabasesDescribeTest,
+                                 base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

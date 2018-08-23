@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Basic tests of the argument wiring between gcloud app and appcfg."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import multiprocessing.pool
 import os
 import tempfile
@@ -146,10 +149,6 @@ class DeployTestBase(api_test_util.ApiTestBase,
         context_util, 'CalculateExtendedSourceContexts', return_value=[])
 
     self.gdcmock_args = []
-
-    # API related setup.
-    self.mock_rsync = self.StartObjectPatch(
-        storage_api, 'Rsync', return_value=0)
 
     # Override default retry logic so that tests don't do unnecessary sleeps.
     self.StartObjectPatch(time, 'sleep')
@@ -1675,34 +1674,13 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
 
 class DeployWithApiTestsCWD(DeployWithApiTestsBase, sdk_test_base.WithTempCWD):
 
-  def _WriteAppYaml(self, directory):
-    return self.WriteApp(os.path.join(directory, 'app.yaml'))
-
-  def SetUp(self):
-    # Mock out fingerprinting.
-    self.StartPatch(
-        'googlecloudsdk.api_lib.app.deploy_command_util'
-        '.CreateAppYamlForAppDirectory').side_effect = self._WriteAppYaml
-    # Mock out file uploads because an app.yaml will be written mid-test,
-    # making the expected manifest inaccurate.
-    self.StartObjectPatch(deploy_app_command_util, 'CopyFilesToCodeBucket',
-                          autospec=True, return_value=None)
-
   def testDeploy_NoYaml(self):
     """Test deploying with a single python file in a directory."""
     self.Touch(self.cwd_path, 'start.py')
-    self.ExpectServiceDeployed('default', '1', deployment={})
-
     properties.VALUES.core.user_output_enabled.Set(True)
-    structured_output = self.Run(
-        'app deploy --bucket=gs://default-bucket/ --version=1')
-
-    self.assertEqual(structured_output, {
-        'configs': [],
-        'versions': [
-            version_util.Version(self.Project(), 'default', '1')
-        ]
-    })
+    with self.assertRaises(app_exceptions.UnknownSourceError):
+      self.Run('app deploy --bucket=gs://default-bucket/ --version=1')
+    self.AssertErrContains('Create an app.yaml file')
 
 
 class BetaDeploy(DeployWithFlexBase):

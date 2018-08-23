@@ -5,7 +5,10 @@ SYNOPSIS
     gcloud container builds describe BUILD [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Get information about a particular build.
+    (DEPRECATED) Get information about a particular build.
+
+    This command is deprecated and will be removed on or after 2018-10-31.
+    Please use gcloud builds describe instead.
 
 POSITIONAL ARGUMENTS
      BUILD

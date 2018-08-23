@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud beta container node-pools update NAME
-        (--enable-autorepair --enable-autoupgrade) [--cluster=CLUSTER]
+        (--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES
+          | --enable-autorepair --enable-autoupgrade) [--cluster=CLUSTER]
         [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -16,25 +17,50 @@ POSITIONAL ARGUMENTS
         The name of the node pool.
 
 REQUIRED FLAGS
-     Node management At least one of these must be specified:
+     Exactly one of these must be specified:
 
-       --enable-autorepair
-          Sets autorepair feature for a node-pool.
+       Cluster autoscaling
 
-              $ gcloud beta container node-pools update node-pool-1 \
-                  --cluster=example-cluster --enable-autorepair
+         --enable-autoscaling
+            Enables autoscaling for a node pool.
 
-          See https://cloud.google.com/kubernetes-engine/docs/node-auto-repair
-          for more info.
+            Enables autoscaling in the node pool specified by --node-pool or
+            the default node pool if --node-pool is not provided.
 
-       --enable-autoupgrade
-          Sets autoupgrade feature for a node-pool.
+         --max-nodes=MAX_NODES
+            Maximum number of nodes in the node pool.
 
-              $ gcloud beta container node-pools update node-pool-1 \
-                  --cluster=example-cluster --enable-autoupgrade
+            Maximum number of nodes to which the node pool specified by
+            --node-pool (or default node pool if unspecified) can scale.
+            Ignored unless --enable-autoscaling is also specified.
 
-          See https://cloud.google.com/kubernetes-engine/docs/node-managament
-          for more info.
+         --min-nodes=MIN_NODES
+            Minimum number of nodes in the node pool.
+
+            Minimum number of nodes to which the node pool specified by
+            --node-pool (or default node pool if unspecified) can scale.
+            Ignored unless --enable-autoscaling is also specified.
+
+       Node management
+
+         --enable-autorepair
+            Enable node autorepair feature for a node-pool.
+
+                $ gcloud beta container node-pools update node-pool-1 \
+                    --cluster=example-cluster --enable-autorepair
+
+            See
+            https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
+            for more info.
+
+         --enable-autoupgrade
+            Sets autoupgrade feature for a node-pool.
+
+                $ gcloud beta container node-pools update node-pool-1 \
+                    --cluster=example-cluster --enable-autoupgrade
+
+            See https://cloud.google.com/kubernetes-engine/docs/node-management
+            for more info.
 
 OPTIONAL FLAGS
      --cluster=CLUSTER
@@ -44,10 +70,10 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS

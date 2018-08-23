@@ -36,8 +36,13 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBbinauthz\fR
+\fB(ALPHA)\fR Manage attestations for Binary Authorization on Google Cloud
+Platform.
+
+.TP 2m
 \fBbuilds\fR
-\fB(ALPHA)\fR Create and manage container builds.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Create and manage builds.
 
 .TP 2m
 \fBclusters\fR
@@ -55,6 +60,10 @@ pools.
 .TP 2m
 \fBoperations\fR
 \fB(ALPHA)\fR Get and list operations for Google Kubernetes Engine clusters.
+
+.TP 2m
+\fBpolicy\fR
+\fB(ALPHA)\fR Manage Kubernetes Policies.
 
 .TP 2m
 \fBsubnets\fR
@@ -79,11 +88,11 @@ pools.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud container

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Command for creating instance templates."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import image_utils
 from googlecloudsdk.api_lib.compute import instance_template_utils
@@ -44,24 +48,21 @@ _INSTANTIATE_FROM_VALUES = [
 def _CommonArgs(parser,
                 release_track,
                 support_source_instance,
-                support_network_tier=False,
                 support_local_ssd_size=False,
                 support_shielded_vms=False,
-                support_sole_tenancy=False
+                support_kms=False,
                ):
   """Adding arguments applicable for creating instance templates."""
   parser.display_info.AddFormat(instance_templates_flags.DEFAULT_LIST_FORMAT)
   metadata_utils.AddMetadataArgs(parser)
-  instances_flags.AddDiskArgs(parser)
-  instances_flags.AddCreateDiskArgs(parser)
+  instances_flags.AddDiskArgs(parser, enable_kms=support_kms)
+  instances_flags.AddCreateDiskArgs(parser, enable_kms=support_kms)
   if support_local_ssd_size:
     instances_flags.AddLocalSsdArgsWithSize(parser)
   else:
     instances_flags.AddLocalSsdArgs(parser)
   instances_flags.AddCanIpForwardArgs(parser)
-  instances_flags.AddAddressArgs(
-      parser, instances=False,
-      support_network_tier=support_network_tier)
+  instances_flags.AddAddressArgs(parser, instances=False)
   instances_flags.AddAcceleratorArgs(parser)
   instances_flags.AddMachineTypeArgs(parser)
   deprecate_maintenance_policy = release_track in [base.ReleaseTrack.ALPHA]
@@ -76,10 +77,9 @@ def _CommonArgs(parser,
   if support_shielded_vms:
     instances_flags.AddShieldedVMConfigArgs(parser)
   labels_util.AddCreateLabelsFlags(parser)
-  if support_network_tier:
-    instances_flags.AddNetworkTierArgs(parser, instance=True)
-  if support_sole_tenancy:
-    sole_tenancy_flags.AddNodeAffinityFlagToParser(parser)
+  instances_flags.AddNetworkTierArgs(parser, instance=True)
+
+  sole_tenancy_flags.AddNodeAffinityFlagToParser(parser)
 
   flags.AddRegionFlag(
       parser,
@@ -131,15 +131,16 @@ def _CommonArgs(parser,
   parser.display_info.AddCacheUpdater(completers.InstanceTemplatesCompleter)
 
 
-def _ValidateInstancesFlags(args):
+def _ValidateInstancesFlags(args, support_kms=False):
   """Validate flags for instance template that affects instance creation.
 
   Args:
       args: argparse.Namespace, An object that contains the values for the
           arguments specified in the .Args() method.
+      support_kms: If KMS is supported.
   """
   instances_flags.ValidateDiskCommonFlags(args)
-  instances_flags.ValidateDiskBootFlags(args)
+  instances_flags.ValidateDiskBootFlags(args, enable_kms=support_kms)
   instances_flags.ValidateCreateDiskFlags(args)
   instances_flags.ValidateLocalSsdFlags(args)
   instances_flags.ValidateNicFlags(args)
@@ -227,9 +228,8 @@ def BuildShieldedVMConfigMessage(messages, args):
 def _RunCreate(compute_api,
                args,
                support_source_instance,
-               support_network_tier=False,
                support_shielded_vms=False,
-               support_node_affinity=False):
+               support_kms=False):
   """Common routine for creating instance template.
 
   This is shared between various release tracks.
@@ -239,17 +239,15 @@ def _RunCreate(compute_api,
       args: argparse.Namespace, An object that contains the values for the
           arguments specified in the .Args() method.
       support_source_instance: indicates whether source instance is supported.
-      support_network_tier: Indicates whether network tier is supported or not.
       support_shielded_vms: Indicate whether a shielded vm config is supported
       or not.
-      support_node_affinity: Indicate whether node affinity is supported or not.
+      support_kms: Indicate whether KMS is integrated or not.
 
   Returns:
       A resource object dispatched by display.Displayer().
   """
-  _ValidateInstancesFlags(args)
-  if support_network_tier:
-    instances_flags.ValidateNetworkTierArgs(args)
+  _ValidateInstancesFlags(args, support_kms=support_kms)
+  instances_flags.ValidateNetworkTierArgs(args)
 
   client = compute_api.client
 
@@ -272,8 +270,7 @@ def _RunCreate(compute_api,
             scope_lister=flags.GetDefaultScopeLister(client),
             messages=client.messages,
             network_interface_arg=args.network_interface,
-            region=args.region,
-            support_network_tier=support_network_tier)
+            region=args.region)
   else:
     network_tier = getattr(args, 'network_tier', None)
     network_interfaces = [
@@ -296,10 +293,8 @@ def _RunCreate(compute_api,
         messages=client.messages,
         args=args)
 
-  node_affinities = None
-  if support_node_affinity:
-    node_affinities = sole_tenancy_util.GetSchedulingNodeAffinityListFromArgs(
-        args, client.messages)
+  node_affinities = sole_tenancy_util.GetSchedulingNodeAffinityListFromArgs(
+      args, client.messages)
 
   scheduling = instance_utils.CreateSchedulingMessage(
       messages=client.messages,
@@ -355,7 +350,7 @@ def _RunCreate(compute_api,
   persistent_create_disks = (
       instance_template_utils.CreatePersistentCreateDiskMessages(
           client, compute_api.resources, instance_template_ref.project,
-          getattr(args, 'create_disk', [])))
+          getattr(args, 'create_disk', []), support_kms=support_kms))
 
   if create_boot_disk:
     boot_disk_list = [
@@ -365,7 +360,9 @@ def _RunCreate(compute_api,
             disk_device_name=args.boot_disk_device_name,
             disk_auto_delete=args.boot_disk_auto_delete,
             disk_size_gb=boot_disk_size_gb,
-            image_uri=image_uri)]
+            image_uri=image_uri,
+            kms_args=args,
+            support_kms=support_kms)]
   else:
     boot_disk_list = []
 
@@ -441,7 +438,8 @@ class Create(base.CreateCommand):
   Instance templates are global resources, and can be used to create
   instances in any zone.
   """
-  _support_source_instance = False
+  _support_source_instance = True
+  _support_kms = False
 
   @classmethod
   def Args(cls, parser):
@@ -449,6 +447,7 @@ class Create(base.CreateCommand):
         parser,
         release_track=base.ReleaseTrack.GA,
         support_source_instance=cls._support_source_instance,
+        support_kms=cls._support_kms
     )
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.GA)
 
@@ -485,17 +484,17 @@ class CreateBeta(Create):
   """
   _support_source_instance = True
   _support_shielded_vms = True
+  _support_kms = True
 
   @classmethod
   def Args(cls, parser):
     _CommonArgs(
         parser,
         release_track=base.ReleaseTrack.BETA,
-        support_network_tier=True,
         support_local_ssd_size=False,
         support_source_instance=cls._support_source_instance,
         support_shielded_vms=cls._support_shielded_vms,
-        support_sole_tenancy=True,
+        support_kms=cls._support_kms
     )
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.BETA)
 
@@ -512,10 +511,9 @@ class CreateBeta(Create):
     return _RunCreate(
         base_classes.ComputeApiHolder(base.ReleaseTrack.BETA),
         args=args,
-        support_network_tier=True,
         support_source_instance=self._support_source_instance,
         support_shielded_vms=self._support_shielded_vms,
-        support_node_affinity=True,
+        support_kms=self._support_kms
     )
 
 
@@ -535,17 +533,17 @@ class CreateAlpha(Create):
   """
   _support_source_instance = True
   _support_shielded_vms = True
+  _support_kms = True
 
   @classmethod
   def Args(cls, parser):
     _CommonArgs(
         parser,
         release_track=base.ReleaseTrack.ALPHA,
-        support_network_tier=True,
         support_local_ssd_size=True,
         support_source_instance=cls._support_source_instance,
         support_shielded_vms=cls._support_shielded_vms,
-        support_sole_tenancy=True,
+        support_kms=cls._support_kms
     )
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.ALPHA)
 
@@ -562,8 +560,7 @@ class CreateAlpha(Create):
     return _RunCreate(
         base_classes.ComputeApiHolder(base.ReleaseTrack.ALPHA),
         args=args,
-        support_network_tier=True,
         support_source_instance=self._support_source_instance,
         support_shielded_vms=self._support_shielded_vms,
-        support_node_affinity=True
+        support_kms=self._support_kms
     )

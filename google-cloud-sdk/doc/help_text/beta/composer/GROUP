@@ -1,5 +1,5 @@
 NAME
-    gcloud beta composer - cloud Composer command groups
+    gcloud beta composer - create and manage Cloud Composer Environments
 
 SYNOPSIS
     gcloud beta composer GROUP [GCLOUD_WIDE_FLAG ...]
@@ -35,5 +35,8 @@ EXAMPLES
         $ gcloud beta composer operations --help
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud composer
 

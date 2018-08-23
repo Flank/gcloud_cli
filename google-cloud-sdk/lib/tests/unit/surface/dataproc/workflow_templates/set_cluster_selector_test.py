@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,14 @@
 """Test of the workflow template set-cluster-selector command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
 
 from googlecloudsdk import calliope
 
 from googlecloudsdk.command_lib.util.args import labels_util
-from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
@@ -30,10 +32,10 @@ class WorkflowTemplateSetClusterSelectorUnitTest(
     unit_base.DataprocUnitTestBase, compute_base.BaseComputeUnitTest):
   """Tests for dataproc workflow template set-cluster-selector."""
 
-  def MakeClusterSelector(self, cluster_labels, zone):
+  def MakeClusterSelector(self, cluster_labels):
     labels = labels_util.Diff(additions=cluster_labels).Apply(
         self.messages.ClusterSelector.ClusterLabelsValue).GetOrNone()
-    return self.messages.ClusterSelector(clusterLabels=labels, zone=zone)
+    return self.messages.ClusterSelector(clusterLabels=labels)
 
   def ExpectSetClusterSelector(self,
                                workflow_template=None,
@@ -51,7 +53,10 @@ class WorkflowTemplateSetClusterSelectorUnitTest(
                                    exception=None):
     if not workflow_template:
       workflow_template = self.MakeWorkflowTemplate()
-    self.ExpectGetWorkflowTemplate(workflow_template=workflow_template)
+    self.ExpectGetWorkflowTemplate(
+        name=workflow_template.name,
+        version=workflow_template.version,
+        response=workflow_template)
     if not cluster_selector:
       cluster_selector = self.messages.ClusterSelector()
     workflow_template.placement = self.messages.WorkflowTemplatePlacement(
@@ -71,32 +76,22 @@ class WorkflowTemplateSetClusterSelectorUnitTestBeta(
   def testSetClusterSelector(self):
     workflow_template = self.MakeWorkflowTemplate()
     cluster_labels = {'k1': 'v1'}
-    cluster_selector = self.MakeClusterSelector(cluster_labels, 'us-west1-a')
+    cluster_selector = self.MakeClusterSelector(cluster_labels)
     self.ExpectCallSetClusterSelector(
         workflow_template=workflow_template, cluster_selector=cluster_selector)
     result = self.RunDataproc('workflow-templates set-cluster-selector {0} '
-                              '--zone us-west1-a --cluster-labels=k1=v1'.format(
+                              '--cluster-labels=k1=v1'.format(
                                   self.WORKFLOW_TEMPLATE))
     self.AssertMessagesEqual(workflow_template, result)
 
-  def testSetClusterSelectorNoZone(self):
-    workflow_template = self.MakeWorkflowTemplate()
-    self.ExpectGetWorkflowTemplate(workflow_template=workflow_template)
-    try:
-      self.RunDataproc('workflow-templates set-cluster-selector {0} '
-                       '--cluster-labels=k1=v1'.format(self.WORKFLOW_TEMPLATE))
-      self.fail('Expected exception has not been raised')
-    except properties.RequiredPropertyError:
-      self.AssertErrContains('required property [zone] is not currently set')
-
   def testSetClusterSelectorNoClusterLabels(self):
     workflow_template = self.MakeWorkflowTemplate()
-    cluster_selector = self.MakeClusterSelector(None, 'us-west1-a')
+    cluster_selector = self.MakeClusterSelector(None)
     self.ExpectCallSetClusterSelector(
         workflow_template=workflow_template, cluster_selector=cluster_selector)
     result = self.RunDataproc(
-        'workflow-templates set-cluster-selector {0} '
-        '--zone us-west1-a'.format(self.WORKFLOW_TEMPLATE))
+        'workflow-templates set-cluster-selector '
+        '{0}'.format(self.WORKFLOW_TEMPLATE))
     self.AssertMessagesEqual(workflow_template, result)
 
   def testSetClusterSelectorClusterLabelsLength(self):

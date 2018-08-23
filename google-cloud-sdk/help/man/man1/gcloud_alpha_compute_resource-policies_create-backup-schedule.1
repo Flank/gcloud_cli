@@ -11,7 +11,7 @@ gcloud alpha compute resource\-policies create\-backup\-schedule \- create a Goo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute resource\-policies create\-backup\-schedule\fR \fINAME\fR \fB\-\-max\-retention\-days\fR=\fIMAX_RETENTION_DAYS\fR (\fB\-\-weekly\-schedule\-from\-file\fR=\fIWEEKLY_CYCLE_FROM_FILE\fR\ |\ \fB\-\-start\-time\fR=\fISTART_TIME\fR\ (\fB\-\-daily\-schedule\fR\ |\ \fB\-\-hourly\-schedule\fR=\fIHOURS\fR\ |\ \fB\-\-weekly\-schedule\fR=\fIWEEKLY_CYCLE\fR)) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-guest\-flush\fR\ \fB\-\-snapshot\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute resource\-policies create\-backup\-schedule\fR \fINAME\fR \fB\-\-max\-retention\-days\fR=\fIMAX_RETENTION_DAYS\fR (\fB\-\-weekly\-schedule\-from\-file\fR=\fIWEEKLY_CYCLE_FROM_FILE\fR\ |\ \fB\-\-start\-time\fR=\fISTART_TIME\fR\ (\fB\-\-daily\-schedule\fR\ |\ \fB\-\-hourly\-schedule\fR=\fIHOURS\fR\ |\ \fB\-\-weekly\-schedule\fR=\fIWEEKLY_CYCLE\fR)) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-guest\-flush\fR\ \fB\-\-snapshot\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-storage\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -109,7 +109,7 @@ An optional, textual description for the backend.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the resource policy to operate on. If not specified, you may be
+Region of the resource policy to operate on. If not specified, you may be
 prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
@@ -146,7 +146,7 @@ snapshot process.
 
 .TP 2m
 \fB\-\-snapshot\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.
+List of label KEY=VALUE pairs to add.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
@@ -154,6 +154,12 @@ only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
 
 These will be added to the disk snapshots on creation.
+
+.TP 2m
+\fB\-\-storage\-location\fR=\fILOCATION\fR
+Google Cloud Storage location, either regional or multi\-regional, where
+snapshot content is to be stored. If absent, a nearby regional or
+multi\-regional location is chosen automatically.
 
 
 .RE
@@ -171,9 +177,9 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
 

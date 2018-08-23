@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +15,13 @@
 """Integration tests for differences between running on GCE and locally."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
 import contextlib
+import json
 import re
-import textwrap
 
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import gce as c_gce
@@ -57,16 +60,16 @@ class GCloudComputeOnGCE(e2e_test_base.BaseTest):
     # prompt. We need number of the zone. When information is printed
     # we extract it in patched_write and call self.WriteInput to provide
     # necessary input for blocked self.Run().
-    real_write = self.stderr.write
     closure = argparse.Namespace()  # Eventually move to nonlocal when available
     closure.count = 0
     def patched_write(s):
-      real_write(s)  # Do not replace - only decorate
-      # This assumes zone line is written as a whole
-      match = re.search(r'\[(\d+)]\s{}'.format(zone), s)
-      if match:
+      try:
+        choices = json.loads(s)['choices']
+        index = choices.index(zone) + 1
         closure.count += 1
-        self.WriteInput(match.group(1))
+        self.WriteInput(str(index))
+      except (KeyError, ValueError):
+        pass
     patcher = mock.patch.object(self.stderr, 'write', patched_write)
     patcher.start()
     try:
@@ -90,11 +93,6 @@ class GCloudComputeOnGCE(e2e_test_base.BaseTest):
             format(instance_name), re.S)):
       with self.AnswerPromptForZone('us-central1-f'):
         self.Run('compute instances describe {0}'.format(instance_name))
-    self.AssertNewErrContains(textwrap.dedent("""
-        For the following instance:
-         - [{0}]
-        choose a zone:
-         [1]""".format(instance_name)))
 
     self.Run('compute instances list')
     self.AssertNewOutputNotContains(instance_name)

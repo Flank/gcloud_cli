@@ -29,8 +29,9 @@ COMMANDS
         (BETA) Changes a user's password in a given instance.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud sql users
+        $ gcloud alpha sql users
 

@@ -17,6 +17,11 @@ gcloud datastore cleanup\-indexes \- remove unused datastore indexes based on yo
 
 .SH "DESCRIPTION"
 
+\fB(DEPRECATED)\fR \f5cleanup\-indexes\fR is deprecated. Please use \f5gcloud
+datastore indexes cleanup\fR instead.
+
+
+
 This command removes unused datastore indexes based on your local index
 configuration. Any indexes that exist that are not in the index file will be
 removed.
@@ -52,14 +57,3 @@ To remove unused indexes based on your local configuration, run:
 .RS 2m
 $ gcloud datastore cleanup\-indexes ~/myapp/index.yaml
 .RE
-
-
-
-.SH "NOTES"
-
-This variant is also available:
-
-.RS 2m
-$ gcloud beta datastore cleanup\-indexes
-.RE
-

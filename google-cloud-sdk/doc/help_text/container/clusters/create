@@ -9,7 +9,7 @@ SYNOPSIS
         [--cluster-secondary-range-name=NAME]
         [--cluster-version=CLUSTER_VERSION]
         [--create-subnetwork=[KEY=VALUE,...]] [--disk-size=DISK_SIZE]
-        [--enable-autorepair] [--enable-autoupgrade]
+        [--disk-type=DISK_TYPE] [--enable-autorepair] [--enable-autoupgrade]
         [--no-enable-cloud-logging] [--no-enable-cloud-monitoring]
         [--enable-ip-alias] [--enable-kubernetes-alpha]
         [--enable-legacy-authorization] [--enable-network-policy]
@@ -147,13 +147,21 @@ FLAGS
      --disk-size=DISK_SIZE
         Size in GB for node VM boot disks. Defaults to 100GB.
 
+     --disk-type=DISK_TYPE
+        Type of the node VM boot disk. Defaults to pd-standard. DISK_TYPE must
+        be one of: pd-standard, pd-ssd.
+
      --enable-autorepair
-        Sets autorepair feature for a cluster's default node-pool(s).
+        Enable node autorepair feature for a cluster's default node-pool(s).
 
             $ gcloud container clusters create example-cluster \
                 --enable-autorepair
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-auto-repair
+        Node autorepair is enabled by default for clusters using COS as a base
+        image.
+
+        See
+        https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
         for more info.
 
      --enable-autoupgrade
@@ -162,7 +170,7 @@ FLAGS
             $ gcloud container clusters create example-cluster \
                 --enable-autoupgrade
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-managament for
+        See https://cloud.google.com/kubernetes-engine/docs/node-management for
         more info.
 
      --enable-cloud-logging
@@ -474,10 +482,10 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
      Options to specify the node identity. At most one of these may be

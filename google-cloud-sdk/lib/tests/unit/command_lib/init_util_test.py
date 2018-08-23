@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 """Tests for googlecloudsdk.command_lib.init_util."""
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_util
 from googlecloudsdk.api_lib.util import apis
@@ -43,9 +46,10 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     """Should return None, since preselected value is not in the list."""
     self.WriteInput('n')
     self.assertEqual(init_util.PickProject('qux'), None)
-    self.AssertErrEquals(
-        '[qux] is not one of your projects [bar,baz,foo].\n\n'
-        'Would you like to create it? (Y/n)?\n', normalize_space=True)
+    self.AssertErrContains(
+        '{"ux": "PROMPT_CONTINUE", "message": "[qux] is not one of your '
+        'projects [bar,baz,foo]. ", "prompt_string": "Would you like to create '
+        'it?"}')
 
   def testPickProject_PreselectedListingProjectsFails(self):
     """Should take preselected value (without validating it)."""
@@ -64,70 +68,43 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
     self.assertEqual(init_util.PickProject(), 'baz')
     # Output is sorted lexicographically
-    self.AssertErrEquals("""\
-        Pick cloud project to use:
-         [1] bar
-         [2] baz
-         [3] foo
-         [4] Create a new project
-        Please enter numeric choice or text value (must exactly match list item):
-        """, normalize_space=True)
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
+        '"choices": ["bar", "baz", "foo", "Create a new project"]}\n')
 
   def testPickProject_FreeformInput(self):
     """Should accept free-form input, since it's in the list."""
     self.WriteInput('bar')
 
     self.assertEqual(init_util.PickProject(), 'bar')
-    self.AssertErrEquals("""\
-        Pick cloud project to use:
-         [1] bar
-         [2] baz
-         [3] foo
-         [4] Create a new project
-        Please enter numeric choice or text value (must exactly match list item):
-        """, normalize_space=True)
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
+        '"choices": ["bar", "baz", "foo", "Create a new project"]}\n')
 
   def testPickProject_BadInput(self):
     """Should return None and show another prompt."""
     self.WriteInput('5')
 
     self.assertEqual(init_util.PickProject(), None)
-    self.AssertErrEquals("""\
-        Pick cloud project to use:
-         [1] bar
-         [2] baz
-         [3] foo
-         [4] Create a new project
-        Please enter numeric choice or text value (must exactly match list item): \
-        Please enter a value between 1 and 4, or a value present in the list:
-        """, normalize_space=True)
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
+        '"choices": ["bar", "baz", "foo", "Create a new project"]}\n')
 
   def testPickProject_BadFreeformInput(self):
     """Should return None and show another prompt."""
     self.WriteInput('qux')
 
     self.assertEqual(init_util.PickProject(), None)
-    self.AssertErrEquals("""\
-        Pick cloud project to use:
-         [1] bar
-         [2] baz
-         [3] foo
-         [4] Create a new project
-        Please enter numeric choice or text value (must exactly match list item): \
-        Please enter a value between 1 and 4, or a value present in the list:
-        """, normalize_space=True)
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
+        '"choices": ["bar", "baz", "foo", "Create a new project"]}\n')
 
   def testPickProject_NoInput(self):
     """Should pick the corresponding project."""
     self.assertEqual(init_util.PickProject(), None)
-    self.AssertErrEquals("""\
-        Pick cloud project to use:
-         [1] bar
-         [2] baz
-         [3] foo
-         [4] Create a new project
-        Please enter numeric choice or text value (must exactly match list item):
-        """, normalize_space=True)
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
+        '"choices": ["bar", "baz", "foo", "Create a new project"]}\n')
 
   def testPickProject_CreateProject(self):
     """Should pick the corresponding project."""
@@ -137,13 +114,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.assertEqual(init_util.PickProject(), 'new-project')
     self.AssertErrEquals(
         """\
-        Pick cloud project to use:
-         [1] bar
-         [2] baz
-         [3] foo
-         [4] Create a new project
-        Please enter numeric choice or text value (must exactly match list \
-        item):
+        {"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", \
+        "choices": ["bar", "baz", "foo", "Create a new project"]}
         Enter a Project ID. Note that a Project ID CANNOT be changed later.
         Project IDs must be 6-30 characters (lowercase ASCII, digits, or
         hyphens) in length and start with a lowercase letter.""",
@@ -160,13 +132,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
         """\
-        Pick cloud project to use:
-         [1] bar
-         [2] baz
-         [3] foo
-         [4] Create a new project
-        Please enter numeric choice or text value (must exactly match list \
-        item):
+        {"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", \
+        "choices": ["bar", "baz", "foo", "Create a new project"]}
         Enter a Project ID. Note that a Project ID CANNOT be changed later.
         Project IDs must be 6-30 characters (lowercase ASCII, digits, or
         hyphens) in length and start with a lowercase letter.""",
@@ -182,13 +149,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
         """\
-        Pick cloud project to use:
-         [1] bar
-         [2] baz
-         [3] foo
-         [4] Create a new project
-        Please enter numeric choice or text value (must exactly match list \
-        item):
+        {"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", \
+        "choices": ["bar", "baz", "foo", "Create a new project"]}
         Enter a Project ID. Note that a Project ID CANNOT be changed later.
         Project IDs must be 6-30 characters (lowercase ASCII, digits, or
         hyphens) in length and start with a lowercase letter. \
@@ -210,12 +172,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
     self.assertEqual(init_util.PickProject(), 'spam')
     self.AssertErrEquals(
-        'Pick cloud project to use:\n'
-        ' [1] spam\n'
-        ' [2] Create a new project\n'
-        'Please enter numeric choice or text value (must exactly match list '
-        'item):\n',
-        normalize_space=True)
+        '{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
+        '"choices": ["spam", "Create a new project"]}\n')
 
   def testPickProject_NoProjects(self):
     """Should return None because an empty project ID was given."""
@@ -223,8 +181,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
     self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
-        'This account has no projects.\n\n'
-        'Would you like to create one? (Y/n)?\n'
+        '{"ux": "PROMPT_CONTINUE", "message": "This account has no projects.", '
+        '"prompt_string": "Would you like to create one?"}\n'
         'Enter a Project ID. Note that a Project ID CANNOT be changed later. \n'
         'Project IDs must be 6-30 characters (lowercase ASCII, digits, or \n'
         'hyphens) in length and start with a lowercase letter.',
@@ -236,9 +194,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
     self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
-        'This account has no projects.\n\n'
-        'Would you like to create one? (Y/n)?\n',
-        normalize_space=True)
+        '{"ux": "PROMPT_CONTINUE", "message": "This account has no projects.", '
+        '"prompt_string": "Would you like to create one?"}\n')
 
   def testPickProject_NoProjectsCreateAProject(self):
     create_projects_mock = self.StartObjectPatch(projects_api, 'Create')
@@ -247,8 +204,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
     self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrEquals(
-        'This account has no projects.\n\n'
-        'Would you like to create one? (Y/n)?\n'
+        '{"ux": "PROMPT_CONTINUE", "message": "This account has no projects.", '
+        '"prompt_string": "Would you like to create one?"}\n'
         'Enter a Project ID. Note that a Project ID CANNOT be changed later. \n'
         'Project IDs must be 6-30 characters (lowercase ASCII, digits, or \n'
         'hyphens) in length and start with a lowercase letter.',
@@ -317,13 +274,9 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
     self.WriteInput('1\nxuq\nqux')
     self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrContains(
-        """\
-        This account has a lot of projects! Listing them all can take a while.
-         [1] Enter a project ID
-         [2] Create a new project
-         [3] List projects
-        Please enter your numeric choice:""",
-        normalize_space=True)
+        '{"ux": "PROMPT_CHOICE", "message": "This account has a lot of '
+        'projects! Listing them all can take a while.", "choices": '
+        '["Enter a project ID", "Create a new project", "List projects"]}')
     self.AssertErrContains('Project ID does not exist or is not active. Please '
                            'enter an existing and active Project ID.')
     self.AssertErrContains('Enter an existing project id you would like to '
@@ -340,13 +293,9 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
     self.WriteInput('2\nqux')
     self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrContains(
-        """\
-        This account has a lot of projects! Listing them all can take a while.
-         [1] Enter a project ID
-         [2] Create a new project
-         [3] List projects
-        Please enter your numeric choice:""",
-        normalize_space=True)
+        '{"ux": "PROMPT_CHOICE", "message": "This account has a lot of '
+        'projects! Listing them all can take a while.", "choices": '
+        '["Enter a project ID", "Create a new project", "List projects"]}')
     create_projects_mock.assert_called_once_with(
         resources.REGISTRY.Create('cloudresourcemanager.projects',
                                   projectId='qux'))
@@ -355,23 +304,12 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
     self.WriteInput('3\n1')
     self.assertEqual(init_util.PickProject(), 'bar')
     self.AssertErrContains(
-        """\
-        This account has a lot of projects! Listing them all can take a while.
-         [1] Enter a project ID
-         [2] Create a new project
-         [3] List projects
-        Please enter your numeric choice:""",
-        normalize_space=True)
-    self.AssertErrContains(
-        """\
-        Pick cloud project to use:
-         [1] bar
-         [2] baz
-         [3] foo
-         [4] Create a new project
-        Please enter numeric choice or text value (must exactly match list \
-        item):""",
-        normalize_space=True)
+        '{"ux": "PROMPT_CHOICE", "message": "This account has a lot of '
+        'projects! Listing them all can take a while.", "choices": '
+        '["Enter a project ID", "Create a new project", "List projects"]}')
+    self.AssertErrContains('{"ux": "PROMPT_CHOICE", "message": "Pick cloud '
+                           'project to use: ", "choices": ["bar", "baz", '
+                           '"foo", "Create a new project"]}')
 
 
 if __name__ == '__main__':

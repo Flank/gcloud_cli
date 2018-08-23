@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Small test to verify that deploy behaves as expected."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import textwrap
 
@@ -152,7 +155,8 @@ class GenConfigTest(FingerprintingTestBase):
     self.WriteFile('app.yaml', NODEJS_APP_YAML)
     self.Run('app gen-config --custom %s' % self.temp_path)
     self.AssertErrContains(output_helpers.RUNTIME_MISMATCH_MSG.format(
-        os.path.join(self.temp_path, 'app.yaml'), normalize_space=True))
+        os.path.join(self.temp_path, 'app.yaml').replace('\\', '\\\\'),
+        normalize_space=True))
 
   def testGenConfigAppYamlFlex(self):
     """Test that params are generated with an `vm: true` app.yaml."""
@@ -166,37 +170,6 @@ class GenConfigTest(FingerprintingTestBase):
     self.assertTrue(self.params.appinfo)
     self.assertTrue(self.params.appinfo.vm)
     self.assertFalse(self.params.appinfo.env, 'flex')
-
-
-@test_case.Filters.RunOnlyIf(properties.VALUES.app.runtime_root.Get(),
-                             'No app runtime root is configured')
-class DeployFingerprintingTest(FingerprintingTestBase,
-                               sdk_test_base.WithTempCWD):
-
-  def SetUp(self):
-    self.temp_path = os.getcwd()
-
-  def testDeployNoAppYaml(self):
-    """Test that nodejs deployment writes app.yaml if necessary."""
-    # This test needs to run in the GA track because the Node.js beta track
-    # uses the Runtime Builder that (by design) doesn't do fingerprinting.
-    self.track = calliope_base.ReleaseTrack.GA
-    self.WriteJSON('package.json', {'scripts': {'start': 'node foo.js'}})
-    self.WriteFile('foo.js', 'console.log("hello")')
-    self.Run('app deploy --bucket=gs://bucket')
-    self.assertTrue('app.yaml' in os.listdir(self.temp_path))
-
-  def testGAEV1Java(self):
-    """Verify that we don't call fingerprinting for java v1."""
-    self.WriteFile('app.yaml', JAVA_V1_APP_YAML)
-    self.StartPatch(
-        'gae_ext_runtime.ext_runtime.ExternalizedRuntime.Fingerprint',
-        new=self.FingerprintMock)
-    self.Run('app deploy %s/app.yaml --bucket=gs://bucket' % self.temp_path)
-    self.assertFalse(self.params)
-
-  # TODO(b/36053575): test that we respond sanely when runtime: nodejs and we
-  # can't fingerprint.
 
 
 if __name__ == '__main__':

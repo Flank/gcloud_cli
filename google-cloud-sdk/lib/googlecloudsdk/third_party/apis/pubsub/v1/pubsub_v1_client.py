@@ -594,8 +594,7 @@ subscription, such as its topic, are not modifiable.
     )
 
     def Pull(self, request, global_params=None):
-      r"""Pulls messages from the server. Returns an empty list if there are no.
-messages available in the backlog. The server may return `UNAVAILABLE` if
+      r"""Pulls messages from the server. The server may return `UNAVAILABLE` if.
 there are too many concurrent pull requests pending for the given
 subscription.
 
@@ -974,8 +973,7 @@ topic are not modifiable.
 
     def Publish(self, request, global_params=None):
       r"""Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic.
-does not exist. The message payload must not be empty; it must contain
- either a non-empty data field, or at least one attribute.
+does not exist.
 
       Args:
         request: (PubsubProjectsTopicsPublishRequest) input message

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +14,10 @@
 # limitations under the License.
 
 """Test of the 'operations cancel' command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.console import console_io
@@ -42,11 +44,9 @@ class OperationsCancelUnitTest(unit_base.DataprocUnitTestBase):
     self.WriteInput('y\n')
     result = self.RunDataproc(
         'operations cancel {0}'.format(self.OperationName()))
-    # Line wrapping messes up white space.
-    self.AssertErrContains(textwrap.dedent("""\
-        The operation '{0}' will be cancelled.
-
-        Do you want to continue (Y/n)?""").format(self.OperationName()))
+    self.AssertErrContains(
+        "The operation '{0}' will be cancelled.".format(self.OperationName()))
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains('Cancelled [{0}].'.format(self.OperationName()))
     self.assertIsNone(result)
 
@@ -56,10 +56,9 @@ class OperationsCancelUnitTest(unit_base.DataprocUnitTestBase):
         console_io.OperationCancelledError,
         'Cancellation aborted by user.'):
       self.RunDataproc('operations cancel {0}'.format(self.OperationName()))
-    self.AssertErrContains(textwrap.dedent("""\
-        The operation '{0}' will be cancelled.
-
-        Do you want to continue (Y/n)?""".format(self.OperationName())))
+    self.AssertErrContains(
+        "The operation '{0}' will be cancelled.".format(self.OperationName()))
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testCancelOperationNotFound(self):
     self.ExpectCancelOperation(

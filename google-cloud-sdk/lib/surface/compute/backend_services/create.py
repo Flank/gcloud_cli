@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +18,9 @@
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
@@ -116,6 +119,7 @@ class CreateGA(base.CreateCommand):
     flags.AddCacheKeyQueryStringList(parser)
     AddIapFlag(parser)
     parser.display_info.AddCacheUpdater(flags.BackendServicesCompleter)
+    signed_url_flags.AddSignedUrlCacheMaxAge(parser, required=False)
 
   def _CreateBackendService(self, holder, args, backend_services_ref):
     health_checks = flags.GetHealthCheckUris(args, self, holder.resources)
@@ -154,7 +158,11 @@ class CreateGA(base.CreateCommand):
       backend_service.affinityCookieTtlSec = args.affinity_cookie_ttl
 
     backend_services_utils.ApplyCdnPolicyArgs(
-        client, args, backend_service, is_update=False)
+        client,
+        args,
+        backend_service,
+        is_update=False,
+        apply_signed_url_cache_max_age=True)
 
     self._ApplyIapArgs(client.messages, args.iap, backend_service)
 
@@ -249,7 +257,7 @@ class CreateAlpha(CreateGA):
     flags.GLOBAL_REGIONAL_BACKEND_SERVICE_ARG.AddArgument(
         parser, operation_type='create')
     flags.AddDescription(parser)
-    cls.HEALTH_CHECK_ARG = flags.HealthCheckArgument()
+    cls.HEALTH_CHECK_ARG = flags.HealthCheckArgument(include_alpha=True)
     cls.HEALTH_CHECK_ARG.AddArgument(parser, cust_metavar='HEALTH_CHECK')
     cls.HTTP_HEALTH_CHECK_ARG = flags.HttpHealthCheckArgument()
     cls.HTTP_HEALTH_CHECK_ARG.AddArgument(
@@ -261,8 +269,7 @@ class CreateAlpha(CreateGA):
     flags.AddPortName(parser)
     flags.AddProtocol(
         parser,
-        default=None,
-        choices=['HTTP', 'HTTPS', 'HTTP2', 'SSL', 'TCP', 'UDP'])
+        default=None)
     flags.AddEnableCdn(parser, default=False)
     flags.AddCacheKeyIncludeProtocol(parser, default=True)
     flags.AddCacheKeyIncludeHost(parser, default=True)
@@ -271,7 +278,7 @@ class CreateAlpha(CreateGA):
     flags.AddSessionAffinity(parser, internal_lb=True)
     flags.AddAffinityCookieTtl(parser)
     flags.AddConnectionDrainingTimeout(parser)
-    flags.AddLoadBalancingScheme(parser)
+    flags.AddLoadBalancingScheme(parser, include_alpha=True)
     flags.AddCustomRequestHeaders(parser, remove_all_flag=False, default=False)
     signed_url_flags.AddSignedUrlCacheMaxAge(parser, required=False)
     flags.AddConnectionDrainOnFailover(parser, default=None)
@@ -317,6 +324,11 @@ class CreateAlpha(CreateGA):
       backend_service.customRequestHeaders = args.custom_request_header
 
     self._ApplyIapArgs(client.messages, args.iap, backend_service)
+
+    if args.load_balancing_scheme != 'EXTERNAL':
+      backend_service.loadBalancingScheme = (
+          client.messages.BackendService.LoadBalancingSchemeValueValuesEnum(
+              args.load_balancing_scheme))
 
     request = client.messages.ComputeBackendServicesInsertRequest(
         backendService=backend_service,
@@ -406,7 +418,9 @@ class CreateBeta(CreateGA):
         parser, cust_metavar='HTTPS_HEALTH_CHECK')
     flags.AddTimeout(parser)
     flags.AddPortName(parser)
-    flags.AddProtocol(parser, default=None)
+    flags.AddProtocol(
+        parser,
+        default=None)
     flags.AddEnableCdn(parser, default=False)
     flags.AddSessionAffinity(parser, internal_lb=True)
     flags.AddAffinityCookieTtl(parser)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """Tests for gcloud meta update-cli-trees."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.meta import generate_cli_trees
@@ -36,6 +38,7 @@ class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
         commands=None,
         directory=None,
         force=False,
+        tarball=None,
         verbose=True)
 
   def testUpdateCliTreesWithCommands(self):
@@ -46,6 +49,7 @@ class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
         commands=commands,
         directory=None,
         force=False,
+        tarball=None,
         verbose=True)
 
   def testUpdateCliTreesWithDirectory(self):
@@ -56,6 +60,7 @@ class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
         commands=None,
         directory=directory,
         force=False,
+        tarball=None,
         verbose=True)
 
   def testUpdateCliTreesGeneratorsHelp(self):

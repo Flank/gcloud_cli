@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Create iOS test matrices in Firebase Test Lab."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import uuid
 
@@ -138,8 +141,8 @@ class MatrixCreator(object):
     return self._messages.IosDevice(
         iosModelId=device_map['model'],
         iosVersionId=device_map['version'],
-        locale='en_US',  # TODO(b/78015882): add real locale/orientation support
-        orientation='portrait')
+        locale=device_map['locale'],
+        orientation=device_map['orientation'])
 
   def _BuildTestMatrixRequest(self, request_id):
     """Build a TestingProjectsTestMatricesCreateRequest for a test matrix.

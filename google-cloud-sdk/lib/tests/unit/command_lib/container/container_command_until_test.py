@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +16,14 @@
 """Tests for container_command_util.py utils."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
 
-from googlecloudsdk.api_lib.container import util
 from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.command_lib.container import constants
 from googlecloudsdk.command_lib.container import container_command_util
 from googlecloudsdk.core import properties
-from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -103,38 +102,6 @@ class GetZoneOrRegionTest(sdk_test_base.SdkBase):
     args = argparse.Namespace(zone='us-central1-a', region='us-central1')
     with self.assertRaises(exceptions.ConflictingArgumentsException):
       container_command_util.GetZoneOrRegion(args)
-
-
-class GetUseV1APIPropertyTest(
-    parameterized.TestCase, cli_test_base.CliTestBase):
-
-  @parameterized.parameters(
-      (None, None, False),
-      (True, None, True),
-      (False, None, False),
-      (None, True, True),
-      (True, True, True),
-      (None, False, False),
-      (False, False, False),
-  )
-  def testGetUseV1APIProperty(self, use_v1_api, use_v1_api_client, expected):
-    self._testGetUseV1APIProperty(use_v1_api, use_v1_api_client, expected)
-
-  @parameterized.parameters(
-      (False, True),
-      (True, False),
-  )
-  def testGetUseV1APIPropertyConflict(self, use_v1_api, use_v1_api_client):
-    with self.AssertRaisesExceptionMatches(
-        util.Error,
-        constants.CANNOT_SET_BOTH_USE_V1_API_PROPERTIES_WITH_DIFF_VALUES):
-      self._testGetUseV1APIProperty(use_v1_api, use_v1_api_client, None)
-
-  def _testGetUseV1APIProperty(self, use_v1_api, use_v1_api_client, expected):
-    properties.VALUES.container.use_v1_api.Set(use_v1_api)
-    properties.VALUES.container.use_v1_api_client.Set(use_v1_api_client)
-    actual = container_command_util.GetUseV1APIProperty()
-    self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

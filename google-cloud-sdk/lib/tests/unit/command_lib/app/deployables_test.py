@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +15,11 @@
 """Tests for deployable services and configs."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
-from googlecloudsdk.api_lib.app import deploy_command_util
 from googlecloudsdk.api_lib.app import env as app_env
 from googlecloudsdk.api_lib.app import yaml_parsing
 from googlecloudsdk.command_lib.app import deployables
@@ -179,14 +181,10 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
   def testDirWithOtherYaml(self):
     """Directory with other.yaml inside, should error."""
     self.config_yaml_mock.return_value = None
-    create_yaml_mock = self.StartObjectPatch(
-        deploy_command_util, 'CreateAppYamlForAppDirectory', autospec=True,
-        side_effect=exceptions.NoAppIdentifiedError('msg'))
     self.Touch(self.cwd_path, name='other.yaml', contents='unused')
-    with self.assertRaises(exceptions.NoAppIdentifiedError):
+    with self.assertRaises(exceptions.UnknownSourceError):
       deployables.GetDeployables(
           ['.'], self.stager, deployables.GetPathMatchers())
-    create_yaml_mock.assert_called_once()
 
   def testOtherYaml(self):
     """Simple other.yaml passed as deployable."""

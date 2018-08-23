@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """compute snapshots set-iam-policy tests."""
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+
 import textwrap
 
 from apitools.base.py import encoding
@@ -21,24 +26,33 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import yaml
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_resources
 
 
-class SetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
+@parameterized.parameters(
+    (base.ReleaseTrack.ALPHA, 'alpha'),
+    (base.ReleaseTrack.BETA, 'beta'))
+class SetIamPolicyTest(sdk_test_base.WithFakeAuth,
+                       cli_test_base.CliTestBase,
+                       parameterized.TestCase):
 
-  def SetUp(self):
-    self.messages = apis.GetMessagesModule('compute', 'alpha')
+  def _SetUp(self, track, api_version):
+    self.messages = apis.GetMessagesModule('compute', api_version)
     self.mock_client = mock.Client(
-        apis.GetClientClass('compute', 'alpha'),
-        real_client=apis.GetClientInstance('compute', 'alpha', no_http=True))
+        apis.GetClientClass('compute', api_version),
+        real_client=apis.GetClientInstance(
+            'compute', api_version, no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = track
 
-  def testSimpleResponseCase(self):
-    policy = test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag()
+  def testSimpleResponseCase(self, track, api_version):
+    self._SetUp(track, api_version)
+    policy = test_resources.IamPolicyWithOneBindingAndDifferentEtag(
+        self.messages)
     self.mock_client.snapshots.SetIamPolicy.Expect(
         self.messages.ComputeSnapshotsSetIamPolicyRequest(
             resource='my-resource',
@@ -63,14 +77,16 @@ class SetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             etag: ZXRhZ1R3bw==
             """))
 
-  def testBadlyFormattedPolicyFile(self):
+  def testBadlyFormattedPolicyFile(self, track, api_version):
+    self._SetUp(track, api_version)
     policy_file = self.Touch(self.temp_path, 'bad.json', contents='bad')
 
     with self.assertRaises(exceptions.BadFileException):
       self.Run(
           'compute snapshots set-iam-policy my-resource {}'.format(policy_file))
 
-  def testMissingPolicyFile(self):
+  def testMissingPolicyFile(self, track, api_version):
+    self._SetUp(track, api_version)
     with self.assertRaises(yaml.FileLoadError):
       self.Run('compute snapshots set-iam-policy my-resource missing-file')
 

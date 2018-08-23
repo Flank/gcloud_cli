@@ -1,0 +1,148 @@
+
+.TH "GCLOUD_COMPUTE_SOLE\-TENANCY_NODE\-TEMPLATES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute sole\-tenancy node\-templates create \- creates a Google Compute Engine node template
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute sole\-tenancy node\-templates create\fR \fINAME\fR (\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]\ |\ \fB\-\-node\-type\fR=\fINODE_TYPE\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Creates a Google Compute Engine node template.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the node templates to operate on.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]
+The requirements for nodes. Google Compute Engine will automatically choose a
+node type that fits the requirements on Node Group creation. If multiple node
+types match your defined criteria, the NodeType with the least amount of each
+resource will be selected. You can specify 'any' to indicate any non\-zero value
+for a certain resource.
+
+The following keys are allowed:
+
+.RS 2m
+.TP 2m
+\fBvCPU\fR
+The number of committed cores available to the node.
+
+.TP 2m
+\fBmemory\fR
+The amount of memory available to the node. This value should include unit (eg.
+3072MB or 9GB). If no units are specified, \fBMB is assumed\fR.
+
+.TP 2m
+\fBlocalSSD\fR
+Optional. The amount of SSD space available on the node. This value should
+include unit (eg. 3072MB or 9GB). If no units are specified, \fBGB is
+assumed\fR. If this key is not specified, local SSD is unconstrained.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-node\-type\fR=\fINODE_TYPE\fR
+The node type to use for nodes in node groups using this template. The type of a
+node determines what resources are available to instances running on the node.
+
+See the following for more information:
+
+.RS 2m
+$ gcloud alpha compute sole\-tenancy node\-types
+.RE
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional description of this resource.
+
+.TP 2m
+\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+Labels to use for node affinity, which will be used in instance scheduling. This
+corresponds to the \f5\-\-node\-affinity\fR flag on \f5compute instances
+create\fR and \f5compute instance\-templates create\fR.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the node templates to operate on. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute sole\-tenancy node\-templates create
+$ gcloud beta compute sole\-tenancy node\-templates create
+.RE
+

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,9 @@
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import abc
 import collections
 from functools import wraps
@@ -81,10 +84,10 @@ class ReleaseTrack(object):
       'ALPHA', 'alpha',
       '{0}(ALPHA){0} '.format(MARKDOWN_BOLD),
       'This command is currently in ALPHA and may change without notice. '
-      'Usually, users of ALPHA commands and flags need to apply for access, '
-      'agree to applicable terms, and have their projects whitelisted. '
-      'Contact Google or sign up on a product\'s page for ALPHA access. '
-      'Product pages can be found at https://cloud.google.com/products/.')
+      'If this command fails with API permission errors despite specifying '
+      'the right project, you will have to apply for early access and have your'
+      ' projects registered on the API whitelist to use it. To do so, contact '
+      'Support at https://cloud.google.com/support/.')
   _ALL = [GA, BETA, ALPHA]
 
   @staticmethod
@@ -305,7 +308,7 @@ FORMAT_FLAG = Argument(
     default=None,
     category=COMMONLY_USED_FLAGS,
     help="""\
-        Sets the format for printing command output resources. The default is a
+        Set the format for printing command output resources. The default is a
         command-specific human-friendly output format. The supported formats
         are: `{0}`. For more details run $ gcloud topic formats.""".format(
             '`, `'.join(resource_printer.SupportedFormats())))
@@ -325,8 +328,8 @@ FILTER_FLAG = Argument(
     category=LIST_COMMAND_FLAGS,
     help="""\
     Apply a Boolean filter _EXPRESSION_ to each resource item to be listed.
-    If the expression evaluates True then that item is listed. For more
-    details and examples of filter expressions run $ gcloud topic filters. This
+    If the expression evaluates `True`, then that item is listed. For more
+    details and examples of filter expressions, run $ gcloud topic filters. This
     flag interacts with other flags that are applied in this order: *--flatten*,
     *--sort-by*, *--filter*, *--limit*.""")
 
@@ -335,7 +338,7 @@ LIMIT_FLAG = Argument(
     type=arg_parsers.BoundedInt(1, sys.maxsize, unlimited=True),
     category=LIST_COMMAND_FLAGS,
     help="""\
-    The maximum number of resources to list. The default is *unlimited*.
+    Maximum number of resources to list. The default is *unlimited*.
     This flag interacts with other flags that are applied in this order:
     *--flatten*, *--sort-by*, *--filter*, *--limit*.
     """)
@@ -358,7 +361,7 @@ SORT_BY_FLAG = Argument(
     type=arg_parsers.ArgList(),
     category=LIST_COMMAND_FLAGS,
     help="""\
-    A comma-separated list of resource field key names to sort by. The
+    Comma-separated list of resource field key names to sort by. The
     default order is ascending. Prefix a field with ``~'' for descending
     order on that field. This flag interacts with other flags that are applied
     in this order: *--flatten*, *--sort-by*, *--filter*, *--limit*.
@@ -473,6 +476,8 @@ class _Common(six.with_metaclass(abc.ABCMeta, object)):
 class Group(_Common):
   """Group is a base class for groups to implement."""
 
+  IS_COMMAND_GROUP = True
+
   _allow_py3 = True
   _command_suggestions = {}
 
@@ -506,6 +511,8 @@ class Command(six.with_metaclass(abc.ABCMeta, _Common)):
         common initialization among commands.
     _uri_cache_enabled: bool, The URI cache enabled state.
   """
+
+  IS_COMMAND = True
 
   def __init__(self, cli, context):
     super(Command, self).__init__(is_group=False)
@@ -882,6 +889,12 @@ def DisableUserProjectQuota():
   if not properties.VALUES.billing.quota_project.IsExplicitlySet():
     properties.VALUES.billing.quota_project.Set(
         properties.VALUES.billing.LEGACY)
+
+
+def EnableUserProjectQuota():
+  """Enable the quota header for current project."""
+  properties.VALUES.billing.quota_project.Set(
+      properties.VALUES.billing.CURRENT_PROJECT)
 
 
 def LogCommand(prog, args):

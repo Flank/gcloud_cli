@@ -178,8 +178,8 @@ Command value flag help.
 *--filter*=_EXPRESSION_::
 
 Apply a Boolean filter _EXPRESSION_ to each resource item to be listed.
-If the expression evaluates True then that item is listed. For more
-details and examples of filter expressions run $ link:gcloud[gcloud] topic filters. This
+If the expression evaluates `True`, then that item is listed. For more
+details and examples of filter expressions, run $ link:gcloud[gcloud] topic filters. This
 flag interacts with other flags that are applied in this order: *--flatten*,
 *--sort-by*, *--filter*, *--limit*.
 

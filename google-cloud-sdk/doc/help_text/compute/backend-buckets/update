@@ -4,7 +4,9 @@ NAME
 SYNOPSIS
     gcloud compute backend-buckets update BACKEND_BUCKET_NAME
         [--description=DESCRIPTION] [--enable-cdn]
-        [--gcs-bucket-name=GCS_BUCKET_NAME] [GCLOUD_WIDE_FLAG ...]
+        [--gcs-bucket-name=GCS_BUCKET_NAME]
+        [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute backend-buckets update is used to update backend buckets.
@@ -25,6 +27,20 @@ FLAGS
      --gcs-bucket-name=GCS_BUCKET_NAME
         The name of the Google Cloud Storage bucket to serve from. The storage
         bucket must be in the same project.
+
+     --signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE
+        The amount of time up to which the response to a signed URL request
+        will be cached in the CDN. After this time period, the Signed URL will
+        be revalidated before being served. Cloud CDN will internally act as
+        though all responses from this backend had a Cache-Control: public,
+        max-age=[TTL] header, regardless of any existing Cache-Control header.
+        The actual headers served in responses will not be altered.
+
+        For example, specifying 12h will cause the responses to signed URL
+        requests to be cached in the CDN up to 12 hours. See $ gcloud topic
+        datetimes for information on duration formats.
+
+        This flag only affects signed URL requests.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

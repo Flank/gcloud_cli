@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for 'gcloud category-manager taxonomies annotations update'."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class AnnotationsUpdateIntTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
@@ -39,9 +45,8 @@ class AnnotationsUpdateIntTest(base.CategoryManagerUnitTestBase):
     self.expected_project_annotation = self.messages.Annotation(
         description=self.annotation_description)
 
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testUpdateProjectAnnotationDescription(self):
+  def testUpdateProjectAnnotationDescription(self, track):
+    self.track = track
     self.ExpectProjectAnnotationUpdate(self.project_annotation,
                                        self.expected_project_annotation)
     args = ('{annotation_id} --taxonomy {taxonomy_id} '

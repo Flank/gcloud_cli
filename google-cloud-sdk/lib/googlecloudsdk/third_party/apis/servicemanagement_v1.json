@@ -923,6 +923,10 @@
           "description": "The name of the request field whose value is mapped to the HTTP body, or\n`*` for mapping all fields not captured by the path pattern to the HTTP\nbody. NOTE: the referred field must not be a repeated field and must be\npresent at the top-level of request message type.",
           "type": "string"
         },
+        "responseBody": {
+          "description": "Optional. The name of the response field whose value is mapped to the HTTP\nbody of response. Other response fields are ignored. When\nnot set, the response message will be used as HTTP body of response.",
+          "type": "string"
+        },
         "mediaUpload": {
           "description": "Use this only for Scotty Requests. Do not use this for media support using\nBytestream, add instead\n[][google.bytestream.RestByteStream] as an API to your\nconfiguration for Bytestream methods.",
           "$ref": "MediaUpload"
@@ -1466,7 +1470,7 @@
           "type": "string"
         },
         "type": {
-          "description": "The metric type, including its DNS name prefix. The type is not\nURL-encoded.  All user-defined custom metric types have the DNS name\n`custom.googleapis.com`.  Metric types should use a natural hierarchical\ngrouping. For example:\n\n    \"custom.googleapis.com\/invoice\/paid\/amount\"\n    \"appengine.googleapis.com\/http\/server\/response_latencies\"",
+          "description": "The metric type, including its DNS name prefix. The type is not\nURL-encoded.  All user-defined metric types have the DNS name\n`custom.googleapis.com` or `external.googleapis.com`.  Metric types should\nuse a natural hierarchical grouping. For example:\n\n    \"custom.googleapis.com\/invoice\/paid\/amount\"\n    \"external.googleapis.com\/prometheus\/up\"\n    \"appengine.googleapis.com\/http\/server\/response_latencies\"",
           "type": "string"
         },
         "labels": {
@@ -1525,6 +1529,47 @@
         "displayName": {
           "description": "A concise name for the metric, which can be displayed in user interfaces.\nUse sentence case without an ending period, for example \"Request count\".\nThis field is optional but it is recommended to be set for any metrics\nassociated with user-visible concepts, such as Quota.",
           "type": "string"
+        },
+        "metadata": {
+          "description": "Optional. Metadata which can be used to guide usage of the metric.",
+          "$ref": "MetricDescriptorMetadata"
+        }
+      }
+    },
+    "MetricDescriptorMetadata": {
+      "id": "MetricDescriptorMetadata",
+      "description": "Additional annotations that can be used to guide the usage of a metric.",
+      "type": "object",
+      "properties": {
+        "launchStage": {
+          "description": "The launch stage of the metric definition.",
+          "enumDescriptions": [
+            "Do not use this default value.",
+            "Early Access features are limited to a closed group of testers. To use\nthese features, you must sign up in advance and sign a Trusted Tester\nagreement (which includes confidentiality provisions). These features may\nbe unstable, changed in backward-incompatible ways, and are not\nguaranteed to be released.",
+            "Alpha is a limited availability test for releases before they are cleared\nfor widespread use. By Alpha, all significant design issues are resolved\nand we are in the process of verifying functionality. Alpha customers\nneed to apply for access, agree to applicable terms, and have their\nprojects whitelisted. Alpha releases don\u2019t have to be feature complete,\nno SLAs are provided, and there are no technical support obligations, but\nthey will be far enough along that customers can actually use them in\ntest environments or for limited-use tests -- just like they would in\nnormal production cases.",
+            "Beta is the point at which we are ready to open a release for any\ncustomer to use. There are no SLA or technical support obligations in a\nBeta release. Products will be complete from a feature perspective, but\nmay have some open outstanding issues. Beta releases are suitable for\nlimited production use cases.",
+            "GA features are open to all developers and are considered stable and\nfully qualified for production use.",
+            "Deprecated features are scheduled to be shut down and removed. For more\ninformation, see the \u201CDeprecation Policy\u201D section of our [Terms of\nService](https:\/\/cloud.google.com\/terms\/)\nand the [Google Cloud Platform Subject to the Deprecation\nPolicy](https:\/\/cloud.google.com\/terms\/deprecation) documentation."
+          ],
+          "type": "string",
+          "enum": [
+            "LAUNCH_STAGE_UNSPECIFIED",
+            "EARLY_ACCESS",
+            "ALPHA",
+            "BETA",
+            "GA",
+            "DEPRECATED"
+          ]
+        },
+        "samplePeriod": {
+          "description": "The sampling period of metric data points. For metrics which are written\nperiodically, consecutive data points are stored at this time interval,\nexcluding data loss due to errors. Metrics with a higher granularity have\na smaller sampling period.",
+          "type": "string",
+          "format": "google-duration"
+        },
+        "ingestDelay": {
+          "description": "The delay of data points caused by ingestion. Data points older than this\nage are guaranteed to be ingested and available to be read, excluding\ndata loss due to errors.",
+          "type": "string",
+          "format": "google-duration"
         }
       }
     },
@@ -2740,7 +2785,7 @@
       "type": "object",
       "properties": {
         "role": {
-          "description": "Role that is assigned to `members`.\nFor example, `roles\/viewer`, `roles\/editor`, or `roles\/owner`.\nRequired",
+          "description": "Role that is assigned to `members`.\nFor example, `roles\/viewer`, `roles\/editor`, or `roles\/owner`.",
           "type": "string"
         },
         "members": {
@@ -2749,6 +2794,33 @@
           "items": {
             "type": "string"
           }
+        },
+        "condition": {
+          "description": "Unimplemented. The condition that is associated with this binding.\nNOTE: an unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently.",
+          "$ref": "Expr"
+        }
+      }
+    },
+    "Expr": {
+      "id": "Expr",
+      "description": "Represents an expression text. Example:\n\n    title: \"User account presence\"\n    description: \"Determines whether the request has a user account\"\n    expression: \"size(request.user) > 0\"",
+      "type": "object",
+      "properties": {
+        "expression": {
+          "description": "Textual representation of an expression in\nCommon Expression Language syntax.\n\nThe application context of the containing message determines which\nwell-known feature set of CEL is supported.",
+          "type": "string"
+        },
+        "title": {
+          "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
+          "type": "string"
+        },
+        "description": {
+          "description": "An optional description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
+          "type": "string"
+        },
+        "location": {
+          "description": "An optional string indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
+          "type": "string"
         }
       }
     },
@@ -4169,6 +4241,11 @@
                   "location": "query",
                   "type": "string",
                   "format": "google-fieldmask"
+                },
+                "excludeFinalQuotaSettingsInResponse": {
+                  "description": "Do not include updated quota setting in the operation response.",
+                  "location": "query",
+                  "type": "boolean"
                 }
               },
               "parameterOrder": [

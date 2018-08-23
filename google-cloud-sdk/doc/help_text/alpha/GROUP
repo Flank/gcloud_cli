@@ -34,7 +34,7 @@ GLOBAL FLAGS
         --limit.
 
      --format=FORMAT
-        Sets the format for printing command output resources. The default is a
+        Set the format for printing command output resources. The default is a
         command-specific human-friendly output format. The supported formats
         are: config, csv, default, diff, disable, flattened, get, json, list,
         multi, none, object, table, text, value, yaml. For more details run $
@@ -60,9 +60,9 @@ GLOBAL FLAGS
 
      --verbosity=VERBOSITY; default="warning"
         Override the default verbosity for this command with any of the
-        supported standard verbosity levels: debug, info, warning, error, and
-        none. Overrides the default core/verbosity property value for this
-        command invocation.
+        supported standard verbosity levels: debug, info, warning, error,
+        critical, none. Overrides the default core/verbosity property value for
+        this command invocation.
 
      --version, -v
         Print version information and exit. This flag is only available at the
@@ -95,8 +95,14 @@ GROUPS
      auth
         (ALPHA) Manage oauth2 credentials for the Google Cloud SDK.
 
+     bigtable
+        (ALPHA) Manage your Cloud Bigtable storage.
+
      billing
         (ALPHA) Manage billing accounts and associate them with projects.
+
+     builds
+        (ALPHA) Create and manage builds for Google Cloud Build.
 
      cloud-shell
         (ALPHA) Manage Google Cloud Shell.
@@ -113,6 +119,9 @@ GROUPS
      dataflow
         (ALPHA) Read and manipulate Google Dataflow resources.
 
+     datastore
+        (ALPHA) Manage your Cloud Datastore indexes.
+
      deployment-manager
         (ALPHA) Manage deployments of cloud resources.
 
@@ -125,8 +134,14 @@ GROUPS
      endpoints
         (ALPHA) Create, enable and manage API services.
 
+     filestore
+        (ALPHA) Create and manipulate Cloud Filestore resources.
+
      firebase
         (ALPHA) Work with Google Firebase.
+
+     firestore
+        (ALPHA) Manage your Cloud Firestore imports and exports.
 
      functions
         (ALPHA) Manage Google Cloud Functions.
@@ -183,6 +198,9 @@ GROUPS
      spanner
         (ALPHA) Command groups for Cloud Spanner.
 
+     sql
+        (ALPHA) Create and manage Google Cloud SQL databases.
+
      tasks
         (ALPHA) Manage Cloud Tasks queues and tasks.
 
@@ -199,9 +217,9 @@ COMMANDS
         (ALPHA) Search the help text of gcloud commands.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
 

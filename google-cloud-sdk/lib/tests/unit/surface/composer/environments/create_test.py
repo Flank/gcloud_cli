@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,20 +15,26 @@
 """Unit tests for environments create."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-from googlecloudsdk.api_lib.composer import util as api_util
+
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.composer import util as command_util
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 import six
 
 
-class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
 
-  def SetUp(self):
+  # Must be called after self.SetTrack() for self.messages to be present
+  def _SetTestMessages(self):
     # pylint: disable=invalid-name
     self.NODE_COUNT = 5
     self.LOCATION_SHORT_NAME = 'us-central1-a'
@@ -47,13 +54,13 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
             self.TEST_PROJECT, self.TEST_LOCATION,
             self.SUBNETWORK_SHORT_NAME))
     self.DEFAULT_DISK_SIZE_GB = 100
-    self.NODE_CONFIG = api_util.GetMessagesModule().NodeConfig(
+    self.NODE_CONFIG = self.messages.NodeConfig(
         location=self.LOCATION_RELATIVE_NAME,
         machineType=self.MACHINE_TYPE_RELATIVE_NAME,
         network=self.NETWORK_RELATIVE_NAME,
         subnetwork=self.SUBNETWORK_RELATIVE_NAME,
         diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    self.CONFIG = api_util.GetMessagesModule().EnvironmentConfig(
+    self.CONFIG = self.messages.EnvironmentConfig(
         nodeCount=self.NODE_COUNT, nodeConfig=self.NODE_CONFIG)
     self.LABELS_DICT = {'label1': 'value1', 'label2': 'value2'}
     self.LABELS_STR = ','.join(
@@ -79,15 +86,19 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         self.TEST_OPERATION_UUID,
         done=False)
 
-  def testSuccessfulCreate_synchronous(self):
+  def testSuccessfulCreate_synchronous(self, track):
     """Tests a successful synchronous creation.
 
     The progress tracker should be activated and terminated.
+
+    Args:
+      track: base.ReleaseTrack, the release track to use when testing Composer
+      commands.
     """
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     successful_op = self.MakeOperation(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -112,17 +123,21 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         r'be created with \[{}]"'.format(self.TEST_ENVIRONMENT_NAME,
                                          self.TEST_OPERATION_NAME))
 
-  def testFailedCreate_synchronous(self):
+  def testFailedCreate_synchronous(self, track):
     """Tests a failed synchronous creation.
 
     A command_util.Error or a subclass thereof hould be raised.
+
+    Args:
+      track: base.ReleaseTrack, the release track to use when testing Composer
+      commands.
     """
+    self.SetTrack(track)
+    self._SetTestMessages()
     # pylint: disable=invalid-name
     ERROR_DESCRIPTION = 'ERROR DESCRIPTION'
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     failed_op = self.MakeOperation(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -150,8 +165,10 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
                            '--location', self.TEST_LOCATION,
                            self.TEST_ENVIRONMENT_ID)
 
-  def testSuccessfulAsyncCreateWithCustomConfiguration_network(self):
+  def testSuccessfulAsyncCreateWithCustomConfiguration_network(self, track):
     """Tests a successful asynchronous creation with a custom network."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -168,15 +185,17 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         self.SUBNETWORK_RELATIVE_NAME, '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testSuccessfulAsyncCreateWithCustomConfiguration_subnetwork(self):
+  def testSuccessfulAsyncCreateWithCustomConfiguration_subnetwork(self, track):
     """Tests a successful asynchronous creation with a custom subnetwork."""
-    node_config = api_util.GetMessagesModule().NodeConfig(
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(
         location=self.LOCATION_RELATIVE_NAME,
         machineType=self.MACHINE_TYPE_RELATIVE_NAME,
         network=self.NETWORK_RELATIVE_NAME,
         subnetwork=self.SUBNETWORK_RELATIVE_NAME,
         diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
+    config = self.messages.EnvironmentConfig(
         nodeCount=self.NODE_COUNT, nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
@@ -194,12 +213,12 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         self.SUBNETWORK_RELATIVE_NAME, '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testSuccessfulAsyncCreateWithLabels(self):
+  def testSuccessfulAsyncCreateWithLabels(self, track):
     """Test that creating an environment with labels works."""
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -217,21 +236,21 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         r'^Create in progress for environment \[{}] with operation \[{}]'
         .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testSuccessfulAsyncCreateWithEnvVariables(self):
+  def testSuccessfulAsyncCreateWithEnvVariables(self, track):
     """Test that user-provided env variables are conveyed in the API call."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     # pylint: disable=invalid-name
-    SoftwareConfig = api_util.GetMessagesModule().SoftwareConfig
+    SoftwareConfig = self.messages.SoftwareConfig
 
     software_config = SoftwareConfig(
         envVariables=SoftwareConfig.EnvVariablesValue(additionalProperties=[
             SoftwareConfig.EnvVariablesValue.AdditionalProperty(key=k, value=v)
             for k, v in six.iteritems(self.ENV_VARS_DICT)
         ]))
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config,
-        softwareConfig=software_config)
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config, softwareConfig=software_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -247,10 +266,12 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         r'^Create in progress for environment \[{}] with operation \[{}]'
         .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testSuccessfulAsyncCreateWithAirflowConfigOverrides(self):
+  def testSuccessfulAsyncCreateWithAirflowConfigOverrides(self, track):
     """Test that Airflow config property overrides are conveyed to the API."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     # pylint: disable=invalid-name
-    SoftwareConfig = api_util.GetMessagesModule().SoftwareConfig
+    SoftwareConfig = self.messages.SoftwareConfig
     AirflowConfigOverrides = SoftwareConfig.AirflowConfigOverridesValue
 
     software_config = SoftwareConfig(
@@ -258,11 +279,9 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
             AirflowConfigOverrides.AdditionalProperty(key=k, value=v)
             for k, v in six.iteritems(self.AIRFLOW_CONFIG_OVERRIDES_DICT)
         ]))
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config,
-        softwareConfig=software_config)
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config, softwareConfig=software_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -278,12 +297,12 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         r'^Create in progress for environment \[{}] with operation '
         r'\[{}]'.format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testCreateWithoutUserProvidedConfigValues(self):
+  def testCreateWithoutUserProvidedConfigValues(self, track):
     """Test that creating an environment with minimal config values works."""
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -296,11 +315,17 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
                                      '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testCreateAlreadyExists(self):
+  def testCreateAlreadyExists(self, track):
     """Tests a creation attempt when the environment already exists.
 
     There should be an HTTP 409 ALREADY EXISTS
+
+    Args:
+      track: base.ReleaseTrack, the release track to use when testing Composer
+      commands.
     """
+    self.SetTrack(track)
+    self._SetTestMessages()
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -319,21 +344,24 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
                            self.SUBNETWORK_RELATIVE_NAME,
                            self.TEST_ENVIRONMENT_ID)
 
-  def testNameValidation(self):
+  def testNameValidation(self, track):
     """Test that environment name validation fails fast."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     with self.AssertRaisesExceptionMatches(command_util.Error,
                                            'Invalid environment name'):
       self.RunEnvironments('create', '--project', self.TEST_PROJECT,
                            '--location', self.TEST_LOCATION, 'foo_bar')
 
-  def testMultipleAirflowConfigsMerged(self):
+  def testMultipleAirflowConfigsMerged(self, track):
     """Test merging when --airflow-configs is provided many times."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     # pylint: disable=invalid-name
-    SoftwareConfig = api_util.GetMessagesModule().SoftwareConfig
+    SoftwareConfig = self.messages.SoftwareConfig
     AirflowConfigOverrides = SoftwareConfig.AirflowConfigOverridesValue
 
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
     software_config = SoftwareConfig(
         airflowConfigOverrides=AirflowConfigOverrides(additionalProperties=[
             AirflowConfigOverrides.AdditionalProperty(key=k, value=v)
@@ -344,9 +372,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
                 'd': '4'
             })
         ]))
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config,
-        softwareConfig=software_config)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config, softwareConfig=software_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -358,10 +385,12 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
                          '--airflow-configs', 'c=3,d=4',
                          self.TEST_ENVIRONMENT_ID, '--async')
 
-  def testMultipleEnvVarsMerged(self):
+  def testMultipleEnvVarsMerged(self, track):
     """Test merging when --env-variables is provided many times."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     # pylint: disable=invalid-name
-    SoftwareConfig = api_util.GetMessagesModule().SoftwareConfig
+    SoftwareConfig = self.messages.SoftwareConfig
 
     software_config = SoftwareConfig(
         envVariables=SoftwareConfig.EnvVariablesValue(additionalProperties=[
@@ -373,11 +402,9 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
                 'd': '4'
             })
         ]))
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config,
-        softwareConfig=software_config)
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config, softwareConfig=software_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -389,12 +416,13 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
                          '--env-variables', 'c=3,d=4', self.TEST_ENVIRONMENT_ID,
                          '--async')
 
-  def testServiceAccount(self):
-    node_config = api_util.GetMessagesModule().NodeConfig(
+  def testServiceAccount(self, track):
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(
         serviceAccount=self.SERVICE_ACCOUNT,
         diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -409,12 +437,12 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testOauthScopes(self):
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        oauthScopes=self.OAUTH_SCOPES,
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+  def testOauthScopes(self, track):
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(
+        oauthScopes=self.OAUTH_SCOPES, diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -429,12 +457,12 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testTags(self):
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        tags=self.TAGS,
-        diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+  def testTags(self, track):
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(
+        tags=self.TAGS, diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -449,14 +477,19 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testZoneExpansion(self):
+  def testZoneExpansion(self, track):
     """Tests that if --zone is provided as a short name, it is expanded.
+
+    Args:
+      track: base.ReleaseTrack, the release track to use when testing Composer
+      commands.
     """
-    node_config = api_util.GetMessagesModule().NodeConfig(
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(
         location=self.LOCATION_RELATIVE_NAME,
         diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -470,15 +503,20 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testMachineTypeExpansion(self):
+  def testMachineTypeExpansion(self, track):
     """Tests that if --machine-type is provided as a short name, it is expanded.
+
+    Args:
+      track: base.ReleaseTrack, the release track to use when testing Composer
+      commands.
     """
-    node_config = api_util.GetMessagesModule().NodeConfig(
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(
         location=self.LOCATION_RELATIVE_NAME,
         machineType=self.MACHINE_TYPE_RELATIVE_NAME,
         diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -494,14 +532,19 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testNetworkExpansion(self):
+  def testNetworkExpansion(self, track):
     """Tests that if --network is provided as a short name, it is expanded.
+
+    Args:
+      track: base.ReleaseTrack, the release track to use when testing Composer
+      commands.
     """
-    node_config = api_util.GetMessagesModule().NodeConfig(
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(
         network=self.NETWORK_RELATIVE_NAME,
         diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -516,15 +559,20 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testSubnetworkExpansion(self):
+  def testSubnetworkExpansion(self, track):
     """Tests that if --subnetwork is provided as a short name, it is expanded.
+
+    Args:
+      track: base.ReleaseTrack, the release track to use when testing Composer
+      commands.
     """
-    node_config = api_util.GetMessagesModule().NodeConfig(
+    self.SetTrack(track)
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(
         network=self.NETWORK_RELATIVE_NAME,
         subnetwork=self.SUBNETWORK_RELATIVE_NAME,
         diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -540,9 +588,15 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testUrlsReducedToRelativeNames(self):
+  def testUrlsReducedToRelativeNames(self, track):
     """Tests that fully-qualified URLs are provided, they become relative names.
+
+    Args:
+      track: base.ReleaseTrack, the release track to use when testing Composer
+      commands.
     """
+    self.SetTrack(track)
+    self._SetTestMessages()
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -561,14 +615,14 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testCustomDiskSize(self):
+  def testCustomDiskSize(self, track):
     """Tests that a non-default --disk-size can be used."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     disk_size_gb = 123
     disk_size_kb = disk_size_gb << 20
-    node_config = api_util.GetMessagesModule().NodeConfig(
-        diskSizeGb=disk_size_gb)
-    config = api_util.GetMessagesModule().EnvironmentConfig(
-        nodeConfig=node_config)
+    node_config = self.messages.NodeConfig(diskSizeGb=disk_size_gb)
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -583,8 +637,10 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testCustomDiskSizeTooSmall(self):
+  def testCustomDiskSizeTooSmall(self, track):
     """Tests error if --disk-size is < 20GB."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     with self.AssertRaisesArgumentErrorRegexp(
         'must be greater than or equal to'):
       self.RunEnvironments(
@@ -593,8 +649,10 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
           '--disk-size', '19GB',
           '--async', self.TEST_ENVIRONMENT_ID)
 
-  def testCustomDiskSizeTooLarge(self):
+  def testCustomDiskSizeTooLarge(self, track):
     """Tests error if --disk-size is > 64TB."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     with self.AssertRaisesArgumentErrorRegexp(
         'must be less than or equal to'):
       self.RunEnvironments(
@@ -603,8 +661,10 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
           '--disk-size', '{}GB'.format((64 << 10) + 1),
           '--async', self.TEST_ENVIRONMENT_ID)
 
-  def testCustomDiskSizeNotGigabyteMultiple(self):
+  def testCustomDiskSizeNotGigabyteMultiple(self, track):
     """Tests error if --disk-size is not an integer multiple of gigabytes."""
+    self.SetTrack(track)
+    self._SetTestMessages()
     disk_size_kb = (123 << 20) + 10  # 123 GB + 10 KB
     with self.AssertRaisesExceptionRegexp(
         exceptions.InvalidArgumentException,

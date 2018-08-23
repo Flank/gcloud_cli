@@ -1,1 +1,9 @@
 lib/surface/alpha/__init__.py
+lib/surface/alpha/firestore/__init__.py
+lib/surface/alpha/firestore/export.py
+lib/surface/alpha/firestore/import.py
+lib/surface/alpha/firestore/operations/__init__.py
+lib/surface/alpha/firestore/operations/cancel.py
+lib/surface/alpha/firestore/operations/delete.py
+lib/surface/alpha/firestore/operations/describe.py
+lib/surface/alpha/firestore/operations/list.py

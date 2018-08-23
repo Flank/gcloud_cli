@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ml-engine jobs submit batch prediction command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.ml_engine import jobs
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
@@ -104,6 +108,7 @@ aren't a first-class Cloud Storage concept) of `my-bucket`.
             'batch_size number of records in memory before invoking TensorFlow.'
             ' Defaults to 64 if not specified.'))
 
+  flags.SIGNATURE_NAME.AddToParser(parser)
   flags.RUNTIME_VERSION.AddToParser(parser)
   labels_util.AddCreateLabelsFlags(parser)
 
@@ -136,6 +141,7 @@ class Prediction(base.Command):
         runtime_version=args.runtime_version,
         max_worker_count=args.max_worker_count,
         batch_size=args.batch_size,
+        signature_name=args.signature_name,
         labels=labels)
 
 
@@ -167,6 +173,7 @@ class PredictionAlpha(base.Command):
         runtime_version=args.runtime_version,
         max_worker_count=args.max_worker_count,
         batch_size=args.batch_size,
+        signature_name=args.signature_name,
         labels=labels,
         accelerator_type=args.accelerator_type,
         accelerator_count=args.accelerator_count)

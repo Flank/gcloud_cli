@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """Unit tests for the resource_expr_rewrite module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis
@@ -38,7 +40,7 @@ class ResourceFilterExpressionBackendRewriteTest(subtests.Base):
 
   def SetUp(self):
     symbols = {'len': len, 'test_transform': lambda x: 'test'}
-    aliases = {'y': resource_lex.Lexer('a.b.c').Key()}
+    aliases = {'y': resource_lex.Lexer('a.b.c').KeyWithAttribute()}
     self.defaults = resource_projection_parser.Parse(
         '(compound.string:alias=s, floating:alias=z)',
         aliases=aliases,

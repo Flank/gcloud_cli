@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Module for compute test utilities."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import json
 
 from apitools.base.py import encoding
@@ -31,6 +34,8 @@ SAMPLE_WRAPPED_CSEK_KEY = ('ea2QS4AIhWKprsmuk/mh7g3vdBDGiTcSynFASvJC/rs/3BmOnW'
                            '7wYEAixZ+DbLgvAvtl16p1FMsLQ8ArsjrNBd9ll9pb/+9dKMCy'
                            'NXyY/jOKRDrtg+AyKWjg0FifmjCvzZ0pYC+DCM6jJIc9IsX6Kp'
                            '4gNhJTPfzXCvhviqUNGM6xMMXUvq4fCaBoaHOdm66w==')
+
+DEBIAN_IMAGE_FAMILY = 'debian-9'
 
 
 class CsekKeyStore(object):

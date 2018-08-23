@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """e2e tests for ml local predict command."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import subprocess
 
 from googlecloudsdk.core.util import files
@@ -42,6 +46,53 @@ def _VerifyTensorflow():
         '{stderr}'.format(python=python_executable, command=command,
                           stdout=stdout, stderr=stderr))
 
+
+def _VerifyScikitLearn():
+  python_executables = files.SearchForExecutableOnPath('python')
+  if not python_executables:
+    raise RuntimeError('No python executable available')
+  python_executable = python_executables[0]
+  command = [python_executable, '-c', 'import sklearn']
+  proc = subprocess.Popen(
+      command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  stdout, stderr = proc.communicate()
+  if proc.returncode:
+    raise RuntimeError('Could not verify Scikit-learn install.\n'
+                       'Python location: {python}\n'
+                       'Command to test: {command}\n'
+                       '----------------stdout----------------\n'
+                       '{stdout}'
+                       '----------------stderr----------------'
+                       '{stderr}'.format(
+                           python=python_executable,
+                           command=command,
+                           stdout=stdout,
+                           stderr=stderr))
+
+
+def _VerifyXgboost():
+  python_executables = files.SearchForExecutableOnPath('python')
+  if not python_executables:
+    raise RuntimeError('No python executable available')
+  python_executable = python_executables[0]
+  command = [python_executable, '-c', 'import xgboost']
+  proc = subprocess.Popen(
+      command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  stdout, stderr = proc.communicate()
+  if proc.returncode:
+    raise RuntimeError('Could not verify XGBoost install.\n'
+                       'Python location: {python}\n'
+                       'Command to test: {command}\n'
+                       '----------------stdout----------------\n'
+                       '{stdout}'
+                       '----------------stderr----------------'
+                       '{stderr}'.format(
+                           python=python_executable,
+                           command=command,
+                           stdout=stdout,
+                           stderr=stderr))
+
+
 try:
   _VerifyTensorflow()
 except RuntimeError as err:
@@ -50,14 +101,30 @@ except RuntimeError as err:
 else:
   tensorflow_available = True
   reason = 'Needs tensorflow installed'
+try:
+  _VerifyScikitLearn()
+except RuntimeError as err:
+  sklearn_available = False
+  reason = 'Needs scikit-learn installed: ' + str(err)
+else:
+  sklearn_available = True
+  reason = 'Needs scikit-learn installed'
+try:
+  _VerifyXgboost()
+except RuntimeError as err:
+  xgboost_available = False
+  reason = 'Needs XGBoost installed: ' + str(err)
+else:
+  xgboost_available = True
+  reason = 'Needs XGBoost installed'
 
 
 # If this test is skipped, we have very little effective coverage of this code
 # path and it should be treated as a high-priority issue.
 @sdk_test_base.Filters.RunOnlyInBundle
 @test_case.Filters.RunOnlyIf(tensorflow_available, reason)
-class PredictTest(base.MlGaPlatformTestBase):
-  """E2E tests for ml-engine local predict command."""
+class TensorflowPredictTest(base.MlGaPlatformTestBase):
+  """E2E tests for ml-engine local predict command using tensorflow."""
 
   @property
   def model_path(self):
@@ -93,6 +160,69 @@ class PredictTest(base.MlGaPlatformTestBase):
     expected_keys = set(['prediction', 'key', 'scores'])
     for prediction in predictions:
       self.assertSetEqual(set(prediction.keys()), expected_keys)
+
+
+# If this test is skipped, we have very little effective coverage of this code
+# path and it should be treated as a high-priority issue.
+@test_case.Filters.skip('Ensure framework properly Installed', 'b/110259958')
+@sdk_test_base.Filters.RunOnlyInBundle
+@test_case.Filters.RunOnlyIf(sklearn_available, reason)
+class ScikitLearnPredictTest(base.MlGaPlatformTestBase):
+  """E2E tests for ml-engine local predict command using scikit-learn."""
+
+  @property
+  def model_path(self):
+    return self.Resource('tests', 'e2e', 'surface', 'ml_engine', 'testdata',
+                         'scikit_learn_iris_model')
+
+  def testLocalPredict(self):
+    json_instances = self.Resource('tests', 'e2e', 'surface', 'ml_engine',
+                                   'testdata', 'iris_model_input.json')
+
+    results = self.Run('ml-engine local predict '
+                       '    --model-dir={} '
+                       '    --framework=scikit-learn'
+                       '    --json-instances={}'.format(self.model_path,
+                                                        json_instances))
+
+    # Prediction output should look something like the following:
+    # {'predictions' : [2,2]}
+    self.AssertOutputMatches('[2,2]')
+    self.assertEqual(list(results.keys()), ['predictions'])
+    predictions = results['predictions']
+    self.assertEqual(len(predictions), 2)
+
+
+# If this test is skipped, we have very little effective coverage of this code
+# path and it should be treated as a high-priority issue.
+@test_case.Filters.skip('Ensure framework properly Installed', 'b/110259958')
+@sdk_test_base.Filters.RunOnlyInBundle
+@test_case.Filters.RunOnlyIf(xgboost_available, reason)
+class XgboostPredictTest(base.MlGaPlatformTestBase):
+  """E2E tests for ml-engine local predict command using xgboost."""
+
+  @property
+  def model_path(self):
+    return self.Resource('tests', 'e2e', 'surface', 'ml_engine', 'testdata',
+                         'xgboost_iris_model')
+
+  def testLocalPredict(self):
+    json_instances = self.Resource('tests', 'e2e', 'surface', 'ml_engine',
+                                   'testdata', 'iris_model_input.json')
+
+    results = self.Run('ml-engine local predict '
+                       '    --model-dir={} '
+                       '    --framework=xgboost'
+                       '    --json-instances={}'.format(self.model_path,
+                                                        json_instances))
+
+    self.AssertOutputMatches(
+        r"""\[\[0.989785[e0-9-]+, 0.005485[e0-9-]+, 0.004728[e0-9-]+\],
+        \[0.989785[e0-9-]+, 0.005485[e0-9-]+, 0.004728[e0-9-]+\]\]""",
+        normalize_space=' \t\v\n')
+    self.assertEqual(list(results.keys()), ['predictions'])
+    predictions = results['predictions']
+    self.assertEqual(len(predictions), 2)
 
 
 if __name__ == '__main__':

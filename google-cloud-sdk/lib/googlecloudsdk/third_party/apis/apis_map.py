@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,12 +82,6 @@ MAP = {
             messages_modulepath='alpha_vision_v1_messages',
             default_version=True
         ),
-        'v1alpha1': APIDef(
-            class_path='googlecloudsdk.third_party.apis.alpha_vision.v1alpha1',
-            client_classpath='alpha_vision_v1alpha1_client.AlphaVisionV1alpha1',
-            messages_modulepath='alpha_vision_v1alpha1_messages',
-            default_version=False
-        ),
     },
     'apikeys': {
         'v1': APIDef(
@@ -133,11 +128,17 @@ MAP = {
         ),
     },
     'binaryauthorization': {
-        'v1alpha1': APIDef(
-            class_path='googlecloudsdk.third_party.apis.binaryauthorization.v1alpha1',
-            client_classpath='binaryauthorization_v1alpha1_client.BinaryauthorizationV1alpha1',
-            messages_modulepath='binaryauthorization_v1alpha1_messages',
+        'v1alpha2': APIDef(
+            class_path='googlecloudsdk.third_party.apis.binaryauthorization.v1alpha2',
+            client_classpath='binaryauthorization_v1alpha2_client.BinaryauthorizationV1alpha2',
+            messages_modulepath='binaryauthorization_v1alpha2_messages',
             default_version=True
+        ),
+        'v1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.binaryauthorization.v1beta1',
+            client_classpath='binaryauthorization_v1beta1_client.BinaryauthorizationV1beta1',
+            messages_modulepath='binaryauthorization_v1beta1_messages',
+            default_version=False
         ),
     },
     'bio': {
@@ -283,11 +284,17 @@ MAP = {
         ),
     },
     'composer': {
+        'v1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.composer.v1',
+            client_classpath='composer_v1_client.ComposerV1',
+            messages_modulepath='composer_v1_messages',
+            default_version=True
+        ),
         'v1beta1': APIDef(
             class_path='googlecloudsdk.third_party.apis.composer.v1beta1',
             client_classpath='composer_v1beta1_client.ComposerV1beta1',
             messages_modulepath='composer_v1beta1_messages',
-            default_version=True
+            default_version=False
         ),
     },
     'compute': {
@@ -456,6 +463,20 @@ MAP = {
             default_version=False
         ),
     },
+    'firestore': {
+        'v1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.firestore.v1',
+            client_classpath='firestore_v1_client.FirestoreV1',
+            messages_modulepath='firestore_v1_messages',
+            default_version=False
+        ),
+        'v1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.firestore.v1beta1',
+            client_classpath='firestore_v1beta1_client.FirestoreV1beta1',
+            messages_modulepath='firestore_v1beta1_messages',
+            default_version=True
+        ),
+    },
     'genomics': {
         'v1': APIDef(
             class_path='googlecloudsdk.third_party.apis.genomics.v1',
@@ -481,6 +502,14 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.iam.v1',
             client_classpath='iam_v1_client.IamV1',
             messages_modulepath='iam_v1_messages',
+            default_version=True
+        ),
+    },
+    'kubernetespolicy': {
+        'v1alpha1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.kubernetespolicy.v1alpha1',
+            client_classpath='kubernetespolicy_v1alpha1_client.KubernetespolicyV1alpha1',
+            messages_modulepath='kubernetespolicy_v1alpha1_messages',
             default_version=True
         ),
     },
@@ -580,6 +609,14 @@ MAP = {
             default_version=True
         ),
     },
+    'serverless': {
+        'v1alpha1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.serverless.v1alpha1',
+            client_classpath='serverless_v1alpha1_client.ServerlessV1alpha1',
+            messages_modulepath='serverless_v1alpha1_messages',
+            default_version=True
+        ),
+    },
     'servicemanagement': {
         'v1': APIDef(
             class_path='googlecloudsdk.third_party.apis.servicemanagement.v1',
@@ -593,15 +630,27 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.servicenetworking.v1alpha',
             client_classpath='servicenetworking_v1alpha_client.ServicenetworkingV1alpha',
             messages_modulepath='servicenetworking_v1alpha_messages',
+            default_version=False
+        ),
+        'v1beta': APIDef(
+            class_path='googlecloudsdk.third_party.apis.servicenetworking.v1beta',
+            client_classpath='servicenetworking_v1beta_client.ServicenetworkingV1beta',
+            messages_modulepath='servicenetworking_v1beta_messages',
             default_version=True
         ),
     },
     'serviceusage': {
+        'v1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.serviceusage.v1',
+            client_classpath='serviceusage_v1_client.ServiceusageV1',
+            messages_modulepath='serviceusage_v1_messages',
+            default_version=True
+        ),
         'v1beta1': APIDef(
             class_path='googlecloudsdk.third_party.apis.serviceusage.v1beta1',
             client_classpath='serviceusage_v1beta1_client.ServiceusageV1beta1',
             messages_modulepath='serviceusage_v1beta1_messages',
-            default_version=True
+            default_version=False
         ),
     },
     'serviceuser': {
@@ -715,6 +764,14 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.vision.v1',
             client_classpath='vision_v1_client.VisionV1',
             messages_modulepath='vision_v1_messages',
+            default_version=True
+        ),
+    },
+    'vpcaccess': {
+        'v1alpha1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.vpcaccess.v1alpha1',
+            client_classpath='vpcaccess_v1alpha1_client.VpcaccessV1alpha1',
+            messages_modulepath='vpcaccess_v1alpha1_messages',
             default_version=True
         ),
     },

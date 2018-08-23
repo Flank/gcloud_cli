@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +13,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud compute shared-vpc associated-projects remove`."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import xpn_test_base
 
 
+@parameterized.parameters(
+    base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class RemoveTest(xpn_test_base.XpnTestBase):
 
-  def testRemove_NoProject(self):
+  def testRemove_NoProject(self, track):
+    self._SetUp(track)
     with self.AssertRaisesArgumentErrorMatches(
         'argument PROJECT_ID --host-project: Must be specified.'):
       self.Run('compute shared-vpc associated-projects remove')
     self.xpn_client.DisableXpnAssociatedProject.assert_not_called()
 
-  def testRemove(self):
+  def testRemove(self, track):
+    self._SetUp(track)
     self._testRemove('shared-vpc')
 
-  def testRemove_xpn(self):
+  def testRemove_xpn(self, track):
+    self._SetUp(track)
     self._testRemove('xpn')
 
   def _testRemove(self, module_name):
@@ -37,6 +48,7 @@ class RemoveTest(xpn_test_base.XpnTestBase):
              'xpn-user'.format(module_name))
     self.xpn_client.DisableXpnAssociatedProject.assert_called_once_with(
         'xpn-host', 'xpn-user')
+    self.get_xpn_client_mock.assert_called_once_with(self.track)
 
 
 if __name__ == '__main__':

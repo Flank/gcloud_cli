@@ -5,7 +5,10 @@ SYNOPSIS
     gcloud container builds log BUILD [--stream] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Stream the logs for a build.
+    (DEPRECATED) Stream the logs for a build.
+
+    This command is deprecated and will be removed on or after 2018-10-31.
+    Please use gcloud builds log instead.
 
 POSITIONAL ARGUMENTS
      BUILD

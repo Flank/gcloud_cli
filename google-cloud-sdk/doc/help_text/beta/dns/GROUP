@@ -28,9 +28,6 @@ GROUPS
      dns-keys
         (BETA) Manage Cloud DNS DNSKEY records.
 
-     dnskeys
-        (BETA) (DEPRECATED) Manage Cloud DNS DNSKEY records.
-
      managed-zones
         (BETA) Manage your Cloud DNS managed-zones.
 

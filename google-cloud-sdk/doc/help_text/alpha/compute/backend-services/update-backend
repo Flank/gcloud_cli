@@ -26,9 +26,10 @@ DESCRIPTION
     the load balancing policy and draining a backend by setting its capacity
     scaler to zero.
 
-    Backends are named by their associated instances groups, and one of the
-    --group or --instance-group flags is required to identify the backend that
-    you are modifying. You cannot "change" the instance group associated with a
+    Backends are named by their associated instances groups or network endpoint
+    groups, and one of the --network-endpoint-group or --instance-group flags
+    is required to identify the backend that you are modifying. You cannot
+    "change" the instance group or network endpoint group associated with a
     backend, but you can accomplish something similar with backend-services
     remove-backend and backend-services add-backend.
 
@@ -52,9 +53,8 @@ REQUIRED FLAGS
          At most one of these may be specified:
 
            --instance-group-region=INSTANCE_GROUP_REGION
-              The region of the instance group to update in the backend
-              service. If not specified, you may be prompted to select a
-              region.
+              Region of the instance group to update in the backend service. If
+              not specified, you may be prompted to select a region.
 
               To avoid prompting when this flag is omitted, you can set the
               compute/region property:
@@ -73,9 +73,9 @@ REQUIRED FLAGS
               variable CLOUDSDK_COMPUTE_REGION.
 
            --instance-group-zone=INSTANCE_GROUP_ZONE
-              The zone of the instance group to update in the backend service.
-              If not specified and the compute/zone property isn't set, you may
-              be prompted to select a zone.
+              Zone of the instance group to update in the backend service. If
+              not specified and the compute/zone property isn't set, you may be
+              prompted to select a zone.
 
               To avoid prompting when this flag is omitted, you can set the
               compute/zone property:
@@ -101,7 +101,7 @@ REQUIRED FLAGS
             in this group are specified.
 
          --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
-            The zone of the network endpoint group to update in the backend
+            Zone of the network endpoint group to update in the backend
             service. If not specified and the compute/zone property isn't set,
             you may be prompted to select a zone.
 
@@ -176,11 +176,11 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the backend service is global.
+          If set, the backend service is global.
 
        --region=REGION
-          The region of the backend service to operate on. Overrides the
-          default compute/region property value for this command invocation.
+          Region of the backend service to operate on. Overrides the default
+          compute/region property value for this command invocation.
 
      At most one of these may be specified:
 
@@ -240,11 +240,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute backend-services update-backend
         $ gcloud beta compute backend-services update-backend

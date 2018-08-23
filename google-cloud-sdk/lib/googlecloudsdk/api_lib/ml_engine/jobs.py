@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Utilities for dealing with ML jobs API."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.util import apis
@@ -186,6 +190,7 @@ class JobsClient(object):
                               runtime_version=None,
                               max_worker_count=None,
                               batch_size=None,
+                              signature_name=None,
                               labels=None,
                               accelerator_count=None,
                               accelerator_type=None):
@@ -202,7 +207,8 @@ class JobsClient(object):
         region: compute region in which to run the job
         runtime_version: the runtime version in which to run the job
         max_worker_count: int, the maximum number of workers to use
-        batch_size: str, the number of records per batch sent to Tensorflow
+        batch_size: int, the number of records per batch sent to Tensorflow
+        signature_name: str, name of input/output signature in the TF meta graph
         labels: Job.LabelsValue, the Cloud labels for the job
         accelerator_count: int, The number of accelerators to attach to the
            machines
@@ -244,6 +250,9 @@ class JobsClient(object):
           model_name, collection='ml.projects.models',
           params={'projectsId': project_id})
       prediction_input.modelName = model_ref.RelativeName()
+
+    if signature_name:
+      prediction_input.signatureName = signature_name
 
     return self.job_class(
         jobId=job_name,

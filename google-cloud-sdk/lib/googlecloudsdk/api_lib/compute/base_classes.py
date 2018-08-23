@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Base classes for abstracting away common logic."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import abc
 import argparse  # pylint: disable=unused-import
 import json
@@ -169,7 +172,7 @@ class BaseLister(base.ListCommand, BaseCommand):
     parser.add_argument(
         '--regexp', '-r',
         help="""\
-        A regular expression to filter the names of the results on. Any names
+        Regular expression to filter the names of the results on. Any names
         that do not match the entire regular expression will be filtered out.
         """)
 
@@ -362,7 +365,7 @@ To list the URIs of all {0} in a project, run:
 To list all {0} in the ``us-central1'' and ``europe-west1'' regions,
 run:
 
-  $ {{command}} --filter="region( us-central1 europe-west1 )"
+  $ {{command}} --filter="region:( us-central1 europe-west1 )"
 """.format(resource)
   }
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +31,9 @@ command line, the concept fails to initialize.
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import re
 
 from googlecloudsdk.calliope.concepts import concepts
@@ -48,7 +51,7 @@ class MultitypeTestsGeneral(concepts_test_base.MultitypeTestBase):
   def testCreateMultiTypeResource(self):
     project_book_resource = util.GetBookResource(name='projectbook')
     organization_book_resource = util.GetOrgShelfBookResource(name='orgbook')
-    resource = multitype.MultitypeConceptSpec(
+    resource = multitype.MultitypeResourceSpec(
         'book',
         project_book_resource,
         organization_book_resource)
@@ -69,7 +72,7 @@ class MultitypeTestsGeneral(concepts_test_base.MultitypeTestBase):
                   resource.type_enum['orgbook']]},
         resource._attribute_to_types_map)
 
-  def testCreateMultiTypeResourceRenamesTypes(self):
+  def testCreateMultiTypeConceptRenamesTypes(self):
     project_book_resource = util.GetBookResource()
     organization_book_resource = util.GetOrgShelfBookResource()
     resource = multitype.MultitypeConceptSpec(
@@ -78,6 +81,25 @@ class MultitypeTestsGeneral(concepts_test_base.MultitypeTestBase):
         organization_book_resource)
     self.assertNotEqual(resource.type_enum['book_project_shelf_book'],
                         resource.type_enum['book_organization_shelf_book'])
+
+  def testCreateMultiTypeResourceRenamesTypes(self):
+    project_book_resource = util.GetBookResource()
+    organization_book_resource = util.GetOrgShelfBookResource()
+    resource = multitype.MultitypeResourceSpec(
+        'book',
+        project_book_resource,
+        organization_book_resource)
+    self.assertNotEqual(
+        resource.type_enum['example.projects.shelves.books'],
+        resource.type_enum['example.organizations.shelves.books'])
+
+  def testCreateMultitypeResourceFailsWithDuplicateCollection(self):
+    project_book_resource = util.GetBookResource()
+    with self.assertRaisesRegexp(ValueError, 'projects.shelves.books'):
+      multitype.MultitypeResourceSpec(
+          'book',
+          project_book_resource,
+          project_book_resource)
 
   def testCreateMultiTypeResourceFailsWithMismatchedAttribute(self):
     book_resource = util.GetBookResource()
@@ -92,7 +114,7 @@ class MultitypeTestsGeneral(concepts_test_base.MultitypeTestBase):
     with self.assertRaisesRegexp(
         multitype.ConfigurationError,
         re.escape('[project]')):
-      multitype.MultitypeConceptSpec(
+      multitype.MultitypeResourceSpec(
           'book',
           book_resource,
           project_resource)
@@ -106,7 +128,7 @@ class MultitypeTestsTwoWay(concepts_test_base.MultitypeTestBase,
     """Get resource with two possible top-level params."""
     project_book_resource = util.GetBookResource(name='projectbook')
     organization_book_resource = util.GetOrgShelfBookResource(name='orgbook')
-    self.resource = multitype.MultitypeConceptSpec(
+    self.resource = multitype.MultitypeResourceSpec(
         'book',
         project_book_resource,
         organization_book_resource)
@@ -124,16 +146,16 @@ class MultitypeTestsTwoWay(concepts_test_base.MultitypeTestBase,
        'projects/my-project/shelves/my-shelf/books/my-book'))
   def testInitialize(self, proj_active, org_value, org_active,
                      expected):
-    deps_obj = deps.Deps(
-        {'project': [deps.Fallthrough(lambda: 'my-project', 'h',
-                                      active=proj_active)],
-         'organization': [
-             deps.Fallthrough(lambda: org_value, 'h', active=org_active)],
-         'shelf': [deps.Fallthrough(lambda: 'my-shelf', 'h')],
-         'book': [deps.Fallthrough(lambda: 'my-book', 'h', active=True)]})
+    fallthroughs_map = {
+        'project': [deps.Fallthrough(lambda: 'my-project', 'h',
+                                     active=proj_active)],
+        'organization': [
+            deps.Fallthrough(lambda: org_value, 'h', active=org_active)],
+        'shelf': [deps.Fallthrough(lambda: 'my-shelf', 'h')],
+        'book': [deps.Fallthrough(lambda: 'my-book', 'h', active=True)]}
     self.assertEqual(
         expected,
-        self.resource.Initialize(deps_obj).result.RelativeName())
+        self.resource.Initialize(fallthroughs_map).result.RelativeName())
 
   @parameterized.named_parameters(
       # Should initialize directly from the anchor.
@@ -153,33 +175,33 @@ class MultitypeTestsTwoWay(concepts_test_base.MultitypeTestBase,
   def testInitializeWithAnchor(self, proj_value, org_value, shelf_value,
                                book_value, expected):
     book_fallthrough = deps.Fallthrough(lambda: book_value, 'h', active=True)
-    deps_obj = deps.Deps(
-        {'project': [
+    fallthroughs_map = {
+        'project': [
             deps.FullySpecifiedAnchorFallthrough(
                 book_fallthrough,
                 self.book_collection,
                 'projectsId'),
             deps.Fallthrough(lambda: proj_value, 'h', active=True)],
-         'organization': [
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.org_shelf_book_collection,
-                 'organizationsId'),
-             deps.Fallthrough(lambda: org_value, 'h', active=True)],
-         'shelf': [
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.org_shelf_book_collection,
-                 'shelvesId'),
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.book_collection,
-                 'shelvesId'),
-             deps.Fallthrough(lambda: shelf_value, 'h')],
-         'book': [book_fallthrough]})
+        'organization': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.org_shelf_book_collection,
+                'organizationsId'),
+            deps.Fallthrough(lambda: org_value, 'h', active=True)],
+        'shelf': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.org_shelf_book_collection,
+                'shelvesId'),
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.book_collection,
+                'shelvesId'),
+            deps.Fallthrough(lambda: shelf_value, 'h')],
+        'book': [book_fallthrough]}
     self.assertEqual(
         expected,
-        self.resource.Initialize(deps_obj).result.RelativeName())
+        self.resource.Initialize(fallthroughs_map).result.RelativeName())
 
   @parameterized.named_parameters(
       # Fail if both project and organization are specified.
@@ -188,48 +210,48 @@ class MultitypeTestsTwoWay(concepts_test_base.MultitypeTestBase,
       # Fail if neither project nor organization specified.
       ('Underspecified', None, None, '[shelf, book]'))
   def testInitializeError(self, proj_value, org_value, expected_error):
-    deps_obj = deps.Deps(
-        {'project': [
+    fallthroughs_map = {
+        'project': [
             deps.Fallthrough(lambda: proj_value, 'h', active=True)],
-         'organization': [
-             deps.Fallthrough(lambda: org_value, 'h', active=True)],
-         'shelf': [deps.Fallthrough(lambda: 'my-shelf', 'h', active=True)],
-         'book': [deps.Fallthrough(lambda: 'my-book', 'h', active=True)]})
+        'organization': [
+            deps.Fallthrough(lambda: org_value, 'h', active=True)],
+        'shelf': [deps.Fallthrough(lambda: 'my-shelf', 'h', active=True)],
+        'book': [deps.Fallthrough(lambda: 'my-book', 'h', active=True)]}
     with self.assertRaisesRegexp(
         multitype.ConflictingTypesError,
         re.escape(expected_error)):
-      self.resource.Initialize(deps_obj).result.RelativeName()
+      self.resource.Initialize(fallthroughs_map).result.RelativeName()
 
   def testInitializeNotFullySpecified(self):
     book_fallthrough = deps.Fallthrough(lambda: 'my-book', 'h', active=True)
-    deps_obj = deps.Deps(
-        {'project': [
+    fallthroughs_map = {
+        'project': [
             deps.FullySpecifiedAnchorFallthrough(
                 book_fallthrough,
                 self.book_collection,
                 'projectsId'),
             deps.Fallthrough(lambda: 'my-project', 'h')],
-         'organization': [
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.org_shelf_book_collection,
-                 'organizationsId'),
-             deps.Fallthrough(lambda: 'my-org', 'h', active=True)],
-         'shelf': [
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.org_shelf_book_collection,
-                 'shelvesId'),
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.book_collection,
-                 'shelvesId'),
-             deps.Fallthrough(lambda: None, 'h')],
-         'book': [book_fallthrough]})
+        'organization': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.org_shelf_book_collection,
+                'organizationsId'),
+            deps.Fallthrough(lambda: 'my-org', 'h', active=True)],
+        'shelf': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.org_shelf_book_collection,
+                'shelvesId'),
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.book_collection,
+                'shelvesId'),
+            deps.Fallthrough(lambda: None, 'h')],
+        'book': [book_fallthrough]}
     with self.assertRaisesRegexp(
         concepts.InitializationError,
         re.escape('[shelf]')):
-      self.resource.Initialize(deps_obj).result.RelativeName()
+      self.resource.Initialize(fallthroughs_map).result.RelativeName()
 
 
 class MultitypeTestsFourWay(concepts_test_base.MultitypeTestBase,
@@ -256,18 +278,19 @@ class MultitypeTestsFourWay(concepts_test_base.MultitypeTestBase,
   def testInitialize(
       self, proj_active, org_active, shelf_active, case_active,
       proj_value, org_value, shelf_value, case_value, expected):
-    deps_obj = deps.Deps(
-        {'project': [
+    fallthroughs_map = {
+        'project': [
             deps.Fallthrough(lambda: proj_value, 'h', active=proj_active)],
-         'organization': [
-             deps.Fallthrough(lambda: org_value, 'h', active=org_active)],
-         'shelf': [
-             deps.Fallthrough(lambda: shelf_value, 'h', active=shelf_active)],
-         'case': [
-             deps.Fallthrough(lambda: case_value, 'h', active=case_active)],
-         'book': [deps.Fallthrough(lambda: 'my-book', 'h', active=True)]})
-    self.assertEqual(expected,
-                     self.resource.Initialize(deps_obj).result.RelativeName())
+        'organization': [
+            deps.Fallthrough(lambda: org_value, 'h', active=org_active)],
+        'shelf': [
+            deps.Fallthrough(lambda: shelf_value, 'h', active=shelf_active)],
+        'case': [
+            deps.Fallthrough(lambda: case_value, 'h', active=case_active)],
+        'book': [deps.Fallthrough(lambda: 'my-book', 'h', active=True)]}
+    self.assertEqual(
+        expected,
+        self.resource.Initialize(fallthroughs_map).result.RelativeName())
 
   @parameterized.named_parameters(
       # Should initialize directly from the anchor.
@@ -287,8 +310,8 @@ class MultitypeTestsFourWay(concepts_test_base.MultitypeTestBase,
   def testInitializeWithAnchor(self, proj_value, org_value, shelf_value,
                                case_value, book_value, expected):
     book_fallthrough = deps.Fallthrough(lambda: book_value, 'h', active=True)
-    deps_obj = deps.Deps(
-        {'project': [
+    fallthroughs_map = {
+        'project': [
             deps.FullySpecifiedAnchorFallthrough(
                 book_fallthrough,
                 self.book_collection,
@@ -298,40 +321,40 @@ class MultitypeTestsFourWay(concepts_test_base.MultitypeTestBase,
                 self.proj_case_book_collection,
                 'projectsId'),
             deps.Fallthrough(lambda: proj_value, 'h', active=True)],
-         'organization': [
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.org_shelf_book_collection,
-                 'organizationsId'),
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.org_case_book_collection,
-                 'organizationsId'),
-             deps.Fallthrough(lambda: org_value, 'h', active=True)],
-         'shelf': [
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.org_shelf_book_collection,
-                 'shelvesId'),
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.book_collection,
-                 'shelvesId'),
-             deps.Fallthrough(lambda: shelf_value, 'h', active=True)],
-         'case': [
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.proj_case_book_collection,
-                 'casesId'),
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.org_case_book_collection,
-                 'casesId'),
-             deps.Fallthrough(lambda: case_value, 'h', active=True)],
-         'book': [book_fallthrough]})
+        'organization': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.org_shelf_book_collection,
+                'organizationsId'),
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.org_case_book_collection,
+                'organizationsId'),
+            deps.Fallthrough(lambda: org_value, 'h', active=True)],
+        'shelf': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.org_shelf_book_collection,
+                'shelvesId'),
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.book_collection,
+                'shelvesId'),
+            deps.Fallthrough(lambda: shelf_value, 'h', active=True)],
+        'case': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.proj_case_book_collection,
+                'casesId'),
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.org_case_book_collection,
+                'casesId'),
+            deps.Fallthrough(lambda: case_value, 'h', active=True)],
+        'book': [book_fallthrough]}
     self.assertEqual(
         expected,
-        self.resource.Initialize(deps_obj).result.RelativeName())
+        self.resource.Initialize(fallthroughs_map).result.RelativeName())
 
   @parameterized.named_parameters(
       # If both project and org are specified, fail.
@@ -347,29 +370,121 @@ class MultitypeTestsFourWay(concepts_test_base.MultitypeTestBase,
        '[project, book]'))
   def testInitializeError(self, proj_value, org_value, shelf_value, case_value,
                           expected_error):
-    deps_obj = deps.Deps(
-        {'project': [deps.Fallthrough(lambda: proj_value, 'h', active=True)],
-         'organization': [
-             deps.Fallthrough(lambda: org_value, 'h', active=True)],
-         'shelf': [deps.Fallthrough(lambda: shelf_value, 'h', active=True)],
-         'case': [deps.Fallthrough(lambda: case_value, 'h', active=True)],
-         'book': [deps.Fallthrough(lambda: 'my-book', 'h', active=True)]})
+    fallthroughs_map = {
+        'project': [deps.Fallthrough(lambda: proj_value, 'h', active=True)],
+        'organization': [
+            deps.Fallthrough(lambda: org_value, 'h', active=True)],
+        'shelf': [deps.Fallthrough(lambda: shelf_value, 'h', active=True)],
+        'case': [deps.Fallthrough(lambda: case_value, 'h', active=True)],
+        'book': [deps.Fallthrough(lambda: 'my-book', 'h', active=True)]}
     with self.assertRaisesRegexp(
         multitype.ConflictingTypesError, re.escape(expected_error)):
-      self.resource.Initialize(deps_obj)
+      self.resource.Initialize(fallthroughs_map)
 
   def testInitializeConceptNotFullySpecified(self):
-    deps_obj = deps.Deps(
-        {'project': [deps.Fallthrough(lambda: 'my-project', 'h')],
-         'organization': [
-             deps.Fallthrough(lambda: 'my-org', 'h', active=True)],
-         'shelf': [deps.Fallthrough(lambda: 'my-shelf', 'h', active=True)],
-         'case': [deps.Fallthrough(lambda: None, 'h')],
-         'book': [deps.Fallthrough(lambda: None, 'h')]})
+    fallthroughs_map = {
+        'project': [deps.Fallthrough(lambda: 'my-project', 'h')],
+        'organization': [
+            deps.Fallthrough(lambda: 'my-org', 'h', active=True)],
+        'shelf': [deps.Fallthrough(lambda: 'my-shelf', 'h', active=True)],
+        'case': [deps.Fallthrough(lambda: None, 'h')],
+        'book': [deps.Fallthrough(lambda: None, 'h')]}
     with self.assertRaisesRegexp(
         concepts.InitializationError,
         re.escape('[book]')):
-      self.resource.Initialize(deps_obj)
+      self.resource.Initialize(fallthroughs_map)
+
+  @parameterized.named_parameters(
+      ('Flag', '--book', 'book', False, False,
+       'examplebook', 'exampleshelf', 'exampleproject',
+       'projects/exampleproject/shelves/exampleshelf/books/examplebook',
+       'Type.projectbook'),
+      ('Positional', 'BOOK', 'BOOK', False, False,
+       'examplebook', 'exampleshelf', 'exampleproject',
+       'projects/exampleproject/shelves/exampleshelf/books/examplebook',
+       'Type.projectbook'),
+      ('Plural', '--books', 'books', True, False,
+       ['example1', 'example2'], 'exampleshelf', 'exampleproject',
+       ['projects/exampleproject/shelves/exampleshelf/books/example1',
+        'projects/exampleproject/shelves/exampleshelf/books/example2'],
+       ['Type.projectbook', 'Type.projectbook']),
+      ('PluralAnchors', '--books', 'books', True, False,
+       ['projects/exampleproject/shelves/exampleshelf/books/example1',
+        'organizations/exampleorg/cases/examplecase/books/example2'],
+       None, None,
+       ['projects/exampleproject/shelves/exampleshelf/books/example1',
+        'organizations/exampleorg/cases/examplecase/books/example2'],
+       ['Type.projectbook', 'Type.orgcasebook']),
+      ('Empty', '--book', 'book', False, True, None, None, None,
+       None, 'None'),
+      ('PluralEmpty', '--book', 'book', True, True, [], None, None,
+       [], []))
+  def testParse(self, name, namespace_name, plural, allow_empty, book_arg,
+                shelf_arg, project_arg, expected, expected_type):
+    """Tests Parse method correctly parses with different anchor names."""
+    attribute_to_args_map = {
+        'book': name, 'shelf': '--shelf', 'project': '--book-project',
+        'organization': '--organization', 'case': '--case'}
+    args_dict = {namespace_name: book_arg,
+                 'shelf': shelf_arg,
+                 'book_project': project_arg,
+                 'organization': None,
+                 'case': None}
+    parsed_args = self._GetMockNamespace(**args_dict)
+
+    parsed = self.resource.Parse(
+        attribute_to_args_map,
+        {},
+        parsed_args=parsed_args,
+        allow_empty=allow_empty,
+        plural=plural)
+    if not plural:
+      if expected is None:
+        self.assertIsNone(parsed.result)
+      else:
+        self.assertEqual(
+            expected, parsed.result.RelativeName())
+      self.assertEqual(expected_type, str(parsed.type_))
+    else:
+      self.assertEqual(
+          expected, [r.result.RelativeName() for r in parsed])
+      self.assertEqual(
+          expected_type, [str(r.type_) for r in parsed])
+
+  @parameterized.named_parameters(
+      ('RequiredMissingAnchor', False, False,
+       {'book': [deps.Fallthrough(lambda: None, 'h')]},
+       {'book_project': 'p1', 'shelf': 's1'},
+       concepts.InitializationError, '[book]'),
+      ('RequiredEmpty', False, False,
+       {}, {}, concepts.InitializationError, '[book]'),
+      ('RequiredPluralMissingAnchor', True, False,
+       {'book': [deps.Fallthrough(lambda: None, 'h')]},
+       {'book_project': 'p1', 'shelf': 's1'},
+       concepts.InitializationError, '[book]'),
+      ('RequiredPluralEmpty', True, False,
+       {}, {}, concepts.InitializationError, '[book]'),
+      ('NotFullySpecified', False, False,
+       {}, {'book_project': 'p1', 'shelf': 's1'},
+       concepts.InitializationError, '[book]'),
+      ('PluralNotFullySpecified', True, False,
+       {}, {'book_project': 'p1', 'shelf': 's1'},
+       concepts.InitializationError, '[book]'))
+  def testParseError(self, plural, allow_empty, fallthroughs, args_dict,
+                     expected_error, expected_msg):
+    """Tests Parse method correctly parses with different anchor names."""
+    attribute_to_args_map = {
+        'book': '--book', 'shelf': '--shelf', 'project': '--book-project',
+        'organization': '--organization', 'case': '--case'}
+    parsed_args = self._GetMockNamespace(**args_dict)
+
+    with self.assertRaisesRegexp(expected_error, re.escape(expected_msg)):
+      self.resource.Parse(
+          attribute_to_args_map,
+          fallthroughs,
+          parsed_args=parsed_args,
+          allow_empty=allow_empty,
+          plural=plural)
 
 
 class MultitypeTestsParentChild(concepts_test_base.MultitypeTestBase,
@@ -382,7 +497,7 @@ class MultitypeTestsParentChild(concepts_test_base.MultitypeTestBase,
     book_resource = util.GetBookResource(name='book')
     # Shelves are the parent - they contain books.
     shelf_resource = util.GetProjShelfResource(name='shelf')
-    self.resource = multitype.MultitypeConceptSpec(
+    self.resource = multitype.MultitypeResourceSpec(
         'shelfbook',
         book_resource,
         shelf_resource)
@@ -395,15 +510,15 @@ class MultitypeTestsParentChild(concepts_test_base.MultitypeTestBase,
       ('ChildNotActivelySpecified', False,
        'projects/my-project/shelves/my-shelf'))
   def testInitialize(self, child_active, expected):
-    deps_obj = deps.Deps(
-        {'project': [
+    fallthroughs_map = {
+        'project': [
             deps.Fallthrough(lambda: 'my-project', 'h', active=True)],
-         'shelf': [deps.Fallthrough(lambda: 'my-shelf', 'h', active=True)],
-         'book': [deps.Fallthrough(lambda: 'my-book', 'h',
-                                   active=child_active)]})
+        'shelf': [deps.Fallthrough(lambda: 'my-shelf', 'h', active=True)],
+        'book': [deps.Fallthrough(lambda: 'my-book', 'h',
+                                  active=child_active)]}
     self.assertEqual(
         expected,
-        self.resource.Initialize(deps_obj).result.RelativeName())
+        self.resource.Initialize(fallthroughs_map).result.RelativeName())
 
   @parameterized.named_parameters(
       # Should initialize directly from the anchor.
@@ -423,8 +538,8 @@ class MultitypeTestsParentChild(concepts_test_base.MultitypeTestBase,
                                expected):
     book_fallthrough = deps.Fallthrough(lambda: book_value, 'h', active=True)
     shelf_fallthrough = deps.Fallthrough(lambda: shelf_value, 'h', active=True)
-    deps_obj = deps.Deps(
-        {'project': [
+    fallthroughs_map = {
+        'project': [
             deps.FullySpecifiedAnchorFallthrough(
                 book_fallthrough,
                 self.book_collection,
@@ -434,22 +549,22 @@ class MultitypeTestsParentChild(concepts_test_base.MultitypeTestBase,
                 self.shelf_collection,
                 'projectsId'),
             deps.Fallthrough(lambda: proj_value, 'h', active=True)],
-         'shelf': [
-             deps.FullySpecifiedAnchorFallthrough(
-                 book_fallthrough,
-                 self.book_collection,
-                 'shelvesId'),
-             deps.Fallthrough(lambda: shelf_value, 'h')],
-         'book': [book_fallthrough]})
+        'shelf': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.book_collection,
+                'shelvesId'),
+            deps.Fallthrough(lambda: shelf_value, 'h')],
+        'book': [book_fallthrough]}
     self.assertEqual(
         expected,
-        self.resource.Initialize(deps_obj).result.RelativeName())
+        self.resource.Initialize(fallthroughs_map).result.RelativeName())
 
   @parameterized.named_parameters(
-      # Will attempt to initialize shelf because it's the parent
+      # Will raise error for both anchors since book is not given.
       ('ShelfNotFullySpecified',
        'exampleproject', True, None, True, None, True,
-       'The [shelf] resource is not properly specified.'),
+       'The [shelfbook] resource is not properly specified.'),
       # Will attempt to initialize book
       ('BookNotFullySpecified',
        'exampleproject', False, None, False, 'examplebook', True,
@@ -457,28 +572,181 @@ class MultitypeTestsParentChild(concepts_test_base.MultitypeTestBase,
   def testInitializeError(self, proj_value, proj_active, shelf_value,
                           shelf_active, book_value, book_active,
                           expected_error):
-    deps_obj = deps.Deps(
-        {'project': [
+    fallthroughs_map = {
+        'project': [
             deps.Fallthrough(lambda: proj_value, 'h', active=proj_active)],
-         'shelf': [
-             deps.Fallthrough(lambda: shelf_value, 'h', active=shelf_active)],
-         'book': [
-             deps.Fallthrough(lambda: book_value, 'h', active=book_active)]})
+        'shelf': [
+            deps.Fallthrough(lambda: shelf_value, 'h', active=shelf_active)],
+        'book': [
+            deps.Fallthrough(lambda: book_value, 'h', active=book_active)]}
     with self.assertRaisesRegexp(
         concepts.InitializationError,
         re.escape(expected_error)):
-      self.resource.Initialize(deps_obj)
+      self.resource.Initialize(fallthroughs_map)
 
   def testInitializeNotFullySpecified(self):
-    deps_obj = deps.Deps(
-        {'project': [
+    fallthroughs_map = {
+        'project': [
             deps.Fallthrough(lambda: 'exampleproject', 'h', active=True)],
-         'shelf': [deps.Fallthrough(lambda: None, 'h')],
-         'book': [deps.Fallthrough(lambda: 'examplebook', 'h', active=True)]})
+        'shelf': [deps.Fallthrough(lambda: None, 'h')],
+        'book': [deps.Fallthrough(lambda: 'examplebook', 'h', active=True)]}
     with self.assertRaisesRegexp(
         concepts.InitializationError,
         re.escape('[shelf]')):
-      self.resource.Initialize(deps_obj).RelativeName()
+      self.resource.Initialize(fallthroughs_map).RelativeName()
+
+  @parameterized.named_parameters(
+      ('Child', '--book', 'book', False, False,
+       'examplebook', 'exampleshelf', 'exampleproject',
+       'projects/exampleproject/shelves/exampleshelf/books/examplebook',
+       'Type.book'),
+      ('Parent', '--book', 'book', False, False,
+       None, 'exampleshelf', 'exampleproject',
+       'projects/exampleproject/shelves/exampleshelf',
+       'Type.shelf'),
+      ('Plural', '--books', 'books', True, False,
+       ['example1', 'example2'], 'exampleshelf', 'exampleproject',
+       ['projects/exampleproject/shelves/exampleshelf/books/example1',
+        'projects/exampleproject/shelves/exampleshelf/books/example2'],
+       ['Type.book', 'Type.book']),
+      ('PluralAnchors', '--books', 'books', True, False,
+       ['projects/exampleproject/shelves/exampleshelf/books/example1',
+        'projects/exampleproject/shelves/exampleshelf/books/example2'],
+       None, None,
+       ['projects/exampleproject/shelves/exampleshelf/books/example1',
+        'projects/exampleproject/shelves/exampleshelf/books/example2'],
+       ['Type.book', 'Type.book']),
+      ('PluralEmpty', '--books', 'books', True, True, [], None, None,
+       [], []),
+      ('PluralParent', '--books', 'books', True, True, [], 'exampleshelf',
+       'exampleproject', ['projects/exampleproject/shelves/exampleshelf'],
+       ['Type.shelf']),
+      ('PluralParentRequired', '--books', 'books', True, False, [],
+       'exampleshelf', 'exampleproject',
+       ['projects/exampleproject/shelves/exampleshelf'], ['Type.shelf']))
+  def testParse(self, name, namespace_name, plural, allow_empty, book_arg,
+                shelf_arg, project_arg, expected, expected_type):
+    """Tests Parse method correctly parses with different anchor names."""
+    attribute_to_args_map = {
+        'book': name, 'shelf': '--shelf', 'project': '--book-project'}
+    args_dict = {namespace_name: book_arg,
+                 'shelf': shelf_arg,
+                 'book_project': project_arg}
+    parsed_args = self._GetMockNamespace(**args_dict)
+
+    parsed = self.resource.Parse(
+        attribute_to_args_map,
+        {},
+        parsed_args=parsed_args,
+        allow_empty=allow_empty,
+        plural=plural)
+
+    if not plural:
+      if expected is None:
+        self.assertIsNone(parsed.result)
+      else:
+        self.assertEqual(
+            expected, parsed.result.RelativeName())
+      self.assertEqual(expected_type, str(parsed.type_))
+    else:
+      self.assertEqual(
+          expected, [r.result.RelativeName() for r in parsed])
+      self.assertEqual(
+          expected_type, [str(r.type_) for r in parsed])
+
+  @parameterized.named_parameters(
+      ('ParentInChild', False,
+       'projects/exampleproject/shelves/exampleshelf',
+       'The [book] resource'),
+      ('PluralParentsInChild', True,
+       ['projects/exampleproject/shelves/exampleshelf',
+        'projects/exampleproject/shelves/exampleshelf2'],
+       'The [book] resource'))
+  def testParseError(self, plural, book_arg, error):
+    attribute_to_args_map = {
+        'book': '--book', 'shelf': '--shelf', 'project': '--book-project'}
+    args_dict = {'book': book_arg,
+                 'shelf': None,
+                 'book_project': None}
+    parsed_args = self._GetMockNamespace(**args_dict)
+
+    with self.assertRaisesRegex(concepts.InitializationError, re.escape(error)):
+      self.resource.Parse(
+          attribute_to_args_map,
+          {},
+          parsed_args=parsed_args,
+          allow_empty=False,
+          plural=plural)
+
+
+class MultitypeTestsFourWayParentChild(concepts_test_base.MultitypeTestBase,
+                                       parameterized.TestCase):
+  """Tests for a multitype resource that can be parent/child or org/project."""
+
+  def SetUp(self):
+    # Just for convenience.
+    self.resource = self.four_way_parent_child_resource
+
+  @parameterized.named_parameters(
+      ('ProjChild', '--book', 'book', False,
+       'examplebook', 'exampleshelf', 'exampleproject', None,
+       'projects/exampleproject/shelves/exampleshelf/books/examplebook',
+       'Type.example.projects.shelves.books'),
+      ('OrgChild', '--book', 'book', False,
+       'examplebook', 'exampleshelf', None, 'exampleorg',
+       'organizations/exampleorg/shelves/exampleshelf/books/examplebook',
+       'Type.example.organizations.shelves.books'),
+      ('ProjParent', '--book', 'book', False,
+       None, 'exampleshelf', 'exampleproject', None,
+       'projects/exampleproject/shelves/exampleshelf',
+       'Type.example.projects.shelves'),
+      ('OrgParent', '--book', 'book', False,
+       None, 'exampleshelf', None, 'exampleorg',
+       'organizations/exampleorg/shelves/exampleshelf',
+       'Type.example.organizations.shelves'),
+      ('Plural', '--books', 'books', True,
+       ['example1', 'example2'], 'exampleshelf', 'exampleproject', None,
+       ['projects/exampleproject/shelves/exampleshelf/books/example1',
+        'projects/exampleproject/shelves/exampleshelf/books/example2'],
+       ['Type.example.projects.shelves.books',
+        'Type.example.projects.shelves.books']),
+      ('PluralAnchors', '--books', 'books', True,
+       ['projects/exampleproject/shelves/exampleshelf/books/example1',
+        'organizations/exampleorg/shelves/exampleshelf/books/example2'],
+       None, None, None,
+       ['projects/exampleproject/shelves/exampleshelf/books/example1',
+        'organizations/exampleorg/shelves/exampleshelf/books/example2'],
+       ['Type.example.projects.shelves.books',
+        'Type.example.organizations.shelves.books']))
+  def testParseFourWayParentChild(self, name, namespace_name, plural, book_arg,
+                                  shelf_arg, project_arg, org_arg, expected,
+                                  expected_type):
+    """Tests Parse method correctly parses with different anchor names."""
+    attribute_to_args_map = {
+        'book': name, 'shelf': '--shelf', 'project': '--book-project',
+        'organization': '--organization'}
+    args_dict = {namespace_name: book_arg,
+                 'shelf': shelf_arg,
+                 'book_project': project_arg,
+                 'organization': org_arg}
+    parsed_args = self._GetMockNamespace(**args_dict)
+
+    parsed = self.resource.Parse(
+        attribute_to_args_map,
+        {},
+        parsed_args=parsed_args,
+        allow_empty=False,
+        plural=plural)
+
+    if not plural:
+      self.assertEqual(
+          expected, parsed.result.RelativeName())
+      self.assertEqual(expected_type, str(parsed.type_))
+    else:
+      self.assertEqual(
+          expected, [r.result.RelativeName() for r in parsed])
+      self.assertEqual(
+          expected_type, [str(r.type_) for r in parsed])
 
 
 if __name__ == '__main__':

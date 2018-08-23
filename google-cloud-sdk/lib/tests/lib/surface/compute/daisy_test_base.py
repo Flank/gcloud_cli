@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Base module for testing commands that call Daisy."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import uuid
 
 from apitools.base.py import encoding
@@ -116,7 +119,8 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
           'https://storage.googleapis.com/{0}/log-1234.txt'.format(
               log_location or 'my-project_cloudbuild/logs'),
           request_headers={'Range': 'bytes=0-'}, status=200,
-          body='Here is some streamed\ndata for you to print\n')
+          body=('Cloudbuild output\n[import-image] output\n'
+                '[image-export] output'))
 
     self.mocked_servicemanagement_v1.services.List.Expect(
         self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(

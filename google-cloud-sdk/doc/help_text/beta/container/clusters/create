@@ -30,6 +30,7 @@ SYNOPSIS
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--enable-master-authorized-networks
           --master-authorized-networks=NETWORK,[NETWORK,...]]
+        [--enable-tpu --tpu-ipv4-cidr=CIDR]
         [--master-ipv4-cidr=MASTER_IPV4_CIDR --private-cluster]
         [--password=PASSWORD --no-enable-basic-auth
           | --username=USERNAME, -u USERNAME; default="admin"]
@@ -147,12 +148,16 @@ FLAGS
         be one of: pd-standard, pd-ssd.
 
      --enable-autorepair
-        Sets autorepair feature for a cluster's default node-pool(s).
+        Enable node autorepair feature for a cluster's default node-pool(s).
 
             $ gcloud beta container clusters create example-cluster \
                 --enable-autorepair
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-auto-repair
+        Node autorepair is enabled by default for clusters using COS as a base
+        image.
+
+        See
+        https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
         for more info.
 
      --enable-autoupgrade
@@ -161,7 +166,7 @@ FLAGS
             $ gcloud beta container clusters create example-cluster \
                 --enable-autoupgrade
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-managament for
+        See https://cloud.google.com/kubernetes-engine/docs/node-management for
         more info.
 
      --enable-cloud-logging
@@ -500,6 +505,26 @@ FLAGS
           1.2.3.4/30). Can not be specified unless
           --enable-master-authorized-networks is also specified.
 
+     Flags relating to Cloud TPUs:
+
+       --enable-tpu
+          Enable Cloud TPUs for this cluster.
+
+          Can not be specified unless --enable-kubernetes-alpha and
+          --enable-ip-alias are also specified.
+
+       --tpu-ipv4-cidr=CIDR
+          Set the IP range for the Cloud TPUs.
+
+          Can be specified as a netmask size (e.g. '/20') or as in CIDR notion
+          (e.g. '10.100.0.0/20'). If given as a netmask size, the IP range will
+          be chosen automatically from the available space in the network.
+
+          If unspecified, the TPU CIDR range will use automatic default '/20'.
+
+          Can not be specified unless '--enable-tpu' and '--enable-ip-alias'
+          are also specified.
+
      Private Clusters
 
        --master-ipv4-cidr=MASTER_IPV4_CIDR
@@ -537,10 +562,10 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          The compute region (e.g. us-central1) for the cluster.
+          Compute region (e.g. us-central1) for the cluster.
 
        --zone=ZONE, -z ZONE
-          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
      Options to specify the node identity. At most one of these may be

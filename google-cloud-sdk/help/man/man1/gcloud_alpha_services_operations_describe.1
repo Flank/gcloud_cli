@@ -11,7 +11,7 @@ gcloud alpha services operations describe \- describes an operation resource for
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha services operations describe\fR \fIOPERATION\fR [\fB\-\-full\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha services operations describe\fR \fIOPERATION\fR [\fB\-\-full\fR=\fIFULL\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -19,13 +19,6 @@ gcloud alpha services operations describe \- describes an operation resource for
 
 \fB(ALPHA)\fR This command will return information about an operation given the
 name of that operation.
-
-The amount of information inside an operation can be very large, so by default,
-only a summary is returned. If you want the entire operation resource, you can
-include the \f5\-\-full\fR flag.
-
-Note that the \f5operations/\fR prefix of the operation name is optional and may
-be omitted.
 
 
 
@@ -44,9 +37,10 @@ The name of the operation to describe.
 
 .RS 2m
 .TP 2m
-\fB\-\-full\fR
-Print the entire operation resource, which could be large. By default, a summary
-will be printed instead.
+\fB\-\-full\fR=\fIFULL\fR
+(DEPRECATED) This flag is deprecated.
+
+This flag is deprecated.
 
 
 .RE
@@ -63,30 +57,21 @@ help\fR for details.
 
 .SH "EXAMPLES"
 
-To describe an operation resource named
-\f5operations/serviceConfigs.my\-service.1\fR, run:
+To describe an operation resource named \f5operations/abc\fR, run:
 
 .RS 2m
-$ gcloud alpha services operations describe \e
-    serviceConfigs.my\-service.1
-.RE
-
-To get the full operation resource, run:
-
-.RS 2m
-$ gcloud alpha services operations describe \e
-    serviceConfigs.my\-service.1 \-\-full
+$ gcloud alpha services operations describe operations/abc
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud services operations describe

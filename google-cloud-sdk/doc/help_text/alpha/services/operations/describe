@@ -3,28 +3,22 @@ NAME
         for a given operation name
 
 SYNOPSIS
-    gcloud alpha services operations describe OPERATION [--full]
+    gcloud alpha services operations describe OPERATION [--full=FULL]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command will return information about an operation given the
     name of that operation.
 
-    The amount of information inside an operation can be very large, so by
-    default, only a summary is returned. If you want the entire operation
-    resource, you can include the --full flag.
-
-    Note that the operations/ prefix of the operation name is optional and may
-    be omitted.
-
 POSITIONAL ARGUMENTS
      OPERATION
         The name of the operation to describe.
 
 FLAGS
-     --full
-        Print the entire operation resource, which could be large. By default,
-        a summary will be printed instead.
+     --full=FULL
+        (DEPRECATED) This flag is deprecated.
+
+        This flag is deprecated.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -32,23 +26,16 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 EXAMPLES
-    To describe an operation resource named
-    operations/serviceConfigs.my-service.1, run:
+    To describe an operation resource named operations/abc, run:
 
-        $ gcloud alpha services operations describe \
-            serviceConfigs.my-service.1
-
-    To get the full operation resource, run:
-
-        $ gcloud alpha services operations describe \
-            serviceConfigs.my-service.1 --full
+        $ gcloud alpha services operations describe operations/abc
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud services operations describe
         $ gcloud beta services operations describe

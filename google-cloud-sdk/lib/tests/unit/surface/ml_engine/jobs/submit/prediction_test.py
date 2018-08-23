@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ml-engine jobs submit batch prediction tests."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core.util import times
@@ -289,6 +293,31 @@ class SubmitPredictionBase(object):
              '    --output-path gs://bucket/output '
              '    --region us-central '
              '    --batch-size 128')
+
+  def testBatchPredictionSignatureName(self):
+    version_name = 'projects/fake-project/models/my_model/versions/v1'
+    self.client.projects_jobs.Create.Expect(
+        self._MakeCreateRequest(
+            job=self.short_msgs.Job(
+                jobId='my_job',
+                predictionInput=self.short_msgs.PredictionInput(
+                    dataFormat=self.data_formats.TF_RECORD,
+                    inputPaths=['gs://bucket/instances'],
+                    versionName=version_name,
+                    outputPath='gs://bucket/output',
+                    region='us-central',
+                    signatureName='my-custom-signature')),
+            parent='projects/{}'.format(self.Project())),
+        self.short_msgs.Job())
+
+    self.Run('ml-engine jobs submit prediction my_job '
+             '    --model my_model '
+             '    --version v1 '
+             '    --input-paths gs://bucket/instances '
+             '    --data-format TF_RECORD '
+             '    --output-path gs://bucket/output '
+             '    --region us-central '
+             '    --signature-name my-custom-signature')
 
 
 class SubmitPredictionGaTest(SubmitPredictionBase,

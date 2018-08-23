@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +16,16 @@
 """Test of the 'clusters create' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import copy
+import os
 
 from googlecloudsdk import calliope
 from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import compute_base
@@ -79,8 +84,9 @@ class ClustersCreateFromFileUnitTestBeta(ClustersCreateFromFileUnitTest,
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
 
-    file_name = '{0}/{1}'.format(self.temp_path, 'cluster.yaml')
-    util.WriteYaml(file_path=file_name, message=expected_request_cluster)
+    file_name = os.path.join(self.temp_path, 'cluster.yaml')
+    with files.FileWriter(file_name) as stream:
+      util.WriteYaml(message=expected_request_cluster, stream=stream)
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
         response_cluster=expected_response_cluster)
@@ -95,8 +101,9 @@ class ClustersCreateFromFileUnitTestBeta(ClustersCreateFromFileUnitTest,
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
 
-    file_name = '{0}/{1}'.format(self.temp_path, 'cluster.yaml')
-    util.WriteYaml(file_path=file_name, message=expected_request_cluster)
+    file_name = os.path.join(self.temp_path, 'cluster.yaml')
+    with files.FileWriter(file_name) as stream:
+      util.WriteYaml(message=expected_request_cluster, stream=stream)
     self.ExpectCreateCluster(cluster=expected_request_cluster)
 
     self.RunDataproc(
@@ -113,8 +120,9 @@ class ClustersCreateFromFileUnitTestBeta(ClustersCreateFromFileUnitTest,
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
 
-    file_name = '{0}/{1}'.format(self.temp_path, 'cluster.yaml')
-    util.WriteYaml(file_path=file_name, message=expected_request_cluster)
+    file_name = os.path.join(self.temp_path, 'cluster.yaml')
+    with files.FileWriter(file_name) as stream:
+      util.WriteYaml(message=expected_request_cluster, stream=stream)
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
         response_cluster=expected_response_cluster,

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """Tests that exercise IAM-related `binauthz policy` commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import textwrap
@@ -23,7 +25,7 @@ from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class PolicyGetIamTest(base.BinauthzMockedPolicyClientUnitTest):
+class PolicyGetIamTest(base.BinauthzMockedBetaPolicyClientUnitTest):
 
   def SetUp(self):
     self.proj = self.Project()
@@ -53,7 +55,7 @@ class PolicyGetIamTest(base.BinauthzMockedPolicyClientUnitTest):
 
 
 class PolicyModifyIamTest(sdk_test_base.WithTempCWD,
-                          base.BinauthzMockedPolicyClientUnitTest):
+                          base.BinauthzMockedBetaPolicyClientUnitTest):
 
   def SetUp(self):
     self.proj = self.Project()

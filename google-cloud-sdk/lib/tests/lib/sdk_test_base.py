@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 import functools
 import inspect
@@ -215,12 +217,13 @@ class SdkBase(test_case.Base):
         encoding='utf-8')
 
     # Redirect home to a temp directory.
+    self.home_path = self.CreateTempDir()
+    self.StartEnvPatch({'HOME': self.home_path})
     self.mock_get_home_path = self.StartPatch(
         'googlecloudsdk.core.util.platforms.GetHomePath',
-        return_value=self.temp_path)
-    self.mock_expandvars = self.StartPatch('os.path.expandvars',
-                                           autospec=True,
-                                           return_value=self.temp_path)
+        return_value=self.home_path)
+    self.mock_expandvars = self.StartPatch(
+        'os.path.expandvars', autospec=True, return_value=self.home_path)
     self.addCleanup(self._CloseDirs)
     self.addCleanup(resources.REGISTRY.Clear)
 
@@ -232,6 +235,7 @@ class SdkBase(test_case.Base):
         ('component_manager', 'disable_update_check'): True,
         ('core', 'disable_usage_reporting'): True,
         ('core', 'should_prompt_to_enable_api'): False,
+        ('core', 'allow_py3'): True,
     }
     self.__CleanProperties()
     self.addCleanup(self.__CleanProperties)
@@ -486,8 +490,7 @@ class WithTempCWD(SdkBase):
   """A base class for tests that want to be in a temporary current dir."""
 
   def SetUp(self):
-    self.cwd_path = os.path.join(self.root_path, 'temp_cwd')
-    file_utils.MakeDir(self.cwd_path)
+    self.cwd_path = self.CreateTempDir('temp_cwd')
     try:
       self.__cwd = encoding.Decode(os.getcwd())
     except OSError:

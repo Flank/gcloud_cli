@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,6 +62,22 @@ def CreateMinimalRouterMessage(messages, api_version='v1'):
       bgp=messages.RouterBgp(asn=65000),
       network=('https://www.googleapis.com/compute/{0}/projects/fake-project/'
                'global/networks/default').format(api_version))
+
+
+def CreateEmptyRouterMessage(messages, track='v1'):
+  """Create a empty router with only metadata fields.
+
+  Args:
+    messages: A compute API messages client.
+    track: The version track, for generating the network ref.
+
+  Returns:
+    A Router message with only required metadata fields.
+  """
+  return messages.Router(
+      name='my-router',
+      network=('https://www.googleapis.com/compute/{0}/projects/fake-project/'
+               'global/networks/default').format(track))
 
 
 def CreateBaseRouterMessage(messages):

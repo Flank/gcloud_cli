@@ -65,9 +65,18 @@ FLAGS
           Clear the field corresponding to --max-doublings.
 
        --max-doublings=MAX_DOUBLINGS
-          The maximum number of times that the interval between failed task
-          retries will be doubled before the increase becomes constant. The
-          constant is: min-backoff * 2 ** (max-doublings - 1).
+          The time between retries will double maxDoublings times.
+
+          A tasks retry interval starts at minBackoff, then doubles
+          maxDoublings times, then increases linearly, and finally retries
+          retries at intervals of maxBackoff up to maxAttempts times.
+
+          For example, if minBackoff is 10s, maxBackoff is 300s, and
+          maxDoublings is 3, then the a task will first be retried in 10s. The
+          retry interval will double three times, and then increase linearly by
+          2^3 * 10s. Finally, the task will retry at intervals of maxBackoff
+          until the task has been attempted maxAttempts times. Thus, the
+          requests will retry at 10s, 20s, 40s, 80s, 160s, 240s, 300s, 300s.
 
      At most one of these may be specified:
 
@@ -88,10 +97,7 @@ FLAGS
           Clear the field corresponding to --max-tasks-dispatched-per-second.
 
        --max-tasks-dispatched-per-second=MAX_TASKS_DISPATCHED_PER_SECOND
-          The maximum rate at which tasks are dispatched from this queue. This
-          also determines "max burst size" for App Engine queues: if
-          --max-tasks-dispatched-per-second is 1, then max burst size is 10;
-          otherwise it is max-tasks-dispatched-per-second / 5.
+          The maximum rate at which tasks are dispatched from this queue.
 
      At most one of these may be specified:
 
@@ -120,9 +126,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta tasks queues update-app-engine-queue
 

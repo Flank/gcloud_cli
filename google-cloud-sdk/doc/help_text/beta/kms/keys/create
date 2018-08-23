@@ -10,16 +10,16 @@ SYNOPSIS
 DESCRIPTION
     (BETA) Creates a new key within the given keyring.
 
-    The optional flags --rotation-period and --next-rotation-time define a
-    rotation schedule for the key. A schedule can also be defined by the
+    The optional flags rotation-period and next-rotation-time define a rotation
+    schedule for the key. A schedule can also be defined by the
     create-rotation-schedule command.
 
-    The flag --next-rotation-time must be in ISO or RFC3339 format, and
-    --rotation-period must be in the form INTEGER[UNIT], where units can be one
+    The flag next-rotation-time must be in ISO 8601 or RFC3339 format, and
+    rotation-period must be in the form INTEGER[UNIT], where units can be one
     of seconds (s), minutes (m), hours (h) or days (d).
 
-    The optional flag '--labels' defines a user specified key/value pair for
-    the given crypto_key.
+    The optional flag 'labels' defines a user specified key/value pair for the
+    given key.
 
 POSITIONAL ARGUMENTS
      KEY
@@ -27,15 +27,15 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --purpose=PURPOSE
-        The "purpose" of the key. PURPOSE must be (currently only one value is
-        supported): encryption.
+        The "purpose" of the key. PURPOSE must be one of:
+        asymmetric-encryption, asymmetric-signing, encryption.
 
 OPTIONAL FLAGS
      --keyring=KEYRING
         Key ring of the key.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must

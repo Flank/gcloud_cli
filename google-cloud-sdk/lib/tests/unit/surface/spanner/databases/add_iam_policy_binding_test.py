@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +15,18 @@
 """Tests for spanner add-iam-policy-binding."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class AddIamPolicyBindingTest(base.SpannerTestBase):
 
   def SetUp(self):
@@ -54,8 +62,9 @@ class AddIamPolicyBindingTest(base.SpannerTestBase):
         etag=b'someUniqueEtag',
         version=1)
 
-  def testAddIamPolicyBinding(self):
+  def testAddIamPolicyBinding(self, track):
     """Test the standard use case."""
+    self.track = track
     self.client.projects_instances_databases.GetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesGetIamPolicyRequest(
             resource=self.database_ref.RelativeName()),
@@ -73,8 +82,9 @@ class AddIamPolicyBindingTest(base.SpannerTestBase):
         """.format(self.new_role, self.new_user))
     self.assertEqual(add_binding_request, self.new_policy)
 
-  def testAddIamPolicyBindingWithDefaultInstance(self):
+  def testAddIamPolicyBindingWithDefaultInstance(self, track):
     """Test the standard use case."""
+    self.track = track
     self.client.projects_instances_databases.GetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesGetIamPolicyRequest(
             resource=self.database_ref.RelativeName()),

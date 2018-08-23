@@ -143,8 +143,13 @@ compute instance\-groups set\-named\-ports \-\-help\fR.
 
 .TP 2m
 \fB\-\-protocol\fR=\fIPROTOCOL\fR
-The protocol for incoming requests. \fIPROTOCOL\fR must be one of: \fBHTTP\fR,
-\fBHTTPS\fR, \fBHTTP2\fR, \fBSSL\fR, \fBTCP\fR, \fBUDP\fR.
+Protocol for incoming requests.
+
+If the load\-balancing\-scheme is \f5INTERNAL\fR, the protocol must be one of:
+\f5TCP\fR, \f5UDP\fR.
+
+If the load\-balancing\-scheme is \f5EXTERNAL\fR, the protocol must be one of:
+\f5HTTP\fR, \f5HTTPS\fR, \f5HTTP2\fR, \f5SSL\fR, \f5TCP\fR, \f5UDP\fR.
 
 .TP 2m
 \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
@@ -260,11 +265,11 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-global\fR
-If provided, it is assumed the backend service is global.
+If set, the backend service is global.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the backend service to update. Overrides the default
+Region of the backend service to update. Overrides the default
 \fBcompute/region\fR property value for this command invocation.
 
 
@@ -283,11 +288,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute backend\-services update

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for rolling back Server CA Certs."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -25,7 +28,7 @@ from tests.lib.surface.sql import base
 from tests.lib.surface.sql import data
 
 
-class ServerCaCertsRollbackTest(base.SqlMockTestBeta):
+class _BaseServerCaCertsRollbackTest(object):
 
   def testRollbackWithPreviousCert(self):
     # The previous cert has fingerprint 'one'.
@@ -132,6 +135,16 @@ one              2024-02-02T21:10:29.402000+00:00
         r'No previous Server CA Certificate exists.'):
       self.Run('sql ssl server-ca-certs rollback --instance={}'.format(
           instance_name))
+
+
+class ServerCaCertsRollbackBetaTest(_BaseServerCaCertsRollbackTest,
+                                    base.SqlMockTestBeta):
+  pass
+
+
+class ServerCaCertsRollbackAlphaTest(_BaseServerCaCertsRollbackTest,
+                                     base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

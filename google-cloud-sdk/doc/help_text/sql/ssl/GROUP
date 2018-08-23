@@ -22,7 +22,8 @@ GROUPS
         instances.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha sql ssl
         $ gcloud beta sql ssl
 

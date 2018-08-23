@@ -8,8 +8,8 @@ SYNOPSIS
         --region=REGION (--model=MODEL | --model-dir=MODEL_DIR)
         [--batch-size=BATCH_SIZE] [--labels=[KEY=VALUE,...]]
         [--max-worker-count=MAX_WORKER_COUNT]
-        [--runtime-version=RUNTIME_VERSION] [--version=VERSION]
-        [GCLOUD_WIDE_FLAG ...]
+        [--runtime-version=RUNTIME_VERSION] [--signature-name=SIGNATURE_NAME]
+        [--version=VERSION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Start a Cloud ML Engine batch prediction job.
@@ -68,7 +68,7 @@ OPTIONAL FLAGS
         if not specified.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -80,10 +80,16 @@ OPTIONAL FLAGS
         Defaults to 10 if not specified.
 
      --runtime-version=RUNTIME_VERSION
-        The Google Cloud ML Engine runtime version for this job. Defaults to a
-        stable version, which is defined in the documentation along with the
-        list of supported versions:
+        Google Cloud ML Engine runtime version for this job. Defaults to a
+        stable version, which is defined in documentation along with the list
+        of supported versions:
         https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
+
+     --signature-name=SIGNATURE_NAME
+        The name of the signature defined in the SavedModel to use for this
+        job. Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
+        https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+        which is "serving_default". Only applies to TensorFlow models.
 
      --version=VERSION
         Model version to be used.

@@ -11,7 +11,7 @@ gcloud beta dataproc workflow\-templates instantiate \- instantiate a workflow t
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dataproc workflow\-templates instantiate\fR (\fITEMPLATE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dataproc workflow\-templates instantiate\fR (\fITEMPLATE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fB\-\-parameters\fR=[\fIPARAM\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -62,6 +62,12 @@ property value for this command invocation.
 \fB\-\-async\fR
 Display information about the operation in progress, without waiting for the
 operation to complete.
+
+.TP 2m
+\fB\-\-parameters\fR=[\fIPARAM\fR=\fIVALUE\fR,...]
+A map from parameter names to values that should be used for those parameters. A
+value must be provided for every configured parameter. Parameters can be
+configured when creating or updating a workflow template.
 
 
 .RE

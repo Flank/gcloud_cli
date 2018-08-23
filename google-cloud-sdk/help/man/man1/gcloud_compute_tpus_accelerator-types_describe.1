@@ -1,0 +1,84 @@
+
+.TH "GCLOUD_COMPUTE_TPUS_ACCELERATOR\-TYPES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute tpus accelerator\-types describe \- describe an accelerator type available for Cloud TPUs
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute tpus accelerator\-types describe\fR (\fIACCELERATOR_TYPE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Get details on an accelerator type.
+
+To get a list of available accelerator types for your location run:
+
+.RS 2m
+$ gcloud compute tpus accelerator\-types list
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Accelerator type resource \- The accelerator type you want to describe. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the flag [accelerator_type]
+on the command line with a fully specified name; provide the flag [\-\-project]
+on the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIACCELERATOR_TYPE\fR
+The ID of the accelerator_type or a fully qualified identifier for the
+accelerator_type. This positional must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The compute/zone of the Cloud TPU.
+
+If not specified, will use \f5default\fR compute/zone.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBtpu/v1\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/tpu/
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute tpus accelerator\-types describe
+$ gcloud beta compute tpus accelerator\-types describe
+.RE
+

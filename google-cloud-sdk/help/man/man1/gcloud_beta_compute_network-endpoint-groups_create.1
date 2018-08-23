@@ -1,0 +1,107 @@
+
+.TH "GCLOUD_BETA_COMPUTE_NETWORK\-ENDPOINT\-GROUPS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute network\-endpoint\-groups create \- creates a Google Compute Engine network endpoint group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute network\-endpoint\-groups create\fR \fINAME\fR [\fB\-\-default\-port\fR=\fIDEFAULT_PORT\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Creates a Google Compute Engine network endpoint group.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the network endpoint group to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-default\-port\fR=\fIDEFAULT_PORT\fR
+The default port to use if the port number is not specified in the network
+endpoint.
+
+If this flag isn't specified, then every network endpoint in the network
+endpoint group must have a port specified.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+Name of the network in which the NEG is created. \f5default\fR project network
+is used if unspecified.
+
+.TP 2m
+\fB\-\-subnet\fR=\fISUBNET\fR
+Name of the subnet to which all network endpoints belong.
+
+If not specified, network endpoints may belong to any subnetwork in the region
+where the network endpoint group is created.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the network endpoint group to operate on. If not specified and the
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
+zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute network\-endpoint\-groups create
+.RE
+

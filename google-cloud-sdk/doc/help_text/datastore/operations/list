@@ -23,13 +23,13 @@ DESCRIPTION
 LIST COMMAND FLAGS
      --filter=EXPRESSION
         Apply a Boolean filter EXPRESSION to each resource item to be listed.
-        If the expression evaluates True then that item is listed. For more
-        details and examples of filter expressions run $ gcloud topic filters.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
         This flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
      --limit=LIMIT; default=100
-        The maximum number of resources to list. The default is 100. This flag
+        Maximum number of resources to list. The default is 100. This flag
         interacts with other flags that are applied in this order: --flatten,
         --sort-by, --filter, --limit.
 
@@ -40,7 +40,7 @@ LIST COMMAND FLAGS
         the service.
 
      --sort-by=[FIELD,...]
-        A comma-separated list of resource field key names to sort by. The
+        Comma-separated list of resource field key names to sort by. The
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
@@ -72,7 +72,8 @@ EXAMPLES
         $ gcloud datastore operations list --filter='labels.run = daily'
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha datastore operations list
         $ gcloud beta datastore operations list
 

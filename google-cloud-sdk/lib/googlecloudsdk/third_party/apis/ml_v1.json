@@ -203,7 +203,7 @@
             "Many workers and a few parameter servers.",
             "A large number of workers with many parameter servers.",
             "A single worker instance [with a\nGPU](\/ml-engine\/docs\/tensorflow\/using-gpus).",
-            "A single worker instance with a\n[Cloud TPU](\/ml-engine\/docs\/tensorflow\/using-tpus).\nThe availability of Cloud TPU is in <i>Beta<\/i> launch stage.",
+            "A single worker instance with a\n[Cloud TPU](\/ml-engine\/docs\/tensorflow\/using-tpus).",
             "The CUSTOM tier is not a set tier, but rather enables you to use your\nown cluster specification. When you use this tier, set values to\nconfigure your processing cluster according to these guidelines:\n\n*   You _must_ set `TrainingInput.masterType` to specify the type\n    of machine to use for your master node. This is the only required\n    setting.\n\n*   You _may_ set `TrainingInput.workerCount` to specify the number of\n    workers to use. If you specify one or more workers, you _must_ also\n    set `TrainingInput.workerType` to specify the type of machine to use\n    for your worker nodes.\n\n*   You _may_ set `TrainingInput.parameterServerCount` to specify the\n    number of parameter servers to use. If you specify one or more\n    parameter servers, you _must_ also set\n    `TrainingInput.parameterServerType` to specify the type of machine to\n    use for your parameter servers.\n\nNote that all of your workers must use the same machine type, which can\nbe different from your parameter server type and master type. Your\nparameter servers must likewise use the same machine type, which can be\ndifferent from your worker type and master type."
           ],
           "type": "string",
@@ -217,7 +217,7 @@
           ]
         },
         "masterType": {
-          "description": "Optional. Specifies the type of virtual machine to use for your training\njob's master worker.\n\nThe following types are supported:\n\n<dl>\n  <dt>standard<\/dt>\n  <dd>\n  A basic machine configuration suitable for training simple models with\n  small to moderate datasets.\n  <\/dd>\n  <dt>large_model<\/dt>\n  <dd>\n  A machine with a lot of memory, specially suited for parameter servers\n  when your model is large (having many hidden layers or layers with very\n  large numbers of nodes).\n  <\/dd>\n  <dt>complex_model_s<\/dt>\n  <dd>\n  A machine suitable for the master and workers of the cluster when your\n  model requires more computation than the standard machine can handle\n  satisfactorily.\n  <\/dd>\n  <dt>complex_model_m<\/dt>\n  <dd>\n  A machine with roughly twice the number of cores and roughly double the\n  memory of <i>complex_model_s<\/i>.\n  <\/dd>\n  <dt>complex_model_l<\/dt>\n  <dd>\n  A machine with roughly twice the number of cores and roughly double the\n  memory of <i>complex_model_m<\/i>.\n  <\/dd>\n  <dt>standard_gpu<\/dt>\n  <dd>\n  A machine equivalent to <i>standard<\/i> that\n  also includes a single NVIDIA Tesla K80 GPU. See more about\n  <a href=\"\/ml-engine\/docs\/tensorflow\/using-gpus\">using GPUs to\n  train your model<\/a>.\n  <\/dd>\n  <dt>complex_model_m_gpu<\/dt>\n  <dd>\n  A machine equivalent to <i>complex_model_m<\/i> that also includes\n  four NVIDIA Tesla K80 GPUs.\n  <\/dd>\n  <dt>complex_model_l_gpu<\/dt>\n  <dd>\n  A machine equivalent to <i>complex_model_l<\/i> that also includes\n  eight NVIDIA Tesla K80 GPUs.\n  <\/dd>\n  <dt>standard_p100<\/dt>\n  <dd>\n  A machine equivalent to <i>standard<\/i> that\n  also includes a single NVIDIA Tesla P100 GPU. The availability of these\n  GPUs is in the <i>Beta<\/i> launch stage.\n  <\/dd>\n  <dt>complex_model_m_p100<\/dt>\n  <dd>\n  A machine equivalent to <i>complex_model_m<\/i> that also includes\n  four NVIDIA Tesla P100 GPUs. The availability of these GPUs is in\n  the <i>Beta<\/i> launch stage.\n  <\/dd>\n  <dt>cloud_tpu<\/dt>\n  <dd>\n  A TPU VM including one Cloud TPU. The availability of Cloud TPU is in\n  <i>Beta<\/i> launch stage. See more about\n  <a href=\"\/ml-engine\/docs\/tensorflow\/using-tpus\">using TPUs to train\n  your model<\/a>.\n  <\/dd>\n<\/dl>\n\nYou must set this value when `scaleTier` is set to `CUSTOM`.",
+          "description": "Optional. Specifies the type of virtual machine to use for your training\njob's master worker.\n\nThe following types are supported:\n\n<dl>\n  <dt>standard<\/dt>\n  <dd>\n  A basic machine configuration suitable for training simple models with\n  small to moderate datasets.\n  <\/dd>\n  <dt>large_model<\/dt>\n  <dd>\n  A machine with a lot of memory, specially suited for parameter servers\n  when your model is large (having many hidden layers or layers with very\n  large numbers of nodes).\n  <\/dd>\n  <dt>complex_model_s<\/dt>\n  <dd>\n  A machine suitable for the master and workers of the cluster when your\n  model requires more computation than the standard machine can handle\n  satisfactorily.\n  <\/dd>\n  <dt>complex_model_m<\/dt>\n  <dd>\n  A machine with roughly twice the number of cores and roughly double the\n  memory of <i>complex_model_s<\/i>.\n  <\/dd>\n  <dt>complex_model_l<\/dt>\n  <dd>\n  A machine with roughly twice the number of cores and roughly double the\n  memory of <i>complex_model_m<\/i>.\n  <\/dd>\n  <dt>standard_gpu<\/dt>\n  <dd>\n  A machine equivalent to <i>standard<\/i> that\n  also includes a single NVIDIA Tesla K80 GPU. See more about\n  <a href=\"\/ml-engine\/docs\/tensorflow\/using-gpus\">using GPUs to\n  train your model<\/a>.\n  <\/dd>\n  <dt>complex_model_m_gpu<\/dt>\n  <dd>\n  A machine equivalent to <i>complex_model_m<\/i> that also includes\n  four NVIDIA Tesla K80 GPUs.\n  <\/dd>\n  <dt>complex_model_l_gpu<\/dt>\n  <dd>\n  A machine equivalent to <i>complex_model_l<\/i> that also includes\n  eight NVIDIA Tesla K80 GPUs.\n  <\/dd>\n  <dt>standard_p100<\/dt>\n  <dd>\n  A machine equivalent to <i>standard<\/i> that\n  also includes a single NVIDIA Tesla P100 GPU. The availability of these\n  GPUs is in the <i>Beta<\/i> launch stage.\n  <\/dd>\n  <dt>complex_model_m_p100<\/dt>\n  <dd>\n  A machine equivalent to <i>complex_model_m<\/i> that also includes\n  four NVIDIA Tesla P100 GPUs. The availability of these GPUs is in\n  the <i>Beta<\/i> launch stage.\n  <\/dd>\n  <dt>cloud_tpu<\/dt>\n  <dd>\n  A TPU VM including one Cloud TPU. See more about\n  <a href=\"\/ml-engine\/docs\/tensorflow\/using-tpus\">using TPUs to train\n  your model<\/a>.\n  <\/dd>\n<\/dl>\n\nYou must set this value when `scaleTier` is set to `CUSTOM`.",
           "type": "string"
         },
         "workerType": {
@@ -514,7 +514,7 @@
       "type": "object",
       "properties": {
         "count": {
-          "description": "The number of accelerators to attach to the machines.",
+          "description": "The number of accelerators to attach to each machine running the job.",
           "type": "string",
           "format": "int64"
         },
@@ -524,7 +524,7 @@
             "Unspecified accelerator type. Default to no GPU.",
             "Nvidia tesla k80 GPU.",
             "Nvidia tesla P100 GPU.",
-            "Nvidia tesla V100 GPU."
+            "Nvidia tesla V100 GPU. Not supported for batch prediction."
           ],
           "type": "string",
           "enum": [
@@ -713,7 +713,7 @@
             "Unspecified accelerator type. Default to no GPU.",
             "Nvidia tesla k80 GPU.",
             "Nvidia tesla P100 GPU.",
-            "Nvidia tesla V100 GPU."
+            "Nvidia tesla V100 GPU. Not supported for batch prediction."
           ],
           "type": "array",
           "items": {
@@ -903,7 +903,7 @@
           "type": "string"
         },
         "machineType": {
-          "description": "Optional. The type of machine on which to serve the model. Currently only\napplies to online prediction service.\nNaming design doc for CMLE online prediction Machine Types:\nhttps:\/\/docs.google.com\/document\/d\/1V3tko3VJ64PcpsmNxCXiPoPGccL9_K8gX1YjC8UofzQ\/edit#heading=h.7lvy6owfx4eh.\nThe following are currently supported and will be deprecated in\nBeta release.\n  mls1-highmem-1    1 core    2 Gb RAM\n  mls1-highcpu-4    4 core    2 Gb RAM\nThe following are available in Beta:\n  mls1-c1-m2        1 core    2 Gb RAM   Default\n  mls1-c4-m2        1 core    4 Gb RAM",
+          "description": "Optional. The type of machine on which to serve the model. Currently only\napplies to online prediction service.\nThe following are currently supported and will be deprecated in\nBeta release.\n  mls1-highmem-1    1 core    2 Gb RAM\n  mls1-highcpu-4    4 core    2 Gb RAM\nThe following are available in Beta:\n  mls1-c1-m2        1 core    2 Gb RAM   Default\n  mls1-c4-m2        4 core    2 Gb RAM",
           "type": "string"
         },
         "autoScaling": {
@@ -937,6 +937,17 @@
         "errorMessage": {
           "description": "Output only. The details of a failure or a cancellation.",
           "type": "string"
+        },
+        "modelClass": {
+          "description": "class Model(object):\n  \"\"\"A Model performs predictions on a given list of instances.\n\n  The input instances are the raw values sent by the user. It is the\n  responsibility of a Model to translate these instances into\n  actual predictions.\n\n  The input instances and the output use python data types. The input\n  instances have been decoded prior to being passed to the predict\n  method. The output, which should use python data types is\n  encoded after being returned from the predict method.\n  \"\"\"\n\n  def predict(self, instances, **kwargs):\n    \"\"\"Returns predictions for the provided instances.\n\n    Instances are the decoded values from the request. Clients need not\n    worry about decoding json nor base64 decoding.\n\n    Args:\n      instances: A list of instances, as described in the API.\n      **kwargs: Additional keyword arguments, will be passed into the\n          client's predict method.\n\n    Returns:\n      A list of outputs containing the prediction results.\n    \"\"\"\n\n  @classmethod\n  def from_path(cls, model_path):\n    \"\"\"Creates a model using the given model path.\n\n    Path is useful, e.g., to load files from the exported directory\n    containing the model.\n\n    Args:\n      model_path: The local directory that contains the exported model\n          file along with any additional files uploaded when creating the\n          version resource.\n\n    Returns:\n      An instance implementing this Model class.\n    \"\"\"",
+          "type": "string"
+        },
+        "packageUris": {
+          "description": "Optional. The Google Cloud Storage location of the packages for custom\nprediction and any additional dependencies.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "labels": {
           "description": "Optional. One or more labels that you can add, to organize your model\nversions. Each label is a key-value pair, where both the key and the value\nare arbitrary strings that you supply.\nFor more information, see the documentation on\n<a href=\"\/ml-engine\/docs\/tensorflow\/resource-labels\">using labels<\/a>.",
@@ -1159,7 +1170,7 @@
       "type": "object",
       "properties": {
         "role": {
-          "description": "Role that is assigned to `members`.\nFor example, `roles\/viewer`, `roles\/editor`, or `roles\/owner`.\nRequired",
+          "description": "Role that is assigned to `members`.\nFor example, `roles\/viewer`, `roles\/editor`, or `roles\/owner`.",
           "type": "string"
         },
         "members": {
@@ -1168,6 +1179,33 @@
           "items": {
             "type": "string"
           }
+        },
+        "condition": {
+          "description": "Unimplemented. The condition that is associated with this binding.\nNOTE: an unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently.",
+          "$ref": "GoogleType__Expr"
+        }
+      }
+    },
+    "GoogleType__Expr": {
+      "id": "GoogleType__Expr",
+      "description": "Represents an expression text. Example:\n\n    title: \"User account presence\"\n    description: \"Determines whether the request has a user account\"\n    expression: \"size(request.user) > 0\"",
+      "type": "object",
+      "properties": {
+        "expression": {
+          "description": "Textual representation of an expression in\nCommon Expression Language syntax.\n\nThe application context of the containing message determines which\nwell-known feature set of CEL is supported.",
+          "type": "string"
+        },
+        "title": {
+          "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
+          "type": "string"
+        },
+        "description": {
+          "description": "An optional description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
+          "type": "string"
+        },
+        "location": {
+          "description": "An optional string indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
+          "type": "string"
         }
       }
     },
@@ -2084,7 +2122,7 @@
                       "type": "string"
                     },
                     "updateMask": {
-                      "description": "Required. Specifies the path, relative to `Version`, of the field to\nupdate. Must be present and non-empty.\n\nFor example, to change the description of a version to \"foo\", the\n`update_mask` parameter would be specified as `description`, and the\n`PATCH` request body would specify the new value, as follows:\n    {\n      \"description\": \"foo\"\n    }\n\nCurrently the only supported update mask is`description`.",
+                      "description": "Required. Specifies the path, relative to `Version`, of the field to\nupdate. Must be present and non-empty.\n\nFor example, to change the description of a version to \"foo\", the\n`update_mask` parameter would be specified as `description`, and the\n`PATCH` request body would specify the new value, as follows:\n    {\n      \"description\": \"foo\"\n    }\n\nCurrently the only supported update mask fields are `description` and\n`autoScaling.minNodes`.",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
@@ -2102,7 +2140,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Updates the specified Version resource.\n\nCurrently the only supported field to update is `description`."
+                  "description": "Updates the specified Version resource.\n\nCurrently the only update-able fields are `description` and\n`autoScaling.minNodes`."
                 },
                 "list": {
                   "id": "ml.projects.models.versions.list",

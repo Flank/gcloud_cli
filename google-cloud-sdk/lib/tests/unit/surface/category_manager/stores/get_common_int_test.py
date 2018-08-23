@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +15,16 @@
 """Tests for 'gcloud category-manager stores get-common'."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class GetCommonIntTest(base.CategoryManagerUnitTestBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def _ExpectCommonStoreResponse(self, expected_store_name):
     """Mocks backend call that gets the common taxonomy store."""
@@ -30,7 +32,8 @@ class GetCommonIntTest(base.CategoryManagerUnitTestBase):
         self.messages.CategorymanagerTaxonomyStoresGetCommonRequest(),
         self.messages.TaxonomyStore(name=expected_store_name))
 
-  def testGettingCommonStore(self):
+  def testGettingCommonStore(self, track):
+    self.track = track
     expected_store_name = 'taxonomyStores/predefined'
     self._ExpectCommonStoreResponse(expected_store_name)
     common_store = self.Run('category-manager stores get-common')

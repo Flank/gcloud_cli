@@ -11,7 +11,7 @@ gcloud beta services operations describe \- describes an operation resource for 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta services operations describe\fR \fIOPERATION\fR [\fB\-\-full\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta services operations describe\fR \fIOPERATION\fR [\fB\-\-full\fR=\fIFULL\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -44,9 +44,11 @@ The name of the operation to describe.
 
 .RS 2m
 .TP 2m
-\fB\-\-full\fR
-Print the entire operation resource, which could be large. By default, a summary
-will be printed instead.
+\fB\-\-full\fR=\fIFULL\fR
+(DEPRECATED) Print the entire operation resource, which could be large. By
+default, a summary will be printed instead.
+
+This flag is deprecated.
 
 
 .RE

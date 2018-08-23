@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +15,23 @@
 """Unit tests for environments describe."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 
 
-class EnvironmentsDescribeTest(base.EnvironmentsUnitTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class EnvironmentsDescribeTest(base.EnvironmentsUnitTest,
+                               parameterized.TestCase):
 
-  def testSuccessfulDescribe(self):
+  def testSuccessfulDescribe(self, track):
+    self.SetTrack(track)
     expected = self.MakeEnvironment(self.TEST_PROJECT, self.TEST_LOCATION,
                                     self.TEST_ENVIRONMENT_ID)
     self.ExpectEnvironmentGet(
@@ -35,7 +44,8 @@ class EnvironmentsDescribeTest(base.EnvironmentsUnitTest):
                                   self.TEST_ENVIRONMENT_ID)
     self.assertEqual(expected, actual)
 
-  def testDescribeEnvironmentNotFound(self):
+  def testDescribeEnvironmentNotFound(self, track):
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -47,7 +57,8 @@ class EnvironmentsDescribeTest(base.EnvironmentsUnitTest):
                            '--location', self.TEST_LOCATION,
                            self.TEST_ENVIRONMENT_ID)
 
-  def testDescribeEnvironmentInsufficientPermissions(self):
+  def testDescribeEnvironmentInsufficientPermissions(self, track):
+    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +15,34 @@
 """Helpers for parsing flags and arguments."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.command_lib.kms import maps
 from googlecloudsdk.command_lib.util import completers
 from googlecloudsdk.command_lib.util import parameter_info_lib
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.util import times
 
-
 KEY_RING_COLLECTION = 'cloudkms.projects.locations.keyRings'
 LOCATION_COLLECTION = 'cloudkms.projects.locations'
 
+# Collection names.
+CRYPTO_KEY_COLLECTION = 'cloudkms.projects.locations.keyRings.cryptoKeys'
+CRYPTO_KEY_VERSION_COLLECTION = '%s.cryptoKeyVersions' % CRYPTO_KEY_COLLECTION
 
 # list command aggregators
 
 
 class ListCommandParameterInfo(parameter_info_lib.ParameterInfoByConvention):
 
-  def GetFlag(self, parameter_name, parameter_value=None,
-              check_properties=True, for_update=False):
+  def GetFlag(self,
+              parameter_name,
+              parameter_value=None,
+              check_properties=True,
+              for_update=False):
     return super(ListCommandParameterInfo, self).GetFlag(
         parameter_name,
         parameter_value=parameter_value,
@@ -79,7 +88,7 @@ class KeyCompleter(ListCommandCompleter):
 
   def __init__(self, **kwargs):
     super(KeyCompleter, self).__init__(
-        collection='cloudkms.projects.locations.keyRings.cryptoKeys',
+        collection=CRYPTO_KEY_COLLECTION,
         list_command='kms keys list --uri',
         flags=['location', 'keyring'],
         **kwargs)
@@ -89,8 +98,7 @@ class KeyVersionCompleter(ListCommandCompleter):
 
   def __init__(self, **kwargs):
     super(KeyVersionCompleter, self).__init__(
-        collection=('cloudkms.projects.locations.keyRings.cryptoKeys'
-                    '.cryptoKeyVersions'),
+        collection=CRYPTO_KEY_VERSION_COLLECTION,
         list_command='kms keys versions list --uri',
         flags=['location', 'key', 'keyring'],
         **kwargs)
@@ -98,18 +106,11 @@ class KeyVersionCompleter(ListCommandCompleter):
 
 # completers by parameter name convention
 
-
 COMPLETERS_BY_CONVENTION = {
     'location': (LocationCompleter, False),
     'keyring': (KeyRingCompleter, False),
     'key': (KeyCompleter, False),
 }
-
-
-# Collection names.
-CRYPTO_KEY_COLLECTION = 'cloudkms.projects.locations.keyRings.cryptoKeys'
-CRYPTO_KEY_VERSION_COLLECTION = (
-    'cloudkms.projects.locations.keyRings.cryptoKeys.cryptoKeyVersions')
 
 
 # Flags.
@@ -129,9 +130,7 @@ def AddKeyRingFlag(parser, resource='resource'):
 
 def AddCryptoKeyFlag(parser, help_text=None):
   parser.add_argument(
-      '--key',
-      completer=KeyCompleter,
-      help=help_text or 'The containing key.')
+      '--key', completer=KeyCompleter, help=help_text or 'The containing key.')
 
 
 def AddKeyResourceFlags(parser, help_text=None):
@@ -193,12 +192,59 @@ def AddCiphertextFileFlag(parser, help_action):
       required=True)
 
 
+def AddSignatureFileFlag(parser, help_action):
+  parser.add_argument(
+      '--signature-file',
+      help='Path to the signature file {}.'.format(help_action))
+
+
+def AddInputFileFlag(parser, help_action):
+  parser.add_argument(
+      '--input-file',
+      help='Path to the input file {}.'.format(help_action),
+      required=True)
+
+
+def AddOutputFileFlag(parser, help_action):
+  parser.add_argument(
+      '--output-file', help='Path to the output file {}.'.format(help_action))
+
+
 def AddAadFileFlag(parser):
   parser.add_argument(
       '--additional-authenticated-data-file',
       help=
       'File path to the optional file containing the additional authenticated '
       'data.')
+
+
+def AddProtectionLevelFlag(parser):
+  parser.add_argument(
+      '--protection-level',
+      choices=['software', 'hsm'],
+      default='software',
+      help='Protection level of the key.')
+
+
+def AddAttestationFileFlag(parser):
+  parser.add_argument(
+      '--attestation-file',
+      help='Path to the output attestation file.')
+
+
+def AddDefaultAlgorithmFlag(parser):
+  parser.add_argument(
+      '--default-algorithm',
+      choices=sorted(maps.ALL_ALGORITHMS),
+      help='The default algorithm for the crypto key.')
+
+
+def AddDigestAlgorithmFlag(parser, help_action):
+  parser.add_argument(
+      '--digest-algorithm',
+      choices=sorted(maps.DIGESTS),
+      help=help_action,
+      required=True)
 
 
 # Arguments

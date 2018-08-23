@@ -1,0 +1,11 @@
+{
+  "name": "nodejs-sample-app",
+  "description": "Sample Hello World for NodeJS on App Engine Standard",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.x"
+  }
+}

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the addresses create subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import random
-import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
@@ -271,15 +274,12 @@ class AddressesCreateTest(test_base.BaseTest):
               region='region-2'))],
     )
 
-    self.AssertErrContains(textwrap.dedent("""\
-        For the following address:
-         - [address-1]
-        choose a region or global:
-         [1] global
-         [2] region: region-1 (DEPRECATED)
-         [3] region: region-2
-         [4] region: region-3
-        Please enter your numeric choice:  \n"""))
+    self.AssertErrContains(
+        r'{"ux": "PROMPT_CHOICE", "message": "For the following address:\n'
+        r' - [address-1]\nchoose a region or global:", '
+        r'"choices": ["global", "region: region-1 (DEPRECATED)", '
+        r'"region: region-2", "region: region-3"]}'
+    )
 
   def testUriSupport(self):
     self.Run("""
@@ -417,6 +417,69 @@ class AddressesCreateWithNetworkTierBetaTest(test_base.BaseTest):
   def SetUp(self):
     self.SelectApi('beta')
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def testOneAddressWithPremiumNetworkTier(self):
+    self.Run("""
+        compute addresses create address-1
+          --network-tier PREMIUM
+          --region us-central2
+        """)
+
+    self.CheckRequests([(self.compute.addresses, 'Insert',
+                         self.messages.ComputeAddressesInsertRequest(
+                             address=self.messages.Address(
+                                 name='address-1',
+                                 networkTier=self.messages.Address.
+                                 NetworkTierValueValuesEnum.PREMIUM,
+                             ),
+                             project='my-project',
+                             region='us-central2'))],)
+
+  def testOneAddressWithStandardNetworkTier(self):
+    self.Run("""
+        compute addresses create address-1
+          --network-tier standard
+          --region us-central2
+        """)
+
+    self.CheckRequests([(self.compute.addresses, 'Insert',
+                         self.messages.ComputeAddressesInsertRequest(
+                             address=self.messages.Address(
+                                 name='address-1',
+                                 networkTier=self.messages.Address.
+                                 NetworkTierValueValuesEnum.STANDARD,
+                             ),
+                             project='my-project',
+                             region='us-central2'))],)
+
+  def testOneAddressWithMissingNetworkTier(self):
+    self.Run("""
+        compute addresses create address-1
+          --region us-central2
+        """)
+
+    self.CheckRequests([(self.compute.addresses, 'Insert',
+                         self.messages.ComputeAddressesInsertRequest(
+                             address=self.messages.Address(name='address-1',),
+                             project='my-project',
+                             region='us-central2'))],)
+
+  def testOneAddressWithInvalidNetworkTier(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Invalid value for \[--network-tier\]: Invalid network tier '
+        r'\[INVALID-TIER\]'):
+      self.Run("""
+          compute addresses create address-1
+            --network-tier invalid-tier
+            --region us-central2
+          """)
+
+
+class AddressesCreateWithNetworkTierTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testOneAddressWithPremiumNetworkTier(self):
     self.Run("""

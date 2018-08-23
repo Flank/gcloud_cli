@@ -11,7 +11,7 @@ gcloud beta ml\-engine predict \- run Cloud ML Engine online prediction
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml\-engine predict\fR \fB\-\-model\fR=\fIMODEL\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml\-engine predict\fR \fB\-\-model\fR=\fIMODEL\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -79,6 +79,13 @@ This flag accepts "\-" for stdin.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR
+The name of the signature defined in the SavedModel to use for this job.
+Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
+https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+which is "serving_default". Only applies to TensorFlow models.
+
 .TP 2m
 \fB\-\-version\fR=\fIVERSION\fR
 Model version to be used.

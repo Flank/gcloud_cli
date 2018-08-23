@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
@@ -30,78 +33,57 @@ messages = core_apis.GetMessagesModule('compute', 'v1')
 class TargetHttpProxiesDeleteTest(test_base.BaseTest,
                                   completer_test_base.CompleterBase):
 
+  def SetUp(self):
+    self._api = 'v1'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute.targetHttpProxies
+
+  def RunDelete(self, command):
+    self.Run('compute target-http-proxies delete ' + command)
+
   def testWithSingleTargetHttpProxy(self):
     properties.VALUES.core.disable_prompts.Set(True)
-    self.Run("""
-        compute target-http-proxies delete proxy-1
-        """)
+    self.RunDelete('proxy-1')
 
     self.CheckRequests(
-        [(self.compute_v1.targetHttpProxies,
-          'Delete',
-          messages.ComputeTargetHttpProxiesDeleteRequest(
-              targetHttpProxy='proxy-1',
-              project='my-project'))],
-    )
+        [(self._target_http_proxies_api, 'Delete',
+          self.messages.ComputeTargetHttpProxiesDeleteRequest(
+              targetHttpProxy='proxy-1', project='my-project'))],)
 
   def testWithManyTargetHttpProxies(self):
     properties.VALUES.core.disable_prompts.Set(True)
-    self.Run("""
-        compute target-http-proxies delete proxy-1 proxy-2 proxy-3
-        """)
+    self.RunDelete('proxy-1 proxy-2 proxy-3')
 
     self.CheckRequests(
-        [(self.compute_v1.targetHttpProxies,
-          'Delete',
-          messages.ComputeTargetHttpProxiesDeleteRequest(
-              targetHttpProxy='proxy-1',
-              project='my-project')),
-
-         (self.compute_v1.targetHttpProxies,
-          'Delete',
-          messages.ComputeTargetHttpProxiesDeleteRequest(
-              targetHttpProxy='proxy-2',
-              project='my-project')),
-
-         (self.compute_v1.targetHttpProxies,
-          'Delete',
-          messages.ComputeTargetHttpProxiesDeleteRequest(
-              targetHttpProxy='proxy-3',
-              project='my-project'))],
-    )
+        [(self._target_http_proxies_api, 'Delete',
+          self.messages.ComputeTargetHttpProxiesDeleteRequest(
+              targetHttpProxy='proxy-1', project='my-project')),
+         (self._target_http_proxies_api, 'Delete',
+          self.messages.ComputeTargetHttpProxiesDeleteRequest(
+              targetHttpProxy='proxy-2', project='my-project')),
+         (self._target_http_proxies_api, 'Delete',
+          self.messages.ComputeTargetHttpProxiesDeleteRequest(
+              targetHttpProxy='proxy-3', project='my-project'))],)
 
   def testPromptingWithYes(self):
     self.WriteInput('y\n')
-    self.Run("""
-        compute target-http-proxies delete proxy-1 proxy-2 proxy-3
-        """)
+    self.RunDelete('proxy-1 proxy-2 proxy-3')
 
     self.CheckRequests(
-        [(self.compute_v1.targetHttpProxies,
-          'Delete',
-          messages.ComputeTargetHttpProxiesDeleteRequest(
-              targetHttpProxy='proxy-1',
-              project='my-project')),
-
-         (self.compute_v1.targetHttpProxies,
-          'Delete',
-          messages.ComputeTargetHttpProxiesDeleteRequest(
-              targetHttpProxy='proxy-2',
-              project='my-project')),
-
-         (self.compute_v1.targetHttpProxies,
-          'Delete',
-          messages.ComputeTargetHttpProxiesDeleteRequest(
-              targetHttpProxy='proxy-3',
-              project='my-project'))],
-    )
+        [(self._target_http_proxies_api, 'Delete',
+          self.messages.ComputeTargetHttpProxiesDeleteRequest(
+              targetHttpProxy='proxy-1', project='my-project')),
+         (self._target_http_proxies_api, 'Delete',
+          self.messages.ComputeTargetHttpProxiesDeleteRequest(
+              targetHttpProxy='proxy-2', project='my-project')),
+         (self._target_http_proxies_api, 'Delete',
+          self.messages.ComputeTargetHttpProxiesDeleteRequest(
+              targetHttpProxy='proxy-3', project='my-project'))],)
 
   def testPromptingWithNo(self):
     self.WriteInput('n\n')
     with self.AssertRaisesToolExceptionRegexp('Deletion aborted by user.'):
-      self.Run("""
-          compute target-http-proxies delete proxy-1 proxy-2 proxy-3
-          """)
+      self.RunDelete('proxy-1 proxy-2 proxy-3')
 
     self.CheckRequests()
 
@@ -131,6 +113,17 @@ class TargetHttpProxiesDeleteTest(test_base.BaseTest,
         'target-http-proxy-3',
     ]
     self.RunCompletion('compute target-http-proxies delete t', uri_list)
+
+
+class TargetHttpProxiesDeleteAlphaTest(TargetHttpProxiesDeleteTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_alpha.targetHttpProxies
+
+  def RunDelete(self, command):
+    self.Run('alpha compute target-http-proxies delete --global ' + command)
 
 
 if __name__ == '__main__':

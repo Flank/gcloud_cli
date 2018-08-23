@@ -11,7 +11,7 @@ gcloud container node\-pools create \- create a node pool in a running cluster
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -65,16 +65,23 @@ The cluster to add the node pool to. Overrides the default
 Size in GB for node VM boot disks. Defaults to 100GB.
 
 .TP 2m
+\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR
+Type of the node VM boot disk. Defaults to pd\-standard. \fIDISK_TYPE\fR must be
+one of: \fBpd\-standard\fR, \fBpd\-ssd\fR.
+
+.TP 2m
 \fB\-\-enable\-autorepair\fR
-Sets autorepair feature for a node\-pool.
+Enable node autorepair feature for a node\-pool.
 
 .RS 2m
 $ gcloud container node\-pools create node\-pool\-1 \e
     \-\-cluster=example\-cluster \-\-enable\-autorepair
 .RE
 
-See https://cloud.google.com/kubernetes\-engine/docs/node\-auto\-repair for more
-info.
+Node autorepair is enabled by default for node pools using COS as a base image.
+
+See https://cloud.google.com/kubernetes\-engine/docs/how\-to/node\-auto\-repair
+for more info.
 
 .TP 2m
 \fB\-\-enable\-autoupgrade\fR
@@ -85,7 +92,7 @@ $ gcloud container node\-pools create node\-pool\-1 \e
     \-\-cluster=example\-cluster \-\-enable\-autoupgrade
 .RE
 
-See https://cloud.google.com/kubernetes\-engine/docs/node\-managament for more
+See https://cloud.google.com/kubernetes\-engine/docs/node\-management for more
 info.
 
 .TP 2m
@@ -266,11 +273,11 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The compute region (e.g. us\-central1) for the cluster.
+Compute region (e.g. us\-central1) for the cluster.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
-The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
+Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 \fBcompute/zone\fR property value for this command invocation.
 
 .RE

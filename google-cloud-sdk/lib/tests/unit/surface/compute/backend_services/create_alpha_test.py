@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for the backend services alpha create command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
@@ -49,6 +52,7 @@ class WithHealthcheckApiTest(CreateTestBase):
     suffix = '' if default_regional else '--global'
     self.Run("""
           compute backend-services create my-backend-service
+          --global-health-checks
           --health-checks my-health-check-1,my-health-check-2
           --description "My backend service"
         """ + suffix)
@@ -133,6 +137,7 @@ class WithHealthcheckApiTest(CreateTestBase):
     self.Run("""
         compute backend-services create my-backend-service
           --protocol TCP
+          --global-health-checks
           --health-checks my-health-check-1,my-health-check-2
           --description "My backend service"
           --global
@@ -159,11 +164,45 @@ class WithHealthcheckApiTest(CreateTestBase):
               project='my-project'))],
     )
 
+  def testLoadBalancingSchemeInternalSelfManaged(self):
+    messages = self.messages
+    self.Run("""
+        compute backend-services create my-backend-service
+          --protocol HTTP
+          --global-health-checks
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+          --load-balancing-scheme internal_self_managed
+          --global
+        """)
+
+    self.CheckRequests([(
+        self.compute.backendServices, 'Insert',
+        messages.ComputeBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                description='My backend service',
+                healthChecks=[
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-1'),
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-2')
+                ],
+                name='my-backend-service',
+                portName='http',
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                loadBalancingScheme=(
+                    messages.BackendService.LoadBalancingSchemeValueValuesEnum.
+                    INTERNAL_SELF_MANAGED),
+                timeoutSec=30),
+            project='my-project'))],)
+
   def testSimpleSslCase(self):
     messages = self.messages
     self.Run("""
         compute backend-services create my-backend-service
           --protocol SSL
+          --global-health-checks
           --health-checks my-health-check-1,my-health-check-2
           --description "My backend service"
           --global
@@ -195,6 +234,7 @@ class WithHealthcheckApiTest(CreateTestBase):
     self.Run("""
         compute backend-services create my-backend-service
           --protocol SSL
+          --global-health-checks
           --health-checks my-health-check
           --port-name ssl1
           --global
@@ -223,6 +263,7 @@ class WithHealthcheckApiTest(CreateTestBase):
     self.Run("""
         compute backend-services create my-backend-service
           --protocol SSL
+          --global-health-checks
           --health-checks my-health-check
           --timeout 1m
           --global
@@ -282,6 +323,7 @@ class WithHealthcheckApiTest(CreateTestBase):
           compute backend-services create my-backend-service
           --global
           --protocol HTTP2
+          --global-health-checks
           --health-checks my-health-check-1,my-health-check-2
           --description "My backend service"
         """)
@@ -310,6 +352,7 @@ class WithHealthcheckApiTest(CreateTestBase):
     self.Run("""
           compute backend-services create my-backend-service
           --global
+          --global-health-checks
           --health-checks my-health-check-1,my-health-check-2
           --description "My backend service"
           --custom-request-header 'Test-Header:'
@@ -830,7 +873,8 @@ class WithCustomCacheKeyApiTest(CreateTestBase):
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
       self.Run("""
-          compute backend-services create my-backend-service --health-checks my-health-check
+          compute backend-services create my-backend-service
+            --global-health-checks --health-checks my-health-check
             --no-cache-key-include-query-string
             --cache-key-query-string-whitelist=contentid,language
             --global
@@ -843,7 +887,8 @@ class WithCustomCacheKeyApiTest(CreateTestBase):
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
       self.Run("""
-          compute backend-services create my-backend-service --health-checks my-health-check
+          compute backend-services create my-backend-service
+          --global-health-checks --health-checks my-health-check
           --no-cache-key-include-query-string
           --cache-key-query-string-blacklist=campaignid
           --global
@@ -1001,8 +1046,8 @@ class RegionalTest(test_base.BaseTest):
     messages = self.messages
 
     self.Run("""compute backend-services create backend-service-1
-                --region alaska
-                --health-checks my-health-check-1""")
+                --region alaska --health-checks my-health-check-1
+                --global-health-checks""")
 
     self.CheckRequests([(
         self.compute.regionBackendServices, 'Insert',
@@ -1034,15 +1079,11 @@ class RegionalTest(test_base.BaseTest):
     self.WriteInput('3')
     self.Run("""compute backend-services create backend-service-24
                 --load-balancing-scheme=internal
+                --global-health-checks
                 --health-checks=main-hc --protocol=TCP""")
-    self.AssertErrEquals('For the following backend service:\n'
-                         ' - [backend-service-24]\n'
-                         'choose a region or global:\n'
-                         ' [1] global\n'
-                         ' [2] region: region-1\n'
-                         ' [3] region: region-2\n'
-                         ' [4] region: region-3\n'
-                         'Please enter your numeric choice:  \n')
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains('"choices": ["global", "region: region-1", '
+                           '"region: region-2", "region: region-3"]')
     self.CheckRequests(
         [(self.compute.regions, 'List', messages.ComputeRegionsListRequest(
             maxResults=500,
@@ -1069,8 +1110,8 @@ class RegionalTest(test_base.BaseTest):
     self.Run("""compute backend-services create backend-service-1
                 --description cheesecake
                 --load-balancing-scheme internal
-                --region alaska
-                --health-checks my-health-check-1
+                --region alaska --health-checks my-health-check-1
+                --global-health-checks
                 --connection-draining-timeout 120""")
 
     self.CheckRequests([(
@@ -1103,7 +1144,7 @@ class WithFailoverPolicyApiTest(CreateTestBase):
   def SetUp(self):
     self._create_service_cmd_line = (
         """compute backend-services create my-backend-service
-           --health-checks my-health-check-1
+           --global-health-checks --health-checks my-health-check-1
            --description "My backend service"
            --region us-central1""")
 

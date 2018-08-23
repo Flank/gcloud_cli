@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +16,14 @@
 """Unit tests for deployments create command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.deployment_manager import dm_api_util
 from googlecloudsdk.api_lib.deployment_manager import exceptions
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.deployment_manager import unit_test_base
 from six.moves import range  # pylint: disable=redefined-builtin
@@ -425,6 +429,7 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
     self.AssertOutputContains('PENDING')
 
   def testDeploymentsCreate_WithError(self):
+    properties.VALUES.deployment_manager.glob_imports.Set(True)
     config_file_path = self.Resource('tests',
                                      'lib',
                                      'surface',
@@ -764,6 +769,7 @@ operation-delete       create  DONE            []      []
         r"Use ':' instead.$")
 
   def testDeploymentsCreate_NewProperties(self):
+    properties.VALUES.deployment_manager.glob_imports.Set(True)
     template_name = 'typed_properties'
     config_file_path = ['tests',
                         'lib',

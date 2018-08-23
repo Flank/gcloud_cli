@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Facilities for getting a list of Cloud resources."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import itertools
 
 from googlecloudsdk.api_lib.compute import constants
@@ -365,8 +368,8 @@ def AddBaseListerArgs(parser, hidden=False):
       action=actions.DeprecationAction(
           'names',
           show_message=bool,
-          warn='Argument NAME is deprecated. '
-          'Use --filter="name=( \'NAME\' ... )" instead.'),
+          warn='Argument `NAME` is deprecated. '
+          'Use `--filter="name=( \'NAME\' ... )"` instead.'),
       metavar='NAME',
       nargs='*',
       default=[],
@@ -381,10 +384,10 @@ def AddBaseListerArgs(parser, hidden=False):
       hidden=hidden,
       action=actions.DeprecationAction(
           'regexp',
-          warn='Flag --regexp is deprecated. '
-          'Use --filter="name~\'REGEXP\'" instead.'),
+          warn='Flag `--regexp` is deprecated. '
+          'Use `--filter="name~\'REGEXP\'"` instead.'),
       help="""\
-        A regular expression to filter the names of the results  on. Any names
+        Regular expression to filter the names of the results  on. Any names
         that do not match the entire regular expression will be filtered out.\
         """)
 
@@ -397,8 +400,8 @@ def AddZonalListerArgs(parser):
       '--zones',
       action=actions.DeprecationAction(
           'zones',
-          warn='Flag --zones is deprecated. '
-          'Use --filter="zone:( ZONE ... )" instead.\n'
+          warn='Flag `--zones` is deprecated. '
+          'Use `--filter="zone:( ZONE ... )"` instead.\n'
           'For example '
           '--filter="zone:( europe-west1-b europe-west1-c )".'),
       metavar='ZONE',
@@ -425,10 +428,10 @@ def AddRegionsArg(parser, hidden=False):
       '--regions',
       action=actions.DeprecationAction(
           'regions',
-          warn='Flag --regions is deprecated. '
-               'Use --filter="region:( REGION ... )" instead.\n'
+          warn='Flag `--regions` is deprecated. '
+               'Use `--filter="region:( REGION ... )"` instead.\n'
                'For example '
-               '--filter="region:( europe-west1 europe-west2 )".'),
+               '`--filter="region:( europe-west1 europe-west2 )"`.'),
       metavar='REGION',
       hidden=hidden,
       help='If provided, only resources from the given regions are queried.',
@@ -448,10 +451,10 @@ def AddMultiScopeListerFlags(parser, zonal=False, regional=False,
         '--zones',
         action=actions.DeprecationAction(
             'zones',
-            warn='Flag --zones is deprecated. '
-            'Use --filter="zone:( ZONE ... )" instead.\n'
+            warn='Flag `--zones` is deprecated. '
+            'Use `--filter="zone:( ZONE ... )"` instead.\n'
             'For example '
-            '--filter="zone:( europe-west1-b europe-west1-c )".'),
+            '`--filter="zone:( europe-west1-b europe-west1-c )"`.'),
         metavar='ZONE',
         help=('If provided, only zonal resources are shown. '
               'If arguments are provided, only resources from the given '
@@ -462,10 +465,10 @@ def AddMultiScopeListerFlags(parser, zonal=False, regional=False,
         '--regions',
         action=actions.DeprecationAction(
             'regions',
-            warn='Flag --regions is deprecated. '
-            'Use --filter="region:( REGION ... )" instead.\n'
+            warn='Flag `--regions` is deprecated. '
+            'Use `--filter="region:( REGION ... )"` instead.\n'
             'For example '
-            '--filter="region:( europe-west1 europe-west2 )".'),
+            '`--filter="region:( europe-west1 europe-west2 )"`.'),
         metavar='REGION',
         help=('If provided, only regional resources are shown. '
               'If arguments are provided, only resources from the given '

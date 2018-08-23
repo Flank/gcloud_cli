@@ -4,8 +4,11 @@ NAME
 SYNOPSIS
     gcloud beta functions deploy (NAME : --region=REGION)
         [--entry-point=ENTRY_POINT] [--memory=MEMORY] [--retry]
-        [--source=SOURCE] [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
-        [--update-labels=[KEY=VALUE,...]]
+        [--runtime=RUNTIME] [--source=SOURCE] [--stage-bucket=STAGE_BUCKET]
+        [--timeout=TIMEOUT] [--update-labels=[KEY=VALUE,...]]
+        [--clear-env-vars | --env-vars-file=FILE_PATH
+          | --set-env-vars=[KEY=VALUE,...]
+          | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]]
         [--trigger-bucket=TRIGGER_BUCKET | --trigger-http
           | --trigger-topic=TRIGGER_TOPIC
@@ -51,6 +54,15 @@ FLAGS
 
      --retry
         If specified, then the function will be retried in case of a failure.
+
+     --runtime=RUNTIME
+        The runtime in which to run the function. Defaults to Node.js 6.
+
+        Choices:
+
+        * nodejs6: Node.js 6
+        * nodejs8: Node.js 8
+        * python37: Python 3.7
 
      --source=SOURCE
         Location of source code to deploy.
@@ -130,6 +142,29 @@ FLAGS
 
      At most one of these may be specified:
 
+       --clear-env-vars
+          Remove all environment variables.
+
+       --env-vars-file=FILE_PATH
+          Path to a local YAML file with definitions for all environment
+          variables. All existing environment variables will be removed before
+          the new environment variables are added.
+
+       --set-env-vars=[KEY=VALUE,...]
+          List of key-value pairs to set as environment variables. All existing
+          environment variables will be removed first.
+
+       Only --update-env-vars and --remove-env-vars can be used together. If
+       both are specified, --remove-env-vars will be applied first.
+
+         --remove-env-vars=[KEY,...]
+            List of environment variables to be removed.
+
+         --update-env-vars=[KEY=VALUE,...]
+            List of key-value pairs to set as environment variables.
+
+     At most one of these may be specified:
+
        --clear-labels
           Removes all labels. If --update-labels is also specified then
           --clear-labels is applied first.
@@ -171,22 +206,14 @@ FLAGS
 
        --trigger-event=EVENT_TYPE
           Specifies which action should trigger the function. For a list of
-          acceptable values, call functions event_types list. EVENT_TYPE must
-          be one of: google.pubsub.topic.publish,
-          google.storage.object.archive, google.storage.object.delete,
-          google.storage.object.finalize, google.storage.object.metadataUpdate,
-          providers/cloud.pubsub/eventTypes/topic.publish,
-          providers/cloud.storage/eventTypes/object.change,
-          providers/firebase.auth/eventTypes/data.write,
-          providers/firebase.auth/eventTypes/user.create,
-          providers/firebase.auth/eventTypes/user.delete.
+          acceptable values, call functions event-types list.
 
        --trigger-resource=RESOURCE
           Specifies which resource from --trigger-event is being observed. E.g.
           if --trigger-event is
           providers/cloud.storage/eventTypes/object.change, --trigger-resource
           must be a bucket name. For a list of expected resources, call
-          functions event_types list.
+          functions event-types list.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -194,8 +221,9 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud functions deploy
         $ gcloud alpha functions deploy
 

@@ -1,11 +1,14 @@
 NAME
-    gcloud beta container builds - create and manage container builds
+    gcloud beta container builds - create and manage builds
 
 SYNOPSIS
     gcloud beta container builds COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Create and manage container builds.
+    (BETA) (DEPRECATED) Create and manage builds.
+
+    This command is deprecated and will be removed on or after 2018-10-31.
+    Please use gcloud builds instead.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -16,19 +19,20 @@ COMMANDS
     COMMAND is one of the following:
 
      cancel
-        (BETA) Cancel an ongoing build.
+        (BETA) (DEPRECATED) Cancel an ongoing build.
 
      describe
-        (BETA) Get information about a particular build.
+        (BETA) (DEPRECATED) Get information about a particular build.
 
      list
-        (BETA) List builds.
+        (BETA) (DEPRECATED) List builds.
 
      log
-        (BETA) Stream the logs for a build.
+        (BETA) (DEPRECATED) Stream the logs for a build.
 
      submit
-        (BETA) Submit a build using the Google Container Builder service.
+        (BETA) (DEPRECATED) Submit a build using the Google Cloud Build
+        service.
 
 NOTES
     This command is currently in BETA and may change without notice. These

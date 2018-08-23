@@ -4,7 +4,8 @@ NAME
 SYNOPSIS
     gcloud ml-engine local predict --model-dir=MODEL_DIR
         (--json-instances=JSON_INSTANCES | --text-instances=TEXT_INSTANCES)
-        [--framework=FRAMEWORK] [GCLOUD_WIDE_FLAG ...]
+        [--framework=FRAMEWORK] [--signature-name=SIGNATURE_NAME]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud ml-engine local predict performs prediction locally with the given
@@ -46,6 +47,12 @@ OPTIONAL FLAGS
         The ML framework used to train this version of the model. If not
         specified, defaults to tensorflow. FRAMEWORK must be one of:
         scikit-learn, tensorflow, xgboost.
+
+     --signature-name=SIGNATURE_NAME
+        The name of the signature defined in the SavedModel to use for this
+        job. Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
+        https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+        which is "serving_default". Only applies to TensorFlow models.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

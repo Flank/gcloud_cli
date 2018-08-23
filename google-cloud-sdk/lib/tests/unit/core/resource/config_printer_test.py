@@ -16,7 +16,9 @@
 """Unit tests for the config_printer module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.util import platforms
 from tests.lib.core.resource import resource_printer_test_base

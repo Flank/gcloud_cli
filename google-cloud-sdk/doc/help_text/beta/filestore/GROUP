@@ -1,0 +1,41 @@
+NAME
+    gcloud beta filestore - create and manipulate Cloud Filestore resources
+
+SYNOPSIS
+    gcloud beta filestore GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) The gcloud filestore command group lets you create, configure and
+    manipulate Cloud Filestore instances.
+
+    With Cloud Filestore, you can take advantage of Google Cloud Platform's
+    scale, performance, and value to create and run managed file systems on
+    Google infrastructure.
+
+    More information on Cloud Filestore can be found here:
+    https://cloud.google.com/filestore/ and detailed documentation can be found
+    here: https://cloud.google.com/filestore/docs/
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     instances
+        (BETA) Manage Cloud Filestore instances.
+
+     locations
+        (BETA) List locations where Cloud Filestore is available.
+
+     operations
+        (BETA) Read and manipulate Cloud Filestore operations.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha filestore
+

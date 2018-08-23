@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,9 @@
 
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.resource import resource_info
 
 
@@ -177,30 +180,6 @@ RESOURCE_REGISTRY = {
           table(
             name,
             type:label=PROTOCOL
-          )
-        """,),
-    'compute.hosts':
-        resource_info.ResourceInfo(
-            cache_command='compute sole-tenancy hosts list',
-            list_format="""
-          table(
-            name,
-            zone.basename(),
-            instances.len():label=INSTANCES,
-            status
-          )
-        """,),
-    'compute.hostTypes':
-        resource_info.ResourceInfo(
-            cache_command='compute sole-tenancy host-types list',
-            list_format="""
-          table(
-            name,
-            zone.basename(),
-            guestCpus:label=CPUs,
-            memoryMb,
-            localSsdGb,
-            deprecated.state:label=DEPRECATED
           )
         """,),
     'compute.httpHealthChecks':

@@ -17,6 +17,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
+    condition: Unimplemented. The condition that is associated with this
+      binding. NOTE: an unsatisfied condition will not allow user access via
+      current binding. Different bindings, including their conditions, are
+      examined independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -31,11 +35,12 @@ class Binding(_messages.Message):
       * `domain:{domain}`: A Google Apps domain name that represents all the
       users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
-      `roles/editor`, or `roles/owner`. Required
+      `roles/editor`, or `roles/owner`.
   """
 
-  members = _messages.StringField(1, repeated=True)
-  role = _messages.StringField(2)
+  condition = _messages.MessageField('Expr', 1)
+  members = _messages.StringField(2, repeated=True)
+  role = _messages.StringField(3)
 
 
 class CloudiotProjectsLocationsRegistriesCreateRequest(_messages.Message):
@@ -231,6 +236,171 @@ class CloudiotProjectsLocationsRegistriesGetRequest(_messages.Message):
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsDevicesConfigVersionsListRequest(_messages.Message):
+  r"""A
+  CloudiotProjectsLocationsRegistriesGroupsDevicesConfigVersionsListRequest
+  object.
+
+  Fields:
+    name: The name of the device. For example, `projects/p0/locations/us-
+      central1/registries/registry0/devices/device0` or `projects/p0/locations
+      /us-central1/registries/registry0/devices/{num_id}`.
+    numVersions: The number of versions to list. Versions are listed in
+      decreasing order of the version number. The maximum number of versions
+      retained is 10. If this value is zero, it will return all the versions
+      available.
+  """
+
+  name = _messages.StringField(1, required=True)
+  numVersions = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsDevicesGetRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesGroupsDevicesGetRequest object.
+
+  Fields:
+    fieldMask: The fields of the `Device` resource to be returned in the
+      response. If the field mask is unset or empty, all fields are returned.
+    name: The name of the device. For example, `projects/p0/locations/us-
+      central1/registries/registry0/devices/device0` or `projects/p0/locations
+      /us-central1/registries/registry0/devices/{num_id}`.
+  """
+
+  fieldMask = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsDevicesListRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesGroupsDevicesListRequest object.
+
+  Fields:
+    deviceIds: A list of device string identifiers. If empty, it will ignore
+      this field. For example, `['device0', 'device12']`. This field cannot
+      hold more than 10,000 entries.
+    deviceNumIds: A list of device numerical ids. If empty, it will ignore
+      this field. This field cannot hold more than 10,000 entries.
+    fieldMask: The fields of the `Device` resource to be returned in the
+      response. The fields `id`, and `num_id` are always returned by default,
+      along with any other fields specified.
+    pageSize: The maximum number of devices to return in the response. If this
+      value is zero, the service will select a default size. A call may return
+      fewer objects than requested, but if there is a non-empty `page_token`,
+      it indicates that more entries are available.
+    pageToken: The value returned by the last `ListDevicesResponse`; indicates
+      that this is a continuation of a prior `ListDevices` call, and that the
+      system should return the next page of data.
+    parent: The device registry path. Required. For example, `projects/my-
+      project/locations/us-central1/registries/my-registry`.
+  """
+
+  deviceIds = _messages.StringField(1, repeated=True)
+  deviceNumIds = _messages.IntegerField(2, repeated=True, variant=_messages.Variant.UINT64)
+  fieldMask = _messages.StringField(3)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
+  parent = _messages.StringField(6, required=True)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsDevicesModifyCloudToDeviceConfigRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesGroupsDevicesModifyCloudToDeviceCon
+  figRequest object.
+
+  Fields:
+    modifyCloudToDeviceConfigRequest: A ModifyCloudToDeviceConfigRequest
+      resource to be passed as the request body.
+    name: The name of the device. For example, `projects/p0/locations/us-
+      central1/registries/registry0/devices/device0` or `projects/p0/locations
+      /us-central1/registries/registry0/devices/{num_id}`.
+  """
+
+  modifyCloudToDeviceConfigRequest = _messages.MessageField('ModifyCloudToDeviceConfigRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsDevicesPatchRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesGroupsDevicesPatchRequest object.
+
+  Fields:
+    device: A Device resource to be passed as the request body.
+    name: The resource path name. For example, `projects/p1/locations/us-
+      central1/registries/registry0/devices/dev0` or `projects/p1/locations
+      /us-central1/registries/registry0/devices/{num_id}`. When `name` is
+      populated as a response from the service, it always ends in the device
+      numeric ID.
+    updateMask: Only updates the `device` fields indicated by this mask. The
+      field mask must not be empty, and it must not contain fields that are
+      immutable or only set by the server. Mutable top-level fields:
+      `credentials`, `blocked`, and `metadata`
+  """
+
+  device = _messages.MessageField('Device', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsDevicesStatesListRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesGroupsDevicesStatesListRequest
+  object.
+
+  Fields:
+    name: The name of the device. For example, `projects/p0/locations/us-
+      central1/registries/registry0/devices/device0` or `projects/p0/locations
+      /us-central1/registries/registry0/devices/{num_id}`.
+    numStates: The number of states to list. States are listed in descending
+      order of update time. The maximum number of states retained is 10. If
+      this value is zero, it will return all the states available.
+  """
+
+  name = _messages.StringField(1, required=True)
+  numStates = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsGetIamPolicyRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesGroupsGetIamPolicyRequest object.
+
+  Fields:
+    getIamPolicyRequest: A GetIamPolicyRequest resource to be passed as the
+      request body.
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See the operation documentation for the appropriate value for this
+      field.
+  """
+
+  getIamPolicyRequest = _messages.MessageField('GetIamPolicyRequest', 1)
+  resource = _messages.StringField(2, required=True)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsSetIamPolicyRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesGroupsSetIamPolicyRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See the operation documentation for the appropriate value for this
+      field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsTestIamPermissionsRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesGroupsTestIamPermissionsRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See the operation documentation for the appropriate value for
+      this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
 
 
 class CloudiotProjectsLocationsRegistriesListRequest(_messages.Message):
@@ -562,6 +732,30 @@ class EventNotificationConfig(_messages.Message):
 
   pubsubTopicName = _messages.StringField(1)
   subfolderMatches = _messages.StringField(2)
+
+
+class Expr(_messages.Message):
+  r"""Represents an expression text. Example:      title: "User account
+  presence"     description: "Determines whether the request has a user
+  account"     expression: "size(request.user) > 0"
+
+  Fields:
+    description: An optional description of the expression. This is a longer
+      text which describes the expression, e.g. when hovered over it in a UI.
+    expression: Textual representation of an expression in Common Expression
+      Language syntax.  The application context of the containing message
+      determines which well-known feature set of CEL is supported.
+    location: An optional string indicating the location of the expression for
+      error reporting, e.g. a file name and a position in the file.
+    title: An optional title for the expression, i.e. a short string
+      describing its purpose. This can be used e.g. in UIs which allow to
+      enter the expression.
+  """
+
+  description = _messages.StringField(1)
+  expression = _messages.StringField(2)
+  location = _messages.StringField(3)
+  title = _messages.StringField(4)
 
 
 class GetIamPolicyRequest(_messages.Message):

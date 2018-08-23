@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """Tests for the backend services add-signed-url-key alpha command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -22,7 +24,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import backend_services_test_base
 
 
-class BackendServiceAddSignedUrlKeyTestBeta(
+class BackendServiceAddSignedUrlKeyTestGA(
     backend_services_test_base.BackendServicesTestBase):
 
   # Arbitrary base64url encoded 128-bit key.
@@ -37,7 +39,7 @@ class BackendServiceAddSignedUrlKeyTestBeta(
         self.temp_path, 'test2.key', contents=self.KEY + '\n\n\r\n')
 
   def _SetUpReleaseTrack(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def testValidKey(self):
     """Tests adding a valid key is successful."""
@@ -105,6 +107,13 @@ class BackendServiceAddSignedUrlKeyTestBeta(
       self.RunBackendServices('add-signed-url-key ' +
                               backend_service_ref.Name() + ' --key-name key1 '
                               '--key-file non-existent-file')
+
+
+class BackendServiceAddSignedUrlKeyTestBeta(
+    BackendServiceAddSignedUrlKeyTestGA):
+
+  def _SetUpReleaseTrack(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
 class BackendServiceAddSignedUrlKeyTestAlpha(

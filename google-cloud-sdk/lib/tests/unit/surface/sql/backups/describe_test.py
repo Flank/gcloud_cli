@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -26,7 +29,7 @@ from tests.lib.surface.sql import base
 sqladmin_v1beta3 = core_apis.GetMessagesModule('sqladmin', 'v1beta3')
 
 
-class BackupsDescribeTest(base.SqlMockTestBeta):
+class _BaseBackupsDescribeTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testBackupsDescribe(self):
@@ -78,6 +81,19 @@ class BackupsDescribeTest(base.SqlMockTestBeta):
         ))
 
     self.Run('sql backups describe --instance=clone-instance-7 42')
+
+
+class BackupsDescribeGATest(_BaseBackupsDescribeTest, base.SqlMockTestGA):
+  pass
+
+
+class BackupsDescribeBetaTest(_BaseBackupsDescribeTest, base.SqlMockTestBeta):
+  pass
+
+
+class BackupsDescribeAlphaTest(_BaseBackupsDescribeTest, base.SqlMockTestAlpha):
+  pass
+
 
 if __name__ == '__main__':
   test_case.main()

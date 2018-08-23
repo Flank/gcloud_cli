@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the sign-url subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import base64
 import calendar
 import hashlib
@@ -85,11 +88,11 @@ class SignUrlTestsBase(cli_test_base.CliTestBase):
       return self.Run(' '.join(['compute sign-url'] + args_list))
 
 
-class SigningTestsBeta(SignUrlTestsBase):
-  """Tests related to signing the URL using beta 'sign-url' command."""
+class SigningTestsGA(SignUrlTestsBase):
+  """Tests related to signing the URL using GA 'sign-url' command."""
 
   def _SetUpReleaseTrack(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _VerifySignedUrl(self, input_url, has_query_params,
                        expected_expires_in_seconds, actual_signed_url):
@@ -312,6 +315,13 @@ class SigningTestsBeta(SignUrlTestsBase):
       ])
 
 
+class SigningTestsBeta(SigningTestsGA):
+  """Tests related to signing the URL using beta 'sign-url' command."""
+
+  def _SetUpReleaseTrack(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
 class SigningTestsAlpha(SigningTestsBeta):
   """Tests related to signing the URL using alpha 'sign-url' command."""
 
@@ -319,18 +329,18 @@ class SigningTestsAlpha(SigningTestsBeta):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 
-class ValidationTestsBeta(SignUrlTestsBase):
-  """Tests related to validating the URL using beta 'sign-url' command."""
+class ValidationTestsGA(SignUrlTestsBase):
+  """Tests related to validating the URL using GA 'sign-url' command."""
 
   def SetUp(self):
-    super(ValidationTestsBeta, self).SetUp()
+    super(ValidationTestsGA, self).SetUp()
     self.http_request_mock = self.StartObjectPatch(
         httplib2.Http, 'request', autospec=True)
     self.http_response_mock = self.StartObjectPatch(
         httplib2, 'Response', autospec=True)
 
   def _SetUpReleaseTrack(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _MockResponseForRequest(self, url, response_code):
     """Mocks the response for the specified request URL."""
@@ -371,6 +381,13 @@ class ValidationTestsBeta(SignUrlTestsBase):
     ])
     self._VerifyValidationRequest(expected_signed_url)
     self.assertEqual(result['validationResponseCode'], 403)
+
+
+class ValidationTestsBeta(ValidationTestsGA):
+  """Tests related to validating the URL using beta 'sign-url' command."""
+
+  def _SetUpReleaseTrack(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ValidationTestsAlpha(ValidationTestsBeta):

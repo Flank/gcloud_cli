@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,7 +67,7 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
         signature=self.signature,
     )
 
-  def testYieldNoteOccurrences(self):
+  def testYieldAttestations(self):
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
         occurrences_to_return=[self.response_occurrence],
@@ -74,11 +75,11 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
     # We need the list() to force-unroll the returned iterator, otherwise the
     # actual code isn't run.
     occurrences = list(
-        self.ca_client._YieldNoteOccurrences(
+        self.ca_client.YieldAttestations(
             note_ref=self.note_ref, artifact_url=self.artifact_url))
     self.assertEqual([self.response_occurrence], occurrences)
 
-  def testYieldNoteOccurrencesFilter(self):
+  def testYieldAttestationsFilter(self):
     # Mock a returned occurrence with the wrong kind (but matching artifact URL)
     messages = self.containeranalysis_messages
     unmatched_kind_response_occurrence = self.CreateGenericResponseOccurrence(
@@ -112,45 +113,9 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
     # We need the list() to force-unroll the returned iterator, otherwise the
     # actual code isn't run.
     occurrences = list(
-        self.ca_client._YieldNoteOccurrences(
+        self.ca_client.YieldAttestations(
             note_ref=self.note_ref, artifact_url=self.artifact_url))
     self.assertEqual([self.response_occurrence], occurrences)
-
-  def testYieldPgpKeyFingerprintsAndSignatures(self):
-    self.ExpectProjectsNotesOccurrencesList(
-        note_relative_name=self.note_relative_name,
-        occurrences_to_return=[self.response_occurrence],
-    )
-    # We need the list() to force-unroll the returned iterator, otherwise the
-    # actual code isn't run.
-    signatures = list(
-        self.ca_client.YieldPgpKeyFingerprintsAndSignatures(
-            note_ref=self.note_ref, artifact_url=self.artifact_url))
-    self.assertEqual(
-        [(self.pgp_key_fingerprint, self.signature)],
-        signatures,
-    )
-
-  def testYieldUrlsWithOccurrences(self):
-    self.ExpectProjectsNotesOccurrencesList(
-        note_relative_name=self.note_relative_name,
-        occurrences_to_return=[self.response_occurrence],
-    )
-    resources_urls = list(
-        self.ca_client.YieldUrlsWithOccurrences(note_ref=self.note_ref))
-    self.assertEqual([self.artifact_url], resources_urls)
-
-  def testYieldUrlsWithOccurrencesDeduplication(self):
-    self.ExpectProjectsNotesOccurrencesList(
-        note_relative_name=self.note_relative_name,
-        occurrences_to_return=[
-            self.response_occurrence,
-            self.response_occurrence,
-        ],
-    )
-    resources_urls = list(
-        self.ca_client.YieldUrlsWithOccurrences(note_ref=self.note_ref))
-    self.assertEqual([self.artifact_url], resources_urls)
 
 
 if __name__ == '__main__':

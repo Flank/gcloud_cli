@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """`gcloud tasks create-app-engine-task` command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.tasks import tasks
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.tasks import constants
@@ -24,7 +27,6 @@ from googlecloudsdk.core import log
 
 
 # TODO(b/64460484): Add descriptions of App Engine vs. pull queues.
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAppEngine(base.CreateCommand):
   """Create and add a task to an App Engine queue."""
 
@@ -36,7 +38,8 @@ class CreateAppEngine(base.CreateCommand):
   def Run(self, args):
     tasks_client = tasks.Tasks()
     queue_ref = parsers.ParseQueue(args.queue, args.location)
-    task_ref = parsers.ParseTask(args.id, queue_ref) if args.id else None
+    task_ref = parsers.ParseTask(args.task,
+                                 queue_ref) if args.task else None
     task_config = parsers.ParseCreateTaskArgs(
         args, constants.APP_ENGINE_QUEUE, tasks_client.api.messages)
     create_response = tasks_client.Create(

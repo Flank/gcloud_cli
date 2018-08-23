@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Import image command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os.path
 import uuid
 
@@ -49,6 +52,7 @@ _IMPORT_FROM_IMAGE_WORKFLOW = _WORKFLOW_DIR + 'import_from_image.wf.json'
 _IMPORT_AND_TRANSLATE_WORKFLOW = _WORKFLOW_DIR + 'import_and_translate.wf.json'
 _WORKFLOWS_URL = ('https://github.com/GoogleCloudPlatform/compute-image-tools/'
                   'tree/master/daisy_workflows/image_import')
+_OUTPUT_FILTER = ['[Daisy', '[import-', 'starting build', '  import', 'ERROR']
 
 
 def _IsLocalFile(file_name):
@@ -102,7 +106,7 @@ def _MakeGcsUri(uri):
 
 
 class Import(base.CreateCommand):
-  """Import a Google Compute Engine image."""
+  """Import an image into Google Compute Engine."""
 
   @staticmethod
   def Args(parser):
@@ -206,10 +210,11 @@ class Import(base.CreateCommand):
     log.warning('Importing image. This may take up to 2 hours.')
     return daisy_utils.RunDaisyBuild(args, workflow, ','.join(daisy_vars),
                                      daisy_bucket=daisy_bucket,
-                                     user_zone=args.zone)
+                                     user_zone=args.zone,
+                                     output_filter=_OUTPUT_FILTER)
 
 Import.detailed_help = {
-    'brief': 'Import a Google Compute Engine image',
+    'brief': 'Import an image into Google Compute Engine',
     'DESCRIPTION': """\
         *{command}* imports Virtual Disk images, such as VMWare VMDK files
         and VHD files, into Google Compute Engine.
@@ -223,6 +228,10 @@ Import.detailed_help = {
 
         This command uses the `--os` flag to choose the appropriate translation.
         You can omit the translation step using the `--data-disk` flag.
+
+        If you exported your disk from Google Compute Engine then you do not
+        need to re-import it. Instead, use the `create` command to create
+        further images from it.
 
         Files stored on Cloud Storage and images in Compute Engine incur
         charges. See [](https://cloud.google.com/compute/docs/images/importing-virtual-disks#resource_cleanup).

@@ -1,0 +1,167 @@
+
+.TH "GCLOUD_COMPOSER_ENVIRONMENTS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud composer environments create \- create and initialize a Cloud Composer environment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+If run asynchronously with \f5\-\-async\fR, exits after printing an operation
+that can be used to poll the status of the creation operation via:
+
+.RS 2m
+gcloud composer operations describe
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Environment resource \- The environment to create. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the flag [environment] on the command line with a
+fully specified name; provide the flag [\-\-project] on the command line; set
+the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIENVIRONMENT\fR
+The ID of the environment or a fully qualified identifier for the environment.
+This positional must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Compute Engine region in which to create the environment.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of Airflow software configuration override KEY=VALUE pairs to set. For
+information on how to structure KEYs and VALUEs, run \f5$ gcloud help composer
+environments update\fR.
+
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR; default="100GB"
+The disk size for each VM node in the environment. The minimum size is 20GB, and
+the maximum is 64TB. Specified value must be an integer multiple of gigabytes.
+Cannot be updated after the environment has been created. If units are not
+provided, defaults to GB.
+
+.TP 2m
+\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]
+A comma\-delimited list of environment variable \f5NAME=VALUE\fR pairs to
+provide to the Airflow scheduler, worker, and webserver processes. NAME may
+contain upper and lowercase letters, digits, and underscores, but they may not
+begin with a digit. To include commas as part of a \f5VALUE\fR, see \f5gcloud
+topics escaping\fR for information about overriding the delimiter.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
+The Compute Engine machine type
+(https://cloud.google.com/compute/docs/machine\-types) to use for nodes. For
+example \f5\-\-machine\-type=n1\-standard\-1\fR.
+
+.TP 2m
+\fB\-\-node\-count\fR=\fINODE_COUNT\fR
+The number of nodes to create to run the environment.
+
+.TP 2m
+\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]
+The set of Google API scopes to be made available on all of the node VMs.
+Defaults to ['https://www.googleapis.com/auth/cloud\-platform']. Cannot be
+updated.
+
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+The Google Cloud Platform service account to be used by the node VMs. If a
+service account is not specified, the "default" Compute Engine service account
+for the project is used. Cannot be updated.
+
+.TP 2m
+\fB\-\-tags\fR=[\fITAG\fR,...]
+The set of instance tags applied to all node VMs. Tags are used to identify
+valid sources or targets for network firewalls. Each tag within the list must
+comply with RFC 1035. Cannot be updated.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The Compute Engine zone in which the environment will be created. For example
+\f5\-\-zone=us\-central1\-a\fR.
+
+.TP 2m
+
+Virtual Private Cloud networking
+
+.RS 2m
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The Compute Engine Network to which the environment will be connected. If a
+\'Custom Subnet Network' is provided, \f5\-\-subnetwork\fR must be specified as
+well. This flag must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-subnetwork\fR=\fISUBNETWORK\fR
+The Compute Engine subnetwork
+(https://cloud.google.com/compute/docs/subnetworks) to which the environment
+will be connected.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta composer environments create
+.RE
+

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the network-endpoint-groups delete subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -23,7 +26,7 @@ from tests.lib.surface.compute import test_base
 class NetworkEndpointGroupsDeleteTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):
@@ -34,7 +37,7 @@ class NetworkEndpointGroupsDeleteTest(test_base.BaseTest):
     self.WriteInput('y\n')
     self.Run('compute network-endpoint-groups delete my-neg1 --zone zone-1')
     self.CheckRequests(
-        [(self.compute_alpha.networkEndpointGroups,
+        [(self.compute_beta.networkEndpointGroups,
           'Delete',
           self.messages.ComputeNetworkEndpointGroupsDeleteRequest(
               networkEndpointGroup='my-neg1',

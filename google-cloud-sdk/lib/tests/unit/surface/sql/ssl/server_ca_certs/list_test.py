@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for listing Server CA Certs."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -24,7 +27,7 @@ from tests.lib.surface.sql import base
 from tests.lib.surface.sql import data
 
 
-class ServerCaCertsListTest(base.SqlMockTestBeta):
+class _BaseServerCaCertsListTest(object):
 
   def testSslCertsList(self):
     active_cert_fingerprint = 'one'
@@ -73,6 +76,16 @@ one              2024-02-02T21:10:29.402000+00:00
 two              2024-04-04T21:10:29.402000+00:00
 """,
         normalize_space=True)
+
+
+class ServerCaCertsListBetaTest(_BaseServerCaCertsListTest,
+                                base.SqlMockTestBeta):
+  pass
+
+
+class ServerCaCertsListAlphaTest(_BaseServerCaCertsListTest,
+                                 base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

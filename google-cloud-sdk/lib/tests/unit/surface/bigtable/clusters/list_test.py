@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +15,21 @@
 """Test of the 'list' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.bigtable import util
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.bigtable import arguments
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase,
                       resource_completer_test_base.ResourceCompleterBase):
 
@@ -46,7 +53,8 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase,
                 serveNodes=5)
         ]))
 
-  def testList(self):
+  def testList(self, track):
+    self.track = track
     self.expectClusterList(self.instance_ref, 'thecluster')
     self.Run('bigtable clusters list --instances theinstance')
 
@@ -54,7 +62,8 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase,
         'INSTANCE     NAME        ZONE     NODES  STORAGE  STATE\n'
         'theinstance  thecluster  thezone  5      SSD      READY\n')
 
-  def testUri(self):
+  def testUri(self, track):
+    self.track = track
     self.expectClusterList(self.instance_ref, 'thecluster')
     # Check that URI project is used for instance and list of clusters.
     self.Run('bigtable clusters list --instances {} --uri --project bogus'
@@ -65,7 +74,8 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase,
         'projects/{}/instances/theinstance/clusters/thecluster\n'.format(
             self.Project()))
 
-  def testListMultiple(self):
+  def testListMultiple(self, track):
+    self.track = track
     self.expectClusterList(self.instance_ref, 'thecluster')
     self.expectClusterList(self.other_instance_ref, 'theothercluster')
     self.Run('bigtable clusters list --instances theinstance,theotherinstance')
@@ -75,7 +85,8 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase,
         'theinstance       thecluster       thezone  5      SSD      READY\n'
         'theotherinstance  theothercluster  thezone  5      SSD      READY\n')
 
-  def testListNoInstanceProvided(self):
+  def testListNoInstanceProvided(self, track):
+    self.track = track
     self.clusters_list_mock.Expect(
         request=self.msgs.BigtableadminProjectsInstancesClustersListRequest(
             parent=util.GetInstanceRef('-').RelativeName()),
@@ -104,7 +115,8 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase,
         'theinstance       thecluster       thezone  5      SSD      READY\n'
         'theotherinstance  theothercluster  thezone  5      SSD      READY\n')
 
-  def testCompletion(self):
+  def testCompletion(self, track):
+    self.track = track
     self.expectClusterList(self.instance_ref, 'thecluster')
     self.RunResourceCompleter(
         arguments.GetClusterResourceSpec(),

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +15,19 @@
 """Tests for the backend buckets delete-signed-url-key alpha command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import backend_buckets_test_base
 
 
-class BackendBucketDeleteSignedUrlKeyTestBeta(
+class BackendBucketDeleteSignedUrlKeyTestGA(
     backend_buckets_test_base.BackendBucketsTestBase):
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def testWithKeyNameArg(self):
     """Tests deleting a key is successful."""
@@ -53,6 +56,13 @@ class BackendBucketDeleteSignedUrlKeyTestBeta(
         'argument --key-name: Must be specified.'):
       self.RunBackendBuckets('delete-signed-url-key ' +
                              backend_bucket_ref.Name())
+
+
+class BackendBucketDeleteSignedUrlKeyTestBeta(
+    BackendBucketDeleteSignedUrlKeyTestGA):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
 class BackendBucketDeleteSignedUrlKeyTestAlpha(

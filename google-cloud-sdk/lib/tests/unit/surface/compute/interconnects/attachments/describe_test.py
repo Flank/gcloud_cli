@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,8 @@
 """Tests for the interconnects describe subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base
@@ -183,15 +184,9 @@ class InterconnectsDescribeTest(test_base.BaseTest):
     self.assertEqual(result.selfLink,
                      self.compute_uri + '/projects/my-project/regions/'
                      'us-central1/interconnectAttachments/my-attachment1')
+    self.AssertErrContains('PROMPT_CHOICE')
     self.AssertErrContains(
-        textwrap.dedent("""\
-          For the following interconnect attachment:
-           - [my-attachment1]
-          choose a region:
-           [1] us-central1
-           [2] us-central2
-           [3] us-central3
-          Please enter your numeric choice:  """))
+        '"choices": ["us-central1", "us-central2", "us-central3"]')
 
 
 class InterconnectsDescribeBetaTest(InterconnectsDescribeTest):

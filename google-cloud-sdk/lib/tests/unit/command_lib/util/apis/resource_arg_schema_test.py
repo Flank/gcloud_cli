@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +16,11 @@
 """Tests for the yaml command schema."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import itertools
+import re
 
 from googlecloudsdk.api_lib.util import resource as resource_util
 from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
@@ -262,6 +266,149 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
                 'zone': [fallthrough_def]}})
     expected = {'zone': [arg_name]}
     self.assertEqual(expected, r.command_level_fallthroughs)
+
+  def testFromDataWithDisplayNameHook(self):
+    data = {'name': 'location',
+            'help_text': 'group help',
+            'spec': {'name': 'zone', 'collection': 'foo.projects.zones',
+                     'attributes': [
+                         {'parameter_name': 'projectsId',
+                          'attribute_name': 'project',
+                          'help': 'help1'},
+                         {'parameter_name': 'zonesId',
+                          'attribute_name': 'zone',
+                          'help': 'help2'}]},
+            'display_name_hook': 'path.to:Hook'}
+    mock_hook = self.StartObjectPatch(util.Hook, 'FromPath',
+                                      return_value='hook')
+    resource_arg = resource_arg_schema.YAMLConceptArgument.FromData(data)
+    self.assertEqual(resource_arg.display_name_hook, 'hook')
+    mock_hook.assert_called_once_with('path.to:Hook')
+
+
+class MultitypeTests(base.Base, parameterized.TestCase):
+
+  def SetUp(self):
+    self._sub_resource_specs = [
+        {'name': 'zone', 'collection': 'foo.projects.zones',
+         'attributes': [
+             {'parameter_name': 'projectsId',
+              'attribute_name': 'project',
+              'help': 'help1'},
+             {'parameter_name': 'zonesId',
+              'attribute_name': 'zone',
+              'help': 'help2'}]},
+        {'name': 'region', 'collection': 'foo.projects.regions',
+         'attributes': [
+             {'parameter_name': 'projectsId',
+              'attribute_name': 'project',
+              'help': 'help1'},
+             {'parameter_name': 'regionsId',
+              'attribute_name': 'region',
+              'help': 'help3'}]}]
+
+  @parameterized.named_parameters(
+      ('Resource',
+       {'name': 'x', 'collection': 'foo.bar', 'attributes': []},
+       resource_arg_schema.YAMLResourceArgument),
+      ('MultitypeResource',
+       {'name': 'x', 'resources': []},
+       resource_arg_schema.YAMLMultitypeResourceArgument))
+  def testConceptArgFromData(self, resource_spec, expected_type):
+    spec = {'name': 'location',
+            'help_text': 'group help',
+            'spec': resource_spec}
+    resource_arg = resource_arg_schema.YAMLConceptArgument.FromData(spec)
+    self.assertTrue(isinstance(resource_arg, expected_type))
+
+  def testMultitypeResourceArg(self):
+    self.MockGetListCreateMethods(('foo.projects.zones', True),
+                                  ('foo.projects.regions', True))
+    r = resource_arg_schema.YAMLMultitypeResourceArgument.FromData(
+        {
+            'name': 'location',
+            'help_text': 'group help',
+            'spec': {
+                'name': 'region-or-zone',
+                'resources': self._sub_resource_specs}})
+    self.assertEqual(r.group_help, 'group help')
+    self.assertEqual(r.removed_flags, [])
+    self.assertEqual(r.is_positional, True)
+
+    spec = r.GenerateResourceSpec()
+    project_attr, zone_attr, region_attr = [spec.attributes[0],
+                                            spec.attributes[1],
+                                            spec.attributes[2]]
+    self.assertEqual(project_attr.name, 'project')
+    self.assertEqual(project_attr.help_text, 'help1')
+    self.assertEqual(
+        project_attr.fallthroughs,
+        project_resource_args.PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
+    self.assertEqual(zone_attr.name, 'zone')
+    self.assertEqual(zone_attr.help_text, 'help2')
+    self.assertEqual(zone_attr.fallthroughs, [])
+    self.assertEqual(region_attr.name, 'region')
+    self.assertEqual(region_attr.help_text, 'help3')
+    self.assertEqual(region_attr.fallthroughs, [])
+    self.assertTrue(spec.disable_auto_completers)
+
+  def testMultitypeResourceArgOptions(self):
+    self.MockGetListCreateMethods(('foo.projects.zones', True),
+                                  ('foo.projects.regions', True))
+    r = resource_arg_schema.YAMLMultitypeResourceArgument.FromData(
+        {
+            'name': 'location',
+            'is_positional': False,
+            'help_text': 'group help',
+            'removed_flags': ['region'],
+            'command_level_fallthroughs': {
+                'region': [{'arg_name': 'other-region'}]},
+            'spec': {
+                'name': 'region-or-zone',
+                'plural_name': 'regions-or-zones',
+                'resources': self._sub_resource_specs}})
+    self.assertEqual(r.group_help, 'group help')
+    self.assertEqual(r.removed_flags, ['region'])
+    self.assertEqual(r.is_positional, False)
+    self.assertEqual(r.command_level_fallthroughs,
+                     {'region': ['--other-region']})
+    self.assertEqual(r._plural_name, 'regions-or-zones')
+
+  def testMultitypeResourceArgMismatchedCollection(self):
+    self.MockGetListCreateMethods(('foo.projects.zones', True),
+                                  ('foo.projects.regions', True))
+    r = resource_arg_schema.YAMLMultitypeResourceArgument.FromData(
+        {
+            'name': 'location',
+            'is_positional': False,
+            'help_text': 'group help',
+            'spec': {
+                'name': 'region-or-zone',
+                'resources': self._sub_resource_specs}})
+    collection_info = resource_util.CollectionInfo(
+        'bar', 'v1', '', '', 'projects.zones',
+        'projects/{projectsId}/zones/{zonesId}',
+        {'': 'projects/{projectsId}/zones/{zonesId}'},
+        ['projectsId', 'zonesId'])
+    with self.assertRaisesRegex(
+        util.InvalidSchemaError,
+        re.escape(
+            'Collection names do not match for resource argument specification '
+            '[region-or-zone]. Expected [bar.projects.zones version v1], and '
+            'no contained resources matched. Given collections: '
+            '[foo.projects.regions None, foo.projects.zones None]')):
+      r.GenerateResourceSpec(collection_info)
+
+  def testFromDataWithDisplayNameHook(self):
+    data = {'name': 'location',
+            'help_text': 'group help',
+            'spec': {'name': 'zone', 'resources': self._sub_resource_specs},
+            'display_name_hook': 'path.to:Hook'}
+    mock_hook = self.StartObjectPatch(util.Hook, 'FromPath',
+                                      return_value='hook')
+    resource_arg = resource_arg_schema.YAMLConceptArgument.FromData(data)
+    self.assertEqual(resource_arg.display_name_hook, 'hook')
+    mock_hook.assert_called_once_with('path.to:Hook')
 
 
 class CollectionValidationTests(base.Base, parameterized.TestCase):

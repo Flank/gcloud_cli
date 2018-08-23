@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +23,7 @@ own module and you do not need these, use the gcloud_test_base module instead.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import base64
 import cgi
 import json
@@ -243,16 +245,20 @@ class WithServiceAuth(WithServiceAccountFile):
                          'to integration test config.')
     if self.requires_refresh_token:
       self.Run(
+          '--no-user-output-enabled '
           'auth activate-refresh-token {account} {token}'.format(
               account='no_accountability ',
               token=_TEST_CONFIG['auth_data']['user_account']['refresh_token']))
-      self.Run('config set account no_accountability')
+      self.Run('--no-user-output-enabled '
+               'config set account no_accountability')
     else:
       self.Run(
+          '--no-user-output-enabled '
           'auth activate-service-account {account} --key-file={key}'.format(
               account=self.Account(),
               key=self.json_key_file))
-      self.Run('config set account ' + self.Account())
+      self.Run('--no-user-output-enabled '
+               'config set account ' + self.Account())
 
     orig_refresh = c_store.Refresh
     def RefreshWithRetry(creds, http=None):
@@ -263,7 +269,7 @@ class WithServiceAuth(WithServiceAccountFile):
 
     if 'property_overrides' in _TEST_CONFIG:
       for prop, value in six.iteritems(_TEST_CONFIG['property_overrides']):
-        self.Run(['config', 'set', prop, value])
+        self.Run(['--no-user-output-enabled', 'config', 'set', prop, value])
 
   def BillingId(self):
     return _TEST_CONFIG['auth_data']['user_account']['billing_id']

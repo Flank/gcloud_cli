@@ -67,7 +67,7 @@ FLAGS
         check.
 
      --region=REGION
-        The region of the target pool to create. If not specified, you may be
+        Region of the target pool to create. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the

@@ -6,9 +6,10 @@ SYNOPSIS
     gcloud alpha compute health-checks create udp NAME --request=REQUEST
         --response=RESPONSE [--check-interval=CHECK_INTERVAL; default="5s"]
         [--description=DESCRIPTION]
-        [--healthy-threshold=HEALTHY_THRESHOLD; default=2] [--port=PORT]
-        [--port-name=PORT_NAME] [--timeout=TIMEOUT; default="5s"]
+        [--healthy-threshold=HEALTHY_THRESHOLD; default=2]
+        [--timeout=TIMEOUT; default="5s"]
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2]
+        [--global | --region=REGION] [--port=PORT --port-name=PORT_NAME]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -46,15 +47,6 @@ OPTIONAL FLAGS
         The number of consecutive successful health checks before an unhealthy
         instance is marked as healthy. The default is 2.
 
-     --port=PORT
-        The UDP port number that this health check monitors. The default is not
-        set.
-
-     --port-name=PORT_NAME
-        The port name that this health check monitors. By default, this is
-        empty. Setting this to an empty string will clear any existing
-        port-name value.
-
      --timeout=TIMEOUT; default="5s"
         If Google Compute Engine doesn't receive a healthy response from the
         instance by the time specified by the value of this flag, the health
@@ -67,6 +59,41 @@ OPTIONAL FLAGS
         The number of consecutive health check failures before a healthy
         instance is marked as unhealthy. The default is 2.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the UDP health check is global.
+
+       --region=REGION
+          Region of the UDP health check to create. If not specified, you may
+          be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+     These flags configure the port that the health check monitors. If both
+     --port and --port-name are specified, --port takes precedence.
+
+       --port=PORT
+          The UDP port number that this health check monitors.
+
+       --port-name=PORT_NAME
+          The port name that this health check monitors. By default, this is
+          empty.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
@@ -75,8 +102,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change
-    without notice. Usually, users of ALPHA commands and flags need to apply
-    for access, agree to applicable terms, and have their projects whitelisted.
-    Contact Google or sign up on a product's page for ALPHA access. Product
-    pages can be found at https://cloud.google.com/products/.
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
 

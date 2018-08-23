@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +16,12 @@
 """Bundle tests for the lookup module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import gcloud
 from googlecloudsdk.command_lib.static_completion import lookup
+from googlecloudsdk.core.util import encoding
 from tests.lib import sdk_test_base
 
 
@@ -33,7 +37,7 @@ class LookupBundleTests(sdk_test_base.BundledBase):
 
       @staticmethod
       def write(s):
-        self.completions_value = s
+        self.completions_value = encoding.Decode(s)
 
     self.StartObjectPatch(lookup, '_OpenCompletionsOutputStream',
                           return_value=_FakeStream())

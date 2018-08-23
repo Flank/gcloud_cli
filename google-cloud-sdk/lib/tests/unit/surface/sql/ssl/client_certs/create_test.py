@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise client cert creation."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 import os
 import re
@@ -26,7 +29,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class ClientCertsCreateTest(base.SqlMockTestBeta):
+class _BaseClientCertsCreateTest(object):
 
   def testClientCertsCreate(self):
     self.mocked_client.sslCerts.Insert.Expect(
@@ -108,6 +111,20 @@ newcert  d926e1fb26e4dba2f73a14bea4ee9554577deda9  -
       self.Run('sql ssl client-certs create newcert {file} '
                '--instance=integration-test'.format(file=path))
     self.AssertFileExistsWithContents(file_contents, path)
+
+
+class ClientCertsCreateGATest(_BaseClientCertsCreateTest, base.SqlMockTestGA):
+  pass
+
+
+class ClientCertsCreateBetaTest(_BaseClientCertsCreateTest,
+                                base.SqlMockTestBeta):
+  pass
+
+
+class ClientCertsCreateAlphaTest(_BaseClientCertsCreateTest,
+                                 base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

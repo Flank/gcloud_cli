@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +17,20 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class DeleteAnnotationIntegrationTest(base.CategoryManagerUnitTestBase):
   """Tests for category-manager delete-annotation."""
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.asset = resources.REGISTRY.Create(
         'categorymanager.assets', assetId='company.com:project-12345/a/b/c')
     self.taxonomy_id = '123'
@@ -39,7 +42,8 @@ class DeleteAnnotationIntegrationTest(base.CategoryManagerUnitTestBase):
         annotationsId=self.annotation_id)
     self.sub_asset = 'column1'
 
-  def testDeleteAssetAnnotation_promptingYes(self):
+  def testDeleteAssetAnnotation_promptingYes(self, track):
+    self.track = track
     self.ExpectDeleteAnnotation(self.asset, self.project_annotation,
                                 self.sub_asset)
     args = ('{asset_name} --annotation {annotation_id} '
@@ -53,7 +57,8 @@ class DeleteAnnotationIntegrationTest(base.CategoryManagerUnitTestBase):
     self.AssertErrContains('Deleted annotation tag [{}].'.format(
         self.project_annotation.RelativeName()))
 
-  def testDeleteAssetAnnotation_promptingNo(self):
+  def testDeleteAssetAnnotation_promptingNo(self, track):
+    self.track = track
     args = ('{asset_name} --annotation {annotation_id} '
             '--taxonomy {taxonomy_id} --sub-asset {sub_asset}').format(
                 asset_name=('assets/' + self.asset.assetId),

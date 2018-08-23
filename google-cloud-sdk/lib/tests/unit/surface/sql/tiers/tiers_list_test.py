@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,14 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class TiersListsTest(base.SqlMockTestBeta):
+class _BaseTiersListTest(object):
 
   def testTiersList(self):
     self.mocked_client.tiers.List.Expect(
@@ -116,6 +119,18 @@ D8    us-central,europe-west1,asia-east1  4 GiB    250 GiB
 D16   us-central,europe-west1,asia-east1  8 GiB    250 GiB
 D32   us-central                          16 GiB   250 GiB
 """, normalize_space=True)
+
+
+class TiersListGATest(_BaseTiersListTest, base.SqlMockTestGA):
+  pass
+
+
+class TiersListBetaTest(_BaseTiersListTest, base.SqlMockTestBeta):
+  pass
+
+
+class TiersListAlphaTest(_BaseTiersListTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

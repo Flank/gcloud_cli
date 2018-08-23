@@ -32,5 +32,8 @@ COMMANDS
         (BETA) Rotate in the upcoming server CA cert for a Cloud SQL instance.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha sql ssl server-ca-certs
 

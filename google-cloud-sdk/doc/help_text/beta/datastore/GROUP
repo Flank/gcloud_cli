@@ -34,14 +34,6 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
-     cleanup-indexes
-        (BETA) Remove unused datastore indexes based on your local index
-        configuration.
-
-     create-indexes
-        (BETA) Create new datastore indexes based on your local index
-        configuration.
-
      export
         (BETA) Export Cloud Datastore entities to Google Cloud Storage.
 
@@ -58,8 +50,9 @@ EXAMPLES
         $ gcloud beta datastore cleanup-indexes index.yaml
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud datastore
+        $ gcloud alpha datastore
 

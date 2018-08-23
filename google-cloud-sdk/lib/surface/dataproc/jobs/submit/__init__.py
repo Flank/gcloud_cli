@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """The command group for submitting cloud dataproc jobs."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
 
 from googlecloudsdk.calliope import base
@@ -30,15 +33,15 @@ class Submit(base.Group):
 
   To submit a Hadoop MapReduce job, run:
 
-    $ {command} hadoop --cluster my_cluster --jar my_jar.jar arg1 arg2
+    $ {command} hadoop --cluster my_cluster --jar my_jar.jar -- arg1 arg2
 
   To submit a Spark Scala or Java job, run:
 
-    $ {command} spark --cluster my_cluster --jar my_jar.jar arg1 arg2
+    $ {command} spark --cluster my_cluster --jar my_jar.jar -- arg1 arg2
 
   To submit a PySpark job, run:
 
-    $ {command} pyspark --cluster my_cluster my_script.py arg1 arg2
+    $ {command} pyspark --cluster my_cluster my_script.py -- arg1 arg2
 
   To submit a Spark SQL job, run:
 

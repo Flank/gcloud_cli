@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +28,7 @@ that the user may have saved while in the EDITOR.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import subprocess
 import tempfile

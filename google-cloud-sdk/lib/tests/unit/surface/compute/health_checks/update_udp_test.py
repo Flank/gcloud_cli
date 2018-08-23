@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the health-checks update udp subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -52,6 +56,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         compute health-checks update udp my-health-check
         --request ''
         --response ack
+        --global
         """)
     self.CheckRequests()
 
@@ -61,6 +66,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         compute health-checks update udp my-health-check
         --request sync
         --response ''
+        --global
         """)
     self.CheckRequests()
 
@@ -73,7 +79,9 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
                 port=80))],
     ])
 
-    self.Run('compute health-checks update udp my-health-check --port 80')
+    self.Run("""
+      compute health-checks update udp my-health-check --port 80 --global
+    """)
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -145,7 +153,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update udp my-health-check
-          --request req2
+          --request req2 --global
         """)
 
     self.CheckRequests(
@@ -190,6 +198,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         compute health-checks update udp my-health-check
           --request req-2
           --format json
+          --global
         """)
 
     self.assertMultiLineEqual(
@@ -231,6 +240,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         compute health-checks update udp my-health-check
           --request req-2
           --format text
+          --global
         """)
 
     self.assertMultiLineEqual(
@@ -267,6 +277,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         compute health-checks update udp my-health-check
           --request req_2
           --format yaml
+          --global
         """)
 
     self.assertMultiLineEqual(
@@ -291,7 +302,9 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         [],
     ])
 
-    self.Run('compute health-checks update udp my-health-check --port 8888')
+    self.Run("""
+      compute health-checks update udp my-health-check --port 8888 --global
+    """)
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -322,7 +335,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
     ])
 
     self.Run('compute health-checks update udp my-health-check '
-             '--port-name new-port')
+             '--port-name new-port --global')
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -352,7 +365,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
     ])
 
     self.Run('compute health-checks update udp my-health-check '
-             '--port-name new-port')
+             '--port-name new-port --global')
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -383,7 +396,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
     ])
 
     self.Run("""
-        compute health-checks update udp my-health-check --port-name ''
+        compute health-checks update udp my-health-check --port-name '' --global
         """)
 
     self.CheckRequests(
@@ -418,7 +431,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update udp my-health-check
-          --response new-response
+          --response new-response --global
         """)
 
     self.CheckRequests(
@@ -455,7 +468,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update udp my-health-check
-          --check-interval 30s
+          --check-interval 30s --global
         """)
 
     self.CheckRequests(
@@ -483,7 +496,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         'must not be less than 1 second or greater than 300 seconds'):
       self.Run("""
           compute health-checks update udp my-health-check
-            --check-interval 0
+            --check-interval 0 --global
           """)
     self.CheckRequests()
 
@@ -501,7 +514,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update udp my-health-check
-          --timeout 2m
+          --timeout 2m --global
         """)
 
     self.CheckRequests(
@@ -530,7 +543,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         'must not be less than 1 second or greater than 300 seconds'):
       self.Run("""
           compute health-checks update udp my-health-check
-             --timeout 0
+             --timeout 0 --global
           """)
     self.CheckRequests()
 
@@ -546,7 +559,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update udp my-health-check
-          --healthy-threshold 7
+          --healthy-threshold 7 --global
         """)
 
     self.CheckRequests(
@@ -573,7 +586,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         'must be an integer between 1 and 10'):
       self.Run("""
           compute health-checks update udp my-health-check
-            --healthy-threshold 0
+            --healthy-threshold 0 --global
           """)
     self.CheckRequests()
 
@@ -590,7 +603,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update udp my-health-check
-          --unhealthy-threshold 8
+          --unhealthy-threshold 8 --global
         """)
 
     self.CheckRequests(
@@ -619,7 +632,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         r'inclusive; received \[0\].'):
       self.Run("""
           compute health-checks update udp my-health-check
-            --unhealthy-threshold 0
+            --unhealthy-threshold 0 --global
           """)
     self.CheckRequests()
 
@@ -635,7 +648,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update udp my-health-check
-          --description 'Circulation, Airway, Breathing'
+          --description 'Circulation, Airway, Breathing' --global
         """)
 
     self.CheckRequests(
@@ -670,7 +683,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update udp my-health-check
-          --description ''
+          --description '' --global
         """)
 
     self.CheckRequests(
@@ -704,7 +717,99 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
     with self.assertRaisesRegex(
         core_exceptions.Error,
         'update udp subcommand applied to health check with protocol HTTP'):
-      self.Run('compute health-checks update udp my-health-check --port 8888')
+      self.Run("""
+        compute health-checks update udp my-health-check --port 8888 --global
+      """)
+
+
+class RegionHealthChecksUpdateUdpTest(test_base.BaseTest,
+                                      test_case.WithOutputCapture):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+  def testUriSupport(self):
+    # This is the same as testRequestOption, but uses a full URI.
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.UDP,
+                udpHealthCheck=self.messages.UDPHealthCheck(
+                    request='initial-req', port=80, response='ack'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update udp
+          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          --request req
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.UDP,
+                  udpHealthCheck=self.messages.UDPHealthCheck(
+                      request='req', port=80, response='ack')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testRequestOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.UDP,
+                udpHealthCheck=self.messages.UDPHealthCheck(
+                    request='req1', port=80, response='ack'))
+        ],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.UDP,
+                udpHealthCheck=self.messages.UDPHealthCheck(
+                    request='req2', port=80, response='ack'))
+        ],
+    ])
+
+    self.Run("""
+        compute health-checks update udp my-health-check
+          --request req2 --region us-west-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.UDP,
+                  udpHealthCheck=self.messages.UDPHealthCheck(
+                      request='req2', port=80, response='ack')),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+    # By default, the resource should not be displayed
+    self.assertFalse(self.GetOutput())
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -116,11 +116,11 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-global\fR
-If provided, it is assumed the backend service is global.
+If set, the backend service is global.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the backend service to operate on. Overrides the default
+Region of the backend service to operate on. Overrides the default
 \fBcompute/region\fR property value for this command invocation.
 
 .RE
@@ -132,8 +132,8 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR
-The region of the instance group to update the backend service. If not
-specified, you may be prompted to select a region.
+Region of the instance group to update the backend service. If not specified,
+you may be prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -159,9 +159,9 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR
-The zone of the instance group to update the backend service. If not specified
-and the \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to
-select a zone.
+Zone of the instance group to update the backend service. If not specified and
+the \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
+zone.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/zone\fR\fR property:

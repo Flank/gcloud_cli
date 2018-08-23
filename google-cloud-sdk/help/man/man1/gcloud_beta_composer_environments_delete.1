@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta composer environments delete \- deletes one or more Cloud Composer environments
+gcloud beta composer environments delete \- delete one or more Cloud Composer environments
 
 
 
@@ -53,7 +53,7 @@ are specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the environments.
+Compute Engine region in which to create the environments.
 
 
 .RE
@@ -83,5 +83,10 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud composer environments delete
+.RE
 

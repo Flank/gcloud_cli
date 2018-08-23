@@ -4,10 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha container binauthz attestations list
-        ([--attestation-authority=ATTESTATION_AUTHORITY
-          : --attestation-authority-project=ATTESTATION_AUTHORITY_PROJECT]
-          | [--attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
-          : --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT])
+        (--attestor=ATTESTOR : --attestor-project=ATTESTOR_PROJECT)
         [--artifact-url=ARTIFACT_URL] [--filter=EXPRESSION] [--limit=LIMIT]
         [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
@@ -19,38 +16,19 @@ DESCRIPTION
     occurrences.
 
 REQUIRED FLAGS
-     Exactly one of these must be specified:
+     Attestor resource - The Attestor whose Container Analysis Note will be
+     queried for attestations. Note that the caller must have the
+     containeranalysis.notes.listOccurrences permission on the note being
+     queried. The arguments in this group can be used to specify the attributes
+     of this resource. This must be specified.
 
-       Authority resource - The Attestation Authority whose Container Analysis
-       Note will be queried for attestations. Note that the caller must have
-       the containeranalysis.notes.listOccurrences permission on the note being
-       queried. The arguments in this group can be used to specify the
-       attributes of this resource.
+       --attestor=ATTESTOR
+          The ID of the attestor or a fully qualified identifier for the
+          attestor. This flag must be specified if any of the other arguments
+          in this group are specified.
 
-         --attestation-authority=ATTESTATION_AUTHORITY
-            The ID of the authority or a fully qualified identifier for the
-            authority. This flag must be specified if any of the other
-            arguments in this group are specified.
-
-         --attestation-authority-project=ATTESTATION_AUTHORITY_PROJECT
-            The Cloud project for the authority.
-
-       Note resource - The Container Analysis ATTESTATION_AUTHORITY Note that
-       will be queried for attestations. When this option is passed, only
-       occurrences with kind ATTESTATION_AUTHORITY will be returned. The
-       occurrences might be from any project, not just the project where the
-       note lives. Note that the caller must have the
-       containeranalysis.notes.listOccurrences permission on the note being
-       queried. The arguments in this group can be used to specify the
-       attributes of this resource.
-
-         --attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
-            The ID of the note or a fully qualified identifier for the note.
-            This flag must be specified if any of the other arguments in this
-            group are specified.
-
-         --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT
-            The Container Analysis project for the note.
+       --attestor-project=ATTESTOR_PROJECT
+          The Cloud project for the attestor.
 
 FLAGS
      --artifact-url=ARTIFACT_URL
@@ -60,13 +38,13 @@ FLAGS
 LIST COMMAND FLAGS
      --filter=EXPRESSION
         Apply a Boolean filter EXPRESSION to each resource item to be listed.
-        If the expression evaluates True then that item is listed. For more
-        details and examples of filter expressions run $ gcloud topic filters.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
         This flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
      --limit=LIMIT
-        The maximum number of resources to list. The default is unlimited. This
+        Maximum number of resources to list. The default is unlimited. This
         flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
@@ -78,7 +56,7 @@ LIST COMMAND FLAGS
         and --limit depending on the service.
 
      --sort-by=[FIELD,...]
-        A comma-separated list of resource field key names to sort by. The
+        Comma-separated list of resource field key names to sort by. The
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
@@ -92,24 +70,25 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 EXAMPLES
-    List all artifact URLs for which an attestation exists and is bound to the
-    passed attestation authority:
+    List the Occurrence messages for all attestations bound to the passed
+    attestor:
 
         $ gcloud alpha container binauthz attestations list \
-            --attestation-authority=projects/foo/attestationAuthorities/bar
+            --attestor=projects/foo/attestor/bar
 
-    List the (pgp_key_fingerprint, signature) pairs for all attestations for
-    the passed artifact-url bound to the passed attestation authority:
+    List the Occurrence messages for all attestations for the passed
+    artifact-url bound to the passed attestor:
 
         $ gcloud alpha container binauthz attestations list \
-            --attestation-authority=projects/foo/attestationAuthorities/bar \
+            --attestor=projects/foo/attestors/bar \
             --artifact-url='gcr.io/foo/example-image@sha256:abcd'
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. Usually, users of ALPHA commands and flags need to apply
-    for access, agree to applicable terms, and have their projects whitelisted.
-    Contact Google or sign up on a product's page for ALPHA access. Product
-    pages can be found at https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta container binauthz attestations list
 

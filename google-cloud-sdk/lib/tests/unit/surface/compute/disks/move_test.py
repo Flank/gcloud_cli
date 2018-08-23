@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the disks move subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import collections
 
 from apitools.base.py.testing import mock as api_mock
@@ -142,18 +145,8 @@ class DisksMoveTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
           """)
 
     self.AssertOutputEquals('')
-    self.AssertErrEquals("""\
-For the following disk:
- - [disk-1]
-choose a zone:
- [1] us-central1-a
- [2] us-central1-b
-Please enter your numeric choice:  \n\
-Update in progress for disk disk-1 \
-[https://www.googleapis.com/compute/v1/projects/fake-project/global/operations/\
-operation-X] Run the [gcloud compute operations describe] command to check the \
-status of this operation.
-""")
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains('"choices": ["us-central1-a", "us-central1-b"]')
 
 
 if __name__ == '__main__':

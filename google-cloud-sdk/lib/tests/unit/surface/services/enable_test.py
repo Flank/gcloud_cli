@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +16,16 @@
 """Unit tests for service-management enable command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.services import exceptions
 from googlecloudsdk.api_lib.util import exceptions as api_lib_exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
-from six.moves import range  # pylint: disable=redefined-builtin
-from six.moves import zip  # pylint: disable=redefined-builtin
+from six.moves import range
+from six.moves import zip
 
 
 class ServicesEnableTest(unit_test_base.SV1UnitTestBase):
@@ -154,6 +157,43 @@ class ServicesEnableTest(unit_test_base.SV1UnitTestBase):
     with self.assertRaises(api_lib_exceptions.HttpException):
       self.Run('services enable %s '
                '--project %s' % (self.DEFAULT_SERVICE_NAME, consumer_project))
+
+
+class EnableAlphaTest(unit_test_base.SUUnitTestBase):
+  """Unit tests for services enable command."""
+  OPERATION_NAME = 'operations/abc.0000000000'
+
+  def testEnable(self):
+    self.ExpectEnableApiCall(self.OPERATION_NAME)
+    self.ExpectOperation(self.OPERATION_NAME, 3)
+
+    self.Run('alpha services enable %s' % self.DEFAULT_SERVICE_NAME)
+    self.AssertErrContains(self.OPERATION_NAME)
+    self.AssertErrContains('finished successfully')
+
+  def testBatchEnable(self):
+    self.ExpectBatchEnableApiCall(self.OPERATION_NAME)
+    self.ExpectOperation(self.OPERATION_NAME, 3)
+
+    self.Run('alpha services enable %s %s' % (self.DEFAULT_SERVICE_NAME,
+                                              self.DEFAULT_SERVICE_NAME_2))
+    self.AssertErrContains(self.OPERATION_NAME)
+    self.AssertErrContains('finished successfully')
+
+  def testEnableAsync(self):
+    self.ExpectEnableApiCall(self.OPERATION_NAME)
+
+    self.Run('alpha services enable %s --async' % self.DEFAULT_SERVICE_NAME)
+    self.AssertErrContains(self.OPERATION_NAME)
+    self.AssertErrContains('operation is in progress')
+
+  def testEnablePermissionDenied(self):
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
+    self.ExpectEnableApiCall(None, error=server_error)
+
+    with self.assertRaisesRegex(
+        exceptions.EnableServicePermissionDeniedException, r'Error.'):
+      self.Run('alpha services enable %s' % self.DEFAULT_SERVICE_NAME)
 
 
 if __name__ == '__main__':

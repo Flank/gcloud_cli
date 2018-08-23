@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Unit tests for the iOS MatrixCreator."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
@@ -46,10 +49,14 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
         test='ios-test.zip',
         device=[{
             'model': 'ipen9',
-            'version': 'ios6'
+            'version': 'ios6',
+            'locale': 'es_MX',
+            'orientation': 'landscape'
         }, {
             'model': 'iPad0',
-            'version': 'ios71'
+            'version': 'ios71',
+            'locale': 'fr',
+            'orientation': 'default'
         }],
         network_profile='barely-usable',
         results_bucket='kfc',
@@ -71,8 +78,12 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
     self.assertEqual(len(devices), 2)
     self.assertEqual(devices[0].iosModelId, 'ipen9')
     self.assertEqual(devices[0].iosVersionId, 'ios6')
+    self.assertEqual(devices[0].locale, 'es_MX')
+    self.assertEqual(devices[0].orientation, 'landscape')
     self.assertEqual(devices[1].iosModelId, 'iPad0')
     self.assertEqual(devices[1].iosVersionId, 'ios71')
+    self.assertEqual(devices[1].locale, 'fr')
+    self.assertEqual(devices[1].orientation, 'default')
 
     spec = matrix.testSpecification
     self.assertEqual(spec.testTimeout, '321s')

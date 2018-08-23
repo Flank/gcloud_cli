@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -23,7 +26,7 @@ from tests.lib.surface.sql import base
 from tests.lib.surface.sql import data
 
 
-class ListsTest(base.SqlMockTestBeta):
+class _BaseInstancesListTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testInstancesListNoLists(self):
@@ -351,6 +354,18 @@ backupless-instance1  another
 backupless-instance2  athird
 """,
         normalize_space=True)
+
+
+class InstancesListGATest(_BaseInstancesListTest, base.SqlMockTestGA):
+  pass
+
+
+class InstancesListBetaTest(_BaseInstancesListTest, base.SqlMockTestBeta):
+  pass
+
+
+class InstancesListAlphaTest(_BaseInstancesListTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

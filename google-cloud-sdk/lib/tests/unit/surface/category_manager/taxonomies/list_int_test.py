@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,18 @@
 """Tests for 'gcloud category-manager taxonomies list'."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class TaxonomiesListIntTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
@@ -52,33 +58,37 @@ class TaxonomiesListIntTest(base.CategoryManagerUnitTestBase):
             parent=taxonomy_store_resource.RelativeName()),
         expected_taxonomy_list)
 
-  def testListingTaxonomiesUsingProject(self):
+  def testListingTaxonomiesUsingProject(self, track):
     """Test that listing taxonomies emits the anticipated taxonomy fields."""
+    self.track = track
     self.ExpectProjectTaxonomyList(self.Project(), self.expected_taxonomy_list)
-    self.Run('alpha category-manager taxonomies list')
+    self.Run('category-manager taxonomies list')
     self._VerifyCorrectOutput()
 
-  def testListingOutputFormatUsingProject(self):
+  def testListingOutputFormatUsingProject(self, track):
     """Test that the format of listing taxonomies is correct."""
+    self.track = track
     self.ExpectProjectTaxonomyList(self.Project(), self.expected_taxonomy_list)
-    self.Run('alpha category-manager taxonomies list')
+    self.Run('category-manager taxonomies list')
     self._VerifyListingFormat()
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
-  def testListingTaxonomiesUsingTaxonomyStore(self):
+  def testListingTaxonomiesUsingTaxonomyStore(self, track):
     """Test that listing taxonomies emits the anticipated taxonomy fields."""
+    self.track = track
     self._ExpectTaxonomyStoreTaxonomyList(self.taxonomy_store_id,
                                           self.expected_taxonomy_list)
-    self.Run('alpha category-manager taxonomies list --store ' +
+    self.Run('category-manager taxonomies list --store ' +
              self.taxonomy_store_id)
     self._VerifyCorrectOutput()
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
-  def testListingOutputFormatUsingTaxonomyStore(self):
+  def testListingOutputFormatUsingTaxonomyStore(self, track):
     """Test that the format of listing taxonomies is correct."""
+    self.track = track
     self._ExpectTaxonomyStoreTaxonomyList(self.taxonomy_store_id,
                                           self.expected_taxonomy_list)
-    self.Run('alpha category-manager taxonomies list --store ' +
+    self.Run('category-manager taxonomies list --store ' +
              self.taxonomy_store_id)
     self._VerifyListingFormat()
 

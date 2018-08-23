@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha filestore operations - read and manipulate Cloud Filestore
+        operations
+
+SYNOPSIS
+    gcloud alpha filestore operations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Read and manipulate Cloud Filestore operations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe a Cloud Filestore operation.
+
+     list
+        (ALPHA) List all Cloud Filestore operations.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta filestore operations
+

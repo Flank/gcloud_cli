@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Command to export files into a Cloud Composer environment's bucket."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import posixpath
 
 from googlecloudsdk.calliope import base
@@ -24,7 +27,7 @@ from googlecloudsdk.command_lib.composer import storage_util
 
 
 class Export(base.Command):
-  """Exports DAGs from an environment into local storage or Cloud Storage.
+  """Export DAGs from an environment into local storage or Cloud Storage.
 
   If the SOURCE is a directory, it and its contents are are exported
   recursively. If no SOURCE is provided, the entire contents of the
@@ -110,7 +113,7 @@ class Export(base.Command):
   @staticmethod
   def Args(parser):
     resource_args.AddEnvironmentResourceArg(
-        parser, 'from whose Cloud Storage bucket to export DAGs.',
+        parser, 'from whose Cloud Storage bucket to export DAGs',
         positional=False)
     flags.AddExportSourceFlag(parser, Export.SUBDIR_BASE)
     flags.AddExportDestinationFlag(parser)
@@ -119,4 +122,7 @@ class Export(base.Command):
     env_ref = args.CONCEPTS.environment.Parse()
     source_path = posixpath.join(Export.SUBDIR_BASE,
                                  (args.source or '*').strip(posixpath.sep))
-    return storage_util.Export(env_ref, [source_path], args.destination)
+    return storage_util.Export(
+        env_ref, [source_path],
+        args.destination,
+        release_track=self.ReleaseTrack())

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,7 @@
 """Tests for the instances create subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -36,9 +38,11 @@ from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
+from tests.lib.cli_test_base import MockArgumentError
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute import utils
+
 
 import mock
 from six.moves import range
@@ -2717,15 +2721,10 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
     # This tool should not sort the zones as returned from the
     # server. Zone orderings are different on a per-project basis to
     # ensure equal load on all zones.
-    self.AssertErrContains(textwrap.dedent("""\
-        For the following instance:
-         - [instance-1]
-        choose a zone:
-         [1] europe-west1-a
-         [2] europe-west1-b (DELETED)
-         [3] us-central1-a (DEPRECATED)
-         [4] us-central1-b
-        Please enter your numeric choice:"""))
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains(
+        '"choices": ["europe-west1-a", "europe-west1-b (DELETED)", '
+        '"us-central1-a (DEPRECATED)", "us-central1-b"]')
 
   def testPromptingWithSimpleNamesAndUris(self):
     # ResourceArgument checks if this is true before attempting to prompt.
@@ -3220,13 +3219,11 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
     self.AssertErrContains('instance-1')
     self.AssertErrContains('central2-a')
     self.AssertErrContains('central2-b')
-    # pylint: disable=line-too-long
-    self.AssertErrContains(textwrap.dedent("""\
-        WARNING: The following selected zone is deprecated. All resources in this zone will be deleted after the turndown date.
-         - [central2-a] 2015-03-29T00:00.000-07:00
-
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        r'WARNING: The following selected zone is deprecated. All resources in '
+        r'this zone will be deleted after the turndown date.\n'
+        r' - [central2-a] 2015-03-29T00:00.000-07:00')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDeprecationWithOneZoneWorksWithYes(self):
     m = self.messages
@@ -3292,12 +3289,11 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
               zone='central2-a',
           ))],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        WARNING: The following selected zone is deprecated. All resources in this zone will be deleted after the turndown date.
-         - [central2-a] 2015-03-29T00:00.000-07:00
-
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        r'WARNING: The following selected zone is deprecated. All resources in '
+        r'this zone will be deleted after the turndown date.\n'
+        r' - [central2-a] 2015-03-29T00:00.000-07:00')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDeprecationWorkWithOneZoneWithYes(self):
     m = self.messages
@@ -3367,13 +3363,11 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
           ))],
     )
 
-    # pylint: disable=line-too-long
-    self.AssertErrContains(textwrap.dedent("""\
-        WARNING: The following selected zone is deprecated. All resources in this zone will be deleted after the turndown date.
-         - [central2-a] 2015-03-29T00:00.000-07:00
-
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        r'WARNING: The following selected zone is deprecated. All resources in '
+        r'this zone will be deleted after the turndown date.\n'
+        r' - [central2-a] 2015-03-29T00:00.000-07:00')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDeprecationWorkWithOneZoneWithNo(self):
     m = self.messages
@@ -3408,13 +3402,11 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
               zone='central2-b'))],
     )
 
-    # pylint: disable=line-too-long
-    self.AssertErrContains(textwrap.dedent("""\
-        WARNING: The following selected zone is deprecated. All resources in this zone will be deleted after the turndown date.
-         - [central2-b] 2015-03-29T00:00.000-07:00
-
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        r'WARNING: The following selected zone is deprecated. All resources in '
+        r'this zone will be deleted after the turndown date.\n'
+        r' - [central2-b] 2015-03-29T00:00.000-07:00')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDeprecationWorkWithManyZonesWithYes(self):
     m = self.messages
@@ -3539,13 +3531,12 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
           ))],
     )
 
-    self.AssertErrContains(textwrap.dedent("""\
-      WARNING: The following selected zones are deprecated. All resources in these zones will be deleted after their turndown date.
-       - [central1-a] 2015-05-07T00:00.000-07:00
-       - [central1-b] 2015-03-29T00:00.000-07:00
-
-
-      Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        r'WARNING: The following selected zones are deprecated. All resources '
+        r'in these zones will be deleted after their turndown date.\n'
+        r' - [central1-a] 2015-05-07T00:00.000-07:00\n'
+        r' - [central1-b] 2015-03-29T00:00.000-07:00')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testDeprecationWorkWithZonalFetchError(self):
     m = self.messages
@@ -3675,12 +3666,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
               zone='central2-a',
           ))],
     )
-    # pylint: disable=line-too-long
-    self.AssertErrNotContains(textwrap.dedent("""\
-        WARNING: The following selected zone is deprecated. All resources in this zone will be deleted after the turndown date.
-         - [central2-a] 2015-03-29T00:00.000-07:00
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrNotContains('PROMPT_CONTINUE')
 
   def testZoneDeprecatedWarningNo(self):
     m = self.messages
@@ -3712,12 +3698,11 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
     self.CheckRequests(
         self.zone_get_request,
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        WARNING: The following selected zone is deprecated. All resources in this zone will be deleted after the turndown date.
-         - [central2-a] 2015-03-29T00:00.000-07:00
-
-
-        Do you want to continue (Y/n)?"""))
+    self.AssertErrContains(
+        r'WARNING: The following selected zone is deprecated. All resources in '
+        r'this zone will be deleted after the turndown date.\n'
+        r' - [central2-a] 2015-03-29T00:00.000-07:00')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testLocalSSDRequestNoDeviceNames(self):
     m = self.messages
@@ -6441,8 +6426,8 @@ class InstancesCreateWithNodeAffinity(InstancesCreateTestsMixin,
   """Test creation of VM instances on sole tenant host."""
 
   def SetUp(self):
-    SetUp(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
     self.node_affinity = self.messages.SchedulingNodeAffinity
     self.operator_enum = self.node_affinity.OperatorValueValuesEnum
 
@@ -7481,6 +7466,105 @@ class InstancesCreateWithNetworkTierBeta(InstancesCreateTestsMixin):
         self.zone_get_request,
         self.project_get_request,
         [(self.compute.instances, 'Insert',
+          self.CreateRequestWithNetworkTier('STANDARD'))],
+    )
+
+  def testInvalidNetworkTier(self):
+    with self.AssertRaisesToolExceptionMatches(
+        'Invalid value for [--network-tier]: Invalid network tier '
+        '[RANDOM-NETWORK-TIER]'):
+      self.Run("""
+          compute instances create instance-1
+            --network-tier random-network-tier
+            --zone central2-a
+          """)
+
+
+class InstancesCreateWithNetworkTierGa(InstancesCreateTestsMixin):
+
+  def SetUp(self):
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def CreateRequestWithNetworkTier(self, network_tier):
+    m = self.messages
+    if network_tier:
+      network_tier_enum = m.AccessConfig.NetworkTierValueValuesEnum(
+          network_tier)
+    else:
+      network_tier_enum = None
+    return m.ComputeInstancesInsertRequest(
+        instance=m.Instance(
+            canIpForward=False,
+            deletionProtection=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
+            machineType=self._default_machine_type,
+            metadata=m.Metadata(),
+            name='instance-1',
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[
+                        m.AccessConfig(
+                            name='external-nat',
+                            type=self._one_to_one_nat,
+                            networkTier=network_tier_enum)
+                    ],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True),
+        ),
+        project='my-project',
+        zone='central2-a',
+    )
+
+  def testWithDefaultNetworkTier(self):
+    self.Run("""
+        compute instances create instance-1
+          --zone central2-a
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert',
+          self.CreateRequestWithNetworkTier(None))],
+    )
+
+  def testWithPremiumNetworkTier(self):
+    self.Run("""
+        compute instances create instance-1
+          --zone central2-a
+          --network-tier PREMIUM
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert',
+          self.CreateRequestWithNetworkTier('PREMIUM'))],
+    )
+
+  def testWithStandardNetworkTier(self):
+    self.Run("""
+        compute instances create instance-1
+          --zone central2-a
+          --network-tier standard
+        """)
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert',
           self.CreateRequestWithNetworkTier('STANDARD'))],)
 
   def testInvalidNetworkTier(self):
@@ -8188,8 +8272,9 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
 
   def testCreateWithImageAndFamilyFlags(self):
     with self.AssertRaisesToolExceptionRegexp(
-        r'Cannot specify \[image\] and \[image-family\] for a '
-        r'\[--create-disk\]. The fields are mutually exclusive.'):
+        r'Must specify exactly one of \[image\], \[image-family\] or '
+        r'\[source-snapshot\] for a \[--create-disk\]. '
+        r'These fields are mutually exclusive.'):
       self.Run("""
           compute instances create vm
             --create-disk image=foo,image-family=bar
@@ -8454,6 +8539,220 @@ class InstancesCreateShieldedVMConfigBetaTest(
   def SetUp(self):
     SetUp(self, 'beta')
     self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
+                                          parameterized.TestCase):
+  """Test creation of VM instances with create disk(s)."""
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+
+  @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
+  def testCreateDiskWithAllProperties(self, track):
+    self.track = track
+    m = self.messages
+
+    self.Run(
+        'compute instances create hamlet '
+        '  --zone central2-a '
+        '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,'
+        'source-snapshot=my-snapshot,device-name=data,auto-delete=yes')
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                deletionProtection=False,
+                disks=[
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=True,
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            sourceImage=self._default_image,),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=False,
+                        deviceName='data',
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            diskName='disk-1',
+                            diskSizeGb=10,
+                            sourceSnapshot=(self.compute_uri +
+                                            '/projects/my-project/global/'
+                                            'snapshots/my-snapshot'),
+                            diskType=(self.compute_uri +
+                                      '/projects/my-project/zones/central2-a/'
+                                      'diskTypes/SSD')),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                ],
+                machineType=self._default_machine_type,
+                metadata=m.Metadata(),
+                name='hamlet',
+                networkInterfaces=[m.NetworkInterface(
+                    accessConfigs=[m.AccessConfig(
+                        name='external-nat',
+                        type=self._one_to_one_nat)],
+                    network=self._default_network)],
+                serviceAccounts=[
+                    m.ServiceAccount(
+                        email='default',
+                        scopes=_DEFAULT_SCOPES,),
+                ],
+                scheduling=m.Scheduling(automaticRestart=True),),
+            project='my-project',
+            zone='central2-a',))],)
+
+  @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
+  def testCreateDiskWithSnapshotProperty(self, track):
+    msg = self.messages
+    self.track = track
+    self.Run("""
+        compute instances create hamlet
+          --zone central2-a
+          --create-disk source-snapshot=my-backup
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', msg.ComputeInstancesInsertRequest(
+            instance=msg.Instance(
+                canIpForward=False,
+                deletionProtection=False,
+                disks=[
+                    msg.AttachedDisk(
+                        autoDelete=True,
+                        boot=True,
+                        initializeParams=msg.AttachedDiskInitializeParams(
+                            sourceImage=self._default_image,),
+                        mode=msg.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=msg.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                    msg.AttachedDisk(
+                        autoDelete=True,
+                        boot=False,
+                        initializeParams=msg.AttachedDiskInitializeParams(
+                            sourceSnapshot=(self.compute_uri +
+                                            '/projects/my-project/global/'
+                                            'snapshots/my-backup'),),
+                        mode=msg.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=msg.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                ],
+                machineType=_DefaultMachineTypeOf(self.api),
+                metadata=msg.Metadata(),
+                name='hamlet',
+                networkInterfaces=[msg.NetworkInterface(
+                    accessConfigs=[msg.AccessConfig(
+                        name='external-nat',
+                        type=self._one_to_one_nat)],
+                    network=_DefaultNetworkOf(self.api))],
+                serviceAccounts=[
+                    msg.ServiceAccount(
+                        email='default', scopes=_DEFAULT_SCOPES),
+                ],
+                scheduling=msg.Scheduling(automaticRestart=True),),
+            project='my-project',
+            zone='central2-a',))],)
+
+  @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
+  def testCreateDiskSnapshotAndImagePropertyFails(self, track):
+    self.track = track
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Must specify exactly one of \[image\], \[image-family\] or '
+        r'\[source-snapshot\] for a \[--create-disk\]. '
+        r'These fields are mutually exclusive.'):
+      self.Run("""
+          compute instances create vm
+            --create-disk image=foo,source-snapshot=my-snapshot
+          """)
+
+  @parameterized.parameters([
+      (calliope_base.ReleaseTrack.ALPHA, '', 'my-backup'),
+      (calliope_base.ReleaseTrack.ALPHA,
+       ('https://www.googleapis.com/compute/'
+        'alpha/projects/my-project/global/snapshots/'), 'my-backup')])
+  def testCreateBootDiskWithSnapshotFlag(
+      self,
+      track,
+      snapshot_path,
+      snapshot_name):
+    m = self.messages
+    self.track = track
+
+    self.make_requests.side_effect = iter([
+        [
+            m.Zone(name='central2-a')
+        ],
+        [
+            self.messages.Project(
+                defaultServiceAccount='default@service.account'),
+        ],
+        [],
+    ])
+    snapshot_arg = snapshot_path + snapshot_name
+    self.Run("""
+        compute instances create instance-1
+          --source-snapshot {}
+          --zone central2-a
+        """.format(snapshot_arg))
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances,
+          'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[m.AttachedDisk(
+                      autoDelete=True,
+                      boot=True,
+                      initializeParams=m.AttachedDiskInitializeParams(
+                          sourceSnapshot=(
+                              'https://www.googleapis.com/compute/{0}/projects/'
+                              'my-project/global/snapshots/{1}'.format(
+                                  self.api, snapshot_name)),
+                      ),
+                      mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                      type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[m.NetworkInterface(
+                      accessConfigs=[m.AccessConfig(
+                          name='external-nat',
+                          type=self._one_to_one_nat)],
+                      network=self._default_network)],
+                  serviceAccounts=[
+                      m.ServiceAccount(
+                          email='default',
+                          scopes=_DEFAULT_SCOPES
+                      ),
+                  ],
+                  scheduling=m.Scheduling(
+                      automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
+  @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
+  def testCreateBootDiskWithSnapshotAndImageFlagFails(self, track):
+    self.track = track
+    with self.assertRaisesRegex(
+        MockArgumentError,
+        r'argument --image: At most one of --image \| --image-family \| '
+        r'--source-snapshot may be specified.'):
+      self.Run("""
+          compute instances create vm
+            --image=foo --source-snapshot=my-snapshot
+          """)
 
 
 if __name__ == '__main__':

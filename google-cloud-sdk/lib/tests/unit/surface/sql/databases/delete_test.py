@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests that exercise operations listing and executing."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -25,7 +28,7 @@ from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
-class DatabasesDeleteTest(base.SqlMockTestBeta):
+class _BaseDatabasesDeleteTest(object):
 
   def testDelete(self):
     sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
@@ -131,6 +134,18 @@ class DatabasesDeleteTest(base.SqlMockTestBeta):
   def testDeleteNotExist(self):
     # TODO(b/36051029): implement this test.
     pass
+
+
+class DatabasesDeleteGATest(_BaseDatabasesDeleteTest, base.SqlMockTestGA):
+  pass
+
+
+class DatabasesDeleteBetaTest(_BaseDatabasesDeleteTest, base.SqlMockTestBeta):
+  pass
+
+
+class DatabasesDeleteAlphaTest(_BaseDatabasesDeleteTest, base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

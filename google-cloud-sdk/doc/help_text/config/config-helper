@@ -3,7 +3,9 @@ NAME
         to external tools
 
 SYNOPSIS
-    gcloud config config-helper [--force-auth-refresh] [GCLOUD_WIDE_FLAG ...]
+    gcloud config config-helper
+        [--force-auth-refresh | --min-expiry=MIN_EXPIRY; default="0s"]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     A helper for providing auth and config data to external tools.
@@ -26,9 +28,15 @@ DESCRIPTION
           gcloud properties
 
 FLAGS
-     --force-auth-refresh
-        Force a refresh of the credentials even if they have not yet expired.
-        By default, credentials will only refreshed when necessary.
+     At most one of these may be specified:
+
+       --force-auth-refresh
+          Force a refresh of the credentials even if they have not yet expired.
+          By default, credentials will only refreshed when necessary.
+
+       --min-expiry=MIN_EXPIRY; default="0s"
+          If given, refresh the credentials if they are within MIN_EXPIRY from
+          expiration.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -47,6 +55,13 @@ EXAMPLES
     credentials:
 
         $ gcloud config config-helper --format=json --force-auth-refresh
+
+    To set MIN_EXPIRY amount of time that if given, refresh the credentials if
+    they are within MIN_EXPIRY from expiration:
+
+        $ gcloud config config-helper --format=json --min-expiry=MIN_EXPIRY
+
+    By default, MIN_EXPIRY is set to be 0 second.
 
 NOTES
     This command is an internal implementation detail and may change or

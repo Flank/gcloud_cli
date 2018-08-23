@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for subnets list-usable subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis
@@ -27,7 +30,8 @@ from tests.lib import test_case
 
 
 @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
+                          (calliope_base.ReleaseTrack.BETA, 'beta'),
+                          (calliope_base.ReleaseTrack.GA, 'v1'))
 class SubnetsListUsableTest(cli_test_base.CliTestBase,
                             sdk_test_base.WithFakeAuth, parameterized.TestCase):
   """Unit tests for 'subnets list-usable' fake auth and mocks."""
@@ -41,8 +45,8 @@ class SubnetsListUsableTest(cli_test_base.CliTestBase,
   HEADER = 'PROJECT REGION NETWORK SUBNET RANGE SECONDARY_RANGES'
   API_NAME = 'compute'
 
-  def _SetUp(self, api_version):
-    self.api_version = api_version
+  def _SetUp(self, track, api_version):
+    self.track = track
     properties.VALUES.compute.use_new_list_usable_subnets_api.Set(True)
     properties.VALUES.core.project.Set(self.PROJECT_ID)
     self.mock_client = mock.Client(
@@ -54,13 +58,13 @@ class SubnetsListUsableTest(cli_test_base.CliTestBase,
     self.messages = apis.GetMessagesModule(self.API_NAME, api_version)
 
   def testNoUsableSubnets(self, track, api_version):
-    self._SetUp(api_version)
+    self._SetUp(track, api_version)
     self._SetupMockResults(results=[])
     self._RunCommand()
     self.AssertOutputEquals('', normalize_space=True)
 
   def testSingleUsableSubnet(self, track, api_version):
-    self._SetUp(api_version)
+    self._SetUp(track, api_version)
     self._SetupMockResults(results=[
         self._CreateSubnet(
             name='subnet-1',
@@ -78,7 +82,7 @@ class SubnetsListUsableTest(cli_test_base.CliTestBase,
     self.AssertOutputEquals(expected_output, normalize_space=True)
 
   def testMultipleUsableSubnet(self, track, api_version):
-    self._SetUp(api_version)
+    self._SetUp(track, api_version)
     self._SetupMockResults(results=[
         self._CreateSubnet(
             name='subnet-1',
@@ -104,7 +108,7 @@ class SubnetsListUsableTest(cli_test_base.CliTestBase,
     self.AssertOutputEquals(expected_output, normalize_space=True)
 
   def testMultipleUsableSubnet_secondaryRanges(self, track, api_version):
-    self._SetUp(api_version)
+    self._SetUp(track, api_version)
     self._SetupMockResults(results=[
         # subnet-1 has 1 secondary range
         self._CreateSubnet(
@@ -153,10 +157,7 @@ class SubnetsListUsableTest(cli_test_base.CliTestBase,
     self.mock_client.subnetworks.ListUsable.Expect(expected_request, result)
 
   def _RunCommand(self):
-    command_template = ('{api_version} compute networks subnets list-usable')
-    command = command_template.format(
-        api_version=self.api_version if self.api_version else '')
-    self.Run(command.strip())
+    self.Run('compute networks subnets list-usable')
 
   def _Secondary_Ip_Range(self, range_name, ip_cidr_range):
     return self.messages.UsableSubnetworkSecondaryRange(

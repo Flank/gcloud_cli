@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """Tests for the container images list-tags commands."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from containerregistry.client.v2_2 import docker_http
@@ -185,8 +187,8 @@ class ListTagsALPHATest(
   def ListTags(
       self, image=_IMAGE, show_occurrences=True, show_occurrences_from=None):
     params = ['alpha', 'container', 'images', 'list-tags', image]
-    if show_occurrences:
-      params.append('--show-occurrences')
+    if not show_occurrences:
+      params.append('--no-show-occurrences')
     if show_occurrences_from:
       params.append('--show-occurrences-from=%s' % show_occurrences_from)
     self.Run(params)

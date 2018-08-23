@@ -11,7 +11,7 @@ gcloud alpha ml\-engine local predict \- run prediction locally
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml\-engine local predict\fR \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml\-engine local predict\fR \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -80,6 +80,13 @@ The ML framework used to train this version of the model. If not specified,
 defaults to \f5tensorflow\fR. \fIFRAMEWORK\fR must be one of:
 \fBscikit\-learn\fR, \fBtensorflow\fR, \fBxgboost\fR.
 
+.TP 2m
+\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR
+The name of the signature defined in the SavedModel to use for this job.
+Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
+https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+which is "serving_default". Only applies to TensorFlow models.
+
 
 .RE
 .sp
@@ -95,11 +102,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud ml\-engine local predict

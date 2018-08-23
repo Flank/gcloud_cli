@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the target-http-proxies list subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.command_lib.compute.target_http_proxies import flags
@@ -83,6 +87,153 @@ class TargetHttpProxiesListTest(test_base.BaseTest,
         filter_expr=None,
         batch_url=self.batch_url,
         errors=[])
+
+
+class TargetHttpProxiesListAlphaTest(test_base.BaseTest,
+                                     completer_test_base.CompleterBase):
+
+  URI_PREFIX = 'https://www.googleapis.com/compute/alpha/projects/my-project/'
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._compute_api = self.compute_alpha
+
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+
+    self.target_http_proxies = [
+        self.messages.TargetHttpProxy(
+            name='target-http-proxy-1',
+            urlMap=self.URI_PREFIX + 'global/urlMaps/url-map-1',
+            selfLink=(self.URI_PREFIX +
+                      'global/targetHttpProxies/target-http-proxy-1')),
+        self.messages.TargetHttpProxy(
+            name='target-http-proxy-2',
+            urlMap=self.URI_PREFIX + 'global/urlMaps/url-map-2',
+            selfLink=(self.URI_PREFIX +
+                      'global/targetHttpProxies/target-http-proxy-2')),
+    ]
+    self.region_target_http_proxies = [
+        self.messages.TargetHttpProxy(
+            name='target-http-proxy-3',
+            urlMap=self.URI_PREFIX + 'regions/region-1/urlMaps/url-map-3',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-1/targetHttpProxies/target-http-proxy-3'),
+            region='region-1'),
+        self.messages.TargetHttpProxy(
+            name='target-http-proxy-4',
+            urlMap=self.URI_PREFIX + 'regions/region-2/urlMaps/url-map-4',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-2/targetHttpProxies/target-http-proxy-4'),
+            region='region-2'),
+    ]
+
+  def testGlobalOption(self):
+    command = 'alpha compute target-http-proxies list --uri --global'
+    output = ("""\
+        https://www.googleapis.com/compute/alpha/projects/my-project/global/targetHttpProxies/target-http-proxy-1
+        https://www.googleapis.com/compute/alpha/projects/my-project/global/targetHttpProxies/target-http-proxy-2
+    """)
+
+    self.RequestOnlyGlobal(command, self.target_http_proxies, output)
+
+  def testOneRegion(self):
+    command = 'alpha compute target-http-proxies list --uri --regions region-1'
+    output = ("""\
+        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/targetHttpProxies/target-http-proxy-3
+        """)
+
+    self.RequestOneRegion(command, self.region_target_http_proxies, output)
+
+  def testTwoRegions(self):
+    command = """
+      alpha compute target-http-proxies list --uri --regions region-1,region-2
+    """
+    output = ("""\
+        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/targetHttpProxies/target-http-proxy-3
+        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-2/targetHttpProxies/target-http-proxy-4
+        """)
+
+    self.RequestTwoRegions(command, self.region_target_http_proxies, output)
+
+  def testPositionalArgsWithSimpleNames(self):
+    command = 'alpha compute target-http-proxies list'
+    return_value = self.target_http_proxies + self.region_target_http_proxies
+    output = ("""\
+        NAME                URL_MAP
+        target-http-proxy-1 url-map-1
+        target-http-proxy-2 url-map-2
+        target-http-proxy-3 url-map-3
+        target-http-proxy-4 url-map-4
+    """)
+
+    self.RequestAggregate(command, return_value, output)
+
+  def RequestOnlyGlobal(self, command, return_value, output):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(return_value)
+    ]
+    self.Run(command)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.targetHttpProxies, 'List',
+                   self.messages.ComputeTargetHttpProxiesListRequest(
+                       project='my-project'))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+
+    self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
+
+  def RequestAggregate(self, command, return_value, output):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(return_value)
+    ]
+    self.Run(command)
+
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.targetHttpProxies, 'AggregatedList',
+                   self.messages.ComputeTargetHttpProxiesAggregatedListRequest(
+                       project='my-project'))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+
+    self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
+
+  def RequestOneRegion(self, command, return_value, output):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(return_value)
+    ]
+    self.Run(command)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.regionTargetHttpProxies, 'List',
+                   self.messages.ComputeRegionTargetHttpProxiesListRequest(
+                       project='my-project', region='region-1'))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+
+    self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
+
+  def RequestTwoRegions(self, command, return_value, output):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(return_value)
+    ]
+    self.Run(command)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.regionTargetHttpProxies, 'List',
+                   self.messages.ComputeRegionTargetHttpProxiesListRequest(
+                       project='my-project', region='region-1')),
+                  (self._compute_api.regionTargetHttpProxies, 'List',
+                   self.messages.ComputeRegionTargetHttpProxiesListRequest(
+                       project='my-project', region='region-2'))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+
+    self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
 
 
 if __name__ == '__main__':

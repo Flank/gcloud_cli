@@ -4,7 +4,8 @@ NAME
 SYNOPSIS
     gcloud docker [--authorize-only, -a] [--docker-host=DOCKER_HOST]
         [--server=SERVER,[SERVER,...], -s SERVER,[SERVER,...];
-          default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,staging-k8s.gcr.io"]
+          default="gcr.io,us.gcr.io,
+          eu.gcr.io,asia.gcr.io,staging-k8s.gcr.io,marketplace.gcr.io"]
         [GCLOUD_WIDE_FLAG ...] [-- DOCKER_ARGS ...]
 
 DESCRIPTION
@@ -50,7 +51,7 @@ FLAGS
         URL to connect to Docker Daemon. Format: tcp://host:port or
         unix:///path/to/socket.
 
-     --server=SERVER,[SERVER,...], -s SERVER,[SERVER,...]; default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,staging-k8s.gcr.io"
+     --server=SERVER,[SERVER,...], -s SERVER,[SERVER,...]; default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,staging-k8s.gcr.io,marketplace.gcr.io"
         Address of the Google Cloud Registry.
 
 GCLOUD WIDE FLAGS

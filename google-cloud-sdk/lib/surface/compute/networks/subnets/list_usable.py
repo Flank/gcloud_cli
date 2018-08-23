@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,15 @@
 """Command for list subnetworks which the current user has permission to use."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class ListUsableSubnets(base.ListCommand):
   """List subnetworks which the current user has permission to use."""
 
@@ -71,8 +73,7 @@ class ListUsableSubnets(base.ListCommand):
 ListUsableSubnets.detailed_help = {
     'brief':
         """\
-        List Google Compute Engine subnetworks in a project that the user has
-        permission to use.
+        List Google Compute Engine subnetworks permitted for use.
         """,
     'DESCRIPTION':
         """\

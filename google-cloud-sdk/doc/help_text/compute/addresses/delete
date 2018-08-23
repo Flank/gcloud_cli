@@ -17,10 +17,10 @@ FLAGS
      At most one of these may be specified:
 
        --global
-          If provided, it is assumed the addresses are global.
+          If set, the addresses are global.
 
        --region=REGION
-          The region of the addresses to delete. Overrides the default
+          Region of the addresses to delete. Overrides the default
           compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS

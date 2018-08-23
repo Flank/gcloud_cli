@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for creating Server CA Certs."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -24,7 +27,7 @@ from tests.lib.surface.sql import base
 from tests.lib.surface.sql import data
 
 
-class ServerCaCertsCreateTest(base.SqlMockTestBeta):
+class _BaseServerCaCertsCreateTest(object):
 
   def testCreateCert(self):
     instance_name = 'integration-test'
@@ -106,6 +109,16 @@ SHA1_FINGERPRINT EXPIRATION
 three            2024-05-05T21:10:29.402000+00:00
 """,
         normalize_space=True)
+
+
+class ServerCaCertsCreateBetaTest(_BaseServerCaCertsCreateTest,
+                                  base.SqlMockTestBeta):
+  pass
+
+
+class ServerCaCertsCreateAlphaTest(_BaseServerCaCertsCreateTest,
+                                   base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

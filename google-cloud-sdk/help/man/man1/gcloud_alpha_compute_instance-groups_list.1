@@ -34,7 +34,8 @@ are listed. The results can be narrowed down by providing the
 (DEPRECATED) If provided, show details for the specified names and/or URIs of
 resources.
 
-Argument NAME is deprecated. Use \-\-filter="name=( 'NAME' ... )" instead.
+Argument \f5NAME\fR is deprecated. Use \f5\-\-filter="name=( 'NAME' ... )"\fR
+instead.
 
 
 .RE
@@ -45,10 +46,11 @@ Argument NAME is deprecated. Use \-\-filter="name=( 'NAME' ... )" instead.
 .RS 2m
 .TP 2m
 \fB\-\-regexp\fR=\fIREGEXP\fR, \fB\-r\fR \fIREGEXP\fR
-(DEPRECATED) A regular expression to filter the names of the results on. Any
-names that do not match the entire regular expression will be filtered out.
+(DEPRECATED) Regular expression to filter the names of the results on. Any names
+that do not match the entire regular expression will be filtered out.
 
-Flag \-\-regexp is deprecated. Use \-\-filter="name~'REGEXP'" instead.
+Flag \f5\-\-regexp\fR is deprecated. Use \f5\-\-filter="name~'REGEXP'"\fR
+instead.
 
 .TP 2m
 
@@ -60,16 +62,18 @@ At most one of these may be specified:
 (DEPRECATED) If provided, only regional resources are shown. If arguments are
 provided, only resources from the given regions are shown.
 
-Flag \-\-regions is deprecated. Use \-\-filter="region:( REGION ... )" instead.
-For example \-\-filter="region:( europe\-west1 europe\-west2 )".
+Flag \f5\-\-regions\fR is deprecated. Use \f5\-\-filter="region:( REGION ...
+)"\fR instead. For example \f5\-\-filter="region:( europe\-west1 europe\-west2
+)"\fR.
 
 .TP 2m
 \fB\-\-zones\fR=[\fIZONE\fR,...]
 (DEPRECATED) If provided, only zonal resources are shown. If arguments are
 provided, only resources from the given zones are shown.
 
-Flag \-\-zones is deprecated. Use \-\-filter="zone:( ZONE ... )" instead. For
-example \-\-filter="zone:( europe\-west1\-b europe\-west1\-c )".
+Flag \f5\-\-zones\fR is deprecated. Use \f5\-\-filter="zone:( ZONE ... )"\fR
+instead. For example \f5\-\-filter="zone:( europe\-west1\-b europe\-west1\-c
+)"\fR.
 
 
 .RE
@@ -82,16 +86,16 @@ example \-\-filter="zone:( europe\-west1\-b europe\-west1\-c )".
 .TP 2m
 \fB\-\-filter\fR=\fIEXPRESSION\fR
 Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
-the expression evaluates True then that item is listed. For more details and
-examples of filter expressions run $ gcloud topic filters. This flag interacts
-with other flags that are applied in this order: \fB\-\-flatten\fR,
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-limit\fR=\fILIMIT\fR
-The maximum number of resources to list. The default is \fBunlimited\fR. This
-flag interacts with other flags that are applied in this order:
-\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
 \fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
@@ -103,9 +107,9 @@ service.
 
 .TP 2m
 \fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
-A comma\-separated list of resource field key names to sort by. The default
-order is ascending. Prefix a field with ``~'' for descending order on that
-field. This flag interacts with other flags that are applied in this order:
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
@@ -159,11 +163,11 @@ $ gcloud alpha compute instance\-groups list \e
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. These variants are also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
 $ gcloud compute instance\-groups list

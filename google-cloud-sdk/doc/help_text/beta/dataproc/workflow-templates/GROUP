@@ -32,8 +32,14 @@ COMMANDS
      describe
         (BETA) Describe a workflow template.
 
+     export
+        (BETA) Export a workflow template.
+
      get-iam-policy
         (BETA) Get IAM policy for a workflow template.
+
+     import
+        (BETA) Import a workflow template.
 
      instantiate
         (BETA) Instantiate a workflow template.
@@ -93,7 +99,8 @@ EXAMPLES
     To update cluster selector in a workflow template, run:
 
         $ gcloud beta dataproc workflow-templates set-cluster-selector \
-            my_template --num-workers 5
+            my_template \
+            --cluster-labels environment=prod
 
 NOTES
     This command is currently in BETA and may change without notice.

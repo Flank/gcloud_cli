@@ -9,12 +9,19 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create snapshots of Google Compute Engine persistent disks.
-
     gcloud compute disks snapshot creates snapshots of persistent disks.
-    Snapshots are useful for backing up data or copying a persistent disk. Once
-    created, snapshots may be managed (listed, deleted, etc.) via gcloud
-    compute snapshots.
+    Snapshots are useful for backing up data, copying a persistent disk, and
+    even, creating a custom image. Snapshots can be created from persistent
+    disks even while they are attached to running instances. Once created,
+    snapshots may be managed (listed, deleted, resized etc.) via gcloud compute
+    snapshots.
+
+    For best practices regarding managing snapshots, refer to this guide:
+    https://cloud.google.com/compute/docs/disks/create-snapshots#best_practices.
+
+    gcloud compute disks snapshot waits until the operation returns a status of
+    READY or FAILED, or reaches the maximum timeout, and returns the last known
+    details of the snapshot.
 
 POSITIONAL ARGUMENTS
      DISK_NAME [DISK_NAME ...]
@@ -36,7 +43,7 @@ FLAGS
         for more details.
 
      --description=DESCRIPTION
-        An optional, textual description for the snapshots being created.
+        Text to describe the snapshots being created.
 
      --guest-flush
         Create an application consistent snapshot by informing the OS to
@@ -44,20 +51,19 @@ FLAGS
         instances using the Volume Shadow Copy Service (VSS).
 
      --snapshot-names=SNAPSHOT_NAME,[...]
-        Names to assign to the snapshots. Without this option, the name of each
-        snapshot will be a random, 16-character hexadecimal number that starts
-        with a letter. The values of this option run parallel to the disks
-        specified. For example,
+        Names to assign to the created snapshots. Without this option, the name
+        of each snapshot will be a random 16-character hexadecimal number that
+        starts with a letter. The values of this option run parallel to the
+        disks specified. For example,
 
-            $ gcloud compute disks snapshot my-disk-1 my-disk-2 my-disk-3 \
-                --snapshot-names snapshot-1,snapshot-2,snapshot-3
+            gcloud compute disks snapshot my-disk-1 my-disk-2 my-disk-3 --snapshot-names snapshot-1,snapshot-2,snapshot-3
 
         will result in my-disk-1 being snapshotted as snapshot-1, my-disk-2 as
         snapshot-2, and so on.
 
      --zone=ZONE
-        The zone of the disks to operate on. If not specified and the
-        compute/zone property isn't set, you may be prompted to select a zone.
+        Zone of the disks to operate on. If not specified and the compute/zone
+        property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:
@@ -79,6 +85,14 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a snapshot named snapshot-test of a persistent disk named test in
+    zone us-central1-a, run:
+
+        $ gcloud compute disks snapshot test --zone=us-central1-a \
+            --snapshot-names=snapshot-test \
+            --description="This is an example snapshot"
 
 NOTES
     These variants are also available:

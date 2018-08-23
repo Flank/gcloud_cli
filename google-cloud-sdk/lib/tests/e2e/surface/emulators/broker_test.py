@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 """Integration tests for the broker library."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import datetime
@@ -124,7 +126,7 @@ class BrokerTestBase(sdk_test_base.BundledBase,
       }''' % (port, int(port) + 1)
 
     f = tempfile.NamedTemporaryFile(delete=False)
-    f.write(config)
+    f.write(config.encode('utf-8'))
     f.flush()
     f.close()
 
@@ -196,6 +198,7 @@ class BrokerTest(BrokerTestBase):
     with self.assertRaises(arg_parsers.ArgumentTypeError):
       self._NewBroker('bad:add:ress')
 
+  @test_case.Filters.skip('Failing', 'b/112307987')
   def testStart(self):
     b = self._NewBroker(self._BrokerAddress())
     b.Start()

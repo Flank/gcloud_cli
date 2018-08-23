@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -227,12 +228,23 @@ class TestCase(unittest.TestCase, object):
       # deprecation warning.
       self.assertRaisesRegex = self._assertRaisesRegex  # pylint: disable=invalid-name
 
+      # Using this assertRegex in py2 shuts up the py3 assertRegexp
+      # deprecation warning.
+      self.assertRegex = self._assertRegex  # pylint: disable=invalid-name
+
       # Backporting assertCountEqual to py2 to get python2 tests to pass.
       self.assertCountEqual = self._assertCountEqual  # pylint: disable=invalid-name
+    else:
+      # assertRegexpMatches works but we need ...
+      self.assertNotRegexpMatches = self.assertNotRegex  # pylint: disable=invalid-name
 
   def _assertRaisesRegex(self, *args, **kwargs):  # pylint: disable=invalid-name
     """python3 really hates that trailing p."""
     return six.assertRaisesRegex(self, *args, **kwargs)
+
+  def _assertRegex(self, *args, **kwargs):  # pylint: disable=invalid-name
+    """python3 really hates that trailing p."""
+    return six.assertRegex(self, *args, **kwargs)
 
   def _assertCountEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
     """Accounts for the removal of assertItemsEqual in Python 3."""
@@ -942,6 +954,10 @@ class Filters(object):
   _skipUnless = staticmethod(unittest.skipUnless)  # pylint: disable=invalid-name
 
   @staticmethod
+  def _GetSkipString(reason, issue):
+    return '{why} ({bug})'.format(why=reason, bug=issue)
+
+  @staticmethod
   def _Skip(skip_type, reason, issue, **kwargs):
     """A base skip function that enforces certain usage patterns.
 
@@ -962,7 +978,7 @@ class Filters(object):
 
     if issue:
       if isinstance(issue, six.string_types) and issue.startswith('b/'):
-        reason = '{why} ({bug})'.format(why=reason, bug=issue)
+        reason = Filters._GetSkipString(reason, issue)
       else:
         raise InvalidFilterError('Invalid issue number given')
     else:

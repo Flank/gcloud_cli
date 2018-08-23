@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*- #
 #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
@@ -17,6 +18,7 @@
 """gcloud command line tool."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import os

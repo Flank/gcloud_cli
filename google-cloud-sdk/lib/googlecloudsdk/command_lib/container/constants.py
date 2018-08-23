@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,12 @@
 
 """Shared constants used by container commands."""
 
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-DEGRADED_WARNING = (
-    "! Clusters in DEGRADED status are missing edit permissions on project.\n"
-    "Please refer to https://cloud.google.com/kubernetes-engine/docs/support\n"
-    "to fix this.\n"
-)
+
+DEGRADED_WARNING = ("Cluster {cluster_name} is DEGRADED with message:"
+                    " \"{cluster_degraded_warning}\".\n")
 
 EXPIRE_WARNING_DAYS = 14
 
@@ -40,22 +41,6 @@ KUBERNETES_REGIONAL_CHARGES_PROMPT = (
     "While this feature is available at no charge in Alpha, "
     "in the future you may be charged for it.\n"
 )
-
-KUBERNETES_API_MISMATCH_WARNING_TEMPLATE = (
-    "You invoked `gcloud {track}`, but with current configuration "
-    "Kubernetes Engine v1 API will be used instead of {api} API.\n"
-    "If you want to keep using `gcloud {track}` to talk to v1 API temporarily, "
-    "please set `container/use_v1_api` property to true.\n"
-    "But we will drop the support for this property at the beginning of "
-    "May 2018, please migrate if necessary.")
-
-KUBERNETES_V1ALPHA1_API_WARNING = (
-    "Kubernetes Engine v1alpha1 API is for whitelist-only at the moment.\n"
-    "If you want to use it, please make sure your project is whitelisted.")
-
-CANNOT_SET_BOTH_USE_V1_API_PROPERTIES_WITH_DIFF_VALUES = (
-    "You cannot specify container/use_v1_api and container/use_v1_api_client "
-    "properties at the same time with different values.")
 
 KUBERNETES_GPU_LIMITATION_MSG = (
     "Machines with GPUs have certain limitations "

@@ -16,10 +16,12 @@
 """Tests for the command_lib.meta.generate_cli_trees module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import json
 import os
+import re
 import subprocess
 
 from googlecloudsdk.calliope import cli_tree
@@ -28,6 +30,7 @@ from googlecloudsdk.command_lib.meta import list_cli_trees
 from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.util import files
 from tests.lib import calliope_test_base
+from tests.lib import test_case
 from tests.unit.calliope import testdata
 
 import httplib2
@@ -521,6 +524,7 @@ bq,2.0.27,1,CONFIG/bq.json,
 gcloud,TEST,1,INSTALL/gcloud.json,
 gcloud-branch,TEST,1,INSTALL/gcloud-branch.json,
 gcloud-deserialized,TEST,1,INSTALL/gcloud-deserialized.json,
+gcloud_completions_branch,UNKNOWN,UNKNOWN,INSTALL/gcloud_completions_branch.golden,
 gsutil,4.27,1,CONFIG/gsutil.json,
 kubectl,v1.7.6,1,CONFIG/kubectl.json,
 ls-man,man-0.1,1,CONFIG/ls-man.json,
@@ -1477,6 +1481,46 @@ class LoadAllTest(calliope_test_base.CalliopeTestBase):
     # test, 'cat' is from CliTreeConfigDir.
     tree = generate_cli_trees.LoadAll()
     self.assertEqual(['cat'], list(tree[cli_tree.LOOKUP_COMMANDS].keys()))
+
+
+@test_case.Filters.RunOnlyIf(test_case.Filters.IsInDeb() or
+                             test_case.Filters.IsInRpm(),
+                             'DEB and RPM CLI tree packaging.')
+class InstalledCliTreesTest(calliope_test_base.CalliopeTestBase):
+  """Checks that the CLI tree have some commands."""
+
+  _AT_LEAST = 16  # sanity value so we don't fail every time a command is added
+
+  def _VerifyCliTreeInstalled(self, command):
+    tree = generate_cli_trees.LoadOrGenerate(command, generate=False)
+    self.assertIsNotNone(tree)
+    self.assertGreater(len(tree[cli_tree.LOOKUP_COMMANDS]), self._AT_LEAST)
+
+  def testBqCliTreeInstalled(self):
+    self._VerifyCliTreeInstalled('bq')
+
+  def testGcloudCliTreeInstalled(self):
+    self._VerifyCliTreeInstalled('gcloud')
+
+  def testGsutilCliTreeInstalled(self):
+    self._VerifyCliTreeInstalled('gsutil')
+
+  def testKubectlCliTreeInstalled(self):
+    expected = [
+        ('bq', 'data/cli/bq.json', True),
+        ('gcloud', 'data/cli/gcloud.json', True),
+        ('gcloud_completions', 'data/cli/gcloud_completions.py', False),
+        ('gcloud_completions', 'data/cli/gcloud_completions.pyc', False),
+        ('gsutil', 'data/cli/gsutil.json', True),
+        ('kubectl', 'data/cli/kubectl.json', False),
+    ]
+
+    def _chop(path):
+      return re.sub('.*/google-cloud-sdk/', '', path)
+
+    actual = [(p.command, _chop(p.path), p.command_installed)
+              for p in list_cli_trees.ListAll()]
+    self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

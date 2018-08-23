@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +16,12 @@
 """Unit tests for services operations wait command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.services import exceptions
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
 
 
@@ -62,6 +66,25 @@ class ServiceManagementOperationsWaitTest(unit_test_base.SV1UnitTestBase):
         exceptions.OperationErrorException,
         'The operation with ID operation-12345 resulted in a failure.'):
       self.Run('services operations wait ' + operation_name)
+
+
+class WaitTest(unit_test_base.SUUnitTestBase):
+  """Unit tests for services operations wait command."""
+  OPERATION_NAME = 'operations/abc.0000000000'
+
+  def testWait(self):
+    self.ExpectOperation(self.OPERATION_NAME, 3)
+
+    self.Run('alpha services operations wait %s' % self.OPERATION_NAME)
+    self.AssertErrContains(self.OPERATION_NAME)
+    self.AssertErrContains('finished successfully')
+
+  def testWaitPermissionDenied(self):
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
+    self.ExpectOperation(self.OPERATION_NAME, 3, server_error)
+
+    with self.assertRaisesRegex(exceptions.OperationErrorException, r'Error.'):
+      self.Run('alpha services operations wait %s' % self.OPERATION_NAME)
 
 
 if __name__ == '__main__':

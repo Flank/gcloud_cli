@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -147,14 +148,18 @@ class _BaseInstancesExportSqlTest(object):
              '--table=table1,table2 gs://speckletest/testinstance.gz')
 
 
+class InstancesExportSqlGATest(_BaseInstancesExportSqlTest, base.SqlMockTestGA):
+  pass
+
+
 class InstancesExportSqlBetaTest(_BaseInstancesExportSqlTest,
                                  base.SqlMockTestBeta):
   pass
 
 
-class InstancesExportSqlGATest(_BaseInstancesExportSqlTest, base.SqlMockTestGA):
+class InstancesExportSqlAlphaTest(_BaseInstancesExportSqlTest,
+                                  base.SqlMockTestAlpha):
   pass
-
 
 if __name__ == '__main__':
   test_case.main()

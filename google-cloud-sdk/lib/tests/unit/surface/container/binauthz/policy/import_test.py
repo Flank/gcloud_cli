@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +31,7 @@ from tests.lib.surface.container.binauthz import base
 
 
 class ImportTest(sdk_test_base.WithTempCWD,
-                 base.BinauthzMockedPolicyClientUnitTest):
+                 base.BinauthzMockedBetaPolicyClientUnitTest):
 
   def testSuccessYaml(self):
     policy_fname = self.Touch(
@@ -42,29 +43,29 @@ class ImportTest(sdk_test_base.WithTempCWD,
             clusterAdmissionRules:
               us-east1-b.my-cluster-1:
                 evaluationMode: REQUIRE_ATTESTATION
-                nonConformanceAction: DENY_AND_AUDIT_LOG
-                requireAttestationAuthorities:
-                - projects/{0}/attestationAuthorities/build-env
+                enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG
+                requireAttestationsBy:
+                - projects/{0}/attestors/build-env
             defaultAdmissionRule:
-              evaluationMode: ALWAYS_CONFORMANT
-              nonConformanceAction: DENY_AND_AUDIT_LOG
+              evaluationMode: ALWAYS_ALLOW
+              enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG
         """).format(self.Project())
     )
 
     # Create the expected policy proto.
     EvaluationModeEnum = (  # pylint: disable=invalid-name
         self.messages.AdmissionRule.EvaluationModeValueValuesEnum)
-    NonConformanceActionEnum = (  # pylint: disable=invalid-name
-        self.messages.AdmissionRule.NonConformanceActionValueValuesEnum)
+    EnforcementModeEnum = (  # pylint: disable=invalid-name
+        self.messages.AdmissionRule.EnforcementModeValueValuesEnum)
     cluster_rules = [
         self.messages.Policy.ClusterAdmissionRulesValue.AdditionalProperty(
             key='us-east1-b.my-cluster-1',
             value=self.messages.AdmissionRule(
                 evaluationMode=EvaluationModeEnum.REQUIRE_ATTESTATION,
-                nonConformanceAction=(
-                    NonConformanceActionEnum.DENY_AND_AUDIT_LOG),
-                requireAttestationAuthorities=[
-                    'projects/fake-project/attestationAuthorities/build-env',
+                enforcementMode=(
+                    EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+                requireAttestationsBy=[
+                    'projects/fake-project/attestors/build-env',
                 ],
             ),
         ),
@@ -80,10 +81,10 @@ class ImportTest(sdk_test_base.WithTempCWD,
             additionalProperties=cluster_rules,
         ),
         defaultAdmissionRule=self.messages.AdmissionRule(
-            evaluationMode=EvaluationModeEnum.ALWAYS_CONFORMANT,
-            nonConformanceAction=(
-                NonConformanceActionEnum.DENY_AND_AUDIT_LOG),
-            requireAttestationAuthorities=[],
+            evaluationMode=EvaluationModeEnum.ALWAYS_ALLOW,
+            enforcementMode=(
+                EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+            requireAttestationsBy=[],
         ),
 
     )
@@ -108,15 +109,15 @@ class ImportTest(sdk_test_base.WithTempCWD,
               "clusterAdmissionRules": {
                 "us-east1-b.my-cluster-1": {
                   "evaluationMode": "REQUIRE_ATTESTATION",
-                  "nonConformanceAction": "DENY_AND_AUDIT_LOG",
-                  "requireAttestationAuthorities": [
-                    "projects/fake-project/attestationAuthorities/build-env"
+                  "enforcementMode": "ENFORCED_BLOCK_AND_AUDIT_LOG",
+                  "requireAttestationsBy": [
+                    "projects/fake-project/attestors/build-env"
                   ]
                 }
               },
               "defaultAdmissionRule": {
-                "evaluationMode": "ALWAYS_CONFORMANT",
-                "nonConformanceAction": "DENY_AND_AUDIT_LOG"
+                "evaluationMode": "ALWAYS_ALLOW",
+                "enforcementMode": "ENFORCED_BLOCK_AND_AUDIT_LOG"
               }
             }
         """)
@@ -125,17 +126,17 @@ class ImportTest(sdk_test_base.WithTempCWD,
     # Create the expected policy proto.
     EvaluationModeEnum = (  # pylint: disable=invalid-name
         self.messages.AdmissionRule.EvaluationModeValueValuesEnum)
-    NonConformanceActionEnum = (  # pylint: disable=invalid-name
-        self.messages.AdmissionRule.NonConformanceActionValueValuesEnum)
+    EnforcementModeEnum = (  # pylint: disable=invalid-name
+        self.messages.AdmissionRule.EnforcementModeValueValuesEnum)
     cluster_rules = [
         self.messages.Policy.ClusterAdmissionRulesValue.AdditionalProperty(
             key='us-east1-b.my-cluster-1',
             value=self.messages.AdmissionRule(
                 evaluationMode=EvaluationModeEnum.REQUIRE_ATTESTATION,
-                nonConformanceAction=(
-                    NonConformanceActionEnum.DENY_AND_AUDIT_LOG),
-                requireAttestationAuthorities=[
-                    'projects/fake-project/attestationAuthorities/build-env',
+                enforcementMode=(
+                    EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+                requireAttestationsBy=[
+                    'projects/fake-project/attestors/build-env',
                 ],
             ),
         ),
@@ -151,10 +152,10 @@ class ImportTest(sdk_test_base.WithTempCWD,
             additionalProperties=cluster_rules,
         ),
         defaultAdmissionRule=self.messages.AdmissionRule(
-            evaluationMode=EvaluationModeEnum.ALWAYS_CONFORMANT,
-            nonConformanceAction=(
-                NonConformanceActionEnum.DENY_AND_AUDIT_LOG),
-            requireAttestationAuthorities=[],
+            evaluationMode=EvaluationModeEnum.ALWAYS_ALLOW,
+            enforcementMode=(
+                EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+            requireAttestationsBy=[],
         ),
 
     )

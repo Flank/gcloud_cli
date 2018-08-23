@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Command for creating VM instances running Docker images."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import containers_utils
 from googlecloudsdk.api_lib.compute import image_utils
@@ -119,7 +123,7 @@ class CreateWithContainer(base.CreateCommand):
     user_metadata = instance_utils.GetValidatedMetadata(args, client)
     boot_disk_size_gb = instance_utils.GetBootDiskSizeGb(args)
     instance_refs = instance_utils.GetInstanceRefs(args, client, holder)
-    network_interfaces = instance_utils.GetNetworkInterfacesBeta(
+    network_interfaces = instance_utils.GetNetworkInterfaces(
         args, client, holder, instance_refs, skip_defaults)
     machine_type_uris = instance_utils.GetMachineTypeUris(
         args, client, holder, instance_refs, skip_defaults)

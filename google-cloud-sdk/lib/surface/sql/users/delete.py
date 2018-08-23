@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,16 +18,20 @@ Deletes a user in a given instance specified by username and host.
 """
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.sql import api_util
 from googlecloudsdk.api_lib.sql import operations
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.sql import flags
+from googlecloudsdk.command_lib.sql import users
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.ALPHA)
 class Delete(base.DeleteCommand):
   """Deletes a Cloud SQL user in a given instance.
 
@@ -61,10 +66,12 @@ class Delete(base.DeleteCommand):
         collection='sql.instances')
     operation_ref = None
 
+    host = users.GetHostValue(args)
+
     console_io.PromptContinue(
         message='{0}@{1} will be deleted. New connections can no longer be '
         'made using this user. Existing connections are not affected.'.format(
-            args.username, args.host),
+            args.username, host),
         default=True,
         cancel_on_no=True)
 
@@ -73,7 +80,7 @@ class Delete(base.DeleteCommand):
             project=instance_ref.project,
             instance=instance_ref.Name(),
             name=args.username,
-            host=args.host))
+            host=host))
     operation_ref = client.resource_parser.Create(
         'sql.operations',
         operation=result_operation.name,

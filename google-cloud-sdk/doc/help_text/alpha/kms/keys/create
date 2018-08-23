@@ -2,24 +2,31 @@ NAME
     gcloud alpha kms keys create - create a new key
 
 SYNOPSIS
-    gcloud alpha kms keys create KEY --purpose=PURPOSE [--keyring=KEYRING]
+    gcloud alpha kms keys create KEY --purpose=PURPOSE
+        [--default-algorithm=DEFAULT_ALGORITHM] [--keyring=KEYRING]
         [--labels=[KEY=VALUE,...]] [--location=LOCATION]
         [--next-rotation-time=NEXT_ROTATION_TIME]
+        [--protection-level=PROTECTION_LEVEL; default="software"]
         [--rotation-period=ROTATION_PERIOD] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates a new key within the given keyring.
 
-    The optional flags --rotation-period and --next-rotation-time define a
-    rotation schedule for the key. A schedule can also be defined by the
+    The flag 'purpose' is always required when creating a key. The flag
+    'default-algorithm' is required when creating an asymmetric key. Algorithm
+    and purpose should be compatible.
+
+    The optional flags rotation-period and next-rotation-time define a rotation
+    schedule for the key. A schedule can also be defined by the
     create-rotation-schedule command.
 
-    The flag --next-rotation-time must be in ISO or RFC3339 format, and
-    --rotation-period must be in the form INTEGER[UNIT], where units can be one
+    The flag next-rotation-time must be in ISO 8601 or RFC3339 format, and
+    rotation-period must be in the form INTEGER[UNIT], where units can be one
     of seconds (s), minutes (m), hours (h) or days (d).
 
-    The optional flag '--labels' defines a user specified key/value pair for
-    the given crypto_key.
+    The optional flag protection-level specifies the protection level of the
+    created key. The default is software; use "HSM" to create a hardware-backed
+    key.
 
 POSITIONAL ARGUMENTS
      KEY
@@ -27,15 +34,24 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --purpose=PURPOSE
-        The "purpose" of the key. PURPOSE must be (currently only one value is
-        supported): encryption.
+        The "purpose" of the key. PURPOSE must be one of:
+        asymmetric-encryption, asymmetric-signing, encryption.
 
 OPTIONAL FLAGS
+     --default-algorithm=DEFAULT_ALGORITHM
+        The default algorithm for the crypto key. DEFAULT_ALGORITHM must be one
+        of: crypto-key-version-algorithm-unspecified, ec-sign-p256-sha256,
+        ec-sign-p384-sha384, google-symmetric-encryption,
+        rsa-decrypt-oaep-2048-sha256, rsa-decrypt-oaep-3072-sha256,
+        rsa-sign-pkcs1-2048-sha256, rsa-sign-pkcs1-3072-sha256,
+        rsa-sign-pkcs1-4096-sha256, rsa-sign-pss-2048-sha256,
+        rsa-sign-pss-3072-sha256, rsa-sign-pss-4096-sha256.
+
      --keyring=KEYRING
         Key ring of the key.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -48,6 +64,10 @@ OPTIONAL FLAGS
      --next-rotation-time=NEXT_ROTATION_TIME
         Next automatic rotation time of the key. See $ gcloud topic datetimes
         for information on time formats.
+
+     --protection-level=PROTECTION_LEVEL; default="software"
+        Protection level of the key. PROTECTION_LEVEL must be one of: software,
+        hsm.
 
      --rotation-period=ROTATION_PERIOD
         Automatic rotation period of the key. See $ gcloud topic datetimes for
@@ -76,21 +96,22 @@ EXAMPLES
             --rotation-period 30d \
             --next-rotation-time 2017-10-12T12:34:56.1234Z
 
-    The following command creates a key named foo within the keyring fellowship
-    and location us-east1 with two specified labels:
+    The following command creates an asymmetric key named samwise with default
+    algorithm 'ec-sign-p256-sha256' within the keyring fellowship and location
+    us-east1:
 
-        $ gcloud alpha kms keys create foo \
+        $ gcloud alpha kms keys create samwise \
             --location us-east1 \
             --keyring fellowship \
-            --purpose encryption \
-            --labels env=prod,team=kms
+            --purpose asymmetric-signing \
+            --default-algorithm ec-sign-p256-sha256
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud kms keys create
         $ gcloud beta kms keys create

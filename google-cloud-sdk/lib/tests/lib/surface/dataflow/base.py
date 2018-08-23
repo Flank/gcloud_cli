@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Base classes for all dataflow tests."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -127,14 +130,17 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
     run_job_req_body = MESSAGE_MODULE.CreateJobFromTemplateRequest
     run_job_req_class = (
         MESSAGE_MODULE.DataflowProjectsLocationsTemplatesCreateRequest)
-    params_value = run_job_req_body.ParametersValue
 
     location = location or DEFAULT_REGION
 
-    params_list = []
-    for k, v in sorted(six.iteritems(parameters)) if parameters else {}:
-      params_list.append(params_value.AdditionalProperty(
-          key=six.text_type(k), value=six.text_type(v)))
+    additional_properties = None
+    if parameters:
+      params_value = run_job_req_body.ParametersValue
+      params_list = []
+      for k, v in sorted(six.iteritems(parameters)):
+        params_list.append(params_value.AdditionalProperty(
+            key=six.text_type(k), value=six.text_type(v)))
+      additional_properties = params_value(additionalProperties=params_list)
 
     body = run_job_req_body(
         gcsPath=gcs_location,
@@ -145,8 +151,7 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
             zone=zone,
             maxWorkers=max_workers,
         ),
-        parameters=params_value(additionalProperties=params_list)
-        if parameters else None)
+        parameters=additional_properties)
 
     self.mocked_client.projects_locations_templates.Create.Expect(
         request=run_job_req_class(

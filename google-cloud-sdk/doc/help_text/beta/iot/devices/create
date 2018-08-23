@@ -70,10 +70,10 @@ FLAGS
           used to verify RS256 signatures in JWT tokens (RFC7518
           (https://www.ietf.org/rfc/rfc7518.txt)).
         * rs256: Deprecated name for rsa-x509-pem
-        * es256-x509-pem: (As ES256_PEM, but wrapped in an X.509v3
-          certificate ([RFC5280]( https://www.ietf.org/rfc/rfc5280.txt)),
-          encoded in base64, and wrapped by -----BEGIN CERTIFICATE----- and
-          -----END CERTIFICATE-----.
+        * es256-x509-pem: As ES256_PEM, but wrapped in an X.509v3 certificate
+          (RFC5280 (https://www.ietf.org/rfc/rfc5280.txt)), encoded in base64,
+          and wrapped by -----BEGIN CERTIFICATE----- and -----END
+          CERTIFICATE-----.
         * es256-pem: Public key for the ECDSA algorithm using P-256 and
           SHA-256, encoded in base64, and wrapped by -----BEGIN PUBLIC KEY-----
           and -----END PUBLIC KEY-----. This can be used to verify JWT tokens

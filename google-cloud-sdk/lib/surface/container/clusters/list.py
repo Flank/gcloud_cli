@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2014 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """List clusters command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.container import transforms
@@ -75,7 +78,9 @@ class List(base.ListCommand):
         if time_left and time_left.days < constants.EXPIRE_WARNING_DAYS:
           expiring = True
         if adapter.IsDegraded(c):
-          self._degraded_warning = constants.DEGRADED_WARNING
+          self._degraded_warning += constants.DEGRADED_WARNING.format(
+              cluster_name=c.name,
+              cluster_degraded_warning=adapter.GetDegradedWarning(c))
         if c.enableKubernetesAlpha:
           # Don't print upgrade hints for alpha clusters, they aren't
           # upgradeable.

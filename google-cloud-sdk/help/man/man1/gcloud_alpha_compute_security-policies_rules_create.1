@@ -25,6 +25,7 @@ run:
 
 .RS 2m
 $ gcloud alpha compute security\-policies rules create 1000 \e
+    \-\-action deny\-403 \e
     \-\-security\-policy my\-policy \e
     \-\-description "block 1.2.3.0/24" \e
     \-\-src\-ip\-ranges 1.2.3.0/24
@@ -64,7 +65,7 @@ The Cloud Armor rules language expression to match for this rule.
 
 .TP 2m
 \fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]
-The source IP ranges to match for this rule.
+The source IPs/IP ranges to match for this rule. To match all IPs specify *.
 
 
 .RE
@@ -101,11 +102,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. This variant is also available:
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
 
 .RS 2m
 $ gcloud beta compute security\-policies rules create

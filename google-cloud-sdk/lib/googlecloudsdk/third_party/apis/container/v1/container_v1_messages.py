@@ -89,6 +89,13 @@ class AuditEvent(_messages.Message):
   ster/staging/src/k8s.io/apiserver/pkg/apis/audit/v1beta1/generated.proto.
 
   Messages:
+    AnnotationsValue: Annotations is an unstructured key value map stored with
+      an audit event that may be set by plugins invoked in the request serving
+      chain, including authentication, authorization and admission plugins.
+      Keys should uniquely identify the informing component to avoid name
+      collisions (e.g. podsecuritypolicy.admission.k8s.io/policy). Values
+      should be short. Annotations are included in the Metadata level.
+      +optional
     OldRequestObjectValue: API object from the request, in JSON format. The
       RequestObject is recorded as-is in the request (possibly re-encoded as
       JSON), prior to version conversion, defaulting, admission or merging. It
@@ -102,6 +109,13 @@ class AuditEvent(_messages.Message):
       +optional
 
   Fields:
+    annotations: Annotations is an unstructured key value map stored with an
+      audit event that may be set by plugins invoked in the request serving
+      chain, including authentication, authorization and admission plugins.
+      Keys should uniquely identify the informing component to avoid name
+      collisions (e.g. podsecuritypolicy.admission.k8s.io/policy). Values
+      should be short. Annotations are included in the Metadata level.
+      +optional
     auditID: Unique audit ID, generated for each request.
     impersonatedUser: Impersonated user information. +optional
     metadata: ObjectMeta is included for interoperability with Kubernetes API
@@ -150,6 +164,36 @@ class AuditEvent(_messages.Message):
     verb: Verb is the kubernetes verb associated with the request.  For non-
       resource requests, this is identical to HttpMethod.
   """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class AnnotationsValue(_messages.Message):
+    r"""Annotations is an unstructured key value map stored with an audit
+    event that may be set by plugins invoked in the request serving chain,
+    including authentication, authorization and admission plugins. Keys should
+    uniquely identify the informing component to avoid name collisions (e.g.
+    podsecuritypolicy.admission.k8s.io/policy). Values should be short.
+    Annotations are included in the Metadata level. +optional
+
+    Messages:
+      AdditionalProperty: An additional property for a AnnotationsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type AnnotationsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a AnnotationsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class OldRequestObjectValue(_messages.Message):
@@ -209,23 +253,24 @@ class AuditEvent(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  auditID = _messages.StringField(1)
-  impersonatedUser = _messages.MessageField('AuthnV1UserInfo', 2)
-  metadata = _messages.MessageField('ObjectMeta', 3)
-  objectRef = _messages.MessageField('AuditObjectReference', 4)
-  oldRequestObject = _messages.MessageField('OldRequestObjectValue', 5)
-  oldResponseObject = _messages.MessageField('OldResponseObjectValue', 6)
-  requestObject = _messages.MessageField('extra_types.JsonValue', 7)
-  requestReceivedTimestamp = _messages.StringField(8)
-  requestURI = _messages.StringField(9)
-  responseObject = _messages.MessageField('extra_types.JsonValue', 10)
-  responseStatus = _messages.MessageField('MetaV1Status', 11)
-  sourceIPs = _messages.StringField(12, repeated=True)
-  stage = _messages.StringField(13)
-  stageTimestamp = _messages.StringField(14)
-  timestamp = _messages.StringField(15)
-  user = _messages.MessageField('AuthnV1UserInfo', 16)
-  verb = _messages.StringField(17)
+  annotations = _messages.MessageField('AnnotationsValue', 1)
+  auditID = _messages.StringField(2)
+  impersonatedUser = _messages.MessageField('AuthnV1UserInfo', 3)
+  metadata = _messages.MessageField('ObjectMeta', 4)
+  objectRef = _messages.MessageField('AuditObjectReference', 5)
+  oldRequestObject = _messages.MessageField('OldRequestObjectValue', 6)
+  oldResponseObject = _messages.MessageField('OldResponseObjectValue', 7)
+  requestObject = _messages.MessageField('extra_types.JsonValue', 8)
+  requestReceivedTimestamp = _messages.StringField(9)
+  requestURI = _messages.StringField(10)
+  responseObject = _messages.MessageField('extra_types.JsonValue', 11)
+  responseStatus = _messages.MessageField('MetaV1Status', 12)
+  sourceIPs = _messages.StringField(13, repeated=True)
+  stage = _messages.StringField(14)
+  stageTimestamp = _messages.StringField(15)
+  timestamp = _messages.StringField(16)
+  user = _messages.MessageField('AuthnV1UserInfo', 17)
+  verb = _messages.StringField(18)
 
 
 class AuditEventList(_messages.Message):
@@ -573,6 +618,48 @@ class CertificateSigningRequestStatus(_messages.Message):
   conditions = _messages.MessageField('CertificateSigningRequestCondition', 2, repeated=True)
 
 
+class CheckAuditPolicyData(_messages.Message):
+  r"""Subset of AuditEvent fields required to check Audit Policy.
+
+  Fields:
+    objectRef: Object reference this request is targeted at. Does not apply
+      for List-type requests, or non-resource requests. +optional
+    user: Authenticated user information.
+    verb: Verb is the kubernetes verb associated with the request.  For non-
+      resource requests, this is identical to HttpMethod.
+  """
+
+  objectRef = _messages.MessageField('AuditObjectReference', 1)
+  user = _messages.MessageField('AuthnV1UserInfo', 2)
+  verb = _messages.StringField(3)
+
+
+class CheckAuditPolicyRequest(_messages.Message):
+  r"""A request to check whether user action (auditItem) described in
+  AuditPolicyCheckData requires writing to Cloud Audit Logging or Gin Logging.
+
+  Fields:
+    auditItem: Subset of AuditEvent fields required to check Audit Policy.
+    zone: The zone of this master's cluster. This field is deprecated. Use
+      location instead.
+  """
+
+  auditItem = _messages.MessageField('CheckAuditPolicyData', 1)
+  zone = _messages.StringField(2)
+
+
+class CheckAuditPolicyResponse(_messages.Message):
+  r"""A response to CheckAuditPolicy.
+
+  Fields:
+    calRequired: write to Cloud Audit Logging required
+    ginRequired: write to Gin required
+  """
+
+  calRequired = _messages.BooleanField(1)
+  ginRequired = _messages.BooleanField(2)
+
+
 class CidrBlock(_messages.Message):
   r"""CidrBlock contains an optional name and one CIDR block.
 
@@ -633,10 +720,12 @@ class Cluster(_messages.Message):
       master endpoint.
     currentNodeCount: [Output only] The number of nodes currently in the
       cluster.
-    currentNodeVersion: [Output only] The current version of the node software
-      components. If they are currently at multiple versions because they're
-      in the process of being upgraded, this reflects the minimum version of
-      all nodes.
+    currentNodeVersion: [Output only] Deprecated, use [NodePool.version
+      ](/kubernetes-
+      engine/docs/reference/rest/v1/projects.zones.clusters.nodePool) instead.
+      The current version of the node software components. If they are
+      currently at multiple versions because they're in the process of being
+      upgraded, this reflects the minimum version of all nodes.
     description: An optional description of this cluster.
     enableKubernetesAlpha: Kubernetes alpha features are enabled on this
       cluster. This includes alpha API groups (e.g. v1alpha1) and features
@@ -704,6 +793,7 @@ class Cluster(_messages.Message):
     network: The name of the Google Compute Engine [network](/compute/docs
       /networks-and-firewalls#networks) to which the cluster is connected. If
       left unspecified, the `default` network will be used.
+    networkConfig: Configuration for cluster networking.
     networkPolicy: Configuration options for the NetworkPolicy feature.
     nodeConfig: Parameters used in creating the cluster's nodes. See
       `nodeConfig` for the description of its properties. For requests, this
@@ -816,29 +906,35 @@ class Cluster(_messages.Message):
   monitoringService = _messages.StringField(25)
   name = _messages.StringField(26)
   network = _messages.StringField(27)
-  networkPolicy = _messages.MessageField('NetworkPolicy', 28)
-  nodeConfig = _messages.MessageField('NodeConfig', 29)
-  nodeIpv4CidrSize = _messages.IntegerField(30, variant=_messages.Variant.INT32)
-  nodePools = _messages.MessageField('NodePool', 31, repeated=True)
-  resourceLabels = _messages.MessageField('ResourceLabelsValue', 32)
-  selfLink = _messages.StringField(33)
-  servicesIpv4Cidr = _messages.StringField(34)
-  status = _messages.EnumField('StatusValueValuesEnum', 35)
-  statusMessage = _messages.StringField(36)
-  subnetwork = _messages.StringField(37)
-  zone = _messages.StringField(38)
+  networkConfig = _messages.MessageField('NetworkConfig', 28)
+  networkPolicy = _messages.MessageField('NetworkPolicy', 29)
+  nodeConfig = _messages.MessageField('NodeConfig', 30)
+  nodeIpv4CidrSize = _messages.IntegerField(31, variant=_messages.Variant.INT32)
+  nodePools = _messages.MessageField('NodePool', 32, repeated=True)
+  resourceLabels = _messages.MessageField('ResourceLabelsValue', 33)
+  selfLink = _messages.StringField(34)
+  servicesIpv4Cidr = _messages.StringField(35)
+  status = _messages.EnumField('StatusValueValuesEnum', 36)
+  statusMessage = _messages.StringField(37)
+  subnetwork = _messages.StringField(38)
+  zone = _messages.StringField(39)
 
 
 class ClusterStatus(_messages.Message):
-  r"""ClusterStatus is used for internal only purposes to transition a cluster
-  between DEGRADED AND RUNNING using UpdateClusterInternal. The message is
-  used in ClusterUpdate's DesiredClusterStatus field and should not be
-  confused with Cluster's Status Enum.
+  r"""ClusterStatus is used for internal only purposes by the monitoring
+  server to transition a cluster between DEGRADED AND RUNNING using
+  UpdateClusterInternal. The message is used in ClusterUpdate's
+  DesiredClusterStatus field and should not be confused with Cluster's Status
+  Enum. TODO(b/72158008) Implement a PatchClusterInternal method that takes an
+  internal proto instead so we don't have to define this message here Till
+  then, this message should be in sync with the definition in the
+  internal.proto
 
   Enums:
     StatusValueValuesEnum: The current status of the cluster.
 
   Fields:
+    conditions: Which conditions caused the current cluster state.
     internal: An internal field for the sub-error type or other metadata for
       the Status.
     message: A human-readable message that describes the status of the
@@ -861,9 +957,10 @@ class ClusterStatus(_messages.Message):
     RUNNING = 1
     DEGRADED = 2
 
-  internal = _messages.StringField(1)
-  message = _messages.StringField(2)
-  status = _messages.EnumField('StatusValueValuesEnum', 3)
+  conditions = _messages.MessageField('StatusCondition', 1, repeated=True)
+  internal = _messages.StringField(2)
+  message = _messages.StringField(3)
+  status = _messages.EnumField('StatusValueValuesEnum', 4)
 
 
 class ClusterUpdate(_messages.Message):
@@ -988,6 +1085,29 @@ class CompleteIPRotationRequest(_messages.Message):
   projectId = _messages.StringField(3)
   version = _messages.StringField(4)
   zone = _messages.StringField(5)
+
+
+class ContainerMasterProjectsLocationsAuditPolicyRequest(_messages.Message):
+  r"""A ContainerMasterProjectsLocationsAuditPolicyRequest object.
+
+  Fields:
+    checkAuditPolicyRequest: A CheckAuditPolicyRequest resource to be passed
+      as the request body.
+    clusterId: The name of this master's cluster.
+    location: The location of this master's cluster.
+    masterProjectId: The hosted master project in which this master resides.
+      This can be either a [project ID or project
+      number](https://support.google.com/cloud/answer/6158840).
+    projectNumber: The project number for which the request is being
+      authorized.  This is the project in which this master's cluster resides.
+      This is an int64, so it must be a project number, not a project ID.
+  """
+
+  checkAuditPolicyRequest = _messages.MessageField('CheckAuditPolicyRequest', 1)
+  clusterId = _messages.StringField(2, required=True)
+  location = _messages.StringField(3, required=True)
+  masterProjectId = _messages.StringField(4, required=True)
+  projectNumber = _messages.IntegerField(5, required=True)
 
 
 class ContainerMasterProjectsLocationsAuditRequest(_messages.Message):
@@ -1793,7 +1913,7 @@ class CreateNodePoolRequest(_messages.Message):
     nodePool: The node pool to create.
     parent: The parent (project, location, cluster id) where the node pool
       will be created. Specified in the format
-      'projects/*/locations/*/clusters/*/nodePools/*'.
+      'projects/*/locations/*/clusters/*'.
     projectId: Deprecated. The Google Developers Console [project ID or
       project
       number](https://developers.google.com/console/help/new/#projectnumber).
@@ -2258,8 +2378,8 @@ class MasterAuth(_messages.Message):
     clientCertificate: [Output only] Base64-encoded public certificate used by
       clients to authenticate to the cluster endpoint.
     clientCertificateConfig: Configuration for client certificate
-      authentication on the cluster.  If no configuration is specified, a
-      client certificate is issued.
+      authentication on the cluster. For clusters before v1.12, if no
+      configuration is specified, a client certificate is issued.
     clientKey: [Output only] Base64-encoded private key used by clients to
       authenticate to the cluster endpoint.
     clusterCaCertificate: [Output only] Base64-encoded public certificate that
@@ -2327,6 +2447,23 @@ class MetaV1Status(_messages.Message):
 
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   message = _messages.StringField(2)
+
+
+class NetworkConfig(_messages.Message):
+  r"""NetworkConfig reports the relative names of network & subnetwork.
+
+  Fields:
+    network: Output only. The relative name of the Google Compute Engine
+      network(/compute/docs/networks-and-firewalls#networks) to which the
+      cluster is connected. Example: projects/my-project/global/networks/my-
+      network
+    subnetwork: Output only. The relative name of the Google Compute Engine
+      [subnetwork](/compute/docs/vpc) to which the cluster is connected.
+      Example: projects/my-project/regions/us-central1/subnetworks/my-subnet
+  """
+
+  network = _messages.StringField(1)
+  subnetwork = _messages.StringField(2)
 
 
 class NetworkPolicy(_messages.Message):
@@ -2401,7 +2538,6 @@ class NodeConfig(_messages.Message):
       size is 100GB.
     diskType: Type of the disk attached to each node (e.g. 'pd-standard' or
       'pd-ssd')  If unspecified, the default disk type is 'pd-standard'
-      Currently restricted because of b/36071127#comment27
     imageType: The image type to use for this node. Note that for a given
       image type, the latest version of it will be used.
     labels: The map of Kubernetes labels (key/value pairs) to be applied to
@@ -3420,6 +3556,35 @@ class StartIPRotationRequest(_messages.Message):
   zone = _messages.StringField(6)
 
 
+class StatusCondition(_messages.Message):
+  r"""StatusCondition describes why a cluster or a node pool has a certain
+  status (e.g., ERROR or DEGRADED).
+
+  Enums:
+    CodeValueValuesEnum: Machine-friendly representation of the condition
+
+  Fields:
+    code: Machine-friendly representation of the condition
+    message: Human-friendly representation of the condition
+  """
+
+  class CodeValueValuesEnum(_messages.Enum):
+    r"""Machine-friendly representation of the condition
+
+    Values:
+      UNKNOWN: UNKNOWN indicates a generic condition.
+      GCE_STOCKOUT: GCE_STOCKOUT indicates a GCE stockout.
+      GKE_SERVICE_ACCOUNT_DELETED: GKE_SERVICE_ACCOUNT_DELETED indicates that
+        the user deleted their robot service account. More codes TBA
+    """
+    UNKNOWN = 0
+    GCE_STOCKOUT = 1
+    GKE_SERVICE_ACCOUNT_DELETED = 2
+
+  code = _messages.EnumField('CodeValueValuesEnum', 1)
+  message = _messages.StringField(2)
+
+
 class SubjectAccessReviewSpec(_messages.Message):
   r"""The description of the request for authorization. This should match the
   SubjectAccessReviewSpec struct in pkg/apis/authorization/v1beta1/types.go
@@ -3667,7 +3832,8 @@ class UserInfo(_messages.Message):
       ExtraValue>, where ExtraValue is a typedef to []string. Proto3 doesn't
       support that way, so we use ListValue here.
     groups: Groups that this user is a part of. This is currently only filled
-      in for VMID-based Authenticate calls.
+      in for VMID-based Authenticate calls and for organizations that have
+      enabled security groups.
     uid: A unique identifier (across time) for the user. This is not currently
       filled in for GKE.
     username: The name of the user. This should be the email address

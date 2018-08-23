@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """A group for testing how well required/not-required arguments are handled."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 
 
@@ -24,7 +27,7 @@ class Lotsofargs(base.Group):
   @staticmethod
   def Args(parser):
     parser.display_info.AddFormat('table(mid)')
-    parser.display_info.AddAliases({'ALL': 'mid', 'MID': 'Mid'})
+    parser.display_info.AddAliases({'ALL': ['mid'], 'MID': ['Mid']})
     parser.add_argument('--group-required-test',
                         required=True,
                         help='Auxilio aliis.')

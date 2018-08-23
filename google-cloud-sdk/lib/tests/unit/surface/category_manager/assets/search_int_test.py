@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for 'category-manager assets search' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.category_manager import assets
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
@@ -28,7 +31,7 @@ class SearchAnnotationsIntegrationTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.expected_json_response = """\
+    self.expected_json_response = b"""\
     {
       "assets": [
         {

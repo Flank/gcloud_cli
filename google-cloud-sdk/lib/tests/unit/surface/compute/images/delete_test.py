@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the images delete subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
@@ -112,14 +114,12 @@ class ImagesDeleteTest(test_base.BaseTest):
               image='image-3',
               project='my-project'))],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following images will be deleted:
-         - [image-1]
-         - [image-2]
-         - [image-3]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following images will be deleted:\n'
+        r' - [image-1]\n'
+        r' - [image-2]\n'
+        r' - [image-3]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.WriteInput('n\n')
@@ -129,14 +129,12 @@ class ImagesDeleteTest(test_base.BaseTest):
           """)
 
     self.CheckRequests()
-    self.AssertErrContains(textwrap.dedent("""\
-        The following images will be deleted:
-         - [image-1]
-         - [image-2]
-         - [image-3]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following images will be deleted:\n'
+        r' - [image-1]\n'
+        r' - [image-2]\n'
+        r' - [image-3]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
 
 if __name__ == '__main__':

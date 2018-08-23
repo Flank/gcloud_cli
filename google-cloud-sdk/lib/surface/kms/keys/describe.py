@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Describe a key."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.cloudkms import base as cloudkms_base
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
@@ -46,6 +49,13 @@ class Describe(base.DescribeCommand):
     if not crypto_key_ref.Name():
       raise exceptions.InvalidArgumentException('key',
                                                 'key id must be non-empty.')
-    return client.projects_locations_keyRings_cryptoKeys.Get(
+    resp = client.projects_locations_keyRings_cryptoKeys.Get(
         messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=crypto_key_ref.RelativeName()))
+
+    # Suppress the attestation in the response, if there is one. Users can use
+    # keys versions describe --attestation-file to obtain it, instead.
+    if resp.primary and resp.primary.attestation:
+      resp.primary.attestation = None
+
+    return resp

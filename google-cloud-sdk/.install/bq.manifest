@@ -1,4 +1,5 @@
 bin/bootstrapping/bq.py
+data/cli/bq.json
 platform/bq/LICENSE.txt
 platform/bq/MANIFEST.in
 platform/bq/README.txt

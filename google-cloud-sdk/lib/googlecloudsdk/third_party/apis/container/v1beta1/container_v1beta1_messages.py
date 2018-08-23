@@ -38,6 +38,8 @@ class AddonsConfig(_messages.Message):
     httpLoadBalancing: Configuration for the HTTP (L7) load balancing
       controller addon, which makes it easy to set up HTTP load balancers for
       services in a cluster.
+    istioConfig: Configuration for Istio, an open platform to connect, manage,
+      and secure microservices.
     kubernetesDashboard: Configuration for the Kubernetes Dashboard.
     networkPolicyConfig: Configuration for NetworkPolicy. This only tracks
       whether the addon is enabled or not on the Master, it does not track
@@ -46,8 +48,9 @@ class AddonsConfig(_messages.Message):
 
   horizontalPodAutoscaling = _messages.MessageField('HorizontalPodAutoscaling', 1)
   httpLoadBalancing = _messages.MessageField('HttpLoadBalancing', 2)
-  kubernetesDashboard = _messages.MessageField('KubernetesDashboard', 3)
-  networkPolicyConfig = _messages.MessageField('NetworkPolicyConfig', 4)
+  istioConfig = _messages.MessageField('IstioConfig', 3)
+  kubernetesDashboard = _messages.MessageField('KubernetesDashboard', 4)
+  networkPolicyConfig = _messages.MessageField('NetworkPolicyConfig', 5)
 
 
 class AuditConfig(_messages.Message):
@@ -59,6 +62,36 @@ class AuditConfig(_messages.Message):
   """
 
   enabled = _messages.BooleanField(1)
+
+
+class AuthorizationLoggingOptions(_messages.Message):
+  r"""Authorization-related information used by Cloud Audit Logging.
+
+  Enums:
+    PermissionTypeValueValuesEnum: The type of the permission that was
+      checked.
+
+  Fields:
+    permissionType: The type of the permission that was checked.
+  """
+
+  class PermissionTypeValueValuesEnum(_messages.Enum):
+    r"""The type of the permission that was checked.
+
+    Values:
+      PERMISSION_TYPE_UNSPECIFIED: Default. Should not be used.
+      ADMIN_READ: A read of admin (meta) data.
+      ADMIN_WRITE: A write of admin (meta) data.
+      DATA_READ: A read of standard data.
+      DATA_WRITE: A write of standard data.
+    """
+    PERMISSION_TYPE_UNSPECIFIED = 0
+    ADMIN_READ = 1
+    ADMIN_WRITE = 2
+    DATA_READ = 3
+    DATA_WRITE = 4
+
+  permissionType = _messages.EnumField('PermissionTypeValueValuesEnum', 1)
 
 
 class AutoUpgradeOptions(_messages.Message):
@@ -164,21 +197,28 @@ class Cluster(_messages.Message):
     addonsConfig: Configurations for the various addons available to run in
       the cluster.
     auditConfig: Configuration for audit logging.
+    autoscaling: Cluster-level autoscaling configuration.
     binaryAuthorization: Configuration for Binary Authorization.
     clusterIpv4Cidr: The IP address range of the container pods in this
       cluster, in [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-
       Domain_Routing) notation (e.g. `10.96.0.0/14`). Leave blank to have one
       automatically chosen or specify a `/14` block in `10.0.0.0/8`.
+    conditions: Which conditions caused the current cluster state.
     createTime: [Output only] The time the cluster was created, in
       [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     currentMasterVersion: [Output only] The current software version of the
       master endpoint.
     currentNodeCount: [Output only] The number of nodes currently in the
       cluster.
-    currentNodeVersion: [Output only] The current version of the node software
-      components. If they are currently at multiple versions because they're
-      in the process of being upgraded, this reflects the minimum version of
-      all nodes.
+    currentNodeVersion: [Output only] Deprecated, use [NodePool.version
+      ](/kubernetes-
+      engine/docs/reference/rest/v1beta1/projects.zones.clusters.nodePool)
+      instead. The current version of the node software components. If they
+      are currently at multiple versions because they're in the process of
+      being upgraded, this reflects the minimum version of all nodes.
+    defaultMaxPodsConstraint: The default constraint on the maximum number of
+      pods that can be run simultaneously on a node in the node pool of this
+      cluster. Only honored if cluster created with IP Alias support.
     description: An optional description of this cluster.
     enableKubernetesAlpha: Kubernetes alpha features are enabled on this
       cluster. This includes alpha API groups (e.g. v1beta1) and features that
@@ -237,7 +277,9 @@ class Cluster(_messages.Message):
       authorized networks feature.
     masterIpv4CidrBlock: The IP prefix in CIDR notation to use for the hosted
       master network. This prefix will be used for assigning private IP
-      addresses to the master or set of masters, as well as the ILB VIP.
+      addresses to the master or set of masters, as well as the ILB VIP. This
+      field is deprecated, use private_cluster_config.master_ipv4_cidr_block
+      instead.
     monitoringService: The monitoring service the cluster should use to write
       metrics. Currently available options:  * `monitoring.googleapis.com` -
       the Google Cloud Monitoring service. * `none` - no metrics will be
@@ -269,7 +311,9 @@ class Cluster(_messages.Message):
     podSecurityPolicyConfig: Configuration for the PodSecurityPolicy feature.
     privateCluster: If this is a private cluster setup. Private clusters are
       clusters that, by default have no external IP addresses on the nodes and
-      where nodes and the master communicate over private IP addresses.
+      where nodes and the master communicate over private IP addresses. This
+      field is deprecated, use private_cluster_config.enabled instead.
+    privateClusterConfig: Configuration for private cluster.
     resourceLabels: The resource labels for the cluster to use to annotate any
       related Google Compute Engine resources.
     selfLink: [Output only] Server-defined URL for the resource.
@@ -286,6 +330,8 @@ class Cluster(_messages.Message):
     tpuIpv4CidrBlock: [Output only] The IP address range of the Cloud TPUs in
       this cluster, in [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-
       Domain_Routing) notation (e.g. `1.2.3.4/29`).
+    verticalPodAutoscaling: Cluster-level Vertical Pod Autoscaling
+      configuration.
     zone: [Output only] The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field is deprecated, use location instead.
@@ -346,49 +392,70 @@ class Cluster(_messages.Message):
 
   addonsConfig = _messages.MessageField('AddonsConfig', 1)
   auditConfig = _messages.MessageField('AuditConfig', 2)
-  binaryAuthorization = _messages.MessageField('BinaryAuthorization', 3)
-  clusterIpv4Cidr = _messages.StringField(4)
-  createTime = _messages.StringField(5)
-  currentMasterVersion = _messages.StringField(6)
-  currentNodeCount = _messages.IntegerField(7, variant=_messages.Variant.INT32)
-  currentNodeVersion = _messages.StringField(8)
-  description = _messages.StringField(9)
-  enableKubernetesAlpha = _messages.BooleanField(10)
-  enableTpu = _messages.BooleanField(11)
-  endpoint = _messages.StringField(12)
-  expireTime = _messages.StringField(13)
-  initialClusterVersion = _messages.StringField(14)
-  initialNodeCount = _messages.IntegerField(15, variant=_messages.Variant.INT32)
-  instanceGroupUrls = _messages.StringField(16, repeated=True)
-  ipAllocationPolicy = _messages.MessageField('IPAllocationPolicy', 17)
-  labelFingerprint = _messages.StringField(18)
-  legacyAbac = _messages.MessageField('LegacyAbac', 19)
-  location = _messages.StringField(20)
-  locations = _messages.StringField(21, repeated=True)
-  loggingService = _messages.StringField(22)
-  maintenancePolicy = _messages.MessageField('MaintenancePolicy', 23)
-  masterAuth = _messages.MessageField('MasterAuth', 24)
-  masterAuthorizedNetworks = _messages.MessageField('MasterAuthorizedNetworks', 25)
-  masterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 26)
-  masterIpv4CidrBlock = _messages.StringField(27)
-  monitoringService = _messages.StringField(28)
-  name = _messages.StringField(29)
-  network = _messages.StringField(30)
-  networkConfig = _messages.MessageField('NetworkConfig', 31)
-  networkPolicy = _messages.MessageField('NetworkPolicy', 32)
-  nodeConfig = _messages.MessageField('NodeConfig', 33)
-  nodeIpv4CidrSize = _messages.IntegerField(34, variant=_messages.Variant.INT32)
-  nodePools = _messages.MessageField('NodePool', 35, repeated=True)
-  podSecurityPolicyConfig = _messages.MessageField('PodSecurityPolicyConfig', 36)
-  privateCluster = _messages.BooleanField(37)
-  resourceLabels = _messages.MessageField('ResourceLabelsValue', 38)
-  selfLink = _messages.StringField(39)
-  servicesIpv4Cidr = _messages.StringField(40)
-  status = _messages.EnumField('StatusValueValuesEnum', 41)
-  statusMessage = _messages.StringField(42)
-  subnetwork = _messages.StringField(43)
-  tpuIpv4CidrBlock = _messages.StringField(44)
-  zone = _messages.StringField(45)
+  autoscaling = _messages.MessageField('ClusterAutoscaling', 3)
+  binaryAuthorization = _messages.MessageField('BinaryAuthorization', 4)
+  clusterIpv4Cidr = _messages.StringField(5)
+  conditions = _messages.MessageField('StatusCondition', 6, repeated=True)
+  createTime = _messages.StringField(7)
+  currentMasterVersion = _messages.StringField(8)
+  currentNodeCount = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  currentNodeVersion = _messages.StringField(10)
+  defaultMaxPodsConstraint = _messages.MessageField('MaxPodsConstraint', 11)
+  description = _messages.StringField(12)
+  enableKubernetesAlpha = _messages.BooleanField(13)
+  enableTpu = _messages.BooleanField(14)
+  endpoint = _messages.StringField(15)
+  expireTime = _messages.StringField(16)
+  initialClusterVersion = _messages.StringField(17)
+  initialNodeCount = _messages.IntegerField(18, variant=_messages.Variant.INT32)
+  instanceGroupUrls = _messages.StringField(19, repeated=True)
+  ipAllocationPolicy = _messages.MessageField('IPAllocationPolicy', 20)
+  labelFingerprint = _messages.StringField(21)
+  legacyAbac = _messages.MessageField('LegacyAbac', 22)
+  location = _messages.StringField(23)
+  locations = _messages.StringField(24, repeated=True)
+  loggingService = _messages.StringField(25)
+  maintenancePolicy = _messages.MessageField('MaintenancePolicy', 26)
+  masterAuth = _messages.MessageField('MasterAuth', 27)
+  masterAuthorizedNetworks = _messages.MessageField('MasterAuthorizedNetworks', 28)
+  masterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 29)
+  masterIpv4CidrBlock = _messages.StringField(30)
+  monitoringService = _messages.StringField(31)
+  name = _messages.StringField(32)
+  network = _messages.StringField(33)
+  networkConfig = _messages.MessageField('NetworkConfig', 34)
+  networkPolicy = _messages.MessageField('NetworkPolicy', 35)
+  nodeConfig = _messages.MessageField('NodeConfig', 36)
+  nodeIpv4CidrSize = _messages.IntegerField(37, variant=_messages.Variant.INT32)
+  nodePools = _messages.MessageField('NodePool', 38, repeated=True)
+  podSecurityPolicyConfig = _messages.MessageField('PodSecurityPolicyConfig', 39)
+  privateCluster = _messages.BooleanField(40)
+  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 41)
+  resourceLabels = _messages.MessageField('ResourceLabelsValue', 42)
+  selfLink = _messages.StringField(43)
+  servicesIpv4Cidr = _messages.StringField(44)
+  status = _messages.EnumField('StatusValueValuesEnum', 45)
+  statusMessage = _messages.StringField(46)
+  subnetwork = _messages.StringField(47)
+  tpuIpv4CidrBlock = _messages.StringField(48)
+  verticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 49)
+  zone = _messages.StringField(50)
+
+
+class ClusterAutoscaling(_messages.Message):
+  r"""ClusterAutoscaling contains global, per-cluster information required by
+  Cluster Autoscaler to automatically adjust the size of the cluster and
+  create/delete node pools based on the current needs.
+
+  Fields:
+    enableNodeAutoprovisioning: Enables automatic node pool creation and
+      deletion.
+    resourceLimits: Contains global constraints regarding minimum and maximum
+      amount of resources in the cluster.
+  """
+
+  enableNodeAutoprovisioning = _messages.BooleanField(1)
+  resourceLimits = _messages.MessageField('ResourceLimit', 2, repeated=True)
 
 
 class ClusterStatus(_messages.Message):
@@ -401,6 +468,7 @@ class ClusterStatus(_messages.Message):
     StatusValueValuesEnum: The current status of the cluster.
 
   Fields:
+    conditions: Which conditions caused the current cluster state.
     internal: An internal field for the sub-error type or other metadata for
       the Status.
     message: A human-readable message that describes the status of the
@@ -423,9 +491,10 @@ class ClusterStatus(_messages.Message):
     RUNNING = 1
     DEGRADED = 2
 
-  internal = _messages.StringField(1)
-  message = _messages.StringField(2)
-  status = _messages.EnumField('StatusValueValuesEnum', 3)
+  conditions = _messages.MessageField('StatusCondition', 1, repeated=True)
+  internal = _messages.StringField(2)
+  message = _messages.StringField(3)
+  status = _messages.EnumField('StatusValueValuesEnum', 4)
 
 
 class ClusterUpdate(_messages.Message):
@@ -441,6 +510,7 @@ class ClusterUpdate(_messages.Message):
     desiredAuditConfig: The desired configuration for audit logging.
     desiredBinaryAuthorization: The desired configuration options for the
       Binary Authorization feature.
+    desiredClusterAutoscaling: Cluster-level autoscaling configuration.
     desiredClusterStatus: The desired status fields for the cluster.
     desiredImage: The desired name of the image to use for this node. This is
       used to create clusters using a custom image.
@@ -454,6 +524,12 @@ class ClusterUpdate(_messages.Message):
       nodes being either created or removed from the cluster, depending on
       whether locations are being added or removed.  This list must always
       include the cluster's primary zone.
+    desiredLoggingService: The logging service the cluster should use to write
+      metrics. Currently available options:  *
+      "logging.googleapis.com/kubernetes" - the Google Cloud Logging service
+      with Kubernetes-native resource model in Stackdriver *
+      "logging.googleapis.com" - the Google Cloud Logging service * "none" -
+      no logs will be exported from the cluster
     desiredMasterAuthorizedNetworks: The desired configuration options for
       master authorized networks feature. This field is deprecated, use
       desired_master_authorized_networks_config instead.
@@ -475,6 +551,8 @@ class ClusterUpdate(_messages.Message):
       Kubernetes version - "-": picks the default Kubernetes version
     desiredMonitoringService: The monitoring service the cluster should use to
       write metrics. Currently available options:  *
+      "monitoring.googleapis.com/kubernetes" - the Google Cloud Monitoring
+      service with Kubernetes-native resource model in Stackdriver *
       "monitoring.googleapis.com" - the Google Cloud Monitoring service *
       "none" - no metrics will be exported from the cluster
     desiredNodePoolAutoscaling: Autoscaler configuration for the node pool
@@ -495,27 +573,32 @@ class ClusterUpdate(_messages.Message):
       picks the Kubernetes master version
     desiredPodSecurityPolicyConfig: The desired configuration options for the
       PodSecurityPolicy feature.
+    desiredVerticalPodAutoscaling: Cluster-level Vertical Pod Autoscaling
+      configuration.
   """
 
   concurrentNodeCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   desiredAddonsConfig = _messages.MessageField('AddonsConfig', 2)
   desiredAuditConfig = _messages.MessageField('AuditConfig', 3)
   desiredBinaryAuthorization = _messages.MessageField('BinaryAuthorization', 4)
-  desiredClusterStatus = _messages.MessageField('ClusterStatus', 5)
-  desiredImage = _messages.StringField(6)
-  desiredImageProject = _messages.StringField(7)
-  desiredImageType = _messages.StringField(8)
-  desiredLocations = _messages.StringField(9, repeated=True)
-  desiredMasterAuthorizedNetworks = _messages.MessageField('MasterAuthorizedNetworks', 10)
-  desiredMasterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 11)
-  desiredMasterId = _messages.StringField(12)
-  desiredMasterMachineType = _messages.StringField(13)
-  desiredMasterVersion = _messages.StringField(14)
-  desiredMonitoringService = _messages.StringField(15)
-  desiredNodePoolAutoscaling = _messages.MessageField('NodePoolAutoscaling', 16)
-  desiredNodePoolId = _messages.StringField(17)
-  desiredNodeVersion = _messages.StringField(18)
-  desiredPodSecurityPolicyConfig = _messages.MessageField('PodSecurityPolicyConfig', 19)
+  desiredClusterAutoscaling = _messages.MessageField('ClusterAutoscaling', 5)
+  desiredClusterStatus = _messages.MessageField('ClusterStatus', 6)
+  desiredImage = _messages.StringField(7)
+  desiredImageProject = _messages.StringField(8)
+  desiredImageType = _messages.StringField(9)
+  desiredLocations = _messages.StringField(10, repeated=True)
+  desiredLoggingService = _messages.StringField(11)
+  desiredMasterAuthorizedNetworks = _messages.MessageField('MasterAuthorizedNetworks', 12)
+  desiredMasterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 13)
+  desiredMasterId = _messages.StringField(14)
+  desiredMasterMachineType = _messages.StringField(15)
+  desiredMasterVersion = _messages.StringField(16)
+  desiredMonitoringService = _messages.StringField(17)
+  desiredNodePoolAutoscaling = _messages.MessageField('NodePoolAutoscaling', 18)
+  desiredNodePoolId = _messages.StringField(19)
+  desiredNodeVersion = _messages.StringField(20)
+  desiredPodSecurityPolicyConfig = _messages.MessageField('PodSecurityPolicyConfig', 21)
+  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 22)
 
 
 class ClusterUpdateOptions(_messages.Message):
@@ -585,6 +668,21 @@ class ContainerProjectsAggregatedUsableSubnetworksListRequest(_messages.Message)
   pageToken = _messages.StringField(3)
   parent = _messages.StringField(4, required=True)
   version = _messages.StringField(5)
+
+
+class ContainerProjectsGetIamPolicyRequest(_messages.Message):
+  r"""A ContainerProjectsGetIamPolicyRequest object.
+
+  Fields:
+    googleIamV1GetIamPolicyRequest: A GoogleIamV1GetIamPolicyRequest resource
+      to be passed as the request body.
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See the operation documentation for the appropriate value for this
+      field.
+  """
+
+  googleIamV1GetIamPolicyRequest = _messages.MessageField('GoogleIamV1GetIamPolicyRequest', 1)
+  resource = _messages.StringField(2, required=True)
 
 
 class ContainerProjectsLocationsClustersDeleteRequest(_messages.Message):
@@ -777,8 +875,8 @@ class ContainerProjectsLocationsListRequest(_messages.Message):
       if that response token was set (which happens when listing more
       Locations than fit in a single ListLocationsResponse). This is currently
       not used and will be honored once we use pagination.
-    parent: Contains the name of the resource requested. Specific in the
-      format 'projects/*/locations'.
+    parent: Contains the name of the resource requested. Specified in the
+      format 'projects/*'.
     version: API request version that initiates this operation.
   """
 
@@ -833,6 +931,37 @@ class ContainerProjectsLocationsOperationsListRequest(_messages.Message):
   projectId = _messages.StringField(2)
   version = _messages.StringField(3)
   zone = _messages.StringField(4)
+
+
+class ContainerProjectsSetIamPolicyRequest(_messages.Message):
+  r"""A ContainerProjectsSetIamPolicyRequest object.
+
+  Fields:
+    googleIamV1SetIamPolicyRequest: A GoogleIamV1SetIamPolicyRequest resource
+      to be passed as the request body.
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See the operation documentation for the appropriate value for this
+      field.
+  """
+
+  googleIamV1SetIamPolicyRequest = _messages.MessageField('GoogleIamV1SetIamPolicyRequest', 1)
+  resource = _messages.StringField(2, required=True)
+
+
+class ContainerProjectsTestIamPermissionsRequest(_messages.Message):
+  r"""A ContainerProjectsTestIamPermissionsRequest object.
+
+  Fields:
+    googleIamV1TestIamPermissionsRequest: A
+      GoogleIamV1TestIamPermissionsRequest resource to be passed as the
+      request body.
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See the operation documentation for the appropriate value for
+      this field.
+  """
+
+  googleIamV1TestIamPermissionsRequest = _messages.MessageField('GoogleIamV1TestIamPermissionsRequest', 1)
+  resource = _messages.StringField(2, required=True)
 
 
 class ContainerProjectsZonesClustersDeleteRequest(_messages.Message):
@@ -1091,7 +1220,7 @@ class CreateNodePoolRequest(_messages.Message):
     nodePool: The node pool to create.
     parent: The parent (project, location, cluster id) where the node pool
       will be created. Specified in the format
-      'projects/*/locations/*/clusters/*/nodePools/*'.
+      'projects/*/locations/*/clusters/*'.
     projectId: Deprecated. The Google Developers Console [project ID or
       project
       number](https://developers.google.com/console/help/new/#projectnumber).
@@ -1150,6 +1279,497 @@ class Empty(_messages.Message):
   JSON representation for `Empty` is empty JSON object `{}`.
   """
 
+
+
+class Expr(_messages.Message):
+  r"""Represents an expression text. Example:      title: "User account
+  presence"     description: "Determines whether the request has a user
+  account"     expression: "size(request.user) > 0"
+
+  Fields:
+    description: An optional description of the expression. This is a longer
+      text which describes the expression, e.g. when hovered over it in a UI.
+    expression: Textual representation of an expression in Common Expression
+      Language syntax.  The application context of the containing message
+      determines which well-known feature set of CEL is supported.
+    location: An optional string indicating the location of the expression for
+      error reporting, e.g. a file name and a position in the file.
+    title: An optional title for the expression, i.e. a short string
+      describing its purpose. This can be used e.g. in UIs which allow to
+      enter the expression.
+  """
+
+  description = _messages.StringField(1)
+  expression = _messages.StringField(2)
+  location = _messages.StringField(3)
+  title = _messages.StringField(4)
+
+
+class GoogleIamV1AuditConfig(_messages.Message):
+  r"""Specifies the audit configuration for a service. The configuration
+  determines which permission types are logged, and what identities, if any,
+  are exempted from logging. An AuditConfig must have one or more
+  AuditLogConfigs.  If there are AuditConfigs for both `allServices` and a
+  specific service, the union of the two AuditConfigs is used for that
+  service: the log_types specified in each AuditConfig are enabled, and the
+  exempted_members in each AuditLogConfig are exempted.  Example Policy with
+  multiple AuditConfigs:      {       "audit_configs": [         {
+  "service": "allServices"           "audit_log_configs": [             {
+  "log_type": "DATA_READ",               "exempted_members": [
+  "user:foo@gmail.com"               ]             },             {
+  "log_type": "DATA_WRITE",             },             {
+  "log_type": "ADMIN_READ",             }           ]         },         {
+  "service": "fooservice.googleapis.com"           "audit_log_configs": [
+  {               "log_type": "DATA_READ",             },             {
+  "log_type": "DATA_WRITE",               "exempted_members": [
+  "user:bar@gmail.com"               ]             }           ]         }
+  ]     }  For fooservice, this policy enables DATA_READ, DATA_WRITE and
+  ADMIN_READ logging. It also exempts foo@gmail.com from DATA_READ logging,
+  and bar@gmail.com from DATA_WRITE logging.
+
+  Fields:
+    auditLogConfigs: The configuration for logging of each type of permission.
+    exemptedMembers: A string attribute.
+    service: Specifies a service that will be enabled for audit logging. For
+      example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
+      `allServices` is a special value that covers all services.
+  """
+
+  auditLogConfigs = _messages.MessageField('GoogleIamV1AuditLogConfig', 1, repeated=True)
+  exemptedMembers = _messages.StringField(2, repeated=True)
+  service = _messages.StringField(3)
+
+
+class GoogleIamV1AuditLogConfig(_messages.Message):
+  r"""Provides the configuration for logging a type of permissions. Example:
+  {       "audit_log_configs": [         {           "log_type": "DATA_READ",
+  "exempted_members": [             "user:foo@gmail.com"           ]
+  },         {           "log_type": "DATA_WRITE",         }       ]     }
+  This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
+  foo@gmail.com from DATA_READ logging.
+
+  Enums:
+    LogTypeValueValuesEnum: The log type that this config enables.
+
+  Fields:
+    exemptedMembers: Specifies the identities that do not cause logging for
+      this type of permission. Follows the same format of Binding.members.
+    logType: The log type that this config enables.
+  """
+
+  class LogTypeValueValuesEnum(_messages.Enum):
+    r"""The log type that this config enables.
+
+    Values:
+      LOG_TYPE_UNSPECIFIED: Default case. Should never be this.
+      ADMIN_READ: Admin reads. Example: CloudIAM getIamPolicy
+      DATA_WRITE: Data writes. Example: CloudSQL Users create
+      DATA_READ: Data reads. Example: CloudSQL Users list
+    """
+    LOG_TYPE_UNSPECIFIED = 0
+    ADMIN_READ = 1
+    DATA_WRITE = 2
+    DATA_READ = 3
+
+  exemptedMembers = _messages.StringField(1, repeated=True)
+  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
+
+
+class GoogleIamV1Binding(_messages.Message):
+  r"""Associates `members` with a `role`.
+
+  Fields:
+    condition: Unimplemented. The condition that is associated with this
+      binding. NOTE: an unsatisfied condition will not allow user access via
+      current binding. Different bindings, including their conditions, are
+      examined independently.
+    members: Specifies the identities requesting access for a Cloud Platform
+      resource. `members` can have the following values:  * `allUsers`: A
+      special identifier that represents anyone who is    on the internet;
+      with or without a Google account.  * `allAuthenticatedUsers`: A special
+      identifier that represents anyone    who is authenticated with a Google
+      account or a service account.  * `user:{emailid}`: An email address that
+      represents a specific Google    account. For example, `alice@gmail.com`
+      .   * `serviceAccount:{emailid}`: An email address that represents a
+      service    account. For example, `my-other-
+      app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
+      that represents a Google group.    For example, `admins@example.com`.
+      * `domain:{domain}`: A Google Apps domain name that represents all the
+      users of that domain. For example, `google.com` or `example.com`.
+    role: Role that is assigned to `members`. For example, `roles/viewer`,
+      `roles/editor`, or `roles/owner`.
+  """
+
+  condition = _messages.MessageField('Expr', 1)
+  members = _messages.StringField(2, repeated=True)
+  role = _messages.StringField(3)
+
+
+class GoogleIamV1CloudAuditOptions(_messages.Message):
+  r"""Write a Cloud Audit log
+
+  Enums:
+    LogNameValueValuesEnum: The log_name to populate in the Cloud Audit
+      Record.
+
+  Fields:
+    authorizationLoggingOptions: Information used by the Cloud Audit Logging
+      pipeline.
+    logName: The log_name to populate in the Cloud Audit Record.
+  """
+
+  class LogNameValueValuesEnum(_messages.Enum):
+    r"""The log_name to populate in the Cloud Audit Record.
+
+    Values:
+      UNSPECIFIED_LOG_NAME: Default. Should not be used.
+      ADMIN_ACTIVITY: Corresponds to "cloudaudit.googleapis.com/activity"
+      DATA_ACCESS: Corresponds to "cloudaudit.googleapis.com/data_access"
+    """
+    UNSPECIFIED_LOG_NAME = 0
+    ADMIN_ACTIVITY = 1
+    DATA_ACCESS = 2
+
+  authorizationLoggingOptions = _messages.MessageField('AuthorizationLoggingOptions', 1)
+  logName = _messages.EnumField('LogNameValueValuesEnum', 2)
+
+
+class GoogleIamV1Condition(_messages.Message):
+  r"""A condition to be met.
+
+  Enums:
+    IamValueValuesEnum: Trusted attributes supplied by the IAM system.
+    OpValueValuesEnum: An operator to apply the subject with.
+    SysValueValuesEnum: Trusted attributes supplied by any service that owns
+      resources and uses the IAM system for access control.
+
+  Fields:
+    iam: Trusted attributes supplied by the IAM system.
+    op: An operator to apply the subject with.
+    svc: Trusted attributes discharged by the service.
+    sys: Trusted attributes supplied by any service that owns resources and
+      uses the IAM system for access control.
+    value: DEPRECATED. Use 'values' instead.
+    values: The objects of the condition. This is mutually exclusive with
+      'value'.
+  """
+
+  class IamValueValuesEnum(_messages.Enum):
+    r"""Trusted attributes supplied by the IAM system.
+
+    Values:
+      NO_ATTR: Default non-attribute.
+      AUTHORITY: Either principal or (if present) authority selector.
+      ATTRIBUTION: The principal (even if an authority selector is present),
+        which must only be used for attribution, not authorization.
+      SECURITY_REALM: Any of the security realms in the IAMContext (go
+        /security-realms). When used with IN, the condition indicates "any of
+        the request's realms match one of the given values; with NOT_IN, "none
+        of the realms match any of the given values". Note that a value can be
+        either a realm or a realm group (go/realm-groups). A match is
+        determined by a realm group membership check performed by a
+        RealmAclRep object (go/realm-acl-howto). It is not permitted to grant
+        access based on the *absence* of a realm, so realm conditions can only
+        be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
+      APPROVER: An approver (distinct from the requester) that has authorized
+        this request. When used with IN, the condition indicates that one of
+        the approvers associated with the request matches the specified
+        principal, or is a member of the specified group. Approvers can only
+        grant additional access, and are thus only used in a strictly positive
+        context (e.g. ALLOW/IN or DENY/NOT_IN).
+      JUSTIFICATION_TYPE: What types of justifications have been supplied with
+        this request. String values should match enum names from
+        tech.iam.JustificationType, e.g. "MANUAL_STRING". It is not permitted
+        to grant access based on the *absence* of a justification, so
+        justification conditions can only be used in a "positive" context
+        (e.g., ALLOW/IN or DENY/NOT_IN).  Multiple justifications, e.g., a
+        Buganizer ID and a manually-entered reason, are normal and supported.
+      CREDENTIALS_TYPE: What type of credentials have been supplied with this
+        request. String values should match enum names from
+        security_loas_l2.CredentialsType - currently, only
+        CREDS_TYPE_EMERGENCY is supported. It is not permitted to grant access
+        based on the *absence* of a credentials type, so the conditions can
+        only be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
+    """
+    NO_ATTR = 0
+    AUTHORITY = 1
+    ATTRIBUTION = 2
+    SECURITY_REALM = 3
+    APPROVER = 4
+    JUSTIFICATION_TYPE = 5
+    CREDENTIALS_TYPE = 6
+
+  class OpValueValuesEnum(_messages.Enum):
+    r"""An operator to apply the subject with.
+
+    Values:
+      NO_OP: Default no-op.
+      EQUALS: DEPRECATED. Use IN instead.
+      NOT_EQUALS: DEPRECATED. Use NOT_IN instead.
+      IN: The condition is true if the subject (or any element of it if it is
+        a set) matches any of the supplied values.
+      NOT_IN: The condition is true if the subject (or every element of it if
+        it is a set) matches none of the supplied values.
+      DISCHARGED: Subject is discharged
+    """
+    NO_OP = 0
+    EQUALS = 1
+    NOT_EQUALS = 2
+    IN = 3
+    NOT_IN = 4
+    DISCHARGED = 5
+
+  class SysValueValuesEnum(_messages.Enum):
+    r"""Trusted attributes supplied by any service that owns resources and
+    uses the IAM system for access control.
+
+    Values:
+      NO_ATTR: Default non-attribute type
+      REGION: Region of the resource
+      SERVICE: Service name
+      NAME: Resource name
+      IP: IP address of the caller
+    """
+    NO_ATTR = 0
+    REGION = 1
+    SERVICE = 2
+    NAME = 3
+    IP = 4
+
+  iam = _messages.EnumField('IamValueValuesEnum', 1)
+  op = _messages.EnumField('OpValueValuesEnum', 2)
+  svc = _messages.StringField(3)
+  sys = _messages.EnumField('SysValueValuesEnum', 4)
+  value = _messages.StringField(5)
+  values = _messages.StringField(6, repeated=True)
+
+
+class GoogleIamV1CounterOptions(_messages.Message):
+  r"""Increment a streamz counter with the specified metric and field names.
+  Metric names should start with a '/', generally be lowercase-only, and end
+  in "_count". Field names should not contain an initial slash. The actual
+  exported metric names will have "/iam/policy" prepended.  Field names
+  correspond to IAM request parameters and field values are their respective
+  values.  At present the only supported field names are    - "iam_principal",
+  corresponding to IAMContext.principal;    - "" (empty string), resulting in
+  one aggretated counter with no field.  Examples:   counter { metric:
+  "/debug_access_count"  field: "iam_principal" }   ==> increment counter
+  /iam/policy/backend_debug_access_count
+  {iam_principal=[value of IAMContext.principal]}  At this time we do not
+  support: * multiple field names (though this may be supported in the future)
+  * decrementing the counter * incrementing it by anything other than 1
+
+  Fields:
+    field: The field value to attribute.
+    metric: The metric to update.
+  """
+
+  field = _messages.StringField(1)
+  metric = _messages.StringField(2)
+
+
+class GoogleIamV1DataAccessOptions(_messages.Message):
+  r"""Write a Data Access (Gin) log
+
+  Enums:
+    LogModeValueValuesEnum: Whether Gin logging should happen in a fail-closed
+      manner at the caller. This is relevant only in the LocalIAM
+      implementation, for now.
+
+  Fields:
+    logMode: Whether Gin logging should happen in a fail-closed manner at the
+      caller. This is relevant only in the LocalIAM implementation, for now.
+  """
+
+  class LogModeValueValuesEnum(_messages.Enum):
+    r"""Whether Gin logging should happen in a fail-closed manner at the
+    caller. This is relevant only in the LocalIAM implementation, for now.
+
+    Values:
+      LOG_MODE_UNSPECIFIED: Client is not required to write a partial Gin log
+        immediately after the authorization check. If client chooses to write
+        one and it fails, client may either fail open (allow the operation to
+        continue) or fail closed (handle as a DENY outcome).
+      LOG_FAIL_CLOSED: The application's operation in the context of which
+        this authorization check is being made may only be performed if it is
+        successfully logged to Gin. For instance, the authorization library
+        may satisfy this obligation by emitting a partial log entry at
+        authorization check time and only returning ALLOW to the application
+        if it succeeds.  If a matching Rule has this directive, but the client
+        has not indicated that it will honor such requirements, then the IAM
+        check will result in authorization failure by setting
+        CheckPolicyResponse.success=false.
+    """
+    LOG_MODE_UNSPECIFIED = 0
+    LOG_FAIL_CLOSED = 1
+
+  logMode = _messages.EnumField('LogModeValueValuesEnum', 1)
+
+
+class GoogleIamV1GetIamPolicyRequest(_messages.Message):
+  r"""Request message for `GetIamPolicy` method."""
+
+
+class GoogleIamV1LogConfig(_messages.Message):
+  r"""Specifies what kind of log the caller must write
+
+  Fields:
+    cloudAudit: Cloud audit options.
+    counter: Counter options.
+    dataAccess: Data access options.
+  """
+
+  cloudAudit = _messages.MessageField('GoogleIamV1CloudAuditOptions', 1)
+  counter = _messages.MessageField('GoogleIamV1CounterOptions', 2)
+  dataAccess = _messages.MessageField('GoogleIamV1DataAccessOptions', 3)
+
+
+class GoogleIamV1Policy(_messages.Message):
+  r"""Defines an Identity and Access Management (IAM) policy. It is used to
+  specify access control policies for Cloud Platform resources.   A `Policy`
+  consists of a list of `bindings`. A `binding` binds a list of `members` to a
+  `role`, where the members can be user accounts, Google groups, Google
+  domains, and service accounts. A `role` is a named list of permissions
+  defined by IAM.  **JSON Example**      {       "bindings": [         {
+  "role": "roles/owner",           "members": [
+  "user:mike@example.com",             "group:admins@example.com",
+  "domain:google.com",             "serviceAccount:my-other-
+  app@appspot.gserviceaccount.com"           ]         },         {
+  "role": "roles/viewer",           "members": ["user:sean@example.com"]
+  }       ]     }  **YAML Example**      bindings:     - members:       -
+  user:mike@example.com       - group:admins@example.com       -
+  domain:google.com       - serviceAccount:my-other-
+  app@appspot.gserviceaccount.com       role: roles/owner     - members:
+  - user:sean@example.com       role: roles/viewer   For a description of IAM
+  and its features, see the [IAM developer's
+  guide](https://cloud.google.com/iam/docs).
+
+  Fields:
+    auditConfigs: Specifies cloud audit logging configuration for this policy.
+    bindings: Associates a list of `members` to a `role`. `bindings` with no
+      members will result in an error.
+    etag: `etag` is used for optimistic concurrency control as a way to help
+      prevent simultaneous updates of a policy from overwriting each other. It
+      is strongly suggested that systems make use of the `etag` in the read-
+      modify-write cycle to perform policy updates in order to avoid race
+      conditions: An `etag` is returned in the response to `getIamPolicy`, and
+      systems are expected to put that etag in the request to `setIamPolicy`
+      to ensure that their change will be applied to the same version of the
+      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
+      the existing policy is overwritten blindly.
+    iamOwned: A boolean attribute.
+    rules: If more than one rule is specified, the rules are applied in the
+      following manner: - All matching LOG rules are always applied. - If any
+      DENY/DENY_WITH_LOG rule matches, permission is denied.   Logging will be
+      applied if one or more matching rule requires logging. - Otherwise, if
+      any ALLOW/ALLOW_WITH_LOG rule matches, permission is   granted.
+      Logging will be applied if one or more matching rule requires logging. -
+      Otherwise, if no rule applies, permission is denied.
+    version: Deprecated.
+  """
+
+  auditConfigs = _messages.MessageField('GoogleIamV1AuditConfig', 1, repeated=True)
+  bindings = _messages.MessageField('GoogleIamV1Binding', 2, repeated=True)
+  etag = _messages.BytesField(3)
+  iamOwned = _messages.BooleanField(4)
+  rules = _messages.MessageField('GoogleIamV1Rule', 5, repeated=True)
+  version = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+
+
+class GoogleIamV1Rule(_messages.Message):
+  r"""A rule to be applied in a Policy.
+
+  Enums:
+    ActionValueValuesEnum: Required
+
+  Fields:
+    action: Required
+    conditions: Additional restrictions that must be met. All conditions must
+      pass for the rule to match.
+    description: Human-readable description of the rule.
+    in_: If one or more 'in' clauses are specified, the rule matches if the
+      PRINCIPAL/AUTHORITY_SELECTOR is in at least one of these entries.
+    logConfig: The config returned to callers of tech.iam.IAM.CheckPolicy for
+      any entries that match the LOG action.
+    notIn: If one or more 'not_in' clauses are specified, the rule matches if
+      the PRINCIPAL/AUTHORITY_SELECTOR is in none of the entries. The format
+      for in and not_in entries can be found at in the Local IAM documentation
+      (see go/local-iam#features).
+    permissions: A permission is a string of form '<service>.<resource
+      type>.<verb>' (e.g., 'storage.buckets.list'). A value of '*' matches all
+      permissions, and a verb part of '*' (e.g., 'storage.buckets.*') matches
+      all verbs.
+  """
+
+  class ActionValueValuesEnum(_messages.Enum):
+    r"""Required
+
+    Values:
+      NO_ACTION: Default no action.
+      ALLOW: Matching 'Entries' grant access.
+      ALLOW_WITH_LOG: Matching 'Entries' grant access and the caller promises
+        to log the request per the returned log_configs.
+      DENY: Matching 'Entries' deny access.
+      DENY_WITH_LOG: Matching 'Entries' deny access and the caller promises to
+        log the request per the returned log_configs.
+      LOG: Matching 'Entries' tell IAM.Check callers to generate logs.
+    """
+    NO_ACTION = 0
+    ALLOW = 1
+    ALLOW_WITH_LOG = 2
+    DENY = 3
+    DENY_WITH_LOG = 4
+    LOG = 5
+
+  action = _messages.EnumField('ActionValueValuesEnum', 1)
+  conditions = _messages.MessageField('GoogleIamV1Condition', 2, repeated=True)
+  description = _messages.StringField(3)
+  in_ = _messages.StringField(4, repeated=True)
+  logConfig = _messages.MessageField('GoogleIamV1LogConfig', 5, repeated=True)
+  notIn = _messages.StringField(6, repeated=True)
+  permissions = _messages.StringField(7, repeated=True)
+
+
+class GoogleIamV1SetIamPolicyRequest(_messages.Message):
+  r"""Request message for `SetIamPolicy` method.
+
+  Fields:
+    policy: REQUIRED: The complete policy to be applied to the `resource`. The
+      size of the policy is limited to a few 10s of KB. An empty policy is a
+      valid policy but certain Cloud Platform services (such as Projects)
+      might reject them.
+    updateMask: OPTIONAL: A FieldMask specifying which fields of the policy to
+      modify. Only the fields in the mask will be modified. If no mask is
+      provided, the following default mask is used: paths: "bindings, etag"
+      This field is only used by Cloud IAM.
+  """
+
+  policy = _messages.MessageField('GoogleIamV1Policy', 1)
+  updateMask = _messages.StringField(2)
+
+
+class GoogleIamV1TestIamPermissionsRequest(_messages.Message):
+  r"""Request message for `TestIamPermissions` method.
+
+  Fields:
+    permissions: The set of permissions to check for the `resource`.
+      Permissions with wildcards (such as '*' or 'storage.*') are not allowed.
+      For more information see [IAM
+      Overview](https://cloud.google.com/iam/docs/overview#permissions).
+  """
+
+  permissions = _messages.StringField(1, repeated=True)
+
+
+class GoogleIamV1TestIamPermissionsResponse(_messages.Message):
+  r"""Response message for `TestIamPermissions` method.
+
+  Fields:
+    permissions: A subset of `TestPermissionsRequest.permissions` that the
+      caller is allowed.
+  """
+
+  permissions = _messages.StringField(1, repeated=True)
 
 
 class HorizontalPodAutoscaling(_messages.Message):
@@ -1265,6 +1885,32 @@ class IPAllocationPolicy(_messages.Message):
   useIpAliases = _messages.BooleanField(13)
 
 
+class IstioConfig(_messages.Message):
+  r"""Configuration options for Istio addon.
+
+  Enums:
+    AuthValueValuesEnum: The specified Istio auth mode, either none, or mutual
+      TLS.
+
+  Fields:
+    auth: The specified Istio auth mode, either none, or mutual TLS.
+    disabled: Whether Istio is enabled for this cluster.
+  """
+
+  class AuthValueValuesEnum(_messages.Enum):
+    r"""The specified Istio auth mode, either none, or mutual TLS.
+
+    Values:
+      AUTH_NONE: auth not enabled
+      AUTH_MUTUAL_TLS: auth mutual TLS enabled
+    """
+    AUTH_NONE = 0
+    AUTH_MUTUAL_TLS = 1
+
+  auth = _messages.EnumField('AuthValueValuesEnum', 1)
+  disabled = _messages.BooleanField(2)
+
+
 class KubernetesDashboard(_messages.Message):
   r"""Configuration for the Kubernetes Dashboard.
 
@@ -1376,7 +2022,7 @@ class Location(_messages.Message):
       Regional or Zonal.
 
   Fields:
-    name: Contains the name of the resource requested. Specific in the format
+    name: Contains the name of the resource requested. Specified in the format
       'projects/*/locations/*'.
     recommended: Recommended is a bool combining the drain state of the
       location (ie- has the region been drained manually?), and the stockout
@@ -1409,11 +2055,14 @@ class MaintenancePolicy(_messages.Message):
   cluster.
 
   Fields:
+    masterUpdateRestriction: Specifies additional restrictions applying to
+      when master updates may be performed.
     window: Specifies the maintenance window in which maintenance may be
       performed.
   """
 
-  window = _messages.MessageField('MaintenanceWindow', 1)
+  masterUpdateRestriction = _messages.MessageField('MasterUpdateRestriction', 1)
+  window = _messages.MessageField('MaintenanceWindow', 2)
 
 
 class MaintenanceWindow(_messages.Message):
@@ -1437,8 +2086,8 @@ class MasterAuth(_messages.Message):
     clientCertificate: [Output only] Base64-encoded public certificate used by
       clients to authenticate to the cluster endpoint.
     clientCertificateConfig: Configuration for client certificate
-      authentication on the cluster.  If no configuration is specified, a
-      client certificate is issued.
+      authentication on the cluster. For clusters before v1.12, if no
+      configuration is specified, a client certificate is issued.
     clientKey: [Output only] Base64-encoded private key used by clients to
       authenticate to the cluster endpoint.
     clusterCaCertificate: [Output only] Base64-encoded public certificate that
@@ -1493,6 +2142,77 @@ class MasterAuthorizedNetworksConfig(_messages.Message):
   enabled = _messages.BooleanField(2)
 
 
+class MasterUpdateFreeze(_messages.Message):
+  r"""MasterUpdateFreeze defines freeze on master updates. Some customers want
+  to avoid master updates during time periods critical to their bussiness.  In
+  the future each k8s version will have a support window (see go/gke-
+  supported-versions-design). Then we will allow freezing master until ~2
+  weeks before we stop maintaing the version.  For now we approximate this: -
+  Freeze must last at most 13 weeks. - Only masters in newest and second
+  newest (minor) versions can be frozen. - After freeze user must give us 2
+  weeks before starting a new one. - User can end freeze early. - If user
+  ended a freeze early they can resume it (with 13 week duration   limit
+  counting from the original freeze time).  We will apply security updates
+  even to frozen masters.
+
+  Fields:
+    frozen: Indicates if the master version is currently frozen. When master
+      is frozen scheduled_freeze_end_time must be a future timestamp. When
+      master is not frozen scheduled_freeze_end_time must be a past timestamp
+      (frozen during last two weeks) or an empty string (not frozen during
+      last two weeks). You can only set this to true if max_freeze_end_time is
+      a future timestamp. When setting frozen to true you can set
+      scheduled_freeze_end_time to a future timestamp not later than
+      max_freeze_end_time. If you don't set scheduled_freeze_end_time when
+      setting frozen to true it will be set to max_freeze_end_time. After
+      scheduled_freeze_end_time this field automatically becomes false. If you
+      chage value of this field to false scheduled_freeze_end_time becomes
+      timestamp of the request. We still apply security updates to frozen
+      masters.
+    maxFreezeEndTime: [Output only] The time by which the master update freeze
+      must end, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text
+      format. In the future it will be end of support for master version - 2
+      weeks.  For now it is: - For clusters that weren't in a freeze during
+      last 2 weeks and are in one   of the two newest (minor) versions: now +
+      13 weeks. - For clusters that weren't in a freeze during last 2 weeks
+      and are in an   older version: empty - For clusters that were in a
+      freeze during last two weeks (including   currently frozen clusters):
+      start of the freeze + 13 weeks.
+    scheduledFreezeEndTime: The time at which the master update freeze is
+      scheduled to end, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt)
+      text format. Future timestamp means the freeze is ongoing. Past
+      timestamp means the freeze ended recently (the cluster is going through
+      period of recovering from the freeze). Empty string means cluster wasn't
+      affected by a freeze recently. This field can be set only to a timestamp
+      that is: - In the future and - Earlier than max_freeze_end_time.
+  """
+
+  frozen = _messages.BooleanField(1)
+  maxFreezeEndTime = _messages.StringField(2)
+  scheduledFreezeEndTime = _messages.StringField(3)
+
+
+class MasterUpdateRestriction(_messages.Message):
+  r"""MasterUpdateRestriction defines restrictions that apply only to
+  clusters' master updates.
+
+  Fields:
+    freeze: MasterUpdateFreeze defines freeze to master updates.
+  """
+
+  freeze = _messages.MessageField('MasterUpdateFreeze', 1)
+
+
+class MaxPodsConstraint(_messages.Message):
+  r"""Constraints applied to pods.
+
+  Fields:
+    maxPodsPerNode: Constraint enforced on the max num of pods per node.
+  """
+
+  maxPodsPerNode = _messages.IntegerField(1)
+
+
 class Metric(_messages.Message):
   r"""Progress metric is (string, int|float|string) pair.
 
@@ -1514,12 +2234,13 @@ class NetworkConfig(_messages.Message):
   r"""NetworkConfig reports the relative names of network & subnetwork.
 
   Fields:
-    network: Output only. The name of the Google Compute Engine
-      network(/compute/docs/networks-and-firewalls#networks). Example:
-      projects/my-project/global/networks/my-network
-    subnetwork: Output only. The name of the Google Compute Engine
-      [subnetwork](/compute/docs/vpc). Example: projects/my-project/regions
-      /us-central1/subnetworks/my-subnet
+    network: Output only. The relative name of the Google Compute Engine
+      network(/compute/docs/networks-and-firewalls#networks) to which the
+      cluster is connected. Example: projects/my-project/global/networks/my-
+      network
+    subnetwork: Output only. The relative name of the Google Compute Engine
+      [subnetwork](/compute/docs/vpc) to which the cluster is connected.
+      Example: projects/my-project/regions/us-central1/subnetworks/my-subnet
   """
 
   network = _messages.StringField(1)
@@ -1582,12 +2303,12 @@ class NodeConfig(_messages.Message):
       metadata server. Additionally, to avoid ambiguity, keys must not
       conflict with any other metadata keys for the project or be one of the
       reserved keys:  "cluster-location"  "cluster-name"  "cluster-uid"
-      "configure-sh"  "gci-update-strategy"  "gci-ensure-gke-docker"
-      "instance-template"  "kube-env"  "startup-script"  "user-data"  Values
-      are free-form strings, and only have meaning as interpreted by the image
-      running in the instance. The only restriction placed on them is that
-      each value's size must be less than or equal to 32 KB.  The total size
-      of all keys and values must be less than 512 KB.
+      "configure-sh"  "enable-oslogin"  "gci-ensure-gke-docker"  "gci-update-
+      strategy"  "instance-template"  "kube-env"  "startup-script"  "user-
+      data"  Values are free-form strings, and only have meaning as
+      interpreted by the image running in the instance. The only restriction
+      placed on them is that each value's size must be less than or equal to
+      32 KB.  The total size of all keys and values must be less than 512 KB.
 
   Fields:
     accelerators: A list of hardware accelerators to be attached to each node.
@@ -1623,12 +2344,12 @@ class NodeConfig(_messages.Message):
       metadata server. Additionally, to avoid ambiguity, keys must not
       conflict with any other metadata keys for the project or be one of the
       reserved keys:  "cluster-location"  "cluster-name"  "cluster-uid"
-      "configure-sh"  "gci-update-strategy"  "gci-ensure-gke-docker"
-      "instance-template"  "kube-env"  "startup-script"  "user-data"  Values
-      are free-form strings, and only have meaning as interpreted by the image
-      running in the instance. The only restriction placed on them is that
-      each value's size must be less than or equal to 32 KB.  The total size
-      of all keys and values must be less than 512 KB.
+      "configure-sh"  "enable-oslogin"  "gci-ensure-gke-docker"  "gci-update-
+      strategy"  "instance-template"  "kube-env"  "startup-script"  "user-
+      data"  Values are free-form strings, and only have meaning as
+      interpreted by the image running in the instance. The only restriction
+      placed on them is that each value's size must be less than or equal to
+      32 KB.  The total size of all keys and values must be less than 512 KB.
     minCpuPlatform: Minimum CPU platform to be used by this instance. The
       instance may be scheduled on the specified or newer CPU platform.
       Applicable values are the friendly names of CPU platforms, such as
@@ -1703,13 +2424,13 @@ class NodeConfig(_messages.Message):
     in length. These are reflected as part of a URL in the metadata server.
     Additionally, to avoid ambiguity, keys must not conflict with any other
     metadata keys for the project or be one of the reserved keys:  "cluster-
-    location"  "cluster-name"  "cluster-uid"  "configure-sh"  "gci-update-
-    strategy"  "gci-ensure-gke-docker"  "instance-template"  "kube-env"
-    "startup-script"  "user-data"  Values are free-form strings, and only have
-    meaning as interpreted by the image running in the instance. The only
-    restriction placed on them is that each value's size must be less than or
-    equal to 32 KB.  The total size of all keys and values must be less than
-    512 KB.
+    location"  "cluster-name"  "cluster-uid"  "configure-sh"  "enable-oslogin"
+    "gci-ensure-gke-docker"  "gci-update-strategy"  "instance-template"
+    "kube-env"  "startup-script"  "user-data"  Values are free-form strings,
+    and only have meaning as interpreted by the image running in the instance.
+    The only restriction placed on them is that each value's size must be less
+    than or equal to 32 KB.  The total size of all keys and values must be
+    less than 512 KB.
 
     Messages:
       AdditionalProperty: An additional property for a MetadataValue object.
@@ -1780,6 +2501,7 @@ class NodePool(_messages.Message):
   Fields:
     autoscaling: Autoscaler configuration for this NodePool. Autoscaler is
       enabled only if a valid configuration is present.
+    conditions: Which conditions caused the current node pool state.
     config: The node configuration of the pool.
     initialNodeCount: The initial node count for the pool. You must ensure
       that your Compute Engine <a href="/compute/docs/resource-
@@ -1789,6 +2511,8 @@ class NodePool(_messages.Message):
       instance groups](/compute/docs/instance-groups/creating-groups-of-
       managed-instances) associated with this node pool.
     management: NodeManagement configuration for this NodePool.
+    maxPodsConstraint: The constraint on the maximum number of pods that can
+      be run simultaneously on a node in the node pool.
     name: The name of the node pool.
     selfLink: [Output only] Server-defined URL for the resource.
     status: [Output only] The status of the nodes in this pool instance.
@@ -1826,15 +2550,17 @@ class NodePool(_messages.Message):
     ERROR = 6
 
   autoscaling = _messages.MessageField('NodePoolAutoscaling', 1)
-  config = _messages.MessageField('NodeConfig', 2)
-  initialNodeCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  instanceGroupUrls = _messages.StringField(4, repeated=True)
-  management = _messages.MessageField('NodeManagement', 5)
-  name = _messages.StringField(6)
-  selfLink = _messages.StringField(7)
-  status = _messages.EnumField('StatusValueValuesEnum', 8)
-  statusMessage = _messages.StringField(9)
-  version = _messages.StringField(10)
+  conditions = _messages.MessageField('StatusCondition', 2, repeated=True)
+  config = _messages.MessageField('NodeConfig', 3)
+  initialNodeCount = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  instanceGroupUrls = _messages.StringField(5, repeated=True)
+  management = _messages.MessageField('NodeManagement', 6)
+  maxPodsConstraint = _messages.MessageField('MaxPodsConstraint', 7)
+  name = _messages.StringField(8)
+  selfLink = _messages.StringField(9)
+  status = _messages.EnumField('StatusValueValuesEnum', 10)
+  statusMessage = _messages.StringField(11)
+  version = _messages.StringField(12)
 
 
 class NodePoolAutoscaling(_messages.Message):
@@ -1842,6 +2568,7 @@ class NodePoolAutoscaling(_messages.Message):
   to adjust the size of the node pool to the current cluster usage.
 
   Fields:
+    autoprovisioned: Can this node pool be deleted automatically.
     enabled: Is autoscaling enabled for this node pool.
     maxNodeCount: Maximum number of nodes in the NodePool. Must be >=
       min_node_count. There has to enough quota to scale up the cluster.
@@ -1849,9 +2576,10 @@ class NodePoolAutoscaling(_messages.Message):
       max_node_count.
   """
 
-  enabled = _messages.BooleanField(1)
-  maxNodeCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  minNodeCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  autoprovisioned = _messages.BooleanField(1)
+  enabled = _messages.BooleanField(2)
+  maxNodeCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  minNodeCount = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
 class NodeTaint(_messages.Message):
@@ -1897,6 +2625,7 @@ class Operation(_messages.Message):
     StatusValueValuesEnum: The current status of the operation.
 
   Fields:
+    clusterConditions: Which conditions caused the current cluster state.
     detail: Detailed operation progress, if available.
     endTime: [Output only] The time the operation completed, in
       [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
@@ -1905,6 +2634,7 @@ class Operation(_messages.Message):
       [region](/compute/docs/regions-zones/regions-zones#available) in which
       the cluster resides.
     name: The server-assigned ID for the operation.
+    nodepoolConditions: Which conditions caused the current node pool state.
     operationType: The operation type.
     progress: [Output only] Progress information for an operation.
     selfLink: Server-defined URL for the resource.
@@ -1975,18 +2705,20 @@ class Operation(_messages.Message):
     DONE = 3
     ABORTING = 4
 
-  detail = _messages.StringField(1)
-  endTime = _messages.StringField(2)
-  location = _messages.StringField(3)
-  name = _messages.StringField(4)
-  operationType = _messages.EnumField('OperationTypeValueValuesEnum', 5)
-  progress = _messages.MessageField('OperationProgress', 6)
-  selfLink = _messages.StringField(7)
-  startTime = _messages.StringField(8)
-  status = _messages.EnumField('StatusValueValuesEnum', 9)
-  statusMessage = _messages.StringField(10)
-  targetLink = _messages.StringField(11)
-  zone = _messages.StringField(12)
+  clusterConditions = _messages.MessageField('StatusCondition', 1, repeated=True)
+  detail = _messages.StringField(2)
+  endTime = _messages.StringField(3)
+  location = _messages.StringField(4)
+  name = _messages.StringField(5)
+  nodepoolConditions = _messages.MessageField('StatusCondition', 6, repeated=True)
+  operationType = _messages.EnumField('OperationTypeValueValuesEnum', 7)
+  progress = _messages.MessageField('OperationProgress', 8)
+  selfLink = _messages.StringField(9)
+  startTime = _messages.StringField(10)
+  status = _messages.EnumField('StatusValueValuesEnum', 11)
+  statusMessage = _messages.StringField(12)
+  targetLink = _messages.StringField(13)
+  zone = _messages.StringField(14)
 
 
 class OperationProgress(_messages.Message):
@@ -2038,6 +2770,45 @@ class PodSecurityPolicyConfig(_messages.Message):
   """
 
   enabled = _messages.BooleanField(1)
+
+
+class PrivateClusterConfig(_messages.Message):
+  r"""Configuration options for private clusters.
+
+  Fields:
+    enablePrivateEndpoint: Whether the master's internal IP address is used as
+      the cluster endpoint.
+    enablePrivateNodes: Whether nodes have only private IP addresses, and
+      communicate with the master via private networking.
+    masterIpv4CidrBlock: The IP prefix in CIDR notation to use for the hosted
+      master network. This prefix will be used for assigning private IP
+      addresses to the master or set of masters, as well as the ILB VIP.
+    privateEndpoint: Output only. The internal IP address of this cluster's
+      master endpoint.
+    publicEndpoint: Output only. The external IP address of this cluster's
+      master endpoint.
+  """
+
+  enablePrivateEndpoint = _messages.BooleanField(1)
+  enablePrivateNodes = _messages.BooleanField(2)
+  masterIpv4CidrBlock = _messages.StringField(3)
+  privateEndpoint = _messages.StringField(4)
+  publicEndpoint = _messages.StringField(5)
+
+
+class ResourceLimit(_messages.Message):
+  r"""Contains information about amount of some resource in the cluster. For
+  memory, value should be in GB.
+
+  Fields:
+    maximum: Maximum amount of the resource in the cluster.
+    minimum: Minimum amount of the resource in the cluster.
+    resourceType: Resource name "cpu", "memory" or gpu-specific string.
+  """
+
+  maximum = _messages.IntegerField(1)
+  minimum = _messages.IntegerField(2)
+  resourceType = _messages.StringField(3)
 
 
 class RollbackNodePoolUpgradeRequest(_messages.Message):
@@ -2584,6 +3355,35 @@ class StartIPRotationRequest(_messages.Message):
   zone = _messages.StringField(6)
 
 
+class StatusCondition(_messages.Message):
+  r"""StatusCondition describes why a cluster or a node pool has a certain
+  status (e.g., ERROR or DEGRADED).
+
+  Enums:
+    CodeValueValuesEnum: Machine-friendly representation of the condition
+
+  Fields:
+    code: Machine-friendly representation of the condition
+    message: Human-friendly representation of the condition
+  """
+
+  class CodeValueValuesEnum(_messages.Enum):
+    r"""Machine-friendly representation of the condition
+
+    Values:
+      UNKNOWN: UNKNOWN indicates a generic condition.
+      GCE_STOCKOUT: GCE_STOCKOUT indicates a GCE stockout.
+      GKE_SERVICE_ACCOUNT_DELETED: GKE_SERVICE_ACCOUNT_DELETED indicates that
+        the user deleted their robot service account. More codes TBA
+    """
+    UNKNOWN = 0
+    GCE_STOCKOUT = 1
+    GKE_SERVICE_ACCOUNT_DELETED = 2
+
+  code = _messages.EnumField('CodeValueValuesEnum', 1)
+  message = _messages.StringField(2)
+
+
 class UpdateClusterRequest(_messages.Message):
   r"""UpdateClusterRequest updates the settings of a cluster.
 
@@ -2702,13 +3502,76 @@ class UsableSubnetwork(_messages.Message):
       subnetwork.
     network: Network Name. Example: projects/my-project/global/networks/my-
       network
+    secondaryIpRanges: Secondary IP ranges.
+    statusMessage: A human readable status message representing the reasons
+      for cases where the caller cannot use the secondary ranges under the
+      subnet. For example if the secondary_ip_ranges is empty due to a
+      permission issue, an insufficient permission message will be given by
+      status_message.
     subnetwork: Subnetwork Name. Example: projects/my-project/regions/us-
       central1/subnetworks/my-subnet
   """
 
   ipCidrRange = _messages.StringField(1)
   network = _messages.StringField(2)
-  subnetwork = _messages.StringField(3)
+  secondaryIpRanges = _messages.MessageField('UsableSubnetworkSecondaryRange', 3, repeated=True)
+  statusMessage = _messages.StringField(4)
+  subnetwork = _messages.StringField(5)
+
+
+class UsableSubnetworkSecondaryRange(_messages.Message):
+  r"""Secondary IP range of a usable subnetwork.
+
+  Enums:
+    StatusValueValuesEnum: This field is to determine the status of the
+      secondary range programmably.
+
+  Fields:
+    ipCidrRange: The range of IP addresses belonging to this subnetwork
+      secondary range.
+    rangeName: The name associated with this subnetwork secondary range, used
+      when adding an alias IP range to a VM instance.
+    status: This field is to determine the status of the secondary range
+      programmably.
+  """
+
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""This field is to determine the status of the secondary range
+    programmably.
+
+    Values:
+      UNKNOWN: UNKNOWN is the zero value of the Status enum. It's not a valid
+        status.
+      UNUSED: UNUSED denotes that this range is unclaimed by any cluster.
+      IN_USE_SERVICE: IN_USE_SERVICE denotes that this range is claimed by a
+        cluster for services. It cannot be used for other clusters.
+      IN_USE_SHAREABLE_POD: IN_USE_SHAREABLE_POD denotes this range was
+        created by the network admin and is currently claimed by a cluster for
+        pods. It can only be used by other clusters as a pod range.
+      IN_USE_MANAGED_POD: IN_USE_MANAGED_POD denotes this range was created by
+        GKE and is claimed for pods. It cannot be used for other clusters.
+    """
+    UNKNOWN = 0
+    UNUSED = 1
+    IN_USE_SERVICE = 2
+    IN_USE_SHAREABLE_POD = 3
+    IN_USE_MANAGED_POD = 4
+
+  ipCidrRange = _messages.StringField(1)
+  rangeName = _messages.StringField(2)
+  status = _messages.EnumField('StatusValueValuesEnum', 3)
+
+
+class VerticalPodAutoscaling(_messages.Message):
+  r"""VerticalPodAutoscaling contains global, per-cluster information required
+  by Vertical Pod Autoscaler to automatically adjust the resources of pods
+  controlled by it.
+
+  Fields:
+    enabled: Enables vertical pod autoscaling.
+  """
+
+  enabled = _messages.BooleanField(1)
 
 
 class WorkloadMetadataConfig(_messages.Message):
@@ -2746,6 +3609,8 @@ class WorkloadMetadataConfig(_messages.Message):
   nodeMetadata = _messages.EnumField('NodeMetadataValueValuesEnum', 1)
 
 
+encoding.AddCustomJsonFieldMapping(
+    GoogleIamV1Rule, 'in_', 'in')
 encoding.AddCustomJsonFieldMapping(
     StandardQueryParameters, 'f__xgafv', '$.xgafv')
 encoding.AddCustomJsonEnumMapping(

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """tpus delete tests."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
@@ -26,7 +30,8 @@ from six.moves import range
 
 
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA])
+                           calliope_base.ReleaseTrack.BETA,
+                           calliope_base.ReleaseTrack.GA])
 class DeleteTest(base.TpuUnitTestBase):
 
   def SetUp(self):
@@ -202,11 +207,8 @@ class DeleteTest(base.TpuUnitTestBase):
     )
     self.WriteInput('Y\n')
     self.Run('compute tpus delete mytpu')
-    self.AssertErrContains("""\
-You are about to delete tpu [mytpu]
-
-Do you want to continue (Y/n)?
-""", normalize_space=True)
+    self.AssertErrContains('You are about to delete tpu [mytpu]')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrMatches(r'Waiting for operation \[.*delete\] to complete')
     self.AssertErrContains('Deleted tpu [mytpu].', normalize_space=True)
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Test of the 'clusters' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 
 from apitools.base.py import exceptions as apitools_exceptions
@@ -31,12 +34,9 @@ from tests.lib.surface.container import base
 from six.moves import range
 
 
-class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
+class UpdateTestGA(parameterized.TestCase, base.GATestBase,
                    base.ClustersTestBase, test_case.WithInput):
   """gcloud GA track using container v1 API."""
-
-  def SetUp(self):
-    self.api_mismatch = False
 
   def testUpdateMonitoringNone(self):
     self._TestUpdate(
@@ -97,8 +97,8 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
           self.clusters_command_base.format(self.ZONE) + ' update clustername')
 
   def testOnlyOneUpdateType(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --monitoring-service: Exactly one of '):
+    with self.AssertRaisesArgumentErrorRegexp(
+        'argument (--update-addons|--monitoring-service): Exactly one of '):
       self.Run(
           self.clusters_command_base.format(self.ZONE) + ' update clustername '
           '--monitoring-service=monitoring.googleapis.com '
@@ -698,9 +698,6 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
         flags='--additional-zones=us-central1-a,moon-north3-z')
 
   def _TestUpdateLabels(self, location):
-    if self.api_mismatch and location == self.REGION:
-      self.WriteInput('y')
-
     desired = self.msgs.SetLabelsRequest.ResourceLabelsValue(
         additionalProperties=[
             self.msgs.SetLabelsRequest.ResourceLabelsValue.
@@ -726,8 +723,6 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
       self.Run(
           self.clusters_command_base.format(self.ZONE) +
           ' update {0} --update-labels=k=v'.format(name))
-    if self.api_mismatch and location == self.REGION:
-      self.AssertErrContains('You invoked')
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def _TestUpdateLabelsToSame(self):
@@ -1018,12 +1013,8 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestBetaV1API(base.BetaTestBase, UpdateTestGA):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
+class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
+  """gcloud Beta track using container v1beta1 API."""
 
   def testUpdateAdditionalZonesRemove(self):
     self._TestUpdateAdditionalZonesRemove()
@@ -1049,15 +1040,6 @@ class UpdateTestBetaV1API(base.BetaTestBase, UpdateTestGA):
                     disabled=True))),
         flags='--update-addons NetworkPolicy=DISABLED')
 
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestBetaV1Beta1API(base.TestBaseV1Beta1, UpdateTestBetaV1API):
-  """gcloud Beta track using container v1beta1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
-
   def testUpdateLocations(self):
     self._TestUpdate(
         update=self.msgs.ClusterUpdate(
@@ -1081,44 +1063,30 @@ class UpdateTestBetaV1Beta1API(base.TestBaseV1Beta1, UpdateTestBetaV1API):
     update = self.msgs.ClusterUpdate(desiredBinaryAuthorization=binauthz)
     self._TestUpdate(update=update, flags=flags)
 
+  def testUpdateMonitoringAndLogging(self):
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredMonitoringService='some.monitoring.service',
+            desiredLoggingService='some.logging.service'),
+        flags='--monitoring-service=some.monitoring.service '
+        '--logging-service=some.logging.service')
 
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestAlphaV1API(base.AlphaTestBase, UpdateTestBetaV1API):
-  """gcloud Alpha track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
-  def testEnableAutoprovisioning(self):
-    name = 'tobeupdated'
-    self.ExpectGetCluster(self._RunningCluster(name=name))
-    with self.assertRaises(c_util.Error):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
-          ' --enable-autoprovisioning')
-    self.AssertErrContains('Node autoprovisioning is currently in alpha')
-
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
-                                 UpdateTestBetaV1Beta1API):
-  """gcloud Alpha track using container v1alpha1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(False)
-    self.api_mismatch = False
+  def testUpdateMonitoring(self):
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredMonitoringService='some.monitoring.service'),
+        flags='--monitoring-service=some.monitoring.service ')
 
   def testEnableAutoprovisioning(self):
     self._TestUpdateAutoprovisioning(
         enabled=True,
         resource_limits=[
             self.msgs.ResourceLimit(
-                name='cpu',
+                resourceType='cpu',
                 maximum=100,
                 minimum=8),
             self.msgs.ResourceLimit(
-                name='memory',
+                resourceType='memory',
                 maximum=128)],
         flags='--enable-autoprovisioning --max-memory 128 '
               '--max-cpu 100 --min-cpu 8')
@@ -1128,14 +1096,14 @@ class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
         enabled=True,
         resource_limits=[
             self.msgs.ResourceLimit(
-                name='cpu',
+                resourceType='cpu',
                 maximum=100,
                 minimum=8),
             self.msgs.ResourceLimit(
-                name='memory',
+                resourceType='memory',
                 maximum=128),
             self.msgs.ResourceLimit(
-                name='nvidia-tesla-k80',
+                resourceType='nvidia-tesla-k80',
                 minimum=0,
                 maximum=2)],
         flags='--enable-autoprovisioning --max-memory 128 '
@@ -1147,14 +1115,14 @@ class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
         enabled=True,
         resource_limits=[
             self.msgs.ResourceLimit(
-                name='cpu',
+                resourceType='cpu',
                 maximum=100,
                 minimum=8),
             self.msgs.ResourceLimit(
-                name='memory',
+                resourceType='memory',
                 maximum=128),
             self.msgs.ResourceLimit(
-                name='nvidia-tesla-k80',
+                resourceType='nvidia-tesla-k80',
                 minimum=1,
                 maximum=2)],
         flags='--enable-autoprovisioning --max-memory 128 '
@@ -1196,6 +1164,17 @@ class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
     self.AssertErrContains('Maximum and minimum accelerator limits must be set'
                            ' on the same accelerator type.')
 
+  def testEnableVerticalPodAutoscaling(self):
+    update = self.msgs.ClusterUpdate(
+        desiredVerticalPodAutoscaling=self.msgs.VerticalPodAutoscaling(
+            enabled=True))
+    self._TestUpdate(update=update, flags='--enable-vertical-pod-autoscaling')
+
+
+# Mixin class must come in first to have the correct multi-inheritance behavior.
+class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
+  """gcloud Alpha track using container v1alpha1 API."""
+
   def testEnableBinaryAuthorization(self):
     self._TestEnableBinaryAuthorization(
         enabled=True,
@@ -1206,52 +1185,24 @@ class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
     update = self.msgs.ClusterUpdate(desiredBinaryAuthorization=binauthz)
     self._TestUpdate(update=update, flags=flags)
 
-  def testUpdateAddons(self):
-    auth_none = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
-    auth_mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                istioConfig=self.msgs.IstioConfig(
-                    disabled=True, auth=auth_none))),
-        flags='--update-addons Istio=DISABLED')
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                istioConfig=self.msgs.IstioConfig(
-                    disabled=False, auth=auth_none))),
-        flags='--update-addons Istio=ENABLED')
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                istioConfig=self.msgs.IstioConfig(
-                    disabled=False, auth=auth_none))),
-        flags='--update-addons Istio=ENABLED --istio-config auth=NONE')
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                istioConfig=self.msgs.IstioConfig(
-                    disabled=False, auth=auth_mtls))),
-        flags='--update-addons Istio=ENABLED --istio-config auth=MUTUAL_TLS')
+  def testUpdateResourceUsageBigqueryDataset(self):
+    dataset_id = 'dataset_id'
+    bigquery_destination = self.msgs.BigQueryDestination(
+        datasetId=dataset_id)
+    export_config = self.msgs.ResourceUsageExportConfig(
+        bigqueryDestination=bigquery_destination)
+    update = self.msgs.ClusterUpdate(
+        desiredResourceUsageExportConfig=export_config)
+    flags = '--resource-usage-bigquery-dataset={dataset_id}'.format(
+        dataset_id=dataset_id)
+    self._TestUpdate(update=update, flags=flags)
 
-  def testUpdateAddonsValidateDep(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.ExpectGetCluster(self._RunningCluster(name='clustername'))
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' update clustername --update-addons=Istio=DISABLED '
-          '--istio-config auth=MUTUAL_TLS')
-    self.AssertErrContains('update-addons=Istio=ENABLED must be specified')
-
-  def testUpdateAddonsValidateOpt(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.ExpectGetCluster(self._RunningCluster(name='clustername'))
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' update clustername --update-addons=Istio=ENABLED '
-          '--istio-config auth=MUUAL_TLS')
-    self.AssertErrContains('auth must be one of NONE or MUTUAL_TLS ')
-
+  def testClearResourceUsageBigqueryDataset(self):
+    export_config = self.msgs.ResourceUsageExportConfig()
+    update = self.msgs.ClusterUpdate(
+        desiredResourceUsageExportConfig=export_config)
+    self._TestUpdate(update=update,
+                     flags='--clear-resource-usage-bigquery-dataset')
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,20 @@
 """Test of the 'create' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.bigtable import app_profiles
 from googlecloudsdk.api_lib.bigtable import util
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
 
   def SetUp(self):
@@ -31,7 +38,8 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
         'Create',
         return_value=self.msgs.AppProfile(name='my-app-profile'))
 
-  def testCreateMultiCluster(self):
+  def testCreateMultiCluster(self, track):
+    self.track = track
     self.Run('bigtable app-profiles create my-app-profile '
              '--instance my-instance --description my-description '
              '--route-any')
@@ -43,7 +51,8 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
         transactional_writes=False,
         force=False)
 
-  def testCreateSingleCluster(self):
+  def testCreateSingleCluster(self, track):
+    self.track = track
     self.Run('bigtable app-profiles create my-app-profile '
              '--instance my-instance --description my-description '
              '--route-to my-cluster')
@@ -55,7 +64,8 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
         transactional_writes=False,
         force=False)
 
-  def testCreateTransactional(self):
+  def testCreateTransactional(self, track):
+    self.track = track
     self.Run('bigtable app-profiles create my-app-profile '
              '--instance my-instance --description my-description '
              '--route-to my-cluster --transactional-writes')
@@ -67,7 +77,8 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
         transactional_writes=True,
         force=False)
 
-  def testCreateMultiClusterTransactionalInvalid(self):
+  def testCreateMultiClusterTransactionalInvalid(self, track):
+    self.track = track
     with self.AssertRaisesArgumentError():
       self.Run('bigtable app-profiles create my-app-profile '
                '--instance my-instance --description my-description '
@@ -76,7 +87,8 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
 
   @test_case.Filters.SkipOnWindows('Completion unsupported on Windows',
                                    'b/24905560')
-  def testRouteToCompletion(self):
+  def testRouteToCompletion(self, track):
+    self.track = track
     self.clusters_list_mock.Expect(
         request=self.msgs.BigtableadminProjectsInstancesClustersListRequest(
             parent='projects/{0}/instances/{1}'.format(self.Project(),

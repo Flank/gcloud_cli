@@ -25,7 +25,7 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --zone=ZONE
-        The zone of the instance groups to delete. If not specified and the
+        Zone of the instance groups to delete. If not specified and the
         compute/zone property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the

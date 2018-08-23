@@ -1,0 +1,68 @@
+
+.TH "GCLOUD_COMPOSER_ENVIRONMENTS_STORAGE_PLUGINS_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud composer environments storage plugins list \- list the plugins for a Cloud Composer environment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud composer environments storage plugins list\fR (\fB\-\-environment\fR=\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+List the plugins for a Cloud Composer environment.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Environment resource \- The environment for which to list plugins.. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the flag [\-\-environment]
+on the command line with a fully specified name; provide the flag [\-\-project]
+on the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-environment\fR=\fIENVIRONMENT\fR
+The ID of the environment or a fully qualified identifier for the environment.
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Compute Engine region in which to create the environment.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta composer environments storage plugins list
+.RE
+

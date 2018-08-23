@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the disks remove-resource-policies subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
@@ -52,6 +56,25 @@ class DisksRemoveResourcePoliciesTest(test_base.BaseTest):
           remove_request)],
     )
 
+  def _CheckRegionalRemoveRequest(self, policy_names):
+    request_cls = self.messages.ComputeRegionDisksRemoveResourcePoliciesRequest
+    remove_request = request_cls(
+        disk=self.disk_name,
+        project=self.Project(),
+        region=self.region,
+        regionDisksRemoveResourcePoliciesRequest=
+        self.messages.RegionDisksRemoveResourcePoliciesRequest(
+            resourcePolicies=[
+                self.compute_uri + '/projects/{0}/regions/{1}/'
+                'resourcePolicies/{2}'.format(
+                    self.Project(), self.region, name)
+                for name in policy_names]))
+    self.CheckRequests(
+        [(self.compute_alpha.regionDisks,
+          'RemoveResourcePolicies',
+          remove_request)],
+    )
+
   def testRemoveSinglePolicy(self):
     self.Run('compute disks remove-resource-policies {disk} '
              '--zone {zone} --resource-policies pol1'
@@ -85,6 +108,13 @@ class DisksRemoveResourcePoliciesTest(test_base.BaseTest):
       self.Run('compute disks remove-resource-policies {disk} '
                '--zone {zone}'
                .format(disk=self.disk_name, zone=self.zone))
+
+  def testRemovePolicyFromRegionalDisk(self):
+    self.Run('compute disks remove-resource-policies {disk} '
+             '--region {region} --resource-policies pol1'
+             .format(disk=self.disk_name,
+                     region=self.region))
+    self._CheckRegionalRemoveRequest(['pol1'])
 
 
 if __name__ == '__main__':

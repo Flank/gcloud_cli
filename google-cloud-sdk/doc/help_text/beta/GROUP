@@ -34,7 +34,7 @@ GLOBAL FLAGS
         --limit.
 
      --format=FORMAT
-        Sets the format for printing command output resources. The default is a
+        Set the format for printing command output resources. The default is a
         command-specific human-friendly output format. The supported formats
         are: config, csv, default, diff, disable, flattened, get, json, list,
         multi, none, object, table, text, value, yaml. For more details run $
@@ -60,9 +60,9 @@ GLOBAL FLAGS
 
      --verbosity=VERBOSITY; default="warning"
         Override the default verbosity for this command with any of the
-        supported standard verbosity levels: debug, info, warning, error, and
-        none. Overrides the default core/verbosity property value for this
-        command invocation.
+        supported standard verbosity levels: debug, info, warning, error,
+        critical, none. Overrides the default core/verbosity property value for
+        this command invocation.
 
      --version, -v
         Print version information and exit. This flag is only available at the
@@ -101,8 +101,11 @@ GROUPS
      billing
         (BETA) Manage billing accounts and associate them with projects.
 
+     builds
+        (BETA) Create and manage builds for Google Cloud Build.
+
      composer
-        (BETA) Cloud Composer command groups.
+        (BETA) Create and manage Cloud Composer Environments.
 
      compute
         (BETA) Create and manipulate Google Compute Engine resources.
@@ -142,6 +145,9 @@ GROUPS
 
      error-reporting
         (BETA) Manage Stackdriver Error Reporting.
+
+     filestore
+        (BETA) Create and manipulate Cloud Filestore resources.
 
      firebase
         (BETA) Work with Google Firebase.

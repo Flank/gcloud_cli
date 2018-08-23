@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha sql databases delete - deletes a Cloud SQL database
+
+SYNOPSIS
+    gcloud alpha sql databases delete DATABASE --instance=INSTANCE, -i INSTANCE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Deletes a Cloud SQL database.
+
+POSITIONAL ARGUMENTS
+     DATABASE
+        Cloud SQL database name.
+
+REQUIRED FLAGS
+     --instance=INSTANCE, -i INSTANCE
+        Cloud SQL instance ID.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud sql databases delete
+        $ gcloud beta sql databases delete
+

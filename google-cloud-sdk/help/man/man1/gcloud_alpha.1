@@ -49,7 +49,7 @@ flags that are applied in this order: \fB\-\-flatten\fR, \fB\-\-sort\-by\fR,
 
 .TP 2m
 \fB\-\-format\fR=\fIFORMAT\fR
-Sets the format for printing command output resources. The default is a
+Set the format for printing command output resources. The default is a
 command\-specific human\-friendly output format. The supported formats are:
 \f5config\fR, \f5csv\fR, \f5default\fR, \f5diff\fR, \f5disable\fR,
 \f5flattened\fR, \f5get\fR, \f5json\fR, \f5list\fR, \f5multi\fR, \f5none\fR,
@@ -80,8 +80,8 @@ variable \f5CLOUDSDK_CORE_DISABLE_PROMPTS\fR to 1.
 \fB\-\-verbosity\fR=\fIVERBOSITY\fR; default="warning"
 Override the default verbosity for this command with any of the supported
 standard verbosity levels: \f5debug\fR, \f5info\fR, \f5warning\fR, \f5error\fR,
-and \f5none\fR. Overrides the default \fBcore/verbosity\fR property value for
-this command invocation.
+\f5critical\fR, \f5none\fR. Overrides the default \fBcore/verbosity\fR property
+value for this command invocation.
 
 .TP 2m
 \fB\-\-version\fR, \fB\-v\fR
@@ -134,8 +134,16 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Manage oauth2 credentials for the Google Cloud SDK.
 
 .TP 2m
+\fBbigtable\fR
+\fB(ALPHA)\fR Manage your Cloud Bigtable storage.
+
+.TP 2m
 \fBbilling\fR
 \fB(ALPHA)\fR Manage billing accounts and associate them with projects.
+
+.TP 2m
+\fBbuilds\fR
+\fB(ALPHA)\fR Create and manage builds for Google Cloud Build.
 
 .TP 2m
 \fBcloud\-shell\fR
@@ -158,6 +166,10 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Read and manipulate Google Dataflow resources.
 
 .TP 2m
+\fBdatastore\fR
+\fB(ALPHA)\fR Manage your Cloud Datastore indexes.
+
+.TP 2m
 \fBdeployment\-manager\fR
 \fB(ALPHA)\fR Manage deployments of cloud resources.
 
@@ -174,8 +186,16 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Create, enable and manage API services.
 
 .TP 2m
+\fBfilestore\fR
+\fB(ALPHA)\fR Create and manipulate Cloud Filestore resources.
+
+.TP 2m
 \fBfirebase\fR
 \fB(ALPHA)\fR Work with Google Firebase.
+
+.TP 2m
+\fBfirestore\fR
+\fB(ALPHA)\fR Manage your Cloud Firestore imports and exports.
 
 .TP 2m
 \fBfunctions\fR
@@ -251,6 +271,10 @@ channels.
 \fB(ALPHA)\fR Command groups for Cloud Spanner.
 
 .TP 2m
+\fBsql\fR
+\fB(ALPHA)\fR Create and manage Google Cloud SQL databases.
+
+.TP 2m
 \fBtasks\fR
 \fB(ALPHA)\fR Manage Cloud Tasks queues and tasks.
 
@@ -281,9 +305,9 @@ channels.
 
 .SH "NOTES"
 
-This command is currently in ALPHA and may change without notice. Usually, users
-of ALPHA commands and flags need to apply for access, agree to applicable terms,
-and have their projects whitelisted. Contact Google or sign up on a product's
-page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
 

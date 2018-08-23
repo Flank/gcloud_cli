@@ -11,7 +11,7 @@ gcloud beta compute images export \- export a Google Compute Engine image
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute images export\fR \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR) [\fB\-\-async\fR] [\fB\-\-export\-format\fR=\fIEXPORT_FORMAT\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute images export\fR \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR) [\fB\-\-async\fR] [\fB\-\-export\-format\fR=\fIEXPORT_FORMAT\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -103,6 +103,11 @@ must have access to Google Cloud Storage. If not specified, the network named
 Maximum time a build can last before it is failed as "TIMEOUT". For example,
 specifying \f5\fI2h\fR\fR will fail the process after 2 hours. See $ gcloud
 topic datetimes for information on duration formats.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the image to export. The zone to use when exporting the image. Overrides
+the default \fBcompute/zone\fR property value for this command invocation.
 
 
 .RE

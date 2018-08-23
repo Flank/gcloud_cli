@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Tests for the yaml command schema."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
 import re
 
@@ -370,11 +373,13 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
         {'is_hidden': True,
          'release_tracks': ['GA', 'BETA'],
          'help_text': {},
-         'request': {'collection': 'foo.instances'},
+         'request': {'collection': 'foo.instances',
+                     'parse_resource_into_request': False},
          'async': {'collection': 'operations'},
          'arguments': {'params': []},
          'output': {'format': 'yaml'}})
     self.assertEqual(c.is_hidden, True)
+    self.assertFalse(c.request.parse_resource_into_request)
     self.assertEqual(
         c.release_tracks,
         [calliope_base.ReleaseTrack.GA, calliope_base.ReleaseTrack.BETA])

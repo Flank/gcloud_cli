@@ -17,6 +17,7 @@ DESCRIPTION
     1.2.3.0/24, run:
 
         $ gcloud alpha compute security-policies rules create 1000 \
+            --action deny-403 \
             --security-policy my-policy \
             --description "block 1.2.3.0/24" \
             --src-ip-ranges 1.2.3.0/24
@@ -38,7 +39,8 @@ REQUIRED FLAGS
           The Cloud Armor rules language expression to match for this rule.
 
        --src-ip-ranges=[SRC_IP_RANGE,...]
-          The source IP ranges to match for this rule.
+          The source IPs/IP ranges to match for this rule. To match all IPs
+          specify *.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
@@ -56,11 +58,11 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. This variant is also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
 
         $ gcloud beta compute security-policies rules create
 

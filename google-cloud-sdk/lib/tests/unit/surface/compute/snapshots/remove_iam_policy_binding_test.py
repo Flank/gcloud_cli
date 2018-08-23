@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """compute snapshots remove-iam-policy-binding tests."""
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 
 import textwrap
 
@@ -19,36 +23,43 @@ from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_resources
 
 
+@parameterized.parameters(
+    (base.ReleaseTrack.ALPHA, 'alpha'),
+    (base.ReleaseTrack.BETA, 'beta'))
 class RemoveIamPolicyBindingTest(sdk_test_base.WithFakeAuth,
-                                 cli_test_base.CliTestBase):
+                                 cli_test_base.CliTestBase,
+                                 parameterized.TestCase):
 
-  def SetUp(self):
-    self.messages = apis.GetMessagesModule('compute', 'alpha')
+  def _SetUp(self, track, api_version):
+    self.messages = apis.GetMessagesModule('compute', api_version)
     self.mock_client = mock.Client(
-        apis.GetClientClass('compute', 'alpha'),
-        real_client=apis.GetClientInstance('compute', 'alpha', no_http=True))
+        apis.GetClientClass('compute', api_version),
+        real_client=apis.GetClientInstance(
+            'compute', api_version, no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = track
 
-  def testRemoveOwnerFromSnapshot(self):
+  def testRemoveOwnerFromSnapshot(self, track, api_version):
+    self._SetUp(track, api_version)
     self.mock_client.snapshots.GetIamPolicy.Expect(
         self.messages.ComputeSnapshotsGetIamPolicyRequest(
             resource='my-resource', project='fake-project'),
-        response=test_resources.AlphaIamPolicyWithOneBinding())
-    policy = test_resources.EmptyAlphaIamPolicy()
+        response=test_resources.IamPolicyWithOneBinding(self.messages))
+    policy = test_resources.EmptyIamPolicy(self.messages)
     self.mock_client.snapshots.SetIamPolicy.Expect(
         self.messages.ComputeSnapshotsSetIamPolicyRequest(
             resource='my-resource',
             project='fake-project',
             globalSetPolicyRequest=self.messages.GlobalSetPolicyRequest(
                 bindings=policy.bindings, etag=policy.etag)),
-        response=test_resources.EmptyAlphaIamPolicy())
+        response=test_resources.EmptyIamPolicy(self.messages))
 
     self.Run("""
         compute snapshots remove-iam-policy-binding my-resource

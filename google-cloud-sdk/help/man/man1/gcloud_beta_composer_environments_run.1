@@ -45,7 +45,7 @@ are specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the environment.
+Compute Engine region in which to create the environment.
 
 .RE
 .sp
@@ -96,5 +96,10 @@ airflow trigger_dag some_dag \-\-run_id=foo
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud composer environments run
+.RE
 

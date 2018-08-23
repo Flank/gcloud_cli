@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-groups describe subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
 
 class NodeGroupsDescribeTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -35,7 +33,7 @@ class NodeGroupsDescribeTest(test_base.BaseTest):
              '--zone zone-1')
 
     self.CheckRequests(
-        [(self.compute_beta.nodeGroups, 'Get',
+        [(self.compute.nodeGroups, 'Get',
           self.messages.ComputeNodeGroupsGetRequest(
               nodeGroup='group-1', project='my-project', zone='zone-1'))],)
     self.AssertOutputEquals(
@@ -44,18 +42,11 @@ class NodeGroupsDescribeTest(test_base.BaseTest):
     description: description1
     kind: compute#nodeGroup
     name: group-1
-    nodeTemplate: https://www.googleapis.com/compute/beta/projects/my-project/regions/region-1/nodeTemplates/template-1
-    nodes:
-    - instances:
-      - https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/instances/instance-1
-      - https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/instances/instance-2
-      name: node-1
-      nodeType: iAPX-286
-    - instances:
-      - https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/instances/instance-3
-      name: node-2
-      nodeType: iAPX-286
-    selfLink: https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/nodeGroups/group-1
+    nodeTemplate: https://www.googleapis.com/compute/v1/projects/my-project/\
+regions/region-1/nodeTemplates/template-1
+    selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/\
+zone-1/nodeGroups/group-1
+    size: 2
     zone: zone-1
     """,
         normalize_space=True)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +15,43 @@
 """Integration tests for connecting to instances with ssh."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+import io
 import os
 
-from tests.lib import command_capture
+from googlecloudsdk.command_lib.util.ssh import ssh
 from tests.lib import sdk_test_base
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
-class SSHTest(e2e_instances_test_base.InstancesTestBase,
-              command_capture.WithCommandCapture):
+class _SSHCommandOutputCapture(ssh.SSHCommand):
+  """Class used to inject an output file argument into SSHCommand.Run calls.
+
+  Stdout cannot be easily captured as ssh is called in a subprocess without
+  stdout/stderr mapped to pipes. This class is used as an alternative to avoid
+  supporting test time file output in the command or ssh code.
+  """
+
+  stdout_capture = None
+
+  def Run(self, *args, **kwargs):
+    kwargs['explicit_output_file'] = self.stdout_capture
+    return super(_SSHCommandOutputCapture, self).Run(*args, **kwargs)
+
+
+class SSHTest(e2e_instances_test_base.InstancesTestBase):
+
+  def SetUp(self):
+    self.stdout_capture_path = self.Touch(self.temp_path)
+    self.stdout_capture = io.open(self.stdout_capture_path, 'w+')
+    _SSHCommandOutputCapture.stdout_capture = self.stdout_capture
+    self.StartObjectPatch(ssh, 'SSHCommand', new=_SSHCommandOutputCapture)
+
+  def TearDown(self):
+    self.stdout_capture.close()
 
   def testSSH(self):
     self._TestInstanceCreation()
@@ -47,7 +74,7 @@ class SSHTest(e2e_instances_test_base.InstancesTestBase,
     self.Run('compute ssh --quiet {0} --zone {1} --command hostname'
              .format(self.instance_name, self.zone))
 
-    self.AssertCommandOutputContains(self.instance_name)
+    self.AssertFileContains(self.instance_name, self.stdout_capture_path)
 
     # The key for the instance should be added to the known hosts file after
     # the first run, so we should be able to explicitly pass
@@ -57,7 +84,7 @@ class SSHTest(e2e_instances_test_base.InstancesTestBase,
              '--strict-host-key-checking=yes --command "echo qwerty" '
              .format(self.instance_name, self.zone))
 
-    self.AssertCommandOutputContains('qwerty')
+    self.AssertFileContains('qwerty', self.stdout_capture_path)
 
     # Update output seek values
     self.GetNewOutput()

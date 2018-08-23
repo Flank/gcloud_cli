@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Unit tests for the resource_lex module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.resource import resource_exceptions
 from googlecloudsdk.core.resource import resource_lex
 from googlecloudsdk.core.resource import resource_projection_spec
@@ -120,10 +123,10 @@ class ResourceLexTest(subtests.Base):
                annotate=annotate, depth=2, exception=exception, **kwargs)
 
     aliases = {
-        'r': resource_lex.Lexer('r.r').Key(),
-        'x': resource_lex.Lexer('a.b.c').Key(),
-        'y': resource_lex.Lexer('a.b[].c').Key(),
-        'z': resource_lex.Lexer('a[123].b.c').Key(),
+        'r': resource_lex.Lexer('r.r').KeyWithAttribute(),
+        'x': resource_lex.Lexer('a.b.c').KeyWithAttribute(),
+        'y': resource_lex.Lexer('a.b[].c').KeyWithAttribute(),
+        'z': resource_lex.Lexer('a[123].b.c').KeyWithAttribute(),
         }
 
     # empty expression

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Integration tests for backend buckets."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import base as calliope_base
@@ -160,20 +163,26 @@ class BackendBucketsTestBeta(BackendBucketsTestBase):
 
   def testBackendBucket(self):
     """Tests backend bucket operations using Beta API."""
-    backend_bucket_name = self.CreateBackendBucketTest()
+    backend_bucket_name = self.CreateBackendBucketTest(
+        cache_max_age_sec=33445566)
     self.UpdateDescriptionTest(backend_bucket_name)
     self.UpdateGcsBucketTest(backend_bucket_name)
     self.UpdateEnableCdnTest(backend_bucket_name)
+    self.UpdateCdnSignedUrlCacheMaxAgeTest(
+        backend_bucket_name, cache_max_age_sec=1234)
 
 
 class BackendBucketsTestGA(BackendBucketsTestBase):
 
   def testBackendBucket(self):
     """Tests backend bucket operations using GA API."""
-    backend_bucket_name = self.CreateBackendBucketTest()
+    backend_bucket_name = self.CreateBackendBucketTest(
+        cache_max_age_sec=33445566)
     self.UpdateDescriptionTest(backend_bucket_name)
     self.UpdateGcsBucketTest(backend_bucket_name)
     self.UpdateEnableCdnTest(backend_bucket_name)
+    self.UpdateCdnSignedUrlCacheMaxAgeTest(
+        backend_bucket_name, cache_max_age_sec=1234)
 
 
 if __name__ == '__main__':

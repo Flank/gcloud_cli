@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,17 +17,19 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class ApplyAnnotationsIntegrationTest(base.CategoryManagerUnitTestBase):
   """Tests for category-manager apply-annotation."""
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.asset = resources.REGISTRY.Create(
         'categorymanager.assets', assetId='company.com:project-12345/a/b/c')
     self.taxonomy_id = '123'
@@ -42,7 +45,8 @@ class ApplyAnnotationsIntegrationTest(base.CategoryManagerUnitTestBase):
     self.ExpectApplyAnnotation(self.asset, self.project_annotation,
                                expected_annotation_tag)
 
-  def testApplyAnnotation(self):
+  def testApplyAnnotation(self, track):
+    self.track = track
     args = ('{asset_name} --annotation {annotation_id} '
             '--taxonomy {taxonomy_id}').format(
                 asset_name=('assets/' + self.asset.assetId),

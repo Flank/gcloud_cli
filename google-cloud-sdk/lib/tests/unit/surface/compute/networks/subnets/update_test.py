@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the subnets update subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import parameterized
@@ -310,7 +313,7 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
     """Tests toggling enableFlowLogs on a subnet."""
     subnetwork_resource = {
         'name':
-            'subnetwork-1',
+            'subnet-1',
         'network': ('https://www.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
@@ -346,11 +349,178 @@ class SubnetsUpdateTestBeta(SubnetsUpdateTest):
     self.SelectApi('beta')
 
 
-class SubnetsUpdateTestAlpha(SubnetsUpdateTestBeta):
+class SubnetsUpdateTestAlpha(test_base.BaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
+
+  def testSetRoleToActive(self):
+    """Tests setting the role of a subnet to ACTIVE."""
+    subnetwork_resource = {
+        'name':
+            'subnetwork-1',
+        'network': ('https://www.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --role active --region us-central2
+        """)
+
+    subnetwork_resource['role'] = (
+        self.messages.Subnetwork.RoleValueValuesEnum.ACTIVE)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource,
+             drainTimeoutSeconds=0))])
+
+  def testSetRoleToActiveWithDrainTimeout(self):
+    """Tests setting the role of a subnet to ACTIVE."""
+    subnetwork_resource = {
+        'name':
+            'subnetwork-1',
+        'network': ('https://www.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --role active --region us-central2 --drain-timeout 10
+        """)
+
+    subnetwork_resource['role'] = (
+        self.messages.Subnetwork.RoleValueValuesEnum.ACTIVE)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource,
+             drainTimeoutSeconds=10))])
+
+  def testUpdateAggregationInterval(self):
+    """Tests updating the aggregation interval on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://www.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --aggregation-interval interval-30-sec --region us-central2
+        """)
+
+    subnetwork_resource['aggregationInterval'] = (
+        self.messages.Subnetwork.AggregationIntervalValueValuesEnum.
+        INTERVAL_30_SEC)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
+
+  def testUpdateFlowSampling(self):
+    """Tests updating the flow sampling on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://www.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --flow-sampling 0.3 --region us-central2
+        """)
+
+    subnetwork_resource['flowSampling'] = 0.3
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
+
+  def testUpdateMetadata(self):
+    """Tests updating the metadata on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://www.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --metadata exclude-all-metadata --region us-central2
+        """)
+
+    subnetwork_resource['metadata'] = (
+        self.messages.Subnetwork.MetadataValueValuesEnum.EXCLUDE_ALL_METADATA)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,21 @@
 """Describe build command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.builds import flags
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 
+DEPRECATED_WARNING_MESSAGE = """\
+This command is deprecated and will be removed on or after 2018-10-31. Please
+use `gcloud builds describe` instead."""
 
+
+@base.Deprecate(is_removed=False, warning=DEPRECATED_WARNING_MESSAGE)
 class Describe(base.DescribeCommand):
   """Get information about a particular build."""
 

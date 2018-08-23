@@ -20,23 +20,24 @@ gcloud beta kms keys update \- update a key
 \fB(BETA)\fR 1. Update the rotation schedule for the given key.
 
 Updates the rotation schedule for the given key. The schedule automatically
-creates a new primary version for the key according to the
-\f5\-\-next\-rotation\-time\fR and \f5\-\-rotation\-period\fR flags.
+creates a new primary version for the key according to
+\f5next\-rotation\-time\fR and \f5rotation\-period\fR flags.
 
-The flag \f5\-\-next\-rotation\-time\fR must be in ISO or RFC3339 format, and
-\f5\-\-rotation\-period\fR must be in the form INTEGER[UNIT], where units can be
-one of seconds (s), minutes (m), hours (h) or days (d).
+Flag \f5next\-rotation\-time\fR must be in ISO 8601 or RFC3339 format, and
+\f5rotation\-period\fR must be in the form INTEGER[UNIT], where units can be one
+of seconds (s), minutes (m), hours (h) or days (d).
 
 Key rotations performed manually via \f5update\-primary\-version\fR and the
-version \f5create\fR do not affect the stored \f5\-\-next\-rotation\-time\fR.
+version \f5create\fR do not affect the stored \f5next\-rotation\-time\fR.
 
 2. Remove the rotation schedule for the given key with
-\-\-remove\-rotation\-schedule.
+\f5remove\-rotation\-schedule\fR flag.
 
-3. Update/Remove the labels for the given key with \-\-update\-labels and/or
-\-\-remove\-labels.
+3. Update/Remove the labels for the given key with \f5update\-labels\fR and/or
+\f5remove\-labels\fR flags.
 
-4. Update the primary version for the given key with \-\-primary\-version.
+4. Update the primary version for the given key with \f5primary\-version\fR
+flag.
 
 
 

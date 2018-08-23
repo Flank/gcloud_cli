@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,8 +31,7 @@ _INSTANCE_DELETE_PROMPT = """\
 The following instances will be deleted. Any attached disks configured to be \
 auto-deleted will be deleted unless they are attached to any other instances \
 or the `--keep-disks` flag is given and specifies them for keeping. \
-Deleting a disk is irreversible and any data on the disk will be lost.
-"""
+Deleting a disk is irreversible and any data on the disk will be lost."""
 
 
 class InstancesDeleteTest(test_base.BaseTest,
@@ -148,11 +148,8 @@ class InstancesDeleteTest(test_base.BaseTest,
     self.AssertErrContains(
         'No zone specified. Using zone [zone-1] for instance: [instance-1].')
     self.AssertErrContains(
-        _INSTANCE_DELETE_PROMPT + """\
-         - [instance-1] in [zone-1]
-
-
-        Do you want to continue (Y/n)? """, normalize_space=True)
+        _INSTANCE_DELETE_PROMPT + r'\n - [instance-1] in [zone-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testUriSupport(self):
     self.make_requests.side_effect = iter([
@@ -218,13 +215,10 @@ class InstancesDeleteTest(test_base.BaseTest,
               zone='zone-1'))],
     )
     self.AssertErrContains(
-        _INSTANCE_DELETE_PROMPT + """\
-         - [instance-1] in [zone-1]
-         - [instance-2] in [zone-1]
-         - [instance-3] in [zone-1]
-
-
-        Do you want to continue (Y/n)? """, normalize_space=True)
+        _INSTANCE_DELETE_PROMPT + r'\n - [instance-1] in [zone-1]'
+                                  r'\n - [instance-2] in [zone-1]'
+                                  r'\n - [instance-3] in [zone-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.make_requests.side_effect = iter([
@@ -242,13 +236,10 @@ class InstancesDeleteTest(test_base.BaseTest,
 
     self.CheckRequests()
     self.AssertErrContains(
-        _INSTANCE_DELETE_PROMPT + """\
-         - [instance-1] in [zone-1]
-         - [instance-2] in [zone-1]
-         - [instance-3] in [zone-1]
-
-
-        Do you want to continue (Y/n)? """, normalize_space=True)
+        _INSTANCE_DELETE_PROMPT + r'\n - [instance-1] in [zone-1]'
+                                  r'\n - [instance-2] in [zone-1]'
+                                  r'\n - [instance-3] in [zone-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testKeepDisksAndDeleteDisksMutualExclusion(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -725,12 +716,10 @@ class InstancesDeleteTest(test_base.BaseTest,
               zone='zone-1'))],
     )
     # Don't display the warning about disks if --keep-disks=all
-    self.AssertErrContains("""\
-         The following instances will be deleted.
-         - [instance-1] in [zone-1]
-
-
-        Do you want to continue (Y/n)? """, normalize_space=True)
+    self.AssertErrContains(
+        r'The following instances will be deleted.\n'
+        r' - [instance-1] in [zone-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testWithKeepAllDisksAndBootDiskAutoDeleteSetToFalse(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -1014,20 +1003,17 @@ class InstancesDeleteTest(test_base.BaseTest,
         """)
 
     self.AssertErrContains(
-        _INSTANCE_DELETE_PROMPT + """\
-         - [instance-1] in [zone-1]
+        _INSTANCE_DELETE_PROMPT + r'\n - [instance-1] in [zone-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
-
-        Do you want to continue (Y/n)? """, normalize_space=True)
-
-    self.AssertErrContains(textwrap.dedent("""\
-        The following disks are not configured to be automatically deleted with instance deletion, but they will be deleted as a result of this operation if they are not attached to any other instances:
-         - [data-disk-1] in [zone-1]
-         - [data-disk-3] in [zone-1]
-         - [instance-1] in [zone-1]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following disks are not configured to be automatically deleted '
+        r'with instance deletion, but they will be deleted as a result of this '
+        r'operation if they are not attached to any other instances:\n'
+        r' - [data-disk-1] in [zone-1]\n'
+        r' - [data-disk-3] in [zone-1]\n'
+        r' - [instance-1] in [zone-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
     self.CheckRequests(
         [(self.compute_v1.instances,

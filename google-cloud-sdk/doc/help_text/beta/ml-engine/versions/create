@@ -5,9 +5,10 @@ NAME
 SYNOPSIS
     gcloud beta ml-engine versions create VERSION --model=MODEL [--async]
         [--config=CONFIG] [--description=DESCRIPTION] [--framework=FRAMEWORK]
-        [--labels=[KEY=VALUE,...]] [--origin=ORIGIN]
-        [--python-version=PYTHON_VERSION] [--runtime-version=RUNTIME_VERSION]
-        [--staging-bucket=STAGING_BUCKET] [GCLOUD_WIDE_FLAG ...]
+        [--labels=[KEY=VALUE,...]] [--machine-type=MACHINE_TYPE]
+        [--origin=ORIGIN] [--python-version=PYTHON_VERSION]
+        [--runtime-version=RUNTIME_VERSION] [--staging-bucket=STAGING_BUCKET]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Creates a new version of a Cloud ML Engine model.
@@ -66,12 +67,19 @@ OPTIONAL FLAGS
         scikit-learn, tensorflow, xgboost.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     --machine-type=MACHINE_TYPE
+        Type of machine on which to serve the model. Currently only applies to
+        online prediction. Currently supported machine_types are:
+
+        * mls1-c1-m2 - A virtual machine with 1 core and 2 Gb RAM (default).
+        * mls1-c4-m2 - A virtual machine with 4 core and 2 Gb RAM.
 
      --origin=ORIGIN
         Location of model/ "directory" (as output by
@@ -85,15 +93,15 @@ OPTIONAL FLAGS
         Storage and a --staging-bucket argument is required.
 
      --python-version=PYTHON_VERSION
-        The version of Python used when creating the version. If not set, the
+        Version of Python used when creating the version. If not set, the
         default version is 2.7. Python 3.5 is available when runtime_version is
         set to 1.4 and above. Python 2.7 works with all supported runtime
         versions.
 
      --runtime-version=RUNTIME_VERSION
-        The Google Cloud ML Engine runtime version for this job. Defaults to a
-        stable version, which is defined in the documentation along with the
-        list of supported versions:
+        Google Cloud ML Engine runtime version for this job. Defaults to a
+        stable version, which is defined in documentation along with the list
+        of supported versions:
         https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
 
      --staging-bucket=STAGING_BUCKET

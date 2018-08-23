@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,9 @@
 """Submit a Spark job to a cluster."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.dataproc.jobs import spark
@@ -25,7 +28,7 @@ from googlecloudsdk.command_lib.dataproc.jobs import submitter
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class Spark(spark.SparkBase, submitter.JobSubmitter):
   # pylint: disable=line-too-long
-  """Submit a Spark job to a cluster.
+  r"""Submit a Spark job to a cluster.
 
   Submit a Spark job to a cluster.
 
@@ -33,15 +36,19 @@ class Spark(spark.SparkBase, submitter.JobSubmitter):
 
   To submit a Spark job that runs the main class of a jar, run:
 
-    $ {command} --cluster my_cluster --jar my_jar.jar arg1 arg2
+    $ {command} --cluster my_cluster --jar my_jar.jar -- arg1 arg2
 
   To submit a Spark job that runs a specific class of a jar, run:
 
-    $ {command} --cluster my_cluster --class org.my.main.Class --jars my_jar1.jar,my_jar2.jar arg1 arg2
+    $ {command} --cluster my_cluster --class org.my.main.Class \
+        --jars my_jar1.jar,my_jar2.jar -- arg1 arg2
 
   To submit a Spark job that runs a jar that is already on the cluster, run:
 
-    $ {command} --cluster my_cluster --class org.apache.spark.examples.SparkPi --jars file:///usr/lib/spark/lib/spark-examples.jar 1000
+    $ {command} --cluster my_cluster \
+        --class org.apache.spark.examples.SparkPi \
+        --jars file:///usr/lib/spark/examples/jars/spark-examples.jar \
+        -- 1000
   """
   # pylint: enable=line-too-long
 
@@ -78,7 +85,7 @@ class SparkBeta(spark.SparkBase, submitter.JobSubmitterBeta):
 
   To submit a Spark job that runs a jar that is already on the cluster, run:
 
-    $ {command} --cluster my_cluster --class org.apache.spark.examples.SparkPi --jars file:///usr/lib/spark/lib/spark-examples.jar 1000
+    $ {command} --cluster my_cluster --class org.apache.spark.examples.SparkPi --jars file:///usr/lib/spark/examples/jars/spark-examples.jar -- 1000
   """
   # pylint: enable=line-too-long
 

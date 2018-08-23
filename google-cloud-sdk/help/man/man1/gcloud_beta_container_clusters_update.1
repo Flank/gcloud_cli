@@ -11,7 +11,7 @@ gcloud beta container clusters update \- update cluster settings for an existing
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -116,12 +116,6 @@ Ask the server to generate a secure password and use that as the basic auth
 password, keeping the existing username.
 
 .TP 2m
-\fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR
-The logging service to use for the cluster. Options are:
-"logging.googleapis.com" (the Google Cloud Logging service), "none" (logs will
-not be exported from the cluster)
-
-.TP 2m
 \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR
 Set a time of day when you prefer maintenance to start on this cluster. For
 example:
@@ -134,12 +128,6 @@ $ gcloud beta container clusters update example\-cluster \e
 The time corresponds to the UTC time zone, and must be in HH:MM format. To
 remove an existing maintenance window from the cluster, use
 \'\-\-maintenance\-window=None'
-
-.TP 2m
-\fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR
-The monitoring service to use for the cluster. Options are:
-"monitoring.googleapis.com" (the Google Cloud Monitoring service), "none" (no
-metrics will be exported from the cluster)
 
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
@@ -184,8 +172,7 @@ point to the new IP.
 \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]
 Cluster addons to enable or disable. Options are
 HorizontalPodAutoscaling=ENABLED|DISABLED HttpLoadBalancing=ENABLED|DISABLED
-KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
-NetworkPolicy=ENABLED|DISABLED
+KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -255,6 +242,21 @@ $ gcloud beta container clusters update example\-cluster \e
 
 .RE
 .sp
+.TP 2m
+\fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR
+Logging service to use for the cluster. Options are:
+"logging.googleapis.com/kubernetes" (the Google Cloud Logging service with
+Kubernetes\-native resource model enabled), "logging.googleapis.com" (the Google
+Cloud Logging service), "none" (logs will not be exported from the cluster)
+
+.TP 2m
+\fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR
+Monitoring service to use for the cluster. Options are:
+"monitoring.googleapis.com/kubernetes" (the Google Cloud Monitoring service with
+Kubernetes\-native resource model enabled), "monitoring.googleapis.com" (the
+Google Cloud Monitoring service), "none" (no metrics will be exported from the
+cluster)
+
 .TP 2m
 
 Basic auth
@@ -338,11 +340,11 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The compute region (e.g. us\-central1) for the cluster.
+Compute region (e.g. us\-central1) for the cluster.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
-The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
+Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 \fBcompute/zone\fR property value for this command invocation.
 
 

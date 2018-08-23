@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for Spanner rows insert command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 from apitools.base.py import extra_types
 from googlecloudsdk.calliope import base as calliope_base
@@ -112,13 +115,14 @@ class RowsInsertTest(base.SpannerTestBase):
         self.session_ref.RelativeName(),
         'Singers', ['SingerId', 'FirstName', 'LastName'], [
             extra_types.JsonValue(string_value='2'),
-            extra_types.JsonValue(string_value='abc'),
-            extra_types.JsonValue(string_value='cab')
+            extra_types.JsonValue(string_value='abc 123'),
+            extra_types.JsonValue(string_value='')
         ])
     self._ExpectSessionDelete(session)
 
     self.Run('spanner rows insert --table=Singers --database=mydb '
-             '--instance=myins --data=SingerId=2,FirstName=abc,LastName=cab')
+             '--instance=myins --data=SingerId=2,FirstName="abc 123",'
+             'LastName=""')
 
   def testInsertWithComplicatedTable(self, track):
     self.track = track

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,17 @@
 """Tests for 'gcloud category-manager taxonomies delete'."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
+from tests.lib import parameterized
 from tests.lib.surface.category_manager import base
 
 
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class TaxonomiesDeleteIntTest(base.CategoryManagerUnitTestBase):
 
   def SetUp(self):
@@ -31,7 +36,8 @@ class TaxonomiesDeleteIntTest(base.CategoryManagerUnitTestBase):
         taxonomiesId=self.project_taxonomy_id)
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testDeleteProjectTaxonomyPromptingWithYes(self):
+  def testDeleteProjectTaxonomyPromptingWithYes(self, track):
+
     self.ExpectDeleteProjectTaxonomy(self.project_taxonomy_ref.RelativeName())
     self.WriteInput('Y\n')
     self.Run('category-manager taxonomies delete ' +
@@ -39,7 +45,8 @@ class TaxonomiesDeleteIntTest(base.CategoryManagerUnitTestBase):
     self.AssertErrContains('Deleted project_taxonomy [{}].'.format(
         self.project_taxonomy_id))
 
-  def testDeleteProjectTaxonomyPromptingWithNo(self):
+  def testDeleteProjectTaxonomyPromptingWithNo(self, track):
+    self.track = track
     self.WriteInput('n\n')
     with self.AssertRaisesExceptionMatches(
         console_io.OperationCancelledError,

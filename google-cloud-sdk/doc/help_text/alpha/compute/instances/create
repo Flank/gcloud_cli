@@ -35,7 +35,7 @@ SYNOPSIS
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
           : --custom-extensions]
         [--image-project=IMAGE_PROJECT --image=IMAGE
-          | --image-family=IMAGE_FAMILY]
+          | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT]
         [--maintenance-policy=MAINTENANCE_POLICY
           | --on-host-maintenance=MAINTENANCE_POLICY]
         [--node=NODE | --node-affinity-file=NODE_AFFINITY_FILE
@@ -102,7 +102,8 @@ FLAGS
         unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB for
         terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB.
+        multiple of 1 GB. Limit your boot disk size to 2TB to account for MBR
+        partition table limitations.
 
      --boot-disk-type=BOOT_DISK_TYPE
         The type of the boot disk. This option can only be specified if a new
@@ -209,6 +210,13 @@ FLAGS
             https://cloud.google.com/compute/docs/disks/customer-managed-encryption
             for more details.
 
+         source-snapshot
+            The source disk snapshot that will be used to create the disk. You
+            can provide this as a full URL to the snapshot or just the snapshot
+            name. For example, the following are valid values:
+                o https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
+                o snapshot
+
      --csek-key-file=FILE
         Path to a Customer-Supplied Encryption Key (CSEK) key file, mapping
         Google Compute Engine resources to user managed keys to be used when
@@ -264,7 +272,7 @@ FLAGS
             the instance. The default value for this is zonal.
 
      --labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to add.
+        List of label KEY=VALUE pairs to add.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -479,8 +487,8 @@ FLAGS
             $ gcloud compute instances list --filter='tags:tag1'
 
      --zone=ZONE
-        The zone of the instances to create. If not specified and the
-        compute/zone property isn't set, you may be prompted to select a zone.
+        Zone of the instances to create. If not specified and the compute/zone
+        property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:
@@ -576,6 +584,14 @@ FLAGS
           needed.
 
           By default, debian-9 is assumed for this flag.
+
+       --source-snapshot=SOURCE_SNAPSHOT
+          The name of the source disk snapshot that the instance boot disk will
+          be created from. You can provide this as a full URL to the snapshot
+          or just the snapshot name. For example, the following are valid
+          values:
+          + https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
+          + snapshot
 
      Maintenance Behavior. At most one of these may be specified:
 
@@ -769,11 +785,11 @@ EXAMPLES
             --zone us-central1-a
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
         $ gcloud compute instances create
         $ gcloud beta compute instances create

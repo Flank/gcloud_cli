@@ -21,11 +21,6 @@ gcloud compute instance\-groups managed set\-target\-pools \- set target pools o
 pools for an existing managed instance group. Instances that are part of the
 managed instance group will be added to the target pool automatically.
 
-Setting a new target pool won't apply to existing instances in the group unless
-they are recreated using the recreate\-instances command. But any new instances
-created in the managed instance group will be added to all of the provided
-target pools for load balancing purposes.
-
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -62,8 +57,8 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the managed instance group to operate on. If not specified, you
-may be prompted to select a region.
+Region of the managed instance group to operate on. If not specified, you may be
+prompted to select a region.
 
 A list of regions can be fetched by running:
 
@@ -76,8 +71,8 @@ invocation.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-The zone of the managed instance group to operate on. If not specified, you may
-be prompted to select a zone.
+Zone of the managed instance group to operate on. If not specified, you may be
+prompted to select a zone.
 
 A list of zones can be fetched by running:
 

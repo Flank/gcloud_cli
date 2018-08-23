@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +15,23 @@
 """Tests for Spanner instances set-iam-policy command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import os
 import re
 
 from apitools.base.py import encoding
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class SetIamPolicyTest(base.SpannerTestBase):
 
   def SetUp(self):
@@ -47,7 +55,8 @@ class SetIamPolicyTest(base.SpannerTestBase):
     json = encoding.MessageToJson(self.policy)
     self.temp_file = self.Touch(self.temp_path, contents=json)
 
-  def testSetIamPolicy(self):
+  def testSetIamPolicy(self, track):
+    self.track = track
     set_request = self.msgs.SetIamPolicyRequest(policy=self.policy)
     self.client.projects_instances_databases.SetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesSetIamPolicyRequest(
@@ -60,7 +69,8 @@ class SetIamPolicyTest(base.SpannerTestBase):
     self.assertEqual(set_policy_request, self.policy)
     self.AssertErrContains('Updated IAM policy for database [dbId].')
 
-  def testSetIamPolicyWithDefaultInstance(self):
+  def testSetIamPolicyWithDefaultInstance(self, track):
+    self.track = track
     set_request = self.msgs.SetIamPolicyRequest(policy=self.policy)
     self.client.projects_instances_databases.SetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesSetIamPolicyRequest(
@@ -73,7 +83,8 @@ class SetIamPolicyTest(base.SpannerTestBase):
     self.assertEqual(set_policy_request, self.policy)
     self.AssertErrContains('Updated IAM policy for database [dbId].')
 
-  def testBadJsonOrYamlSetIamPolicyProject(self):
+  def testBadJsonOrYamlSetIamPolicyProject(self, track):
+    self.track = track
     temp_file = self.Touch(self.temp_path, 'bad', contents='bad')
 
     with self.AssertRaisesExceptionRegexp(
@@ -82,7 +93,8 @@ class SetIamPolicyTest(base.SpannerTestBase):
           'spanner databases set-iam-policy dbId {0} --instance=insId'.format(
               temp_file))
 
-  def testBadJsonSetIamPolicyProject(self):
+  def testBadJsonSetIamPolicyProject(self, track):
+    self.track = track
     temp_file = os.path.join(self.temp_path, 'doesnotexist')
 
     with self.AssertRaisesExceptionRegexp(

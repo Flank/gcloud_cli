@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,9 @@
 """Tests for the firewall-rules update subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import firewalls_utils
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
@@ -559,6 +562,15 @@ class BetaFirewallRulesUpdateTest(FirewallRulesUpdateTest):
     self.CheckFirewallRequest(
         destinationRanges=['0.0.0.0/0'], targetTags=['tgt'])
 
+  def testEnableLogging(self):
+    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], enableLogging=False)
+
+    self.Run("""
+        compute firewall-rules update firewall-1 --enable-logging
+        """)
+    self.CheckFirewallRequest(
+        destinationRanges=['0.0.0.0/0'], enableLogging=True)
+
 
 class AlphaFirewallRulesUpdateTest(BetaFirewallRulesUpdateTest):
 
@@ -601,16 +613,6 @@ class AlphaFirewallRulesUpdateTest(BetaFirewallRulesUpdateTest):
                              project='my-project'))]
 
       self.CheckRequests(get_request, update_request)
-
-  def testEnableLogging(self):
-    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], enableLogging=False)
-
-    self.Run("""
-        compute firewall-rules update firewall-1
-        --enable-logging
-        """)
-    self.CheckFirewallRequest(
-        destinationRanges=['0.0.0.0/0'], enableLogging=True)
 
 
 if __name__ == '__main__':

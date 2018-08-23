@@ -1,0 +1,70 @@
+NAME
+    gcloud compute tpus list - list Cloud TPUs
+
+SYNOPSIS
+    gcloud compute tpus list [--zone=ZONE] [--filter=EXPRESSION]
+        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    List Cloud TPUs
+
+FLAGS
+     Location resource - The compute/zone of the Cloud TPU. If not specified,
+     will use the value of the [compute/zone] property in the current gcloud
+     configuration. To find a list of compute zones available for Cloud TPUs in
+     your project, run gcloud compute tpus locations list. This represents a
+     Cloud resource. (NOTE) Some attributes are not given arguments in this
+     group but can be set in other ways. To set the [project] attribute:
+     provide the flag [--zone] on the command line with a fully specified name;
+     set the property [compute/zone] with a fully specified name; provide the
+     flag [--project] on the command line; set the property [core/project].
+
+       --zone=ZONE
+          The ID of the location or a fully qualified identifier for the
+          location.
+
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        Maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --page-size=PAGE_SIZE
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        unlimited (no paging). Paging may be applied before or after --filter
+        and --limit depending on the service.
+
+     --sort-by=[FIELD,...]
+        Comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
+
+     --uri
+        Print a list of resource URIs instead of the default output.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the tpu/v1 API. The full documentation for this API can
+    be found at: https://cloud.google.com/tpu/
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute tpus list
+        $ gcloud beta compute tpus list
+

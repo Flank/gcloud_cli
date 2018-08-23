@@ -15,6 +15,17 @@ my-group:
     'click:resource3': ''
   test-targets: ['package kirk', 'class enterprise.spock']
 
+android-instr:
+  app: other-app.apk
+  test: path/to/test.apk
+  results-bucket: bucket-list
+  results-dir: duh
+  timeout: 10m
+  async: yes
+  auto-google-login: off
+  use-orchestrator: false
+  device: [{model: Universe3, orientation: askew, locale: ro}]
+
 ios-group:
   type: xctest
   results-bucket: gs://bucket2
@@ -34,6 +45,8 @@ ios-device:
   device:
     - model: 'iPen3'
       version: '7.2'
+      locale: 'kl'
+      orientation: 'askew'
 
 one.obb:
   obb-files: gs://dir1/dir2/file.obb
@@ -53,7 +66,6 @@ environment-variables.good:
   environment-variables:
     e1: value1
     e2: value2
-
 
 sparse-terse1:  # Terse device list with terse maps notation
   device: [{model: Nexus5}, {model: sailfish}, {model: shamu}]
@@ -80,13 +92,6 @@ sparse-empty:
 
 ios-terse:  # Terse device list with terse maps notation
   device: [{model: iphone8se}, {model: ipad, version: ios9}]
-
-ios-verbose:  # Verbose list with verbose maps notation
-  device:
-    - model: iphone7
-      version: v1
-    - model: ipad5
-      version: v2
 
 use-orchestrator-true:
   use-orchestrator: true

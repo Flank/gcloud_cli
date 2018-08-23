@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,18 @@
 """Test of the 'list' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
 
   def SetUp(self):
@@ -28,7 +35,8 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
     self.msg = self.msgs.BigtableadminProjectsInstancesListRequest(
         parent='projects/' + self.Project())
 
-  def testList(self):
+  def testList(self, track):
+    self.track = track
     self.svc.Expect(
         request=self.msg,
         response=self.msgs.ListInstancesResponse(instances=[self.msgs.Instance(
@@ -39,11 +47,13 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
     self.AssertOutputEquals('NAME         DISPLAY_NAME    STATE\n'
                             'theinstance  thedisplayname  READY\n')
 
-  def testErrorResponse(self):
+  def testErrorResponse(self, track):
+    self.track = track
     with self.AssertHttpResponseError(self.svc, self.msg):
       self.Run(self.cmd)
 
-  def testCompletion(self):
+  def testCompletion(self, track):
+    self.track = track
     self.svc.Expect(
         request=self.msg,
         response=self.msgs.ListInstancesResponse(instances=[self.msgs.Instance(

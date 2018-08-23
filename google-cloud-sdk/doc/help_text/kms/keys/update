@@ -12,23 +12,23 @@ DESCRIPTION
     1. Update the rotation schedule for the given key.
 
     Updates the rotation schedule for the given key. The schedule automatically
-    creates a new primary version for the key according to the
-    --next-rotation-time and --rotation-period flags.
+    creates a new primary version for the key according to next-rotation-time
+    and rotation-period flags.
 
-    The flag --next-rotation-time must be in ISO or RFC3339 format, and
-    --rotation-period must be in the form INTEGER[UNIT], where units can be one
+    Flag next-rotation-time must be in ISO 8601 or RFC3339 format, and
+    rotation-period must be in the form INTEGER[UNIT], where units can be one
     of seconds (s), minutes (m), hours (h) or days (d).
 
     Key rotations performed manually via update-primary-version and the version
-    create do not affect the stored --next-rotation-time.
+    create do not affect the stored next-rotation-time.
 
     2. Remove the rotation schedule for the given key with
-    --remove-rotation-schedule.
+    remove-rotation-schedule flag.
 
-    3. Update/Remove the labels for the given key with --update-labels and/or
-    --remove-labels.
+    3. Update/Remove the labels for the given key with update-labels and/or
+    remove-labels flags.
 
-    4. Update the primary version for the given key with --primary-version.
+    4. Update the primary version for the given key with primary-version flag.
 
 POSITIONAL ARGUMENTS
      KEY

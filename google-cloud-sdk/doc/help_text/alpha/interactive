@@ -2,15 +2,13 @@ NAME
     gcloud alpha interactive - start the gcloud interactive shell
 
 SYNOPSIS
-    gcloud alpha interactive [--context=CONTEXT] [--update-cli-trees]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha interactive [--context=CONTEXT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha interactive provides an enhanced bash(1) command line
     with features that include:
 
-      o auto-completion for gcloud commands, flags and resource arguments
-      o support for other CLIs including bq, gsutil and kubectl
+      o auto-completion and active help for all commands
       o state preservation across commands: cd, local/environment variables
 
   Display
@@ -40,10 +38,6 @@ DESCRIPTION
             Toggles the active help section, ON when enabled, OFF when
             disabled.
 
-         F3:EDIT-MODE
-            Toggles the command line edit mode, either emacs or vi. The default
-            is determined by the bash(1) set -o vi|emacs setting.
-
          F7:context
             Sets the context for command input, so you won't have to re-type
             common command prefixes at every prompt. The context is the command
@@ -56,7 +50,7 @@ DESCRIPTION
             Hit ^C and F7 to clear the context, or edit a command line and/or
             move the cursor and hit F7 to set a different context.
 
-         F8:browse
+         F8:web-help
             Opens a web browser tab/window to display the complete man page
             help for the current command. If there is no active web browser
             (running in ssh(1) for example), then command specific help or
@@ -65,16 +59,17 @@ DESCRIPTION
          F9:quit
             Exit.
 
-  Auto and TAB Completion
-    Command completions are displayed in a scrolling pop-up window. Use TAB and
-    up/down keys to navigate the completions, and ENTER/RETURN to select the
-    highlighted completion. Completions for known commands, flags and static
-    flag values are displayed automatically. Positional and dynamic flag value
-    completions for known commands are displayed after TAB is entered. TAB
-    completion for unknown commands defers to bash(1), but using the
-    interactive user interface. Absent specific command information, a
-    file/path completer is used when TAB is entered for unknown positionals
-    (arguments that do not start with '-').
+  Auto and Tab Completion
+    Command completions are displayed in a scrolling pop-up menu. Use tab and
+    up/down keys to navigate the completions, and space or / to select the
+    highlighted completion. Completions for known commands (gcloud, bq, gsutil,
+    kubectl, or any command with a man page), flags and static flag values are
+    displayed automatically. Positional and dynamic flag value completions for
+    known commands are displayed after tab is entered. tab completion for
+    unknown commands defers to bash(1), while still using the interactive user
+    interface. Absent specific command information, a file/path completer is
+    used when tab is entered for unknown positionals (arguments that do not
+    start with '-').
 
   Control Characters
     Control characters affect the currently running command or the current
@@ -144,6 +139,9 @@ DESCRIPTION
      context
         Command context string. The default value is "".
 
+     debug
+        If True, enable the debugging display. The default value is false.
+
      fixed_prompt_position
         If True, display the prompt at the same position. The default value is
         false.
@@ -166,6 +164,9 @@ DESCRIPTION
         If True, display the completions as a multi-column menu. The default
         value is false.
 
+     obfuscate
+        If True, obfuscate status PII. The default value is false.
+
      prompt
         Command prompt string. The default value is "$ ".
 
@@ -181,7 +182,8 @@ DESCRIPTION
     gcloud alpha interactive uses CLI tree data files for typeahead, command
     line completion and help snippet generation. A few CLI trees are installed
     with their respective Cloud SDK components: gcloud (core component), bq,
-    gsutil, and kubectl. See $ gcloud topic cli-trees for details.
+    gsutil, and kubectl. Trees for commands that have man(1) pages are
+    generated on the fly. See $ gcloud topic cli-trees for details.
 
 FLAGS
      --context=CONTEXT
@@ -189,13 +191,6 @@ FLAGS
         name, flags and arguments. The context is prepopulated in each command
         line. You can inline edit any part of the context, or ^C to eliminate
         it.
-
-     --update-cli-trees
-        Update the bq, gsutil and kubectl CLI trees, if the corresponding
-        command components have been installed. Run with this flag once to
-        enable completion and active help for these commands. NOTICE: it may
-        take a few minutes to complete. This is a workaround that will be
-        automatic (and faster) in a future release.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -213,9 +208,9 @@ NOTES
 
     Please run $ gcloud feedback to report bugs or request new features.
 
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
 

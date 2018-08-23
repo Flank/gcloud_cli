@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups managed delete subcommand."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-import textwrap
 
 from googlecloudsdk.core import properties
 from tests.lib import test_case
@@ -114,14 +116,12 @@ class InstanceGroupManagersDeleteZonalTest(test_base.BaseTest):
               instanceGroupManager='group-3',
               project='my-project',
               zone='zone-1'))],)
-    self.AssertErrContains(textwrap.dedent("""\
-        The following instance group managers will be deleted:
-         - [group-1] in [zone-1]
-         - [group-2] in [zone-1]
-         - [group-3] in [zone-1]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following instance group managers will be deleted:\n'
+        r' - [group-1] in [zone-1]\n'
+        r' - [group-2] in [zone-1]\n'
+        r' - [group-3] in [zone-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.WriteInput('n')
@@ -211,13 +211,11 @@ class InstanceGroupManagersDeleteZonalTest(test_base.BaseTest):
               zone='zone-1')
          )],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following instance group managers will be deleted:
-         - [group-1] in [zone-2]
-         - [group-2] in [zone-1]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following instance group managers will be deleted:\n'
+        r' - [group-1] in [zone-2]\n'
+        r' - [group-2] in [zone-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testMultipleZonesUriAndFlag(self):
     self.make_requests.side_effect = iter([
@@ -250,13 +248,11 @@ class InstanceGroupManagersDeleteZonalTest(test_base.BaseTest):
               zone='zone-1')
          )],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following instance group managers will be deleted:
-         - [group-1] in [zone-2]
-         - [group-2] in [zone-1]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following instance group managers will be deleted:\n'
+        r' - [group-1] in [zone-2]\n'
+        r' - [group-2] in [zone-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
 
 class InstanceGroupManagersDeleteRegionalTest(test_base.BaseTest):
@@ -362,14 +358,12 @@ class InstanceGroupManagersDeleteRegionalTest(test_base.BaseTest):
               instanceGroupManager='group-3',
               project='my-project',
               region='region-1'))],)
-    self.AssertErrContains(textwrap.dedent("""\
-        The following region instance group managers will be deleted:
-         - [group-1] in [region-1]
-         - [group-2] in [region-1]
-         - [group-3] in [region-1]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following region instance group managers will be deleted:\n'
+        r' - [group-1] in [region-1]\n'
+        r' - [group-2] in [region-1]\n'
+        r' - [group-3] in [region-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
     self.WriteInput('n')
@@ -485,13 +479,11 @@ class InstanceGroupManagersDeleteRegionalTest(test_base.BaseTest):
               region='region-1')
          )],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following region instance group managers will be deleted:
-         - [group-1] in [region-2]
-         - [group-2] in [region-1]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following region instance group managers will be deleted:\n'
+        r' - [group-1] in [region-2]\n'
+        r' - [group-2] in [region-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
   def testMultipleZonesUriAndFlag(self):
     self.make_requests.side_effect = iter([
@@ -525,13 +517,11 @@ class InstanceGroupManagersDeleteRegionalTest(test_base.BaseTest):
               region='region-1')
          )],
     )
-    self.AssertErrContains(textwrap.dedent("""\
-        The following region instance group managers will be deleted:
-         - [group-1] in [region-2]
-         - [group-2] in [region-1]
-
-
-        Do you want to continue (Y/n)? """))
+    self.AssertErrContains(
+        r'The following region instance group managers will be deleted:\n'
+        r' - [group-1] in [region-2]\n'
+        r' - [group-2] in [region-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
 
 
 class InstanceGroupManagersDeleteBetaTest(test_base.BaseTest):
@@ -573,13 +563,10 @@ class InstanceGroupManagersDeleteBetaTest(test_base.BaseTest):
         """.format(API_VERSION))
 
     self.AssertErrContains(
-        textwrap.dedent("""\
-        The following instance group managers will be deleted:
-         - [group-1]
-         - [group-2] in [region-1]
-
-
-        Do you want to continue (Y/n)? """))
+        r'The following instance group managers will be deleted:\n'
+        r' - [group-1]\n'
+        r' - [group-2] in [region-1]')
+    self.AssertErrContains('PROMPT_CONTINUE')
     self.CheckRequests(
         self.autoscalers_list_request_zone_1 +
         self.autoscalers_list_request_region_1,

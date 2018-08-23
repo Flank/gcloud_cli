@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- #
 # Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import base64
 import os
 from apitools.base.py import extra_types
@@ -187,7 +190,9 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
       response = self.makeOperation(done=True)
     self.client.UsersEnvironmentsService.Start.Expect(
         self.messages.CloudshellUsersEnvironmentsStartRequest(
-            name='users/me/environments/default'),
+            name='users/me/environments/default',
+            startEnvironmentRequest=self.messages.StartEnvironmentRequest(
+                accessToken='access_token')),
         response=response)
 
   def expectGetOperation(self, name, response=None):
