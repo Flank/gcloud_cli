@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 from string import Template
 import textwrap
 
-from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.container.binauthz import binauthz_util as binauthz_command_util
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.container.binauthz import util as binauthz_command_util
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.container.binauthz import base as binauthz_test_base
@@ -35,7 +35,7 @@ class BinauthzAttestationsSurfaceTest(sdk_test_base.WithFakeAuth,
   def SetUp(self):
     # We don't get our track from the base binauthz test because `CliTestBase`
     # clobbers it in its SetUp.
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.artifact_url = self.GenerateArtifactUrl()
 
   def testGoodUrl(self):

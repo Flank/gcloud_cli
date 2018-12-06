@@ -3,8 +3,9 @@ NAME
         image content
 
 SYNOPSIS
-    gcloud alpha dlp images redact IMAGE --info-types=[INFOTYPE,...]
-        [--include-quote] [--min-likelihood=MIN_LIKELIHOOD; default="possible"]
+    gcloud alpha dlp images redact IMAGE [--include-quote]
+        [--info-types=[INFOTYPE,...]]
+        [--min-likelihood=MIN_LIKELIHOOD; default="possible"]
         [--output-file=OUTPUT_FILE] [--redact-all-text]
         [--redact-color=REDACT_COLOR] [GCLOUD_WIDE_FLAG ...]
 
@@ -16,18 +17,17 @@ POSITIONAL ARGUMENTS
         Image file to search for sensitive info. The file type must be one of
         PNG, JPEG, SVG, or BMP.
 
-REQUIRED FLAGS
+FLAGS
+     --include-quote
+        If True, the server will attempt to filter out profanities, replacing
+        all but the initial character in each filtered word with asterisks,
+        e.g. "f**".
+
      --info-types=[INFOTYPE,...]
         Which infoTypes to scan input for. The values must correspond to
         infoType values found in documentation. For more information about
         valid infoTypes, see infoTypes Reference
         (https://cloud.google.com/dlp/docs/infotypes-reference)
-
-OPTIONAL FLAGS
-     --include-quote
-        If True, the server will attempt to filter out profanities, replacing
-        all but the initial character in each filtered word with asterisks,
-        e.g. "f**".
 
      --min-likelihood=MIN_LIKELIHOOD; default="possible"
         Only return findings equal to or above this threshold. MIN_LIKELIHOOD
@@ -49,8 +49,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
     This command uses the dlp/v2 API. The full documentation for this API can

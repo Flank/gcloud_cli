@@ -346,9 +346,8 @@ class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
   def testUpdateCluster_withNegativeGracefulDecommissionTimeout(self):
     with self.AssertRaisesExceptionMatches(
         cli_test_base.MockArgumentError,
-        ('argument --graceful-decommission-timeout: given value must be of the '
-         'form INTEGER[UNIT] where units can be one of s, m, h, d; received: '
-         '-100s')):
+        ('argument --graceful-decommission-timeout: value must be greater than '
+         'or equal to 0s; received: -100s')):
       self.RunDataproc(
           ('clusters update {0} --num-workers 10 '
            '--graceful-decommission-timeout=-100s').format(self.CLUSTER_NAME))
@@ -361,15 +360,6 @@ class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
       self.RunDataproc(
           ('clusters update {0} --num-workers 10 '
            '--graceful-decommission-timeout=2d').format(self.CLUSTER_NAME))
-
-  def testUpdateCluster_withGracefulDecommissionTimeoutIncorrectUnit(self):
-    with self.AssertRaisesExceptionMatches(
-        cli_test_base.MockArgumentError,
-        ('argument --graceful-decommission-timeout: unit must be one of s, m, '
-         'h, d; received: ms')):
-      self.RunDataproc(
-          ('clusters update {0} --num-workers 10 '
-           '--graceful-decommission-timeout=100ms').format(self.CLUSTER_NAME))
 
 
 class ClustersUpdateUnitTestBeta(ClustersUpdateUnitTest,
@@ -489,13 +479,6 @@ class ClustersUpdateUnitTestBeta(ClustersUpdateUnitTest,
     ):
       self.RunDataproc(('clusters update {0} --max-idle "1300s" '
                         '--no-max-idle ').format(self.CLUSTER_NAME))
-
-  def testUpdateCluster_withMaxAgeMaxIdleIncorrectUnit(self):
-    with self.AssertRaisesArgumentErrorRegexp(
-        'argument --max-idle: unit must be one of s, m, h, d; received: ms'):
-      self.RunDataproc(
-          ('clusters update {0} --max-idle "6000ms" --max-age "700s"'
-          ).format(self.CLUSTER_NAME))
 
   def testUpdateCluster_withExpirationTimeIncorrectDatetimeFormat(self):
     with self.AssertRaisesArgumentErrorRegexp(

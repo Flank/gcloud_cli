@@ -6,6 +6,11 @@ SYNOPSIS
     gcloud auth application-default print-access-token [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
+    Note: Consider using a service account and the complementary gcloud auth
+    activate-service-account to authorize access to Google Cloud Platform. For
+    details on authorizing with a service account, see
+    https://cloud.google.com/sdk/docs/authorizing#authorizing_with_a_service_account.
+
     gcloud auth application-default print-access-token generates and prints an
     access token for the current Application Default Credential (ADC). The ADC
     can be specified either by setting the GOOGLE_APPLICATION_CREDENTIALS
@@ -26,8 +31,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This variant is also available:

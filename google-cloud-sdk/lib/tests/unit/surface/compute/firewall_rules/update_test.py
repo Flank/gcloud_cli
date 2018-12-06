@@ -493,6 +493,32 @@ class FirewallRulesUpdateTest(test_base.BaseTest):
         ],
         sourceRanges=['0.0.0.0/0'])
 
+  def testDisabled(self):
+    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=False)
+
+    self.Run("""
+        compute firewall-rules update firewall-1 --disabled
+        """)
+    self.CheckFirewallRequest(destinationRanges=['0.0.0.0/0'], disabled=True)
+
+  def testEnabled(self):
+    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=True)
+
+    self.Run("""
+        compute firewall-rules update firewall-1 --no-disabled
+        """)
+    self.CheckFirewallRequest(destinationRanges=['0.0.0.0/0'], disabled=False)
+
+  def testDisabledUnspecified(self):
+    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=True)
+
+    self.Run("""
+        compute firewall-rules update firewall-1 --target-tags tgt
+        """)
+    # Request should not have disabled set.
+    self.CheckFirewallRequest(
+        destinationRanges=['0.0.0.0/0'], targetTags=['tgt'])
+
 
 class BetaFirewallRulesUpdateTest(FirewallRulesUpdateTest):
 
@@ -535,32 +561,6 @@ class BetaFirewallRulesUpdateTest(FirewallRulesUpdateTest):
                              project='my-project'))]
 
       self.CheckRequests(get_request, update_request)
-
-  def testDisabled(self):
-    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=False)
-
-    self.Run("""
-        compute firewall-rules update firewall-1 --disabled
-        """)
-    self.CheckFirewallRequest(destinationRanges=['0.0.0.0/0'], disabled=True)
-
-  def testEnabled(self):
-    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=True)
-
-    self.Run("""
-        compute firewall-rules update firewall-1 --no-disabled
-        """)
-    self.CheckFirewallRequest(destinationRanges=['0.0.0.0/0'], disabled=False)
-
-  def testDisabledUnspecified(self):
-    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=True)
-
-    self.Run("""
-        compute firewall-rules update firewall-1 --target-tags tgt
-        """)
-    # Request should not have disabled set.
-    self.CheckFirewallRequest(
-        destinationRanges=['0.0.0.0/0'], targetTags=['tgt'])
 
   def testEnableLogging(self):
     self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], enableLogging=False)

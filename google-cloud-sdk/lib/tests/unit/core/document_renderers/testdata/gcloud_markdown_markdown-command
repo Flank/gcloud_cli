@@ -8,7 +8,7 @@ SYNOPSIS
         [--list-flag [ITEM,...]; default="aaa,bbb,ccc"]
         [--optional-flag OPTIONAL_FLAG] [--question-flag QUESTION_FLAG]
         [--root-flag ROOT_PATH; default="/"] [--true-flag]
-        [--value-flag VALUE_FLAG; default="VALUE"] [GLOBAL-FLAG ...]
+        [--value-flag VALUE_FLAG; default="VALUE"] [GCLOUD-WIDE-FLAG ...]
         [-- IMPLEMENTATION-ARGS ...]
 
 DESCRIPTION
@@ -65,7 +65,7 @@ GROUP FLAGS
      --optional-flag OPTIONAL_FLAG
         Optional flag.
 
-GLOBAL FLAGS
+GCLOUD WIDE FLAGS
     Run $ gcloud help for a description of flags available to all commands.
 
 EXAMPLES

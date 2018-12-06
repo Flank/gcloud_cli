@@ -20,8 +20,7 @@ POSITIONAL ARGUMENTS
      represents a Cloud resource. This must be specified.
 
        DATASET
-          The ID of the dataset or a fully qualified identifier for the
-          dataset.
+          ID of the dataset or fully qualified identifier for the dataset.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -51,8 +50,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
     This command uses the genomics/v1 API. The full documentation for this API

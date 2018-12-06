@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups managed wait-until-stable subcommand."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -20,9 +21,11 @@ from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.compute import utils
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+from mock import patch
 
 API_VERSION = 'v1'
 
@@ -85,10 +88,20 @@ class InstanceGroupManagersWaitUntilStableZonalTest(test_base.BaseTest):
         --timeout 1
         """)
 
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run("""compute instance-groups managed wait-until-stable group-1
+        --zone central2-a""")
+
   @staticmethod
   def _MakeInstanceGroupManager(current_operations, current_state='creating'):
-    return [test_resources.MakeInstanceGroupManagersWithCurrentActions(
-        API_VERSION, current_operations, current_actions_state=current_state)]
+    return [
+        test_resources.MakeInstanceGroupManagersWithActions(
+            API_VERSION, current_operations, actions_state=current_state)
+    ]
 
   def _SetRequestsSideEffects(self, pending_state='creating'):
     self.SelectApi(API_VERSION)
@@ -155,9 +168,14 @@ class InstanceGroupManagersWaitUntilStableRegionalTest(test_base.BaseTest):
 
   @staticmethod
   def _MakeInstanceGroupManager(current_operations):
-    return [test_resources.MakeInstanceGroupManagersWithCurrentActions(
-        api=API_VERSION, current_actions_count=current_operations,
-        scope_type='region', scope_name='central2')]
+    return [
+        test_resources.MakeInstanceGroupManagersWithActions(
+            api=API_VERSION,
+            current_actions_count=current_operations,
+            scope_type='region',
+            scope_name='central2')
+    ]
+
 
 if __name__ == '__main__':
   test_case.main()

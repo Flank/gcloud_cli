@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha pubsub snapshots \- these features are part of an invite\-only release of the Cloud Pub/Sub API
+gcloud alpha pubsub snapshots \- manage Cloud Pub/Sub snapshots
 
 
 
@@ -17,20 +17,16 @@ gcloud alpha pubsub snapshots \- these features are part of an invite\-only rele
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Manage Cloud Pub/Sub snapshots. These features are part of an
-invitation\-only release of the underlying Cloud Pub/Sub API. These commands
-will generate errors unless you have access to this API. This restriction should
-be relaxed in the near future. Please contact cloud\-pubsub@google.com with any
-questions in the meantime.
+\fB(ALPHA)\fR Manage Cloud Pub/Sub snapshots.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -41,23 +37,19 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBcreate\fR
-\fB(ALPHA)\fR This feature is part of an invite\-only release of the Cloud
-Pub/Sub API.
+\fB(ALPHA)\fR Creates one or more Cloud Pub/Sub snapshots.
 
 .TP 2m
 \fBdelete\fR
-\fB(ALPHA)\fR This feature is part of an invite\-only release of the Cloud
-Pub/Sub API.
+\fB(ALPHA)\fR Deletes one or more Cloud Pub/Sub snapshots.
 
 .TP 2m
 \fBdescribe\fR
-\fB(ALPHA)\fR This feature is part of an invite\-only release of the Cloud
-Pub/Sub API.
+\fB(ALPHA)\fR Describes a Cloud Pub/Sub snapshot.
 
 .TP 2m
 \fBlist\fR
-\fB(ALPHA)\fR This feature is part of an invite\-only release of the Cloud
-Pub/Sub API.
+\fB(ALPHA)\fR Lists all the snapshots in a given project.
 
 
 .RE
@@ -69,5 +61,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta pubsub snapshots
+.RE
 

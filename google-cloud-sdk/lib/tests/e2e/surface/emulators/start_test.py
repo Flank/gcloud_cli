@@ -34,6 +34,7 @@ from tests.lib.api_lib.emulators import proxy_util
 # depend on things like it depends on java -- check if they are there,
 # fail if they aren't. For extra credit, it would be possible to configure
 # the location of the dependency for it can easily be run in different ways.
+@test_case.Filters.SkipOnPy3('They are broken', 'b/116340294')
 class StartTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
 
   def SetUp(self):

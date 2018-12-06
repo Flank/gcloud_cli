@@ -280,6 +280,7 @@ class DeployTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
       if os.path.exists(git_dir):
         files.RmTree(git_dir)
 
+  @test_case.Filters.skip('Failing', 'b/118604661')
   def testDeployNodejsUsingApi(self):
     self._deployStandardApp('app_engine_nodejs_data')
 

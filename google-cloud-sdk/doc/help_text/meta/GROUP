@@ -9,8 +9,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -34,7 +35,7 @@ COMMANDS
         Run an interactive debug console with the Cloud SDK libraries loaded.
 
      generate-help-docs
-        Generate all DevSite and man page help docs.
+        Generate and/or update help document directories.
 
      lint
         Validate gcloud flags according to Cloud SDK CLI Style.
@@ -57,6 +58,9 @@ COMMANDS
 
      test
         Run miscellaneous gcloud command and CLI test scenarios.
+
+     validate-yaml
+        Validate a YAML file against a JSON Schema.
 
 NOTES
     This command is an internal implementation detail and may change or

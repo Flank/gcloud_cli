@@ -39,7 +39,7 @@ class QueuesPauseTest(test_base.CloudTasksTestBase):
         self.messages.CloudtasksProjectsLocationsQueuesPauseRequest(
             name='projects/{}/locations/us-central1/queues/{}'.format(
                 self.Project(), 'my-queue')),
-        response=self.messages.Empty())
+        response=self.messages.Queue())
 
     output = self.Run('tasks queues pause my-queue')
 
@@ -52,7 +52,7 @@ class QueuesPauseTest(test_base.CloudTasksTestBase):
     self.queues_service.Pause.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPauseRequest(
             name=queue_name),
-        response=self.messages.Empty())
+        response=self.messages.Queue())
 
     self.Run('tasks queues pause {}'.format(queue_name))
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
@@ -77,7 +77,7 @@ class QueuesPauseTest(test_base.CloudTasksTestBase):
         self.messages.CloudtasksProjectsLocationsQueuesPauseRequest(
             name='projects/{}/locations/us-central2/queues/{}'.format(
                 self.Project(), 'my-queue')),
-        response=self.messages.Empty())
+        response=self.messages.Queue())
 
     output = self.Run('tasks queues pause my-queue --location=us-central2')
 

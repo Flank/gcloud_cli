@@ -17,7 +17,7 @@ actions:
         return_response:
           headers:
             status: '200'
-          body:
+          body: null
     - expect_stderr: |
         Created registry [my-registry].
     - expect_stdout: asdf
@@ -31,7 +31,7 @@ actions:
         expect_request:
           uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/my-registry?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
@@ -48,7 +48,7 @@ actions:
         expect_request:
           uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
@@ -80,11 +80,11 @@ actions:
         expect_request:
           uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/my-registry?alt=json
           method: DELETE
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
-          body:
+          body: null
     - expect_stderr: |
         Deleted registry [my-registry].
     - expect_exit:

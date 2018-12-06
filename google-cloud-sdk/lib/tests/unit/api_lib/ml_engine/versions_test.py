@@ -99,15 +99,15 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
             for key, value in sorted(labels.items())])
     version = self.short_msgs.Version(labels=labels_field,
                                       description=updated_description)
+    op = self.msgs.GoogleLongrunningOperation(name='my-op')
     self.client.projects_models_versions.Patch.Expect(
         self._MakePatchRequest(self.version_ref, version,
                                update_mask=['labels', 'description']),
-        version)
+        op)
 
     label_update = labels_util.UpdateResult(True, labels_field)
-    self.assertEqual(version, self.versions.Patch(self.version_ref,
-                                                  label_update,
-                                                  updated_description))
+    self.assertEqual(op, self.versions.Patch(
+        self.version_ref, label_update, updated_description))
 
   def testPatchNoUpdate(self):
     no_label_update = labels_util.UpdateResult(False, None)

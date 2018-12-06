@@ -13,24 +13,61 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Common utility functions for sql instance commands."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 import getpass
 
 from googlecloudsdk.api_lib.sql import constants
 from googlecloudsdk.api_lib.sql import instance_prop_reducers as reducers
 from googlecloudsdk.api_lib.sql import instances as api_util
+from googlecloudsdk.api_lib.sql import validate
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.command_lib import info_holder
 from googlecloudsdk.command_lib.util.args import labels_util
+from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import log
+from googlecloudsdk.core import properties
 
 DEFAULT_RELEASE_TRACK = base.ReleaseTrack.GA
 
 # PD = Persistent Disk. This is prefixed to all storage type payloads.
 STORAGE_TYPE_PREFIX = 'PD_'
+
+
+def GetInstanceRef(args, client):
+  """Validates and returns the instance reference."""
+  validate.ValidateInstanceName(args.instance)
+  return client.resource_parser.Parse(
+      args.instance,
+      params={'project': properties.VALUES.core.project.GetOrFail},
+      collection='sql.instances')
+
+
+def GetDatabaseArgs(args, flags):
+  """Gets the args for specifying a database during instance connection."""
+  command_line_args = []
+  if args.IsSpecified('database'):
+    try:
+      command_line_args.extend([flags['database'], args.database])
+    except KeyError:
+      raise exceptions.InvalidArgumentException(
+          '--database', 'This instance does not support the database argument.')
+  return command_line_args
+
+
+def ConnectToInstance(cmd_args, sql_user):
+  """Connects to the instance using the relevant CLI."""
+  try:
+    log.status.write(
+        'Connecting to database with SQL user [{0}].'.format(sql_user))
+    execution_utils.Exec(cmd_args)
+  except OSError:
+    log.error('Failed to execute command "{0}"'.format(' '.join(cmd_args)))
+    log.Print(info_holder.InfoHolder())
 
 
 def _IsAlpha(release_track):
@@ -147,8 +184,6 @@ class _BaseInstances(object):
               'using [--storage-auto-increase-limit], '
               '[--storage-auto-increase] must be enabled.')
 
-    # ALPHA args.
-    if _IsAlpha(release_track):
       if args.IsSpecified('network'):
         if not settings.ipConfiguration:
           settings.ipConfiguration = sql_messages.IpConfiguration()

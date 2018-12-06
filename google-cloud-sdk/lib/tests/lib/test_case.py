@@ -209,6 +209,7 @@ class TestCase(unittest.TestCase, object):
 
   _WHITELISTED_ENV_VARS = set([
       '_ARGCOMPLETE_COMP_WORDBREAKS',
+      'PYTEST_CURRENT_TEST',
   ])
 
   def __init__(self, *args, **kwargs):
@@ -301,7 +302,7 @@ class TestCase(unittest.TestCase, object):
     self.addCleanup(self._CleanupTestState)
     self._CatchThreadCreation()
     self._CatchCustomSignalHandling()
-    console_attr.ResetConsoleAttr(encoding='ascii')
+    console_attr.GetConsoleAttr(encoding='ascii')
 
     for cls in reversed(list(self.__Subclasses())):
       if 'PreSetUp' in cls.__dict__:

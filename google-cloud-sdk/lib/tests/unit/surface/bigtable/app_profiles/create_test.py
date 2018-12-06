@@ -22,14 +22,15 @@ from googlecloudsdk.api_lib.bigtable import app_profiles
 from googlecloudsdk.api_lib.bigtable import util
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
+class AppProfileCreateTestsBeta(base.BigtableV2TestBase,
+                                cli_test_base.CliTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.clusters_list_mock = self.client.projects_instances_clusters.List
@@ -38,8 +39,7 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
         'Create',
         return_value=self.msgs.AppProfile(name='my-app-profile'))
 
-  def testCreateMultiCluster(self, track):
-    self.track = track
+  def testCreateMultiCluster(self):
     self.Run('bigtable app-profiles create my-app-profile '
              '--instance my-instance --description my-description '
              '--route-any')
@@ -51,8 +51,7 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
         transactional_writes=False,
         force=False)
 
-  def testCreateSingleCluster(self, track):
-    self.track = track
+  def testCreateSingleCluster(self):
     self.Run('bigtable app-profiles create my-app-profile '
              '--instance my-instance --description my-description '
              '--route-to my-cluster')
@@ -64,8 +63,7 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
         transactional_writes=False,
         force=False)
 
-  def testCreateTransactional(self, track):
-    self.track = track
+  def testCreateTransactional(self):
     self.Run('bigtable app-profiles create my-app-profile '
              '--instance my-instance --description my-description '
              '--route-to my-cluster --transactional-writes')
@@ -77,8 +75,7 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
         transactional_writes=True,
         force=False)
 
-  def testCreateMultiClusterTransactionalInvalid(self, track):
-    self.track = track
+  def testCreateMultiClusterTransactionalInvalid(self):
     with self.AssertRaisesArgumentError():
       self.Run('bigtable app-profiles create my-app-profile '
                '--instance my-instance --description my-description '
@@ -87,8 +84,7 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
 
   @test_case.Filters.SkipOnWindows('Completion unsupported on Windows',
                                    'b/24905560')
-  def testRouteToCompletion(self, track):
-    self.track = track
+  def testRouteToCompletion(self):
     self.clusters_list_mock.Expect(
         request=self.msgs.BigtableadminProjectsInstancesClustersListRequest(
             parent='projects/{0}/instances/{1}'.format(self.Project(),
@@ -102,8 +98,14 @@ class AppProfileCreateTests(base.BigtableV2TestBase, cli_test_base.CliTestBase):
         ]))
 
     self.RunCompletion(
-        'beta bigtable app-profiles create myprofile '
+        'bigtable app-profiles create myprofile '
         '--instance theinstance --route-to c', ['cluster0', 'cluster1'])
+
+
+class AppProfileCreateTestsAlpha(AppProfileCreateTestsBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

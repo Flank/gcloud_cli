@@ -12,7 +12,9 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      OUTPUT-FILE
-        The path where the resulting private key should be written.
+        The path where the resulting private key should be written. File system
+        write permission will be checked on the specified path prior to the key
+        creation.
 
 REQUIRED FLAGS
      --iam-account=IAM_ACCOUNT
@@ -24,8 +26,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To create a new private key for a service account, and save a copy of it

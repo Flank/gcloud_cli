@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import matrix_ops
 from googlecloudsdk.api_lib.firebase.test.android import matrix_creator
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.firebase.test import test_utils
 from tests.lib.surface.firebase.test import unit_base
@@ -108,7 +108,7 @@ class AndroidMockClientTest(unit_base.TestMockClientTest):
   def CreateMatrixCreator(self,
                           args,
                           history_id='hist1',
-                          release_track=base.ReleaseTrack.GA.id):
+                          release_track=calliope_base.ReleaseTrack.GA.id):
     """Construct and return a MatrixCreator object with a mocked client.
 
     Args:

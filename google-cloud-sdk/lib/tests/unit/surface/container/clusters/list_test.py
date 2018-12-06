@@ -300,19 +300,6 @@ cluster2 zone2 2.2.2.2 5 PROVISIONING
     self.AssertErrContains(constants.EXPIRE_WARNING)
 
   def testDegradedClusters(self):
-    self.ExpectListClusters([self._MakeCluster(status=self.degraded)])
-    self.Run(self.COMMAND_BASE + ' clusters list')
-    self.AssertOutputContains(str(self.degraded))
-    self.AssertOutputContains(str('DEGRADED'))
-    self.AssertErrContains('Missing edit permissions on project')
-
-
-# TODO(b/64575339): switch to use parameterized testing.
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class ListTestBeta(base.BetaTestBase, ListTestGA):
-  """gcloud Beta track using container v1beta1 API."""
-
-  def testDegradedClusters(self):
     code = self.messages.StatusCondition.CodeValueValuesEnum.GCE_STOCKOUT
     message = 'test error message'
     self.ExpectListClusters([
@@ -330,6 +317,12 @@ class ListTestBeta(base.BetaTestBase, ListTestGA):
     self.AssertOutputContains(str('DEGRADED'))
     self.AssertErrContains(str(code))
     self.AssertErrContains(message)
+
+
+# TODO(b/64575339): switch to use parameterized testing.
+# Mixin class must come in first to have the correct multi-inheritance behavior.
+class ListTestBeta(base.BetaTestBase, ListTestGA):
+  """gcloud Beta track using container v1beta1 API."""
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.

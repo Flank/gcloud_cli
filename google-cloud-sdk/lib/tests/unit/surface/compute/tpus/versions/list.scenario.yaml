@@ -1,0 +1,42 @@
+title: List TPU Versions
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: compute/zone us-central1-c
+- execute:
+  - command: compute tpus versions list
+  - stdout: |
+      TENSORFLOW_VERSION
+      1.5
+      1.6
+      1.7
+actions:
+- set_property:
+    compute/zone: us-central1-c
+- execute_command:
+    command: compute tpus versions list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/us-central1-c/tensorflowVersions?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            tensorflowVersions:
+            - name: projects/fake-project/locations/us-central1-c/tensorflowVersions/1.7
+              version: '1.7'
+            - name: projects/fake-project/locations/us-central1-c/tensorflowVersions/1.6
+              version: '1.6'
+            - name: projects/fake-project/locations/us-central1-c/tensorflowVersions/1.5
+              version: '1.5'
+    - expect_stdout: |
+        TENSORFLOW_VERSION
+        1.5
+        1.6
+        1.7
+    - expect_exit:
+        code: 0

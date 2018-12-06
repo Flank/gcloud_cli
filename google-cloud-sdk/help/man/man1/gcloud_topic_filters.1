@@ -273,26 +273,26 @@ This table shows : operator pattern matching:
 
 
 .TS
-tab(,);
-lB lB
-l l.
-PATTERN,VALUE,MATCHES,DEPRECATED_MATCHES
-abc\f5*\fR,abcpdqxyz,True,True
-abc,abcpdqxyz,False,True
-pdq\f5*\fR,abcpdqxyz,False,False
-pdq,abcpdqxyz,False,True
-xyz\f5*\fR,abcpdqxyz,False,False
-xyz,abcpdqxyz,False,True
-\f5*\fR,abcpdqxyz,True,True
-\f5*\fR,<None>,False,False
-\f5*\fR,<''>,False,False
-\f5*\fR,<otherwise>,True,True
-abc\f5*\fR,abc.pdq.xyz,True,True
-abc,abc.pdq.xyz,True,True
-abc.pdq,abc.pdq.xyz,True,True
-pdq\f5*\fR,abc.pdq.xyz,True,False
-pdq,abc.pdq.xyz,True,True
-pdq.xyz,abc.pdq.xyz,True,True
-xyz\f5*\fR,abc.pdq.xyz,True,False
-xyz,abc.pdq.xyz,True,True
+tab(	);
+lB lB lB lB
+l l l l.
+PATTERN	VALUE	MATCHES	DEPRECATED_MATCHES
+abc*	abcpdqxyz	True	True
+abc	abcpdqxyz	False	True
+pdq*	abcpdqxyz	False	False
+pdq	abcpdqxyz	False	True
+xyz*	abcpdqxyz	False	False
+xyz	abcpdqxyz	False	True
+*	abcpdqxyz	True	True
+*	<None>	False	False
+*	<''>	False	False
+*	<otherwise>	True	True
+abc*	abc.pdq.xyz	True	True
+abc	abc.pdq.xyz	True	True
+abc.pdq	abc.pdq.xyz	True	True
+pdq*	abc.pdq.xyz	True	False
+pdq	abc.pdq.xyz	True	True
+pdq.xyz	abc.pdq.xyz	True	True
+xyz*	abc.pdq.xyz	True	False
+xyz	abc.pdq.xyz	True	True
 .TE

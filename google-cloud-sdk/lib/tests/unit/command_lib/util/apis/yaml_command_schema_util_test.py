@@ -143,6 +143,32 @@ class CommandSchemaUtilTests(test_case.TestCase, parameterized.TestCase):
         fm.FakeMessage(string1='foo', enum1=fm.FakeMessage.FakeEnum.THING_ONE,
                        bool1=True, int1=1, float1=2.0))
 
+  @parameterized.named_parameters(
+      ('ArgDict', util.ArgDict.FromData),
+      ('Type', lambda x: util.ParseType({'arg_dict': x})),
+  )
+  def testArgDictOptionalKeys(self, loader):
+    data = {'spec': [
+        {'api_field': 'string1', 'arg_name': 'a', 'required': False},
+        {'api_field': 'enum1', 'arg_name': 'b', 'required': False,
+         'choices': [
+             {'arg_value': 'thing_one',
+              'enum_value': fm.FakeMessage.FakeEnum.THING_ONE},
+             {'arg_value': 'thing_two',
+              'enum_value': fm.FakeMessage.FakeEnum.THING_TWO}
+         ]},
+        {'api_field': 'bool1', 'arg_name': 'c', 'required': False},
+        {'api_field': 'int1', 'arg_name': 'd', 'required': False},
+        {'api_field': 'float1', 'arg_name': 'e', 'required': False}
+    ]}
+    arg_dict = loader(data)
+    dict_type = arg_dict.GenerateType(fm.FakeMessage)
+    result = dict_type('')
+    self.assertEqual(
+        result,
+        fm.FakeMessage(string1=None, enum1=None, bool1=None, int1=None,
+                       float1=None))
+
   def testErrors(self):
     data = {'spec': [{'api_field': 'message1', 'arg_name': 'a'}]}
     arg_dict = util.ArgDict.FromData(data)

@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_base
 from tests.lib import test_case
 
@@ -28,7 +28,7 @@ class VisionTests(e2e_base.WithServiceAuth):
   """E2E tests for ml vision command group."""
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _RunTest(self, command, text):
     result = self.Run(
@@ -63,7 +63,7 @@ class VisionTests(e2e_base.WithServiceAuth):
 
   def testClassifyText(self):
     """Test classify-text command."""
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     content = """\
     The time is always right to do what is right.
     Faith is taking the first step even when you don't see the whole staircase.

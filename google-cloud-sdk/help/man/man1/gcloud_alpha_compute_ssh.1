@@ -11,7 +11,7 @@ gcloud alpha compute ssh \- SSH into a virtual machine instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute ssh\fR [\fIUSER\fR@]\fIINSTANCE\fR [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-container\fR=\fICONTAINER\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-internal\-ip\fR] [\fB\-\-plain\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fISSH_ARGS\fR\ ...]
+\f5gcloud alpha compute ssh\fR [\fIUSER\fR@]\fIINSTANCE\fR [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-container\fR=\fICONTAINER\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-internal\-ip\fR] [\fB\-\-plain\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-tunnel\-through\-iap\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fISSH_ARGS\fR\ ...]
 
 
 
@@ -21,8 +21,8 @@ gcloud alpha compute ssh \- SSH into a virtual machine instance
 \fBssh(1)\fR command that takes care of authentication and the translation of
 the instance name into an IP address.
 
-Note, this command does not work for Windows VMs. To connect to a Windows
-instance using a command\-line method, refer to this guide:
+Note, this command does not work when connecting to Windows VMs. To connect to a
+Windows instance using a command\-line method, refer to this guide:
 https://cloud.google.com/compute/docs/instances/connecting\-to\-instance#windows_cli
 
 The default network comes preconfigured to allow ssh access to all VMs. If the
@@ -149,6 +149,10 @@ instance, and will be set to 'yes' for all subsequent connections.
 \fISTRICT_HOST_KEY_CHECKING\fR must be one of: \fByes\fR, \fBno\fR, \fBask\fR.
 
 .TP 2m
+\fB\-\-tunnel\-through\-iap\fR
+Tunnel the ssh connection through the Cloud Identity\-Aware Proxy.
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 Zone of the instance to connect to. If not specified and the
 \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
@@ -183,9 +187,9 @@ Alternatively, the zone can be stored in the environment variable
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

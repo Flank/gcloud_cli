@@ -302,7 +302,7 @@ class ImagesCreateTest(test_base.BaseTest):
 
     image_uri = self.compute_uri + '/projects/my-project/global/images/my-image'
     with self.assertRaisesRegex(
-        csek_utils.MissingCsekKeyException,
+        csek_utils.MissingCsekException,
         r'Key required for resource \[{0}\], but none found.'.format(
             image_uri)):
       # --require-csek-create is default
@@ -325,7 +325,7 @@ class ImagesCreateTest(test_base.BaseTest):
 
     image_uri = self.compute_uri + '/projects/my-project/global/images/my-image'
     with self.assertRaisesRegex(
-        csek_utils.MissingCsekKeyException,
+        csek_utils.MissingCsekException,
         r'Key required for resource \[{0}\], but none found.'.format(
             image_uri)):
       # --require-csek-create is default
@@ -1099,8 +1099,10 @@ class ImagesCreateImageFromSnapshotTest(test_base.BaseTest):
           """)
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
+                          (calliope_base.ReleaseTrack.BETA, 'beta'),
+                          (calliope_base.ReleaseTrack.GA, 'v1'))
 class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
 
   def testKmsKeyWithKeyNameArgsOk(self, track, api_version):

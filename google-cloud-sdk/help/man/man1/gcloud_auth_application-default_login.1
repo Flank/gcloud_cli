@@ -17,6 +17,11 @@ gcloud auth application\-default login \- acquire new user credentials to use fo
 
 .SH "DESCRIPTION"
 
+Note: Consider using a service account and the complementary \f5gcloud auth
+activate\-service\-account\fR to authorize access to Google Cloud Platform. For
+details on authorizing with a service account, see
+https://cloud.google.com/sdk/docs/authorizing#authorizing_with_a_service_account.
+
 Obtains user access credentials via a web flow and puts them in the well\-known
 location for Application Default Credentials to use them as a proxy for a
 service account.
@@ -71,9 +76,9 @@ https://developers.google.com/identity/protocols/googlescopes.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

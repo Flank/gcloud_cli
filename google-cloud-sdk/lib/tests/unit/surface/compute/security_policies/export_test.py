@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import os
 import re
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.security_policies import (
     security_policies_utils)
 from googlecloudsdk.core import resources
@@ -42,10 +42,10 @@ _YAML_FILE_PATH = sdk_test_base.SdkBase.Resource(
 class SecurityPoliciesExportTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', 'v1')
     self.result_file_path = os.path.join(self.temp_path, 'exported')
     self.my_policy = self.resources.Create(
         'compute.securityPolicies',

@@ -238,15 +238,6 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
           self.clusters_command_base.format(self.ZONE) + ' update clustername '
           '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 ')
 
-  def testInvalidMasterAuthorizedNetworksTooManyCIDRs(self):
-    cidr_blocks = []
-    for i in range(1, api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS + 2):
-      cidr_blocks.append('10.0.0.%d/32' % i)
-    with self.AssertRaisesArgumentErrorRegexp('too many args'):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' update clustername '
-          '--master-authorized-networks=' + ','.join(cidr_blocks))
-
   def testEnableLegacyAbac(self):
     self._TestLegacyAbac(
         enabled=True,
@@ -1164,11 +1155,139 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
     self.AssertErrContains('Maximum and minimum accelerator limits must be set'
                            ' on the same accelerator type.')
 
+  def testEnableAutoprovisioningWithMultipleAcceleratorLimits(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path, 'autoprovisioning-config', contents="""
+- resourceType: 'cpu'
+  minimum: 8
+  maximum: 100
+- resourceType: 'memory'
+  maximum: 20
+- resourceType: 'nvidia-tesla-k80'
+  minimum: 1
+  maximum: 2
+- resourceType: 'nvidia-tesla-p100'
+  minimum: 0
+  maximum: 1
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        resource_limits=[
+            self.msgs.ResourceLimit(
+                resourceType='cpu',
+                maximum=100,
+                minimum=8),
+            self.msgs.ResourceLimit(
+                resourceType='memory',
+                maximum=20),
+            self.msgs.ResourceLimit(
+                resourceType='nvidia-tesla-k80',
+                minimum=1,
+                maximum=2),
+            self.msgs.ResourceLimit(
+                resourceType='nvidia-tesla-p100',
+                minimum=0,
+                maximum=1)
+            ],
+        flags='--enable-autoprovisioning '
+              '--autoprovisioning-config-file {}'
+        .format(autoprovisioning_config_file))
+
   def testEnableVerticalPodAutoscaling(self):
     update = self.msgs.ClusterUpdate(
         desiredVerticalPodAutoscaling=self.msgs.VerticalPodAutoscaling(
             enabled=True))
     self._TestUpdate(update=update, flags='--enable-vertical-pod-autoscaling')
+
+  def testUpdateAddonsIstio(self):
+    auth_none = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
+    auth_mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                istioConfig=self.msgs.IstioConfig(
+                    disabled=True, auth=auth_none))),
+        flags='--update-addons Istio=DISABLED')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                istioConfig=self.msgs.IstioConfig(
+                    disabled=False, auth=auth_none))),
+        flags='--update-addons Istio=ENABLED')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                istioConfig=self.msgs.IstioConfig(
+                    disabled=False, auth=auth_none))),
+        flags='--update-addons Istio=ENABLED ''--istio-config auth='
+        'MTLS_PERMISSIVE')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                istioConfig=self.msgs.IstioConfig(
+                    disabled=False, auth=auth_mtls))),
+        flags='--update-addons Istio=ENABLED --istio-config auth=MTLS_STRICT')
+
+  def testUpdateAddonsValidateDep(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.ExpectGetCluster(self._RunningCluster(name='clustername'))
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update clustername --update-addons=Istio=DISABLED '
+          '--istio-config auth=MTLS_STRICT')
+    self.AssertErrContains('update-addons=Istio=ENABLED must be specified')
+
+  def testUpdateAddonsValidateOpt(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.ExpectGetCluster(self._RunningCluster(name='clustername'))
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update clustername --update-addons=Istio=ENABLED '
+          '--istio-config auth=MUUAL_TLS')
+    self.AssertErrContains('auth must be one of MTLS_PERMISSIVE or '
+                           'MTLS_STRICT')
+
+  def testUpdateResourceUsageExportConfig(self):
+    self._TestUpdateResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=updated_dataset_id',
+        self.msgs.ResourceUsageExportConfig(
+            bigqueryDestination=self.msgs.BigQueryDestination(
+                datasetId='updated_dataset_id')))
+    self._TestUpdateResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=updated_dataset_id '
+        '--enable-network-egress-metering',
+        self.msgs.ResourceUsageExportConfig(
+            bigqueryDestination=self.msgs.BigQueryDestination(
+                datasetId='updated_dataset_id'),
+            enableNetworkEgressMetering=True))
+    self._TestUpdateResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=updated_dataset_id '
+        '--no-enable-network-egress-metering',
+        self.msgs.ResourceUsageExportConfig(
+            bigqueryDestination=self.msgs.BigQueryDestination(
+                datasetId='updated_dataset_id')))
+
+  def _TestUpdateResourceUsageExportConfig(self, flags, export_config):
+    update = self.msgs.ClusterUpdate(
+        desiredResourceUsageExportConfig=export_config)
+    self._TestUpdate(update=update, flags=flags)
+
+  def testUpdateResourceUsageExportConfigInvalid(self):
+    with self.assertRaises(c_util.Error):
+      self.ExpectGetCluster(self._RunningCluster(name=self.CLUSTER_NAME))
+      self.Run('{base} update {name} --quiet {flags}'.format(
+          base=self.clusters_command_base.format(self.ZONE),
+          name=self.CLUSTER_NAME,
+          flags='--enable-network-egress-metering'))
+    self.AssertErrContains('Cannot use --[no-]enable-network-egress-metering '
+                           'without --resource-usage-bigquery-dataset')
+
+  def testClearResourceUsageBigqueryDataset(self):
+    export_config = self.msgs.ResourceUsageExportConfig()
+    update = self.msgs.ClusterUpdate(
+        desiredResourceUsageExportConfig=export_config)
+    self._TestUpdate(update=update,
+                     flags='--clear-resource-usage-bigquery-dataset')
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -1185,24 +1304,10 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
     update = self.msgs.ClusterUpdate(desiredBinaryAuthorization=binauthz)
     self._TestUpdate(update=update, flags=flags)
 
-  def testUpdateResourceUsageBigqueryDataset(self):
-    dataset_id = 'dataset_id'
-    bigquery_destination = self.msgs.BigQueryDestination(
-        datasetId=dataset_id)
-    export_config = self.msgs.ResourceUsageExportConfig(
-        bigqueryDestination=bigquery_destination)
-    update = self.msgs.ClusterUpdate(
-        desiredResourceUsageExportConfig=export_config)
-    flags = '--resource-usage-bigquery-dataset={dataset_id}'.format(
-        dataset_id=dataset_id)
-    self._TestUpdate(update=update, flags=flags)
-
-  def testClearResourceUsageBigqueryDataset(self):
-    export_config = self.msgs.ResourceUsageExportConfig()
-    update = self.msgs.ClusterUpdate(
-        desiredResourceUsageExportConfig=export_config)
-    self._TestUpdate(update=update,
-                     flags='--clear-resource-usage-bigquery-dataset')
+  def testUpdateSecurityProfile(self):
+    profile = self.msgs.SecurityProfile(name='test-profile-1')
+    update = self.msgs.ClusterUpdate(securityProfile=profile)
+    self._TestUpdate(update=update, flags='--security-profile=test-profile-1')
 
 if __name__ == '__main__':
   test_case.main()

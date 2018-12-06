@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,7 +70,7 @@ class TimeZoneTest(test_case.TestCase):
   def testGetTimeZoneDiff(self):
     tz1 = times.GetTimeZone('EST5EDT')
     self.assertIsNotNone(tz1)
-    tz2 = times.GetTimeZone('US/Pacific')
+    tz2 = times.GetTimeZone('America/Los_Angeles')
     self.assertIsNotNone(tz2)
     tz3 = times.GetTimeZone('EST5EDT')
     self.assertIsNotNone(tz3)
@@ -143,7 +143,7 @@ class TimeZoneTest(test_case.TestCase):
   def testGetTimeZoneEDTPDT(self):
     ts = 1244567890.123456
     tz_in = times.GetTimeZone('America/New_York')
-    tz_out = times.GetTimeZone('US/Pacific')
+    tz_out = times.GetTimeZone('America/Los_Angeles')
     dt = times.GetDateTimeFromTimeStamp(ts, tz_in)
     expected = '2009-06-09T10:18:10.123456-0700'
     actual = times.FormatDateTime(dt, FORMAT, tz_out)
@@ -263,20 +263,21 @@ class ParseDateTimeTest(subtests.Base):
     self.Run('2009-02-13T23:31:30.000Z', 'Feb 13, 2009 23:31:30 Z')
     self.Run('2009-02-13T16:31:30.000-07:00', '2009-02-13T16:31:30-07:00')
 
-  def testParseDateTimeUSEastern(self):
+  def testParseDateTimeAmericaNewYork(self):
     self.Run('1970-01-01T00:00:00.000-05:00', '1970-01-01T00:00:00.000 EST')
     self.Run('1970-01-01T00:00:00.000-05:00', '1970-01-01T00:00:00 EST')
     self.Run('1970-01-01T00:00:00.000-05:00', '1970-01-01T00:00:00-05:00')
     self.Run('1970-01-01T00:00:00.000-05:00', 'January 1, 1970 EST')
     self.Run('1970-01-01T00:00:00.000-05:00', 'January 1, 1970 EDT')
-    self.Run('1970-01-01T00:00:00.000-05:00', 'January 1, 1970 US/Eastern')
+    self.Run('1970-01-01T00:00:00.000-05:00',
+             'January 1, 1970 America/New_York')
     self.Run('2009-02-13T23:31:30.000-05:00', '2009-02-13T23:31:30.000 EST')
     self.Run('2009-02-13T23:31:30.000-05:00', '2009-02-13T23:31:30 EST')
     self.Run('2009-02-13T16:31:30.000-05:00', '2009-02-13T16:31:30-05:00')
     self.Run('2009-02-13T16:31:30.000-05:00', 'February 13, 2009 16:31:30 EST')
     self.Run('2009-02-13T16:31:30.000-05:00', 'February 13, 2009 16:31:30 EDT')
 
-  def testParseDateTimeUSPacific(self):
+  def testParseDateTimeAmericaLosAngeles(self):
     self.Run('1970-01-01T00:00:00.000-08:00', '1970-01-01T00:00:00.000 PST')
     self.Run('1970-01-01T00:00:00.000-08:00', '1970-01-01T00:00:00 PST')
     self.Run('1970-01-01T00:00:00.000-08:00', '1970-01-01T00:00:00-08:00')
@@ -429,7 +430,7 @@ class ParseDateTimeTest(subtests.Base):
     self.Run('2016-12-28T01:23:45.000-05:00', '2016-12-28T01:23:45 EST')
 
   def testDateTimeDstBoundariesPSTInTzInfo(self):
-    z = times.GetTimeZone('US/Pacific')
+    z = times.GetTimeZone('America/Los_Angeles')
     self.Run('2005-01-28T01:23:45.000-08:00', '2005-01-28T01:23:45', tzinfo=z)
     self.Run('2006-02-28T01:23:45.000-08:00', '2006-02-28T01:23:45', tzinfo=z)
     self.Run('2007-03-28T01:23:45.000-07:00', '2007-03-28T01:23:45', tzinfo=z)
@@ -593,16 +594,17 @@ class ConvertDateTimeTest(test_case.TestCase):
   def testLocalizeDateTime(self):
     subject = '2016-02-29T08:46:37.639-05:00'
     dt_in = times.ParseDateTime(subject)
-    tz_out = times.GetTimeZone('US/Pacific')
+    tz_out = times.GetTimeZone('America/Los_Angeles')
     dt_out = times.LocalizeDateTime(dt_in, tz_out)
     expected = '2016-02-29T05:46:37.639-08:00'
     actual = times.FormatDateTime(dt_out)
     self.assertEqual(expected, actual)
 
   def testLocalizeDateTimeUnaware(self):
-    self.StartObjectPatch(times, 'LOCAL', new=times.GetTimeZone('US/Eastern'))
+    self.StartObjectPatch(times, 'LOCAL',
+                          new=times.GetTimeZone('America/New_York'))
     dt_in = datetime.datetime(2016, 12, 21, 8, 46, 37, 639000, tzinfo=None)
-    tz_out = times.GetTimeZone('US/Pacific')
+    tz_out = times.GetTimeZone('America/Los_Angeles')
     dt_out = times.LocalizeDateTime(dt_in, tz_out)
     expected = '2016-12-21T08:46:37.639-08:00'
     actual = times.FormatDateTime(dt_out)
@@ -610,19 +612,21 @@ class ConvertDateTimeTest(test_case.TestCase):
 
   def testLocalizeDateTimeUnawareDST(self):
     """Same test as previous, but with DST in effect."""
-    self.StartObjectPatch(times, 'LOCAL', new=times.GetTimeZone('US/Eastern'))
+    self.StartObjectPatch(times, 'LOCAL',
+                          new=times.GetTimeZone('America/New_York'))
     dt_in = datetime.datetime(2016, 6, 21, 8, 46, 37, 639000, tzinfo=None)
-    tz_out = times.GetTimeZone('US/Pacific')
+    tz_out = times.GetTimeZone('America/Los_Angeles')
     dt_out = times.LocalizeDateTime(dt_in, tz_out)
     expected = '2016-06-21T08:46:37.639-07:00'
     actual = times.FormatDateTime(dt_out)
     self.assertEqual(expected, actual)
 
   def testLocalizeDateTimeLocal(self):
-    self.StartObjectPatch(times, 'LOCAL', new=times.GetTimeZone('US/Eastern'))
+    self.StartObjectPatch(times, 'LOCAL',
+                          new=times.GetTimeZone('America/New_York'))
     dt_in = datetime.datetime(2016, 12, 21, 8, 46, 37, 639000,
                               tzinfo=times.LOCAL)
-    tz_out = times.GetTimeZone('US/Pacific')
+    tz_out = times.GetTimeZone('America/Los_Angeles')
     dt_out = times.LocalizeDateTime(dt_in, tz_out)
     expected = '2016-12-21T05:46:37.639-08:00'
     actual = times.FormatDateTime(dt_out)
@@ -630,10 +634,11 @@ class ConvertDateTimeTest(test_case.TestCase):
 
   def testLocalizeDateTimeLocalDST(self):
     """Same test as previous, but with DST in effect."""
-    self.StartObjectPatch(times, 'LOCAL', new=times.GetTimeZone('US/Eastern'))
+    self.StartObjectPatch(times, 'LOCAL',
+                          new=times.GetTimeZone('America/New_York'))
     dt_in = datetime.datetime(2016, 6, 21, 8, 46, 37, 639000,
                               tzinfo=times.LOCAL)
-    tz_out = times.GetTimeZone('US/Pacific')
+    tz_out = times.GetTimeZone('America/Los_Angeles')
     dt_out = times.LocalizeDateTime(dt_in, tz_out)
     expected = '2016-06-21T05:46:37.639-07:00'
     actual = times.FormatDateTime(dt_out)
@@ -662,7 +667,7 @@ class NowTest(test_case.TestCase):
     self.assertEqual('+00:00', actual)
 
   def testNowEST(self):
-    tz = times.GetTimeZone('US/Eastern')
+    tz = times.GetTimeZone('America/New_York')
     now = times.Now(tz)
     actual = times.FormatDateTime(now, '%z')
     self.assertTrue(actual == '-0400' or actual == '-0500')
@@ -675,9 +680,9 @@ class NowTest(test_case.TestCase):
 class DurationTest(subtests.Base):
 
   def RunSubTest(self, subject, end=None, relative=None, parts=3, precision=3,
-                 calendar=False, fmt=None):
+                 calendar=False, default_suffix=None, fmt=None):
     if end and relative:
-      duration = times.ParseDuration(subject)
+      duration = times.ParseDuration(subject, default_suffix=default_suffix)
       delta = times.ParseDateTime(end) - times.ParseDateTime(relative)
       duration.AddTimeDelta(delta, calendar=calendar)
       actual = times.FormatDuration(
@@ -688,7 +693,7 @@ class DurationTest(subtests.Base):
             times.ParseDateTime(end) - times.ParseDateTime(subject),
             calendar=calendar)
       else:
-        duration = times.ParseDuration(subject)
+        duration = times.ParseDuration(subject, default_suffix=default_suffix)
       if relative:
         dt = times.GetDateTimePlusDuration(
             times.ParseDateTime(relative), duration)
@@ -887,6 +892,36 @@ class DurationTest(subtests.Base):
     self.Run('PT1S', 'PT0.7S', parts=3, precision=0)
     self.Run('PT1S', 'PT0.7S', parts=2, precision=0)
     self.Run('PT1S', 'PT0.7S', parts=1, precision=0)
+
+  def testParseDurationFormatDurationWithDefaultSuffix(self):
+    self.Run('PT1S', '1', default_suffix='s')
+    self.Run('PT2M', '2m', default_suffix='s')
+    self.Run('PT3H', '3h', default_suffix='s')
+    self.Run('PT4M', '4', default_suffix='m')
+    self.Run('PT5H', '5', default_suffix='h')
+    self.Run('P6D', '6', default_suffix='d')
+    self.Run('PT2M3S', 123, default_suffix='s')  # Yeah, that happens.
+
+  def testParseDurationFormatDurationWithMilliMicroNano(self):
+    self.Run('PT0.001S', '1ms')
+    self.Run('PT0.02S', '20ms')
+    self.Run('PT0.3S', '300ms')
+    self.Run('PT4S', '4000ms')
+    self.Run('P0', '1us')
+    self.Run('P0', '20us')
+    self.Run('P0', '300us')
+    self.Run('PT0.04S', '40000us')
+    self.Run('PT0.5S', '500000us')
+    self.Run('PT6S', '6000000us')
+    self.Run('P0', '1ns')
+    self.Run('P0', '20ns')
+    self.Run('P0', '300ns')
+    self.Run('P0', '40000ns')
+    self.Run('P0', '50000ns')
+    self.Run('PT0.007S', '7000000ns')
+    self.Run('PT0.08S', '80000000ns')
+    self.Run('PT0.9S', '900000000ns')
+    self.Run('PT1S', '1000000000ns')
 
   def testTimeDeltaFormatDuration(self):
     self.Run('P0',
@@ -1246,7 +1281,7 @@ class GetWeekdayInTimezoneTest(test_case.TestCase, parameterized.TestCase):
     self.assertEqual(times.Weekday.MONDAY, times.Weekday.Get(value))
 
   def testWeekdayAccessorFails(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         KeyError, r'\[CATURDAY\] is not a valid Weekday'):
       times.Weekday.Get('caturday')
 

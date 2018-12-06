@@ -22,7 +22,7 @@ import textwrap
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -36,7 +36,7 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
     return 'my-project'
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
     self.client = mock.Client(core_apis.GetClientClass('compute', 'v1'))
     self.client.Mock()
     self.addCleanup(self.client.Unmock)

@@ -76,11 +76,15 @@ class ApproximateSplitRequest(_messages.Message):
   Fields:
     fractionConsumed: A fraction at which to split the work item, from 0.0
       (beginning of the input) to 1.0 (end of the input).
+    fractionOfRemainder: The fraction of the remainder of work to split the
+      work item at, from 0.0 (split at the current position) to 1.0 (end of
+      the input).
     position: A Position at which to split the work item.
   """
 
   fractionConsumed = _messages.FloatField(1)
-  position = _messages.MessageField('Position', 2)
+  fractionOfRemainder = _messages.FloatField(2)
+  position = _messages.MessageField('Position', 3)
 
 
 class AutoscalingEvent(_messages.Message):
@@ -834,6 +838,21 @@ class DataflowProjectsJobsMessagesListRequest(_messages.Message):
   startTime = _messages.StringField(8)
 
 
+class DataflowProjectsJobsSnapshotRequest(_messages.Message):
+  r"""A DataflowProjectsJobsSnapshotRequest object.
+
+  Fields:
+    jobId: The job to be snapshotted.
+    projectId: The project which owns the job to be snapshotted.
+    snapshotJobRequest: A SnapshotJobRequest resource to be passed as the
+      request body.
+  """
+
+  jobId = _messages.StringField(1, required=True)
+  projectId = _messages.StringField(2, required=True)
+  snapshotJobRequest = _messages.MessageField('SnapshotJobRequest', 3)
+
+
 class DataflowProjectsJobsUpdateRequest(_messages.Message):
   r"""A DataflowProjectsJobsUpdateRequest object.
 
@@ -1110,6 +1129,23 @@ class DataflowProjectsLocationsJobsMessagesListRequest(_messages.Message):
   startTime = _messages.StringField(8)
 
 
+class DataflowProjectsLocationsJobsSnapshotRequest(_messages.Message):
+  r"""A DataflowProjectsLocationsJobsSnapshotRequest object.
+
+  Fields:
+    jobId: The job to be snapshotted.
+    location: The location that contains this job.
+    projectId: The project which owns the job to be snapshotted.
+    snapshotJobRequest: A SnapshotJobRequest resource to be passed as the
+      request body.
+  """
+
+  jobId = _messages.StringField(1, required=True)
+  location = _messages.StringField(2, required=True)
+  projectId = _messages.StringField(3, required=True)
+  snapshotJobRequest = _messages.MessageField('SnapshotJobRequest', 4)
+
+
 class DataflowProjectsLocationsJobsUpdateRequest(_messages.Message):
   r"""A DataflowProjectsLocationsJobsUpdateRequest object.
 
@@ -1184,8 +1220,7 @@ class DataflowProjectsLocationsTemplatesGetRequest(_messages.Message):
 
   Fields:
     gcsPath: Required. A Cloud Storage path to the template from which to
-      create the job. Must be a valid Cloud Storage URL, beginning with
-      `gs://`.
+      create the job. Must be valid Cloud Storage URL, beginning with 'gs://'.
     location: The location to which to direct the request.
     projectId: Required. The ID of the Cloud Platform project that the job
       belongs to.
@@ -1210,8 +1245,12 @@ class DataflowProjectsLocationsTemplatesLaunchRequest(_messages.Message):
   r"""A DataflowProjectsLocationsTemplatesLaunchRequest object.
 
   Fields:
-    gcsPath: Required. A Cloud Storage path to the template from which to
-      create the job. Must be valid Cloud Storage URL, beginning with 'gs://'.
+    dynamicTemplate_gcsPath: Path to dynamic template spec file on GCS. The
+      file must be a Json serialized DynamicTemplateFieSpec object.
+    dynamicTemplate_stagingLocation: Cloud Storage path for staging
+      dependencies. Must be a valid Cloud Storage URL, beginning with `gs://`.
+    gcsPath: A Cloud Storage path to the template from which to create the
+      job. Must be valid Cloud Storage URL, beginning with 'gs://'.
     launchTemplateParameters: A LaunchTemplateParameters resource to be passed
       as the request body.
     location: The location to which to direct the request.
@@ -1221,11 +1260,13 @@ class DataflowProjectsLocationsTemplatesLaunchRequest(_messages.Message):
       Defaults to false.
   """
 
-  gcsPath = _messages.StringField(1)
-  launchTemplateParameters = _messages.MessageField('LaunchTemplateParameters', 2)
-  location = _messages.StringField(3, required=True)
-  projectId = _messages.StringField(4, required=True)
-  validateOnly = _messages.BooleanField(5)
+  dynamicTemplate_gcsPath = _messages.StringField(1)
+  dynamicTemplate_stagingLocation = _messages.StringField(2)
+  gcsPath = _messages.StringField(3)
+  launchTemplateParameters = _messages.MessageField('LaunchTemplateParameters', 4)
+  location = _messages.StringField(5, required=True)
+  projectId = _messages.StringField(6, required=True)
+  validateOnly = _messages.BooleanField(7)
 
 
 class DataflowProjectsLocationsWorkerMessagesRequest(_messages.Message):
@@ -1265,8 +1306,7 @@ class DataflowProjectsTemplatesGetRequest(_messages.Message):
 
   Fields:
     gcsPath: Required. A Cloud Storage path to the template from which to
-      create the job. Must be a valid Cloud Storage URL, beginning with
-      `gs://`.
+      create the job. Must be valid Cloud Storage URL, beginning with 'gs://'.
     location: The location to which to direct the request.
     projectId: Required. The ID of the Cloud Platform project that the job
       belongs to.
@@ -1291,8 +1331,12 @@ class DataflowProjectsTemplatesLaunchRequest(_messages.Message):
   r"""A DataflowProjectsTemplatesLaunchRequest object.
 
   Fields:
-    gcsPath: Required. A Cloud Storage path to the template from which to
-      create the job. Must be valid Cloud Storage URL, beginning with 'gs://'.
+    dynamicTemplate_gcsPath: Path to dynamic template spec file on GCS. The
+      file must be a Json serialized DynamicTemplateFieSpec object.
+    dynamicTemplate_stagingLocation: Cloud Storage path for staging
+      dependencies. Must be a valid Cloud Storage URL, beginning with `gs://`.
+    gcsPath: A Cloud Storage path to the template from which to create the
+      job. Must be valid Cloud Storage URL, beginning with 'gs://'.
     launchTemplateParameters: A LaunchTemplateParameters resource to be passed
       as the request body.
     location: The location to which to direct the request.
@@ -1302,11 +1346,13 @@ class DataflowProjectsTemplatesLaunchRequest(_messages.Message):
       Defaults to false.
   """
 
-  gcsPath = _messages.StringField(1)
-  launchTemplateParameters = _messages.MessageField('LaunchTemplateParameters', 2)
-  location = _messages.StringField(3)
-  projectId = _messages.StringField(4, required=True)
-  validateOnly = _messages.BooleanField(5)
+  dynamicTemplate_gcsPath = _messages.StringField(1)
+  dynamicTemplate_stagingLocation = _messages.StringField(2)
+  gcsPath = _messages.StringField(3)
+  launchTemplateParameters = _messages.MessageField('LaunchTemplateParameters', 4)
+  location = _messages.StringField(5)
+  projectId = _messages.StringField(6, required=True)
+  validateOnly = _messages.BooleanField(7)
 
 
 class DataflowProjectsWorkerMessagesRequest(_messages.Message):
@@ -1690,13 +1736,16 @@ class ExecutionStageState(_messages.Message):
         was requested. This state is a terminal state, may only be set by the
         Cloud Dataflow service, and only as a transition from
         `JOB_STATE_DRAINING`.
-      JOB_STATE_PENDING: 'JOB_STATE_PENDING' indicates that the job has been
+      JOB_STATE_PENDING: `JOB_STATE_PENDING` indicates that the job has been
         created but is not yet running.  Jobs that are pending may only
         transition to `JOB_STATE_RUNNING`, or `JOB_STATE_FAILED`.
-      JOB_STATE_CANCELLING: 'JOB_STATE_CANCELLING' indicates that the job has
+      JOB_STATE_CANCELLING: `JOB_STATE_CANCELLING` indicates that the job has
         been explicitly cancelled and is in the process of stopping.  Jobs
-        that are cancelling may only transition to 'JOB_STATE_CANCELLED' or
-        'JOB_STATE_FAILED'.
+        that are cancelling may only transition to `JOB_STATE_CANCELLED` or
+        `JOB_STATE_FAILED`.
+      JOB_STATE_QUEUED: `JOB_STATE_QUEUED` indicates that the job has been
+        created but is being delayed until launch. Jobs that are queued may
+        only transition to `JOB_STATE_PENDING` or `JOB_STATE_CANCELLED`.
     """
     JOB_STATE_UNKNOWN = 0
     JOB_STATE_STOPPED = 1
@@ -1709,6 +1758,7 @@ class ExecutionStageState(_messages.Message):
     JOB_STATE_DRAINED = 8
     JOB_STATE_PENDING = 9
     JOB_STATE_CANCELLING = 10
+    JOB_STATE_QUEUED = 11
 
   currentStateTime = _messages.StringField(1)
   executionStageName = _messages.StringField(2)
@@ -2022,6 +2072,8 @@ class Job(_messages.Message):
       is empty and, in that case, the service ignores it.
     createTime: The timestamp when the job was initially created. Immutable
       and set by the Cloud Dataflow service.
+    createdFromSnapshotId: If this is specified, the job's initial state is
+      populated from the given snapshot.
     currentState: The current state of the job.  Jobs are created in the
       `JOB_STATE_STOPPED` state unless otherwise specified.  A job in the
       `JOB_STATE_RUNNING` state may asynchronously enter a terminal state.
@@ -2068,7 +2120,15 @@ class Job(_messages.Message):
       reached a terminal state.
     stageStates: This field may be mutated by the Cloud Dataflow service;
       callers cannot mutate it.
-    steps: The top-level steps that constitute the entire job.
+    startTime: The timestamp when the job was started (transitioned to
+      JOB_STATE_PENDING). Flexible resource scheduling jobs are started with
+      some delay after job creation, so start_time is unset before start and
+      is updated when the job is started by the Cloud Dataflow service. For
+      other jobs, start_time always equals to create_time and is immutable and
+      set by the Cloud Dataflow service.
+    steps: Exactly one of step or steps_location should be specified.  The
+      top-level steps that constitute the entire job.
+    stepsLocation: The GCS location where the steps are stored.
     tempFiles: A set of files the system should be aware of that are used for
       temporary storage. These temporary files will be removed on job
       completion. No duplicates are allowed. No file patterns are supported.
@@ -2124,13 +2184,16 @@ class Job(_messages.Message):
         was requested. This state is a terminal state, may only be set by the
         Cloud Dataflow service, and only as a transition from
         `JOB_STATE_DRAINING`.
-      JOB_STATE_PENDING: 'JOB_STATE_PENDING' indicates that the job has been
+      JOB_STATE_PENDING: `JOB_STATE_PENDING` indicates that the job has been
         created but is not yet running.  Jobs that are pending may only
         transition to `JOB_STATE_RUNNING`, or `JOB_STATE_FAILED`.
-      JOB_STATE_CANCELLING: 'JOB_STATE_CANCELLING' indicates that the job has
+      JOB_STATE_CANCELLING: `JOB_STATE_CANCELLING` indicates that the job has
         been explicitly cancelled and is in the process of stopping.  Jobs
-        that are cancelling may only transition to 'JOB_STATE_CANCELLED' or
-        'JOB_STATE_FAILED'.
+        that are cancelling may only transition to `JOB_STATE_CANCELLED` or
+        `JOB_STATE_FAILED`.
+      JOB_STATE_QUEUED: `JOB_STATE_QUEUED` indicates that the job has been
+        created but is being delayed until launch. Jobs that are queued may
+        only transition to `JOB_STATE_PENDING` or `JOB_STATE_CANCELLED`.
     """
     JOB_STATE_UNKNOWN = 0
     JOB_STATE_STOPPED = 1
@@ -2143,6 +2206,7 @@ class Job(_messages.Message):
     JOB_STATE_DRAINED = 8
     JOB_STATE_PENDING = 9
     JOB_STATE_CANCELLING = 10
+    JOB_STATE_QUEUED = 11
 
   class RequestedStateValueValuesEnum(_messages.Enum):
     r"""The job's requested state.  `UpdateJob` may be used to switch between
@@ -2187,13 +2251,16 @@ class Job(_messages.Message):
         was requested. This state is a terminal state, may only be set by the
         Cloud Dataflow service, and only as a transition from
         `JOB_STATE_DRAINING`.
-      JOB_STATE_PENDING: 'JOB_STATE_PENDING' indicates that the job has been
+      JOB_STATE_PENDING: `JOB_STATE_PENDING` indicates that the job has been
         created but is not yet running.  Jobs that are pending may only
         transition to `JOB_STATE_RUNNING`, or `JOB_STATE_FAILED`.
-      JOB_STATE_CANCELLING: 'JOB_STATE_CANCELLING' indicates that the job has
+      JOB_STATE_CANCELLING: `JOB_STATE_CANCELLING` indicates that the job has
         been explicitly cancelled and is in the process of stopping.  Jobs
-        that are cancelling may only transition to 'JOB_STATE_CANCELLED' or
-        'JOB_STATE_FAILED'.
+        that are cancelling may only transition to `JOB_STATE_CANCELLED` or
+        `JOB_STATE_FAILED`.
+      JOB_STATE_QUEUED: `JOB_STATE_QUEUED` indicates that the job has been
+        created but is being delayed until launch. Jobs that are queued may
+        only transition to `JOB_STATE_PENDING` or `JOB_STATE_CANCELLED`.
     """
     JOB_STATE_UNKNOWN = 0
     JOB_STATE_STOPPED = 1
@@ -2206,6 +2273,7 @@ class Job(_messages.Message):
     JOB_STATE_DRAINED = 8
     JOB_STATE_PENDING = 9
     JOB_STATE_CANCELLING = 10
+    JOB_STATE_QUEUED = 11
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""The type of Cloud Dataflow job.
@@ -2279,25 +2347,28 @@ class Job(_messages.Message):
 
   clientRequestId = _messages.StringField(1)
   createTime = _messages.StringField(2)
-  currentState = _messages.EnumField('CurrentStateValueValuesEnum', 3)
-  currentStateTime = _messages.StringField(4)
-  environment = _messages.MessageField('Environment', 5)
-  executionInfo = _messages.MessageField('JobExecutionInfo', 6)
-  id = _messages.StringField(7)
-  jobMetadata = _messages.MessageField('JobMetadata', 8)
-  labels = _messages.MessageField('LabelsValue', 9)
-  location = _messages.StringField(10)
-  name = _messages.StringField(11)
-  pipelineDescription = _messages.MessageField('PipelineDescription', 12)
-  projectId = _messages.StringField(13)
-  replaceJobId = _messages.StringField(14)
-  replacedByJobId = _messages.StringField(15)
-  requestedState = _messages.EnumField('RequestedStateValueValuesEnum', 16)
-  stageStates = _messages.MessageField('ExecutionStageState', 17, repeated=True)
-  steps = _messages.MessageField('Step', 18, repeated=True)
-  tempFiles = _messages.StringField(19, repeated=True)
-  transformNameMapping = _messages.MessageField('TransformNameMappingValue', 20)
-  type = _messages.EnumField('TypeValueValuesEnum', 21)
+  createdFromSnapshotId = _messages.StringField(3)
+  currentState = _messages.EnumField('CurrentStateValueValuesEnum', 4)
+  currentStateTime = _messages.StringField(5)
+  environment = _messages.MessageField('Environment', 6)
+  executionInfo = _messages.MessageField('JobExecutionInfo', 7)
+  id = _messages.StringField(8)
+  jobMetadata = _messages.MessageField('JobMetadata', 9)
+  labels = _messages.MessageField('LabelsValue', 10)
+  location = _messages.StringField(11)
+  name = _messages.StringField(12)
+  pipelineDescription = _messages.MessageField('PipelineDescription', 13)
+  projectId = _messages.StringField(14)
+  replaceJobId = _messages.StringField(15)
+  replacedByJobId = _messages.StringField(16)
+  requestedState = _messages.EnumField('RequestedStateValueValuesEnum', 17)
+  stageStates = _messages.MessageField('ExecutionStageState', 18, repeated=True)
+  startTime = _messages.StringField(19)
+  steps = _messages.MessageField('Step', 20, repeated=True)
+  stepsLocation = _messages.StringField(21)
+  tempFiles = _messages.StringField(22, repeated=True)
+  transformNameMapping = _messages.MessageField('TransformNameMappingValue', 23)
+  type = _messages.EnumField('TypeValueValuesEnum', 24)
 
 
 class JobExecutionInfo(_messages.Message):
@@ -2617,6 +2688,8 @@ class MapTask(_messages.Message):
   the list before any instructions which depends on its output.
 
   Fields:
+    counterPrefix: Counter prefix that can be used to prefix counters. Not
+      currently used in Dataflow.
     instructions: The instructions in the MapTask.
     stageName: System-defined name of the stage containing this MapTask.
       Unique across the workflow.
@@ -2624,9 +2697,10 @@ class MapTask(_messages.Message):
       workflow.
   """
 
-  instructions = _messages.MessageField('ParallelInstruction', 1, repeated=True)
-  stageName = _messages.StringField(2)
-  systemName = _messages.StringField(3)
+  counterPrefix = _messages.StringField(1)
+  instructions = _messages.MessageField('ParallelInstruction', 2, repeated=True)
+  stageName = _messages.StringField(3)
+  systemName = _messages.StringField(4)
 
 
 class MetricShortId(_messages.Message):
@@ -3194,8 +3268,12 @@ class ResourceUtilizationReportResponse(_messages.Message):
 class RuntimeEnvironment(_messages.Message):
   r"""The environment values to set at runtime.
 
+  Messages:
+    AdditionalUserLabelsValue: Additional user labels attached to the job.
+
   Fields:
     additionalExperiments: Additional experiment flags for the job.
+    additionalUserLabels: Additional user labels attached to the job.
     bypassTempDirValidation: Whether to bypass the safety checks for the job's
       temporary directory. Use with caution.
     machineType: The machine type to use for the job. Defaults to the value
@@ -3204,6 +3282,8 @@ class RuntimeEnvironment(_messages.Message):
       made available to your pipeline during execution, from 1 to 1000.
     network: Network to which VMs will be assigned.  If empty or unspecified,
       the service will use the network "default".
+    numWorkers: The initial number of Google Compute Engine instnaces for the
+      job.
     serviceAccountEmail: The email address of the service account to run the
       job as.
     subnetwork: Subnetwork to which VMs will be assigned, if desired.
@@ -3215,15 +3295,43 @@ class RuntimeEnvironment(_messages.Message):
       for launching worker instances to run your pipeline.
   """
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class AdditionalUserLabelsValue(_messages.Message):
+    r"""Additional user labels attached to the job.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        AdditionalUserLabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        AdditionalUserLabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a AdditionalUserLabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   additionalExperiments = _messages.StringField(1, repeated=True)
-  bypassTempDirValidation = _messages.BooleanField(2)
-  machineType = _messages.StringField(3)
-  maxWorkers = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  network = _messages.StringField(5)
-  serviceAccountEmail = _messages.StringField(6)
-  subnetwork = _messages.StringField(7)
-  tempLocation = _messages.StringField(8)
-  zone = _messages.StringField(9)
+  additionalUserLabels = _messages.MessageField('AdditionalUserLabelsValue', 2)
+  bypassTempDirValidation = _messages.BooleanField(3)
+  machineType = _messages.StringField(4)
+  maxWorkers = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  network = _messages.StringField(6)
+  numWorkers = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  serviceAccountEmail = _messages.StringField(8)
+  subnetwork = _messages.StringField(9)
+  tempLocation = _messages.StringField(10)
+  zone = _messages.StringField(11)
 
 
 class SdkVersion(_messages.Message):
@@ -3486,6 +3594,36 @@ class Sink(_messages.Message):
 
   codec = _messages.MessageField('CodecValue', 1)
   spec = _messages.MessageField('SpecValue', 2)
+
+
+class Snapshot(_messages.Message):
+  r"""Represents a snapshot of a job.
+
+  Fields:
+    creationTime: The time this snapshot was created.
+    id: The unique ID of this snapshot.
+    projectId: The project this snapshot belongs to.
+    sourceJobId: The job this snapshot was created from.
+    ttl: The time after which this snapshot will be automatically deleted.
+  """
+
+  creationTime = _messages.StringField(1)
+  id = _messages.StringField(2)
+  projectId = _messages.StringField(3)
+  sourceJobId = _messages.StringField(4)
+  ttl = _messages.StringField(5)
+
+
+class SnapshotJobRequest(_messages.Message):
+  r"""Request to create a snapshot of a job.
+
+  Fields:
+    location: The location that contains this job.
+    ttl: TTL for the snapshot.
+  """
+
+  location = _messages.StringField(1)
+  ttl = _messages.StringField(2)
 
 
 class Source(_messages.Message):
@@ -4089,6 +4227,20 @@ class StreamLocation(_messages.Message):
   streamingStageLocation = _messages.MessageField('StreamingStageLocation', 4)
 
 
+class StreamingApplianceSnapshotConfig(_messages.Message):
+  r"""Streaming appliance snapshot configuration.
+
+  Fields:
+    importStateEndpoint: Indicates which endpoint is used to import appliance
+      state.
+    snapshotId: If set, indicates the snapshot id for the snapshot being
+      performed.
+  """
+
+  importStateEndpoint = _messages.StringField(1)
+  snapshotId = _messages.StringField(2)
+
+
 class StreamingComputationConfig(_messages.Message):
   r"""Configuration information for a single streaming computation.
 
@@ -4211,6 +4363,7 @@ class StreamingSetupTask(_messages.Message):
     drain: The user has requested drain.
     receiveWorkPort: The TCP port on which the worker should listen for
       messages from other streaming computation workers.
+    snapshotConfig: Configures streaming appliance snapshot.
     streamingComputationTopology: The global topology of the streaming
       Dataflow job.
     workerHarnessPort: The TCP port used by the worker to communicate with the
@@ -4219,8 +4372,9 @@ class StreamingSetupTask(_messages.Message):
 
   drain = _messages.BooleanField(1)
   receiveWorkPort = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  streamingComputationTopology = _messages.MessageField('TopologyConfig', 3)
-  workerHarnessPort = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  snapshotConfig = _messages.MessageField('StreamingApplianceSnapshotConfig', 3)
+  streamingComputationTopology = _messages.MessageField('TopologyConfig', 4)
+  workerHarnessPort = _messages.IntegerField(5, variant=_messages.Variant.INT32)
 
 
 class StreamingSideInputLocation(_messages.Message):

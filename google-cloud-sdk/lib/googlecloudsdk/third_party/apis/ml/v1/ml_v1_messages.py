@@ -92,15 +92,16 @@ class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
     Values:
       ACCELERATOR_TYPE_UNSPECIFIED: Unspecified accelerator type. Default to
         no GPU.
-      NVIDIA_TESLA_K80: Nvidia tesla k80 GPU.
-      NVIDIA_TESLA_P100: Nvidia tesla P100 GPU.
-      NVIDIA_TESLA_V100: Nvidia tesla V100 GPU. Not supported for batch
-        prediction.
+      NVIDIA_TESLA_K80: Nvidia Tesla K80 GPU.
+      NVIDIA_TESLA_P100: Nvidia Tesla P100 GPU.
+      NVIDIA_TESLA_V100: Nvidia Tesla V100 GPU.
+      NVIDIA_TESLA_P4: Nvidia Tesla P4 GPU.
     """
     ACCELERATOR_TYPE_UNSPECIFIED = 0
     NVIDIA_TESLA_K80 = 1
     NVIDIA_TESLA_P100 = 2
     NVIDIA_TESLA_V100 = 3
+    NVIDIA_TESLA_P4 = 4
 
   count = _messages.IntegerField(1)
   type = _messages.EnumField('TypeValueValuesEnum', 2)
@@ -159,11 +160,13 @@ class GoogleCloudMlV1Capability(_messages.Message):
       NVIDIA_TESLA_K80: <no description>
       NVIDIA_TESLA_P100: <no description>
       NVIDIA_TESLA_V100: <no description>
+      NVIDIA_TESLA_P4: <no description>
     """
     ACCELERATOR_TYPE_UNSPECIFIED = 0
     NVIDIA_TESLA_K80 = 1
     NVIDIA_TESLA_P100 = 2
     NVIDIA_TESLA_V100 = 3
+    NVIDIA_TESLA_P4 = 4
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""TypeValueValuesEnum enum type.
@@ -787,7 +790,7 @@ class GoogleCloudMlV1PredictRequest(_messages.Message):
 
 
 class GoogleCloudMlV1PredictionInput(_messages.Message):
-  r"""Represents input parameters for a prediction job.
+  r"""Represents input parameters for a prediction job. Next field: 19
 
   Enums:
     DataFormatValueValuesEnum: Required. The format of the input data files.
@@ -816,8 +819,8 @@ class GoogleCloudMlV1PredictionInput(_messages.Message):
     region: Required. The Google Compute Engine region to run the prediction
       job in. See the <a href="/ml-engine/docs/tensorflow/regions">available
       regions</a> for ML Engine services.
-    runtimeVersion: Optional. The Google Cloud ML runtime version to use for
-      this batch prediction. If not set, Google Cloud ML will pick the runtime
+    runtimeVersion: Optional. The Cloud ML Engine runtime version to use for
+      this batch prediction. If not set, Cloud ML Engine will pick the runtime
       version used during the CreateVersion request for this model version, or
       choose the latest stable version when model version information is not
       available such as when the model is specified by uri.
@@ -846,6 +849,8 @@ class GoogleCloudMlV1PredictionInput(_messages.Message):
       TF_RECORD: INPUT ONLY. The source file is a TFRecord file.
       TF_RECORD_GZIP: INPUT ONLY. The source file is a GZIP-compressed
         TFRecord file.
+      FILE_LIST: INPUT ONLY. Each line of the file is the location of an
+        instance to process.
       CSV: OUTPUT ONLY. Output values will be in comma-separated rows, with
         keys in a separate file.
     """
@@ -854,7 +859,8 @@ class GoogleCloudMlV1PredictionInput(_messages.Message):
     TEXT = 2
     TF_RECORD = 3
     TF_RECORD_GZIP = 4
-    CSV = 5
+    FILE_LIST = 5
+    CSV = 6
 
   class OutputDataFormatValueValuesEnum(_messages.Enum):
     r"""Optional. Format of the output data files, defaults to JSON.
@@ -867,6 +873,8 @@ class GoogleCloudMlV1PredictionInput(_messages.Message):
       TF_RECORD: INPUT ONLY. The source file is a TFRecord file.
       TF_RECORD_GZIP: INPUT ONLY. The source file is a GZIP-compressed
         TFRecord file.
+      FILE_LIST: INPUT ONLY. Each line of the file is the location of an
+        instance to process.
       CSV: OUTPUT ONLY. Output values will be in comma-separated rows, with
         keys in a separate file.
     """
@@ -875,7 +883,8 @@ class GoogleCloudMlV1PredictionInput(_messages.Message):
     TEXT = 2
     TF_RECORD = 3
     TF_RECORD_GZIP = 4
-    CSV = 5
+    FILE_LIST = 5
+    CSV = 6
 
   accelerator = _messages.MessageField('GoogleCloudMlV1AcceleratorConfig', 1)
   batchSize = _messages.IntegerField(2)
@@ -909,6 +918,19 @@ class GoogleCloudMlV1PredictionOutput(_messages.Message):
   predictionCount = _messages.IntegerField(4)
 
 
+class GoogleCloudMlV1ReplicaConfig(_messages.Message):
+  r"""Represents the configration for a replica in a cluster.
+
+  Fields:
+    acceleratorConfig: A GoogleCloudMlV1AcceleratorConfig attribute.
+    imageUri: The docker image to run on worker. This image must be in Google
+      Container Registry.
+  """
+
+  acceleratorConfig = _messages.MessageField('GoogleCloudMlV1AcceleratorConfig', 1)
+  imageUri = _messages.StringField(2)
+
+
 class GoogleCloudMlV1SetDefaultVersionRequest(_messages.Message):
   r"""Request message for the SetDefaultVersion request."""
 
@@ -932,6 +954,8 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       TensorFlow program as the '--job-dir' command-line argument. The benefit
       of specifying this field is that Cloud ML validates the path for use in
       training.
+    masterConfig: Optional. The configuration for master.  Only one of
+      `masterConfig.imageUri` and `runtimeVersion` should be set.
     masterType: Optional. Specifies the type of virtual machine to use for
       your training job's master worker.  The following types are supported:
       <dl>   <dt>standard</dt>   <dd>   A basic machine configuration suitable
@@ -955,18 +979,31 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       </dd>   <dt>complex_model_l_gpu</dt>   <dd>   A machine equivalent to
       <i>complex_model_l</i> that also includes   eight NVIDIA Tesla K80 GPUs.
       </dd>   <dt>standard_p100</dt>   <dd>   A machine equivalent to
-      <i>standard</i> that   also includes a single NVIDIA Tesla P100 GPU. The
-      availability of these   GPUs is in the <i>Beta</i> launch stage.   </dd>
-      <dt>complex_model_m_p100</dt>   <dd>   A machine equivalent to
+      <i>standard</i> that   also includes a single NVIDIA Tesla P100 GPU.
+      </dd>   <dt>complex_model_m_p100</dt>   <dd>   A machine equivalent to
       <i>complex_model_m</i> that also includes   four NVIDIA Tesla P100 GPUs.
-      The availability of these GPUs is in   the <i>Beta</i> launch stage.
-      </dd>   <dt>cloud_tpu</dt>   <dd>   A TPU VM including one Cloud TPU.
-      See more about   <a href="/ml-engine/docs/tensorflow/using-tpus">using
-      TPUs to train   your model</a>.   </dd> </dl>  You must set this value
-      when `scaleTier` is set to `CUSTOM`.
+      </dd>   <dt>standard_v100</dt>   <dd>   A machine equivalent to
+      <i>standard</i> that   also includes a single NVIDIA Tesla V100 GPU. The
+      availability of these   GPUs is in the <i>Beta</i> launch stage.   </dd>
+      <dt>large_model_v100</dt>   <dd>   A machine equivalent to
+      <i>large_model</i> that   also includes a single NVIDIA Tesla V100 GPU.
+      The availability of these   GPUs is in the <i>Beta</i> launch stage.
+      </dd>   <dt>complex_model_m_v100</dt>   <dd>   A machine equivalent to
+      <i>complex_model_m</i> that   also includes four NVIDIA Tesla V100 GPUs.
+      The availability of these   GPUs is in the <i>Beta</i> launch stage.
+      </dd>   <dt>complex_model_l_v100</dt>   <dd>   A machine equivalent to
+      <i>complex_model_l</i> that   also includes eight NVIDIA Tesla V100
+      GPUs. The availability of these   GPUs is in the <i>Beta</i> launch
+      stage.   </dd>   <dt>cloud_tpu</dt>   <dd>   A TPU VM including one
+      Cloud TPU. See more about   <a href="/ml-engine/docs/tensorflow/using-
+      tpus">using TPUs to train   your model</a>.   </dd> </dl>  You must set
+      this value when `scaleTier` is set to `CUSTOM`.
     packageUris: Required. The Google Cloud Storage location of the packages
       with the training program and any additional dependencies. The maximum
       number of package URIs is 100.
+    parameterServerConfig: Optional. The config of parameter servers.  If
+      `parameterServerConfig.imageUri` has not been set, the value of
+      `masterConfig.imageUri` will be used.
     parameterServerCount: Optional. The number of parameter server replicas to
       use for the training job. Each replica in the cluster will be of the
       type specified in `parameter_server_type`.  This value can only be used
@@ -982,15 +1019,21 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
     pythonVersion: Optional. The version of Python used in training. If not
       set, the default version is '2.7'. Python '3.5' is available when
       `runtime_version` is set to '1.4' and above. Python '2.7' works with all
-      supported runtime versions.
+      supported <a href="/ml-engine/docs/runtime-version-list">runtime
+      versions</a>.
     region: Required. The Google Compute Engine region to run the training job
       in. See the <a href="/ml-engine/docs/tensorflow/regions">available
       regions</a> for ML Engine services.
-    runtimeVersion: Optional. The Google Cloud ML runtime version to use for
-      training.  If not set, Google Cloud ML will choose a stable version,
-      which is defined in the documentation of runtime version list.
+    runtimeVersion: Optional. The Cloud ML Engine runtime version to use for
+      training. If not set, Cloud ML Engine uses the default stable version,
+      1.0. For more information, see the <a href="/ml-engine/docs/runtime-
+      version-list">runtime version list</a> and <a href="/ml-
+      engine/docs/versioning">how to manage runtime versions</a>.
     scaleTier: Required. Specifies the machine types, the number of replicas
       for workers and parameter servers.
+    workerConfig: Optional. The configrations for workers.  If
+      `workerConfig.imageUri` has not been set, the value of
+      `masterConfig.imageUri` will be used.
     workerCount: Optional. The number of worker replicas to use for the
       training job. Each replica in the cluster will be of the type specified
       in `worker_type`.  This value can only be used when `scale_tier` is set
@@ -1044,17 +1087,20 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
   args = _messages.StringField(1, repeated=True)
   hyperparameters = _messages.MessageField('GoogleCloudMlV1HyperparameterSpec', 2)
   jobDir = _messages.StringField(3)
-  masterType = _messages.StringField(4)
-  packageUris = _messages.StringField(5, repeated=True)
-  parameterServerCount = _messages.IntegerField(6)
-  parameterServerType = _messages.StringField(7)
-  pythonModule = _messages.StringField(8)
-  pythonVersion = _messages.StringField(9)
-  region = _messages.StringField(10)
-  runtimeVersion = _messages.StringField(11)
-  scaleTier = _messages.EnumField('ScaleTierValueValuesEnum', 12)
-  workerCount = _messages.IntegerField(13)
-  workerType = _messages.StringField(14)
+  masterConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 4)
+  masterType = _messages.StringField(5)
+  packageUris = _messages.StringField(6, repeated=True)
+  parameterServerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 7)
+  parameterServerCount = _messages.IntegerField(8)
+  parameterServerType = _messages.StringField(9)
+  pythonModule = _messages.StringField(10)
+  pythonVersion = _messages.StringField(11)
+  region = _messages.StringField(12)
+  runtimeVersion = _messages.StringField(13)
+  scaleTier = _messages.EnumField('ScaleTierValueValuesEnum', 14)
+  workerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 15)
+  workerCount = _messages.IntegerField(16)
+  workerType = _messages.StringField(17)
 
 
 class GoogleCloudMlV1TrainingOutput(_messages.Message):
@@ -1086,10 +1132,10 @@ class GoogleCloudMlV1Version(_messages.Message):
   Enums:
     FrameworkValueValuesEnum: Optional. The machine learning framework Cloud
       ML Engine uses to train this version of the model. Valid values are
-      `TENSORFLOW`, `SCIKIT_LEARN`, and `XGBOOST`. If you do not specify a
-      framework, Cloud ML Engine uses TensorFlow. If you choose `SCIKIT_LEARN`
-      or `XGBOOST`, you must also set the runtime version of the model to 1.4
-      or greater.
+      `TENSORFLOW`, `SCIKIT_LEARN`, `XGBOOST`. If you do not specify a
+      framework, Cloud ML Engine will analyze files in the deployment_uri to
+      determine a framework. If you choose `SCIKIT_LEARN` or `XGBOOST`, you
+      must also set the runtime version of the model to 1.4 or greater.
     StateValueValuesEnum: Output only. The state of a version.
 
   Messages:
@@ -1100,6 +1146,7 @@ class GoogleCloudMlV1Version(_messages.Message):
       engine/docs/tensorflow/resource-labels">using labels</a>.
 
   Fields:
+    acceleratorConfig: Accelerator config for GPU serving.
     autoScaling: Automatically scale the number of nodes used to serve the
       model in response to increases and decreases in traffic. Care should be
       taken to ramp up traffic according to the model's ability to scale or
@@ -1126,9 +1173,10 @@ class GoogleCloudMlV1Version(_messages.Message):
       to ensure that their change will be applied to the model as intended.
     framework: Optional. The machine learning framework Cloud ML Engine uses
       to train this version of the model. Valid values are `TENSORFLOW`,
-      `SCIKIT_LEARN`, and `XGBOOST`. If you do not specify a framework, Cloud
-      ML Engine uses TensorFlow. If you choose `SCIKIT_LEARN` or `XGBOOST`,
-      you must also set the runtime version of the model to 1.4 or greater.
+      `SCIKIT_LEARN`, `XGBOOST`. If you do not specify a framework, Cloud ML
+      Engine will analyze files in the deployment_uri to determine a
+      framework. If you choose `SCIKIT_LEARN` or `XGBOOST`, you must also set
+      the runtime version of the model to 1.4 or greater.
     isDefault: Output only. If true, this version will be used to handle
       prediction requests that do not specify a version.  You can change the
       default version by calling [projects.methods.versions.setDefault](/ml-
@@ -1181,17 +1229,23 @@ class GoogleCloudMlV1Version(_messages.Message):
       set, the default version is '2.7'. Python '3.5' is available when
       `runtime_version` is set to '1.4' and above. Python '2.7' works with all
       supported runtime versions.
-    runtimeVersion: Optional. The Google Cloud ML runtime version to use for
-      this deployment. If not set, Google Cloud ML will choose a version.
+    runtimeVersion: Optional. The Cloud ML Engine runtime version to use for
+      this deployment. If not set, Cloud ML Engine uses the default stable
+      version, 1.0. For more information, see the [runtime version list](/ml-
+      engine/docs/runtime-version-list) and [how to manage runtime versions
+      ](/ml-engine/docs/versioning).
+    serviceAccount: Optional. Specifies the service account for resource
+      access control.
     state: Output only. The state of a version.
   """
 
   class FrameworkValueValuesEnum(_messages.Enum):
     r"""Optional. The machine learning framework Cloud ML Engine uses to train
     this version of the model. Valid values are `TENSORFLOW`, `SCIKIT_LEARN`,
-    and `XGBOOST`. If you do not specify a framework, Cloud ML Engine uses
-    TensorFlow. If you choose `SCIKIT_LEARN` or `XGBOOST`, you must also set
-    the runtime version of the model to 1.4 or greater.
+    `XGBOOST`. If you do not specify a framework, Cloud ML Engine will analyze
+    files in the deployment_uri to determine a framework. If you choose
+    `SCIKIT_LEARN` or `XGBOOST`, you must also set the runtime version of the
+    model to 1.4 or greater.
 
     Values:
       FRAMEWORK_UNSPECIFIED: Unspecified framework. Defaults to TensorFlow.
@@ -1257,24 +1311,26 @@ class GoogleCloudMlV1Version(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  autoScaling = _messages.MessageField('GoogleCloudMlV1AutoScaling', 1)
-  createTime = _messages.StringField(2)
-  deploymentUri = _messages.StringField(3)
-  description = _messages.StringField(4)
-  errorMessage = _messages.StringField(5)
-  etag = _messages.BytesField(6)
-  framework = _messages.EnumField('FrameworkValueValuesEnum', 7)
-  isDefault = _messages.BooleanField(8)
-  labels = _messages.MessageField('LabelsValue', 9)
-  lastUseTime = _messages.StringField(10)
-  machineType = _messages.StringField(11)
-  manualScaling = _messages.MessageField('GoogleCloudMlV1ManualScaling', 12)
-  modelClass = _messages.StringField(13)
-  name = _messages.StringField(14)
-  packageUris = _messages.StringField(15, repeated=True)
-  pythonVersion = _messages.StringField(16)
-  runtimeVersion = _messages.StringField(17)
-  state = _messages.EnumField('StateValueValuesEnum', 18)
+  acceleratorConfig = _messages.MessageField('GoogleCloudMlV1AcceleratorConfig', 1)
+  autoScaling = _messages.MessageField('GoogleCloudMlV1AutoScaling', 2)
+  createTime = _messages.StringField(3)
+  deploymentUri = _messages.StringField(4)
+  description = _messages.StringField(5)
+  errorMessage = _messages.StringField(6)
+  etag = _messages.BytesField(7)
+  framework = _messages.EnumField('FrameworkValueValuesEnum', 8)
+  isDefault = _messages.BooleanField(9)
+  labels = _messages.MessageField('LabelsValue', 10)
+  lastUseTime = _messages.StringField(11)
+  machineType = _messages.StringField(12)
+  manualScaling = _messages.MessageField('GoogleCloudMlV1ManualScaling', 13)
+  modelClass = _messages.StringField(14)
+  name = _messages.StringField(15)
+  packageUris = _messages.StringField(16, repeated=True)
+  pythonVersion = _messages.StringField(17)
+  runtimeVersion = _messages.StringField(18)
+  serviceAccount = _messages.StringField(19)
+  state = _messages.EnumField('StateValueValuesEnum', 20)
 
 
 class GoogleIamV1AuditConfig(_messages.Message):

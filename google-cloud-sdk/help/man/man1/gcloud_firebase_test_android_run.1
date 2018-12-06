@@ -28,8 +28,8 @@ Android app which records any installation failures or crashes and builds an
 activity map with associated screenshots and video.
 .IP "\(bu" 2m
 \fBinstrumentation\fR: runs automated unit or integration tests written using a
-testing framework. Firebase Test Lab for Android currently supports the
-Espresso, Robotium and UI Automator 2.0 testing frameworks.
+testing framework. Firebase Test Lab for Android currently supports the Espresso
+and UI Automator 2.0 testing frameworks.
 .IP "\(bu" 2m
 \fBgame\-loop\fR: executes a special intent built into the game app (a "demo
 mode") that simulates the actions of a real player. This test type can include
@@ -165,11 +165,33 @@ prefix for that device.
 
 .TP 2m
 \fB\-\-environment\-variables\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A comma\-separated, key=value, map of environment variables and their desired
-values. The environment variables passed here will be mirrored on to the adb run
-command. For example, specify \-\-environment\-variables
-coverage=true,coverageFile="/sdcard/coverage.ec" to enable code coverage and
-provide a file path to store the coverage results.
+A comma\-separated, key=value map of environment variables and their desired
+values. This flag is repeatable. The environment variables are mirrored as extra
+options to the \f5am instrument \-e KEY1 VALUE1 ...\fR command and passed to
+your test runner (typically AndroidJUnitRunner). Examples:
+
+Break test cases into four shards and run only the first shard:
+
+.RS 2m
+\-\-environment\-variables numShards=4,shardIndex=0
+.RE
+
+Enable code coverage and provide a file path to store the coverage results when
+using Android Test Orchestrator (\f5\-\-use\-orchestrator\fR):
+
+.RS 2m
+\-\-environment\-variables clearPackageData,coverage=true,coverageFile=/sdcard/coverage.ec
+.RE
+
+Enable code coverage and provide a file path to store the coverage results when
+\fBnot\fR using Android Test Orchestrator (\f5\-\-no\-use\-orchestrator\fR):
+
+.RS 2m
+\-\-environment\-variables coverage=true,coverageFile=/sdcard/coverage.ec
+.RE
+
+Note: If you need to embed a comma into a \f5VALUE\fR string, please refer to
+\f5gcloud topic escaping\fR for ways to change the default list delimiter.
 
 .TP 2m
 \fB\-\-obb\-files\fR=\fIOBB_FILE\fR,[\fIOBB_FILE\fR]
@@ -255,16 +277,26 @@ The fully\-qualified Java class name of the instrumentation test runner
 
 .TP 2m
 \fB\-\-test\-targets\fR=\fITEST_TARGET\fR,[\fITEST_TARGET\fR,...]
-A list of one or more instrumentation test targets to be run (default: all
-targets). Each target must be fully qualified with the package name or class
-name, in one of these formats:
+A list of one or more test target filters to apply (default: run all test
+targets). Each target filter must be fully qualified with the package name,
+class name, or test annotation desired. Any test filter supported by \f5am
+instrument \-e ...\fR is supported. See
+https://developer.android.com/reference/android/support/test/runner/AndroidJUnitRunner
+for more information. Examples:
+
 .RS 2m
 .IP "\(em" 2m
-"package package_name"
+\f5\-\-test\-targets "package com.my.package.name"\fR
 .IP "\(em" 2m
-"class package_name.class_name"
+\f5\-\-test\-targets "notPackage com.package.to.skip"\fR
 .IP "\(em" 2m
-"class package_name.class_name#method_name".
+\f5\-\-test\-targets "class com.foo.ClassName"\fR
+.IP "\(em" 2m
+\f5\-\-test\-targets "notClass com.foo.ClassName#testMethodToSkip"\fR
+.IP "\(em" 2m
+\f5\-\-test\-targets "annotation com.foo.AnnotationToRun"\fR
+.IP "\(em" 2m
+\f5\-\-test\-targets "size large notAnnotation com.foo.AnnotationToSkip"\fR
 .RE
 .RE
 .sp
@@ -336,7 +368,7 @@ to provide custom login credentials for your app, or
 
 to instruct Robo to click on the sign in button. To learn more about Robo test
 and robo_directives, see
-https://firebase.google.com/docs/test\-lab/command\-line#custom_login_and_text_input_with_robo_test.
+https://firebase.google.com/docs/test\-lab/android/command\-line#custom_login_and_text_input_with_robo_test.
 
 Caution: You should only use credentials for test accounts that are not
 associated with real users.
@@ -413,9 +445,9 @@ flag interacts with other flags that are applied in this order:
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

@@ -7,8 +7,9 @@ SYNOPSIS
         (--action=ACTION | --allow=PROTOCOL[:PORT[-PORT]],[...])
         [--description=DESCRIPTION]
         [--destination-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
-        [--direction=DIRECTION] [--network=NETWORK; default="default"]
-        [--priority=PRIORITY] [--rules=PROTOCOL[:PORT[-PORT]],[...]]
+        [--direction=DIRECTION] [--disabled]
+        [--network=NETWORK; default="default"] [--priority=PRIORITY]
+        [--rules=PROTOCOL[:PORT[-PORT]],[...]]
         [--source-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
         [--source-service-accounts=EMAIL,[EMAIL,...]]
         [--source-tags=TAG,[TAG,...]]
@@ -85,6 +86,15 @@ OPTIONAL FLAGS
         'OUT' can be used to represent egress direction.
 
         DIRECTION must be one of: INGRESS, EGRESS, IN, OUT.
+
+     --disabled
+        Disable a firewall rule and stop it from being enforced in the network.
+        If a firewall rule is disabled, the associated network behaves as if
+        the rule did not exist. To enable a disabled rule, use:
+
+            $ gcloud compute firewall-rules update MY-RULE --no-disabled
+
+        Firewall rules are enabled by default.
 
      --network=NETWORK; default="default"
         The network to which this rule is attached. If omitted, the rule is
@@ -180,8 +190,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To create a firewall rule allowing incoming TCP traffic on port 8080, run:

@@ -28,8 +28,10 @@ from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.bigtable import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase,
                       resource_completer_test_base.ResourceCompleterBase):
 

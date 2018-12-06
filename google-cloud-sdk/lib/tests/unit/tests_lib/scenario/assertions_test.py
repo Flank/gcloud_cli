@@ -122,7 +122,7 @@ class AssertionTests(test_case.TestCase, parameterized.TestCase):
                                                     {'a': 3, 'b': 4},
                                                     {'a': 5, 'b': 6}]), True),
   ])
-  def testCheckJsonConent(self, assertion, matches):
+  def testCheckJsonContent(self, assertion, matches):
     actual = {
         'a': {'b': 'c', 'd': 'e', 'f': 1, 'g': True},
         'h': {
@@ -144,6 +144,47 @@ class AssertionTests(test_case.TestCase, parameterized.TestCase):
       with self.assertRaises(assertions.Error):
         with assertions.FailureCollector([]) as f:
           f.AddAll(assertion.Check(updates.Context.Empty(), actual))
+
+  def testJsonUpdate(self):
+    actual = {
+        'foo': 'bar',
+        'a': {'b': 'c', 'd': 'e'},
+        'h': {
+            'i': {'j': 'k', 'l': 'm'},
+        },
+        'scalar_list': ['s', 't', 'u'],
+        'dict_list': [
+            {'s': 't', 'u': 'v'},
+            {'w': 'x', 'y': 'z'},
+        ],
+        'diff_len_lists': [{'a': 'b'}, 'b', 'c'],
+    }
+    assertion_data = {
+        'foo': 'X',
+        'a': {'b': 'X'},
+        'h': {'i': {'j': 'X'}},
+        'scalar_list': ['s', 'X', 'u'],
+        'dict_list': [{'s': 'X', 'u': 'v'}, {'w': 'x', 'y': 'X'},],
+        'diff_len_lists': ['X'],
+    }
+    assertion = assertions.JsonAssertion()
+    for field, struct in assertion_data.items():
+      assertion.Matches(field, struct)
+
+    context = updates.Context(
+        {'data': assertion_data}, 'data', updates.Mode.RESULT)
+    failures = assertion.Check(context, actual)
+    self.assertEqual(7, len(failures))
+
+    for f in failures:
+      f.Update([updates.Mode.RESULT])
+    self.assertEqual('bar', assertion_data['foo'])
+    self.assertEqual('c', assertion_data['a']['b'])
+    self.assertEqual('k', assertion_data['h']['i']['j'])
+    self.assertEqual('t', assertion_data['scalar_list'][1])
+    self.assertEqual('t', assertion_data['dict_list'][0]['s'])
+    self.assertEqual('z', assertion_data['dict_list'][1]['y'])
+    self.assertEqual([{'a': 'b'}, 'b', 'c'], assertion_data['diff_len_lists'])
 
 
 class FailureCollectionTests(test_case.TestCase):

@@ -232,7 +232,7 @@ newest first).
         method_id=u'cloudiot.projects.locations.registries.devices.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'deviceIds', u'deviceNumIds', u'fieldMask', u'pageSize', u'pageToken'],
+        query_params=[u'deviceIds', u'deviceNumIds', u'fieldMask', u'gatewayListOptions_associationsDeviceId', u'gatewayListOptions_associationsGatewayId', u'gatewayListOptions_gatewayType', u'pageSize', u'pageToken'],
         relative_path=u'v1/{+parent}/devices',
         request_field='',
         request_type_name=u'CloudiotProjectsLocationsRegistriesDevicesListRequest',
@@ -293,6 +293,45 @@ its metadata.
         request_field=u'device',
         request_type_name=u'CloudiotProjectsLocationsRegistriesDevicesPatchRequest',
         response_type_name=u'Device',
+        supports_download=False,
+    )
+
+    def SendCommandToDevice(self, request, global_params=None):
+      r"""Sends a command to the specified device. In order for a device to be able.
+to receive commands, it must:
+1) be connected to Cloud IoT Core using the MQTT protocol, and
+2) be subscribed to the group of MQTT topics specified by
+   /devices/{device-id}/commands/#. This subscription will receive commands
+   at the top-level topic /devices/{device-id}/commands as well as commands
+   for subfolders, like /devices/{device-id}/commands/subfolder.
+   Note that subscribing to specific subfolders is not supported.
+If the command could not be delivered to the device, this method will
+return an error; in particular, if the device is not subscribed, this
+method will return FAILED_PRECONDITION. Otherwise, this method will
+return OK. If the subscription is QoS 1, at least once delivery will be
+guaranteed; for QoS 0, no acknowledgment will be expected from the device.
+
+      Args:
+        request: (CloudiotProjectsLocationsRegistriesDevicesSendCommandToDeviceRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (SendCommandToDeviceResponse) The response message.
+      """
+      config = self.GetMethodConfig('SendCommandToDevice')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SendCommandToDevice.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/registries/{registriesId}/devices/{devicesId}:sendCommandToDevice',
+        http_method=u'POST',
+        method_id=u'cloudiot.projects.locations.registries.devices.sendCommandToDevice',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1/{+name}:sendCommandToDevice',
+        request_field=u'sendCommandToDeviceRequest',
+        request_type_name=u'CloudiotProjectsLocationsRegistriesDevicesSendCommandToDeviceRequest',
+        response_type_name=u'SendCommandToDeviceResponse',
         supports_download=False,
     )
 
@@ -428,7 +467,7 @@ newest first).
         method_id=u'cloudiot.projects.locations.registries.groups.devices.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'deviceIds', u'deviceNumIds', u'fieldMask', u'pageSize', u'pageToken'],
+        query_params=[u'deviceIds', u'deviceNumIds', u'fieldMask', u'gatewayListOptions_associationsDeviceId', u'gatewayListOptions_associationsGatewayId', u'gatewayListOptions_gatewayType', u'pageSize', u'pageToken'],
         relative_path=u'v1/{+parent}/devices',
         request_field='',
         request_type_name=u'CloudiotProjectsLocationsRegistriesGroupsDevicesListRequest',
@@ -492,6 +531,45 @@ its metadata.
         supports_download=False,
     )
 
+    def SendCommandToDevice(self, request, global_params=None):
+      r"""Sends a command to the specified device. In order for a device to be able.
+to receive commands, it must:
+1) be connected to Cloud IoT Core using the MQTT protocol, and
+2) be subscribed to the group of MQTT topics specified by
+   /devices/{device-id}/commands/#. This subscription will receive commands
+   at the top-level topic /devices/{device-id}/commands as well as commands
+   for subfolders, like /devices/{device-id}/commands/subfolder.
+   Note that subscribing to specific subfolders is not supported.
+If the command could not be delivered to the device, this method will
+return an error; in particular, if the device is not subscribed, this
+method will return FAILED_PRECONDITION. Otherwise, this method will
+return OK. If the subscription is QoS 1, at least once delivery will be
+guaranteed; for QoS 0, no acknowledgment will be expected from the device.
+
+      Args:
+        request: (CloudiotProjectsLocationsRegistriesGroupsDevicesSendCommandToDeviceRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (SendCommandToDeviceResponse) The response message.
+      """
+      config = self.GetMethodConfig('SendCommandToDevice')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SendCommandToDevice.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/registries/{registriesId}/groups/{groupsId}/devices/{devicesId}:sendCommandToDevice',
+        http_method=u'POST',
+        method_id=u'cloudiot.projects.locations.registries.groups.devices.sendCommandToDevice',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1/{+name}:sendCommandToDevice',
+        request_field=u'sendCommandToDeviceRequest',
+        request_type_name=u'CloudiotProjectsLocationsRegistriesGroupsDevicesSendCommandToDeviceRequest',
+        response_type_name=u'SendCommandToDeviceResponse',
+        supports_download=False,
+    )
+
   class ProjectsLocationsRegistriesGroupsService(base_api.BaseApiService):
     """Service class for the projects_locations_registries_groups resource."""
 
@@ -501,6 +579,33 @@ its metadata.
       super(CloudiotV1.ProjectsLocationsRegistriesGroupsService, self).__init__(client)
       self._upload_configs = {
           }
+
+    def BindDeviceToGateway(self, request, global_params=None):
+      r"""Associates the device with the gateway.
+
+      Args:
+        request: (CloudiotProjectsLocationsRegistriesGroupsBindDeviceToGatewayRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (BindDeviceToGatewayResponse) The response message.
+      """
+      config = self.GetMethodConfig('BindDeviceToGateway')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    BindDeviceToGateway.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/registries/{registriesId}/groups/{groupsId}:bindDeviceToGateway',
+        http_method=u'POST',
+        method_id=u'cloudiot.projects.locations.registries.groups.bindDeviceToGateway',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}:bindDeviceToGateway',
+        request_field=u'bindDeviceToGatewayRequest',
+        request_type_name=u'CloudiotProjectsLocationsRegistriesGroupsBindDeviceToGatewayRequest',
+        response_type_name=u'BindDeviceToGatewayResponse',
+        supports_download=False,
+    )
 
     def GetIamPolicy(self, request, global_params=None):
       r"""Gets the access control policy for a resource.
@@ -588,6 +693,33 @@ permissions, not a NOT_FOUND error.
         supports_download=False,
     )
 
+    def UnbindDeviceFromGateway(self, request, global_params=None):
+      r"""Deletes the association between the device and the gateway.
+
+      Args:
+        request: (CloudiotProjectsLocationsRegistriesGroupsUnbindDeviceFromGatewayRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (UnbindDeviceFromGatewayResponse) The response message.
+      """
+      config = self.GetMethodConfig('UnbindDeviceFromGateway')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UnbindDeviceFromGateway.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/registries/{registriesId}/groups/{groupsId}:unbindDeviceFromGateway',
+        http_method=u'POST',
+        method_id=u'cloudiot.projects.locations.registries.groups.unbindDeviceFromGateway',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}:unbindDeviceFromGateway',
+        request_field=u'unbindDeviceFromGatewayRequest',
+        request_type_name=u'CloudiotProjectsLocationsRegistriesGroupsUnbindDeviceFromGatewayRequest',
+        response_type_name=u'UnbindDeviceFromGatewayResponse',
+        supports_download=False,
+    )
+
   class ProjectsLocationsRegistriesService(base_api.BaseApiService):
     """Service class for the projects_locations_registries resource."""
 
@@ -597,6 +729,33 @@ permissions, not a NOT_FOUND error.
       super(CloudiotV1.ProjectsLocationsRegistriesService, self).__init__(client)
       self._upload_configs = {
           }
+
+    def BindDeviceToGateway(self, request, global_params=None):
+      r"""Associates the device with the gateway.
+
+      Args:
+        request: (CloudiotProjectsLocationsRegistriesBindDeviceToGatewayRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (BindDeviceToGatewayResponse) The response message.
+      """
+      config = self.GetMethodConfig('BindDeviceToGateway')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    BindDeviceToGateway.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/registries/{registriesId}:bindDeviceToGateway',
+        http_method=u'POST',
+        method_id=u'cloudiot.projects.locations.registries.bindDeviceToGateway',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}:bindDeviceToGateway',
+        request_field=u'bindDeviceToGatewayRequest',
+        request_type_name=u'CloudiotProjectsLocationsRegistriesBindDeviceToGatewayRequest',
+        response_type_name=u'BindDeviceToGatewayResponse',
+        supports_download=False,
+    )
 
     def Create(self, request, global_params=None):
       r"""Creates a device registry that contains devices.
@@ -816,6 +975,33 @@ permissions, not a NOT_FOUND error.
         request_field=u'testIamPermissionsRequest',
         request_type_name=u'CloudiotProjectsLocationsRegistriesTestIamPermissionsRequest',
         response_type_name=u'TestIamPermissionsResponse',
+        supports_download=False,
+    )
+
+    def UnbindDeviceFromGateway(self, request, global_params=None):
+      r"""Deletes the association between the device and the gateway.
+
+      Args:
+        request: (CloudiotProjectsLocationsRegistriesUnbindDeviceFromGatewayRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (UnbindDeviceFromGatewayResponse) The response message.
+      """
+      config = self.GetMethodConfig('UnbindDeviceFromGateway')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UnbindDeviceFromGateway.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/registries/{registriesId}:unbindDeviceFromGateway',
+        http_method=u'POST',
+        method_id=u'cloudiot.projects.locations.registries.unbindDeviceFromGateway',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}:unbindDeviceFromGateway',
+        request_field=u'unbindDeviceFromGatewayRequest',
+        request_type_name=u'CloudiotProjectsLocationsRegistriesUnbindDeviceFromGatewayRequest',
+        response_type_name=u'UnbindDeviceFromGatewayResponse',
         supports_download=False,
     )
 

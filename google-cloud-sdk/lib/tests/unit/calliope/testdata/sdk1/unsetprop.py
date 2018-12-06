@@ -19,11 +19,12 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import actions
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 
 
-class Unsetprop(base.Command):
+class Unsetprop(calliope_base.Command):
+  """Unset Prop"""
 
   def Run(self, args):
     return properties.VALUES.core.disable_prompts.Get(required=True)
@@ -38,4 +39,3 @@ class Unsetprop(base.Command):
         '--foo',
         action=actions.StoreProperty(properties.VALUES.core.disable_prompts),
         help='Auxilio aliis.')
-

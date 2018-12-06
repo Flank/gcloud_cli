@@ -96,7 +96,7 @@ class InstallationConfig(object):
       seconds since the epoch.
     """
     return int(time.strftime(
-        InstallationConfig.REVISION_FORMAT_STRING, time_struct))
+        InstallationConfig.REVISION_FORMAT_STRING, time_struct))  # pytype: disable=wrong-arg-types
 
   @staticmethod
   def ParseRevision(revision):
@@ -111,7 +111,7 @@ class InstallationConfig(object):
       time.struct_time, The parsed time.
     """
     return time.strptime(str(revision),
-                         InstallationConfig.REVISION_FORMAT_STRING)
+                         InstallationConfig.REVISION_FORMAT_STRING)  # pytype: disable=wrong-arg-types
 
   @staticmethod
   def ParseRevisionAsSeconds(revision):
@@ -219,7 +219,7 @@ def _GetGlobalConfigDir():
   if global_config_dir:
     return global_config_dir
   if platforms.OperatingSystem.Current() != platforms.OperatingSystem.WINDOWS:
-    return os.path.join(os.path.expanduser('~'), '.config',
+    return os.path.join(file_utils.GetHomeDir(), '.config',
                         _CLOUDSDK_GLOBAL_CONFIG_DIR_NAME)
   appdata = encoding.GetEncodedValue(os.environ, 'APPDATA')
   if appdata:

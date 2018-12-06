@@ -24,9 +24,9 @@ gcloud alpha spanner databases \- manage Cloud Spanner databases
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -54,7 +54,7 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBadd\-iam\-policy\-binding\fR
-\fB(ALPHA)\fR Add an IAM policy binding to a Cloud Spanner database.
+\fB(ALPHA)\fR Add IAM policy binding to a Cloud Spanner database.
 
 .TP 2m
 \fBcreate\fR
@@ -70,7 +70,7 @@ help\fR for details.
 
 .TP 2m
 \fBexecute\-sql\fR
-\fB(ALPHA)\fR Executes a read\-only SQL query against a Cloud Spanner database.
+\fB(ALPHA)\fR Executes a SQL query against a Cloud Spanner database.
 
 .TP 2m
 \fBget\-iam\-policy\fR
@@ -83,7 +83,7 @@ instance.
 
 .TP 2m
 \fBremove\-iam\-policy\-binding\fR
-\fB(ALPHA)\fR Remove an IAM policy binding from a Cloud Spanner database.
+\fB(ALPHA)\fR Remove IAM policy binding of a Cloud Spanner database.
 
 .TP 2m
 \fBset\-iam\-policy\fR

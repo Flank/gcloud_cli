@@ -33,7 +33,12 @@ import mock
 
 class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+
   def SetUp(self):
+    self.SelectApi(self.api_version)
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
     self.addCleanup(list_json_patcher.stop)
@@ -329,7 +334,7 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     )
 
 
-class AddressesListAlphaTest(AddressesListTest):
+class AddressesListBetaTest(AddressesListTest):
 
   def _GetInternalAddressesForTest(self):
     return [
@@ -364,10 +369,9 @@ class AddressesListAlphaTest(AddressesListTest):
             status=self.messages.Address.StatusValueValuesEnum.RESERVED)
     ]
 
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    super(AddressesListAlphaTest, self).SetUp()
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testTableOutput(self):
     command = 'compute addresses list'
@@ -384,6 +388,13 @@ class AddressesListAlphaTest(AddressesListTest):
         range-1          10.23.22.0/24  INTERNAL VPC_PEERING  default                 RESERVED
         """)
     self.RequestAggregate(command, return_value, output)
+
+
+class AddressesListAlphaTest(AddressesListBetaTest):
+
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

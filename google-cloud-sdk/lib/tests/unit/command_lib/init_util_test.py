@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for googlecloudsdk.command_lib.init_util."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -59,7 +60,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrEquals(
         'WARNING: Listing available projects failed: blah\n'
-        'Enter project id you would like to use:',
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter project id you would like '
+        'to use: "}',
         normalize_space=True)
 
   def testPickProject(self):
@@ -113,12 +115,12 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
     self.assertEqual(init_util.PickProject(), 'new-project')
     self.AssertErrEquals(
-        """\
-        {"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", \
-        "choices": ["bar", "baz", "foo", "Create a new project"]}
-        Enter a Project ID. Note that a Project ID CANNOT be changed later.
-        Project IDs must be 6-30 characters (lowercase ASCII, digits, or
-        hyphens) in length and start with a lowercase letter.""",
+        '{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
+        '"choices": ["bar", "baz", "foo", "Create a new project"]}\n'
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter a Project ID. Note that a '
+        'Project ID CANNOT be changed later.\\nProject IDs must be 6-30 '
+        'characters (lowercase ASCII, digits, or\\nhyphens) in length and '
+        'start with a lowercase letter. "}',
         normalize_space=True)
     create_projects_mock.assert_called_once_with(
         resources.REGISTRY.Create('cloudresourcemanager.projects',
@@ -131,12 +133,12 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
     self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
-        """\
-        {"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", \
-        "choices": ["bar", "baz", "foo", "Create a new project"]}
-        Enter a Project ID. Note that a Project ID CANNOT be changed later.
-        Project IDs must be 6-30 characters (lowercase ASCII, digits, or
-        hyphens) in length and start with a lowercase letter.""",
+        '{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
+        '"choices": ["bar", "baz", "foo", "Create a new project"]}\n'
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter a Project ID. Note that a '
+        'Project ID CANNOT be changed later.\\nProject IDs must be 6-30 '
+        'characters (lowercase ASCII, digits, or\\nhyphens) in length and '
+        'start with a lowercase letter. "}',
         normalize_space=True)
     create_projects_mock.assert_not_called()
 
@@ -151,10 +153,10 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
         """\
         {"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", \
         "choices": ["bar", "baz", "foo", "Create a new project"]}
-        Enter a Project ID. Note that a Project ID CANNOT be changed later.
-        Project IDs must be 6-30 characters (lowercase ASCII, digits, or
-        hyphens) in length and start with a lowercase letter. \
-        WARNING: Project creation failed: blah
+        {"ux": "PROMPT_RESPONSE", "message": "Enter a Project ID. Note that a \
+        Project ID CANNOT be changed later.\\nProject IDs must be 6-30 \
+        characters (lowercase ASCII, digits, or\\nhyphens) in length and start \
+        with a lowercase letter. "}WARNING: Project creation failed: blah
         Please make sure to create the project [new-project] using
             $ gcloud projects create new-project
         or change to another project using
@@ -183,9 +185,10 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.AssertErrEquals(
         '{"ux": "PROMPT_CONTINUE", "message": "This account has no projects.", '
         '"prompt_string": "Would you like to create one?"}\n'
-        'Enter a Project ID. Note that a Project ID CANNOT be changed later. \n'
-        'Project IDs must be 6-30 characters (lowercase ASCII, digits, or \n'
-        'hyphens) in length and start with a lowercase letter.',
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter a Project ID. Note that a '
+        'Project ID CANNOT be changed later.\\nProject IDs must be 6-30 '
+        'characters (lowercase ASCII, digits, or\\nhyphens) in length and '
+        'start with a lowercase letter. "}',
         normalize_space=True)
 
   def testPickProject_NoProjectsDoNotCreate(self):
@@ -206,9 +209,10 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.AssertErrEquals(
         '{"ux": "PROMPT_CONTINUE", "message": "This account has no projects.", '
         '"prompt_string": "Would you like to create one?"}\n'
-        'Enter a Project ID. Note that a Project ID CANNOT be changed later. \n'
-        'Project IDs must be 6-30 characters (lowercase ASCII, digits, or \n'
-        'hyphens) in length and start with a lowercase letter.',
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter a Project ID. Note that a '
+        'Project ID CANNOT be changed later.\\nProject IDs must be 6-30 '
+        'characters (lowercase ASCII, digits, or\\nhyphens) in length and '
+        'start with a lowercase letter. "}',
         normalize_space=True)
     create_projects_mock.assert_called_once_with(
         resources.REGISTRY.Create('cloudresourcemanager.projects',
@@ -222,7 +226,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrEquals(
         'WARNING: Listing available projects failed: blah\n'
-        'Enter project id you would like to use:',
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter project id you would '
+        'like to use: "}',
         normalize_space=True)
 
   def testPickProject_ListingProjectsFailsNoInput(self):
@@ -232,7 +237,8 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
         'WARNING: Listing available projects failed: blah\n'
-        'Enter project id you would like to use:',
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter project id you would like '
+        'to use: "}',
         normalize_space=True)
 
 

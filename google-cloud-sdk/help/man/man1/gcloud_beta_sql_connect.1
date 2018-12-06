@@ -11,13 +11,14 @@ gcloud beta sql connect \- connects to a Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta sql connect\fR \fIINSTANCE\fR [\fB\-\-database\fR=\fIDATABASE\fR,\ \fB\-d\fR\ \fIDATABASE\fR] [\fB\-\-user\fR=\fIUSER\fR,\ \fB\-u\fR\ \fIUSER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta sql connect\fR \fIINSTANCE\fR [\fB\-\-database\fR=\fIDATABASE\fR,\ \fB\-d\fR\ \fIDATABASE\fR] [\fB\-\-port\fR=\fIPORT\fR;\ default=9470] [\fB\-\-user\fR=\fIUSER\fR,\ \fB\-u\fR\ \fIUSER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Connects to a Cloud SQL instance.
+\fB(BETA)\fR Connects to Cloud SQL V2 instances through the Cloud SQL Proxy.
+Connects to Cloud SQL V1 instances directly.
 
 
 
@@ -40,6 +41,11 @@ Cloud SQL instance ID.
 The PostgreSQL database to connect to.
 
 .TP 2m
+\fB\-\-port\fR=\fIPORT\fR; default=9470
+Port number that gcloud will use to connect to the Cloud SQL Proxy through
+localhost.
+
+.TP 2m
 \fB\-\-user\fR=\fIUSER\fR, \fB\-u\fR \fIUSER\fR
 Cloud SQL instance user to connect as.
 
@@ -50,9 +56,9 @@ Cloud SQL instance user to connect as.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

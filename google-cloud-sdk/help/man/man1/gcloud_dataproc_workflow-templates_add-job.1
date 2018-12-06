@@ -1,0 +1,133 @@
+
+.TH "GCLOUD_DATAPROC_WORKFLOW\-TEMPLATES_ADD\-JOB" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud dataproc workflow\-templates add\-job \- add Google Cloud Dataproc jobs to workflow template
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud dataproc workflow\-templates add\-job\fR \fICOMMAND\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBhadoop\fR
+Add a hadoop job to the workflow template.
+
+.TP 2m
+\fBhive\fR
+Add a Hive job to the workflow template.
+
+.TP 2m
+\fBpig\fR
+Add a Pig job to the workflow template.
+
+.TP 2m
+\fBpyspark\fR
+Add a PySpark job to the workflow template.
+
+.TP 2m
+\fBspark\fR
+Add a Spark job to the workflow template.
+
+.TP 2m
+\fBspark\-sql\fR
+Add a SparkSql job to the workflow template.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To add a Hadoop MapReduce job, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates add\-job hadoop \e
+    \-\-workflow\-template my_template \-\-jar my_jar.jar \e
+    \-\- arg1 arg2
+.RE
+
+To add a Spark Scala or Java job, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates add\-job spark \e
+    \-\-workflow\-template my_template \-\-jar my_jar.jar \e
+    \-\- arg1 arg2
+.RE
+
+To add a PySpark job, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates add\-job pyspark \e
+    \-\-workflow\-template my_template my_script.py \e
+    \-\- arg1 arg2
+.RE
+
+To add a Spark SQL job, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates add\-job spark\-sql \e
+    \-\-workflow\-template my_template \-\-file my_queries.q
+.RE
+
+To add a Pig job, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates add\-job pig \e
+    \-\-workflow\-template my_template \-\-file my_script.pig
+.RE
+
+To add a Hive job, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates add\-job hive \e
+    \-\-workflow\-template my_template \-\-file my_queries.q
+.RE
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta dataproc workflow\-templates add\-job
+.RE
+

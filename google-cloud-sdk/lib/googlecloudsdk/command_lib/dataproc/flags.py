@@ -22,21 +22,21 @@ from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
-from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
 from googlecloudsdk.command_lib.util import completers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.core import properties
 
 
-def AddZoneFlag(parser):
+def AddZoneFlag(parser, short_flags=True):
+  """Add zone flag."""
   parser.add_argument(
       '--zone',
-      '-z',
+      *['-z'] if short_flags else [],
       help="""
-          The compute zone (e.g. us-central1-a) for the cluster. If empty,
-          and --region is set to a value other than 'global', the server will
-          pick a zone in the region.
-          """,
+            The compute zone (e.g. us-central1-a) for the cluster. If empty
+            and --region is set to a value other than `global`, the server will
+            pick a zone in the region.
+            """,
       action=actions.StoreProperty(properties.VALUES.compute.zone))
 
 
@@ -51,35 +51,6 @@ def AddFileFlag(parser, input_type, action):
       '--file',
       help='The YAML file containing the {0} to {1}'.format(input_type, action),
       required=True)
-
-
-def AddTemplateSourceFlag(parser):
-  parser.add_argument(
-      '--source',
-      help="""The path to a YAML file containing a Dataproc WorkflowTemplate
-      resource. The provided YAML file must not contain id, version, or any
-      output-only fields.
-      Alternatively, you may omit this flag to read from the standard input.
-      For more information, see:
-      https://cloud.google.com/dataproc/docs/reference/rest/v1beta2/projects.locations.workflowTemplates#WorkflowTemplate
-      """,
-      # Allow reading from stdin.
-      required=False)
-
-
-def AddTemplateDestinationFlag(parser):
-  parser.add_argument(
-      '--destination',
-      help=
-      """The path to a YAML file to which the Dataproc WorkflowTemplate resource
-      will be exported. The exported template will not contain id, version, or
-      any output-only fields.
-      Alternatively, you may omit this flag to write to the standard output.
-      For more information, see:
-      https://cloud.google.com/dataproc/docs/reference/rest/v1beta2/projects.locations.workflowTemplates#WorkflowTemplate
-      """,
-      # Allow writing to stdout.
-      required=False)
 
 
 def AddJobFlag(parser, action):
@@ -146,6 +117,23 @@ def AddMinCpuPlatformArgs(parser, track):
       help=help_text)
 
 
+def AddComponentFlag(parser):
+  """Add optional components flag."""
+  help_text = """\
+      List of optional components to be installed on cluster machines.
+
+      The following page documents the optional components that can be
+      installed.
+      https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/optional-components.
+      """
+  parser.add_argument(
+      '--optional-components',
+      metavar='COMPONENT',
+      type=arg_parsers.ArgList(element_type=lambda val: val.upper()),
+      dest='components',
+      help=help_text)
+
+
 class RegionsCompleter(completers.ListCommandCompleter):
 
   def __init__(self, **kwargs):
@@ -169,7 +157,7 @@ def RegionAttributeConfig():
           'The Cloud DataProc region for the {resource}. Each Cloud Dataproc '
           'region constitutes an independent resource namespace constrained to '
           'deploying instances into Google Compute Engine zones inside the '
-          'region. The default value of "global" is a special multi-region '
+          'region. The default value of `global` is a special multi-region '
           'namespace which is capable of deploying instances into all Google '
           'Compute Engine zones globally, and is disjoint from other Cloud '
           'Dataproc regions. Overrides the default `dataproc/region` property '
@@ -181,30 +169,81 @@ def RegionAttributeConfig():
   )
 
 
-def GetTemplateResourceSpec():
+def GetTemplateResourceSpec(api_version):
   return concepts.ResourceSpec(
       'dataproc.projects.regions.workflowTemplates',
-      api_version='v1beta2',
+      api_version=api_version,
       resource_name='template',
       disable_auto_completers=False,
-      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG,
+      projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
       regionsId=RegionAttributeConfig(),
       workflowTemplatesId=TemplateAttributeConfig(),
   )
 
 
-def AddTemplateResourceArg(parser, verb, positional=True):
+def AddTemplateResourceArg(parser, verb, api_version, positional=True):
   """Adds a workflow template resource argument.
 
   Args:
     parser: the argparse parser for the command.
     verb: str, the verb to describe the resource, such as 'to update'.
+    api_version: api version, for example v1 or v1beta2
     positional: bool, if True, means that the instance ID is a positional rather
       than a flag.
   """
   name = 'TEMPLATE' if positional else '--template'
   concept_parsers.ConceptParser.ForResource(
       name,
-      GetTemplateResourceSpec(),
+      GetTemplateResourceSpec(api_version=api_version),
       'The name of the workflow template to {}.'.format(verb),
       required=True).AddToParser(parser)
+
+
+def AddListOperationsFormat(parser):
+  parser.display_info.AddTransforms(
+      {'operationState': _TransformOperationState,
+       'operationTimestamp': _TransformOperationTimestamp,
+       'operationType': _TransformOperationType,
+       'operationWarnings': _TransformOperationWarnings,
+      })
+  parser.display_info.AddFormat(
+      'table(name.segment():label=NAME, '
+      'metadata.operationTimestamp():label=TIMESTAMP,'
+      'metadata.operationType():label=TYPE, '
+      'metadata.operationState():label=STATE, '
+      'status.code.yesno(no=\'\'):label=ERROR, '
+      'metadata.operationWarnings():label=WARNINGS)')
+
+
+def _TransformOperationType(metadata):
+  """Extract operation type from metadata."""
+  if 'operationType' in metadata:
+    return metadata['operationType']
+  elif 'graph' in metadata:
+    return 'WORKFLOW'
+  return ''
+
+
+def _TransformOperationState(metadata):
+  """Extract operation state from metadata."""
+  if 'status' in metadata:
+    return metadata['status']['state']
+  elif 'state' in metadata:
+    return metadata['state']
+  return ''
+
+
+def _TransformOperationTimestamp(metadata):
+  """Extract operation start timestamp from metadata."""
+  if 'statusHistory' in metadata:
+    return metadata['statusHistory'][0]['stateStartTime']
+  elif 'startTime' in metadata:
+    return metadata['startTime']
+  return ''
+
+
+def _TransformOperationWarnings(metadata):
+  """Returns a count of operations if any are present."""
+  if 'warnings' in metadata:
+    return len(metadata['warnings'])
+  return ''

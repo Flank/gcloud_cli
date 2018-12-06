@@ -24,9 +24,9 @@ A key represents a logical key that can be used for cryptographic operations.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -50,7 +50,7 @@ Create and manage versions.
 .RS 2m
 .TP 2m
 \fBadd\-iam\-policy\-binding\fR
-Add IAM policy binding to a key.
+Add IAM policy binding for a kms key.
 
 .TP 2m
 \fBcreate\fR
@@ -70,7 +70,7 @@ List the keys within a keyring.
 
 .TP 2m
 \fBremove\-iam\-policy\-binding\fR
-Remove an IAM policy binding from a key.
+Remove IAM policy binding for a kms key.
 
 .TP 2m
 \fBremove\-rotation\-schedule\fR

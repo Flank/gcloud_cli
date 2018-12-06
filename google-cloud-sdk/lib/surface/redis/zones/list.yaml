@@ -1,7 +1,4 @@
-- &beta_command
-  release_tracks: [BETA]
-
-  help_text:
+- help_text:
     brief: |
       List Memorystore Redis zones
     DESCRIPTION: |
@@ -13,15 +10,15 @@
       help_text: |
         The project name.
     params:
-      - arg_name: region
-        help_text: |
-          If provided, returns only resources from the given region. Use region
-          ID only, not the full URI of the region. This flag is the equivalent
-          of: `--filter="region:REGION"`. Run `gcloud topic filters` for more
-          information.
+    - arg_name: region
+      help_text: |
+        If provided, returns only resources from the given region. Use region
+        ID only, not the full URI of the region. This flag is the equivalent
+        of: `--filter="region:REGION"`. Run `gcloud topic filters` for more
+        information.
 
-  request: &request
-    api_version: v1beta1
+  request:
+    api_version: v1
     collection: redis.projects.locations
 
   response:
@@ -34,11 +31,3 @@
         name:label=ZONE:sort=1,
         region
       )
-
-
-- <<: *beta_command
-  release_tracks: [ALPHA]
-
-  request:
-    <<: *request
-    api_version: v1alpha1

@@ -18,8 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import textwrap
 import uuid
+
 from apitools.base.py import encoding
 from googlecloudsdk import calliope
 from googlecloudsdk.calliope import exceptions
@@ -46,11 +48,11 @@ class WorkflowTemplatesInstantiateUnitTest(unit_base.DataprocUnitTestBase,
       workflow_template = self.MakeWorkflowTemplate()
       workflow_template_name = workflow_template.name
     instantiate_request = self.messages.InstantiateWorkflowTemplateRequest()
-    instantiate_request.instanceId = self.frozen_uuid.hex
+    instantiate_request.requestId = self.frozen_uuid.hex
     if version:
       instantiate_request.version = version
     if parameters:
-      instantiate_request.parameters = encoding.DictToMessage(
+      instantiate_request.parameters = encoding.DictToAdditionalPropertyMessage(
           parameters,
           self.messages.InstantiateWorkflowTemplateRequest.ParametersValue)
     if not (response or exception):
@@ -75,24 +77,27 @@ class WorkflowTemplatesInstantiateUnitTest(unit_base.DataprocUnitTestBase,
         parameters=parameters)
     # Initial get operation returns pending
     self.ExpectGetOperation(
-        self.MakeOperation(template=workflow_template_name, state='RUNNING'))
+        self.MakeOperation(
+            metadata=collections.OrderedDict([
+                ('template', workflow_template_name),
+                ('state', 'RUNNING'),
+            ]))
+    )
     # Second get operation returns done
     self.ExpectGetOperation(
         operation=self.MakeCompletedOperation(
-            error=error, template=workflow_template_name, state='DONE'))
-
-
-class WorkflowTemplatesInstantiateUnitTestBeta(
-    WorkflowTemplatesInstantiateUnitTest):
-
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+            error=error,
+            metadata=collections.OrderedDict([
+                ('template', workflow_template_name),
+                ('state', 'DONE')])))
 
   def testInstantiateWorkflowTemplates(self):
     workflow_template = self.MakeWorkflowTemplate()
     self.ExpectWorkflowTemplatesInstantiateCalls(workflow_template.name)
     done = self.MakeCompletedOperation(
-        template=workflow_template.name, state='DONE')
+        metadata=collections.OrderedDict([
+            ('template', workflow_template.name),
+            ('state', 'DONE')]))
     result = self.RunDataproc('workflow-templates instantiate {0}'.format(
         self.WORKFLOW_TEMPLATE))
     self.AssertMessagesEqual(done, result)
@@ -114,8 +119,8 @@ class WorkflowTemplatesInstantiateUnitTestBeta(
 
   def testInstantiateWorkflowTemplatesBadTimeout(self):
     err_msg = (
-        'argument --timeout: given value must be of the form INTEGER[UNIT]'
-        ' where units can be one of s, m, h, d; received: abc')
+        "argument --timeout: Failed to parse duration: Duration unit 'abc' "
+        "must be preceded by a number")
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            err_msg):
       self.RunDataproc(
@@ -136,12 +141,12 @@ class WorkflowTemplatesInstantiateUnitTestBeta(
     workflow_template = self.MakeWorkflowTemplate()
     self.ExpectWorkflowTemplatesInstantiateCalls(
         workflow_template_name=workflow_template.name,
-        parameters={
-            'k1': 'v1',
-            'k2': 'v2'
-        })
+        parameters=collections.OrderedDict([('k1', 'v1'), ('k2', 'v2')]))
     done = self.MakeCompletedOperation(
-        template=workflow_template.name, state='DONE')
+        metadata=collections.OrderedDict([
+            ('template', workflow_template.name),
+            ('state', 'DONE'),
+        ]))
     result = self.RunDataproc(
         'workflow-templates instantiate {0} --parameters=k1=v1,k2=v2'.format(
             self.WORKFLOW_TEMPLATE))
@@ -153,3 +158,37 @@ class WorkflowTemplatesInstantiateUnitTestBeta(
         WorkflowTemplate [{1}] RUNNING
         WorkflowTemplate [{1}] DONE
           """.format(self.OperationName(), workflow_template.name)))
+
+
+class WorkflowTemplatesInstantiateUnitTestBeta(
+    WorkflowTemplatesInstantiateUnitTest):
+
+  def ExpectWorkflowTemplatesInstantiate(self,
+                                         workflow_template_name=None,
+                                         version=None,
+                                         parameters=None,
+                                         response=None,
+                                         exception=None):
+    if not workflow_template_name:
+      workflow_template = self.MakeWorkflowTemplate()
+      workflow_template_name = workflow_template.name
+    instantiate_request = self.messages.InstantiateWorkflowTemplateRequest()
+    instantiate_request.requestId = self.frozen_uuid.hex
+    if version:
+      instantiate_request.version = version
+    if parameters:
+      instantiate_request.parameters = encoding.DictToAdditionalPropertyMessage(
+          parameters,
+          self.messages.InstantiateWorkflowTemplateRequest.ParametersValue)
+    if not (response or exception):
+      response = self.MakeOperation()
+    self.mock_client.projects_regions_workflowTemplates.Instantiate.Expect(
+        self.messages
+        .DataprocProjectsRegionsWorkflowTemplatesInstantiateRequest(
+            instantiateWorkflowTemplateRequest=instantiate_request,
+            name=workflow_template_name),
+        response=response,
+        exception=exception)
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)

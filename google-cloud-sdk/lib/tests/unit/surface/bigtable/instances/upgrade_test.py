@@ -26,8 +26,10 @@ from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.bigtable import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class UpgradeTest(base.BigtableV2TestBase,
                   waiter_test_base.CloudOperationsBase):
 

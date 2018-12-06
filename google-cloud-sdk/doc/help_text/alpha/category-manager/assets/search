@@ -101,9 +101,10 @@ FLAGS
      Annotation resource - A comma separated list of annotation references. The
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: provide the flag
-     [--annotations] on the command line with a fully specified name; provide
-     the flag [--project] on the command line; set the property [core/project].
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [--annotations] on the command line with a fully specified name;
+     provide the argument [--project] on the command line; set the property
+     [core/project].
 
        --annotations=[ANNOTATIONS,...]
           IDs of the annotations or fully qualified identifiers for the
@@ -144,8 +145,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is an internal implementation detail and may change or

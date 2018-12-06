@@ -24,10 +24,9 @@ from tests.lib import test_case
 from tests.lib.surface.container import base
 
 
-class ListUsableTestAlpha(base.AlphaTestBase,
-                          base.SubnetsTestBase,
-                          test_case.WithOutputCapture):
-  """gcloud alpha track using container v1alpha1 API."""
+class ListUsableTestBeta(base.BetaTestBase, base.SubnetsTestBase,
+                         test_case.WithOutputCapture):
+  """gcloud beta track using container v1beta1 API."""
 
   def testMissingProject(self):
     properties.VALUES.core.project.Set(None)
@@ -35,25 +34,98 @@ class ListUsableTestAlpha(base.AlphaTestBase,
       self.Run(self.subnets_command_base + ' list-usable')
 
   def testListAggregate(self):
-    subnets = [self._MakeUsableSubnet(network='my-networkA',
-                                      subnetwork='my-subnetA',
-                                      ipCidrRange='1.1.1.1/10'),
-               self._MakeUsableSubnet(network='my-networkB',
-                                      subnetwork='my-subnetB',
-                                      ipCidrRange='2.2.2.2/10'),
-               self._MakeUsableSubnet(network='my-networkC',
-                                      subnetwork='my-subnetC',
-                                      ipCidrRange='3.3.3.3/10')]
+    subnets = [
+        self._MakeUsableSubnet(
+            network='my-networkA',
+            subnetwork='my-subnetA',
+            ipCidrRange='1.1.1.1/10',
+            secondaryIpRanges=[
+                self._MakeUsableSubnetworkSecondaryRange(
+                    rangeName='pods-range',
+                    ipCidrRange='10.1.0.0/19',
+                    status=self.unused),
+                self._MakeUsableSubnetworkSecondaryRange(
+                    rangeName='svc-range',
+                    ipCidrRange='10.2.0.0/19',
+                    status=self.in_use_service),
+                self._MakeUsableSubnetworkSecondaryRange(
+                    rangeName='extra-range',
+                    ipCidrRange='10.3.0.0/19',
+                    status=self.in_use_shareable_pod)
+            ]),
+        self._MakeUsableSubnet(
+            network='my-networkB',
+            subnetwork='my-subnetB',
+            ipCidrRange='2.2.2.2/10',
+            secondaryIpRanges=[
+                self._MakeUsableSubnetworkSecondaryRange(
+                    rangeName='secondaryRange',
+                    ipCidrRange='10.1.0.0/19',
+                    status=self.in_use_managed_pod)
+            ]),
+        self._MakeUsableSubnet(
+            network='my-networkC',
+            subnetwork='my-subnetC',
+            ipCidrRange='3.3.3.3/10')
+    ]
 
     resp = self._MakeListUsableSubnetworksResponse(subnets)
     self._ExpectListUsableSubnets(resp)
     self.Run(self.subnets_command_base + ' list-usable')
-    self.AssertOutputEquals("""\
+    self.AssertOutputEquals(
+        """\
+PROJECT REGION NETWORK SUBNET RANGE
+fake-project-id us-central1 my-networkA my-subnetA 1.1.1.1/10
+    +----------------------+---------------+-----------------------------+
+    | SECONDARY_RANGE_NAME | IP_CIDR_RANGE |            STATUS           |
+    +----------------------+---------------+-----------------------------+
+    | pods-range           | 10.1.0.0/19   | usable for pods or services |
+    | svc-range            | 10.2.0.0/19   | unusable                    |
+    | extra-range          | 10.3.0.0/19   | usable for pods             |
+    +----------------------+---------------+-----------------------------+
+fake-project-id us-central1 my-networkB my-subnetB 2.2.2.2/10
+    +----------------------+---------------+----------+
+    | SECONDARY_RANGE_NAME | IP_CIDR_RANGE |  STATUS  |
+    +----------------------+---------------+----------+
+    | secondaryRange       | 10.1.0.0/19   | unusable |
+    +----------------------+---------------+----------+
+fake-project-id us-central1 my-networkC my-subnetC 3.3.3.3/10
+""",
+        normalize_space=True)
+
+  def testListAggregateWithWarnings(self):
+    msg1 = 'some message from cluster apiserver'
+    msg2 = 'some other message from cluster apiserver'
+    subnets = [
+        self._MakeUsableSubnet(
+            network='my-networkA',
+            subnetwork='my-subnetA',
+            ipCidrRange='1.1.1.1/10',
+            statusMessage=msg1),
+        self._MakeUsableSubnet(
+            network='my-networkB',
+            subnetwork='my-subnetB',
+            ipCidrRange='2.2.2.2/10',
+            statusMessage=msg1),
+        self._MakeUsableSubnet(
+            network='my-networkC',
+            subnetwork='my-subnetC',
+            ipCidrRange='3.3.3.3/10',
+            statusMessage=msg2)
+    ]
+
+    resp = self._MakeListUsableSubnetworksResponse(subnets)
+    self._ExpectListUsableSubnets(resp)
+    self.Run(self.subnets_command_base + ' list-usable')
+    self.AssertOutputEquals(
+        """\
 PROJECT REGION NETWORK SUBNET RANGE
 fake-project-id us-central1 my-networkA my-subnetA 1.1.1.1/10
 fake-project-id us-central1 my-networkB my-subnetB 2.2.2.2/10
 fake-project-id us-central1 my-networkC my-subnetC 3.3.3.3/10
-""", normalize_space=True)
+""",
+        normalize_space=True)
+    self.AssertErrEquals('WARNING: %s\nWARNING: %s\n' % (msg1, msg2))
 
   def testListAggregateURI(self):
     subnets = [self._MakeUsableSubnet(network='my-networkA',
@@ -70,6 +142,10 @@ fake-project-id us-central1 my-networkC my-subnetC 3.3.3.3/10
 https://www.googleapis.com/compute/v1/projects/fake-project-id/regions/us-central1/subnetworks/my-subnetA
 https://www.googleapis.com/compute/v1/projects/fake-project-id/regions/us-central1/subnetworks/my-subnetB
 """, normalize_space=True)
+
+
+class ListUsableTestAlpha(base.AlphaTestBase, ListUsableTestBeta):
+  """gcloud alpha track using container v1alpha1 API."""
 
 
 if __name__ == '__main__':

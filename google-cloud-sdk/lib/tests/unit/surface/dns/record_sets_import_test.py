@@ -24,7 +24,6 @@ import textwrap
 
 from dns import rdatatype
 from googlecloudsdk.api_lib.dns import import_util
-from googlecloudsdk.calliope.exceptions import ToolException
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.dns import base
@@ -73,14 +72,14 @@ class RecordSetsImportTest(base.DnsMockTest):
     current_record_sets = dict(
         ((record_set.name, record_set.type), record_set)
         for record_set in util.GetRecordSets())
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(import_util.ConflictingRecordsFound) as context:
       import_util.ComputeChange(
           current_record_sets,
           util.GetImportedRecordSets(),
           False, 'zone.com.', True)
       self.assertEqual(
           context.exception.message,
-          'Conflicting records for the following (name type): '
+          'The following records (name type) already exist: '
           '[\'mail.zone.com. A\', \'zone.com. A\', \'zone.com. SOA\']')
 
   def testComputeChangeNoConflicts(self):
@@ -242,16 +241,16 @@ class RecordSetsImportBetaTest(base.DnsMockBetaTest):
 
   def SetUp(self):
     self.zone_file_path = sdk_test_base.SdkBase.Resource(
-        'tests', 'unit', 'surface', 'dns', 'test_data', 'v2beta1',
+        'tests', 'unit', 'surface', 'dns', 'test_data', 'v1beta2',
         'zone.com-to-import.zone')
     self.yaml_file_path = sdk_test_base.SdkBase.Resource(
-        'tests', 'unit', 'surface', 'dns', 'test_data', 'v2beta1',
+        'tests', 'unit', 'surface', 'dns', 'test_data', 'v1beta2',
         'zone.com-to-import.yaml')
     self.zone_file_path_no_conflicts = sdk_test_base.SdkBase.Resource(
-        'tests', 'unit', 'surface', 'dns', 'test_data', 'v2beta1',
+        'tests', 'unit', 'surface', 'dns', 'test_data', 'v1beta2',
         'zone.com-to-import-no-conflicts.zone')
     self.yaml_file_path_no_conflicts = sdk_test_base.SdkBase.Resource(
-        'tests', 'unit', 'surface', 'dns', 'test_data', 'v2beta1',
+        'tests', 'unit', 'surface', 'dns', 'test_data', 'v1beta2',
         'zone.com-to-import-no-conflicts.yaml')
 
   def testRecordSetsFromZoneFile(self):
@@ -272,7 +271,7 @@ class RecordSetsImportBetaTest(base.DnsMockBetaTest):
     current_record_sets = dict(
         ((record_set.name, record_set.type), record_set)
         for record_set in util_beta.GetRecordSets())
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(import_util.ConflictingRecordsFound) as context:
       import_util.ComputeChange(
           current_record_sets,
           util_beta.GetImportedRecordSets(),
@@ -280,7 +279,7 @@ class RecordSetsImportBetaTest(base.DnsMockBetaTest):
           api_version=self.api_version)
       self.assertEqual(
           context.exception.message,
-          'Conflicting records for the following (name type): '
+          'The following records (name type) already exist: '
           '[\'mail.zone.com. A\', \'zone.com. A\', \'zone.com. SOA\']')
 
   def testComputeChangeNoConflicts(self):

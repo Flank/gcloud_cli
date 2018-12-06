@@ -132,6 +132,17 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
     spec = creator._BuildIosXcTestSpec()
     self.assertEqual(spec.disableVideoRecording, False)
 
+  def testMatrixCreator_BuildIosXcTestSpec_xcodeVersionIsSpecified(self):
+    self.args.xcode_version = '9.1.1'
+    creator = self.CreateMatrixCreator(self.args)
+    spec = creator._BuildIosXcTestSpec()
+    self.assertEqual(spec.iosXcTest.xcodeVersion, '9.1.1')
+
+  def testMatrixCreator_BuildIosXcTestSpec_xcodeVersionIsNotSpecified(self):
+    creator = self.CreateMatrixCreator(self.args)
+    spec = creator._BuildIosXcTestSpec()
+    self.assertEqual(spec.iosXcTest.xcodeVersion, None)
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -12,10 +12,10 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      Topic resource - One or more topics to create. This represents a Cloud
      resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: provide the flag
-     [topic] on the command line with a fully specified name; provide the flag
-     [--project] on the command line; set the property [core/project]. This
-     must be specified.
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [topic] on the command line with a fully specified name; provide
+     the argument [--project] on the command line; set the property
+     [core/project]. This must be specified.
 
        TOPIC [TOPIC ...]
           IDs of the topics or fully qualified identifiers for the topics.
@@ -31,8 +31,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To create a Cloud Pub/Sub topic, run:

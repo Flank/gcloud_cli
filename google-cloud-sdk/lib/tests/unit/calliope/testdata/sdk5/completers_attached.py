@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.config import completers as config_completers
 from googlecloudsdk.command_lib.util import completers
 
@@ -54,7 +54,7 @@ class InstancesCompleterV1(completers.ListCommandCompleter):
         **kwargs)
 
 
-class CompletersAttached(base.SilentCommand):
+class CompletersAttached(calliope_base.SilentCommand):
   """Attached completer test command."""
 
   @staticmethod

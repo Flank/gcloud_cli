@@ -20,8 +20,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
+from mock import patch
 
 API_VERSION = 'beta'
 
@@ -43,22 +45,16 @@ class InstanceGroupManagersSetAutohealingZonalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.ComputeInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeInstanceGroupManagersPatchRequest(
             project='my-project',
             zone='central2-a',
             instanceGroupManager='group-1',
-            instanceGroupManagersSetAutoHealingRequest=(
-                self.messages.InstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            healthCheck=health_check_uri),
-                    ],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        healthCheck=health_check_uri),
+                ],))))
+    self.CheckRequests([(self.compute.instanceGroupManagers, 'Patch', request)])
 
   def testSetAutohealing_HttpHealthCheck(self):
     health_check_uri = (
@@ -71,22 +67,16 @@ class InstanceGroupManagersSetAutohealingZonalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.ComputeInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeInstanceGroupManagersPatchRequest(
             project='my-project',
             zone='central2-a',
             instanceGroupManager='group-1',
-            instanceGroupManagersSetAutoHealingRequest=(
-                self.messages.InstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            healthCheck=health_check_uri),
-                    ],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        healthCheck=health_check_uri),
+                ],))))
+    self.CheckRequests([(self.compute.instanceGroupManagers, 'Patch', request)])
 
   def testSetAutohealing_HttpsHealthCheck(self):
     health_check_uri = (
@@ -99,22 +89,16 @@ class InstanceGroupManagersSetAutohealingZonalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.ComputeInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeInstanceGroupManagersPatchRequest(
             project='my-project',
             zone='central2-a',
             instanceGroupManager='group-1',
-            instanceGroupManagersSetAutoHealingRequest=(
-                self.messages.InstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            healthCheck=health_check_uri),
-                    ],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        healthCheck=health_check_uri),
+                ],))))
+    self.CheckRequests([(self.compute.instanceGroupManagers, 'Patch', request)])
 
   def testSetAutohealing_InitialDelay(self):
     self.Run("""
@@ -124,22 +108,16 @@ class InstanceGroupManagersSetAutohealingZonalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.ComputeInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeInstanceGroupManagersPatchRequest(
             project='my-project',
             zone='central2-a',
             instanceGroupManager='group-1',
-            instanceGroupManagersSetAutoHealingRequest=(
-                self.messages.InstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            initialDelaySec=10*60),
-                    ],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        initialDelaySec=10 * 60),
+                ],))))
+    self.CheckRequests([(self.compute.instanceGroupManagers, 'Patch', request)])
 
   def testSetAutohealing_EmptyPolicy(self):
     self.Run("""
@@ -148,19 +126,13 @@ class InstanceGroupManagersSetAutohealingZonalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.ComputeInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeInstanceGroupManagersPatchRequest(
             project='my-project',
             zone='central2-a',
             instanceGroupManager='group-1',
-            instanceGroupManagersSetAutoHealingRequest=(
-                self.messages.InstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[],))))
+    self.CheckRequests([(self.compute.instanceGroupManagers, 'Patch', request)])
 
   def testSetAutohealing_BothHealthChecks(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -187,22 +159,16 @@ class InstanceGroupManagersSetAutohealingZonalTest(test_base.BaseTest):
         """.format(igm_uri, health_check_uri))
 
     request = (
-        self.messages.ComputeInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeInstanceGroupManagersPatchRequest(
             project='my-project',
             zone='central2-a',
             instanceGroupManager='group-1',
-            instanceGroupManagersSetAutoHealingRequest=(
-                self.messages.InstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            healthCheck=health_check_uri),
-                    ],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        healthCheck=health_check_uri),
+                ],))))
+    self.CheckRequests([(self.compute.instanceGroupManagers, 'Patch', request)])
 
   def testScopePrompt(self):
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
@@ -229,25 +195,31 @@ class InstanceGroupManagersSetAutohealingZonalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.ComputeInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeInstanceGroupManagersPatchRequest(
             project='my-project',
             zone='central2-a',
             instanceGroupManager='group-1',
-            instanceGroupManagersSetAutoHealingRequest=(
-                self.messages.InstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            healthCheck=health_check_uri),
-                    ],
-                )
-            )))
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        healthCheck=health_check_uri),
+                ],))))
     self.CheckRequests(
         self.regions_list_request,
         self.zones_list_request,
-        [(self.compute.instanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)],
+        [(self.compute.instanceGroupManagers, 'Patch', request)],
     )
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run("""
+        compute instance-groups managed set-autohealing group-1
+          --zone central2-a
+          --http-health-check health-check-1
+        """)
 
 
 class InstanceGroupManagersSetAutohealingRegionalTest(test_base.BaseTest):
@@ -267,23 +239,17 @@ class InstanceGroupManagersSetAutohealingRegionalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
             project='my-project',
             region='central2',
             instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetAutoHealingRequest=(
-                self.messages.RegionInstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            healthCheck=health_check_uri),
-                    ],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        healthCheck=health_check_uri),
+                ],))))
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Patch',
+                         request)])
 
   def testSetAutohealing_HttpsHealthCheck(self):
     health_check_uri = (
@@ -296,23 +262,17 @@ class InstanceGroupManagersSetAutohealingRegionalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
             project='my-project',
             region='central2',
             instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetAutoHealingRequest=(
-                self.messages.RegionInstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            healthCheck=health_check_uri),
-                    ],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        healthCheck=health_check_uri),
+                ],))))
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Patch',
+                         request)])
 
   def testSetAutohealing_InitialDelay(self):
     self.Run("""
@@ -322,23 +282,17 @@ class InstanceGroupManagersSetAutohealingRegionalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
             project='my-project',
             region='central2',
             instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetAutoHealingRequest=(
-                self.messages.RegionInstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            initialDelaySec=10*60),
-                    ],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        initialDelaySec=10 * 60),
+                ],))))
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Patch',
+                         request)])
 
   def testSetAutohealing_EmptyPolicy(self):
     self.Run("""
@@ -347,20 +301,14 @@ class InstanceGroupManagersSetAutohealingRegionalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
             project='my-project',
             region='central2',
             instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetAutoHealingRequest=(
-                self.messages.RegionInstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[],))))
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Patch',
+                         request)])
 
   def testSetAutohealing_BothHealthChecks(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -387,23 +335,17 @@ class InstanceGroupManagersSetAutohealingRegionalTest(test_base.BaseTest):
         """.format(igm_uri, health_check_uri))
 
     request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
             project='my-project',
             region='central2',
             instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetAutoHealingRequest=(
-                self.messages.RegionInstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            healthCheck=health_check_uri),
-                    ],
-                )
-            )))
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)])
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        healthCheck=health_check_uri),
+                ],))))
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Patch',
+                         request)])
 
   def testScopePrompt(self):
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
@@ -430,25 +372,19 @@ class InstanceGroupManagersSetAutohealingRegionalTest(test_base.BaseTest):
         """)
 
     request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersSetAutoHealingPoliciesRequest(
+        self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
             project='my-project',
             region='central2',
             instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetAutoHealingRequest=(
-                self.messages.RegionInstanceGroupManagersSetAutoHealingRequest(
-                    autoHealingPolicies=[
-                        self.messages.InstanceGroupManagerAutoHealingPolicy(
-                            healthCheck=health_check_uri),
-                    ],
-                )
-            )))
+            instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+                autoHealingPolicies=[
+                    self.messages.InstanceGroupManagerAutoHealingPolicy(
+                        healthCheck=health_check_uri),
+                ],))))
     self.CheckRequests(
         self.regions_list_request,
         self.zones_list_request,
-        [(self.compute.regionInstanceGroupManagers,
-          'SetAutoHealingPolicies',
-          request)],
+        [(self.compute.regionInstanceGroupManagers, 'Patch', request)],
     )
 
 

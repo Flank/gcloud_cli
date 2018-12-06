@@ -368,6 +368,18 @@ Create in progress for [https://cloudresourcemanager.googleapis.com"""
     self.assertEqual(prop.Get(), None)
     self.AssertOutputEquals('')
 
+  def testProjectChangedWithSetDefaultAndName(self):
+    prop = properties.FromString('core/project')
+    self.assertEqual(prop.Get(), None)
+
+    test_project = util.GetTestProjectWithLongNameAndMatchingId()
+    self._expectCreationCall(test_project)
+    self._expectServiceEnableCall(test_project.projectId)
+    self.RunProjects('create', '--quiet', '--set-as-default', '--name',
+                     test_project.name)
+
+    self.assertEqual(prop.Get(), test_project.projectId)
+    self.AssertOutputEquals('')
 
 if __name__ == '__main__':
   test_case.main()

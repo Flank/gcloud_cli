@@ -13,21 +13,21 @@ POSITIONAL ARGUMENTS
      Template resource - The name of the workflow template to export. The
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: provide the flag
-     [TEMPLATE] on the command line with a fully specified name; provide the
-     flag [--project] on the command line; set the property [core/project].
-     This must be specified.
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [TEMPLATE] on the command line with a fully specified name;
+     provide the argument [--project] on the command line; set the property
+     [core/project]. This must be specified.
 
        TEMPLATE
-          The ID of the template or a fully qualified identifier for the
-          template. This positional must be specified if any of the other
-          arguments in this group are specified.
+          ID of the template or fully qualified identifier for the template.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
 
        --region=REGION
           The Cloud DataProc region for the template. Each Cloud Dataproc
           region constitutes an independent resource namespace constrained to
           deploying instances into Google Compute Engine zones inside the
-          region. The default value of "global" is a special multi-region
+          region. The default value of global is a special multi-region
           namespace which is capable of deploying instances into all Google
           Compute Engine zones globally, and is disjoint from other Cloud
           Dataproc regions. Overrides the default dataproc/region property
@@ -35,20 +35,24 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --destination=DESTINATION
-        The path to a YAML file to which the Dataproc WorkflowTemplate resource
-        will be exported. The exported template will not contain id, version,
-        or any output-only fields. Alternatively, you may omit this flag to
-        write to the standard output. For more information, see:
-        https://cloud.google.com/dataproc/docs/reference/rest/v1beta2/projects.locations.workflowTemplates#WorkflowTemplate
+        Path to a YAML file where the workflow template configuration will be
+        exported. The exported data will not contain any output-only fields.
+        Alternatively, you may omit this flag to write to standard output. A
+        schema describing the export/import format can be found in:
+        $CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1beta2/WorkflowTemplate.yaml.
 
      --version=VERSION
         The version of the workflow template.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc workflow-templates export
 

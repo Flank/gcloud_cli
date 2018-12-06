@@ -34,9 +34,9 @@ https://cloud.google.com/datastore/docs
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -63,16 +63,6 @@ Manage Long Running Operations for Cloud Datastore.
 
 .RS 2m
 .TP 2m
-\fBcleanup\-indexes\fR
-\fB(DEPRECATED)\fR Remove unused datastore indexes based on your local index
-configuration.
-
-.TP 2m
-\fBcreate\-indexes\fR
-\fB(DEPRECATED)\fR Create new datastore indexes based on your local index
-configuration.
-
-.TP 2m
 \fBexport\fR
 Export Cloud Datastore entities to Google Cloud Storage.
 
@@ -89,13 +79,13 @@ Import Cloud Datastore entities from Google Cloud Storage.
 To create new indexes from a file, run:
 
 .RS 2m
-$ gcloud datastore create\-indexes index.yaml
+$ gcloud datastore indexes create index.yaml
 .RE
 
 To clean up unused indexes from a file, run:
 
 .RS 2m
-$ gcloud datastore cleanup\-indexes index.yaml
+$ gcloud datastore indexes cleanup index.yaml
 .RE
 
 

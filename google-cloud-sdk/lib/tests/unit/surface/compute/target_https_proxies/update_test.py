@@ -31,26 +31,30 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
 
   def SetUp(self):
     self._SetUpReleaseTrack('v1', calliope_base.ReleaseTrack.GA)
+    self._target_https_proxies_api = self.compute.targetHttpsProxies
+
+  def RunUpdate(self, command):
+    self.Run('compute target-https-proxies update ' + command)
 
   def testSimpleCase(self):
     messages = self.messages
-    self.Run("""
-        compute target-https-proxies update target-https-proxy-1
+    self.RunUpdate("""
+          target-https-proxy-1
           --ssl-certificates my-cert,my-cert2
           --url-map my-map
         """)
 
     cert_uri = self.compute_uri + '/projects/my-project/global/sslCertificates/'
     self.CheckRequests(
-        [(self.compute.targetHttpsProxies, 'SetSslCertificates',
+        [(self._target_https_proxies_api, 'SetSslCertificates',
           messages.ComputeTargetHttpsProxiesSetSslCertificatesRequest(
               project='my-project',
               targetHttpsProxy='target-https-proxy-1',
               targetHttpsProxiesSetSslCertificatesRequest=(
                   messages.TargetHttpsProxiesSetSslCertificatesRequest(
-                      sslCertificates=[(cert_uri + 'my-cert'),
-                                       (cert_uri + 'my-cert2')])))),
-         (self.compute.targetHttpsProxies, 'SetUrlMap',
+                      sslCertificates=[(cert_uri + 'my-cert'), (
+                          cert_uri + 'my-cert2')])))),
+         (self._target_https_proxies_api, 'SetUrlMap',
           messages.ComputeTargetHttpsProxiesSetUrlMapRequest(
               project='my-project',
               targetHttpsProxy='target-https-proxy-1',
@@ -60,13 +64,13 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
 
   def testSimpleCaseMap(self):
     messages = self.messages
-    self.Run("""
-        compute target-https-proxies update target-https-proxy-1
+    self.RunUpdate("""
+          target-https-proxy-1
           --url-map my-map
         """)
 
     self.CheckRequests(
-        [(self.compute.targetHttpsProxies, 'SetUrlMap',
+        [(self._target_https_proxies_api, 'SetUrlMap',
           messages.ComputeTargetHttpsProxiesSetUrlMapRequest(
               project='my-project',
               targetHttpsProxy='target-https-proxy-1',
@@ -76,13 +80,13 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
 
   def testSimpleCaseCert(self):
     messages = self.messages
-    self.Run("""
-        compute target-https-proxies update target-https-proxy-1
+    self.RunUpdate("""
+          target-https-proxy-1
           --ssl-certificates my-cert
         """)
 
     self.CheckRequests([
-        (self.compute.targetHttpsProxies, 'SetSslCertificates',
+        (self._target_https_proxies_api, 'SetSslCertificates',
          messages.ComputeTargetHttpsProxiesSetSslCertificatesRequest(
              project='my-project',
              targetHttpsProxy='target-https-proxy-1',
@@ -98,8 +102,8 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
   def testSimpleCaseWithSslPolicy(self):
     messages = self.messages
 
-    self.Run("""
-        compute target-https-proxies update target-https-proxy-1
+    self.RunUpdate("""
+        target-https-proxy-1
           --ssl-certificates my-cert,my-cert2
           --url-map my-map
           --ssl-policy my-ssl-policy
@@ -107,7 +111,7 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
 
     cert_uri = self.compute_uri + '/projects/my-project/global/sslCertificates/'
     self.CheckRequests([
-        (self.compute.targetHttpsProxies, 'SetSslCertificates',
+        (self._target_https_proxies_api, 'SetSslCertificates',
          messages.ComputeTargetHttpsProxiesSetSslCertificatesRequest(
              project='my-project',
              targetHttpsProxy='target-https-proxy-1',
@@ -115,14 +119,14 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
                  messages.TargetHttpsProxiesSetSslCertificatesRequest(
                      sslCertificates=[(cert_uri + 'my-cert'), (
                          cert_uri + 'my-cert2')])))),
-        (self.compute.targetHttpsProxies, 'SetUrlMap',
+        (self._target_https_proxies_api, 'SetUrlMap',
          messages.ComputeTargetHttpsProxiesSetUrlMapRequest(
              project='my-project',
              targetHttpsProxy='target-https-proxy-1',
              urlMapReference=messages.UrlMapReference(
                  urlMap=(self.compute_uri +
                          '/projects/my-project/global/urlMaps/my-map')))),
-        (self.compute.targetHttpsProxies, 'SetSslPolicy',
+        (self._target_https_proxies_api, 'SetSslPolicy',
          messages.ComputeTargetHttpsProxiesSetSslPolicyRequest(
              project='my-project',
              targetHttpsProxy='target-https-proxy-1',
@@ -138,8 +142,8 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
         messages.TargetHttpsProxiesSetQuicOverrideRequest.
         QuicOverrideValueValuesEnum)
 
-    self.Run("""
-        compute target-https-proxies update target-https-proxy-1
+    self.RunUpdate("""
+        target-https-proxy-1
           --ssl-certificates my-cert,my-cert2
           --url-map my-map
           --quic-override DISABLE
@@ -148,7 +152,7 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
 
     cert_uri = self.compute_uri + '/projects/my-project/global/sslCertificates/'
     self.CheckRequests([
-        (self.compute.targetHttpsProxies, 'SetSslCertificates',
+        (self._target_https_proxies_api, 'SetSslCertificates',
          messages.ComputeTargetHttpsProxiesSetSslCertificatesRequest(
              project='my-project',
              targetHttpsProxy='target-https-proxy-1',
@@ -156,21 +160,21 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
                  messages.TargetHttpsProxiesSetSslCertificatesRequest(
                      sslCertificates=[(cert_uri + 'my-cert'), (
                          cert_uri + 'my-cert2')])))),
-        (self.compute.targetHttpsProxies, 'SetUrlMap',
+        (self._target_https_proxies_api, 'SetUrlMap',
          messages.ComputeTargetHttpsProxiesSetUrlMapRequest(
              project='my-project',
              targetHttpsProxy='target-https-proxy-1',
              urlMapReference=messages.UrlMapReference(
                  urlMap=(self.compute_uri +
                          '/projects/my-project/global/urlMaps/my-map')))),
-        (self.compute.targetHttpsProxies, 'SetQuicOverride',
+        (self._target_https_proxies_api, 'SetQuicOverride',
          messages.ComputeTargetHttpsProxiesSetQuicOverrideRequest(
              project='my-project',
              targetHttpsProxy='target-https-proxy-1',
              targetHttpsProxiesSetQuicOverrideRequest=(
                  messages.TargetHttpsProxiesSetQuicOverrideRequest(
                      quicOverride=quic_enum.DISABLE)))),
-        (self.compute.targetHttpsProxies, 'SetSslPolicy',
+        (self._target_https_proxies_api, 'SetSslPolicy',
          messages.ComputeTargetHttpsProxiesSetSslPolicyRequest(
              project='my-project',
              targetHttpsProxy='target-https-proxy-1',
@@ -182,15 +186,14 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
 
   def testUriSupport(self):
     messages = self.messages
-    self.Run("""
-        compute target-https-proxies update
+    self.RunUpdate("""
           {uri}/projects/my-project/global/targetHttpsProxies/target-https-proxy-1
           --ssl-certificates {uri}/projects/my-project/global/sslCertificates/my-cert
           --url-map {uri}/projects/my-project/global/urlMaps/my-map
         """.format(uri=self.compute_uri))
 
     self.CheckRequests(
-        [(self.compute.targetHttpsProxies, 'SetSslCertificates',
+        [(self._target_https_proxies_api, 'SetSslCertificates',
           messages.ComputeTargetHttpsProxiesSetSslCertificatesRequest(
               project='my-project',
               targetHttpsProxy='target-https-proxy-1',
@@ -201,7 +204,7 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
                           '/projects/my-project/global/sslCertificates/'
                           'my-cert'
                       ])))),
-         (self.compute.targetHttpsProxies, 'SetUrlMap',
+         (self._target_https_proxies_api, 'SetUrlMap',
           messages.ComputeTargetHttpsProxiesSetUrlMapRequest(
               project='my-project',
               targetHttpsProxy='target-https-proxy-1',
@@ -211,12 +214,12 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
 
   def testClearSslPolicy(self):
     messages = self.messages
-    self.Run("""
-        compute target-https-proxies update target-https-proxy-1
+    self.RunUpdate("""
+        target-https-proxy-1
         --clear-ssl-policy
         """)
     self.CheckRequests([
-        (self.compute.targetHttpsProxies, 'SetSslPolicy',
+        (self._target_https_proxies_api, 'SetSslPolicy',
          messages.ComputeTargetHttpsProxiesSetSslPolicyRequest(
              project='my-project',
              targetHttpsProxy='target-https-proxy-1',
@@ -227,8 +230,8 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --clear-ssl-policy: At most one of '
         '--clear-ssl-policy | --ssl-policy may be specified.'):
-      self.Run("""
-          compute target-https-proxies update my-proxy
+      self.RunUpdate("""
+          my-proxy
           --ssl-policy my-ssl-policy
           --clear-ssl-policy
           """)
@@ -238,8 +241,8 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
     with self.AssertRaisesToolExceptionMatches(
         'You must specify at least one of [--ssl-certificates], [--url-map], '
         '[--quic-override], [--ssl-policy] or [--clear-ssl-policy].'):
-      self.Run("""
-          compute target-https-proxies update my-proxy
+      self.RunUpdate("""
+          my-proxy
           """)
     self.CheckRequests()
 
@@ -248,12 +251,151 @@ class TargetHTTPSProxiesUpdateBetaTest(TargetHTTPSProxiesUpdateGATest):
 
   def SetUp(self):
     self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
+    self._target_https_proxies_api = self.compute.targetHttpsProxies
 
 
 class TargetHTTPSProxiesUpdateAlphaTest(TargetHTTPSProxiesUpdateBetaTest):
 
   def SetUp(self):
     self._SetUpReleaseTrack('alpha', calliope_base.ReleaseTrack.ALPHA)
+    self._target_https_proxies_api = self.compute.targetHttpsProxies
+
+  def RunUpdate(self, command):
+    self.Run('compute target-https-proxies update --global ' + command)
+
+
+class RegionTargetHTTPSProxiesUpdateTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_https_proxies_api = self.compute.regionTargetHttpsProxies
+
+  def RunUpdate(self, command):
+    self.Run('alpha compute target-https-proxies update --region us-west-1 ' +
+             command)
+
+  def testSimpleCase(self):
+    self.RunUpdate("""
+                target-https-proxy-1
+                --ssl-certificates my-cert,my-cert2
+                --url-map my-map
+                """)
+
+    self.CheckRequests([(
+        self._target_https_proxies_api, 'SetSslCertificates',
+        self.messages.ComputeRegionTargetHttpsProxiesSetSslCertificatesRequest(
+            project='my-project',
+            region='us-west-1',
+            targetHttpsProxy='target-https-proxy-1',
+            regionTargetHttpsProxiesSetSslCertificatesRequest=(
+                self.messages.RegionTargetHttpsProxiesSetSslCertificatesRequest(
+                    sslCertificates=[
+                        self.compute_uri +
+                        '/projects/my-project/regions/us-west-1/'
+                        'sslCertificates/my-cert', self.compute_uri +
+                        '/projects/my-project/regions/us-west-1/'
+                        'sslCertificates/my-cert2'
+                    ])))
+    ), (self._target_https_proxies_api, 'SetUrlMap',
+        self.messages.ComputeRegionTargetHttpsProxiesSetUrlMapRequest(
+            project='my-project',
+            region='us-west-1',
+            targetHttpsProxy='target-https-proxy-1',
+            urlMapReference=self.messages.UrlMapReference(
+                urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                        'my-project/regions/us-west-1/urlMaps/my-map' % {
+                            'api': self._api
+                        }))))],)
+
+  def testUriSupport(self):
+    self.RunUpdate("""
+          https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/targetHttpsProxies/target-https-proxy-1
+          --ssl-certificates https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/sslCertificates/my-cert
+          --url-map https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-map
+        """ % {'api': self._api})
+
+    self.CheckRequests([(
+        self._target_https_proxies_api, 'SetSslCertificates',
+        self.messages.ComputeRegionTargetHttpsProxiesSetSslCertificatesRequest(
+            project='my-project',
+            region='us-west-1',
+            targetHttpsProxy='target-https-proxy-1',
+            regionTargetHttpsProxiesSetSslCertificatesRequest=(
+                self.messages.RegionTargetHttpsProxiesSetSslCertificatesRequest(
+                    sslCertificates=[
+                        self.compute_uri +
+                        '/projects/my-project/regions/us-west-1/'
+                        'sslCertificates/my-cert'
+                    ])))
+    ), (self._target_https_proxies_api, 'SetUrlMap',
+        self.messages.ComputeRegionTargetHttpsProxiesSetUrlMapRequest(
+            project='my-project',
+            region='us-west-1',
+            targetHttpsProxy='target-https-proxy-1',
+            urlMapReference=self.messages.UrlMapReference(
+                urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                        'my-project/regions/us-west-1/urlMaps/my-map' % {
+                            'api': self._api
+                        }))))],)
+
+  def testSimpleCaseWithQuicOverrideAndSslPolicy(self):
+    quic_enum = (
+        self.messages.TargetHttpsProxiesSetQuicOverrideRequest.
+        QuicOverrideValueValuesEnum)
+
+    self.RunUpdate("""
+        target-https-proxy-1
+          --ssl-certificates my-cert,my-cert2
+          --url-map my-map
+          --quic-override DISABLE
+          --ssl-policy my-ssl-policy
+        """)
+
+    self.CheckRequests([
+        (self._target_https_proxies_api, 'SetSslCertificates',
+         self.messages.ComputeRegionTargetHttpsProxiesSetSslCertificatesRequest(
+             project='my-project',
+             region='us-west-1',
+             targetHttpsProxy='target-https-proxy-1',
+             regionTargetHttpsProxiesSetSslCertificatesRequest=(
+                 self.messages.
+                 RegionTargetHttpsProxiesSetSslCertificatesRequest(
+                     sslCertificates=[
+                         self.compute_uri +
+                         '/projects/my-project/regions/us-west-1/'
+                         'sslCertificates/my-cert', self.compute_uri +
+                         '/projects/my-project/regions/us-west-1/'
+                         'sslCertificates/my-cert2'
+                     ])))),
+        (self._target_https_proxies_api, 'SetUrlMap',
+         self.messages.ComputeRegionTargetHttpsProxiesSetUrlMapRequest(
+             project='my-project',
+             region='us-west-1',
+             targetHttpsProxy='target-https-proxy-1',
+             urlMapReference=self.messages.UrlMapReference(
+                 urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                         'my-project/regions/us-west-1/urlMaps/my-map' % {
+                             'api': self._api
+                         })))),
+        # Only targetHttpsProxies have
+        # SetQuicOverride and SetSslPolicy requests.
+        (self.compute.targetHttpsProxies, 'SetQuicOverride',
+         self.messages.ComputeTargetHttpsProxiesSetQuicOverrideRequest(
+             project='my-project',
+             targetHttpsProxy='target-https-proxy-1',
+             targetHttpsProxiesSetQuicOverrideRequest=(
+                 self.messages.TargetHttpsProxiesSetQuicOverrideRequest(
+                     quicOverride=quic_enum.DISABLE)))),
+        (self.compute.targetHttpsProxies, 'SetSslPolicy',
+         self.messages.ComputeTargetHttpsProxiesSetSslPolicyRequest(
+             project='my-project',
+             targetHttpsProxy='target-https-proxy-1',
+             sslPolicyReference=self.messages.SslPolicyReference(
+                 sslPolicy=(self.compute_uri +
+                            '/projects/my-project/global/sslPolicies/'
+                            'my-ssl-policy')))),
+    ])
 
 
 if __name__ == '__main__':

@@ -23,16 +23,16 @@ import itertools
 from googlecloudsdk.api_lib.util import exceptions
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import util as command_util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 import six
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
+class EnvironmentsUpdateGATest(base.EnvironmentsUnitTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
 
   # Must be called after self.SetTrack() for self.messages to be present
   def _SetTestMessages(self):
@@ -59,9 +59,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         }))
 
   # Overall update tests
-  def testNoUpdateTypeFlagSpecified(self, track):
+  def testNoUpdateTypeFlagSpecified(self):
     """Tests that updating without an update type flag results in an error."""
-    self.SetTrack(track)
     self._SetTestMessages()
     args = [
         'update', '--location', self.TEST_LOCATION, '--project',
@@ -71,9 +70,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'Exactly one of \(.+\) must be specified.', self.RunEnvironments,
         *args)
 
-  def testMultipleUpdateTypeFlagsSpecified(self, track):
+  def testMultipleUpdateTypeFlagsSpecified(self):
     """Tests that updating without an update type flag results in an error."""
-    self.SetTrack(track)
     self._SetTestMessages()
     # All update flags grouped together by the type of update. Flags from
     # different types of updates should not be allowed together.
@@ -103,9 +101,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
     return self.messages.Environment(
         config=self.messages.EnvironmentConfig(nodeCount=node_count))
 
-  def testNodeCountUpdateAsync(self, track):
+  def testNodeCountUpdateAsync(self):
     """Tests that update creates a proper node count patch and field mask."""
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildNodeCountPatchObject(5)
     self.ExpectEnvironmentPatch(
@@ -130,9 +127,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'^Update in progress for environment \[{}] with operation '
         r'\[{}]'.format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testNodeCountUpdateSync(self, track):
+  def testNodeCountUpdateSync(self):
     """Tests the synchronous update of node count."""
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildNodeCountPatchObject(5)
     self.ExpectEnvironmentPatch(
@@ -162,9 +158,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'"Waiting for \[{}] to be updated with \[{}]"'.format(
             self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testNodeCountUpdateTooFew(self, track):
+  def testNodeCountUpdateTooFew(self):
     """Tests that updating the node count to a value < 3 fails."""
-    self.SetTrack(track)
     self._SetTestMessages()
     args = [
         'update', '--async', '--node-count', '2', '--location',
@@ -186,14 +181,9 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         'more-extras[extra1,extra2]\n'
         'extras-and-version[extra-1,extra-2]>=0.1\n')
 
-  def testSetPythonDependenciesSync(self, track):
+  def testSetPythonDependenciesSync(self):
     """Tests the successful synchronous update of pypi dependencies from a file.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     mock_file = self._createValidRequirementsFile()
     self.ExpectEnvironmentPatch(
@@ -225,9 +215,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'updated with \[{}]"'.format(self.TEST_ENVIRONMENT_NAME,
                                       self.TEST_OPERATION_NAME))
 
-  def testSetPythonDependenciesSlowFailureSync(self, track):
+  def testSetPythonDependenciesSlowFailureSync(self):
     """Tests the failed synchronous update of pypi dependencies from a file."""
-    self.SetTrack(track)
     self._SetTestMessages()
     mock_file = self._createValidRequirementsFile()
     error_description = 'ERROR DESCRIPTION'
@@ -268,9 +257,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
           self.TEST_ENVIRONMENT_ID,
       )
 
-  def testSetPythonDependenciesAsync(self, track):
+  def testSetPythonDependenciesAsync(self):
     """Tests the asynchronous update of pypi dependencies from a file."""
-    self.SetTrack(track)
     self._SetTestMessages()
     mock_file = self._createValidRequirementsFile()
     self.ExpectEnvironmentPatch(
@@ -297,9 +285,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'^Update in progress for environment \[{}] with operation \[{}]'.
         format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testSetPythonDependenciesFileNotFound(self, track):
+  def testSetPythonDependenciesFileNotFound(self):
     """Tests the pypi dependencies file not found error."""
-    self.SetTrack(track)
     self._SetTestMessages()
     with self.assertRaises(command_util.Error):
       self.RunEnvironments(
@@ -313,9 +300,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
           self.TEST_ENVIRONMENT_ID,
       )
 
-  def testSetPythonDependenciesMissingEnvironment(self, track):
+  def testSetPythonDependenciesMissingEnvironment(self):
     """Tests the error when updating a nonexistent environment."""
-    self.SetTrack(track)
     self._SetTestMessages()
     mock_file = self._createValidRequirementsFile()
     self.ExpectEnvironmentPatch(
@@ -349,17 +335,12 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         labels=self.messages.Environment.LabelsValue(
             additionalProperties=entry_list))
 
-  def testLabelsFieldMaskPrefix(self, track):
+  def testLabelsFieldMaskPrefix(self):
     """Tests that the update labels flag uses the correct field mask prefix.
 
     Clearing the labels without setting any new values should force the
     field mask to only contain the field mask prefix for labels.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildLabelsPatchObject({})
     self.ExpectEnvironmentPatch(
@@ -383,14 +364,9 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'^Update in progress for environment \[{}] with operation '
         r'\[{}]'.format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testLabelsPatchBuilder(self, track):
+  def testLabelsPatchBuilder(self):
     """Tests that the update labels flag properly constructs a patch object.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildLabelsPatchObject({'a': '1', 'b': '2'})
     self.ExpectEnvironmentPatch(
@@ -417,18 +393,13 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'^Update in progress for environment \[{}] with operation '
         r'\[{}]'.format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testLabelsSynchronous(self, track):
+  def testLabelsSynchronous(self):
     """Tests a successful synchronous update.
 
     The progress tracker should be activated and terminated, labels to be
     updated and removed should be correctly translated to a patch object and
     field mask.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildLabelsPatchObject({'a': '1', 'b': '2'})
     self.ExpectEnvironmentPatch(
@@ -461,9 +432,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'"status": "SUCCESS"}}'.format(
             self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testLabelsMultipleUpdateMerge(self, track):
+  def testLabelsMultipleUpdateMerge(self):
     """Tests merging when --update-labels is provided multiple times."""
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildLabelsPatchObject({
         'a': '1',
@@ -492,9 +462,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         self.TEST_ENVIRONMENT_ID,
     )
 
-  def testLabelsMultipleRemoveMerge(self, track):
+  def testLabelsMultipleRemoveMerge(self):
     """Tests merging when --remove-labels is provided multiple times."""
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildLabelsPatchObject({})
     self.ExpectEnvironmentPatch(
@@ -533,17 +502,12 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
     return self.messages.Environment(
         config=self.messages.EnvironmentConfig(softwareConfig=software_config))
 
-  def testAirflowConfigFieldMaskPrefix(self, track):
+  def testAirflowConfigFieldMaskPrefix(self):
     """Tests that the update config flag uses the correct field mask prefix.
 
     Clearing the configs without setting any new values should force the
     field mask to only contain the field mask prefix for configs.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildAirflowConfigPatchObject({})
     self.ExpectEnvironmentPatch(
@@ -568,9 +532,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                               self.TEST_ENVIRONMENT_NAME,
                               self.TEST_OPERATION_NAME))
 
-  def testAirflowConfigPatchBuilder(self, track):
+  def testAirflowConfigPatchBuilder(self):
     """Tests that the update command can properly construct a patch object."""
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildAirflowConfigPatchObject({
         'core-a': '1',
@@ -600,9 +563,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                               self.TEST_ENVIRONMENT_NAME,
                               self.TEST_OPERATION_NAME))
 
-  def testAirflowConfigUpdateMultipleFlags(self, track):
+  def testAirflowConfigUpdateMultipleFlags(self):
     """Tests that multiple --update-airflow-configs values are merged."""
-    self.SetTrack(track)
     self._SetTestMessages()
     expected_patch = self._buildAirflowConfigPatchObject({
         'core-a': '1',
@@ -638,9 +600,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                               self.TEST_ENVIRONMENT_NAME,
                               self.TEST_OPERATION_NAME))
 
-  def testAirflowConfigRemoveMultipleFlags(self, track):
+  def testAirflowConfigRemoveMultipleFlags(self):
     """Tests that multiple --remove-airflow-configs values are merged."""
-    self.SetTrack(track)
     self._SetTestMessages()
     self.ExpectEnvironmentPatch(
         self.TEST_PROJECT,
@@ -670,17 +631,12 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                               self.TEST_ENVIRONMENT_NAME,
                               self.TEST_OPERATION_NAME))
 
-  def testPartialPyPiPackagesFieldMaskPrefix(self, track):
+  def testPartialPyPiPackagesFieldMaskPrefix(self):
     """Tests that partial pypi package updates use the right field mask prefix.
 
     Clearing the configs without setting any new values should force the
     field mask to only contain the field mask prefix for configs.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     self.ExpectEnvironmentPatch(
         self.TEST_PROJECT,
@@ -704,9 +660,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                               self.TEST_ENVIRONMENT_NAME,
                               self.TEST_OPERATION_NAME))
 
-  def testPartialPyPiPackagesUpdateMultipleFlags(self, track):
+  def testPartialPyPiPackagesUpdateMultipleFlags(self):
     """Tests that multiple --update-pypi-package values are merged."""
-    self.SetTrack(track)
     self._SetTestMessages()
     self.ExpectEnvironmentPatch(
         self.TEST_PROJECT,
@@ -737,9 +692,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                               self.TEST_ENVIRONMENT_NAME,
                               self.TEST_OPERATION_NAME))
 
-  def testPartialPyPiPackagesRemoveMultipleFlags(self, track):
+  def testPartialPyPiPackagesRemoveMultipleFlags(self):
     """Tests that multiple --remove-pypi-packages values are merged."""
-    self.SetTrack(track)
     self._SetTestMessages()
     self.ExpectEnvironmentPatch(
         self.TEST_PROJECT,
@@ -811,14 +765,9 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         self.TEST_ENVIRONMENT_ID,
         response=response)
 
-  def testEnvVariablesWholeFieldMaskPrefix(self, track):
+  def testEnvVariablesWholeFieldMaskPrefix(self):
     """Tests that the correct field mask prefix is used when updating env vars.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     self._SetExpectEnvironmentGetWithEnvVariables({})
     self.ExpectEnvironmentPatch(
@@ -836,9 +785,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                               self.TEST_ENVIRONMENT_NAME,
                               self.TEST_OPERATION_NAME))
 
-  def testEnvVariablesPatchBuilder(self, track):
+  def testEnvVariablesPatchBuilder(self):
     """Tests that the update command can properly construct a patch object."""
-    self.SetTrack(track)
     self._SetTestMessages()
     self._SetExpectEnvironmentGetWithEnvVariables({})
     self.ExpectEnvironmentPatch(
@@ -856,9 +804,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                          self.TEST_LOCATION, '--project', self.TEST_PROJECT,
                          self.TEST_ENVIRONMENT_ID)
 
-  def testEnvVariablesUpdateMultipleFlags(self, track):
+  def testEnvVariablesUpdateMultipleFlags(self):
     """Tests that multiple --update-env-variables values are merged."""
-    self.SetTrack(track)
     self._SetTestMessages()
     self._SetExpectEnvironmentGetWithEnvVariables({
         'name0': 'old_val0',
@@ -883,9 +830,8 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                          self.TEST_LOCATION, '--project', self.TEST_PROJECT,
                          self.TEST_ENVIRONMENT_ID)
 
-  def testEnvVariablesRemoveMultipleFlags(self, track):
+  def testEnvVariablesRemoveMultipleFlags(self):
     """Tests that multiple --remove-env-variables values are merged."""
-    self.SetTrack(track)
     self._SetTestMessages()
     self._SetExpectEnvironmentGetWithEnvVariables({
         'name1': 'val1',
@@ -907,6 +853,18 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                          'name1,name3', '--remove-env-variables', 'name2,name4',
                          '--location', self.TEST_LOCATION, '--project',
                          self.TEST_PROJECT, self.TEST_ENVIRONMENT_ID)
+
+
+class EnvironmentsUpdateBetaTest(EnvironmentsUpdateGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+
+class EnvironmentsUpdateAlphaTest(EnvironmentsUpdateBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

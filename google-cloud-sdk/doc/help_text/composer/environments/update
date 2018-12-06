@@ -23,13 +23,13 @@ POSITIONAL ARGUMENTS
      Environment resource - The environment to update. The arguments in this
      group can be used to specify the attributes of this resource. (NOTE) Some
      attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: provide the flag [environment] on
-     the command line with a fully specified name; provide the flag [--project]
-     on the command line; set the property [core/project]. This must be
-     specified.
+     ways. To set the [project] attribute: provide the argument [environment]
+     on the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
 
        ENVIRONMENT
-          The ID of the environment or a fully qualified identifier for the
+          ID of the environment or fully qualified identifier for the
           environment. This positional must be specified if any of the other
           arguments in this group are specified.
 
@@ -126,7 +126,8 @@ REQUIRED FLAGS
             The path to a file containing a list of PyPI packages to install in
             the environment. Each line in the file should contain a package
             specification in the format of the update-pypi-package argument
-            defined above.
+            defined above. The path can be a local file path or a Google Cloud
+            Storage file path (Cloud Storage file path starts with 'gs://').
 
          --update-pypi-package=PACKAGE[EXTRAS_LIST]VERSION_SPECIFIER
             A PyPI package add to the environment. If a package already exists,
@@ -169,11 +170,13 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha composer environments update
         $ gcloud beta composer environments update
 

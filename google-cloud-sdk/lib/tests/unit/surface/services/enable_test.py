@@ -20,180 +20,56 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.services import exceptions
-from googlecloudsdk.api_lib.util import exceptions as api_lib_exceptions
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
-from six.moves import range
-from six.moves import zip
 
 
-class ServicesEnableTest(unit_test_base.SV1UnitTestBase):
-  """Unit tests for services enable command."""
-
-  def testServicesEnable(self):
-    operation_name = 'operation-12345-67890'
-
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=self.DEFAULT_SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=operation_name,
-            done=False,
-        )
-    )
-
-    self.MockOperationWait(operation_name)
-
-    self.WriteInput('y\n')
-    self.Run('services enable %s' % self.DEFAULT_SERVICE_NAME)
-    self.AssertErrContains(operation_name)
-    self.AssertErrContains('Operation finished successfully.')
-
-  def testServicesMultiEnable(self):
-    num_services = 3
-    service_names = ['service-name%d.googleapis.com' % i
-                     for i in range(num_services)]
-    operation_names = ['operation-12345-%d' % i for i in range(num_services)]
-
-    messages = self.services_messages
-    for service_name, operation_name in zip(service_names, operation_names):
-      self.mocked_client.services.Enable.Expect(
-          request=messages.ServicemanagementServicesEnableRequest(
-              serviceName=service_name,
-              enableServiceRequest=messages.EnableServiceRequest(
-                  consumerId='project:' + self.PROJECT_NAME
-              )
-          ),
-          response=messages.Operation(
-              name=operation_name,
-              done=False,
-          )
-      )
-      self.MockOperationWait(operation_name)
-
-    self.WriteInput('y\n')
-    self.Run('services enable %s' % ' '.join(service_names))
-    for operation_name in operation_names:
-      self.AssertErrContains(operation_name)
-    self.AssertErrContains('Operation finished successfully.')
-
-  def testServicesEnableAsync(self):
-    operation_name = 'operation-12345-67890'
-
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=self.DEFAULT_SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=operation_name,
-            done=False,
-        )
-    )
-
-    self.WriteInput('y\n')
-    self.Run('services enable %s --async' % (self.DEFAULT_SERVICE_NAME))
-    self.AssertErrContains(operation_name)
-    self.AssertErrContains('Asynchronous operation is in progress.')
-
-  def testServicesEnableConsumer(self):
-    operation_name = 'operation-12345-67890'
-    consumer_project = 'another-consumer-project'
-
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=self.DEFAULT_SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + consumer_project
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=operation_name,
-            done=False,
-        )
-    )
-
-    self.MockOperationWait(operation_name)
-
-    self.WriteInput('y\n')
-    self.Run('services enable %s '
-             '--project %s' % (self.DEFAULT_SERVICE_NAME, consumer_project))
-    self.AssertErrContains(operation_name)
-    self.AssertErrContains('Operation finished successfully.')
-
-  def _ExpectEnableServiceCall_Error(self, consumer_project, server_error):
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=self.DEFAULT_SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + consumer_project
-            )
-        ),
-        exception=server_error
-    )
-
-  def testServicesEnableConsumer_PermissionsError(self):
-    consumer_project = 'another-consumer-project'
-    server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
-    self._ExpectEnableServiceCall_Error(consumer_project, server_error)
-    self.WriteInput('y\n')
-    with self.assertRaises(
-        exceptions.EnableServicePermissionDeniedException):
-      self.Run('services enable %s '
-               '--project %s' % (self.DEFAULT_SERVICE_NAME, consumer_project))
-
-  def testServicesEnableConsumer_GenericError(self):
-    consumer_project = 'another-consumer-project'
-    server_error = http_error.MakeDetailedHttpError(code=400, message='Error.')
-    self._ExpectEnableServiceCall_Error(consumer_project, server_error)
-    self.WriteInput('y\n')
-    with self.assertRaises(api_lib_exceptions.HttpException):
-      self.Run('services enable %s '
-               '--project %s' % (self.DEFAULT_SERVICE_NAME, consumer_project))
-
-
-class EnableAlphaTest(unit_test_base.SUUnitTestBase):
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class EnableTest(unit_test_base.SUUnitTestBase):
   """Unit tests for services enable command."""
   OPERATION_NAME = 'operations/abc.0000000000'
 
-  def testEnable(self):
+  def testEnable(self, track):
+    self.track = track
     self.ExpectEnableApiCall(self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    self.Run('alpha services enable %s' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services enable %s' % self.DEFAULT_SERVICE_NAME)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testBatchEnable(self):
+  def testBatchEnable(self, track):
+    self.track = track
     self.ExpectBatchEnableApiCall(self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    self.Run('alpha services enable %s %s' % (self.DEFAULT_SERVICE_NAME,
-                                              self.DEFAULT_SERVICE_NAME_2))
+    self.Run('services enable %s %s' % (self.DEFAULT_SERVICE_NAME,
+                                        self.DEFAULT_SERVICE_NAME_2))
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testEnableAsync(self):
+  def testEnableAsync(self, track):
+    self.track = track
     self.ExpectEnableApiCall(self.OPERATION_NAME)
 
-    self.Run('alpha services enable %s --async' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services enable %s --async' % self.DEFAULT_SERVICE_NAME)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
-  def testEnablePermissionDenied(self):
+  def testEnablePermissionDenied(self, track):
+    self.track = track
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
     self.ExpectEnableApiCall(None, error=server_error)
 
     with self.assertRaisesRegex(
         exceptions.EnableServicePermissionDeniedException, r'Error.'):
-      self.Run('alpha services enable %s' % self.DEFAULT_SERVICE_NAME)
+      self.Run('services enable %s' % self.DEFAULT_SERVICE_NAME)
 
 
 if __name__ == '__main__':

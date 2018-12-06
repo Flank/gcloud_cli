@@ -18,15 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
-from tests.lib.surface.compute import xpn_test_base
+from tests.lib.surface.compute import shared_vpc_test_base
 
 
-@parameterized.parameters(
-    base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
-class AddTest(xpn_test_base.XpnTestBase):
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class AddTest(shared_vpc_test_base.SharedVpcTestBase):
 
   def testAdd_NoProject(self, track):
     self._SetUp(track)
@@ -37,15 +39,8 @@ class AddTest(xpn_test_base.XpnTestBase):
 
   def testAdd(self, track):
     self._SetUp(track)
-    self._testAdd('shared-vpc')
-
-  def testAdd_xpn(self, track):
-    self._SetUp(track)
-    self._testAdd('xpn')
-
-  def _testAdd(self, module_name):
-    self.Run('compute {} associated-projects add --host-project xpn-host '
-             'xpn-user'.format(module_name))
+    self.Run('compute shared-vpc associated-projects add --host-project '
+             'xpn-host xpn-user')
     self.xpn_client.EnableXpnAssociatedProject.assert_called_once_with(
         'xpn-host', 'xpn-user')
     self.get_xpn_client_mock.assert_called_once_with(self.track)

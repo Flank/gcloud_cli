@@ -18,12 +18,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import extra_types
+
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA,
                           calliope_base.ReleaseTrack.GA)
@@ -49,7 +52,14 @@ class LocationsListTest(base.KmsMockTest):
             name='projects/'+self.Project(), pageSize=100),
         self.messages.ListLocationsResponse(locations=[
             self.messages.Location(
-                locationId='global', name=glbl.RelativeName()),
+                locationId='global',
+                metadata=self.messages.Location.MetadataValue(
+                    additionalProperties=[
+                        self.messages.Location.MetadataValue.AdditionalProperty(
+                            key='hsmAvailable',
+                            value=extra_types.JsonValue(string_value='True')),
+                    ]),
+                name=glbl.RelativeName()),
             self.messages.Location(
                 locationId='us-east1', name=east.RelativeName()),
         ]))
@@ -57,8 +67,8 @@ class LocationsListTest(base.KmsMockTest):
     self.Run('kms locations list')
     self.AssertOutputContains(
         """\
-LOCATION_ID
-global
+LOCATION_ID HSM_AVAILABLE
+global      True
 us-east1
 """, normalize_space=True)
 

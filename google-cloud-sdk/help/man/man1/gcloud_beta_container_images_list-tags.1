@@ -11,7 +11,7 @@ gcloud beta container images list\-tags \- list tags and digests for the specifi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container images list\-tags\fR \fIIMAGE_NAME\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...];\ default="~timestamp"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container images list\-tags\fR \fIIMAGE_NAME\fR [\fB\-\-occurrence\-filter\fR=\fIOCCURRENCE_FILTER\fR;\ default='kind\ =\ "BUILD_DETAILS"\ OR\ kind\ =\ "IMAGE_BASIS"\ OR\ kind\ =\ "DISCOVERY"'] [\fB\-\-no\-show\-occurrences\fR] [\fB\-\-show\-occurrences\-from\fR=\fISHOW_OCCURRENCES_FROM\fR;\ default=10] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...];\ default="~timestamp"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,6 +30,26 @@ by the Google Container Registry.
 \fIIMAGE_NAME\fR
 The name of the image to list tags for. The name format should be
 *.gcr.io/PROJECT_ID/IMAGE_PATH[:TAG|@sha256:DIGEST].
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-occurrence\-filter\fR=\fIOCCURRENCE_FILTER\fR; default='kind = "BUILD_DETAILS" OR kind = "IMAGE_BASIS" OR kind = "DISCOVERY"'
+A filter for the Occurrences which will be summarized.
+
+.TP 2m
+\fB\-\-show\-occurrences\fR
+Whether to show summaries of the various Occurrence types. Enabled by default,
+use \fB\-\-no\-show\-occurrences\fR to disable.
+
+.TP 2m
+\fB\-\-show\-occurrences\-from\fR=\fISHOW_OCCURRENCES_FROM\fR; default=10
+How many of the most recent images for which to summarize Occurences.
 
 
 .RE
@@ -75,9 +95,9 @@ default is \fB~timestamp\fR.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

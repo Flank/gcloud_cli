@@ -4,29 +4,47 @@ NAME
 
 SYNOPSIS
     gcloud beta compute ssl-certificates create NAME
-        --certificate=LOCAL_FILE_PATH --private-key=LOCAL_FILE_PATH
+        (--domains=DOMAIN,[DOMAIN,...]
+          | --certificate=LOCAL_FILE_PATH --private-key=LOCAL_FILE_PATH)
         [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute ssl-certificates create is used to create SSL
     certificates which can be used to configure a target HTTPS proxy. An SSL
     certificate consists of a certificate and private key. The private key is
-    encrypted before it is stored. For more information, see:
-    https://cloud.google.com/load-balancing/docs/ssl-certificates
+    encrypted before it is stored.
+
+    You can create either a managed or a self-managed SslCertificate. A managed
+    SslCertificate will be provisioned and renewed for you, when you specify
+    the --domains flag. A self-managed certificate is created by passing the
+    certificate obtained from Certificate Authority through --certificate and
+    --private-key flags.
 
 POSITIONAL ARGUMENTS
      NAME
         Name of the SSL certificate to create.
 
 REQUIRED FLAGS
-     --certificate=LOCAL_FILE_PATH
-        The path to a local certificate file. The certificate must be in PEM
-        format. The certificate chain must be no greater than 5 certs long. The
-        chain must include at least one intermediate cert.
+     Flags for managed or self-managed certificate. Exactly one of these must
+     be specified:
 
-     --private-key=LOCAL_FILE_PATH
-        The path to a local private key file. The private key must be in PEM
-        format and must use RSA or ECDSA encryption.
+       --domains=DOMAIN,[DOMAIN,...]
+          List of domains to create a managed certificate for.
+
+       Flags for self-managed certificate
+
+         --certificate=LOCAL_FILE_PATH
+            Path to a local certificate file to create a self-managed
+            certificate. The certificate must be in PEM format. The certificate
+            chain must be no greater than 5 certs long. The chain must include
+            at least one intermediate cert. This flag must be specified if any
+            of the other arguments in this group are specified.
+
+         --private-key=LOCAL_FILE_PATH
+            Path to a local private key file. The private key must be in PEM
+            format and must use RSA or ECDSA encryption. This flag must be
+            specified if any of the other arguments in this group are
+            specified.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
@@ -34,8 +52,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

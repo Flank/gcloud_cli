@@ -7,8 +7,8 @@ SYNOPSIS
         [[USER@]INSTANCE:]DEST [--compress] [--dry-run]
         [--force-key-file-overwrite] [--internal-ip] [--plain] [--port=PORT]
         [--recurse] [--scp-flag=SCP_FLAG] [--ssh-key-file=SSH_KEY_FILE]
-        [--strict-host-key-checking=STRICT_HOST_KEY_CHECKING] [--zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--strict-host-key-checking=STRICT_HOST_KEY_CHECKING]
+        [--tunnel-through-iap] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute scp securely copies files between a virtual
@@ -90,6 +90,9 @@ FLAGS
         subsequent connections. STRICT_HOST_KEY_CHECKING must be one of: yes,
         no, ask.
 
+     --tunnel-through-iap
+        Tunnel the ssh connection through the Cloud Identity-Aware Proxy.
+
      --zone=ZONE
         The zone of the instance to copy files to/from.
 
@@ -114,8 +117,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To copy a remote directory, ~/narnia, from example-instance to the
@@ -135,6 +139,11 @@ EXAMPLES
 
         $ gcloud alpha compute scp --recurse example-instance:~/narnia \
             ~/wardrobe --zone us-central1-a
+
+    To specify the project, zone, and recurse all together, run:
+
+        $ gcloud alpha compute scp --project "my-gcp-project" \
+            --zone "us-east1-b" --recurse ~/foo-folder/ gcp-instance-name:~/
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

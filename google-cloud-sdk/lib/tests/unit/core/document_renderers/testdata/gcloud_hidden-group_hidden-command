@@ -2,12 +2,12 @@ NAME
     gcloud hidden-group hidden-command - (ALPHA) hidden command docstring index
 
 SYNOPSIS
-    gcloud hidden-group hidden-command [GLOBAL-FLAG ...]
+    gcloud hidden-group hidden-command [GCLOUD-WIDE-FLAG ...]
 
 DESCRIPTION
     (ALPHA) Hidden command docstring description.
 
-GLOBAL FLAGS
+GCLOUD WIDE FLAGS
     Run $ gcloud help for a description of flags available to all commands.
 
 NOTES

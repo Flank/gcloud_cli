@@ -1,0 +1,223 @@
+title: Create AppEngine Jobs Test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      scheduler jobs create app-engine my-job
+      --schedule "every tuesday" --message-body my-payload
+  - stdout: |
+      appEngineHttpTarget:
+        body: bXktcGF5bG9hZA==
+        httpMethod: POST
+        relativeUri: /
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      retryConfig:
+        maxBackoffDuration: 3600s
+        maxDoublings: 16
+        minBackoffDuration: 5s
+        retryCount: 0
+      schedule: every tuesday
+      timeZone: Etc/UTC
+- execute:
+  - command: |
+      scheduler jobs create app-engine my-job
+      --schedule "every tuesday"
+      --description "my super cool job"
+      --max-retry-attempts 5
+      --max-retry-duration 2h
+      --min-backoff 0.2s
+      --max-backoff 10s
+      --relative-url /foo/bar
+      --max-doublings 2
+      --http-method gEt
+      --headers Header1=Value1,Header2=Value2
+      --message-body-from-file payload_file
+      --version version
+      --service service
+  - stdout: |
+      appEngineHttpTarget:
+        appEngineRouting:
+          service: service
+          version: version
+        body: bXktcGF5bG9hZC0y
+        headers:
+          Header1: Value1
+          Header2: Value2
+        httpMethod: GET
+        relativeUri: /foo/bar
+      description: my super cool job
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      retryConfig:
+        maxBackoffDuration: 10s
+        maxDoublings: 2
+        maxRetryDuration: 7200s
+        minBackoffDuration: 0.2s
+        retryCount: 5
+      schedule: every tuesday
+      timeZone: Etc/UTC
+actions:
+- write_file:
+    path: payload_file
+    contents: my-payload-2
+- execute_command:
+    label: test create base case
+    command: |
+      scheduler jobs create app-engine my-job
+      --schedule "every tuesday" --message-body my-payload
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            dispatchRules: []
+            locationId: us-central1
+            name: apps/fake-project
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              appEngineHttpTarget:
+                body: bXktcGF5bG9hZA==
+                httpMethod: POST
+                relativeUri: /
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+                minBackoffDuration: 5s
+                retryCount: 0
+              schedule: every tuesday
+              timeZone: Etc/UTC
+        return_response:
+          headers:
+            status: '200'
+          body:
+            appEngineHttpTarget:
+              body: bXktcGF5bG9hZA==
+              httpMethod: POST
+              relativeUri: /
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            retryConfig:
+              maxBackoffDuration: 3600s
+              maxDoublings: 16
+              minBackoffDuration: 5s
+              retryCount: 0
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        appEngineHttpTarget:
+          body: bXktcGF5bG9hZA==
+          httpMethod: POST
+          relativeUri: /
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        retryConfig:
+          maxBackoffDuration: 3600s
+          maxDoublings: 16
+          minBackoffDuration: 5s
+          retryCount: 0
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: test create all args
+    command: |
+      scheduler jobs create app-engine my-job
+      --schedule "every tuesday"
+      --description "my super cool job"
+      --max-retry-attempts 5
+      --max-retry-duration 2h
+      --min-backoff 0.2s
+      --max-backoff 10s
+      --relative-url /foo/bar
+      --max-doublings 2
+      --http-method gEt
+      --headers Header1=Value1,Header2=Value2
+      --message-body-from-file payload_file
+      --version version
+      --service service
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              appEngineHttpTarget:
+                appEngineRouting:
+                  service: service
+                  version: version
+                body: bXktcGF5bG9hZC0y
+                headers:
+                  Header1: Value1
+                  Header2: Value2
+                httpMethod: GET
+                relativeUri: /foo/bar
+              description: my super cool job
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                maxBackoffDuration: 10s
+                maxDoublings: 2
+                maxRetryDuration: 7200s
+                minBackoffDuration: 0.2s
+                retryCount: 5
+              schedule: every tuesday
+              timeZone: Etc/UTC
+        return_response:
+          headers:
+            status: '200'
+          body:
+            appEngineHttpTarget:
+              appEngineRouting:
+                service: service
+                version: version
+              body: bXktcGF5bG9hZC0y
+              headers:
+                Header1: Value1
+                Header2: Value2
+              httpMethod: GET
+              relativeUri: /foo/bar
+            description: my super cool job
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            retryConfig:
+              maxBackoffDuration: 10s
+              maxDoublings: 2
+              maxRetryDuration: 7200s
+              minBackoffDuration: 0.2s
+              retryCount: 5
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        appEngineHttpTarget:
+          appEngineRouting:
+            service: service
+            version: version
+          body: bXktcGF5bG9hZC0y
+          headers:
+            Header1: Value1
+            Header2: Value2
+          httpMethod: GET
+          relativeUri: /foo/bar
+        description: my super cool job
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        retryConfig:
+          maxBackoffDuration: 10s
+          maxDoublings: 2
+          maxRetryDuration: 7200s
+          minBackoffDuration: 0.2s
+          retryCount: 5
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0

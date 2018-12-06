@@ -22,23 +22,21 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudiot import devices as devices_api
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class DevicesDescribeTest(base.CloudIotBase):
+class DevicesDescribeTestGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.devices_client = devices_api.DevicesClient(self.client, self.messages)
 
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def testDescribe(self, track):
-    self.track = track
+  def testDescribe(self):
     device_name = ('projects/{}/'
                    'locations/us-central1/'
                    'registries/my-registry/'
@@ -55,8 +53,7 @@ class DevicesDescribeTest(base.CloudIotBase):
 
     self.assertEqual(result, device)
 
-  def testDescribe_RelativeName(self, track):
-    self.track = track
+  def testDescribe_RelativeName(self):
     device_name = ('projects/{}/'
                    'locations/us-central1/'
                    'registries/my-registry/'
@@ -74,6 +71,18 @@ class DevicesDescribeTest(base.CloudIotBase):
     result = self.Run('iot devices describe {}'.format(device_name))
 
     self.assertEqual(result, device)
+
+
+class DevicesDescribeTestBeta(DevicesDescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DevicesDescribeTestAlpha(DevicesDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

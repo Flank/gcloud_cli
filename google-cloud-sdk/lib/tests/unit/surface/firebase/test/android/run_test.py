@@ -387,6 +387,24 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
     self.AssertErrContains('instrumentation test on 3 device(s)')
     self.AssertErrContains('Instrumentation testing complete')
 
+  def testInstrumentationTest_Async_WithEnvironmentVariables(self):
+    self.ExpectInitializeSettings()
+    self.ExpectFileUpload(APP_APK)
+    self.ExpectFileUpload(TEST_APK)
+    spec = self.BuildInstrumentationTestSpec()
+    # TODO(b/116255948): if fixed, test with more than one key=value pair.
+    spec.testSetup.environmentVariables = [
+        self.testing_msgs.EnvironmentVariable(key='size', value='small')]
+    self.ExpectMatrixCreate(spec, [DEFAULT_DEVICE])
+
+    self.Run(commands.ANDROID_TEST_RUN +
+             '--app {aa} --test {ta} --environment-variables size=small '
+             '--async --no-auto-google-login --no-use-orchestrator'
+             .format(aa=APP_PATH, ta=TEST_PATH))
+
+    self.AssertErrContains('instrumentation test on 1 device(s)')
+    self.AssertOutputContains('results will be available at')
+
   def testLoopTest_AllDefaultArgs(self):
     self.ExpectInitializeSettings()
     self.ExpectFileUpload(APP_APK)

@@ -1,0 +1,163 @@
+title: Basic tests of the operations commands
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: filestore operations list --location us-central1-c --limit 2 --format
+      none
+- execute:
+  - command: filestore operations describe --location us-central1-c $$first-operation$$
+      --format 'text(name)'
+  - stdout: |
+      name: projects/cloud-sdk-integration-testing/locations/us-central1-c/operations/$$first-operation$$
+skip:
+  reason: API Responds Null, breaking extract_reference. Possible api change.
+  bug: b/120037531
+actions:
+
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
+
+- execute_command:
+    command: filestore operations list --location us-central1-c --limit 2 --format
+      none
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-central1-c/operations?alt=json&pageSize=2
+          method: GET
+          headers: {}
+          body: null
+        expect_response:
+          extract_references:
+          - field: operations[0].name
+            reference: first-operation
+            modifiers:
+              basename: true
+          body:
+            json: {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3374'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            operations:
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/operations/operation-1537451032054-5764db6a00922-d1968784-e39154cf
+              metadata:
+                '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+                createTime: '2018-09-20T13:43:52.064055872Z'
+                endTime: '2018-09-20T13:43:52.099683701Z'
+                target: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180920-134125-5hbr
+                verb: reporthealth
+                cancelRequested: false
+                apiVersion: v1internal
+              done: true
+              response:
+                '@type': type.googleapis.com/google.internal.cloud.filestore.v1internal.InternalInstance
+                name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180920-134125-5hbr
+                healthMonitoring:
+                  resources:
+                  - id:
+                      id: r-fcf7ffa8-f2e2-40da-ac83-1f3b392a3b3e-00000005-vm
+                      rootId: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180920-134125-5hbr
+                state: READY
+                tier: STANDARD
+                createTime: '2018-09-20T13:41:27.064168995Z'
+                fileShares:
+                - name: my_vol
+                  capacityGb: '1024'
+                networks:
+                - network: filestore-net
+                  reservedIpRange: 10.48.218.128/29
+                  ipAddresses:
+                  - 10.48.218.130
+                uniqueId: 0f4bd7d0-8bdf-4336-9e96-e212495d98a1
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/operations/operation-1537225261675-5761925a975c4-aa4e174e-c359d8d1
+              metadata:
+                '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+                createTime: '2018-09-17T23:01:02.549998620Z'
+                endTime: '2018-09-17T23:03:20.164640303Z'
+                target: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180917-230100-4xx1
+                verb: create
+                cancelRequested: false
+                apiVersion: $$api-version$$
+              done: true
+              response:
+                '@type': type.googleapis.com/google.cloud.filestore.$$api-version$$.Instance
+                name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180917-230100-4xx1
+                state: READY
+                createTime: '2018-09-17T23:01:02.544527732Z'
+                tier: STANDARD
+                volumes:
+                - name: my_vol
+                  capacityGb: '1024'
+                networks:
+                - network: filestore-net
+                  reservedIpRange: 10.179.194.128/29
+                  ipAddresses:
+                  - 10.179.194.130
+            nextPageToken: CqMBCjkKDXVzLWNlbnRyYWwxLWMSE2ZpbGUuZ29vZ2xlYXBpcy5jb20YASCJxdqJvA0qCm9wZXJhdGlvbnMSN29wZXJhdGlvbi0xNTM3MjI1MjYxNjc1LTU3NjE5MjVhOTc1YzQtYWE0ZTE3NGUtYzM1OWQ4ZDEaJDNiZmM0ZjgxLWUzNDMtNDQ1Ny05ZTdjLWE2ODhlYjE4NzgxYSHV5-jCioMeAA
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: filestore operations describe --location us-central1-c $$first-operation$$
+      --format 'text(name)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-central1-c/operations/$$first-operation$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1594'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-c/operations/operation-1537451032054-5764db6a00922-d1968784-e39154cf
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2018-09-20T13:43:52.064055872Z'
+              endTime: '2018-09-20T13:43:52.099683701Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180920-134125-5hbr
+              verb: reporthealth
+              cancelRequested: false
+              apiVersion: v1internal
+            done: true
+            response:
+              '@type': type.googleapis.com/google.internal.cloud.filestore.v1internal.InternalInstance
+              name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180920-134125-5hbr
+              healthMonitoring:
+                resources:
+                - id:
+                    id: r-fcf7ffa8-f2e2-40da-ac83-1f3b392a3b3e-00000005-vm
+                    rootId: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180920-134125-5hbr
+              state: READY
+              tier: STANDARD
+              createTime: '2018-09-20T13:41:27.064168995Z'
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.48.218.128/29
+                ipAddresses:
+                - 10.48.218.130
+              uniqueId: 0f4bd7d0-8bdf-4336-9e96-e212495d98a1
+        poll_operation: false
+        expect_response:
+          body:
+            json: {}
+    - expect_stdout: |
+        name: projects/cloud-sdk-integration-testing/locations/us-central1-c/operations/$$first-operation$$
+    - expect_exit:
+        code: 0

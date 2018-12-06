@@ -1,0 +1,30 @@
+NAME
+    gcloud bigtable - manage your Cloud Bigtable storage
+
+SYNOPSIS
+    gcloud bigtable GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage your Cloud Bigtable storage.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     clusters
+        Manage Cloud Bigtable clusters.
+
+     instances
+        Manage Cloud Bigtable instances.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha bigtable
+        $ gcloud beta bigtable
+

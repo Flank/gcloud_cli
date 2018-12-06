@@ -13,8 +13,6 @@ DESCRIPTION
     be overwritten. If a file exists in the bucket but is not present in the
     SOURCE, it is not removed.
 
-    The SOURCE path can contain wildcards. See gsutil help wildcards.
-
 REQUIRED FLAGS
      --source=SOURCE
         Path to a local directory/file or Cloud Storage bucket/object to be
@@ -25,12 +23,12 @@ REQUIRED FLAGS
      import DAGs. The arguments in this group can be used to specify the
      attributes of this resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
-     attribute: provide the flag [--environment] on the command line with a
-     fully specified name; provide the flag [--project] on the command line;
-     set the property [core/project]. This must be specified.
+     attribute: provide the argument [--environment] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
 
        --environment=ENVIRONMENT
-          The ID of the environment or a fully qualified identifier for the
+          ID of the environment or fully qualified identifier for the
           environment. This flag must be specified if any of the other
           arguments in this group are specified.
 
@@ -47,8 +45,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     Suppose the '/foo' directory in the local filesystem has the following
@@ -133,8 +132,9 @@ EXAMPLES
         |   |   |   |   +-- file4.txt
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud composer environments storage dags import
+        $ gcloud alpha composer environments storage dags import
 

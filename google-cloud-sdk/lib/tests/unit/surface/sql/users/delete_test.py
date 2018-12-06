@@ -20,13 +20,13 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core.console import console_io
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
 class _BaseUsersDeleteTest(object):
 
-  # TODO(b/110486599): Remove the positional host argument.
   def testDelete(self):
     prompt_mock = self.StartObjectPatch(
         console_io, 'PromptContinue', return_value=True)
@@ -42,10 +42,17 @@ class _BaseUsersDeleteTest(object):
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
         msgs.Operation(name='op_name', status='DONE'))
-    self.Run('sql users delete --instance my_instance my_username my_host')
+    self.Run('sql users delete --instance my_instance my_username '
+             '--host my_host')
     self.assertEqual(prompt_mock.call_count, 1)
-    # TODO(b/110486599): Remove the deprecation warning.
-    self.AssertErrContains('Positional argument deprecated_host is deprecated')
+
+  # TODO(b/110486599): Remove this when the argument is removed.
+  def testPositionalHostError(self):
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
+                                'Positional argument deprecated_host has been '
+                                'removed'):
+      self.Run('sql users delete --instance my_instance '
+               'my_username my_host --password my_password')
 
   def testDeleteWithNoHostArgument(self):
     prompt_mock = self.StartObjectPatch(
@@ -84,14 +91,12 @@ class _BaseUsersDeleteTest(object):
              '--host my_host')
     self.assertEqual(prompt_mock.call_count, 1)
 
-  # TODO(b/110486599): Remove the positional host argument.
   def testDeleteNoConfirmCancels(self):
     self.WriteInput('n\n')
     with self.assertRaises(console_io.OperationCancelledError):
       self.Run('sql users delete --instance my_instance my_username '
-               'my_host --async')
+               '--host my_host --async')
 
-  # TODO(b/110486599): Remove the positional host argument.
   def testDeleteAsync(self):
     msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
     self.mocked_client.users.Delete.Expect(
@@ -107,7 +112,7 @@ class _BaseUsersDeleteTest(object):
         msgs.Operation(name='op_name'))
 
     result = self.Run('sql users delete --instance my_instance my_username '
-                      'my_host --async')
+                      '--host my_host --async')
     self.assertEqual(result.name, 'op_name')
     self.AssertOutputEquals('')
     self.AssertErrContains('my_username@my_host will be deleted. New '

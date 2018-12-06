@@ -21,12 +21,15 @@ from __future__ import unicode_literals
 from apitools.base.protorpclite import messages
 
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.api_lib.util import resource as resource_util
 from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.concepts import completers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import resources
+from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -40,33 +43,7 @@ import six
 from six.moves import zip  # pylint: disable=redefined-builtin
 
 
-class ShelvesMessage(messages.Message):
-  """Fake shelves list response."""
-
-  class Shelf(messages.Message):
-    name = messages.StringField(1)
-
-  shelves = messages.MessageField('Shelf', 1, repeated=True)
-
-
-class BooksMessage(messages.Message):
-  """Fake books list response."""
-
-  class Book(messages.Message):
-    name = messages.StringField(1)
-
-  books = messages.MessageField('Book', 1, repeated=True)
-
-
-class ProjectsMessage(messages.Message):
-  """Fake projects list response."""
-
-  class Project(messages.Message):
-    projectId = messages.StringField(1)  # pylint: disable=invalid-name
-
-  projects = messages.MessageField('Project', 1, repeated=True)
-
-
+# TODO(b/113116299): Make tests more robust.
 class CompleterTest(concepts_test_base.ConceptsTestBase,
                     apis_base.Base,
                     parameterized.TestCase,
@@ -84,46 +61,6 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         prefixes=False)
     self.resource_info = concept_parsers.ConceptParser(
         [self.presentation_spec]).GetInfo(self.presentation_spec.name)
-
-  def BuildBooksList(self, books):
-    """Helper function to build return message for fake books List method."""
-    return BooksMessage(
-        books=[
-            BooksMessage.Book(name=book) for book in books])
-
-  def BuildShelvesList(self, shelves):
-    """Helper function to build return message for fake shelves List method."""
-    return ShelvesMessage(
-        shelves=[
-            ShelvesMessage.Shelf(name=shelf) for shelf in shelves])
-
-  def BuildProjectsList(self, projects):
-    """Helper function to build return message for fake projects List method."""
-    return ProjectsMessage(
-        projects=[
-            ProjectsMessage.Project(projectId=project) for project in projects]
-    )
-
-  def _PatchProjectReturnType(self):
-    """Patch project resource method to have certain return type messages."""
-    projects_method = registry.GetMethod('cloudresourcemanager.projects',
-                                         'list')
-    self.StartObjectPatch(projects_method, 'GetResponseType',
-                          return_value=ProjectsMessage)
-
-  def _PatchBookReturnType(self):
-    """Patch book resource method to have certain return type messages."""
-    books_method = registry.GetMethod('example.projects.shelves.books', 'list')
-    self.StartObjectPatch(books_method, 'GetResponseType',
-                          return_value=BooksMessage)
-
-  def PatchBookResourceReturnTypes(self):
-    """Patch each resource method to have certain return type messages."""
-    self._PatchProjectReturnType()
-    shelves_method = registry.GetMethod('example.projects.shelves', 'list')
-    self.StartObjectPatch(shelves_method, 'GetResponseType',
-                          return_value=ShelvesMessage)
-    self._PatchBookReturnType()
 
   def SetUpAttrCompleterAndParameterInfo(self, attribute_name, argument_dest,
                                          args=None, static_params=None,
@@ -207,12 +144,12 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
        'projects/exampleproject/shelves/exampleshelf'),
       ('Middle', 'shelf', {'--book-project': 'exampleproject'},
        'projects/exampleproject'))
-  def testGetParentRef(self, attribute_name, args, expected_result):
+  def testGetParent(self, attribute_name, args, expected_result):
     collections = [
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves', True),
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
         attribute_name,
         attribute_name,
@@ -220,7 +157,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
 
     self.assertEqual(
         expected_result,
-        completer.GetParentRef(parameter_info).RelativeName())
+        completer.GetParent(parameter_info).RelativeName())
 
   @parameterized.named_parameters(
       # This is always None - no parent collection
@@ -228,25 +165,25 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
       # These should be None if there is not enough information.
       ('AnchorNotEnoughInfo', 'book', {}),
       ('MiddleNotEnoughInfo', 'shelf', {}))
-  def testGetParentRefIsNone(self, attribute_name, args):
+  def testGetParentIsNone(self, attribute_name, args):
     collections = [
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves', True),
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
         'book',
         attribute_name,
         args=args)
 
-    self.assertIsNone(completer.GetParentRef(parameter_info))
+    self.assertIsNone(completer.GetParent(parameter_info))
 
   def testMethodProperty(self):
     collections = [
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves', True),
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     completer, _ = self.SetUpAttrCompleterAndParameterInfo('book', 'book')
     method = completer.method
     self.assertEqual(self.book_collection, method.collection)
@@ -265,7 +202,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves', True),
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
         attribute_name, attribute_name, args=args)
 
@@ -278,7 +215,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves', True),
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
 
     completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
         'book',
@@ -307,7 +244,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves', False),
         ('example.projects.shelves.books', False)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
         attribute_name, attribute_name, args=args)
 
@@ -323,7 +260,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('cloudresourcemanager.projects', is_relative),
         ('example.projects.shelves', is_relative),
         ('example.projects.shelves.books', is_relative)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     self.PatchBookResourceReturnTypes()
 
     completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
@@ -349,7 +286,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves', False),
         ('example.projects.shelves.books', False)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
 
     class ListResponseMessage(messages.Message):
 
@@ -393,7 +330,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves', True),
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     books_method = registry.GetMethod('example.projects.shelves.books', 'list')
     self.PatchBookResourceReturnTypes()
 
@@ -425,7 +362,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('example.projects.shelves.books', True),
         ('example.projects.shelves', True),
         ('cloudresourcemanager.projects', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     args = {'--shelf': 'exampleshelf'}
     completer, _ = self.SetUpAttrCompleterAndParameterInfo(
         'book',
@@ -449,7 +386,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('example.projects.shelves.books', True),
         ('example.projects.shelves', True),
         ('cloudresourcemanager.projects', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     expected_completer = completers.ResourceArgumentCompleter(
         self.resource_spec,
         self.book_collection,
@@ -476,12 +413,55 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         self.resource_spec, 'project')()
     self.assertEqual(expected_completer, completer)
 
+  def testCompleterForAttribute_DifferentVersions(self):
+    collections = [
+        ('example.projects.shelves.books', True),
+        ('example.projects.shelves', True),
+        ('example.projects', True),
+        ('example.projects.shelves.books', True, 'v1beta1'),
+        ('example.projects.shelves', True, 'v1beta1'),
+        ('example.projects', True, 'v1beta1')]
+    self.MockCRUDMethods(*collections)
+    book_collection = registry.GetAPICollection(
+        'example.projects.shelves.books', 'v1beta1')
+    resource_spec = util.GetBookResource(api_version='v1beta1')
+
+    expected_completer = completers.ResourceArgumentCompleter(
+        resource_spec,
+        book_collection,
+        registry.GetMethod('example.projects.shelves.books', 'list',
+                           api_version='v1beta1'),
+        param='booksId',
+        static_params={})
+    completer = completers.CompleterForAttribute(self.resource_spec, 'book')()
+
+    self.assertEqual(expected_completer, completer)
+    expected_completer = completers.ResourceArgumentCompleter(
+        resource_spec,
+        registry.GetAPICollection('example.projects.shelves', 'v1beta1'),
+        registry.GetMethod('example.projects.shelves', 'list',
+                           api_version='v1beta1'),
+        param='shelvesId',
+        static_params={})
+    completer = completers.CompleterForAttribute(self.resource_spec, 'shelf')()
+    self.assertEqual(expected_completer, completer)
+
+    expected_completer = completers.ResourceArgumentCompleter(
+        self.resource_spec,
+        registry.GetAPICollection('example.projects', 'v1beta1'),
+        registry.GetMethod('example.projects', 'list', api_version='v1beta1'),
+        param='projectsId',
+        static_params={})
+    completer = completers.CompleterForAttribute(
+        self.resource_spec, 'project')()
+    self.assertEqual(expected_completer, completer)
+
   def testAddCompleter(self):
     collections = [
         ('example.projects.shelves.books', True),
         ('example.projects.shelves', True),
         ('cloudresourcemanager.projects', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     info = concept_parsers.ConceptParser([self.presentation_spec]).GetInfo(
         self.presentation_spec.name)
 
@@ -505,7 +485,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('example.projects.shelves.books', True),
         ('example.projects.shelves', True),
         ('cloudresourcemanager.projects', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     self.PatchBookResourceReturnTypes()
     parent_name = 'projects/exampleproject/shelves/s0'
     self.mock_client.projects_shelves_books.List.return_value = (
@@ -532,7 +512,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('example.projects.shelves.books', True),
         ('example.projects.shelves', True),
         ('cloudresourcemanager.projects', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     self.PatchBookResourceReturnTypes()
     parent_name = 'projects/exampleproject'
     self.mock_client.projects_shelves.List.return_value = self.BuildShelvesList(
@@ -562,7 +542,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves', True),
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     self.PatchBookResourceReturnTypes()
     self.mock_client.projects.List.return_value = self.BuildProjectsList(
         ['projects/p0', 'projects/p1'])
@@ -598,7 +578,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
     collections = [
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     self._PatchProjectReturnType()
     self._PatchBookReturnType()
     self.mock_client.projects.List.return_value = self.BuildProjectsList(
@@ -620,7 +600,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
     collections = [
         ('cloudresourcemanager.projects', True),
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     self._PatchProjectReturnType()
     self._PatchBookReturnType()
     self.assertIsNone(completers.CompleterForAttribute(
@@ -632,7 +612,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('example.projects.shelves.books', True),
         ('example.projects.shelves', True),
         ('cloudresourcemanager.projects', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     self.PatchBookResourceReturnTypes()
     parent_name = 'projects/exampleproject/shelves/s0'
     self.mock_client.projects_shelves_books.List.return_value = (
@@ -652,6 +632,265 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
               '--other': 's0'},
         flag_name_overrides={'project': '--book-project'},
         expected_completions=expected_results)
+
+
+class ProjectCompleterTest(
+    concepts_test_base.ResourceTestBase,
+    cli_test_base.CliTestBase,
+    apis_base.Base,
+    parameterized.TestCase,
+    resource_completer_test_base.ResourceCompleterBase):
+
+  def SetUp(self):
+    resource_registry = resources.REGISTRY
+    self.project_collection = resource_registry.GetCollectionInfo(
+        'cloudresourcemanager.projects')
+    resource_registry.registered_apis['example'] = ['v1']
+    self.book_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'projects.shelves.books',
+        'projects/{projectsId}/shelves/{shelvesId}/books/{booksId}',
+        {'': 'projects/{projectsId}/shelves/{shelvesId}/books/{booksId}'},
+        ['projectsId', 'shelvesId', 'booksId'])
+    self.shelf_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'projects.shelves', 'projects/{projectsId}/shelves/{shelvesId}',
+        {'': 'projects/{projectsId}/shelves/{shelvesId}'},
+        ['projectsId', 'shelvesId'])
+
+    # pylint:disable=protected-access
+    resource_registry._RegisterCollection(self.book_collection)
+    resource_registry._RegisterCollection(self.shelf_collection)
+    # pylint:enable=protected-access
+
+    self.mock_client = mock.MagicMock()
+    self.StartObjectPatch(apis, 'GetClientInstance',
+                          return_value=self.mock_client)
+    self.presentation_spec = presentation_specs.ResourcePresentationSpec(
+        '--book',
+        self.resource_spec_auto_completers,
+        'a resource',
+        flag_name_overrides={'project': '--book-project'},
+        prefixes=False)
+    self.resource_info = concept_parsers.ConceptParser(
+        [self.presentation_spec]).GetInfo(self.presentation_spec.name)
+    self.cloudresourcemanager_format = True
+
+  def SetUpAttrCompleterAndParameterInfo(self, attribute_name, argument_dest,
+                                         args=None, static_params=None,
+                                         id_field=None):
+    """Creates a ResourceParameterInfo and a ResourceArgCompleter.
+
+    Args:
+      attribute_name: the name of the attribute for which to get a completer.
+      argument_dest: the argument name to be given to the attribute (must
+        match the argument that would be created by self.presentation_spec).
+      args: {str: str} | None, the dict of arg names to values for the mock
+        namespace.
+      static_params: {str: str} | None, if given, overrides static fields in the
+        list query.
+      id_field: str | None, the completion_id_field configured for the resource
+        attribute, if any.
+
+    Returns:
+      (Completer, ResourceParameterInfo), a tuple of the completer and the
+        resource parameter info.
+    """
+    args = args or {}
+    static_params = static_params or {}
+    resource_spec = self.resource_spec
+    book_collection = self.book_collection
+    shelf_collection = self.shelf_collection
+
+    class BookCompleter(completers.ResourceArgumentCompleter):
+
+      def __init__(self, **kwargs):
+        super(BookCompleter, self).__init__(
+            resource_spec,
+            book_collection,
+            registry.GetMethod('example.projects.shelves.books', 'list'),
+            param='booksId',
+            static_params=static_params,
+            id_field=id_field,
+            **kwargs)
+
+    class ShelfCompleter(completers.ResourceArgumentCompleter):
+
+      def __init__(self, **kwargs):
+        super(ShelfCompleter, self).__init__(
+            resource_spec,
+            shelf_collection,
+            registry.GetMethod('example.projects.shelves', 'list'),
+            param='shelvesId',
+            static_params=static_params,
+            id_field=id_field,
+            **kwargs)
+
+    class ProjectCompleter(completers.ResourceArgumentCompleter):
+
+      def __init__(self, **kwargs):
+        super(ProjectCompleter, self).__init__(
+            resource_spec,
+            resources.REGISTRY.GetCollectionInfo(
+                'cloudresourcemanager.projects'),
+            registry.GetMethod('cloudresourcemanager.projects', 'list'),
+            param='projectId',
+            static_params=static_params,
+            id_field=id_field,
+            **kwargs)
+
+    attribute_completers = {
+        'book': BookCompleter,
+        'shelf': ShelfCompleter,
+        'project': ProjectCompleter}
+    completer = self.Completer(
+        attribute_completers.get(attribute_name),
+        args=args,
+        handler_info=self.resource_info,
+        cli=self.cli)
+    argument = mock.MagicMock(dest=argument_dest)
+    parameter_info = completer.ParameterInfo(self.parsed_args, argument)
+    return completer, parameter_info
+
+  @parameterized.named_parameters(
+      ('Atomic', True),
+      ('NotAtomic', False))
+  def testGetParent(self, is_atomic):
+    collections = [
+        ('cloudresourcemanager.projects', True),
+        ('example.projects.shelves', is_atomic),
+        ('example.projects.shelves.books', is_atomic)]
+    self.MockCRUDMethods(*collections, mock_parents=False)
+    completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
+        'shelf',
+        'shelf',
+        args={'--book-project': 'p0'})
+
+    result = completer.GetParent(
+        parameter_info,
+        parent_translator=completers._PARENT_TRANSLATORS['projectsId'])
+    self.assertEqual('projects/p0', result.RelativeName())
+
+  @parameterized.named_parameters(
+      ('MiddleWithParent', 'shelf', {'--book-project': 'p0'},
+       completers._PARENT_TRANSLATORS['projectsId'],
+       'projects/p0'),
+      ('Project', 'project', {}, None, None))
+  def testBuildQueryAtomic(self, attribute_name, args, parent_translator,
+                           expected_parent):
+    collections = [
+        ('cloudresourcemanager.projects', True),
+        ('example.projects.shelves', True),
+        ('example.projects.shelves.books', True)]
+    self.MockCRUDMethods(*collections, mock_parents=False)
+    completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
+        attribute_name, attribute_name, args=args)
+
+    query = completer.BuildListQuery(parameter_info,
+                                     parent_translator=parent_translator)
+
+    self.assertEqual(expected_parent, query.parent)
+    self.assertNotEqual('p0', query.projectsId)
+
+  def testBuildQueryNotAtomicMismatchedParent(self):
+    collections = [
+        ('cloudresourcemanager.projects', True),
+        ('example.projects.shelves', False),
+        ('example.projects.shelves.books', False)]
+    self.MockCRUDMethods(*collections, mock_parents=False)
+    completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
+        'shelf', 'shelf', args={'--book-project': 'p0'})
+
+    query = completer.BuildListQuery(
+        parameter_info,
+        parent_translator=completers._PARENT_TRANSLATORS['projectsId'])
+
+    self.assertNotEqual('projects/p0', query.parent)
+    self.assertEqual('p0', query.projectsId)
+
+  @parameterized.named_parameters(
+      ('Relative', True),
+      ('NotRelative', False))
+  def testUpdate(self, is_relative):
+    collections = [
+        ('cloudresourcemanager.projects', is_relative),
+        ('example.projects.shelves', is_relative),
+        ('example.projects.shelves.books', is_relative)]
+    self.MockCRUDMethods(*collections)
+    self.PatchBookResourceReturnTypes()
+
+    completer, parameter_info = self.SetUpAttrCompleterAndParameterInfo(
+        'book',
+        'book',
+        args={'--shelf': 'exampleshelf',
+              '--book-project': 'exampleproject'})
+    parent_name = 'projects/exampleproject/shelves/exampleshelf'
+    self.mock_client.projects_shelves_books.List.return_value = (
+        self.BuildBooksList(
+            ['{}/books/b0'.format(parent_name),
+             '{}/books/b1'.format(parent_name)]))
+
+    updates = completer.Update(parameter_info, {})
+
+    self.assertEqual(
+        [['exampleproject', 'exampleshelf', 'b0'],
+         ['exampleproject', 'exampleshelf', 'b1']],
+        updates)
+
+  @parameterized.named_parameters(
+      ('Atomic', True,
+       ['projects/exampleproject/shelves/s0'],
+       ['projects/exampleproject/shelves/s0/books/b0',
+        'projects/exampleproject/shelves/s0/books/b1'],
+       {'parent': 'projects/exampleproject'},
+       {'parent': 'projects/exampleproject/shelves/s0'}),
+      ('NotAtomic', False, ['projects/exampleproject/shelves/s0'],
+       ['projects/exampleproject/shelves/s0/books/b0',
+        'projects/exampleproject/shelves/s0/books/b1'],
+       {'projectsId': 'exampleproject'},
+       {'projectsId': 'exampleproject', 'shelvesId': 's0'}),
+      ('NotAtomicWithNotAtomicResponse', False,
+       ['projects/exampleproject/shelves/s0'],
+       ['b0', 'b1'],
+       {'projectsId': 'exampleproject'},
+       {'projectsId': 'exampleproject', 'shelvesId': 's0'}))
+  def testCompleteWithUpdates(self, is_relative, shelf_responses,
+                              book_responses, shelf_list_query,
+                              book_list_query):
+    properties.VALUES.core.project.Set(None)
+    properties.PersistProperty(properties.VALUES.core.project, None,
+                               properties.Scope.USER)
+    collections = [
+        ('cloudresourcemanager.projects', True),
+        ('example.projects.shelves', is_relative),
+        ('example.projects.shelves.books', is_relative)]
+    self.MockCRUDMethods(*collections, mock_parents=False)
+    self.PatchBookResourceReturnTypes()
+    parent_name = 'projects/exampleproject'
+    self.mock_client.projects.List.return_value = self.BuildProjectsList(
+        [parent_name])
+    self.mock_client.projects_shelves.List.return_value = self.BuildShelvesList(
+        shelf_responses)
+    self.mock_client.projects_shelves_books.List.return_value = (
+        self.BuildBooksList(book_responses))
+
+    expected_results = ['b0 --book-project=exampleproject --shelf=s0',
+                        'b1 --book-project=exampleproject --shelf=s0']
+    self.RunResourceCompleter(
+        self.resource_spec_auto_completers,
+        'book',
+        presentation_name='--book',
+        dest='book',
+        args={},
+        flag_name_overrides={'project': '--book-project'},
+        expected_completions=expected_results)
+    shelf_list_call = self.mock_client.projects_shelves.List.call_args_list[0]
+    for key, value in six.iteritems(shelf_list_query):
+      self.assertEqual(value, getattr(shelf_list_call[0][0], key))
+    book_list_call = (
+        self.mock_client.projects_shelves_books.List.call_args_list[0])
+    for key, value in six.iteritems(book_list_query):
+      self.assertEqual(value, getattr(book_list_call[0][0], key))
 
 
 if __name__ == '__main__':

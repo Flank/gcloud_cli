@@ -25,6 +25,7 @@ from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class FoldersGetIamPolicyTest(testbase.FoldersUnitTestBase):

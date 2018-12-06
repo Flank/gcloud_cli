@@ -21,14 +21,15 @@ from __future__ import unicode_literals
 
 from apitools.base.protorpclite import messages
 from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import multitype
 from googlecloudsdk.command_lib.util.apis import arg_utils
-from googlecloudsdk.command_lib.util.apis import resource_arg_schema
 from googlecloudsdk.command_lib.util.apis import yaml_command_schema
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.resource import resource_property
+import six
 
 
 class Error(Exception):
@@ -77,7 +78,8 @@ class DeclarativeArgumentGenerator(object):
                     resource_method_params=None,
                     use_relative_name=True,
                     override_method=None,
-                    parse_resource_into_request=True):
+                    parse_resource_into_request=True,
+                    existing_message=None):
     """Generates the request object for the method call from the parsed args.
 
     Args:
@@ -94,12 +96,21 @@ class DeclarativeArgumentGenerator(object):
         used when the command has more than one API call.
       parse_resource_into_request: bool, True if the resource reference should
         be automatically parsed into the request.
+      existing_message: the apitools message returned from server, which is used
+        to construct the to-be-modified message when the command follows
+        get-modify-update pattern.
 
     Returns:
       The apitools message to be send to the method.
     """
     message_type = (override_method or self.method).GetRequestType()
     message = message_type()
+
+    # If an apitools message is provided, use the existing one by default
+    # instead of creating an empty one.
+    if existing_message:
+      message = arg_utils.ParseExistingMessageIntoMessage(
+          message, existing_message, self.method)
 
     # Insert static fields into message.
     arg_utils.ParseStaticFieldsIntoMessage(message, static_fields=static_fields)
@@ -118,6 +129,7 @@ class DeclarativeArgumentGenerator(object):
           resource_method_params=resource_method_params,
           request_id_field=self.resource_arg.request_id_field,
           use_relative_name=use_relative_name)
+
     return message
 
   def GetRequestResourceRef(self, namespace):
@@ -192,7 +204,11 @@ class DeclarativeArgumentGenerator(object):
     # attributes or for list commands (where everything should be a flag since
     # the parent resource collection is being used).
     anchor_arg_name = self._GetAnchorArgName()
-    no_gen = {n: '' for n in resource_arg_schema.IGNORED_FIELDS}
+    no_gen = {
+        n: ''
+        for _, n in six.iteritems(concepts.IGNORED_FIELDS)
+        if n in self.resource_arg.attribute_names
+    }
     no_gen.update({n: '' for n in self.resource_arg.removed_flags})
     command_level_fallthroughs = {}
     concept_parsers.UpdateFallthroughsMap(

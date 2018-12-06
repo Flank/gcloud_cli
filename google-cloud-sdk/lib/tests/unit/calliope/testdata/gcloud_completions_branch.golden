@@ -85,6 +85,7 @@ STATIC_COMPLETION_CLI_TREE = {
   },
   "flags": {
     "--configuration": "value",
+    "--flags-file": "value",
     "--flatten": "value",
     "--format": "value",
     "--help": "bool",

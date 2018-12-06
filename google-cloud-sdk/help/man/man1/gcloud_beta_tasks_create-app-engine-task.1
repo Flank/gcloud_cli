@@ -11,7 +11,7 @@ gcloud beta tasks create\-app\-engine\-task \- create and add a task to an App E
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta tasks create\-app\-engine\-task\fR [\fITASK_ID\fR] \fB\-\-queue\fR=\fIQUEUE\fR [\fB\-\-header\fR=\fIHEADER_FIELD\fR:\ \fIHEADER_VALUE\fR] [\fB\-\-method\fR=\fIMETHOD\fR] [\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR] [\fB\-\-url\fR=\fIURL\fR] [\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR\ |\ \fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta tasks create\-app\-engine\-task\fR [\fITASK_ID\fR] \fB\-\-queue\fR=\fIQUEUE\fR [\fB\-\-header\fR=\fIHEADER_FIELD\fR:\ \fIHEADER_VALUE\fR] [\fB\-\-method\fR=\fIMETHOD\fR] [\fB\-\-relative\-uri\fR=\fIRELATIVE_URI\fR] [\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR] [\fB\-\-body\-content\fR=\fIBODY_CONTENT\fR\ |\ \fB\-\-body\-file\fR=\fIBODY_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -65,6 +65,12 @@ repeated. Repeated header fields will have their values overridden.
 The HTTP method to use for the request. If not specified, "POST" will be used.
 
 .TP 2m
+\fB\-\-relative\-uri\fR=\fIRELATIVE_URI\fR
+The relative URI of the request. Must begin with "/" and must be a valid HTTP
+relative URI. It can contain a path and query string arguments. If not
+specified, then the root path "/" will be used.
+
+.TP 2m
 \fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[...]
 The route to be used for this task. KEY must be at least one of: [service,
 version, instance]. Any missing keys will use the default.
@@ -77,23 +83,17 @@ The time when the task is scheduled to be first attempted. Defaults to "now" if
 not specified.
 
 .TP 2m
-\fB\-\-url\fR=\fIURL\fR
-The relative URL of the request. Must begin with "/" and must be a valid HTTP
-relative URL. It can contain a path and query string arguments. If not
-specified, then the root path "/" will be used.
-
-.TP 2m
 
 At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR
-Data payload used by the task worker to process the task.
+\fB\-\-body\-content\fR=\fIBODY_CONTENT\fR
+HTTP Body data sent to the task worker processing the task.
 
 .TP 2m
-\fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR
-File containing data payload used by the task worker to process the task.
+\fB\-\-body\-file\fR=\fIBODY_FILE\fR
+File containing HTTP body data sent to the task worker processing the task.
 
 
 .RE
@@ -103,9 +103,9 @@ File containing data payload used by the task worker to process the task.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

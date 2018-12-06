@@ -4,7 +4,7 @@ manual_scaling:
   instances: 1
 inbound_services:
 - warmup
-threadsafe: True
+threadsafe: true
 auto_id_policy: default
 env_variables:
   'CDBG_AGENT_URL': 'https://storage.googleapis.com/cloud-debugger/appengine-java/current/cdbg_java_agent.tar.gz'
@@ -14,19 +14,19 @@ beta_settings:
   'machine_type': 'n1-standard-1'
   'java_quickstart': 'true'
 health_check:
-  enable_health_check: True
+  enable_health_check: true
 api_version: '1.0'
 handlers:
 - url: (/_ah/queue/__deferred__)
   static_files: __static__\1
   upload: __NOT_USED__
-  require_matching_file: True
+  require_matching_file: true
   login: admin
   secure: optional
 - url: (/.*)
   static_files: __static__\1
   upload: __NOT_USED__
-  require_matching_file: True
+  require_matching_file: true
   login: required
   secure: optional
 - url: /

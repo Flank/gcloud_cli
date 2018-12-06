@@ -176,6 +176,148 @@ class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):
   def SetUp(self):
     self._SetUpReleaseTrack('alpha', calliope_base.ReleaseTrack.ALPHA)
 
+  def testSimpleCaseWithoutQuic(self):
+    messages = self.messages
+    self.make_requests.side_effect = [[
+        messages.TargetHttpsProxy(
+            name='my-proxy',
+            sslCertificates=[
+                'https://www.googleapis.com/compute/alpha/'
+                'projects/my-project/regions/us-west-1/'
+                'sslCertificates/my-cert'
+            ],
+            urlMap='https://www.googleapis.com/compute/alpha/projects/'
+            'my-project/regions/us-west-1/urlMaps/my-map',
+            sslPolicy='my-ssl-policy')
+    ]]
+
+    results = self.Run("""
+        compute target-https-proxies create --region us-west-1
+          my-proxy
+          --description "My target HTTPS proxy"
+          --ssl-certificates my-cert
+          --url-map my-map
+          --ssl-policy my-ssl-policy
+          --format=disable
+        """)
+    target_https_proxy = list(results)[0]
+    self.AssertEqual(target_https_proxy.name, 'my-proxy')
+    self.AssertEqual(target_https_proxy.sslCertificates, [
+        'https://www.googleapis.com/compute/alpha/'
+        'projects/my-project/regions/us-west-1/'
+        'sslCertificates/my-cert'
+    ])
+    self.AssertEqual(
+        target_https_proxy.urlMap,
+        'https://www.googleapis.com/compute/alpha/projects/'
+        'my-project/regions/us-west-1/urlMaps/my-map')
+    self.AssertEqual(target_https_proxy.sslPolicy, 'my-ssl-policy')
+
+    self.CheckRequests([
+        (self.compute.regionTargetHttpsProxies, 'Insert',
+         messages.ComputeRegionTargetHttpsProxiesInsertRequest(
+             project='my-project',
+             region='us-west-1',
+             targetHttpsProxy=messages.TargetHttpsProxy(
+                 description='My target HTTPS proxy',
+                 name='my-proxy',
+                 sslCertificates=[
+                     (self.compute_uri + '/projects/my-project/regions/'
+                      'us-west-1/sslCertificates/my-cert')
+                 ],
+                 urlMap=(self.compute_uri +
+                         '/projects/my-project/regions/us-west-1/'
+                         'urlMaps/my-map'),
+                 sslPolicy=(
+                     self.compute_uri +
+                     '/projects/my-project/global/sslPolicies/my-ssl-policy'))))
+    ],)
+
+  def testSimpleCaseWithQuicEnabled(self):
+    messages = self.messages
+    quic_enum = messages.TargetHttpsProxy.QuicOverrideValueValuesEnum
+
+    self.make_requests.side_effect = [[
+        messages.TargetHttpsProxy(
+            name='my-proxy',
+            sslCertificates=[
+                'https://www.googleapis.com/compute/alpha/'
+                'projects/my-project/global/'
+                'sslCertificates/my-cert',
+                'https://www.googleapis.com/compute/alpha/'
+                'projects/my-project/global/'
+                'sslCertificates/my-cert2'
+            ],
+            urlMap='my-map',
+            quicOverride=quic_enum.ENABLE,
+            sslPolicy='my-ssl-policy')
+    ]]
+
+    results = self.Run("""
+        compute target-https-proxies create --global my-proxy
+          --description "My target HTTPS proxy"
+          --ssl-certificates my-cert,my-cert2
+          --url-map my-map
+          --quic-override ENABLE
+          --ssl-policy my-ssl-policy
+          --format=disable
+        """)
+    target_https_proxy = list(results)[0]
+    self.AssertEqual(target_https_proxy.name, 'my-proxy')
+    self.AssertEqual(target_https_proxy.sslCertificates, [
+        'https://www.googleapis.com/compute/alpha/'
+        'projects/my-project/global/'
+        'sslCertificates/my-cert', 'https://www.googleapis.com/compute/alpha/'
+        'projects/my-project/global/'
+        'sslCertificates/my-cert2'
+    ])
+    self.AssertEqual(target_https_proxy.urlMap, 'my-map')
+    self.AssertEqual(target_https_proxy.sslPolicy, 'my-ssl-policy')
+
+    cert_uri = self.compute_uri + '/projects/my-project/global/sslCertificates/'
+    self.CheckRequests([
+        (self.compute.targetHttpsProxies, 'Insert',
+         messages.ComputeTargetHttpsProxiesInsertRequest(
+             project='my-project',
+             targetHttpsProxy=messages.TargetHttpsProxy(
+                 description='My target HTTPS proxy',
+                 name='my-proxy',
+                 sslCertificates=[(cert_uri + 'my-cert'),
+                                  (cert_uri + 'my-cert2')],
+                 urlMap=(self.compute_uri +
+                         '/projects/my-project/global/urlMaps/my-map'),
+                 quicOverride=quic_enum.ENABLE,
+                 sslPolicy=(
+                     self.compute_uri +
+                     '/projects/my-project/global/sslPolicies/my-ssl-policy'))))
+    ],)
+
+  def testUriSupport(self):
+    messages = self.messages
+
+    self.Run("""
+        compute target-https-proxies create --region us-west-1
+          {uri}/projects/my-project/regions/us-west-1/targetHttpsProxies/my-proxy
+          --ssl-certificates {uri}/projects/my-project/regions/us-west-1/sslCertificates/my-cert
+          --url-map {uri}/projects/my-project/regions/us-west-1/urlMaps/my-map
+        """.format(uri=self.compute_uri))
+
+    self.CheckRequests(
+        [(self.compute.regionTargetHttpsProxies, 'Insert',
+          messages.ComputeRegionTargetHttpsProxiesInsertRequest(
+              project='my-project',
+              region='us-west-1',
+              targetHttpsProxy=messages.TargetHttpsProxy(
+                  name='my-proxy',
+                  sslCertificates=[(self.compute_uri + '/projects/my-project/'
+                                    'regions/us-west-1/sslCertificates/my-cert')
+                                  ],
+                  urlMap=(self.compute_uri +
+                          '/projects/my-project/regions/us-west-1/'
+                          'urlMaps/my-map'))))],)
+
+    self.CheckRequests()
+
 
 if __name__ == '__main__':
   test_case.main()

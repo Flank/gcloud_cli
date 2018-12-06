@@ -27,14 +27,14 @@ from tests.lib.surface.compute import router_test_utils
 from tests.lib.surface.compute import test_base
 
 
-class AlphaDeleteTest(test_base.BaseTest):
+class DeleteTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
     self.orig = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, track='alpha')
+        self.messages, track='v1')
     self.orig.nats = [
         self.messages.RouterNat(name='nat1'),
         self.messages.RouterNat(name='nat2')
@@ -116,6 +116,36 @@ class AlphaDeleteTest(test_base.BaseTest):
                              router='my-router',
                              region='us-central1',
                              project='my-project'))])
+
+
+class BetaDeleteTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+    self.orig = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='beta')
+    self.orig.nats = [
+        self.messages.RouterNat(name='nat1'),
+        self.messages.RouterNat(name='nat2')
+    ]
+    self.make_requests.side_effect = iter([[self.orig], []])
+
+
+class AlphaDeleteTest(BetaDeleteTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+    self.orig = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='beta')
+    self.orig.nats = [
+        self.messages.RouterNat(name='nat1'),
+        self.messages.RouterNat(name='nat2')
+    ]
+    self.make_requests.side_effect = iter([[self.orig], []])
 
 
 if __name__ == '__main__':

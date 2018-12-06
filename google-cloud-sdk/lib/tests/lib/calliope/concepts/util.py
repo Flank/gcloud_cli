@@ -70,21 +70,25 @@ def MakeAttributeConfigs(with_completers=False, attribute_names=None):
 
 
 def _GetFakeResource(collection_name, name, attribute_names=None,
-                     with_completers=False, auto_completers=False):
+                     with_completers=False, auto_completers=False,
+                     api_version='v1'):
   return concepts.ResourceSpec(
       collection_name,
       name,
+      api_version=api_version,
       disable_auto_completers=not auto_completers,
       **MakeAttributeConfigs(
           attribute_names=attribute_names,
           with_completers=with_completers))
 
 
-def GetBookResource(name='book', with_completers=False, auto_completers=False):
+def GetBookResource(name='book', with_completers=False, auto_completers=False,
+                    api_version=None):
   """Makes the test book resource."""
   return _GetFakeResource(
       'example.projects.shelves.books',
       name,
+      api_version=api_version,
       with_completers=with_completers,
       auto_completers=auto_completers)
 
@@ -151,6 +155,17 @@ def GetOrgCaseResource(name='shelf', with_completers=False,
       'example.organizations.cases',
       name,
       attribute_names=['organizationsId', 'casesId'],
+      with_completers=with_completers,
+      auto_completers=auto_completers)
+
+
+def GetProjCaseShelfBookResource(name='book', with_completers=False,
+                                 auto_completers=False):
+  """Makes the test shelf resource."""
+  return _GetFakeResource(
+      'example.projects.cases.shelves.books',
+      name,
+      attribute_names=['projectsId', 'casesId', 'shelvesId', 'booksId'],
       with_completers=with_completers,
       auto_completers=auto_completers)
 

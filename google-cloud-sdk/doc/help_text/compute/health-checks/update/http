@@ -6,7 +6,8 @@ SYNOPSIS
         [--check-interval=CHECK_INTERVAL] [--description=DESCRIPTION]
         [--healthy-threshold=HEALTHY_THRESHOLD] [--host=HOST]
         [--proxy-header=PROXY_HEADER] [--request-path=REQUEST_PATH]
-        [--timeout=TIMEOUT] [--unhealthy-threshold=UNHEALTHY_THRESHOLD]
+        [--response=RESPONSE] [--timeout=TIMEOUT]
+        [--unhealthy-threshold=UNHEALTHY_THRESHOLD]
         [--port=PORT --port-name=PORT_NAME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -52,6 +53,11 @@ FLAGS
         The request path that this health check monitors. For example,
         /healthcheck.
 
+     --response=RESPONSE
+        When empty, status code of the response determines health. When not
+        empty, presence of specified string in first 1024 characters of
+        response body determines health. Only ASCII characters allowed.
+
      --timeout=TIMEOUT
         If Google Compute Engine doesn't receive a healthy response from the
         instance by the time specified by the value of this flag, the health
@@ -77,8 +83,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

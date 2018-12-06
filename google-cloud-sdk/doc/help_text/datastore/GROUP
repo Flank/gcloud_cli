@@ -19,8 +19,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -34,14 +35,6 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
-     cleanup-indexes
-        (DEPRECATED) Remove unused datastore indexes based on your local index
-        configuration.
-
-     create-indexes
-        (DEPRECATED) Create new datastore indexes based on your local index
-        configuration.
-
      export
         Export Cloud Datastore entities to Google Cloud Storage.
 
@@ -51,11 +44,11 @@ COMMANDS
 EXAMPLES
     To create new indexes from a file, run:
 
-        $ gcloud datastore create-indexes index.yaml
+        $ gcloud datastore indexes create index.yaml
 
     To clean up unused indexes from a file, run:
 
-        $ gcloud datastore cleanup-indexes index.yaml
+        $ gcloud datastore indexes cleanup index.yaml
 
 NOTES
     These variants are also available:

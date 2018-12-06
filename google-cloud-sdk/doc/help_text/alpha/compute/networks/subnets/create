@@ -6,10 +6,10 @@ SYNOPSIS
     gcloud alpha compute networks subnets create NAME --network=NETWORK
         --range=RANGE [--aggregation-interval=AGGREGATION_INTERVAL]
         [--description=DESCRIPTION] [--enable-flow-logs]
-        [--enable-private-ip-google-access] [--flow-sampling=FLOW_SAMPLING]
-        [--metadata=METADATA] [--purpose=PURPOSE] [--region=REGION]
-        [--role=ROLE] [--secondary-range=PROPERTY=VALUE,[...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--enable-private-ip-google-access] [--enable-private-ipv6-access]
+        [--flow-sampling=FLOW_SAMPLING] [--metadata=METADATA]
+        [--purpose=PURPOSE] [--region=REGION] [--role=ROLE]
+        [--secondary-range=PROPERTY=VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Define a subnet for a network in custom subnet mode. Subnets must
@@ -48,6 +48,9 @@ OPTIONAL FLAGS
         Enable/disable access to Google Cloud APIs from this subnet for
         instances without a public ip address.
 
+     --enable-private-ipv6-access
+        Enable/disable private IPv6 access for the subnet.
+
      --flow-sampling=FLOW_SAMPLING
         Can only be specified if VPC flow logging for this subnetwork is
         enabled. The value of the field must be in [0, 1]. Set the sampling
@@ -66,7 +69,7 @@ OPTIONAL FLAGS
 
          INTERNAL_HTTPS_LOAD_BALANCER
             Reserved for Internal HTTP(S) Load Balancing.
-         PRIVATE_RFC_1918
+         PRIVATE
             Regular user created or automatically created subnet.
 
      --region=REGION
@@ -113,8 +116,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

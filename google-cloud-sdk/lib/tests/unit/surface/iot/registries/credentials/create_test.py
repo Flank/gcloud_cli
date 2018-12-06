@@ -23,18 +23,13 @@ import os
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsCreateTest(base.CloudIotRegistryBase):
+class CredentialsCreateTestGA(base.CloudIotRegistryBase):
 
-  def testCreate_InvalidPath(self, track):
-    self.track = track
+  def testCreate_InvalidPath(self):
     with self.AssertRaisesExceptionMatches(util.InvalidKeyFileError,
                                            'Could not read key file'):
       self.Run(
@@ -43,8 +38,7 @@ class CredentialsCreateTest(base.CloudIotRegistryBase):
           '    --region us-central1 '
           '    --path {} '.format(os.path.join(self.temp_path, 'bad.pub')))
 
-  def testCreate_MissingPath(self, track):
-    self.track = track
+  def testCreate_MissingPath(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --path: Must be specified.'):
       self.Run(
@@ -52,8 +46,7 @@ class CredentialsCreateTest(base.CloudIotRegistryBase):
           '    --registry my-registry '
           '    --region us-central1 ')
 
-  def testCreate_Empty(self, track):
-    self.track = track
+  def testCreate_Empty(self):
     new_credential = self._CreateRegistryCredential(self.CERTIFICATE_CONTENTS)
     self._ExpectGet([])
     self._ExpectPatch([new_credential])
@@ -69,8 +62,7 @@ class CredentialsCreateTest(base.CloudIotRegistryBase):
     self.assertEqual(results, expected_registry)
     self.AssertLogContains('Created credentials for registry [my-registry].')
 
-  def testCreate_CredentialExists(self, track):
-    self.track = track
+  def testCreate_CredentialExists(self):
     old_credential = self._CreateRegistryCredential(self.CERTIFICATE_CONTENTS)
     new_credential = self._CreateRegistryCredential(
         self.OTHER_CERTIFICATE_CONTENTS)
@@ -92,8 +84,7 @@ class CredentialsCreateTest(base.CloudIotRegistryBase):
         id='my-registry', credentials=[old_credential, new_credential])
     self.assertEqual(results, expected_registry)
 
-  def testCreate_RelativeName(self, track):
-    self.track = track
+  def testCreate_RelativeName(self):
     new_credential = self._CreateRegistryCredential(self.CERTIFICATE_CONTENTS)
     self._ExpectGet([])
     self._ExpectPatch([new_credential])
@@ -109,6 +100,18 @@ class CredentialsCreateTest(base.CloudIotRegistryBase):
     expected_registry = self.messages.DeviceRegistry(
         id='my-registry', credentials=[new_credential])
     self.assertEqual(results, expected_registry)
+
+
+class CredentialsCreateTestBeta(CredentialsCreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsCreateTestAlpha(CredentialsCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

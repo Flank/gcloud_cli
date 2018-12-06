@@ -18,10 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+from mock import patch
 
 API_VERSION = 'v1'
 
@@ -253,6 +255,14 @@ class InstanceGroupManagersDeleteZonalTest(test_base.BaseTest):
         r' - [group-1] in [zone-2]\n'
         r' - [group-2] in [zone-1]')
     self.AssertErrContains('PROMPT_CONTINUE')
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGERS_ARG',
+         instance_groups_flags.MakeZonalInstanceGroupArg(plural=True))
+  def testInvalidCollectionPath(self):
+    properties.VALUES.core.disable_prompts.Set(True)
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run('compute instance-groups managed delete group-1 --zone zone-1')
 
 
 class InstanceGroupManagersDeleteRegionalTest(test_base.BaseTest):

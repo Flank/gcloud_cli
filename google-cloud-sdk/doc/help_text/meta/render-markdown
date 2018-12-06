@@ -16,13 +16,14 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --style=STYLE; default="text"
-        The renderer output format. STYLE must be one of: devsite, html, man,
-        markdown, text.
+        The renderer output format. STYLE must be one of: devsite, html,
+        linter, man, markdown, text.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is an internal implementation detail and may change or

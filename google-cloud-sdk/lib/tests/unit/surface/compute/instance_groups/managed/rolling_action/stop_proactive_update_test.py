@@ -18,10 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+from mock import patch
 
 
 def SetUp(test_obj, api_version):
@@ -38,8 +40,8 @@ def SetUp(test_obj, api_version):
 
   test_obj.default_update_policy = (
       test_obj.messages.InstanceGroupManagerUpdatePolicy(
-          type=(test_obj.messages.InstanceGroupManagerUpdatePolicy.
-                TypeValueValuesEnum.OPPORTUNISTIC)))
+          type=(test_obj.messages.InstanceGroupManagerUpdatePolicy
+                .TypeValueValuesEnum.OPPORTUNISTIC)))
 
 
 class InstanceGroupManagersRollingActionStopProactiveUpdateBetaZonalTest(
@@ -47,7 +49,7 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaZonalTest(
 
   def SetUp(self):
     SetUp(self, 'beta')
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
         'beta', self.ZONE)
 
@@ -67,8 +69,7 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaZonalTest(
     self.make_requests.side_effect = [[self.igms[0]], []]
     self.Run(
         'compute instance-groups managed rolling-action stop-proactive-update '
-        '{0} --zone {1}'.format(
-            self.IGM_NAME_A, self.ZONE))
+        '{0} --zone {1}'.format(self.IGM_NAME_A, self.ZONE))
 
     self.checkStopUpdateRequest(self.generateUpdateRequestStub(self.IGM_NAME_A))
 
@@ -76,8 +77,7 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaZonalTest(
     self.make_requests.side_effect = [[self.igms[1]], []]
     self.Run(
         'compute instance-groups managed rolling-action stop-proactive-update '
-        '{0} --zone {1}'.format(
-            self.IGM_NAME_B, self.ZONE))
+        '{0} --zone {1}'.format(self.IGM_NAME_B, self.ZONE))
 
     self.checkStopUpdateRequest(self.generateUpdateRequestStub(self.IGM_NAME_B))
 
@@ -85,10 +85,18 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaZonalTest(
     self.make_requests.side_effect = [[self.igms[2]], []]
     self.Run(
         'compute instance-groups managed rolling-action stop-proactive-update '
-        '{0} --zone {1}'.format(
-            self.IGM_NAME_C, self.ZONE))
+        '{0} --zone {1}'.format(self.IGM_NAME_C, self.ZONE))
 
     self.checkStopUpdateRequest(self.generateUpdateRequestStub(self.IGM_NAME_C))
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run('compute instance-groups managed rolling-action '
+               'stop-proactive-update {0} --zone {1}'.format(
+                   self.IGM_NAME_C, self.ZONE))
 
 
 class InstanceGroupManagersRollingActionStopProactiveUpdateBetaRegionalTest(
@@ -96,7 +104,7 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaRegionalTest(
 
   def SetUp(self):
     SetUp(self, 'beta')
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
         'beta', self.ZONE)
 
@@ -116,8 +124,7 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaRegionalTest(
     self.make_requests.side_effect = [[self.igms[0]], []]
     self.Run(
         'compute instance-groups managed rolling-action stop-proactive-update '
-        '{0} --region {1}'.format(
-            self.IGM_NAME_A, self.REGION))
+        '{0} --region {1}'.format(self.IGM_NAME_A, self.REGION))
 
     self.checkStopUpdateRequest(self.generateUpdateRequestStub(self.IGM_NAME_A))
 
@@ -125,8 +132,7 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaRegionalTest(
     self.make_requests.side_effect = [[self.igms[1]], []]
     self.Run(
         'compute instance-groups managed rolling-action stop-proactive-update '
-        '{0} --region {1}'.format(
-            self.IGM_NAME_B, self.REGION))
+        '{0} --region {1}'.format(self.IGM_NAME_B, self.REGION))
 
     self.checkStopUpdateRequest(self.generateUpdateRequestStub(self.IGM_NAME_B))
 
@@ -134,8 +140,7 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaRegionalTest(
     self.make_requests.side_effect = [[self.igms[2]], []]
     self.Run(
         'compute instance-groups managed rolling-action stop-proactive-update '
-        '{0} --region {1}'.format(
-            self.IGM_NAME_C, self.REGION))
+        '{0} --region {1}'.format(self.IGM_NAME_C, self.REGION))
 
     self.checkStopUpdateRequest(self.generateUpdateRequestStub(self.IGM_NAME_C))
 
@@ -145,7 +150,7 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateAlphaZonalTest(
 
   def SetUp(self):
     SetUp(self, 'alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
         'alpha', self.ZONE)
 
@@ -155,9 +160,10 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateAlphaRegionalTest(
 
   def SetUp(self):
     SetUp(self, 'alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
         'alpha', self.ZONE)
+
 
 if __name__ == '__main__':
   test_case.main()

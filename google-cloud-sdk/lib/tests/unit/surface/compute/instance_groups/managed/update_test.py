@@ -21,8 +21,10 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import managed_instance_groups_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
+from mock import patch
 
 API_VERSION = 'alpha'
 
@@ -334,6 +336,14 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
             --{} {}
             --add-stateful-disks disk-1
           """.format(*self.scope_params))
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run("""compute instance-groups managed update group-1 --{} {}"""
+               .format(*self.scope_params))
 
 
 class InstanceGroupManagersUpdateRegionalTest(

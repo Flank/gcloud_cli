@@ -22,10 +22,10 @@ POSITIONAL ARGUMENTS
      Environment resource - The environments to delete. The arguments in this
      group can be used to specify the attributes of this resource. (NOTE) Some
      attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: provide the flag [environments] on
-     the command line with a fully specified name; provide the flag [--project]
-     on the command line; set the property [core/project]. This must be
-     specified.
+     ways. To set the [project] attribute: provide the argument [environments]
+     on the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
 
        ENVIRONMENTS [ENVIRONMENTS ...]
           IDs of the environments or fully qualified identifiers for the
@@ -42,11 +42,13 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha composer environments delete
         $ gcloud beta composer environments delete
 

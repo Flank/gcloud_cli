@@ -103,7 +103,7 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
     return name
 
   def DeleteGcsBucket(self, name):
-    bucket_ref = storage_util.BucketReference.FromBucketUrl(
+    bucket_ref = storage_util.BucketReference.FromUrl(
         '{0}{1}/'.format(self.GSUTIL_BUCKET_PREFIX, name))
     storage_api.StorageClient().DeleteBucket(bucket_ref)
 

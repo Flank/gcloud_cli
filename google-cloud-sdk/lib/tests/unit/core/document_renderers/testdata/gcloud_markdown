@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud markdown COMMAND [--optional-flag OPTIONAL_FLAG] --required-flag
-        REQUIRED_FLAG [GLOBAL-FLAG ...]
+        REQUIRED_FLAG [GCLOUD-WIDE-FLAG ...]
 
 DESCRIPTION
     Markdown group docstring description.
@@ -25,12 +25,12 @@ DESCRIPTION
       o Last item for now.
         * Last sub-item for now.
 
-    Did the end of list work? Also, format="csv" tables are recognized:
+    Did the end of list work? Also, tables are recognized:
 
-      Alias       Project  Image Name
-      a1a1a       p1p1p    i1ii1
-      a222        p2       i22222i2222
-      a3aaaa3a3a3 p3p3pp3p iii3i3i
+      Alias        Project   Image Name
+      a1a1a        p1p1p     i1ii1
+      a222         p2        i22222i2222
+      a3aaaa3a3a3  p3p3pp3p  iii3i3i
 
     Did the end of table work?
 
@@ -90,7 +90,7 @@ FLAGS
      --required-flag REQUIRED_FLAG
         Required flag.
 
-GLOBAL FLAGS
+GCLOUD WIDE FLAGS
     Run $ gcloud help for a description of flags available to all commands.
 
 COMMANDS

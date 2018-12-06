@@ -19,21 +19,19 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CryptokeysGetIamTest(base.KmsMockTest):
+class CryptokeysGetIamTestGA(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.key_name = self.project_name.Descendant('global/my_kr/my_key')
 
-  def testGet(self, track):
-    self.track = track
+  def testGet(self):
     self.kms.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
         self.messages.
         CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
@@ -46,8 +44,7 @@ class CryptokeysGetIamTest(base.KmsMockTest):
                  self.key_name.crypto_key_id))
     self.AssertOutputContains('etag: Zm9v')  # "foo" in b64
 
-  def testListCommandFilter(self, track):
-    self.track = track
+  def testListCommandFilter(self):
     self.kms.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
         self.messages.
         CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
@@ -65,16 +62,27 @@ class CryptokeysGetIamTest(base.KmsMockTest):
     self.AssertOutputEquals('Zm9v\n')
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CryptokeysIamTest(base.KmsMockTest):
+class CryptokeysGetIamTestBeta(CryptokeysGetIamTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CryptokeysGetIamTestAlpha(CryptokeysGetIamTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class CryptokeysSetIamTestGA(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.key_name = self.project_name.Descendant('global/my_kr/my_key')
 
-  def testSetBindings(self, track):
-    self.track = track
+  def testSetBindings(self):
     policy = self.messages.Policy(
         etag=b'foo',
         bindings=[
@@ -108,8 +116,7 @@ etag: Zm9v
 """)
     self.AssertErrContains('Updated IAM policy for key [my_key].')
 
-  def testSetBindingsAndAuditConfig(self, track):
-    self.track = track
+  def testSetBindingsAndAuditConfig(self):
     policy = self.messages.Policy(
         etag=b'foo',
         bindings=[
@@ -158,64 +165,17 @@ etag: Zm9v
 """)
     self.AssertErrContains('Updated IAM policy for key [my_key].')
 
-  def testAddBinding(self, track):
-    self.track = track
-    self.kms.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
-            resource=self.key_name.RelativeName()),
-        self.messages.Policy(etag=b'foo'))
 
-    policy = self.messages.Policy(
-        etag=b'foo',
-        bindings=[
-            self.messages.Binding(members=['people'], role='roles/owner')
-        ])
-    self.kms.projects_locations_keyRings_cryptoKeys.SetIamPolicy.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysSetIamPolicyRequest(
-            resource=self.key_name.RelativeName(),
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=policy, updateMask='bindings,etag')), policy)
-    self.Run('kms keys add-iam-policy-binding '
-             '--location={0} --keyring={1} {2} '
-             '--member people --role roles/owner'.format(
-                 self.key_name.location_id, self.key_name.key_ring_id,
-                 self.key_name.crypto_key_id))
-    self.AssertOutputContains("""bindings:
-- members:
-  - people
-  role: roles/owner
-etag: Zm9v
-""")
+class CryptokeysSetIamTestBeta(CryptokeysSetIamTestGA):
 
-  def testRemoveBinding(self, track):
-    self.track = track
-    policy_before = self.messages.Policy(
-        etag=b'foo',
-        bindings=[
-            self.messages.Binding(members=['people'], role='roles/owner')
-        ])
-    policy_after = self.messages.Policy(etag=b'foo', bindings=[])
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
-    self.kms.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
-            resource=self.key_name.RelativeName()),
-        policy_before)
 
-    self.kms.projects_locations_keyRings_cryptoKeys.SetIamPolicy.Expect(
-        self.messages.
-        CloudkmsProjectsLocationsKeyRingsCryptoKeysSetIamPolicyRequest(
-            resource=self.key_name.RelativeName(),
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=policy_after, updateMask='bindings,etag')), policy_after)
-    self.Run('kms keys remove-iam-policy-binding '
-             '--location={0} --keyring={1} {2} '
-             '--member people --role roles/owner'.format(
-                 self.key_name.location_id, self.key_name.key_ring_id,
-                 self.key_name.crypto_key_id))
-    self.AssertOutputContains('etag: Zm9v')
+class CryptokeysSetIamTestAlpha(CryptokeysSetIamTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

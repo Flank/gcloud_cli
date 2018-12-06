@@ -1,0 +1,72 @@
+
+.TH "GCLOUD_BETA_SCHEDULER_JOBS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta scheduler jobs describe \- show details about a job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta scheduler jobs describe\fR \fIJOB\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Show details about a job.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Job resource \- The job you want to show details for. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument [job]
+on the command line with a fully specified name; provide the argument
+[\-\-project] on the command line; set the property [core/project]. To set the
+[location] attribute: provide the argument [job] on the command line with a
+fully specified name; as the location of the current project's App Engine App.
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+ID of the job or fully qualified identifier for the job.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudscheduler/v1beta1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/scheduler/
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha scheduler jobs describe
+.RE
+

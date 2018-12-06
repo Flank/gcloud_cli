@@ -50,6 +50,7 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
     self.job_id_generator = e2e_utils.GetResourceNameGenerator(
         prefix='gcloud-dataproc-integration')
 
+  @sdk_test_base.Filters.SkipOnPy3('gsutil does not work on py3', 'b/109938541')
   def testAllJobsCommands(self):
     """Run all tests as one test case reuse a cluster when sharded."""
     self.CreateClusterWithRetries()
@@ -65,6 +66,7 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
     self.DoTestPySparkJobSubmission()
     self.DoTestSparkJobSubmission()
     self.DoTestSparkSqlJobSubmission()
+    self.DoTestSparkRJobSubmission()
     # Cluster will get deleted in TearDown.
 
   def DoTestHadoopJobSubmission(self):
@@ -151,6 +153,10 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
                      result.status.state)
     self.assertIsNotNone(result.sparkSqlJob)
 
+  # SparkR is only available in beta, so it should not be tested on the GA track
+  def DoTestSparkRJobSubmission(self):
+    pass
+
   def DoTestJobWaiting(self):
     job_id = next(self.job_id_generator)
     result = self.RunDataproc((
@@ -216,6 +222,10 @@ class JobsIntegrationTestBeta(JobsIntegrationTest, base.DataprocTestBaseBeta):
   clusters.
   """
 
+  # Location of an example sparkR main file.
+  GCS_SPARK_R_SCRIPT = ('file:///usr/lib/spark/examples/src/main/r/'
+                        'data-manipulation.R')
+
   def testBeta(self):
     self.assertEqual(self.messages,
                      core_apis.GetMessagesModule('dataproc', 'v1beta2'))
@@ -232,6 +242,26 @@ class JobsIntegrationTestBeta(JobsIntegrationTest, base.DataprocTestBaseBeta):
         '--async '
     ).format(self.cluster_name, job_id))
     self.GetSetIAMPolicy('jobs', job_id)
+
+  def DoTestSparkRJobSubmission(self):
+    local_script = None
+    if self.IsBundled():
+      # If this is bundled, gsutil is available for uploads.
+      with tempfile.NamedTemporaryFile(
+          dir=self.temp_path, suffix='.R', delete=False) as local_script:
+        local_script.write(b'print("hello world")')
+      script_uri = local_script.name
+    else:
+      script_uri = self.GCS_SPARK_R_SCRIPT
+    result = self.RunDataproc(('jobs submit spark-r '
+                               '--cluster {0} '
+                               '--async '
+                               '{1} ').format(self.cluster_name, script_uri))
+    if local_script:
+      os.remove(local_script.name)
+    self.assertEqual(self.messages.JobStatus.StateValueValuesEnum.PENDING,
+                     result.status.state)
+    self.assertIsNotNone(result.sparkRJob)
 
 
 if __name__ == '__main__':

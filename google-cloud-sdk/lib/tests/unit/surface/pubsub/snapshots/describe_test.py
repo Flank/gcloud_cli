@@ -29,7 +29,7 @@ from tests.lib.surface.pubsub import base
 class SnapshotsDescribeTest(base.CloudPubsubTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.svc = self.client.projects_snapshots.Get
     self.snapshot_ref = util.ParseSnapshot('snap1', self.Project())
     self.topic_ref = util.ParseTopic('topic1', self.Project())

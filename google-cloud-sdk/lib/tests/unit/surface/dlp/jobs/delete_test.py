@@ -28,6 +28,7 @@ from tests.lib.surface.dlp import base
 class DeleteTest(base.DlpUnitTestBase):
   """dlp jobs delete tests."""
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testDelete(self, track):
     self.track = track

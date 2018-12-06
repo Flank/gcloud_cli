@@ -33,14 +33,14 @@ class AnalyzeTest(base.DlpUnitTestBase):
        'mytable', 'col1.subcol.id', None, None, None, ['mycooltopic'], None),
       ('NumStatField', calliope_base.ReleaseTrack.ALPHA, 'myjob', 'myds',
        'mytable', None, 'col2.subcol.id', None, None, None,
-       ['fakeproject.myds.mytable1', 'fakeproject.myds.mytable2']),
+       'fakeproject.myds.mytable1'),
       ('LDiversity', calliope_base.ReleaseTrack.ALPHA, 'myjob', 'myds',
        'mytable', None, None, ['col1', 'col2.subcol.id'], 'col1',
        ['mycooltopic'], None),
   )
   def testAnalyze(self, track, jobid, dataset, table, cat_stat_field,
                   num_stat_field, quasi_ids, sensitive_field, output_topics,
-                  output_tables):
+                  output_table):
     self.track = track
     job = self.MakeAnalysisJob(jobid, dataset, table, self.Project(),
                                cat_stat_field, num_stat_field, quasi_ids,
@@ -49,13 +49,13 @@ class AnalyzeTest(base.DlpUnitTestBase):
         jobid,
         risk_config=self.MakeAnalysisConfig(
             dataset, table, self.Project(), cat_stat_field, num_stat_field,
-            quasi_ids, sensitive_field, output_topics, output_tables))
+            quasi_ids, sensitive_field, output_topics, output_table))
     self.client.projects_dlpJobs.Create.Expect(
         request=create_job_request, response=job)
     table_flag = '{}.{}.{}'.format(self.Project(), dataset, table)
-    if output_tables:
-      output_flag = '--output-tables {}'.format(','.join(output_tables))
-    else:  # topics
+    if output_table:
+      output_flag = '--output-table ' + output_table
+    else:  # topics, but incorrectly assumes only one or the other is allowed
       output_flag = '--output-topics {}'.format(','.join(output_topics))
 
     if cat_stat_field:
@@ -78,6 +78,7 @@ class AnalyzeTest(base.DlpUnitTestBase):
             output=output_flag,
             privacy_metric=privacy_metric)))
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testAnalyzeMissingQuasiIdFails(self, track):
     self.track = track
@@ -87,6 +88,7 @@ class AnalyzeTest(base.DlpUnitTestBase):
           'dlp datasources bigquery analyze fakeproject.myds.mytable2 '
           '--output-topics mytopic --sensitive-attribute col1')
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testAnalyzeMultiplePrivacyMetricsFails(self, track):
     self.track = track

@@ -14,6 +14,72 @@ from apitools.base.py import extra_types
 package = 'iam'
 
 
+class AttributeTranslatorCEL(_messages.Message):
+  r"""Specifies a list of output attribute names and the corresponding input
+  attribute to use for that output attribute. Each defined output attribute is
+  populated with the value of the specified input attribute.
+
+  Messages:
+    AttributesValue: Each entry specifies the desired output attribute and a
+      CEL field selector expression for the corresponding input to read. This
+      field supports a subset of the CEL functionality to select fields from
+      the input (no boolean expressions, functions or arithmetics).  Output
+      attributes must match `(google.sub|a-z_*)`.  The output attribute
+      google.sub is interpreted to be the "identity" of the requesting user.
+      For example, to copy the inbound attribute "sub" into the output
+      `google.sub` add an entry `google.sub` -> `inclaim.sub` or `google.sub`
+      -> `inclaim[\"sub\"]`.  See https://github.com/google/cel-spec for more
+      details.  If the input does not exist the output attribute will be null.
+
+  Fields:
+    attributes: Each entry specifies the desired output attribute and a CEL
+      field selector expression for the corresponding input to read. This
+      field supports a subset of the CEL functionality to select fields from
+      the input (no boolean expressions, functions or arithmetics).  Output
+      attributes must match `(google.sub|a-z_*)`.  The output attribute
+      google.sub is interpreted to be the "identity" of the requesting user.
+      For example, to copy the inbound attribute "sub" into the output
+      `google.sub` add an entry `google.sub` -> `inclaim.sub` or `google.sub`
+      -> `inclaim[\"sub\"]`.  See https://github.com/google/cel-spec for more
+      details.  If the input does not exist the output attribute will be null.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class AttributesValue(_messages.Message):
+    r"""Each entry specifies the desired output attribute and a CEL field
+    selector expression for the corresponding input to read. This field
+    supports a subset of the CEL functionality to select fields from the input
+    (no boolean expressions, functions or arithmetics).  Output attributes
+    must match `(google.sub|a-z_*)`.  The output attribute google.sub is
+    interpreted to be the "identity" of the requesting user.  For example, to
+    copy the inbound attribute "sub" into the output `google.sub` add an entry
+    `google.sub` -> `inclaim.sub` or `google.sub` -> `inclaim[\"sub\"]`.  See
+    https://github.com/google/cel-spec for more details.  If the input does
+    not exist the output attribute will be null.
+
+    Messages:
+      AdditionalProperty: An additional property for a AttributesValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type AttributesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a AttributesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  attributes = _messages.MessageField('AttributesValue', 1)
+
+
 class AuditConfig(_messages.Message):
   r"""Specifies the audit configuration for a service. The configuration
   determines which permission types are logged, and what identities, if any,
@@ -183,6 +249,25 @@ class CreateRoleRequest(_messages.Message):
   roleId = _messages.StringField(2)
 
 
+class CreateServiceAccountIdentityBindingRequest(_messages.Message):
+  r"""The service account identity binding create request.
+
+  Fields:
+    acceptanceFilter: A CEL expression that is evaluated to determine whether
+      a credential should be accepted. To accept any credential, specify
+      "true". See: https://github.com/google/cel-spec . The input claims are
+      available using "inclaim[\"attribute_name\"]". The output attributes
+      calculated by the translator are available using
+      "outclaim[\"attribute_name\"]"
+    cel: A set of output attributes and corresponding input attribute names.
+    oidc: An OIDC reference with Discovery.
+  """
+
+  acceptanceFilter = _messages.StringField(1)
+  cel = _messages.MessageField('AttributeTranslatorCEL', 2)
+  oidc = _messages.MessageField('IDPReferenceOIDC', 3)
+
+
 class CreateServiceAccountKeyRequest(_messages.Message):
   r"""The service account key create request.
 
@@ -246,7 +331,7 @@ class CreateServiceAccountRequest(_messages.Message):
       project, must be 6-30 characters long, and match the regular expression
       `[a-z]([-a-z0-9]*[a-z0-9])` to comply with RFC1035.
     serviceAccount: The ServiceAccount resource to create. Currently, only the
-      following values are user assignable: `display_name`, and `description`.
+      following values are user assignable: `display_name` .
   """
 
   accountId = _messages.StringField(1)
@@ -285,6 +370,33 @@ class Expr(_messages.Message):
   expression = _messages.StringField(2)
   location = _messages.StringField(3)
   title = _messages.StringField(4)
+
+
+class IDPReferenceOIDC(_messages.Message):
+  r"""Represents a reference to an OIDC provider.
+
+  Fields:
+    audience: Optional. The acceptable audience. Default is the unique_id of
+      the Service Account.
+    maxTokenLifetimeSeconds: This optional field allows enforcing a maximum
+      lifetime for tokens. Using a lifetime that is as short as possible
+      improves security since it prevents use of exfiltrated tokens after a
+      certain amount of time. All tokens must specify both exp and iat or they
+      will be rejected. If "nbf" is present we will reject tokens that are not
+      yet valid. Expiration and lifetime will be enforced in the following
+      way: - "exp" > "current time" is always required (expired tokens are
+      rejected) - "iat" < "current time" + 300 seconds is required (tokens
+      from the future .      are rejected although a small amount of clock
+      skew is tolerated). - If max_token_lifetime_seconds is set:        "exp"
+      - "iat" < max_token_lifetime_seconds will be checked - The default is
+      otherwise to accept a max_token_lifetime_seconds of 3600 (1 hour)
+    url: The OpenID Connect URL. To use this Identity Binding, JWT 'iss' field
+      should match this field.
+  """
+
+  audience = _messages.StringField(1)
+  maxTokenLifetimeSeconds = _messages.IntegerField(2)
+  url = _messages.StringField(3)
 
 
 class IamOrganizationsRolesCreateRequest(_messages.Message):
@@ -546,6 +658,66 @@ class IamProjectsServiceAccountsGetRequest(_messages.Message):
     name: The resource name of the service account in the following format:
       `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
       wildcard for the `PROJECT_ID` will infer the project from the account.
+      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
+      service account.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class IamProjectsServiceAccountsIdentityBindingsCreateRequest(_messages.Message):
+  r"""A IamProjectsServiceAccountsIdentityBindingsCreateRequest object.
+
+  Fields:
+    createServiceAccountIdentityBindingRequest: A
+      CreateServiceAccountIdentityBindingRequest resource to be passed as the
+      request body.
+    name: The resource name of the service account in the following format:
+      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
+      wildcard for the `PROJECT_ID` will infer the project from the account.
+      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
+      service account.
+  """
+
+  createServiceAccountIdentityBindingRequest = _messages.MessageField('CreateServiceAccountIdentityBindingRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class IamProjectsServiceAccountsIdentityBindingsDeleteRequest(_messages.Message):
+  r"""A IamProjectsServiceAccountsIdentityBindingsDeleteRequest object.
+
+  Fields:
+    name: The resource name of the service account identity binding in the
+      following format `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/identi
+      tyBindings/{BINDING}`. Using `-` as a wildcard for the `PROJECT_ID` will
+      infer the project from the account. The `ACCOUNT` value can be the
+      `email` address or the `unique_id` of the service account.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class IamProjectsServiceAccountsIdentityBindingsGetRequest(_messages.Message):
+  r"""A IamProjectsServiceAccountsIdentityBindingsGetRequest object.
+
+  Fields:
+    name: The resource name of the service account identity binding in the
+      following format `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/identi
+      tyBindings/{BINDING}`.  Using `-` as a wildcard for the `PROJECT_ID`
+      will infer the project from the account. The `ACCOUNT` value can be the
+      `email` address or the `unique_id` of the service account.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class IamProjectsServiceAccountsIdentityBindingsListRequest(_messages.Message):
+  r"""A IamProjectsServiceAccountsIdentityBindingsListRequest object.
+
+  Fields:
+    name: The resource name of the service account in the following format:
+      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.  Using `-` as a
+      wildcard for the `PROJECT_ID`, will infer the project from the account.
       The `ACCOUNT` value can be the `email` address or the `unique_id` of the
       service account.
   """
@@ -881,15 +1053,15 @@ class LintResult(_messages.Message):
       with any particular binding and only targets the policy as a whole, such
       as results about policy size violations.
     debugMessage: Human readable debug message associated with the issue.
-    fieldName: The name of the field for which this lint result is about,
-      relative to the input object to lint in the request.  For nested
-      messages, `field_name` consists of names of the embedded fields
-      separated by period character. For instance, if the lint request is on a
+    fieldName: The name of the field for which this lint result is about.  For
+      nested messages, `field_name` consists of names of the embedded fields
+      separated by period character. The top-level qualifier is the input
+      object to lint in the request. For instance, if the lint request is on a
       google.iam.v1.Policy and this lint result is about a condition
       expression of one of the input policy bindings, the field would be
-      populated as `bindings.condition.expression`.  This field does not
-      identify the ordinality of the repetitive fields (for instance bindings
-      in a policy).
+      populated as `policy.bindings.condition.expression`.  This field does
+      not identify the ordinality of the repetitive fields (for instance
+      bindings in a policy).
     level: The validation unit level.
     locationOffset: 0-based character position of problematic construct within
       the object identified by `field_name`. Currently, this is populated only
@@ -971,6 +1143,17 @@ class ListRolesResponse(_messages.Message):
 
   nextPageToken = _messages.StringField(1)
   roles = _messages.MessageField('Role', 2, repeated=True)
+
+
+class ListServiceAccountIdentityBindingsResponse(_messages.Message):
+  r"""The service account identity bindings list response.
+
+  Fields:
+    identityBinding: The identity bindings trusted to assert the service
+      account.
+  """
+
+  identityBinding = _messages.MessageField('ServiceAccountIdentityBinding', 1, repeated=True)
 
 
 class ListServiceAccountKeysResponse(_messages.Message):
@@ -1212,7 +1395,9 @@ class Role(_messages.Message):
   r"""A role in the Identity and Access Management API.
 
   Enums:
-    StageValueValuesEnum: The current launch stage of the role.
+    StageValueValuesEnum: The current launch stage of the role. If the `ALPHA`
+      launch stage has been selected for a role, the `stage` field will not be
+      included in the returned definition for the role.
 
   Fields:
     deleted: The current deleted state of the role. This field is read only.
@@ -1226,22 +1411,28 @@ class Role(_messages.Message):
       as UpdateRole, the role name is the complete path, e.g.,
       roles/logging.viewer for curated roles and
       organizations/{ORGANIZATION_ID}/roles/logging.viewer for custom roles.
-    stage: The current launch stage of the role.
+    stage: The current launch stage of the role. If the `ALPHA` launch stage
+      has been selected for a role, the `stage` field will not be included in
+      the returned definition for the role.
     title: Optional.  A human-readable title for the role.  Typically this is
       limited to 100 UTF-8 bytes.
   """
 
   class StageValueValuesEnum(_messages.Enum):
-    r"""The current launch stage of the role.
+    r"""The current launch stage of the role. If the `ALPHA` launch stage has
+    been selected for a role, the `stage` field will not be included in the
+    returned definition for the role.
 
     Values:
-      ALPHA: The user has indicated this role is currently in an alpha phase.
-      BETA: The user has indicated this role is currently in a beta phase.
+      ALPHA: The user has indicated this role is currently in an Alpha phase.
+        If this launch stage is selected, the `stage` field will not be
+        included when requesting the definition for a given role.
+      BETA: The user has indicated this role is currently in a Beta phase.
       GA: The user has indicated this role is generally available.
       DEPRECATED: The user has indicated this role is being deprecated.
       DISABLED: This role is disabled and will not contribute permissions to
         any members it is granted to in policies.
-      EAP: The user has indicated this role is currently in an eap phase.
+      EAP: The user has indicated this role is currently in an EAP phase.
     """
     ALPHA = 0
     BETA = 1
@@ -1276,7 +1467,8 @@ class ServiceAccount(_messages.Message):
     displayName: Optional. A user-specified name for the service account. Must
       be less than or equal to 100 UTF-8 bytes.
     email: @OutputOnly The email address of the service account.
-    etag: Optional. Not currently used.
+    etag: Optional. Note: `etag` is an inoperable legacy field that is only
+      returned for backwards compatibility.
     name: The resource name of the service account in the following format:
       `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.  Requests using `-`
       as a wildcard for the `PROJECT_ID` will infer the project from the
@@ -1301,16 +1493,49 @@ class ServiceAccount(_messages.Message):
   uniqueId = _messages.StringField(7)
 
 
+class ServiceAccountIdentityBinding(_messages.Message):
+  r"""Represents a service account identity provider reference.  A service
+  account has at most one identity binding for the EAP.  This is an
+  alternative to service account keys and enables the service account to be
+  configured to trust an external IDP through the provided identity binding.
+
+  Fields:
+    acceptanceFilter: A CEL expression that is evaluated to determine whether
+      a credential should be accepted. To accept any credential, specify
+      "true". See: https://github.com/google/cel-spec . This field supports a
+      subset of the CEL functionality to select fields and evaluate boolean
+      expressions based on the input (no functions or arithmetics). The values
+      for input claims are available using `inclaim.attribute_name` or
+      `inclaim[\"attribute_name\"]`. The values for output attributes
+      calculated by the translator are available using
+      `outclaim.attribute_name` or `outclaim[\"attribute_name\"]`.
+    cel: A set of output attributes and corresponding input attribute
+      expressions.
+    name: The resource name of the service account identity binding in the
+      following format `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/identi
+      tyBindings/{BINDING}`.
+    oidc: OIDC with discovery.
+  """
+
+  acceptanceFilter = _messages.StringField(1)
+  cel = _messages.MessageField('AttributeTranslatorCEL', 2)
+  name = _messages.StringField(3)
+  oidc = _messages.MessageField('IDPReferenceOIDC', 4)
+
+
 class ServiceAccountKey(_messages.Message):
   r"""Represents a service account key.  A service account has two sets of
   key-pairs: user-managed, and system-managed.  User-managed key-pairs can be
   created and deleted by users.  Users are responsible for rotating these keys
   periodically to ensure security of their service accounts.  Users retain the
   private key of these key-pairs, and Google retains ONLY the public key.
-  System-managed key-pairs are managed automatically by Google, and rotated
-  daily without user intervention.  The private key never leaves Google's
-  servers to maximize security.  Public keys for all service accounts are also
-  published at the OAuth2 Service Account API.
+  System-managed keys are automatically rotated by Google, and are used for
+  signing for a maximum of two weeks. The rotation process is probabilistic,
+  and usage of the new key will gradually ramp up and down over the key's
+  lifetime. We recommend caching the public key set for a service account for
+  no more than 24 hours to ensure you have access to the latest keys.  Public
+  keys for all service accounts are also published at the OAuth2 Service
+  Account API.
 
   Enums:
     KeyAlgorithmValueValuesEnum: Specifies the algorithm (and possibly key

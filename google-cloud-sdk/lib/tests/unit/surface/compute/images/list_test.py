@@ -21,9 +21,10 @@ from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py.testing import mock as apitools_mock
+from googlecloudsdk.api_lib.compute import lister
 from googlecloudsdk.api_lib.resource_manager import org_policies
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.images import flags
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
@@ -296,7 +297,8 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
       kwargs['errors'].append((500, 'Internal Error'))
     self.list_json.side_effect = MakeRequests
 
-    with self.AssertRaisesToolExceptionRegexp(
+    with self.AssertRaisesExceptionMatches(
+        lister.ListException,
         textwrap.dedent("""\
         Some requests did not succeed:
          - Internal Error
@@ -340,7 +342,7 @@ class ImagesListBetaTest(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('beta')
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
 
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)

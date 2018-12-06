@@ -19,19 +19,17 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class EnvironmentsDescribeTest(base.EnvironmentsUnitTest,
-                               parameterized.TestCase):
+class EnvironmentsDescribeGATest(base.EnvironmentsUnitTest):
 
-  def testSuccessfulDescribe(self, track):
-    self.SetTrack(track)
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
+
+  def testSuccessfulDescribe(self):
     expected = self.MakeEnvironment(self.TEST_PROJECT, self.TEST_LOCATION,
                                     self.TEST_ENVIRONMENT_ID)
     self.ExpectEnvironmentGet(
@@ -44,8 +42,7 @@ class EnvironmentsDescribeTest(base.EnvironmentsUnitTest,
                                   self.TEST_ENVIRONMENT_ID)
     self.assertEqual(expected, actual)
 
-  def testDescribeEnvironmentNotFound(self, track):
-    self.SetTrack(track)
+  def testDescribeEnvironmentNotFound(self):
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -57,8 +54,7 @@ class EnvironmentsDescribeTest(base.EnvironmentsUnitTest,
                            '--location', self.TEST_LOCATION,
                            self.TEST_ENVIRONMENT_ID)
 
-  def testDescribeEnvironmentInsufficientPermissions(self, track):
-    self.SetTrack(track)
+  def testDescribeEnvironmentInsufficientPermissions(self):
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -70,6 +66,18 @@ class EnvironmentsDescribeTest(base.EnvironmentsUnitTest,
       self.RunEnvironments('describe', '--project', self.TEST_PROJECT,
                            '--location', self.TEST_LOCATION,
                            self.TEST_ENVIRONMENT_ID)
+
+
+class EnvironmentsDescribeBetaTest(EnvironmentsDescribeGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+
+class EnvironmentsDescribeAlphaTest(EnvironmentsDescribeBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

@@ -132,13 +132,16 @@ class ParseCommandInteractiveTest(calliope_test_base.CalliopeTestBase):
 
   def testInteractiveParseEOF(self):
     self.Execute('meta resources parse')
-    self.AssertErrEquals('PARSE> \n')
+    self.AssertErrEquals('{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}\n')
     self.AssertOutputEquals('')
 
   def testInteractiveParseEmptyLine(self):
     self.WriteInput('\n')
     self.Execute('meta resources parse')
-    self.AssertErrEquals('PARSE> PARSE> PARSE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}\n')
     self.AssertOutputEquals('')
 
   def testInteractiveParseTwoGood(self):
@@ -160,7 +163,11 @@ class ParseCommandInteractiveTest(calliope_test_base.CalliopeTestBase):
   "zone": "my-zone-2"
 }
 """)
-    self.AssertErrEquals('PARSE> PARSE> PARSE> PARSE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}\n')
 
   def testInteractiveParseOneBadOneGood(self):
     with self.AssertRaisesExceptionMatches(
@@ -176,7 +183,7 @@ class ParseCommandInteractiveTest(calliope_test_base.CalliopeTestBase):
       self.Run('meta resources parse')
     self.AssertOutputEquals('')
     self.AssertErrEquals(
-        'PARSE> '
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}'
         'ERROR: (gcloud.meta.resources.parse) '
         'could not parse resource [https://www.googleapis.com/foo/v1/'
         'projects/my-project-1/bars/my-zone-1/instances/my-instance-1]: '
@@ -197,11 +204,13 @@ class ParseCommandInteractiveTest(calliope_test_base.CalliopeTestBase):
 }
 """)
     self.AssertErrEquals(
-        'PARSE> '
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}'
         'ERROR: could not parse resource [https://www.googleapis.com/foo/v1/'
         'projects/my-project-1/bars/my-zone-1/instances/my-instance-1]: '
         'unknown api foo\n'
-        'PARSE> PARSE> PARSE> \n')
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "PARSE> "}\n')
 
 
 if __name__ == '__main__':

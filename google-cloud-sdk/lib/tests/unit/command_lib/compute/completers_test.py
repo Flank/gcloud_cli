@@ -39,6 +39,8 @@ _COMMAND_RESOURCES = {
     _Uris(test_resources.HTTPS_HEALTH_CHECKS_V1),
     'compute.instance-templates.list':
     _Uris(test_resources.INSTANCE_TEMPLATES_V1),
+    'compute.machine-images.list':
+    _Uris(test_resources.MACHINE_IMAGES),
 }
 
 _SEARCH_RESOURCES = {
@@ -449,6 +451,22 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertCountEqual(
         [],
         completer.Complete('my_a:*:my_y', self.parameter_info))
+
+  def testMachineImagesCompleter(self):
+    completer = self.Completer(completers.MachineImagesCompleter,
+                               command_resources=_COMMAND_RESOURCES)
+    self.assertEqual(
+        2,
+        len(completer.Complete('', self.parameter_info)))
+    self.assertCountEqual(
+        [
+            'machine-image-1:my-project',
+            'machine-image-2:my-project',
+        ],
+        completer.Complete('', self.parameter_info))
+    self.assertCountEqual(
+        ['machine-image-2:my-project'],
+        completer.Complete('*-2', self.parameter_info))
 
   def testSearchHealthChecksCompleter(self):
     completer = self.Completer(completers.SearchHealthChecksCompleter,

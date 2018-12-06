@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for integration test base classes."""
+"""Module for integration test calliope_base classes."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
@@ -68,7 +68,7 @@ class CustomRolesBaseTest(e2e_base.WithServiceAuth,
   """
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.requires_cleanup = False
     self.requires_cleanup_copied_role = False
     self.requires_recover_deleted_role = False

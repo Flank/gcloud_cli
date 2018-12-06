@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud beta spanner databases execute\-sql \- executes a read\-only SQL query against a Cloud Spanner database
+gcloud beta spanner databases execute\-sql \- executes a SQL query against a Cloud Spanner database
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta spanner databases execute\-sql\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-sql\fR=\fISQL\fR [\fB\-\-query\-mode\fR=\fIQUERY_MODE\fR;\ default="NORMAL"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta spanner databases execute\-sql\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-sql\fR=\fISQL\fR [\fB\-\-enable\-partitioned\-dml\fR] [\fB\-\-query\-mode\fR=\fIQUERY_MODE\fR;\ default="NORMAL"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Executes a read\-only SQL query against a Cloud Spanner database.
+\fB(BETA)\fR Executes a SQL query against a Cloud Spanner database.
 
 
 
@@ -29,15 +29,15 @@ gcloud beta spanner databases execute\-sql \- executes a read\-only SQL query ag
 Database resource \- The Cloud Spanner database to execute the SQL query
 against. The arguments in this group can be used to specify the attributes of
 this resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: provide the flag
-[database] on the command line with a fully specified name; provide the flag
+can be set in other ways. To set the [project] attribute: provide the argument
+[database] on the command line with a fully specified name; provide the argument
 [\-\-project] on the command line; set the property [core/project]. This must be
 specified.
 
 .RS 2m
 .TP 2m
 \fIDATABASE\fR
-The ID of the database or a fully qualified identifier for the database. This
+ID of the database or fully qualified identifier for the database. This
 positional must be specified if any of the other arguments in this group are
 specified.
 
@@ -66,6 +66,10 @@ https://cloud.google.com/spanner/docs/query\-syntax
 
 .RS 2m
 .TP 2m
+\fB\-\-enable\-partitioned\-dml\fR
+Execute DML statement using Partitioned DML
+
+.TP 2m
 \fB\-\-query\-mode\fR=\fIQUERY_MODE\fR; default="NORMAL"
 Mode in which the query must be processed. \fIQUERY_MODE\fR must be one of:
 
@@ -81,18 +85,20 @@ information.
 \fBPROFILE\fR
 Returns both the query plan and the execution statistics along with the result
 rows.
-
-
 .RE
+.sp
+
+
+
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

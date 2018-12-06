@@ -34,6 +34,8 @@ from googlecloudsdk.core.util import platforms
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
+import mock
+
 from six.moves import range  # pylint: disable=redefined-builtin
 from six.moves import zip  # pylint: disable=redefined-builtin
 
@@ -879,17 +881,20 @@ class MoreThePagerTests(sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
     self.StartEnvPatch({})
+    encoding.SetEncodedValue(os.environ, 'LESS', None)
     encoding.SetEncodedValue(os.environ, 'PAGER', None)
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath').side_effect = self.MockFindExecutableOnPath
-    self.StartObjectPatch(console_io,
-                          'IsInteractive').side_effect = self.MockIsInteractive
-    self.StartObjectPatch(console_pager.Pager,
-                          'Run').side_effect = self.MockRun
-    self.popen = self.StartObjectPatch(subprocess, 'Popen')
+    self.StartObjectPatch(
+        console_io, 'IsInteractive', side_effect=self.MockIsInteractive)
+    self.StartObjectPatch(
+        console_pager.Pager, 'Run', side_effect=self.MockRun)
+    self.popen = self.StartObjectPatch(
+        subprocess, 'Popen', side_effect=self.MockPopen)
     self.executables = True
     self.interactive = True
+    self.less_env = None
     self.ran = False
     self.raw_chars = None
     self.contents = 'Here\nlies\nLes\nMoore.\nNo\nLes\nno\nmore.'
@@ -902,6 +907,10 @@ class MoreThePagerTests(sdk_test_base.WithOutputCapture):
 
   def MockIsInteractive(self, output=False, error=False):
     return self.interactive
+
+  def MockPopen(self, *args, **kwargs):
+    self.less_env = os.environ.get('LESS')
+    return mock.MagicMock()
 
   def SetExecutables(self, executables):
     self.executables = executables
@@ -929,11 +938,20 @@ class MoreThePagerTests(sdk_test_base.WithOutputCapture):
     console_io.More(self.contents, check_pager=False)
     self.assertTrue(self.ran)
 
-  def testExternalPagerDefault(self):
+  def testExternalPagerDefaultWithNoLess(self):
     console_io.More(self.contents)
     self.popen.assert_called_once_with('less', stdin=subprocess.PIPE,
                                        shell=True)
     self.assertFalse(self.ran)
+    self.assertEqual('-R', self.less_env)
+
+  def testExternalPagerDefaultWithLess(self):
+    encoding.SetEncodedValue(os.environ, 'LESS', '-Z')
+    console_io.More(self.contents)
+    self.popen.assert_called_once_with('less', stdin=subprocess.PIPE,
+                                       shell=True)
+    self.assertFalse(self.ran)
+    self.assertEqual('-R-Z', self.less_env)
 
   def testExternalPagerEnviron(self):
     encoding.SetEncodedValue(os.environ, 'PAGER', 'more')
@@ -1029,9 +1047,9 @@ class UxlementTests(sdk_test_base.WithOutputCapture):
 
   def testJsonUXStubPromptResponse(self):
     stub_output = console_io.JsonUXStub(
-        console_io.UXElementType.PROMPT_RESPONSE, choices=['1', '2', '3'])
+        console_io.UXElementType.PROMPT_RESPONSE, message='asdf')
     self.assertEqual(stub_output,
-                     '{"ux": "PROMPT_RESPONSE", "choices": ["1", "2", "3"]}')
+                     '{"ux": "PROMPT_RESPONSE", "message": "asdf"}')
 
   def testJsonUXStubPromtpContinue(self):
     stub_output = console_io.JsonUXStub(

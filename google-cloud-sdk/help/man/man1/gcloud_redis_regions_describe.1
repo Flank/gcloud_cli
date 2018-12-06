@@ -1,0 +1,90 @@
+
+.TH "GCLOUD_REDIS_REGIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud redis regions describe \- show metadata for a Memorystore Redis region
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud redis regions describe\fR \fIREGION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Display all metadata associated with a Redis region given a valid region name.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The region specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to access the given region.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Region resource \- Arguments and flags that specify the Memorystore Redis region
+you want to describe. This represents a Cloud resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [region] on the command line with a
+fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIREGION\fR
+ID of the region or fully qualified identifier for the region.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBredis/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/memorystore/docs/redis/
+
+
+
+.SH "EXAMPLES"
+
+To display the metadata for the region \f5us\-central1\fR, run:
+
+.RS 2m
+$ gcloud redis regions describe us\-central1
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha redis regions describe
+$ gcloud beta redis regions describe
+.RE
+

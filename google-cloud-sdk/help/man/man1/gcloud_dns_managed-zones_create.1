@@ -69,14 +69,16 @@ Enable DNSSEC for the managed zone.
 .TP 2m
 \fBtransfer\fR
 Enable DNSSEC and allow transferring a signed zone in or out.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR
 String mnemonic specifying the DNSSEC algorithm of the key\-signing key.
-Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256, RSASHA512,
-ECDSAP256SHA256, ECDSAP384SHA384
+Requires DNSSEC enabled. \fIKSK_ALGORITHM\fR must be one of:
+\fBecdsap256sha256\fR, \fBecdsap384sha384\fR, \fBrsasha1\fR, \fBrsasha256\fR,
+\fBrsasha512\fR.
 
 .TP 2m
 \fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR
@@ -93,9 +95,10 @@ numbers.
 
 .TP 2m
 \fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR
-String mnemonic specifying the DNSSEC algorithm of the zone\-signing key.
-Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256, RSASHA512,
-ECDSAP256SHA256, ECDSAP384SHA384
+String mnemonic specifying the DNSSEC algorithm of the key\-signing key.
+Requires DNSSEC enabled. \fIZSK_ALGORITHM\fR must be one of:
+\fBecdsap256sha256\fR, \fBecdsap384sha384\fR, \fBrsasha1\fR, \fBrsasha256\fR,
+\fBrsasha512\fR.
 
 .TP 2m
 \fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR
@@ -108,9 +111,9 @@ Length of the zone\-signing key in bits. Requires DNSSEC enabled.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

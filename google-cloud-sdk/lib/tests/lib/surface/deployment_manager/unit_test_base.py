@@ -24,7 +24,7 @@ import time
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -76,10 +76,10 @@ class DmV2UnitTestBase(
     self.messages = apis.GetMessagesModule('deploymentmanager', version)
 
   def TargetingAlphaCommandTrack(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def TargetingBetaCommandTrack(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def WithOperationPolling(self,
                            operation_type,

@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 import os
 import uuid
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import config
 from tests.lib import test_case
 from tests.lib.surface.firebase.test.android import commands
@@ -53,7 +53,8 @@ class MatrixCreatorOrchestratorTests(unit_base.AndroidMockClientTest):
                 self.testing_msgs.ClientInfoDetail(
                     key='Cloud SDK Version', value=config.CLOUD_SDK_VERSION),
                 self.testing_msgs.ClientInfoDetail(
-                    key='Release Track', value=base.ReleaseTrack.GA.id),
+                    key='Release Track',
+                    value=calliope_base.ReleaseTrack.GA.id),
             ]),
         environmentMatrix=self.testing_msgs.EnvironmentMatrix(
             androidMatrix=self.testing_msgs.AndroidMatrix(
@@ -68,8 +69,8 @@ class MatrixCreatorOrchestratorTests(unit_base.AndroidMockClientTest):
             toolResultsHistory=self.testing_msgs.ToolResultsHistory(
                 projectId=PROJECT_ID)),
         testSpecification=self.testing_msgs.TestSpecification(
-            androidInstrumentationTest=self.testing_msgs.
-            AndroidInstrumentationTest(
+            androidInstrumentationTest=self.testing_msgs
+            .AndroidInstrumentationTest(
                 appApk=self.testing_msgs.FileReference(
                     gcsPath='gs://{db}/{ub}/app.apk'.format(
                         db=DEFAULT_BUCKET, ub=UNIQUE_OBJECT_NAME)),

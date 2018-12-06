@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py import encoding
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
@@ -78,8 +78,9 @@ class DisksListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     )
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
-                          (base.ReleaseTrack.BETA, 'beta'))
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                          (calliope_base.ReleaseTrack.BETA, 'beta'))
 class RegionalDisksListTest(test_base.BaseTest, parameterized.TestCase):
 
   def _SetUp(self, track, api_version):

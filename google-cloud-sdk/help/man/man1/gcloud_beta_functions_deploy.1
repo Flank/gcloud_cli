@@ -11,7 +11,7 @@ gcloud beta functions deploy \- create or update a Google Cloud Function
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-runtime\fR=\fIRUNTIME\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-runtime\fR=\fIRUNTIME\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -29,14 +29,14 @@ gcloud beta functions deploy \- create or update a Google Cloud Function
 Function resource \- The Cloud function name to deploy. The arguments in this
 group can be used to specify the attributes of this resource. (NOTE) Some
 attributes are not given arguments in this group but can be set in other ways.
-To set the [project] attribute: provide the flag [NAME] on the command line with
-a fully specified name; provide the flag [\-\-project] on the command line; set
-the property [core/project]. This must be specified.
+To set the [project] attribute: provide the argument [NAME] on the command line
+with a fully specified name; provide the argument [\-\-project] on the command
+line; set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fINAME\fR
-The ID of the function or a fully qualified identifier for the function. This
+ID of the function or fully qualified identifier for the function. This
 positional must be specified if any of the other arguments in this group are
 specified.
 
@@ -93,17 +93,30 @@ Choices:
 
 .RS 2m
 .TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+The email address of the IAM service account associated with the function at
+runtime. The service account represents the identity of the running function,
+and determines what permissions the function has.
+
+If not provided, the function will use the project's default service account.
+
+.TP 2m
 \fB\-\-source\fR=\fISOURCE\fR
 Location of source code to deploy.
 
 Location of the source can be one of the following three options:
 
 .RS 2m
-1. Source code in Google Cloud Storage (must be a `.zip` archive),
-2. Reference to source repository or,
-3. Local filesystem path (root directory of function source).
-.RE
+.IP "\(em" 2m
+Source code in Google Cloud Storage (must be a \f5.zip\fR archive),
+.IP "\(em" 2m
+Reference to source repository or,
+.IP "\(em" 2m
+Local filesystem path (root directory of function source).
 
+.RE
+.RE
+.sp
 The value of the flag will be interpreted as a Cloud Storage location, if it
 starts with \f5gs://\fR.
 
@@ -126,11 +139,15 @@ If you want to deploy from a revision different from \f5master\fR, append one of
 the following three sources to the URL:
 
 .RS 2m
-1. `/revisions/${REVISION}`,
-2. `/moveable\-aliases/${MOVEABLE_ALIAS}`,
-3. `/fixed\-aliases/${FIXED_ALIAS}`.
-.RE
+.IP "\(bu" 2m
+\f5/revisions/${REVISION}\fR,
+.IP "\(bu" 2m
+\f5/moveable\-aliases/${MOVEABLE_ALIAS}\fR,
+.IP "\(bu" 2m
+\f5/fixed\-aliases/${FIXED_ALIAS}\fR.
 
+.RE
+.sp
 If you'd like to deploy sources from a directory different from the root, you
 must specify a revision, a moveable alias, or a fixed alias, as above, and
 append \f5/paths/${PATH_TO_SOURCES_DIRECTORY}\fR to the URL.
@@ -155,6 +172,7 @@ If the source location is not explicitly set, new functions will deploy from the
 current directory. Existing functions keep their old source.
 
 
+.RS 2m
 .TP 2m
 \fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR
 When deploying a function from a local directory, this flag's value is the name
@@ -294,9 +312,9 @@ resources, call \f5functions event\-types list\fR.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

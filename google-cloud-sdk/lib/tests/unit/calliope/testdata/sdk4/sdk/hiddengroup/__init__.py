@@ -18,10 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.Hidden
-class HiddenGroup(base.Group):
+@calliope_base.Hidden
+class HiddenGroup(calliope_base.Group):
   """gcloud sdk tests hidden subgroup."""
   pass

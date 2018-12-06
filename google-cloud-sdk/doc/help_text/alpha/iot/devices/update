@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha iot devices update
-        (DEVICE : --region=REGION --registry=REGISTRY) [--blocked]
+        (DEVICE : --region=REGION --registry=REGISTRY)
+        [--auth-method=AUTH_METHOD] [--blocked] [--log-level=LOG_LEVEL]
         [--metadata=[KEY=VALUE,...]] [--metadata-from-file=[KEY=PATH,...]]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -14,14 +15,14 @@ POSITIONAL ARGUMENTS
      Device resource - The device to update. The arguments in this group can be
      used to specify the attributes of this resource. (NOTE) Some attributes
      are not given arguments in this group but can be set in other ways. To set
-     the [project] attribute: provide the flag [device] on the command line
-     with a fully specified name; provide the flag [--project] on the command
-     line; set the property [core/project]. This must be specified.
+     the [project] attribute: provide the argument [device] on the command line
+     with a fully specified name; provide the argument [--project] on the
+     command line; set the property [core/project]. This must be specified.
 
        DEVICE
-          The ID of the device or a fully qualified identifier for the device.
-          This positional must be specified if any of the other arguments in
-          this group are specified.
+          ID of the device or fully qualified identifier for the device. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
 
        --region=REGION
           The Cloud region for the device.
@@ -30,6 +31,22 @@ POSITIONAL ARGUMENTS
           The device registry for the device.
 
 FLAGS
+     --auth-method=AUTH_METHOD
+        The authorization/authentication method used by devices in relation to
+        the gateway. This property is set only on gateways. If left
+        unspecified, devices will not be able to access the gateway.
+        AUTH_METHOD must be one of:
+
+         association-and-device-auth-token
+            The device is authenticated through both device credentials and
+            gateway association.
+         association-only
+            The device is authenticated through the gateway association only.
+            Device credentials are ignored if provided.
+         device-auth-token-only
+            The device is authenticated through its own credentials. Gateway
+            association is not checked.
+
      --blocked
         If blocked, connections from this device will fail.
 
@@ -37,6 +54,23 @@ FLAGS
         example, the sensor is generating bad data and needs maintenance.
 
         Use --no-blocked to enable connections and --blocked to disable.
+
+     --log-level=LOG_LEVEL
+        The default logging verbosity for activity from devices in this
+        registry. The verbosity level can be overridden by setting a specific
+        device's log level.
+
+        LOG_LEVEL must be one of:
+
+         debug
+            All events will be logged
+         error
+            Error events will be logged.
+         info
+            Informational events will be logged, such as connections and
+            disconnections. Also includes error events.
+         none
+            Disables logging.
 
      --metadata=[KEY=VALUE,...]
         The metadata key/value pairs assigned to devices. This metadata is not
@@ -56,8 +90,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

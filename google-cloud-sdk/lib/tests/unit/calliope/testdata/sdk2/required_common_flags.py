@@ -18,17 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class RequiredCommonFlags(base.Command):
+class RequiredCommonFlags(calliope_base.Command):
   """A command with required+common flags."""
 
   @staticmethod
   def Args(parser):
     parser.add_argument('--required', required=True,
                         help='This flag is required.')
-    parser.add_argument('--common', category=base.COMMONLY_USED_FLAGS,
+    parser.add_argument('--common', category=calliope_base.COMMONLY_USED_FLAGS,
                         help='This flag is common.')
 
   def Run(self, args):

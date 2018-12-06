@@ -25,7 +25,6 @@ from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.configurations import named_configs
 from googlecloudsdk.core.configurations import properties_file
-from googlecloudsdk.core.resource import session_capturer
 from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 
@@ -120,15 +119,6 @@ class ConfigTest(cli_test_base.CliTestBase):
     self.AssertErrNotContains('Your active configuration is')
     self.AssertOutputEquals('True\n')
 
-  def testSessionCapture(self):
-    capture_session_file = os.path.join(self.CreateTempDir(), 'session.yaml')
-    properties.VALUES.core.capture_session_file.Set(capture_session_file)
-    self.Run('config get-value core/project')
-    self.AssertFileExists(capture_session_file)
-    self.AssertFileContains('properties:\n', capture_session_file)
-    properties.VALUES.core.capture_session_file.Set(None)
-    session_capturer.SessionCapturer.capturer = None
-
   def testGetValueWithInvalidProperty(self):
     # Test Invalid Property
     with self.assertRaisesRegex(
@@ -182,8 +172,6 @@ class ConfigTest(cli_test_base.CliTestBase):
       else:
         raise properties.InvalidValueError('Invalid value error message')
     self.StartObjectPatch(property_mock, 'Get').side_effect = get_effect
-    self.StartObjectPatch(values_mock.core.capture_session_file,
-                          'Get').return_value = None
 
     self.Run('config get-value core/disable_color')
     self.AssertErrContains('Invalid value error message')

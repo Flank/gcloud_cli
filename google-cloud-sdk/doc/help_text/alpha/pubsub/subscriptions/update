@@ -1,38 +1,42 @@
 NAME
-    gcloud alpha pubsub subscriptions update - this feature is part of an
-        invite-only release of the Cloud Pub/Sub API
+    gcloud alpha pubsub subscriptions update - updates an existing Cloud
+        Pub/Sub subscription
 
 SYNOPSIS
     gcloud alpha pubsub subscriptions update SUBSCRIPTION
-        [--ack-deadline=ACK_DEADLINE]
+        [--ack-deadline=ACK_DEADLINE] [--expiration-period=EXPIRATION_PERIOD]
         [--message-retention-duration=MESSAGE_RETENTION_DURATION]
         [--push-endpoint=PUSH_ENDPOINT] [--retain-acked-messages]
         [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Updates an existing Cloud Pub/Sub subscription. This feature is
-    part of an invitation-only release of the underlying Cloud Pub/Sub API. The
-    command will generate errors unless you have access to this API. This
-    restriction should be relaxed in the near future. Please contact
-    cloud-pubsub@google.com with any questions in the meantime.
+    (ALPHA) Updates an existing Cloud Pub/Sub subscription.
 
 POSITIONAL ARGUMENTS
      Subscription resource - Name of the subscription to update. This
      represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
-     attribute: provide the flag [subscription] on the command line with a
-     fully specified name; provide the flag [--project] on the command line;
-     set the property [core/project]. This must be specified.
+     attribute: provide the argument [subscription] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
 
        SUBSCRIPTION
-          The ID of the subscription or a fully qualified identifier for the
+          ID of the subscription or fully qualified identifier for the
           subscription.
 
 FLAGS
      --ack-deadline=ACK_DEADLINE
         The number of seconds the system will wait for a subscriber to
         acknowledge receiving a message before re-attempting delivery.
+
+     --expiration-period=EXPIRATION_PERIOD
+        The subscription will expire if it is inactive for the given period.
+        Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+        of "s", "m", "h", and "d" for seconds, minutes, hours, and days,
+        respectively. If the unit is omitted, seconds is assumed. This flag
+        additionally accepts the special value "never" to indicate that the
+        subscription will never expire.
 
      --message-retention-duration=MESSAGE_RETENTION_DURATION
         How long to retain unacknowledged messages in the subscription's
@@ -82,13 +86,16 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta pubsub subscriptions update
 

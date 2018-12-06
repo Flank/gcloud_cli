@@ -16,15 +16,17 @@
 """Unit tests for the calliope/display module."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
+
 import copy
 import datetime
 import inspect
 import logging
 import operator
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import display
 from googlecloudsdk.calliope import display_info
 from googlecloudsdk.calliope import display_taps
@@ -284,7 +286,7 @@ class _MockArgs(object):
     return self._command
 
 
-class _MockCommand(base.Command):
+class _MockCommand(calliope_base.Command):
   """Mock ListCommand."""
 
   def __init__(self):
@@ -316,7 +318,7 @@ class _MockCommandWithDisplay(_MockCommand):
     print('Display().')
 
 
-class _MockCreateCommand(base.CreateCommand):
+class _MockCreateCommand(calliope_base.CreateCommand):
   """Mock CreateCommand."""
 
   def __init__(self):
@@ -331,7 +333,7 @@ class _MockCreateCommand(base.CreateCommand):
     return None
 
 
-class _MockDeleteCommand(base.DeleteCommand):
+class _MockDeleteCommand(calliope_base.DeleteCommand):
   """Mock DeleteCommand."""
 
   def __init__(self):
@@ -346,7 +348,7 @@ class _MockDeleteCommand(base.DeleteCommand):
     return None
 
 
-class _MockDescribeCommand(base.DescribeCommand):
+class _MockDescribeCommand(calliope_base.DescribeCommand):
   """Mock DescribeCommand."""
 
   def __init__(self):
@@ -356,7 +358,7 @@ class _MockDescribeCommand(base.DescribeCommand):
     return None
 
 
-class _MockSilentCommand(base.SilentCommand):
+class _MockSilentCommand(calliope_base.SilentCommand):
   """Mock SilentCommand."""
 
   def __init__(self):
@@ -366,7 +368,7 @@ class _MockSilentCommand(base.SilentCommand):
     return None
 
 
-class _MockListCommand(base.ListCommand):
+class _MockListCommand(calliope_base.ListCommand):
   """Mock ListCommand."""
 
   def __init__(self):
@@ -397,7 +399,7 @@ class _MockBypassListCommand(_MockListCommand):
     parser.display_info.AddCacheUpdater(None)
 
 
-class _MockRestoreCommand(base.RestoreCommand):
+class _MockRestoreCommand(calliope_base.RestoreCommand):
   """Mock RestoreCommand."""
 
   def __init__(self):
@@ -412,7 +414,7 @@ class _MockRestoreCommand(base.RestoreCommand):
     return None
 
 
-class _MockUpdateCommand(base.UpdateCommand):
+class _MockUpdateCommand(calliope_base.UpdateCommand):
   """Mock UpdateCommand."""
 
   def __init__(self):
@@ -426,7 +428,7 @@ class _MockUpdateCommand(base.UpdateCommand):
     return None
 
 
-class _MockBypassCreateCommand(base.CreateCommand):
+class _MockBypassCreateCommand(calliope_base.CreateCommand):
   """Mock CreateCommand with no cache updater."""
 
   def __init__(self):
@@ -441,7 +443,7 @@ class _MockBypassCreateCommand(base.CreateCommand):
     return None
 
 
-class _MockBypassDeleteCommand(base.DeleteCommand):
+class _MockBypassDeleteCommand(calliope_base.DeleteCommand):
   """Mock DeleteCommand with no cache updater."""
 
   def __init__(self):

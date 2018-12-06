@@ -25,6 +25,7 @@ import textwrap
 
 from googlecloudsdk.calliope import display_taps
 from googlecloudsdk.core import log
+from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.document_renderers import render_document
 from googlecloudsdk.core.resource import resource_exceptions
 from googlecloudsdk.core.resource import resource_printer
@@ -32,6 +33,7 @@ from googlecloudsdk.core.resource import resource_printer_base
 from googlecloudsdk.core.resource import resource_projection_spec
 from googlecloudsdk.core.resource import table_printer
 from googlecloudsdk.core.util import peek_iterable
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.core.resource import resource_printer_test_base
 
@@ -233,21 +235,83 @@ class TablePrinterFormatHeadingTest(resource_printer_test_base.Base):
         """))
 
 
-class TablePrinterFormatUnicodeHeadingTest(resource_printer_test_base.Base):
-
-  def SetUp(self):
-    self._printer = resource_printer.Printer('table(name, kind)')
+class TableFormatTest(resource_printer_test_base.Base):
 
   def testMultipleStreamedResourceCase(self):
+    printer = resource_printer.Printer('table(name, kind)')
     for resource in self.CreateResourceList(4):
-      self._printer.AddRecord(resource)
-    self._printer.Finish()
+      printer.AddRecord(resource)
+    printer.Finish()
     self.AssertOutputEquals(textwrap.dedent("""\
         NAME                KIND
         my-instance-a-0     compute#instance
         my-instance-az-1    compute#instance
         my-instance-azz-2   compute#instance
         my-instance-azzz-3  compute#instance
+        """))
+
+  def testFixedWidthNarrow(self):
+    printer = resource_printer.Printer('table(name:width=16, kind)')
+    for resource in self.CreateResourceList(4):
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        NAME                KIND
+        my-instance-a-0     compute#instance
+        my-instance-az-1    compute#instance
+        my-instance-azz-2   compute#instance
+        my-instance-azzz-3  compute#instance
+        """))
+
+  def testFixedWidthWide(self):
+    printer = resource_printer.Printer('table(name:width=32, kind)')
+    for resource in self.CreateResourceList(4):
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        NAME                              KIND
+        my-instance-a-0                   compute#instance
+        my-instance-az-1                  compute#instance
+        my-instance-azz-2                 compute#instance
+        my-instance-azzz-3                compute#instance
+        """))
+
+  def testFixedWidthAlignLastCenter(self):
+    printer = resource_printer.Printer(
+        'table(abc:label=LEFT:align=left:width=8,'
+        '      xyz:label=RIGHT:align=center:width=9)')
+    resources = [
+        {'abc': 'A', 'xyz': 'Z'},
+        {'abc': 'AB', 'xyz': 'YZ'},
+        {'abc': 'ABC', 'xyz': 'XYZ'},
+    ]
+    for resource in resources:
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        LEFT        RIGHT
+        A             Z
+        AB            YZ
+        ABC          XYZ
+        """))
+
+  def testFixedWidthAlignLastRight(self):
+    printer = resource_printer.Printer(
+        'table(abc:label=LEFT:align=left:width=8,'
+        '      xyz:label=RIGHT:align=right:width=8)')
+    resources = [
+        {'abc': 'A', 'xyz': 'Z'},
+        {'abc': 'AB', 'xyz': 'YZ'},
+        {'abc': 'ABC', 'xyz': 'XYZ'},
+    ]
+    for resource in resources:
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        LEFT         RIGHT
+        A                Z
+        AB              YZ
+        ABC            XYZ
         """))
 
 
@@ -303,6 +367,80 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         | my-instance-az-1 | Sed at cursus risus. Praesent facilisis at ligula at      |
         |                  | mattis. Vestibulum et quam et ipsum .                     |
         +------------------+-----------------------------------------------------------+
+        """))
+
+  def testWrapBoxWithMargin(self):
+    self.SetUpPrinter('table[box, ascii, margin=8](name, description:wrap)')
+    for resource in [
+        {'name': 'my-instance-a-0',
+         'description': ('Lorem ipsum dolor sit amet, consectetur '
+                         'adipiscing elit. Morbi sit amet elit nulla.')},
+        {'name': 'my-instance-az-1',
+         'description': ('Sed at cursus risus. Praesent facilisis '
+                         'at ligula at mattis. Vestibulum et quam et ipsum .')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        +------------------+---------------------------------------------------+
+        |       NAME       |                    DESCRIPTION                    |
+        +------------------+---------------------------------------------------+
+        | my-instance-a-0  | Lorem ipsum dolor sit amet, consectetur           |
+        |                  | adipiscing elit. Morbi sit amet elit nulla.       |
+        | my-instance-az-1 | Sed at cursus risus. Praesent facilisis at ligula |
+        |                  | at mattis. Vestibulum et quam et ipsum .          |
+        +------------------+---------------------------------------------------+
+        """))
+
+  def testWrapBoxWithWidth(self):
+    self.SetUpPrinter('table[box, ascii, width=60](name, description:wrap)')
+    for resource in [
+        {'name': 'my-instance-a-0',
+         'description': ('Lorem ipsum dolor sit amet, consectetur '
+                         'adipiscing elit. Morbi sit amet elit nulla.')},
+        {'name': 'my-instance-az-1',
+         'description': ('Sed at cursus risus. Praesent facilisis '
+                         'at ligula at mattis. Vestibulum et quam et ipsum .')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        +------------------+---------------------------------------+
+        |       NAME       |              DESCRIPTION              |
+        +------------------+---------------------------------------+
+        | my-instance-a-0  | Lorem ipsum dolor sit amet,           |
+        |                  | consectetur adipiscing elit. Morbi    |
+        |                  | sit amet elit nulla.                  |
+        | my-instance-az-1 | Sed at cursus risus. Praesent         |
+        |                  | facilisis at ligula at mattis.        |
+        |                  | Vestibulum et quam et ipsum .         |
+        +------------------+---------------------------------------+
+        """))
+
+  def testWrapBoxWithWidtAndMargin(self):
+    self.SetUpPrinter(
+        'table[box, ascii, width=70, margin=10](name, description:wrap)')
+    for resource in [
+        {'name': 'my-instance-a-0',
+         'description': ('Lorem ipsum dolor sit amet, consectetur '
+                         'adipiscing elit. Morbi sit amet elit nulla.')},
+        {'name': 'my-instance-az-1',
+         'description': ('Sed at cursus risus. Praesent facilisis '
+                         'at ligula at mattis. Vestibulum et quam et ipsum .')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        +------------------+---------------------------------------+
+        |       NAME       |              DESCRIPTION              |
+        +------------------+---------------------------------------+
+        | my-instance-a-0  | Lorem ipsum dolor sit amet,           |
+        |                  | consectetur adipiscing elit. Morbi    |
+        |                  | sit amet elit nulla.                  |
+        | my-instance-az-1 | Sed at cursus risus. Praesent         |
+        |                  | facilisis at ligula at mattis.        |
+        |                  | Vestibulum et quam et ipsum .         |
+        +------------------+---------------------------------------+
         """))
 
   def testWrapUnicodeData(self):
@@ -1454,6 +1592,29 @@ my-instance-az-1  x       Lorem ipsum dolor sit amet, consectetur adipiscing eli
               車車車車車車車車車車車車車車車車車車車車車車車車車車車車車車車:
     """.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 64)))
 
+  def testWrapWithPager(self):
+    mock_more = self.StartObjectPatch(console_io, 'More')
+    self.SetUpPrinter('table[pager](name, description:wrap)')
+    for resource in [
+        {'name': 'my-instance-a-0',
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur '
+             'adipiscing elit. Morbi sit amet elit nulla.')},  # 83 chars
+        {'name': 'my-instance-az-1',
+         'description': (
+             'Sed at cursus risus. Praesent facilisis '
+             'at ligula at mattis. Vestibulum et quam et ipsum .')}  # 90 chars
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    mock_more.assert_called_once_with(textwrap.dedent("""\
+        NAME              DESCRIPTION
+        my-instance-a-0   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
+                          sit amet elit nulla.
+        my-instance-az-1  Sed at cursus risus. Praesent facilisis at ligula at mattis.
+                          Vestibulum et quam et ipsum .
+        """), out=log.out)
+
 
 class TablePrinterFormatSortTest(resource_printer_test_base.Base):
 
@@ -1471,6 +1632,22 @@ class TablePrinterFormatSortTest(resource_printer_test_base.Base):
         my-instance-azz-2   compute#instance  10.240.150.2
         my-instance-azzz-3  compute#instance  10.240.150.3
         """))
+
+  def testMultipleStreamedResourceCaseWithPager(self):
+    mock_more = self.StartObjectPatch(console_io, 'More')
+    printer = resource_printer.Printer(
+        'table[pager](name:label=MONIKER:sort=102, kind:sort=101, '
+        'networkInterfaces[0].networkIP:label=IP)')
+    for resource in self.CreateResourceList(4):
+      printer.AddRecord(resource)
+    printer.Finish()
+    mock_more.assert_called_once_with(textwrap.dedent("""\
+        MONIKER             KIND              IP
+        my-instance-a-0     compute#instance  10.240.150.0
+        my-instance-az-1    compute#instance  10.240.150.1
+        my-instance-azz-2   compute#instance  10.240.150.2
+        my-instance-azzz-3  compute#instance  10.240.150.3
+        """), out=log.out)
 
   def testHiddenSortByMultipleStreamedResourceCase(self):
     printer = resource_printer.Printer(
@@ -1500,6 +1677,45 @@ class TablePrinterFormatSortTest(resource_printer_test_base.Base):
         my-instance-azz-2
         my-instance-az-1
         my-instance-a-0
+        """))
+
+  def testHiddenSortByMultipleStreamedResourceCaseBox(self):
+    printer = resource_printer.Printer(
+        'table[box,ascii](name:label=MONIKER:sort=102, kind:sort=101)'
+        ':(networkInterfaces[0].networkIP:sort=1:reverse)')
+    for resource in self.CreateResourceList(4):
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        +--------------------+------------------+
+        |      MONIKER       |       KIND       |
+        +--------------------+------------------+
+        | my-instance-azzz-3 | compute#instance |
+        | my-instance-azz-2  | compute#instance |
+        | my-instance-az-1   | compute#instance |
+        | my-instance-a-0    | compute#instance |
+        +--------------------+------------------+
+        """))
+
+  def testHiddenSortByMultipleStreamedResourceCaseAllBox(self):
+    printer = resource_printer.Printer(
+        'table[all-box,ascii](name:label=MONIKER:sort=102, kind:sort=101)'
+        ':(networkInterfaces[0].networkIP:sort=1:reverse)')
+    for resource in self.CreateResourceList(4):
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(textwrap.dedent("""\
+        +--------------------+------------------+
+        |      MONIKER       |       KIND       |
+        +--------------------+------------------+
+        | my-instance-azzz-3 | compute#instance |
+        +--------------------+------------------+
+        | my-instance-azz-2  | compute#instance |
+        +--------------------+------------------+
+        | my-instance-az-1   | compute#instance |
+        +--------------------+------------------+
+        | my-instance-a-0    | compute#instance |
+        +--------------------+------------------+
         """))
 
   def testVisibleSortByMultipleStreamedResourceCase(self):
@@ -2131,67 +2347,95 @@ class TablePrinterConsoleAttrTest(resource_printer_test_base.Base):
 
 
 class TablePrivateAttributeTest(sdk_test_base.WithLogCapture,
-                                resource_printer_test_base.Base):
+                                resource_printer_test_base.Base,
+                                parameterized.TestCase):
 
   _SECRET = 'too many secrets'
   _RESOURCE = [{'message': _SECRET}]
 
-  def testTableNoPrivateAttributeDefaultOut(self):
-    resource_printer.Print(self._RESOURCE, 'table(message)', out=None)
+  @parameterized.named_parameters(
+      ('', 'table(message)'),
+      ('WithPager', '[pager]table(message)'))
+  def testTableNoPrivateAttributeDefaultOut(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string, out=None)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogContains(self._SECRET)
 
-  def testTableNoPrivateAttributeLogOut(self):
-    resource_printer.Print(self._RESOURCE, 'table(message)', out=log.out)
+  @parameterized.named_parameters(
+      ('', 'table(message)'),
+      ('WithPager', '[pager]table(message)'))
+  def testTableNoPrivateAttributeLogOut(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string, out=log.out)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogContains(self._SECRET)
 
-  def testTablePrivateAttributeDefaultOut(self):
-    resource_printer.Print(self._RESOURCE, '[private]table(message)',
+  @parameterized.named_parameters(
+      ('', '[private]table(message)'),
+      ('WithPager', '[private,pager]table(message)'))
+  def testTablePrivateAttributeDefaultOut(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=None)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testTablePrivateAttributeLogOut(self):
-    resource_printer.Print(self._RESOURCE, '[private]table(message)',
+  @parameterized.named_parameters(
+      ('', '[private]table(message)'),
+      ('WithPager', '[private,pager]table(message)'))
+  def testTablePrivateAttributeLogOut(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=log.out)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testTableNoPrivateAttributeLogErr(self):
-    resource_printer.Print(self._RESOURCE, 'table(message)',
+  @parameterized.named_parameters(
+      ('', 'table(message)'),
+      ('WithPager', '[pager]table(message)'))
+  def testTableNoPrivateAttributeLogErr(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=log.err)
     self.AssertOutputNotContains(self._SECRET)
     self.AssertErrContains(self._SECRET)
     self.AssertLogContains(self._SECRET)
 
-  def testTablePrivateAttributeLogErr(self):
-    resource_printer.Print(self._RESOURCE, '[private]table(message)',
+  @parameterized.named_parameters(
+      ('', '[private]table(message)'),
+      ('WithPager', '[private,pager]table(message)'))
+  def testTablePrivateAttributeLogErr(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=log.err)
     self.AssertOutputNotContains(self._SECRET)
     self.AssertErrContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testTablePrivateAttributeLogStatus(self):
-    resource_printer.Print(self._RESOURCE, '[private]table(message)',
+  @parameterized.named_parameters(
+      ('', '[private]table(message)'),
+      ('WithPager', '[private,pager]table(message)'))
+  def testTablePrivateAttributeLogStatus(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=log.status)
     self.AssertOutputNotContains(self._SECRET)
     self.AssertErrContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testTablePrivateAttributeStdout(self):
-    resource_printer.Print(self._RESOURCE, '[private]table(message)',
+  @parameterized.named_parameters(
+      ('', '[private]table(message)'),
+      ('WithPager', '[private,pager]table(message)'))
+  def testTablePrivateAttributeStdout(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=sys.stdout)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testTablePrivateAttributeStderr(self):
-    resource_printer.Print(self._RESOURCE, '[private]table(message)',
+  @parameterized.named_parameters(
+      ('', '[private]table(message)'),
+      ('WithPager', '[private,pager]table(message)'))
+  def testTablePrivateAttributeStderr(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=sys.stderr)
     self.AssertOutputNotContains(self._SECRET)
     self.AssertErrContains(self._SECRET)
@@ -2541,7 +2785,7 @@ last
      - last-2
 """)
 
-  def testTableestedTableDuplicateKeyName(self):
+  def testTableNestedTableDuplicateKeyName(self):
     resources = [
         {
             'predictions': [
@@ -2591,6 +2835,34 @@ KEY  PREDICTIONS
 2    7,8
 3    9
 """)
+
+  def testTableNestedTableNoBoxWithPager(self):
+    mock_more = self.StartObjectPatch(console_io, 'More')
+    resource_printer.Print(
+        self.CreateResourceList(3),
+        'table[pager](name, kind, metadata.kind, '
+        '      metadata.items:format="table(key, value)")')
+    mock_more.assert_called_once_with("""\
+NAME               KIND              METADATA_KIND
+my-instance-a-0    compute#instance  compute#metadata.2
+    KEY  VALUE
+    a    b
+    c    d
+    e    f
+    g    h
+my-instance-az-1   compute#instance  compute#metadata.1
+    KEY  VALUE
+    a    b
+    c    d
+    e    f
+    g    h
+my-instance-azz-2  compute#instance  compute#metadata.0
+    KEY  VALUE
+    a    b
+    c    d
+    e    f
+    g    h
+""", out=log.out)
 
 
 class TablePrintFormatTest(resource_printer_test_base.Base):
@@ -2751,6 +3023,23 @@ xyz-789
           '      :format="table(name, foo)"'
           ')',
       )
+
+  def testTableExtractJoin(self):
+    resource = [
+        {'dir': 'bin', 'file': 'abc'},
+        {'dir': 'usr'},
+        {'dir': 'lost+found', 'file': 'tmp/junk'},
+    ]
+    resource_printer.Print(
+        resource,
+        'table(extract(dir, file).join():label=PATH)',
+    )
+    self.AssertOutputEquals("""\
+PATH
+bin/abc
+usr
+lost+found/tmp/junk
+""")
 
 
 class TablePrintFloatTest(resource_printer_test_base.Base):

@@ -50,6 +50,10 @@ HINT_VERSION = ('This field is not used by gcloud and must be removed. '
 HINT_THREADSAFE = ('This field is not supported with runtime [{}] and can '
                    'safely be removed.')
 
+HINT_READABLE = ('This field is not configurable with runtime [{}] since '
+                 'static files are always readable by the application. It '
+                 'can safely be removed.')
+
 MANAGED_VMS_DEPRECATION_WARNING = """\
 Deployments using `vm: true` have been deprecated.  Please update your \
 app.yaml to use `env: flex`. To learn more, please visit \
@@ -222,7 +226,36 @@ class ConfigYamlInfo(_YamlInfo):
         file_path=file_path,
         msg=HINT_PROJECT)
 
+    if base == 'dispatch':
+      return DispatchConfigYamlInfo(file_path, config=base, parsed=parsed)
     return ConfigYamlInfo(file_path, config=base, parsed=parsed)
+
+
+class DispatchConfigYamlInfo(ConfigYamlInfo):
+  """Provides methods for getting 1p-ready representation."""
+
+  def _HandlerToDict(self, handler):
+    parsed_url = dispatchinfo.ParsedURL(handler.url)
+    dispatch_domain = parsed_url.host
+    if not parsed_url.host_exact:
+      dispatch_domain = '*' + dispatch_domain
+
+    dispatch_path = parsed_url.path
+    if not parsed_url.path_exact:
+      dispatch_path = dispatch_path.rstrip('/') + '/*'
+    return {
+        'domain': dispatch_domain,
+        'path': dispatch_path,
+        'service': handler.service,
+    }
+
+  def GetRules(self):
+    """Get dispatch rules on a format suitable for Admin API.
+
+    Returns:
+      [{'service': str, 'domain': str, 'path': str}], rules.
+    """
+    return [self._HandlerToDict(h) for h in self.parsed.dispatch or []]
 
 
 class ServiceYamlInfo(_YamlInfo):
@@ -349,14 +382,6 @@ class ServiceYamlInfo(_YamlInfo):
         GetRuntimeConfigAttr(self.parsed, 'python_version') == '3.4'):
       log.warning(FLEX_PY34_WARNING)
 
-    if self.is_ti_runtime:
-      _CheckIllegalAttribute(
-          name='threadsafe',
-          yaml_info=self.parsed,
-          extractor_func=lambda yaml: yaml.threadsafe,
-          file_path=self.file,
-          msg=HINT_THREADSAFE.format(self.runtime))
-
     _CheckIllegalAttribute(
         name='application',
         yaml_info=self.parsed,
@@ -370,6 +395,28 @@ class ServiceYamlInfo(_YamlInfo):
         extractor_func=lambda yaml: yaml.version,
         file_path=self.file,
         msg=HINT_VERSION)
+
+    self._ValidateTi()
+
+  def _ValidateTi(self):
+    """Validation specifically for Ti-runtimes."""
+    if not self.is_ti_runtime:
+      return
+    _CheckIllegalAttribute(
+        name='threadsafe',
+        yaml_info=self.parsed,
+        extractor_func=lambda yaml: yaml.threadsafe,
+        file_path=self.file,
+        msg=HINT_THREADSAFE.format(self.runtime))
+
+    # pylint: disable=cell-var-from-loop
+    for handler in self.parsed.handlers:
+      _CheckIllegalAttribute(
+          name='application_readable',
+          yaml_info=handler,
+          extractor_func=lambda yaml: handler.application_readable,
+          file_path=self.file,
+          msg=HINT_READABLE.format(self.runtime))
 
   def RequiresImage(self):
     """Returns True if we'll need to build a docker image."""

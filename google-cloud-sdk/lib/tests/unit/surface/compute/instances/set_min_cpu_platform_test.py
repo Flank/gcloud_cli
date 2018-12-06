@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -35,7 +35,7 @@ class SetMinCpuPlatformTest(sdk_test_base.WithFakeAuth,
                             cli_test_base.CliTestBase, waiter_test_base.Base):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.client_class = core_apis.GetClientClass('compute', 'alpha')
     self.messages = core_apis.GetMessagesModule('compute', 'alpha')
     self.resources = resources.REGISTRY.Clone()

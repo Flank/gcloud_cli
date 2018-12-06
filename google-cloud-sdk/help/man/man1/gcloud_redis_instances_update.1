@@ -1,0 +1,173 @@
+
+.TH "GCLOUD_REDIS_INSTANCES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud redis instances update \- update Memorystore Redis instances
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud redis instances update\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-remove\-redis\-config\fR=[\fIKEY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-update\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Update the metadata and/or configuration parameters of a Redis instance.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The instance specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to update the given instance.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- Arguments and flags that specify the Memorystore Redis
+instance you want to update. The arguments in this group can be used to specify
+the attributes of this resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [instance] on the command line with a fully specified name;
+provide the argument [\-\-project] on the command line; set the property
+[core/project]. This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Redis region of the instance. Overrides the default redis/region
+property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+A human\-readable name for the instance.
+
+.TP 2m
+\fB\-\-remove\-redis\-config\fR=[\fIKEY\fR,...]
+A list of Redis config parameters to remove. Removing a non\-existent config
+parameter is silently ignored.
+
+.TP 2m
+\fB\-\-size\fR=\fISIZE\fR
+The memory size of the instance in GiB.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-update\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR
+A list of Redis config KEY=VALUE pairs to update according to
+http://redis.io/topics/config. If a config parameter is already set, its value
+is modified; otherwise a new Redis config parameter is added. Currently, the
+only supported parameters are: maxmemory\-policy, notify\-keyspace\-events.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Removes all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud redis instances update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud redis instances update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+A list of label keys to remove. If a label does not exist it is silently
+ignored.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBredis/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/memorystore/docs/redis/
+
+
+
+.SH "EXAMPLES"
+
+To update a Redis instance with the name \f5my\-redis\-instance\fR to have the
+display name "Cache for Foo Service", and add the two labels, \f5env\fR and
+\f5service\fR, run:
+
+.RS 2m
+$ gcloud redis instances update my\-redis\-instance \e
+    \-\-display\-name="Cache for Foo Service" \e
+    \-\-update\-labels=env=test,service=foo
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha redis instances update
+$ gcloud beta redis instances update
+.RE
+

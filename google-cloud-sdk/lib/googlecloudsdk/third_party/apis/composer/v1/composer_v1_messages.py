@@ -133,14 +133,14 @@ class ComposerProjectsLocationsEnvironmentsPatchRequest(_messages.Message):
       Apache Airflow config overrides. If a replacement config  overrides map
       is not included in `environment`, all config overrides  are cleared.  It
       is an error to provide both this mask and a mask specifying one or  more
-      individual config overrides.</td>  </tr>  <tr>
-      <td>config.softwareConfig.properties.<var>section</var>-<var>name
-      </var></td>  <td>Override the Apache Airflow property <var>name</var> in
-      the section  named <var>section</var>, preserving other properties. To
-      delete the  property override, include it in `updateMask` and omit its
-      mapping  in `environment.config.softwareConfig.properties`.  It is an
+      individual config overrides.</td>  </tr>  <tr>  <td>config.softwareConfi
+      g.airflowConfigOverrides.<var>section</var>-<var>name  </var></td>
+      <td>Override the Apache Airflow config property <var>name</var> in the
+      section named <var>section</var>, preserving other properties. To delete
+      the property override, include it in `updateMask` and omit its mapping
+      in `environment.config.softwareConfig.airflowConfigOverrides`.  It is an
       error to provide both a mask of this form and the
-      "config.softwareConfig.properties" mask.</td>  </tr>  <tr>
+      "config.softwareConfig.airflowConfigOverrides" mask.</td>  </tr>  <tr>
       <td>config.softwareConfig.envVariables</td>  <td>Replace all environment
       variables. If a replacement environment  variable map is not included in
       `environment`, all custom environment  variables  are cleared.  It is an
@@ -295,9 +295,9 @@ class EnvironmentConfig(_messages.Message):
   r"""Configuration information for an environment.
 
   Fields:
-    airflowUri: The URI of the Apache Airflow Web UI hosted within this
-      environment (see [Airflow web interface](/composer/docs/how-to/accessing
-      /airflow-web-interface)).
+    airflowUri: Output only. The URI of the Apache Airflow Web UI hosted
+      within this environment (see [Airflow web interface](/composer/docs/how-
+      to/accessing/airflow-web-interface)).
     dagGcsPrefix: Output only. The Cloud Storage prefix of the DAGs for this
       environment. Although Cloud Storage objects reside in a flat namespace,
       a hierarchical file tree can be simulated using "/"-delimited object
@@ -388,7 +388,7 @@ class NodeConfig(_messages.Message):
       VPC](/vpc/docs/shared-vpc) is not currently supported. The network must
       belong to the environment's project. If unspecified, the "default"
       network ID in the environment's project is used.  If a [Custom Subnet
-      Network]((/vpc/docs/vpc#vpc_networks_and_subnets) is provided,
+      Network](/vpc/docs/vpc#vpc_networks_and_subnets) is provided,
       `nodeConfig.subnetwork` must also be provided.
     oauthScopes: Optional. The set of Google API scopes to be made available
       on all node VMs. If `oauth_scopes` is empty, defaults to
@@ -661,6 +661,9 @@ class SoftwareConfig(_messages.Message):
       specifier such as "==1.12.0", "[devel,gcp_api]", or "[devel]>=1.8.2,
       <1.9.2". To specify a package without pinning it to a version specifier,
       use the empty string as the value.
+    pythonVersion: Optional. The major version of Python used to run the
+      Apache Airflow scheduler, worker, and webserver processes.  Can be set
+      to '2' or '3'. If not specified, the default is '2'. Cannot be updated.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -769,6 +772,7 @@ class SoftwareConfig(_messages.Message):
   envVariables = _messages.MessageField('EnvVariablesValue', 2)
   imageVersion = _messages.StringField(3)
   pypiPackages = _messages.MessageField('PypiPackagesValue', 4)
+  pythonVersion = _messages.StringField(5)
 
 
 class StandardQueryParameters(_messages.Message):

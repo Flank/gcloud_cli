@@ -24,20 +24,22 @@ from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.compute import managed_instance_groups_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import httplib2
+from mock import patch
 
 
 class _InstanceGroupManagerInstanceConfigsCreateTestBase(
     sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'alpha')
@@ -463,6 +465,17 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
             --stateful-disk device-name=abc
           """)
 
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run("""
+          compute instance-groups managed instance-configs create group-1
+            --zone us-central2-a
+            --instance foo
+          """)
+
 
 class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
     _InstanceGroupManagerInstanceConfigsCreateTestBase):
@@ -480,7 +493,7 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
             instance='{project_uri}/zones/us-central2-a/instances/foo'.format(
                 project_uri=self.project_uri),),
     ]
-    response = self.messages.InstanceGroupManagersListManagedInstancesResponse(
+    response = self.messages.RegionInstanceGroupManagersListInstancesResponse(
         managedInstances=managed_instances)
     self.client.regionInstanceGroupManagers.ListManagedInstances.Expect(
         request,
@@ -516,7 +529,7 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
       ]
     else:
       items = []
-    response = self.messages.InstanceGroupManagersListPerInstanceConfigsResp(
+    response = self.messages.RegionInstanceGroupManagersListInstanceConfigsResp(
         items=items)
     self.client.regionInstanceGroupManagers.ListPerInstanceConfigs.Expect(
         request,

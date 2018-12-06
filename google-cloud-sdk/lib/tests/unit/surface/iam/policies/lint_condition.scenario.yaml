@@ -1,0 +1,185 @@
+title: iam policies lint-condition scenario tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam policies lint-condition --resource-name='//cloudresourcemanager.googleapis.com/v1/projects/sample-project'
+      --expression='true' --title='title' --description='descr'
+  - stdout: |
+      {}
+- execute:
+  - command: iam policies lint-condition --resource-name='//cloudresourcemanager.googleapis.com/v1/projects/sample-project'
+      --condition-from-file='condition.yaml'
+  - stdout: |
+      {}
+- execute:
+  - command: iam policies lint-condition --resource-name='//cloudresourcemanager.googleapis.com/v1/projects/sample-project'
+      --condition-from-file='condition.json'
+  - stdout: |
+      {}
+- execute:
+  - command: iam policies lint-condition --expression='true' --title='title' --description='descr'
+  - stdout: |
+      {}
+- execute:
+  - command: iam policies lint-condition --expression='true' --description='descr'
+  - stderr: |
+      ERROR: (gcloud.alpha.iam.policies.lint-condition) argument [--expression : --description]: --title must be specified.
+      Usage: gcloud alpha iam policies lint-condition (--condition-from-file=CONDITION_FROM_FILE | [--expression=EXPRESSION --title=TITLE : --description=DESCRIPTION]) [optional flags]
+        optional flags may be  --condition-from-file | --description | --expression |
+                               --help | --resource-name | --title
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha iam policies lint-condition --help
+  - error: '1: argument [--expression : --description]: --title must be specified.'
+- execute:
+  - command: iam policies lint-condition --resource-name='//cloudresourcemanager.googleapis.com/v1/projects/sample-project'
+      --condition-from-file='condition_format_wrong.json'
+  - error: '1: Invalid value for [condition-from-file]: condition_format_wrong.json
+      must be a path to a YAML or JSON file containing the condition. `expression`
+      and `title` are required keys. `description` is optional.'
+actions:
+- write_file:
+    path: condition.yaml
+    contents: |
+      "expression": "true"
+      "title": "title"
+      "description": "descr"
+
+- write_file:
+    path: condition.json
+    contents: |
+      {
+        "expression": "true",
+        "title": "title",
+        "description": "descr"
+      }
+- write_file:
+    path: condition_format_wrong.json
+    contents: |
+      {
+        "expression": "true",
+        "description": "descr"
+      }
+
+- execute_command:
+    command: iam policies lint-condition --resource-name='//cloudresourcemanager.googleapis.com/v1/projects/sample-project'
+      --expression='true' --title='title' --description='descr'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v1/iamPolicies:lintPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              condition:
+                description: descr
+                expression: 'true'
+                title: title
+              fullResourceName: //cloudresourcemanager.googleapis.com/v1/projects/sample-project
+        return_response:
+          headers:
+            status: '200'
+          body: null
+
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: iam policies lint-condition --resource-name='//cloudresourcemanager.googleapis.com/v1/projects/sample-project'
+      --condition-from-file='condition.yaml'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v1/iamPolicies:lintPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              condition:
+                description: descr
+                expression: 'true'
+                title: title
+              fullResourceName: //cloudresourcemanager.googleapis.com/v1/projects/sample-project
+        return_response:
+          headers:
+            status: '200'
+          body: null
+
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: iam policies lint-condition --resource-name='//cloudresourcemanager.googleapis.com/v1/projects/sample-project'
+      --condition-from-file='condition.json'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v1/iamPolicies:lintPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              condition:
+                description: descr
+                expression: 'true'
+                title: title
+              fullResourceName: //cloudresourcemanager.googleapis.com/v1/projects/sample-project
+        return_response:
+          headers:
+            status: '200'
+          body: null
+
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: iam policies lint-condition --expression='true' --title='title' --description='descr'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v1/iamPolicies:lintPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              condition:
+                description: descr
+                expression: 'true'
+                title: title
+        return_response:
+          headers:
+            status: '200'
+          body: null
+
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: iam policies lint-condition --expression='true' --description='descr'
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.iam.policies.lint-condition) argument [--expression : --description]: --title must be specified.
+        Usage: gcloud alpha iam policies lint-condition (--condition-from-file=CONDITION_FROM_FILE | [--expression=EXPRESSION --title=TITLE : --description=DESCRIPTION]) [optional flags]
+          optional flags may be  --condition-from-file | --description | --expression |
+                                 --help | --resource-name | --title
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha iam policies lint-condition --help
+    - expect_exit:
+        code: 1
+        message: 'argument [--expression : --description]: --title must be specified.'
+- execute_command:
+    command: iam policies lint-condition --resource-name='//cloudresourcemanager.googleapis.com/v1/projects/sample-project'
+      --condition-from-file='condition_format_wrong.json'
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [condition-from-file]: condition_format_wrong.json
+          must be a path to a YAML or JSON file containing the condition. `expression`
+          and `title` are required keys. `description` is optional.'

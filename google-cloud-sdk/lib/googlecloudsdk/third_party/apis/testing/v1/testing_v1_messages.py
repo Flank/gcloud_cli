@@ -91,6 +91,7 @@ class AndroidInstrumentationTest(_messages.Message):
 
   Fields:
     appApk: The APK for the application under test.
+    appBundle: A multi-apk app bundle for the application under test.
     appPackageId: The java package for the application under test. Optional,
       default is determined by examining the application's manifest.
     orchestratorOption: The option of whether running each test within its own
@@ -139,12 +140,13 @@ class AndroidInstrumentationTest(_messages.Message):
     DO_NOT_USE_ORCHESTRATOR = 2
 
   appApk = _messages.MessageField('FileReference', 1)
-  appPackageId = _messages.StringField(2)
-  orchestratorOption = _messages.EnumField('OrchestratorOptionValueValuesEnum', 3)
-  testApk = _messages.MessageField('FileReference', 4)
-  testPackageId = _messages.StringField(5)
-  testRunnerClass = _messages.StringField(6)
-  testTargets = _messages.StringField(7, repeated=True)
+  appBundle = _messages.MessageField('AppBundle', 2)
+  appPackageId = _messages.StringField(3)
+  orchestratorOption = _messages.EnumField('OrchestratorOptionValueValuesEnum', 4)
+  testApk = _messages.MessageField('FileReference', 5)
+  testPackageId = _messages.StringField(6)
+  testRunnerClass = _messages.StringField(7)
+  testTargets = _messages.StringField(8, repeated=True)
 
 
 class AndroidMatrix(_messages.Message):
@@ -177,6 +179,8 @@ class AndroidModel(_messages.Message):
   Enums:
     FormValueValuesEnum: Whether this device is virtual or physical.
       @OutputOnly
+    FormFactorValueValuesEnum: Whether this device is a phone, tablet,
+      wearable, etc. @OutputOnly
 
   Fields:
     brand: The company that this device is branded with. Example: "Google",
@@ -184,8 +188,13 @@ class AndroidModel(_messages.Message):
     codename: The name of the industrial design. This corresponds to
       android.os.Build.DEVICE @OutputOnly
     form: Whether this device is virtual or physical. @OutputOnly
+    formFactor: Whether this device is a phone, tablet, wearable, etc.
+      @OutputOnly
     id: The unique opaque id for this model. Use this for invoking the
       TestExecutionService. @OutputOnly
+    lowFpsVideoRecording: True if and only if tests with this model are
+      recorded by stitching together screenshots. See
+      use_low_spec_video_recording in device config. @OutputOnly
     manufacturer: The manufacturer of this device. @OutputOnly
     name: The human-readable marketing name for this device model. Examples:
       "Nexus 5", "Galaxy S5" @OutputOnly
@@ -206,10 +215,21 @@ class AndroidModel(_messages.Message):
       @OutputOnly
     tags: Tags for this dimension. Examples: "default", "preview",
       "deprecated"
-    videoRecordingNotSupported: True if and only if tests with this model DO
-      NOT have video output. See also
-      TestSpecification.disable_video_recording @OutputOnly
   """
+
+  class FormFactorValueValuesEnum(_messages.Enum):
+    r"""Whether this device is a phone, tablet, wearable, etc. @OutputOnly
+
+    Values:
+      DEVICE_FORM_FACTOR_UNSPECIFIED: Do not use. For proto versioning only.
+      PHONE: This device has the shape of a phone
+      TABLET: This device has the shape of a tablet
+      WEARABLE: This device has the shape of a watch or other wearable
+    """
+    DEVICE_FORM_FACTOR_UNSPECIFIED = 0
+    PHONE = 1
+    TABLET = 2
+    WEARABLE = 3
 
   class FormValueValuesEnum(_messages.Enum):
     r"""Whether this device is virtual or physical. @OutputOnly
@@ -226,16 +246,17 @@ class AndroidModel(_messages.Message):
   brand = _messages.StringField(1)
   codename = _messages.StringField(2)
   form = _messages.EnumField('FormValueValuesEnum', 3)
-  id = _messages.StringField(4)
-  manufacturer = _messages.StringField(5)
-  name = _messages.StringField(6)
-  screenDensity = _messages.IntegerField(7, variant=_messages.Variant.INT32)
-  screenX = _messages.IntegerField(8, variant=_messages.Variant.INT32)
-  screenY = _messages.IntegerField(9, variant=_messages.Variant.INT32)
-  supportedAbis = _messages.StringField(10, repeated=True)
-  supportedVersionIds = _messages.StringField(11, repeated=True)
-  tags = _messages.StringField(12, repeated=True)
-  videoRecordingNotSupported = _messages.BooleanField(13)
+  formFactor = _messages.EnumField('FormFactorValueValuesEnum', 4)
+  id = _messages.StringField(5)
+  lowFpsVideoRecording = _messages.BooleanField(6)
+  manufacturer = _messages.StringField(7)
+  name = _messages.StringField(8)
+  screenDensity = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  screenX = _messages.IntegerField(10, variant=_messages.Variant.INT32)
+  screenY = _messages.IntegerField(11, variant=_messages.Variant.INT32)
+  supportedAbis = _messages.StringField(12, repeated=True)
+  supportedVersionIds = _messages.StringField(13, repeated=True)
+  tags = _messages.StringField(14, repeated=True)
 
 
 class AndroidRoboTest(_messages.Message):
@@ -244,6 +265,7 @@ class AndroidRoboTest(_messages.Message):
 
   Fields:
     appApk: The APK for the application under test.
+    appBundle: A multi-apk app bundle for the application under test.
     appInitialActivity: The initial activity that should be used to start the
       app. Optional
     appPackageId: The java package for the application under test. Optional,
@@ -265,13 +287,14 @@ class AndroidRoboTest(_messages.Message):
   """
 
   appApk = _messages.MessageField('FileReference', 1)
-  appInitialActivity = _messages.StringField(2)
-  appPackageId = _messages.StringField(3)
-  maxDepth = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  maxSteps = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  roboDirectives = _messages.MessageField('RoboDirective', 6, repeated=True)
-  roboScript = _messages.MessageField('FileReference', 7)
-  startingIntents = _messages.MessageField('RoboStartingIntent', 8, repeated=True)
+  appBundle = _messages.MessageField('AppBundle', 2)
+  appInitialActivity = _messages.StringField(3)
+  appPackageId = _messages.StringField(4)
+  maxDepth = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  maxSteps = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  roboDirectives = _messages.MessageField('RoboDirective', 7, repeated=True)
+  roboScript = _messages.MessageField('FileReference', 8)
+  startingIntents = _messages.MessageField('RoboStartingIntent', 9, repeated=True)
 
 
 class AndroidRuntimeConfiguration(_messages.Message):
@@ -293,6 +316,7 @@ class AndroidTestLoop(_messages.Message):
 
   Fields:
     appApk: The APK for the application under test.
+    appBundle: A multi-apk app bundle for the application under test.
     appPackageId: The java package for the application under test. Optional,
       default is determined by examining the application's manifest.
     scenarioLabels: The list of scenario labels that should be run during the
@@ -308,9 +332,10 @@ class AndroidTestLoop(_messages.Message):
   """
 
   appApk = _messages.MessageField('FileReference', 1)
-  appPackageId = _messages.StringField(2)
-  scenarioLabels = _messages.StringField(3, repeated=True)
-  scenarios = _messages.IntegerField(4, repeated=True, variant=_messages.Variant.INT32)
+  appBundle = _messages.MessageField('AppBundle', 2)
+  appPackageId = _messages.StringField(3)
+  scenarioLabels = _messages.StringField(4, repeated=True)
+  scenarios = _messages.IntegerField(5, repeated=True, variant=_messages.Variant.INT32)
 
 
 class AndroidVersion(_messages.Message):
@@ -385,6 +410,19 @@ class ApkManifest(_messages.Message):
   maxSdkVersion = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   minSdkVersion = _messages.IntegerField(4, variant=_messages.Variant.INT32)
   packageName = _messages.StringField(5)
+
+
+class AppBundle(_messages.Message):
+  r"""An Android App Bundle file format, containing a BundleConfig.pb file, a
+  base module directory, zero or more dynamic feature module directories.
+  <p>See https://developer.android.com/guide/app-bundle/build for guidance on
+  building App Bundles.
+
+  Fields:
+    bundleLocation: .aab file representing the app bundle under test.
+  """
+
+  bundleLocation = _messages.MessageField('FileReference', 1)
 
 
 class CancelTestMatrixResponse(_messages.Message):
@@ -474,19 +512,21 @@ class ClientInfoDetail(_messages.Message):
 
 
 class Date(_messages.Message):
-  r"""Represents a whole calendar date, e.g. date of birth. The time of day
-  and time zone are either specified elsewhere or are not significant. The
-  date is relative to the Proleptic Gregorian Calendar. The day may be 0 to
-  represent a year and month where the day is not significant, e.g. credit
-  card expiration date. The year may be 0 to represent a month and day
-  independent of year, e.g. anniversary date. Related types are
+  r"""Represents a whole or partial calendar date, e.g. a birthday. The time
+  of day and time zone are either specified elsewhere or are not significant.
+  The date is relative to the Proleptic Gregorian Calendar. This can
+  represent:  * A full date, with non-zero year, month and day values * A
+  month and day value, with a zero year, e.g. an anniversary * A year on its
+  own, with zero month and day values * A year and month value, with a zero
+  day, e.g. a credit card expiration date  Related types are
   google.type.TimeOfDay and `google.protobuf.Timestamp`.
 
   Fields:
     day: Day of month. Must be from 1 to 31 and valid for the year and month,
-      or 0 if specifying a year/month where the day is not significant.
-    month: Month of year. Must be from 1 to 12, or 0 if specifying a date
-      without a month.
+      or 0 if specifying a year by itself or a year and month where the day is
+      not significant.
+    month: Month of year. Must be from 1 to 12, or 0 if specifying a year
+      without a month and day.
     year: Year of date. Must be from 1 to 9999, or 0 if specifying a date
       without a year.
   """
@@ -626,16 +666,14 @@ class IosDevice(_messages.Message):
   r"""A single iOS device.
 
   Fields:
-    iosModelId: The id of the iOS device to be used. Use the
-      EnvironmentDiscoveryService to get supported options. Required
-    iosVersionId: The id of the iOS major software version to be used. Use the
-      EnvironmentDiscoveryService to get supported options. Required
-    locale: The locale the test device used for testing (only "en" is
-      currently supported). Use the EnvironmentDiscoveryService to get
-      supported options (not yet implemented). Required
-    orientation: How the device is oriented during the test (only "portrait"
-      is currently supported). Use the EnvironmentDiscoveryService to get
-      supported options. (not yet implemented). Required
+    iosModelId: Required. The id of the iOS device to be used. Use the
+      EnvironmentDiscoveryService to get supported options.
+    iosVersionId: Required. The id of the iOS major software version to be
+      used. Use the EnvironmentDiscoveryService to get supported options.
+    locale: Required. The locale the test device used for testing. Use the
+      EnvironmentDiscoveryService to get supported options.
+    orientation: Required. How the device is oriented during the test. Use the
+      EnvironmentDiscoveryService to get supported options.
   """
 
   iosModelId = _messages.StringField(1)
@@ -648,22 +686,24 @@ class IosDeviceCatalog(_messages.Message):
   r"""The currently supported iOS devices.
 
   Fields:
-    models: The set of supported iOS device models. @OutputOnly
-    runtimeConfiguration: The set of supported runtime configurations.
-      @OutputOnly
-    versions: The set of supported iOS software versions. @OutputOnly
+    models: Output only. The set of supported iOS device models.
+    runtimeConfiguration: Output only. The set of supported runtime
+      configurations.
+    versions: Output only. The set of supported iOS software versions.
+    xcodeVersions: Output only. The set of supported Xcode versions.
   """
 
   models = _messages.MessageField('IosModel', 1, repeated=True)
   runtimeConfiguration = _messages.MessageField('IosRuntimeConfiguration', 2)
   versions = _messages.MessageField('IosVersion', 3, repeated=True)
+  xcodeVersions = _messages.MessageField('XcodeVersion', 4, repeated=True)
 
 
 class IosDeviceList(_messages.Message):
   r"""A list of iOS device configurations in which the test is to be executed.
 
   Fields:
-    iosDevices: A list of iOS devices Required
+    iosDevices: Required. A list of iOS devices
   """
 
   iosDevices = _messages.MessageField('IosDevice', 1, repeated=True)
@@ -672,29 +712,55 @@ class IosDeviceList(_messages.Message):
 class IosModel(_messages.Message):
   r"""A description of an iOS device tests may be run on.
 
+  Enums:
+    FormFactorValueValuesEnum: Whether this device is a phone, tablet,
+      wearable, etc. @OutputOnly
+
   Fields:
-    id: The unique opaque id for this model. Use this for invoking the
-      TestExecutionService. @OutputOnly
-    name: The human-readable name for this device model. Examples: "iPhone
-      4s", "iPad Mini 2" @OutputOnly
-    supportedVersionIds: The set of iOS major software versions this device
-      supports. @OutputOnly
-    tags: Tags for this dimension. Examples: "default", "preview",
-      "deprecated" @OutputOnly
+    deviceCapabilities: Output only. Device capabilities. Copied from https://
+      developer.apple.com/library/archive/documentation/DeviceInformation/Refe
+      rence/iOSDeviceCompatibility/DeviceCompatibilityMatrix/DeviceCompatibili
+      tyMatrix.html
+    formFactor: Whether this device is a phone, tablet, wearable, etc.
+      @OutputOnly
+    id: Output only. The unique opaque id for this model. Use this for
+      invoking the TestExecutionService.
+    name: Output only. The human-readable name for this device model.
+      Examples: "iPhone 4s", "iPad Mini 2"
+    supportedVersionIds: Output only. The set of iOS major software versions
+      this device supports.
+    tags: Output only. Tags for this dimension. Examples: "default",
+      "preview", "deprecated"
   """
 
-  id = _messages.StringField(1)
-  name = _messages.StringField(2)
-  supportedVersionIds = _messages.StringField(3, repeated=True)
-  tags = _messages.StringField(4, repeated=True)
+  class FormFactorValueValuesEnum(_messages.Enum):
+    r"""Whether this device is a phone, tablet, wearable, etc. @OutputOnly
+
+    Values:
+      DEVICE_FORM_FACTOR_UNSPECIFIED: Do not use. For proto versioning only.
+      PHONE: This device has the shape of a phone
+      TABLET: This device has the shape of a tablet
+      WEARABLE: This device has the shape of a watch or other wearable
+    """
+    DEVICE_FORM_FACTOR_UNSPECIFIED = 0
+    PHONE = 1
+    TABLET = 2
+    WEARABLE = 3
+
+  deviceCapabilities = _messages.StringField(1, repeated=True)
+  formFactor = _messages.EnumField('FormFactorValueValuesEnum', 2)
+  id = _messages.StringField(3)
+  name = _messages.StringField(4)
+  supportedVersionIds = _messages.StringField(5, repeated=True)
+  tags = _messages.StringField(6, repeated=True)
 
 
 class IosRuntimeConfiguration(_messages.Message):
   r"""iOS configuration that can be selected at the time a test is run.
 
   Fields:
-    locales: The set of available locales. @OutputOnly
-    orientations: The set of available orientations. @OutputOnly
+    locales: Output only. The set of available locales.
+    orientations: Output only. The set of available orientations.
   """
 
   locales = _messages.MessageField('Locale', 1, repeated=True)
@@ -705,8 +771,10 @@ class IosTestSetup(_messages.Message):
   r"""A description of how to set up an iOS device prior to a test.
 
   Fields:
-    networkProfile: The network traffic profile used for running the test.
-      Optional
+    networkProfile: Optional. The network traffic profile used for running the
+      test. Available network profiles can be queried by using the
+      NETWORK_CONFIGURATION environment type when calling
+      TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
   """
 
   networkProfile = _messages.StringField(1)
@@ -716,20 +784,23 @@ class IosVersion(_messages.Message):
   r"""An iOS version
 
   Fields:
-    id: An opaque id for this iOS version. Use this id to invoke the
-      TestExecutionService. @OutputOnly
-    majorVersion: A integer representing the major iOS version. Examples: "8",
-      "9" @OutputOnly
-    minorVersion: A integer representing the minor iOS version. Examples: "1",
-      "2" @OutputOnly
-    tags: Tags for this dimension. Examples: "default", "preview",
-      "deprecated" @OutputOnly
+    id: Output only. An opaque id for this iOS version. Use this id to invoke
+      the TestExecutionService.
+    majorVersion: Output only. An integer representing the major iOS version.
+      Examples: "8", "9"
+    minorVersion: Output only. An integer representing the minor iOS version.
+      Examples: "1", "2"
+    supportedXcodeVersionIds: Output only. The available Xcode versions for
+      this version.
+    tags: Output only. Tags for this dimension. Examples: "default",
+      "preview", "deprecated"
   """
 
   id = _messages.StringField(1)
   majorVersion = _messages.IntegerField(2, variant=_messages.Variant.INT32)
   minorVersion = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  tags = _messages.StringField(4, repeated=True)
+  supportedXcodeVersionIds = _messages.StringField(4, repeated=True)
+  tags = _messages.StringField(5, repeated=True)
 
 
 class IosXcTest(_messages.Message):
@@ -741,18 +812,21 @@ class IosXcTest(_messages.Message):
   binaries needed to run the tests.
 
   Fields:
-    testsZip: The .zip containing the .xctestrun file and the contents of the
-      DerivedData/Build/Products directory. The .xctestrun file in this zip is
-      ignored if the xctestrun field is specified. Required
-    xctestrun: An .xctestrun file that will override the .xctestrun file in
-      the tests zip. Because the .xctestrun file contains environment
+    testsZip: Required. The .zip containing the .xctestrun file and the
+      contents of the DerivedData/Build/Products directory. The .xctestrun
+      file in this zip is ignored if the xctestrun field is specified.
+    xcodeVersion: Optional. The Xcode version that should be used for the
+      test. Use the EnvironmentDiscoveryService to get supported options.
+      Defaults to the latest Xcode version Firebase Test Lab supports.
+    xctestrun: Optional. An .xctestrun file that will override the .xctestrun
+      file in the tests zip. Because the .xctestrun file contains environment
       variables along with test methods to run and/or ignore, this can be
-      useful for sharding tests. Optional, default is taken from the tests
-      zip.
+      useful for sharding tests. Default is taken from the tests zip.
   """
 
   testsZip = _messages.MessageField('FileReference', 1)
-  xctestrun = _messages.MessageField('FileReference', 2)
+  xcodeVersion = _messages.StringField(2)
+  xctestrun = _messages.MessageField('FileReference', 3)
 
 
 class LauncherActivityIntent(_messages.Message):
@@ -1026,15 +1100,10 @@ class TestDetails(_messages.Message):
       progress. For example: "Provisioning a device", "Starting Test".  During
       the course of execution new data may be appended to the end of
       progress_messages. @OutputOnly
-    videoRecordingDisabled: Indicates that video will not be recorded for this
-      execution either because the user chose to disable it or the device does
-      not support it. See AndroidModel.video_recording_not_supported
-      @OutputOnly
   """
 
   errorMessage = _messages.StringField(1)
   progressMessages = _messages.StringField(2, repeated=True)
-  videoRecordingDisabled = _messages.BooleanField(3)
 
 
 class TestEnvironmentCatalog(_messages.Message):
@@ -1212,6 +1281,8 @@ class TestMatrix(_messages.Message):
         disallowed.
       TEST_NOT_APP_HOSTED: XC tests which run on physical devices must have
         "IsAppHostedTestBundle" == "true" in the xctestrun file.
+      PLIST_CANNOT_BE_PARSED: An Info.plist file in the XCTest zip could not
+        be parsed.
       TEST_ONLY_APK: The APK is marked as "testOnly". NOT USED
       MALFORMED_IPA: The input IPA could not be parsed. NOT USED
       NO_CODE_APK: APK contains no code. See also
@@ -1220,6 +1291,8 @@ class TestMatrix(_messages.Message):
       INVALID_INPUT_APK: Either the provided input APK path was malformed, the
         APK file does not exist, or the user does not have permission to
         access the APK file.
+      INVALID_APK_PREVIEW_SDK: APK is built for a preview SDK which is
+        unsupported
     """
     INVALID_MATRIX_DETAILS_UNSPECIFIED = 0
     DETAILS_UNAVAILABLE = 1
@@ -1245,10 +1318,12 @@ class TestMatrix(_messages.Message):
     NO_TESTS_IN_XC_TEST_ZIP = 21
     USE_DESTINATION_ARTIFACTS = 22
     TEST_NOT_APP_HOSTED = 23
-    TEST_ONLY_APK = 24
-    MALFORMED_IPA = 25
-    NO_CODE_APK = 26
-    INVALID_INPUT_APK = 27
+    PLIST_CANNOT_BE_PARSED = 24
+    TEST_ONLY_APK = 25
+    MALFORMED_IPA = 26
+    NO_CODE_APK = 27
+    INVALID_INPUT_APK = 28
+    INVALID_APK_PREVIEW_SDK = 29
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Indicates the current progress of the test matrix (e.g., FINISHED)
@@ -1327,8 +1402,10 @@ class TestSetup(_messages.Message):
       applicable for instrumentation tests).
     filesToPush: List of files to push to the device before starting the test.
       Optional
-    networkProfile: The network traffic profile used for running the test.
-      Optional
+    networkProfile: Optional. The network traffic profile used for running the
+      test. Available network profiles can be queried by using the
+      NETWORK_CONFIGURATION environment type when calling
+      TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
   """
 
   account = _messages.MessageField('Account', 1)
@@ -1356,7 +1433,7 @@ class TestSpecification(_messages.Message):
     disablePerformanceMetrics: Disables performance metrics recording; may
       reduce test latency.
     disableVideoRecording: Disables video recording; may reduce test latency.
-    iosTestSetup: Test setup requirements for iOS. Optional
+    iosTestSetup: Optional. Test setup requirements for iOS.
     iosXcTest: An iOS XCTest, via an .xctestrun file
     testSetup: Test setup requirements for Android e.g. files to install,
       bootstrap scripts. Optional
@@ -1511,6 +1588,18 @@ class TrafficRule(_messages.Message):
   delay = _messages.StringField(3)
   packetDuplicationRatio = _messages.FloatField(4, variant=_messages.Variant.FLOAT)
   packetLossRatio = _messages.FloatField(5, variant=_messages.Variant.FLOAT)
+
+
+class XcodeVersion(_messages.Message):
+  r"""An Xcode version that an iOS version is compatible with.
+
+  Fields:
+    tags: Output only. Tags for this Xcode version. Examples: "default"
+    version: Output only. The id for this version. Example: "9.2"
+  """
+
+  tags = _messages.StringField(1, repeated=True)
+  version = _messages.StringField(2)
 
 
 encoding.AddCustomJsonFieldMapping(

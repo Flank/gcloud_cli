@@ -1,0 +1,51 @@
+NAME
+    gcloud alpha run - manage your Cloud Run applications
+
+SYNOPSIS
+    gcloud alpha run GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The gcloud run command group lets you deploy container images to
+    Google Cloud Run.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     configurations
+        (ALPHA) View and manage your Cloud Run configurations.
+
+     revisions
+        (ALPHA) View and manage your Cloud Run revisions.
+
+     routes
+        (ALPHA) View your Cloud Run routes.
+
+     services
+        (ALPHA) View and manage your Cloud Run services.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     deploy
+        (ALPHA) Deploy an app, function or container to Cloud Run.
+
+EXAMPLES
+    To deploy your container, use the gcloud run deploy command:
+
+        $ gcloud run deploy <service-name> --image <image_name>
+
+    For more information, run:        $ gcloud run deploy --help
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

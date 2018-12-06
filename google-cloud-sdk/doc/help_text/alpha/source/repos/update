@@ -16,11 +16,11 @@ POSITIONAL ARGUMENTS
      Repo resource - Name of the Cloud Source repository to update. This
      represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
-     attribute: provide the flag [repo] on the command line with a fully
+     attribute: provide the argument [repo] on the command line with a fully
      specified name; set the property [core/project]. This must be specified.
 
        REPO
-          The ID of the repo or a fully qualified identifier for the repo.
+          ID of the repo or fully qualified identifier for the repo.
 
 REQUIRED FLAGS
      Manages Cloud Pub/Sub topics associated with the repository. At least one
@@ -47,41 +47,41 @@ REQUIRED FLAGS
          Topic resource - The Cloud Pub/Sub topic to add to the repository.
          This represents a Cloud resource. (NOTE) Some attributes are not given
          arguments in this group but can be set in other ways. To set the
-         [project] attribute: provide the flag [--add-topic] on the command
-         line with a fully specified name; provide the flag [--topic-project]
-         on the command line; set the property [core/project].
+         [project] attribute: provide the argument [--add-topic] on the command
+         line with a fully specified name; provide the argument
+         [--topic-project] on the command line; set the property
+         [core/project].
 
            --add-topic=ADD_TOPIC
-              The ID of the topic or a fully qualified identifier for the
-              topic.
+              ID of the topic or fully qualified identifier for the topic.
 
          Topic resource - The Cloud Pub/Sub topic to remove from the
          repository. This represents a Cloud resource. (NOTE) Some attributes
          are not given arguments in this group but can be set in other ways. To
-         set the [project] attribute: provide the flag [--remove-topic] on the
-         command line with a fully specified name; provide the flag
+         set the [project] attribute: provide the argument [--remove-topic] on
+         the command line with a fully specified name; provide the argument
          [--topic-project] on the command line; set the property
          [core/project].
 
            --remove-topic=REMOVE_TOPIC
-              The ID of the topic or a fully qualified identifier for the
-              topic.
+              ID of the topic or fully qualified identifier for the topic.
 
          Topic resource - The Cloud Pub/Sub topic to update in the project.
          This represents a Cloud resource. (NOTE) Some attributes are not given
          arguments in this group but can be set in other ways. To set the
-         [project] attribute: provide the flag [--update-topic] on the command
-         line with a fully specified name; provide the flag [--topic-project]
-         on the command line; set the property [core/project].
+         [project] attribute: provide the argument [--update-topic] on the
+         command line with a fully specified name; provide the argument
+         [--topic-project] on the command line; set the property
+         [core/project].
 
            --update-topic=UPDATE_TOPIC
-              The ID of the topic or a fully qualified identifier for the
-              topic.
+              ID of the topic or fully qualified identifier for the topic.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

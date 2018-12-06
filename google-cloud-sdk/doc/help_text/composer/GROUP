@@ -13,8 +13,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -35,7 +36,8 @@ EXAMPLES
         $ gcloud composer operations --help
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha composer
         $ gcloud beta composer
 

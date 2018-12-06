@@ -1049,9 +1049,6 @@ class MetricsTests(test_case.Base):
       py_args_mock = self.StartObjectPatch(execution_utils, 'ArgsForPythonTool')
       py_args_mock.return_value = ['run', 'python']
 
-      env_mock = self.StartObjectPatch(os.environ, 'copy')
-      env_mock.return_value = {}
-
       popen_mock = self.StartObjectPatch(subprocess, 'Popen')
 
       self.collector.ReportMetrics()
@@ -1119,9 +1116,6 @@ class MetricsTests(test_case.Base):
 
     py_args_mock = self.StartObjectPatch(execution_utils, 'ArgsForPythonTool')
     py_args_mock.return_value = ['run', 'python']
-
-    env_mock = self.StartObjectPatch(os.environ, 'copy')
-    env_mock.return_value = {}
 
     popen_mock = self.StartObjectPatch(subprocess, 'Popen')
     popen_mock.side_effect = OSError()

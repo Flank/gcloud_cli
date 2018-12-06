@@ -22,6 +22,7 @@ import argparse
 import os
 import shutil
 
+from googlecloudsdk.core.util import files
 from tests.lib.core.updater import util
 
 
@@ -43,7 +44,7 @@ def main():
                       help='The directory to generate the data to.')
   args = parser.parse_args()
 
-  out_dir = os.path.expanduser(args.output_dir)
+  out_dir = files.ExpandHomeDir(args.output_dir)
   util.Directories.TEMP_DIR = out_dir
   util.Directories.SetUpDirectories()
 

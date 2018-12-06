@@ -28,15 +28,15 @@ Update an existing Cloud DNS managed\-zone.
 
 Zone resource \- The name of the managed\-zone to be updated. This represents a
 Cloud resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: provide the flag
-[zone] on the command line with a fully specified name; provide the flag
+can be set in other ways. To set the [project] attribute: provide the argument
+[zone] on the command line with a fully specified name; provide the argument
 [\-\-project] on the command line; set the property [core/project]. This must be
 specified.
 
 .RS 2m
 .TP 2m
 \fIZONE\fR
-The ID of the zone or a fully qualified identifier for the zone.
+ID of the zone or fully qualified identifier for the zone.
 
 
 .RE
@@ -69,14 +69,16 @@ Enable DNSSEC for the managed zone.
 .TP 2m
 \fBtransfer\fR
 Enable DNSSEC and allow transferring a signed zone in or out.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR
 String mnemonic specifying the DNSSEC algorithm of the key\-signing key.
-Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256, RSASHA512,
-ECDSAP256SHA256, ECDSAP384SHA384
+Requires DNSSEC enabled. \fIKSK_ALGORITHM\fR must be one of:
+\fBecdsap256sha256\fR, \fBecdsap384sha384\fR, \fBrsasha1\fR, \fBrsasha256\fR,
+\fBrsasha512\fR.
 
 .TP 2m
 \fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR
@@ -94,9 +96,10 @@ numbers.
 
 .TP 2m
 \fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR
-String mnemonic specifying the DNSSEC algorithm of the zone\-signing key.
-Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256, RSASHA512,
-ECDSAP256SHA256, ECDSAP384SHA384
+String mnemonic specifying the DNSSEC algorithm of the key\-signing key.
+Requires DNSSEC enabled. \fIZSK_ALGORITHM\fR must be one of:
+\fBecdsap256sha256\fR, \fBecdsap384sha384\fR, \fBrsasha1\fR, \fBrsasha256\fR,
+\fBrsasha512\fR.
 
 .TP 2m
 \fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR
@@ -138,9 +141,9 @@ ignored.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

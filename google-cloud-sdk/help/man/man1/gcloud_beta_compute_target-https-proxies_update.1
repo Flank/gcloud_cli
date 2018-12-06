@@ -19,13 +19,13 @@ gcloud beta compute target\-https\-proxies update \- update a target HTTPS proxy
 
 \fB(BETA)\fR \fBgcloud beta compute target\-https\-proxies update\fR is used to
 change the SSL certificate and/or URL map of existing target HTTPS proxies. A
-target HTTPS proxy is referenced by one or more forwarding rules which define
-which packets the proxy is responsible for routing. The target HTTPS proxy in
-turn points to a URL map that defines the rules for routing the requests. The
-URL map's job is to map URLs to backend services which handle the actual
-requests. The target HTTPS proxy also points to at most 10 SSL certificates used
-for server\-side authentication. The target HTTPS proxy can be associated with
-at most one SSL policy.
+target HTTPS proxy is referenced by one or more forwarding rules which specify
+the network traffic that the proxy is responsible for routing. The target HTTPS
+proxy in turn points to a URL map that defines the rules for routing the
+requests. The URL map's job is to map URLs to backend services which handle the
+actual requests. The target HTTPS proxy also points to at most 10 SSL
+certificates used for server\-side authentication. The target HTTPS proxy can be
+associated with at most one SSL policy.
 
 
 
@@ -60,9 +60,10 @@ Allows load balancer to negotiate QUIC with clients.
 .TP 2m
 \fBNONE\fR
 Allows Google to control when QUIC is rolled out.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]
 References to at most 10 SSL certificate resources that are used for
@@ -101,9 +102,9 @@ by a target HTTPS proxy.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

@@ -253,6 +253,8 @@ class BuildOptions(_messages.Message):
   Enums:
     LogStreamingOptionValueValuesEnum: Option to define build log streaming
       behavior to Google Cloud Storage.
+    LoggingValueValuesEnum: Option to specify the logging mode, which
+      determines where the logs are stored.
     MachineTypeValueValuesEnum: Compute Engine machine type on which to run
       the build.
     RequestedVerifyOptionValueValuesEnum: Requested verifiability options.
@@ -268,13 +270,34 @@ class BuildOptions(_messages.Message):
       a larger disk than requested. At present, the maximum disk size is
       1000GB; builds that request more than the maximum are rejected with an
       error.
+    env: A list of global environment variable definitions that will exist for
+      all build steps in this build. If a variable is defined in both globally
+      and in a build step, the variable will use the build step value.  The
+      elements are of the form "KEY=VALUE" for the environment variable "KEY"
+      being given the value "VALUE".
     logStreamingOption: Option to define build log streaming behavior to
       Google Cloud Storage.
+    logging: Option to specify the logging mode, which determines where the
+      logs are stored.
     machineType: Compute Engine machine type on which to run the build.
     requestedVerifyOption: Requested verifiability options.
+    secretEnv: A list of global environment variables, which are encrypted
+      using a Cloud Key Management Service crypto key. These values must be
+      specified in the build's `Secret`. These variables will be available to
+      all build steps in this build.
     sourceProvenanceHash: Requested hash for SourceProvenance.
     substitutionOption: Option to specify behavior when there is an error in
       the substitution checks.
+    volumes: Global list of volumes to mount for ALL build steps  Each volume
+      is created as an empty volume prior to starting the build process. Upon
+      completion of the build, volumes and their contents are discarded.
+      Global volume names and paths cannot conflict with the volumes defined a
+      build step.  Using a global volume in a build with only one step is not
+      valid as it is indicative of a build request with an incorrect
+      configuration.
+    workerPool: Option to specify a `WorkerPool` for the build. User specifies
+      the pool with the format "[WORKERPOOL_PROJECT_ID]/[WORKERPOOL_NAME]".
+      This is an experimental field.
   """
 
   class LogStreamingOptionValueValuesEnum(_messages.Enum):
@@ -290,6 +313,21 @@ class BuildOptions(_messages.Message):
     STREAM_DEFAULT = 0
     STREAM_ON = 1
     STREAM_OFF = 2
+
+  class LoggingValueValuesEnum(_messages.Enum):
+    r"""Option to specify the logging mode, which determines where the logs
+    are stored.
+
+    Values:
+      LOGGING_UNSPECIFIED: The service determines the logging mode. The
+        default is `LEGACY`. Do not rely on the default logging behavior as it
+        may change in the future.
+      LEGACY: Stackdriver logging and Cloud Storage logging are enabled.
+      GCS_ONLY: Only Cloud Storage logging is enabled.
+    """
+    LOGGING_UNSPECIFIED = 0
+    LEGACY = 1
+    GCS_ONLY = 2
 
   class MachineTypeValueValuesEnum(_messages.Enum):
     r"""Compute Engine machine type on which to run the build.
@@ -338,11 +376,16 @@ class BuildOptions(_messages.Message):
     ALLOW_LOOSE = 1
 
   diskSizeGb = _messages.IntegerField(1)
-  logStreamingOption = _messages.EnumField('LogStreamingOptionValueValuesEnum', 2)
-  machineType = _messages.EnumField('MachineTypeValueValuesEnum', 3)
-  requestedVerifyOption = _messages.EnumField('RequestedVerifyOptionValueValuesEnum', 4)
-  sourceProvenanceHash = _messages.EnumField('SourceProvenanceHashValueListEntryValuesEnum', 5, repeated=True)
-  substitutionOption = _messages.EnumField('SubstitutionOptionValueValuesEnum', 6)
+  env = _messages.StringField(2, repeated=True)
+  logStreamingOption = _messages.EnumField('LogStreamingOptionValueValuesEnum', 3)
+  logging = _messages.EnumField('LoggingValueValuesEnum', 4)
+  machineType = _messages.EnumField('MachineTypeValueValuesEnum', 5)
+  requestedVerifyOption = _messages.EnumField('RequestedVerifyOptionValueValuesEnum', 6)
+  secretEnv = _messages.StringField(7, repeated=True)
+  sourceProvenanceHash = _messages.EnumField('SourceProvenanceHashValueListEntryValuesEnum', 8, repeated=True)
+  substitutionOption = _messages.EnumField('SubstitutionOptionValueValuesEnum', 9)
+  volumes = _messages.MessageField('Volume', 10, repeated=True)
+  workerPool = _messages.StringField(11)
 
 
 class BuildStep(_messages.Message):
@@ -387,6 +430,8 @@ class BuildStep(_messages.Message):
       you attempt to use them.  If you built an image in a previous build
       step, it will be stored in the host's Docker daemon's cache and is
       available to use as the name for a later build step.
+    pullTiming: Output only. Stores timing information for pulling this build
+      step's builder image only.
     secretEnv: A list of environment variables which are encrypted using a
       Cloud Key Management Service crypto key. These values must be specified
       in the build's `Secret`.
@@ -398,11 +443,11 @@ class BuildStep(_messages.Message):
       either it completes or the build itself times out.
     timing: Output only. Stores timing information for executing this build
       step.
-    volumes: List of volumes to mount into the build step.  Each volume will
-      be created as an empty volume prior to execution of the build step. Upon
-      completion of the build, volumes and their contents will be discarded.
+    volumes: List of volumes to mount into the build step.  Each volume is
+      created as an empty volume prior to execution of the build step. Upon
+      completion of the build, volumes and their contents are discarded.
       Using a named volume in only one step is not valid as it is indicative
-      of a mis-configured build request.
+      of a build request with an incorrect configuration.
     waitFor: The ID(s) of the step(s) that this build step depends on. This
       build step will not start until all the build steps in `wait_for` have
       completed successfully. If `wait_for` is empty, this build step will
@@ -440,12 +485,13 @@ class BuildStep(_messages.Message):
   env = _messages.StringField(4, repeated=True)
   id = _messages.StringField(5)
   name = _messages.StringField(6)
-  secretEnv = _messages.StringField(7, repeated=True)
-  status = _messages.EnumField('StatusValueValuesEnum', 8)
-  timeout = _messages.StringField(9)
-  timing = _messages.MessageField('TimeSpan', 10)
-  volumes = _messages.MessageField('Volume', 11, repeated=True)
-  waitFor = _messages.StringField(12, repeated=True)
+  pullTiming = _messages.MessageField('TimeSpan', 7)
+  secretEnv = _messages.StringField(8, repeated=True)
+  status = _messages.EnumField('StatusValueValuesEnum', 9)
+  timeout = _messages.StringField(10)
+  timing = _messages.MessageField('TimeSpan', 11)
+  volumes = _messages.MessageField('Volume', 12, repeated=True)
+  waitFor = _messages.StringField(13, repeated=True)
 
 
 class BuildTrigger(_messages.Message):
@@ -979,7 +1025,7 @@ class Secret(_messages.Message):
     SecretEnvValue: Map of environment variable name to its encrypted value.
       Secret environment variables must be unique across all of a build's
       secrets, and must be used by at least one build step. Values can be at
-      most 1 KB in size. There can be at most ten secret values across all of
+      most 64 KB in size. There can be at most 100 secret values across all of
       a build's secrets.
 
   Fields:
@@ -987,7 +1033,7 @@ class Secret(_messages.Message):
     secretEnv: Map of environment variable name to its encrypted value.
       Secret environment variables must be unique across all of a build's
       secrets, and must be used by at least one build step. Values can be at
-      most 1 KB in size. There can be at most ten secret values across all of
+      most 64 KB in size. There can be at most 100 secret values across all of
       a build's secrets.
   """
 
@@ -995,8 +1041,8 @@ class Secret(_messages.Message):
   class SecretEnvValue(_messages.Message):
     r"""Map of environment variable name to its encrypted value.  Secret
     environment variables must be unique across all of a build's secrets, and
-    must be used by at least one build step. Values can be at most 1 KB in
-    size. There can be at most ten secret values across all of a build's
+    must be used by at least one build step. Values can be at most 64 KB in
+    size. There can be at most 100 secret values across all of a build's
     secrets.
 
     Messages:

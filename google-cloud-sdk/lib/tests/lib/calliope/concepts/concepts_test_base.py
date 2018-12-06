@@ -29,13 +29,56 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 from tests.lib.calliope import util as calliope_util
 from tests.lib.calliope.concepts import util
 import six
 
 
+class GenericConceptsTestBase(test_case.TestCase):
+  """Functionality used for concepts and concepts v2."""
+
+  def SetUp(self):
+    # Set up a sample argparse parser.
+    command = calliope_util.MockCommand('command')
+    argparser = parser_extensions.ArgumentParser(
+        calliope_command=command)
+    self.parser = parser_arguments.ArgumentInterceptor(
+        parser=argparser,
+        cli_generator=None,
+        allow_positional=True)
+    command.ai = self.parser
+
+    # Set up a default fallthrough.
+    def Fallthrough():
+      return '!'
+    self.fallthrough = deps.Fallthrough(Fallthrough, hint='h')
+
+
+class ResourceTestBase(GenericConceptsTestBase):
+  """Test base with resource args pre-made."""
+
+  @property
+  def resource_spec(self):
+    """A basic resource spec for the fake "book" resource."""
+    # Lazy creation allows checking of the GetCollectionInfo mock.
+    return util.GetBookResource()
+
+  @property
+  def resource_spec_completers(self):
+    """A basic resource spec for the fake "book" resource, with completers."""
+    return util.GetBookResource(with_completers=True)
+
+  @property
+  def resource_spec_auto_completers(self):
+    """A basic resource spec for the fake "book" resource with auto complete."""
+    # Lazy creation allows checking of the GetCollectionInfo mock.
+    return util.GetBookResource(auto_completers=True)
+
+
 class ConceptsTestBase(sdk_test_base.WithFakeAuth,
-                       cli_test_base.CliTestBase):
+                       cli_test_base.CliTestBase,
+                       ResourceTestBase):
   """Mixin for testing concepts library."""
 
   # TODO(b/66911840): Remove if and when strange test interactions with the
@@ -71,21 +114,6 @@ class ConceptsTestBase(sdk_test_base.WithFakeAuth,
     registry._RegisterCollection(self.project_collection)
     # pylint:enable=protected-access
 
-    # Set up a sample argparse parser.
-    command = calliope_util.MockCommand('command')
-    argparser = parser_extensions.ArgumentParser(
-        calliope_command=command)
-    self.parser = parser_arguments.ArgumentInterceptor(
-        parser=argparser,
-        cli_generator=None,
-        allow_positional=True)
-    command.ai = self.parser
-
-    # Set up a default fallthrough.
-    def Fallthrough():
-      return '!'
-    self.fallthrough = deps.Fallthrough(Fallthrough, hint='h')
-
   def _GetMockNamespace(self, **kwargs):
 
     class MockNamespace(object):
@@ -100,23 +128,6 @@ class ConceptsTestBase(sdk_test_base.WithFakeAuth,
   def _MakeAttributeConfigs(self, with_completers=False):
     """Makes default attribute configs."""
     return util.MakeAttributeConfigs(with_completers=with_completers)
-
-  @property
-  def resource_spec(self):
-    """A basic resource spec for the fake "book" resource."""
-    # Lazy creation allows checking of the GetCollectionInfo mock.
-    return util.GetBookResource()
-
-  @property
-  def resource_spec_completers(self):
-    """A basic resource spec for the fake "book" resource, with completers."""
-    return util.GetBookResource(with_completers=True)
-
-  @property
-  def resource_spec_auto_completers(self):
-    """A basic resource spec for the fake "book" resource with auto complete."""
-    # Lazy creation allows checking of the GetCollectionInfo mock.
-    return util.GetBookResource(auto_completers=True)
 
   def SetUpFallthroughSpec(self, fallthrough=None):
     if not fallthrough:
@@ -146,6 +157,14 @@ class MultitypeTestBase(ConceptsTestBase):
         'projects/{projectsId}/cases/{casesId}/books/{booksId}',
         {'': 'projects/{projectsId}/cases/{casesId}/books/{booksId}'},
         ['projectsId', 'casesId', 'booksId'])
+    self.proj_case_shelf_book_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'projects.cases.shelves.books',
+        'projects/{projectsId}/cases/{casesId}/shelves/{shelvesId}/'
+        'books/{booksId}',
+        {'': 'projects/{projectsId}/cases/{casesId}/shelves/{shelvesId}/'
+             'books/{booksId}'},
+        ['projectsId', 'casesId', 'shelvesId', 'booksId'])
     self.proj_case_collection = resource_util.CollectionInfo(
         'example', 'v1', 'https://example.googleapis.com/v1/', '',
         'projects.cases',
@@ -185,6 +204,7 @@ class MultitypeTestBase(ConceptsTestBase):
 
     for collection in [
         self.proj_case_book_collection,
+        self.proj_case_shelf_book_collection,
         self.proj_case_collection,
         self.org_shelf_book_collection,
         self.org_shelf_collection,
@@ -251,6 +271,16 @@ class MultitypeTestBase(ConceptsTestBase):
         'book',
         project_shelf_book_resource,
         project_case_book_resource)
+
+  @property
+  def multitype_extra_attribute_in_path(self):
+    plain_resource = util.GetBookResource(name='book')
+    # Shelves are the parent - they contain books.
+    with_case_resource = util.GetProjCaseShelfBookResource(name='book')
+    return multitype.MultitypeResourceSpec(
+        'book',
+        plain_resource,
+        with_case_resource)
 
   @property
   def different_anchor_resource(self):

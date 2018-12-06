@@ -22,7 +22,7 @@ import textwrap
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
@@ -31,8 +31,8 @@ from tests.lib.surface.compute import test_resources
 
 
 @parameterized.parameters(
-    (base.ReleaseTrack.ALPHA, 'alpha'),
-    (base.ReleaseTrack.BETA, 'beta'))
+    (calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+    (calliope_base.ReleaseTrack.BETA, 'beta'))
 class GetIamPolicyTest(sdk_test_base.WithFakeAuth,
                        cli_test_base.CliTestBase,
                        parameterized.TestCase):

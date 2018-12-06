@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import re
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute.security_policies import security_policies_utils
 from googlecloudsdk.core import resources
@@ -53,14 +53,13 @@ _YAML_INVALID_FILE_PATH = sdk_test_base.SdkBase.Resource(
     'security-policy-invalid.yaml')
 
 
-class SecurityPoliciesCreateTestAlpha(test_base.BaseTest,
-                                      parameterized.TestCase):
+class SecurityPoliciesCreateTest(test_base.BaseTest, parameterized.TestCase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', 'v1')
 
   def CreateSecurityPolicy(self):
     return self.resources.Create(
@@ -71,12 +70,11 @@ class SecurityPoliciesCreateTestAlpha(test_base.BaseTest,
   def CheckSecurityPolicyRequest(self, **kwargs):
     security_policy_msg = {}
     security_policy_msg.update(kwargs)
-    self.CheckRequests(
-        [(self.compute.securityPolicies, 'Insert',
-          self.messages.ComputeSecurityPoliciesInsertRequest(
-              project='my-project',
-              securityPolicy=self.messages.SecurityPolicy(
-                  **security_policy_msg)))],)
+    self.CheckRequests([(self.compute.securityPolicies, 'Insert',
+                         self.messages.ComputeSecurityPoliciesInsertRequest(
+                             project='my-project',
+                             securityPolicy=self.messages.SecurityPolicy(
+                                 **security_policy_msg)))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
@@ -140,8 +138,8 @@ class SecurityPoliciesCreateTestAlpha(test_base.BaseTest,
                 description=rule_description,
                 priority=2147483647,
                 match=messages.SecurityPolicyRuleMatcher(
-                    versionedExpr=messages.SecurityPolicyRuleMatcher.
-                    VersionedExprValueValuesEnum('SRC_IPS_V1'),
+                    versionedExpr=messages.SecurityPolicyRuleMatcher
+                    .VersionedExprValueValuesEnum('SRC_IPS_V1'),
                     config=messages.SecurityPolicyRuleMatcherConfig(
                         srcIpRanges=['*'])),
                 action='allow',
@@ -164,20 +162,29 @@ class SecurityPoliciesCreateTestAlpha(test_base.BaseTest,
                '--file-format {1}'.format(file_path, file_format))
 
   def testBadFilePath(self):
-    with self.AssertRaisesExceptionRegexp(exceptions.BadFileException,
-                                          r'No such file \[{0}\]'.format(
-                                              re.escape(_BAD_FILE_PATH))):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.BadFileException, r'No such file \[{0}\]'.format(
+            re.escape(_BAD_FILE_PATH))):
       self.Run('compute security-policies create my-policy --file-name {0} '
                '--file-format {1}'.format(_BAD_FILE_PATH, 'yaml'))
 
 
-class SecurityPoliciesCreateTestBeta(SecurityPoliciesCreateTestAlpha):
+class SecurityPoliciesCreateTestBeta(SecurityPoliciesCreateTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'beta')
+
+
+class SecurityPoliciesCreateTestAlpha(SecurityPoliciesCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
 
 
 if __name__ == '__main__':

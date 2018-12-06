@@ -171,12 +171,13 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
                                          params={'projectsId': self.Project()},
                                          collection='ml.projects.models')
     model = self.short_msgs.Model(labels=labels_field)
+    op = self.msgs.GoogleLongrunningOperation(name='my-op')
     self.client.projects_models.Patch.Expect(
         self._MakePatchRequest(model_ref=model_ref, model=model,
-                               update_mask=['labels']), model)
+                               update_mask=['labels']), op)
 
     label_update = labels_util.UpdateResult(True, labels_field)
-    self.assertEqual(model, self.models_client.Patch(model_ref, label_update))
+    self.assertEqual(op, self.models_client.Patch(model_ref, label_update))
 
   def testPatchDescription(self):
     updated_description = 'My New Description'
@@ -184,14 +185,14 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
                                          params={'projectsId': self.Project()},
                                          collection='ml.projects.models')
     model = self.short_msgs.Model(description=updated_description)
+    op = self.msgs.GoogleLongrunningOperation(name='my-op')
     self.client.projects_models.Patch.Expect(
         self._MakePatchRequest(model_ref=model_ref, model=model,
-                               update_mask=['description']), model)
+                               update_mask=['description']), op)
 
     no_label_update = labels_util.UpdateResult(False, None)
-    self.assertEqual(model, self.models_client.Patch(model_ref,
-                                                     no_label_update,
-                                                     updated_description))
+    self.assertEqual(op, self.models_client.Patch(
+        model_ref, no_label_update, updated_description))
 
   def testPatchAll(self):
     labels = {'foo': 'bar', 'fizz': 'buzz'}
@@ -203,12 +204,13 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
                                          collection='ml.projects.models')
     model = self.short_msgs.Model(labels=labels_field,
                                   description=updated_description)
+    op = self.msgs.GoogleLongrunningOperation(name='my-op')
     self.client.projects_models.Patch.Expect(
         self._MakePatchRequest(model_ref=model_ref, model=model,
-                               update_mask=['labels', 'description']), model)
+                               update_mask=['labels', 'description']), op)
 
     label_update = labels_util.UpdateResult(True, labels_field)
-    self.assertEqual(model, self.models_client.Patch(
+    self.assertEqual(op, self.models_client.Patch(
         model_ref, label_update, description=updated_description))
 
   def testPatchNoUpdate(self):

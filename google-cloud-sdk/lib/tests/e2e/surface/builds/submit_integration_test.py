@@ -44,70 +44,46 @@ steps:
 """
 
 
+@test_case.Filters.SkipOnPy3('They are broken', 'b/114743556')
 class SubmitIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
 
-  def _PrepareBuildFiles(self):
-    path = self.CreateTempDir()
-    self.cloudbuild_yaml = os.path.join(path, 'cloudbuild.yaml')
-    with open(self.cloudbuild_yaml, 'w') as f:
-      f.write(CLOUDBUILD_YAML)
-    return path
-
   def SetUp(self):
-    self.source_path = self._PrepareBuildFiles()
+    self.cloudbuild_yaml = self.Touch(
+        self.root_path, 'cloudbuild.yaml', CLOUDBUILD_YAML)
 
   def testSuccess(self):
     self.Run('builds submit --config={0} {1}'.format(
-        self.cloudbuild_yaml, self.source_path))
+        self.cloudbuild_yaml, self.root_path))
     self.AssertOutputContains('SUCCESS')
 
   def testRespectingGcloudIgnore(self):
-    trash = os.path.join(self.source_path, 'trash')
-    with open(trash, 'w') as f:
-      f.write('This file should not be uploaded with my build.')
-    with open(os.path.join(self.source_path, '.gcloudignore'), 'w') as f:
-      f.write('trash')
+    self.Touch(self.root_path, 'trash',
+               'This file in a subdirectory should not be uploaded with'
+               ' my build.')
+    self.Touch(self.root_path, '.gcloudignore', 'trash')
     self.Run('builds submit --config={0} {1}'.format(
-        self.cloudbuild_yaml, self.source_path))
+        self.cloudbuild_yaml, self.root_path))
     self.AssertOutputContains('SUCCESS')
-    os.remove(trash)
 
   def testDeployRespectingGitIgnore(self):
-    subdir = os.path.join(self.source_path, 'subdir')
-    trash = os.path.join(subdir, 'trash')
-    os.mkdir(subdir)
-    with open(trash, 'w') as f:
-      f.write('This file in a subdirectory should not be uploaded with'
-              ' my build.')
-    with open(os.path.join(self.source_path, '.gitignore'), 'w') as f:
-      f.write('subdir')
+    self.Touch(os.path.join(self.root_path, 'subdir'), 'trash',
+               'This file should not be uploaded with my build.', makedirs=True)
+    self.Touch(self.root_path, '.gcloudignore', 'subdir')
     self.Run('builds submit --config={0} {1}'.format(
-        self.cloudbuild_yaml, self.source_path))
+        self.cloudbuild_yaml, self.root_path))
     self.AssertOutputContains('SUCCESS')
-    os.remove(trash)
-    os.rmdir(subdir)
 
   def testDeployTopBotDirRespectingGitIgnore(self):
     """Catch os.walk() usage bug caused by keepdir/ignoredir in .gitignore."""
-    topdir = os.path.join(self.source_path, 'topdir')
-    botdir = os.path.join(topdir, 'botdir')
-    trash = os.path.join(botdir, 'trash')
-    os.mkdir(topdir)
-    os.mkdir(botdir)
-    with open(trash, 'w') as f:
-      f.write('This file in a sub-sub-directory should not be uploaded with'
-              ' my build.')
-    with open(os.path.join(self.source_path, '.gitignore'), 'w') as f:
-      f.write('topdir/botdir')
+    self.Touch(os.path.join(self.root_path, 'topdir', 'botdir'), 'trash',
+               'This file in a sub-sub-directory should not be uploaded with'
+               ' my build.',
+               makedirs=True)
+    self.Touch(self.root_path, '.gcloudignore', 'topdir/botdir')
     self.Run('builds submit --config={0} {1}'.format(
-        self.cloudbuild_yaml, self.source_path))
+        self.cloudbuild_yaml, self.root_path))
     self.AssertOutputContains('SUCCESS')
-    os.remove(trash)
-    os.rmdir(botdir)
-    os.rmdir(topdir)
 
-  def TearDown(self):
-    pass
 
 if __name__ == '__main__':
   test_case.main()

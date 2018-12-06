@@ -29,19 +29,19 @@ from tests.lib.surface.composer import kubectl_util
 import mock
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
+@parameterized.parameters([True, False])
 @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-class EnvironmentsStorageDataDeleteTest(base.GsutilShellingUnitTest,
-                                        base.StorageApiCallingUnitTest,
-                                        parameterized.TestCase):
+class EnvironmentsStorageDataDeleteGATest(base.GsutilShellingUnitTest,
+                                          base.StorageApiCallingUnitTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
 
   def SetUp(self):
     properties.VALUES.core.disable_prompts.Set(True)
 
-  def testDataDeleteTargetSpecified(self, track, exec_mock):
+  def testDataDeleteTargetSpecified(self, use_gsutil, exec_mock):
     """Tests successful data deleting for a specific file."""
-    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -50,28 +50,34 @@ class EnvironmentsStorageDataDeleteTest(base.GsutilShellingUnitTest,
 
     subdir_ref = storage_util.ObjectReference(self.test_gcs_bucket, 'data/')
     self.ExpectObjectGet(subdir_ref)
-
-    fake_exec = kubectl_util.FakeExec()
-    exec_mock.side_effect = fake_exec
-
     target = 'subdir/file.txt'
 
-    fake_exec.AddCallback(
-        0,
-        self.MakeGsutilExecCallback(
-            ['-m', 'rm', '-r',
-             '{}/data/{}'.format(self.test_gcs_bucket_path, target)]))
+    if use_gsutil:
+      self._SetUpGsutil()
+      fake_exec = kubectl_util.FakeExec()
+      exec_mock.side_effect = fake_exec
+      fake_exec.AddCallback(
+          0,
+          self.MakeGsutilExecCallback(
+              ['-m', 'rm', '-r',
+               '{}/data/{}'.format(self.test_gcs_bucket_path, target)]))
+    else:
+      self._SetUpStorageApi()
 
     self.RunEnvironments('storage', 'data', 'delete',
                          '--project', self.TEST_PROJECT,
                          '--location', self.TEST_LOCATION,
                          '--environment', self.TEST_ENVIRONMENT_ID,
                          target)
-    fake_exec.Verify()
 
-  def testDataDeleteTargetNotSpecified(self, track, exec_mock):
+    if use_gsutil:
+      fake_exec.Verify()
+    else:
+      self.delete_mock.assert_called_once_with(
+          storage_util.BucketReference(self.test_gcs_bucket), target, 'data')
+
+  def testDataDeleteTargetNotSpecified(self, use_gsutil, exec_mock):
     """Tests successful deletion of the entire data directory."""
-    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -81,23 +87,31 @@ class EnvironmentsStorageDataDeleteTest(base.GsutilShellingUnitTest,
     subdir_ref = storage_util.ObjectReference(self.test_gcs_bucket, 'data/')
     self.ExpectObjectGet(subdir_ref)
 
-    fake_exec = kubectl_util.FakeExec()
-    exec_mock.side_effect = fake_exec
-
-    fake_exec.AddCallback(
-        0,
-        self.MakeGsutilExecCallback(
-            ['-m', 'rm', '-r', '{}/data/*'.format(self.test_gcs_bucket_path)]))
+    if use_gsutil:
+      self._SetUpGsutil()
+      fake_exec = kubectl_util.FakeExec()
+      exec_mock.side_effect = fake_exec
+      fake_exec.AddCallback(
+          0,
+          self.MakeGsutilExecCallback(
+              ['-m', 'rm', '-r', '{}/data/*'.format(
+                  self.test_gcs_bucket_path)]))
+    else:
+      self._SetUpStorageApi()
 
     self.RunEnvironments('storage', 'data', 'delete',
                          '--project', self.TEST_PROJECT,
                          '--location', self.TEST_LOCATION,
                          '--environment', self.TEST_ENVIRONMENT_ID)
-    fake_exec.Verify()
 
-  def testDataDeleteRestoresSubdir(self, track, exec_mock):
+    if use_gsutil:
+      fake_exec.Verify()
+    else:
+      self.delete_mock.assert_called_once_with(
+          storage_util.BucketReference(self.test_gcs_bucket), '*', 'data')
+
+  def testDataDeleteRestoresSubdir(self, use_gsutil, exec_mock):
     """Tests that the data dir is restored if it's missing after deletion."""
-    self.SetTrack(track)
     self.ExpectEnvironmentGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -109,19 +123,42 @@ class EnvironmentsStorageDataDeleteTest(base.GsutilShellingUnitTest,
                          exception=http_error.MakeHttpError(code=404))
     self.ExpectObjectInsert(subdir_ref)
 
-    fake_exec = kubectl_util.FakeExec()
-    exec_mock.side_effect = fake_exec
-
-    fake_exec.AddCallback(
-        0,
-        self.MakeGsutilExecCallback(
-            ['-m', 'rm', '-r', '{}/data/*'.format(self.test_gcs_bucket_path)]))
+    if use_gsutil:
+      self._SetUpGsutil()
+      fake_exec = kubectl_util.FakeExec()
+      exec_mock.side_effect = fake_exec
+      fake_exec.AddCallback(
+          0,
+          self.MakeGsutilExecCallback(
+              ['-m', 'rm', '-r', '{}/data/*'.format(
+                  self.test_gcs_bucket_path)]))
+    else:
+      self._SetUpStorageApi()
 
     self.RunEnvironments('storage', 'data', 'delete',
                          '--project', self.TEST_PROJECT,
                          '--location', self.TEST_LOCATION,
                          '--environment', self.TEST_ENVIRONMENT_ID)
-    fake_exec.Verify()
+
+    if use_gsutil:
+      fake_exec.Verify()
+    else:
+      self.delete_mock.assert_called_once_with(
+          storage_util.BucketReference(self.test_gcs_bucket), '*', 'data')
+
+
+class EnvironmentsStorageDataDeleteBetaTest(
+    EnvironmentsStorageDataDeleteGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+
+class EnvironmentsStorageDataDeleteAlphaTest(
+    EnvironmentsStorageDataDeleteBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

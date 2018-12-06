@@ -803,6 +803,13 @@ class FindOnPathTests(test_case.Base):
     with self.assertRaisesRegex(ValueError, r'must not have an extension'):
       file_utils.FindExecutableOnPath('foo.exe')
 
+  def testAllowExtensionInExecutableArg(self):
+    self.Populate(['foo.sh'], True)
+    self.assertEqual(
+        'foo.sh',
+        file_utils.FindExecutableOnPath(
+            'foo.sh', path='.', pathext=('',), allow_extensions=True))
+
   def testNoPathInExecutableArg(self):
     with self.assertRaisesRegex(ValueError, r'must not have a path'):
       file_utils.FindExecutableOnPath('bin/foo')
@@ -1354,6 +1361,52 @@ class WriteFileAtomicallyTest(test_case.Base, test_case.WithOutputCapture):
 
     file_utils.WriteFileAtomically(path, test_contents)
     self.AssertFileEquals(test_contents, path)
+
+
+class HomeDirTest(test_case.Base):
+
+  def testGetHomeDirascii(self):
+    self.StartObjectPatch(os.path, 'expanduser',
+                          return_value='abc.xyz'.encode('ascii'))
+    self.assertEqual('abc.xyz', file_utils.GetHomeDir())
+
+  def testGetHomeDirutf8(self):
+    self.StartObjectPatch(os.path, 'expanduser',
+                          return_value='Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.GetHomeDir())
+
+  def testGetHomeDirunicode(self):
+    self.StartObjectPatch(os.path, 'expanduser', return_value='Ṳᾔḯ¢◎ⅾℯ')
+    self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.GetHomeDir())
+
+  def testExpandHomeDirascii(self):
+    self.StartObjectPatch(os.path, 'expanduser',
+                          return_value='abc.xyz'.encode('ascii'))
+    self.assertEqual('abc.xyz', file_utils.ExpandHomeDir('~user'))
+
+  def testExpandHomeDirutf8(self):
+    self.StartObjectPatch(os.path, 'expanduser',
+                          return_value='Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.ExpandHomeDir('~user'))
+
+  def testExpandHomeDirunicode(self):
+    self.StartObjectPatch(os.path, 'expanduser', return_value='Ṳᾔḯ¢◎ⅾℯ')
+    self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.ExpandHomeDir('~user'))
+
+
+class GetCWDTest(test_case.Base):
+
+  def testGetCWDascii(self):
+    self.StartObjectPatch(os, 'getcwd', return_value='abc.xyz'.encode('ascii'))
+    self.assertEqual('abc.xyz', file_utils.GetCWD())
+
+  def testGetCWDutf8(self):
+    self.StartObjectPatch(os, 'getcwd', return_value='Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.GetCWD())
+
+  def testGetCWDunicode(self):
+    self.StartObjectPatch(os, 'getcwd', return_value='Ṳᾔḯ¢◎ⅾℯ')
+    self.assertEqual('Ṳᾔḯ¢◎ⅾℯ', file_utils.GetCWD())
 
 
 if __name__ == '__main__':

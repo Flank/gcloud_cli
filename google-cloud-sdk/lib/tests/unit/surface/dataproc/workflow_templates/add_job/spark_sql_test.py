@@ -70,11 +70,8 @@ class WorkflowTemplatesJobSparkSqlUnitTestBeta(
   def testSparkSqlJobWithParams(self):
     workflow_template = self.MakeWorkflowTemplate()
     spark_sql_job = self.SPARK_SQL_JOB
-    spark_sql_job.scriptVariables = encoding.PyValueToMessage(
-        self.messages.SparkSqlJob.ScriptVariablesValue, {
-            'foo': 'bar',
-            'var': 'value'
-        })
+    spark_sql_job.scriptVariables = encoding.DictToAdditionalPropertyMessage(
+        self.PARAMS, self.messages.SparkSqlJob.ScriptVariablesValue)
     ordered_job = self.MakeOrderedJob(
         sparkSqlJob=spark_sql_job, step_id='002', start_after=['001'])
     self.ExpectUpdateWorkflowTemplatesJobCalls(

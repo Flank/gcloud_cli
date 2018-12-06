@@ -26,6 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.source import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class TopicsAddTest(base.SourceTestBase):
@@ -84,6 +85,7 @@ class TopicsAddTest(base.SourceTestBase):
              '--message-format=protobuf --service-account=b@gmail.com')
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class TopicsRemoveTest(base.SourceTestBase):
@@ -164,6 +166,7 @@ class TopicsRemoveTest(base.SourceTestBase):
       self.Run('source repos update my-repo --remove-topic=foo')
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class TopicsUpdateTest(base.SourceTestBase):

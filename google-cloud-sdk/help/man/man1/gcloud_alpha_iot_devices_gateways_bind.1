@@ -1,0 +1,107 @@
+
+.TH "GCLOUD_ALPHA_IOT_DEVICES_GATEWAYS_BIND" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha iot devices gateways bind \- associate a device with a gateway
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha iot devices gateways bind\fR (\fB\-\-device\fR=\fIDEVICE\fR\ :\ \fB\-\-device\-region\fR=\fIDEVICE_REGION\fR\ \fB\-\-device\-registry\fR=\fIDEVICE_REGISTRY\fR) (\fB\-\-gateway\fR=\fIGATEWAY\fR\ :\ \fB\-\-gateway\-region\fR=\fIGATEWAY_REGION\fR\ \fB\-\-gateway\-registry\fR=\fIGATEWAY_REGISTRY\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Associate a device with a gateway.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Device resource \- The device to bind to the gateway. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [\-\-device] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-device\fR=\fIDEVICE\fR
+ID of the device or fully qualified identifier for the device. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-device\-region\fR=\fIDEVICE_REGION\fR
+The Cloud region for the device.
+
+.TP 2m
+\fB\-\-device\-registry\fR=\fIDEVICE_REGISTRY\fR
+The device registry for the device.
+
+.RE
+.sp
+.TP 2m
+
+Gateway resource \- The gateway device to bind to. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [\-\-gateway] on the command line with
+a fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-gateway\fR=\fIGATEWAY\fR
+ID of the gateway or fully qualified identifier for the gateway. This flag must
+be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-gateway\-region\fR=\fIGATEWAY_REGION\fR
+The Cloud region for the gateway.
+
+.TP 2m
+\fB\-\-gateway\-registry\fR=\fIGATEWAY_REGISTRY\fR
+The device registry for the gateway.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudiot/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/iot
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta iot devices gateways bind
+.RE
+

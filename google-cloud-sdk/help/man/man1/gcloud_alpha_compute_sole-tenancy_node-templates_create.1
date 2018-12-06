@@ -11,7 +11,7 @@ gcloud alpha compute sole\-tenancy node\-templates create \- creates a Google Co
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute sole\-tenancy node\-templates create\fR \fINAME\fR (\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]\ |\ \fB\-\-node\-type\fR=\fINODE_TYPE\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute sole\-tenancy node\-templates create\fR \fINAME\fR (\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]\ |\ \fB\-\-node\-type\fR=\fINODE_TYPE\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-server\-binding\fR=\fISERVER_BINDING\fR;\ default="restart\-node\-on\-any\-server"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -124,6 +124,33 @@ $ gcloud config unset compute/region
 Alternatively, the region can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
+.TP 2m
+\fB\-\-server\-binding\fR=\fISERVER_BINDING\fR; default="restart\-node\-on\-any\-server"
+The server binding policy for nodes using this template, which determines where
+the nodes should restart following a maintenance event. \fISERVER_BINDING\fR
+must be one of:
+
+.RS 2m
+.TP 2m
+\fBrestart\-node\-on\-any\-server\fR
+Nodes using this template will restart on any physical server following a
+maintenance event.
+.TP 2m
+\fBrestart\-node\-on\-minimal\-servers\fR
+Nodes using this template will restart on the same physical server following a
+maintenance event, instead of being live migrated to or restarted on a new
+physical server. This means that VMs on such nodes will experience outages while
+maintenance is applied. This option may be useful if you are using software
+licenses tied to the underlying server characteristics such as physical sockets
+or cores, to avoid the need for additional licenses when maintenance occurs.
+
+Note that in some cases, Google Compute Engine may need to move your VMs to a
+new underlying server. During these situations your VMs will be restarted on a
+new physical server and assigned a new sole tenant physical server ID.
+.RE
+.sp
+
+
 
 .RE
 .sp
@@ -131,9 +158,9 @@ Alternatively, the region can be stored in the environment variable
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

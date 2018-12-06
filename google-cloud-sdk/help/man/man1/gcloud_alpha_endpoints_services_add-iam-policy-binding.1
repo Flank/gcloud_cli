@@ -5,19 +5,20 @@
 
 .SH "NAME"
 .HP
-gcloud alpha endpoints services add\-iam\-policy\-binding \- add IAM policy binding for a service
+gcloud alpha endpoints services add\-iam\-policy\-binding \- add IAM policy binding to a service
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha endpoints services add\-iam\-policy\-binding\fR \fISERVICE\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha endpoints services add\-iam\-policy\-binding\fR \fISERVICE\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Adds IAM policy binding to a service's access policy.
+\fB(ALPHA)\fR Add an IAM policy binding to the IAM policy of a service. One
+binding consists of a member, a role, and an optional condition.
 
 
 
@@ -25,10 +26,17 @@ gcloud alpha endpoints services add\-iam\-policy\-binding \- add IAM policy bind
 
 .RS 2m
 .TP 2m
+
+Service resource \- The service for which to add IAM policy binding to. This
+represents a Cloud resource. This must be specified.
+
+.RS 2m
+.TP 2m
 \fISERVICE\fR
-The name of the service to which the member is to be added.
+ID of the service or fully qualified identifier for the service.
 
 
+.RE
 .RE
 .sp
 
@@ -65,20 +73,70 @@ Define the role of the member.
 .RE
 .sp
 
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+
+Condition of the binding to be added. When condition is explicitly specified as
+\f5None\fR (e.g. \-\-condition=None), a binding without a condition is added.
+When \-\-condition is specified and is not a \f5None\fR condition,
+\f5\-\-role\fR cannot be a primitive role. Primitive roles are
+\f5roles/editor\fR, \f5roles/owner\fR, and \f5roles/viewer\fR.
+
+.TP 2m
+\fBexpression\fR
+(Required) Expression of the condition which evaluates to True or False. This
+uses a subset of Common Expression Language syntax.
+
+.TP 2m
+\fBtitle\fR
+(Required) Title for the expression, i.e. a short string describing its purpose.
+
+.TP 2m
+\fBdescription\fR
+(Optional) Description for the expression. This is a longer text which describes
+the expression.
+
+NOTE: An unsatisfied condition will not allow access via this binding.
+
+.TP 2m
+\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR
+Path to a local JSON or YAML file that defines the condition. To see available
+fields, see the help for \f5\-\-condition\fR.
+
+
+.RE
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBservicemanagement/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/service\-management/
 
 
 
 .SH "EXAMPLES"
 
-The following command will add an IAM policy binding for the role of
+To add an IAM policy binding for the role of
 \'roles/servicemanagement.serviceConsumer' for the user 'test\-user@gmail.com'
-on a service with identifier 'my\-service'
+with service 'my\-service', run:
 
 .RS 2m
 $ gcloud alpha endpoints services add\-iam\-policy\-binding \e
@@ -86,9 +144,9 @@ $ gcloud alpha endpoints services add\-iam\-policy\-binding \e
     \-\-role='roles/servicemanagement.serviceConsumer'
 .RE
 
-For a service account \f5test\-proj1@example.domain.com\fR, the following
-command will add an IAM policy binding for the role of
-\'roles/servicemanagement.serviceConsumer' to the given service account:
+To add an IAM policy binding for the role of
+\'roles/servicemanagement.serviceConsumer' to the service account
+\'test\-proj1@example.domain.com', run:
 
 .RS 2m
 $ gcloud alpha endpoints services add\-iam\-policy\-binding \e
@@ -97,9 +155,9 @@ $ gcloud alpha endpoints services add\-iam\-policy\-binding \e
     \-\-role='roles/servicemanagement.serviceConsumer'
 .RE
 
-The following command will add an IAM policy binding for the role of
+To add an IAM policy binding for the role of
 \'roles/servicemanagement.serviceConsumer' for all authenticated users on a
-service with identifier 'my\-service':
+service with identifier 'my\-service', run:
 
 .RS 2m
 $ gcloud alpha endpoints services add\-iam\-policy\-binding \e
@@ -107,8 +165,23 @@ $ gcloud alpha endpoints services add\-iam\-policy\-binding \e
     \-\-role='roles/servicemanagement.serviceConsumer'
 .RE
 
+To add an IAM policy binding which expires at the end of the year 2018 for the
+role of 'roles/servicemanagement.quotaAdmin' and the user 'test\-user@gmail.com'
+with service 'my\-service', run:
+
+.RS 2m
+$ gcloud alpha endpoints services add\-iam\-policy\-binding \e
+    my\-service \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/servicemanagement.quotaAdmin' \e
+    \-\-condition='expression=request.time <
+ timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+tion=Expires at midnight on 2018\-12\-31'
+.RE
+
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy
-role and member types.
+role and member types. See
+https://cloud.google.com/iam/docs/conditions\-overview for details on
+conditions.
 
 
 

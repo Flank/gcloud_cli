@@ -21,10 +21,11 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.compute import containers_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
@@ -33,12 +34,15 @@ from tests.lib.api_lib.util import waiter as waiter_test_base
 class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
                           waiter_test_base.Base):
 
-  def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.client_class = core_apis.GetClientClass('compute', 'beta')
-    self.messages = core_apis.GetMessagesModule('compute', 'beta')
+  def SetUpTrack(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.client_class = core_apis.GetClientClass('compute', 'v1')
+    self.messages = core_apis.GetMessagesModule('compute', 'v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', 'v1')
+
+  def SetUp(self):
+    self.SetUpTrack()
 
     self.default_container_manifest = {
         'spec': {
@@ -498,6 +502,274 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     self.AssertErrContains('Updating specification of container [instance-1]')
     self.AssertErrContains('Stopping instance [instance-1]')
     self.AssertErrContains('Starting instance [instance-1]')
+
+
+class UpdateContainerTestBeta(UpdateContainerTest):
+
+  def SetUpTrack(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.client_class = core_apis.GetClientClass('compute', 'beta')
+    self.messages = core_apis.GetMessagesModule('compute', 'beta')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
+
+
+class UpdateContainerAlphaTest(
+    UpdateContainerTest, parameterized.TestCase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.client_class = core_apis.GetClientClass('compute', 'alpha')
+    self.messages = core_apis.GetMessagesModule('compute', 'alpha')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+
+  def Client(self):
+    return api_mock.Client(
+        self.client_class,
+        real_client=core_apis.GetClientInstance(
+            'compute', 'alpha', no_http=True))
+
+  def _GetContainerManifest(self, volume_mounts, volumes):
+    return {
+        'spec': {
+            'containers': [{
+                'name':
+                    'instance-1',
+                'image':
+                    'gcr.io/my-docker/test-image',
+                'command': ['echo -a "Hello world!"'],
+                'args': ['arg1', 'arg2'],
+                'stdin':
+                    True,
+                'tty':
+                    True,
+                'securityContext': {
+                    'privileged': True
+                },
+                'env': [{
+                    'name': 'key1',
+                    'value': 'val1'
+                }],
+                'volumeMounts': volume_mounts}],
+            'restartPolicy':
+                'OnFailure',
+            'volumes': volumes}
+    }
+
+  def _GetInstanceWithManifest(self, manifest=None, disks=None):
+    disks = disks or []
+    manifest = manifest or {}
+    return self.messages.Instance(
+        status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
+        disks=disks,
+        metadata=self.messages.Metadata(items=[
+            self.messages.Metadata.ItemsValueListEntry(
+                key='gce-container-declaration',
+                value=containers_utils.DumpYaml(
+                    manifest))
+        ]))
+
+  def _GetDiskMessage(self, device_name=None, mode=None, disk_name=None):
+    return self.messages.AttachedDisk(
+        autoDelete=False,
+        boot=False,
+        deviceName=device_name,
+        licenses=[],
+        mode=mode or self.messages.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+        type=(self.messages.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        source='https://www.googleapis.com/compute/v1/projects/{}/zones'
+        '/central2-a/disks/{}'.format(self.Project(), disk_name))
+
+  def _GetMetadataRequestWithMetadata(self, metadata):
+    return self.messages.ComputeInstancesSetMetadataRequest(
+        project=self.Project(),
+        zone='central2-a',
+        instance='instance-1',
+        metadata=self.messages.Metadata(items=[
+            self.messages.Metadata.ItemsValueListEntry(
+                key='gce-container-declaration',
+                value=containers_utils.DumpYaml(metadata))
+        ]))
+
+  @parameterized.named_parameters(
+      ('Remove',
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-0', 'fsType': 'ext4'}}],
+       [], [], [], '--remove-container-mounts "/mounted"'),
+      ('Update',
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-0', 'fsType': 'ext4'}}],
+       ['disk-0', 'disk-1'],
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False},
+        {'name': 'pd-1', 'mountPath': '/mounted1', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-0', 'fsType': 'ext4'}},
+        {'name': 'pd-1',
+         'gcePersistentDisk': {'pdName': 'disk-1', 'fsType': 'ext4'}}],
+       '--container-mount-disk name=disk-1,mount-path="/mounted1"'),
+      ('UpdateNoDiskName',
+       [], [], ['disk-1'],
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-1', 'fsType': 'ext4'}}],
+       '--container-mount-disk mount-path="/mounted"'),
+      ('UpdateAndRemove',
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-0', 'fsType': 'ext4'}}],
+       ['disk-0', 'disk-1'],
+       [{'name': 'pd-0', 'mountPath': '/mounted1', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-1', 'fsType': 'ext4'}}],
+       '--container-mount-disk name=disk-1,mount-path="/mounted1" '
+       '--remove-container-mounts "/mounted"'),
+      ('UpdateWithRepeated',
+       [], [], ['disk-1'],
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False},
+        {'name': 'pd-0', 'mountPath': '/mounted-1', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-1', 'fsType': 'ext4',
+                               'partition': 1}}],
+       '--container-mount-disk name=disk-1,partition=1,mount-path="/mounted" '
+       '--container-mount-disk name=disk-1,partition=1,mount-path="/mounted-1"'
+      ),
+      ('UpdateWithRepeatedNoName',
+       [], [], ['disk-1'],
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False},
+        {'name': 'pd-0', 'mountPath': '/mounted-1', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-1', 'fsType': 'ext4',
+                               'partition': 1}}],
+       '--container-mount-disk partition=1,mount-path="/mounted" '
+       '--container-mount-disk partition=1,mount-path="/mounted-1"'),
+      ('UpdateWithRepeatedNoPartition',
+       [], [], ['disk-1'],
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False},
+        {'name': 'pd-0', 'mountPath': '/mounted-1', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-1', 'fsType': 'ext4'}}],
+       '--container-mount-disk name=disk-1,mount-path="/mounted" '
+       '--container-mount-disk name=disk-1,mount-path="/mounted-1"'),
+      ('UpdateWithRepeatedNoNameNoPartition',
+       [], [], ['disk-1'],
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False},
+        {'name': 'pd-0', 'mountPath': '/mounted-1', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-1', 'fsType': 'ext4'}}],
+       '--container-mount-disk mount-path="/mounted" '
+       '--container-mount-disk mount-path="/mounted-1"')
+  )
+  def testUpdateContainerMountDisk(self, volume_mounts, volumes, disk_names,
+                                   updated_volume_mounts, updated_volumes,
+                                   flag):
+    disks = [
+        self._GetDiskMessage(device_name=disk_name, disk_name=disk_name)
+        for disk_name in disk_names]
+    instance = self._GetInstanceWithManifest(
+        self._GetContainerManifest(volume_mounts, volumes),
+        disks=disks)
+    with self.Client() as client:
+      client.instances.Get.Expect(
+          self.messages.ComputeInstancesGetRequest(
+              project=self.Project(), zone='central2-a', instance='instance-1'),
+          instance)
+      client.instances.SetMetadata.Expect(
+          self._GetMetadataRequestWithMetadata(
+              self._GetContainerManifest(updated_volume_mounts,
+                                         updated_volumes)),
+          self._GetOperationMessage(
+              self._GetOperationRef('operation-X', 'central2-a'),
+              self.messages.Operation.StatusValueValuesEnum.PENDING))
+      client.zoneOperations.Get.Expect(
+          self.messages.ComputeZoneOperationsGetRequest(
+              operation='operation-X',
+              zone='central2-a',
+              project=self.Project()),
+          self._GetOperationMessage(
+              self._GetOperationRef('operation-X', 'central2-a'),
+              self.messages.Operation.StatusValueValuesEnum.DONE,
+              self._GetInstanceRef('instance-1', 'central2-a')))
+      client.instances.Get.Expect(
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-1', project='fake-project', zone='central2-a'),
+          self.messages.Instance(name='instance-1'))
+      self._ExpectStop(client)
+      self._ExpectStart(client)
+
+      self.Run("""
+          compute instances update-container instance-1
+            --zone central2-a
+            {}
+          """.format(flag))
+
+  @parameterized.named_parameters(
+      # Must have a disk attached.
+      ('DiskNotPresent', [], [], [],
+       '--container-mount-disk name=disk-1,mount-path="/mounted"',
+       r'--container-mount-disk(.*)Attempting to mount a disk that is not '
+       r'attached to the instance(.*)\[disk-1\]'),
+      # Must attach a disk with the same name first.
+      ('DiskNameNotPresent',
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-0', 'fsType': 'ext4'}}],
+       [('disk-0', 'disk-0')],
+       '--container-mount-disk name=disk-1,mount-path="/mounted"',
+       r'--container-mount-disk(.*)Attempting to mount a disk that is not '
+       r'attached to the instance(.*)\[disk-1\]'),
+      # If no name is given for --container-mount-disk, there can be only one
+      # disk attached.
+      ('NoNameSpecified',
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': False},
+        {'name': 'pd-1', 'mountPath': '/mounted', 'readOnly': False}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-0', 'fsType': 'ext4'}},
+        {'name': 'pd-1',
+         'gcePersistentDisk': {'pdName': 'disk-1', 'fsType': 'ext4'}}],
+       [('disk-0', 'disk-0'), ('disk-1', 'disk-1')],
+       '--container-mount-disk mount-path="/mounted"',
+       r'--container-mount-disk(.*)Must specify the name of the disk to be '
+       r'mounted unless exactly one disk is attached to the instance'),
+      # attached disk mode must be rw if --container-mount-disk mode is rw
+      ('MismatchedMode',
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': True}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-0', 'fsType': 'ext4'}}],
+       [('disk-0', 'disk-0')],
+       '--container-mount-disk name=disk-0,mount-path="/mounted",mode=rw',
+       r'--container-mount-disk(.*)\[rw\](.*)\[ro\](.*)disk name \[disk-0\], '
+       r'partition \[None\]'),
+      # attached disk must have the same name as deviceName
+      ('MismatchedDiskName',
+       [{'name': 'pd-0', 'mountPath': '/mounted', 'readOnly': True}],
+       [{'name': 'pd-0',
+         'gcePersistentDisk': {'pdName': 'disk-0', 'fsType': 'ext4'}}],
+       [('disk-x', 'disk-0')],
+       '--container-mount-disk name=disk-0,mount-path="/mounted",mode=rw',
+       r'--container-mount-disk(.*)\[disk-0\](.*)\[disk-x\]'))
+  def testContainerMountDiskInvalid(self, volume_mounts, volumes, disk_names,
+                                    container_mount_disk_flag, regexp):
+    disks = [
+        self._GetDiskMessage(device_name=dev, disk_name=disk)
+        for (dev, disk) in disk_names]
+    with self.Client() as client:
+      client.instances.Get.Expect(
+          self.messages.ComputeInstancesGetRequest(
+              project=self.Project(), zone='central2-a', instance='instance-1'),
+          self._GetInstanceWithManifest(
+              self._GetContainerManifest(volume_mounts, volumes),
+              disks=disks))
+      with self.assertRaisesRegexp(
+          exceptions.InvalidArgumentException,
+          regexp):
+        self.Run("""
+            compute instances update-container instance-1
+              --zone central2-a
+              {}
+            """.format(container_mount_disk_flag))
 
 
 if __name__ == '__main__':

@@ -13,21 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud access-context-manager levels list`."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 from six.moves import map
 from six.moves import range
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class LevelsListTest(accesscontextmanager.Base):
+class LevelsListTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -53,8 +55,8 @@ class LevelsListTest(accesscontextmanager.Base):
         ),
         self.messages.ListAccessLevelsResponse(accessLevels=levels))
 
-  def testList(self, track):
-    self.SetUpForTrack(track)
+  def testList(self):
+    self.SetUpForTrack(self.track)
     levels = self._MakeLevels()
     self._ExpectList(levels, 'my-policy')
 
@@ -62,8 +64,8 @@ class LevelsListTest(accesscontextmanager.Base):
 
     self.assertEqual(results, levels)
 
-  def testList_PolicyFromProperty(self, track):
-    self.SetUpForTrack(track)
+  def testList_PolicyFromProperty(self):
+    self.SetUpForTrack(self.track)
     levels = self._MakeLevels()
     policy = 'my-acm-policy'
     properties.VALUES.access_context_manager.policy.Set(policy)
@@ -73,8 +75,8 @@ class LevelsListTest(accesscontextmanager.Base):
 
     self.assertEqual(results, levels)
 
-  def testList_Format(self, track):
-    self.SetUpForTrack(track)
+  def testList_Format(self):
+    self.SetUpForTrack(self.track)
     properties.VALUES.core.user_output_enabled.Set(True)
     levels = self._MakeLevels()
     self._ExpectList(levels, 'my-policy')
@@ -87,6 +89,12 @@ class LevelsListTest(accesscontextmanager.Base):
         level1  My level #1  Basic
         level2  My level #2  Basic
         """, normalize_space=True)
+
+
+class LevelsListTestAlpha(LevelsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

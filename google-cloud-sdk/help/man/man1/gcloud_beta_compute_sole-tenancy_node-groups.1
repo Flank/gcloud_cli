@@ -24,9 +24,9 @@ gcloud beta compute sole\-tenancy node\-groups \- read Google Compute Engine sol
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -35,6 +35,10 @@ help\fR for details.
 \f5\fICOMMAND\fR\fR is one of the following:
 
 .RS 2m
+.TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(BETA)\fR Add an IAM policy binding to a node group.
+
 .TP 2m
 \fBcreate\fR
 \fB(BETA)\fR Creates a Google Compute Engine node group.
@@ -48,6 +52,10 @@ help\fR for details.
 \fB(BETA)\fR Describes a Google Compute Engine node group.
 
 .TP 2m
+\fBget\-iam\-policy\fR
+\fB(BETA)\fR Get the IAM Policy for a Google Compute Engine node group.
+
+.TP 2m
 \fBlist\fR
 \fB(BETA)\fR List Google Compute Engine node groups.
 
@@ -55,6 +63,14 @@ help\fR for details.
 \fBlist\-nodes\fR
 \fB(BETA)\fR List Google Compute Engine sole\-tenant nodes present in a node
 group.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(BETA)\fR Remove an IAM policy binding from a node group.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(BETA)\fR Set the IAM policy for a Google Compute Engine node group.
 
 .TP 2m
 \fBupdate\fR

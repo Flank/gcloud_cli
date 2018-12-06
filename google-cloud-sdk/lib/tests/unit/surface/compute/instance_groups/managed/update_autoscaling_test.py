@@ -31,6 +31,7 @@ from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(list(itertools.product(
     [calliope_base.ReleaseTrack.ALPHA],
     [scope_util.ScopeEnum.REGION, scope_util.ScopeEnum.ZONE])))

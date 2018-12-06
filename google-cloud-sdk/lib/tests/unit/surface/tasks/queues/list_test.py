@@ -41,10 +41,10 @@ class QueuesListTest(test_base.CloudTasksTestBase):
       queue_name = '{}/queues/q{}'.format(self.location_name, i)
       q = self.messages.Queue(
           name=queue_name,
-          appEngineHttpTarget=self.messages.AppEngineHttpTarget(),
+          appEngineHttpQueue=self.messages.AppEngineHttpQueue(),
           state=self.messages.Queue.StateValueValuesEnum.RUNNING,
           rateLimits=self.messages.RateLimits(
-              maxConcurrentTasks=10, maxTasksDispatchedPerSecond=500))
+              maxConcurrentDispatches=10, maxDispatchesPerSecond=500))
       queues.append(q)
     return queues
 

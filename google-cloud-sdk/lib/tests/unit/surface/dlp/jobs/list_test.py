@@ -28,6 +28,7 @@ from tests.lib.surface.dlp import base
 class ListTest(base.DlpUnitTestBase):
   """dlp jobs list tests."""
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testListOutput(self, track):
     self.track = track
@@ -38,6 +39,7 @@ class ListTest(base.DlpUnitTestBase):
     result = self.Run('dlp jobs list')
     self.assertEqual(list_response.jobs, result)
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testListDefaultFormat(self, track):
     properties.VALUES.core.user_output_enabled.Set(True)

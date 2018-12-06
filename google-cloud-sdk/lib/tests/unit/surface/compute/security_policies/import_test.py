@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import re
 import textwrap
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute.security_policies import (
     security_policies_utils)
@@ -57,10 +57,10 @@ _YAML_INVALID_FILE_PATH = sdk_test_base.SdkBase.Resource(
 class SecurityPoliciesImportTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', 'v1')
     self.my_policy = self.resources.Create(
         'compute.securityPolicies',
         securityPolicy='my-policy',

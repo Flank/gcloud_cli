@@ -65,10 +65,12 @@ class ListNodesResponse(_messages.Message):
   Fields:
     nextPageToken: The next page token or empty if none.
     nodes: The listed nodes.
+    unreachable: Locations that could not be reached.
   """
 
   nextPageToken = _messages.StringField(1)
   nodes = _messages.MessageField('Node', 2, repeated=True)
+  unreachable = _messages.StringField(3, repeated=True)
 
 
 class ListOperationsResponse(_messages.Message):
@@ -270,6 +272,8 @@ class Node(_messages.Message):
       STARTING: TPU node is currently starting.
       PREEMPTED: TPU node has been preempted. Only applies to Preemptible TPU
         Nodes.
+      TERMINATED: TPU node has been terminated due to maintenance or has
+        reached the end of its life cycle (for preemptible nodes).
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -282,6 +286,7 @@ class Node(_messages.Message):
     STOPPING = 8
     STARTING = 9
     PREEMPTED = 10
+    TERMINATED = 11
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):

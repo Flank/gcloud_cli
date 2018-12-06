@@ -17,11 +17,11 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class DualCommand(base.Command):
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.ALPHA)
+class DualCommand(calliope_base.Command):
 
   @staticmethod
   def Args(parser):

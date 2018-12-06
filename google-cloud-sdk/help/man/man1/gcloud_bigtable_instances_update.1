@@ -1,0 +1,73 @@
+
+.TH "GCLOUD_BIGTABLE_INSTANCES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud bigtable instances update \- modify an existing Bigtable instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud bigtable instances update\fR \fIINSTANCE\fR [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Modify an existing Bigtable instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- The instance to update. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [instance] on
+the command line with a fully specified name; provide the argument [\-\-project]
+on the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Friendly name of the instance.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha bigtable instances update
+$ gcloud beta bigtable instances update
+.RE
+

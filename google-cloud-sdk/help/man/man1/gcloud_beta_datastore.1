@@ -34,9 +34,9 @@ https://cloud.google.com/datastore/docs
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -79,13 +79,13 @@ help\fR for details.
 To create new indexes from a file, run:
 
 .RS 2m
-$ gcloud beta datastore create\-indexes index.yaml
+$ gcloud beta datastore indexes create index.yaml
 .RE
 
 To clean up unused indexes from a file, run:
 
 .RS 2m
-$ gcloud beta datastore cleanup\-indexes index.yaml
+$ gcloud beta datastore indexes cleanup index.yaml
 .RE
 
 

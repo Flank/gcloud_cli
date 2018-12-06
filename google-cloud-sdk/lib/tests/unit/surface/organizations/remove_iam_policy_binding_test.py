@@ -20,7 +20,11 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import copy
+import json
 
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.organizations import testbase
 
@@ -92,6 +96,149 @@ class OrganizationsRemoveIamPolicyBindingTest(
         self.TEST_ORGANIZATION.name[len('organizations/'):],
         '--role={0}'.format(self.REMOVE_ROLE),
         '--member={0}'.format(self.REMOVE_USER))
+
+
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
+class OrganizationsRemoveIamPolicyBindingWithConditionTest(
+    testbase.OrganizationsUnitTestBase):
+
+  def SetUp(self):
+    self.messages = testbase.OrganizationsUnitTestBase.messages
+    self.test_iam_policy_with_condition = self.messages.Policy(
+        bindings=[
+            self.messages.Binding(
+                members=['user:test@gmail.com'],
+                role='roles/non-primitive',
+                condition=self.messages.Expr(
+                    expression='expr', title='title', description='descr')),
+            self.messages.Binding(
+                members=['user:test@gmail.com'], role='roles/non-primitive')
+        ],
+        etag=b'an etag',
+        version=1)
+    self.test_org_id = self.TEST_ORGANIZATION.name[len('organizations/'):]
+
+  def testBindingWithoutConditionPolicyWithCondition(self, track):
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
+    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
+    new_policy = copy.deepcopy(start_policy)
+    remove_user = 'user:test@gmail.com'
+    remove_role = 'roles/non-primitive'
+    self.WriteInput('1')
+    new_policy.bindings[:] = new_policy.bindings[1:]
+
+    self.mock_client.organizations.GetIamPolicy.Expect(
+        self.ExpectedGetRequest(), copy.deepcopy(start_policy))
+    self.mock_client.organizations.SetIamPolicy.Expect(
+        self.messages.CloudresourcemanagerOrganizationsSetIamPolicyRequest(
+            organizationsId=self.test_org_id,
+            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
+                policy=new_policy)), new_policy)
+
+    response = self.RunRemoveIamPolicyBinding(
+        self.test_org_id,
+        '--role={0}'.format(remove_role),
+        '--member={0}'.format(remove_user),
+        track=track)
+    self.assertEqual(response, new_policy)
+    choices_in_stderr = json.loads(self.GetErr())['choices']
+    expected_choices = [
+        'expression=expr,title=title,description=descr', 'None',
+        'all conditions'
+    ]
+    self.assertEqual(choices_in_stderr, expected_choices)
+
+  def testBindingWithoutConditionPolicyWithCondition_NoneCondition(self, track):
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
+    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
+    new_policy = copy.deepcopy(start_policy)
+    remove_user = 'user:test@gmail.com'
+    remove_role = 'roles/non-primitive'
+    self.WriteInput('2')
+    new_policy.bindings[:] = new_policy.bindings[:1]
+
+    self.mock_client.organizations.GetIamPolicy.Expect(
+        self.ExpectedGetRequest(), copy.deepcopy(start_policy))
+    self.mock_client.organizations.SetIamPolicy.Expect(
+        self.messages.CloudresourcemanagerOrganizationsSetIamPolicyRequest(
+            organizationsId=self.test_org_id,
+            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
+                policy=new_policy)), new_policy)
+
+    response = self.RunRemoveIamPolicyBinding(
+        self.test_org_id,
+        '--role={0}'.format(remove_role),
+        '--member={0}'.format(remove_user),
+        track=track)
+    self.assertEqual(response, new_policy)
+    choices_in_stderr = json.loads(self.GetErr())['choices']
+    expected_choices = [
+        'expression=expr,title=title,description=descr', 'None',
+        'all conditions'
+    ]
+    self.assertEqual(choices_in_stderr, expected_choices)
+
+  def testBindingWithoutConditionPolicyWithCondition_AllConditions(self, track):
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
+    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
+    new_policy = copy.deepcopy(start_policy)
+    remove_user = 'user:test@gmail.com'
+    remove_role = 'roles/non-primitive'
+    self.WriteInput('3')
+    new_policy.bindings[:] = []
+
+    self.mock_client.organizations.GetIamPolicy.Expect(
+        self.ExpectedGetRequest(), copy.deepcopy(start_policy))
+    self.mock_client.organizations.SetIamPolicy.Expect(
+        self.messages.CloudresourcemanagerOrganizationsSetIamPolicyRequest(
+            organizationsId=self.test_org_id,
+            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
+                policy=new_policy)), new_policy)
+
+    response = self.RunRemoveIamPolicyBinding(
+        self.test_org_id,
+        '--role={0}'.format(remove_role),
+        '--member={0}'.format(remove_user),
+        track=track)
+    self.assertEqual(response, new_policy)
+    choices_in_stderr = json.loads(self.GetErr())['choices']
+    expected_choices = [
+        'expression=expr,title=title,description=descr', 'None',
+        'all conditions'
+    ]
+    self.assertEqual(choices_in_stderr, expected_choices)
+
+  def testBindingWithoutConditionPolicyWithCondition_CannotPrompt(self, track):
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=False)
+    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
+    remove_user = 'user:test@gmail.com'
+    remove_role = 'roles/non-primitive'
+    self.mock_client.organizations.GetIamPolicy.Expect(
+        self.ExpectedGetRequest(), copy.deepcopy(start_policy))
+    with self.AssertRaisesExceptionRegexp(
+        iam_util.IamPolicyBindingIncompleteError,
+        '.*Removing a binding without specifying a condition from a policy.*'):
+      self.RunRemoveIamPolicyBinding(
+          self.test_org_id,
+          '--role={0}'.format(remove_role),
+          '--member={0}'.format(remove_user),
+          track=track)
+
+  def ExpectedGetRequest(self):
+    return self.messages.CloudresourcemanagerOrganizationsGetIamPolicyRequest(
+        organizationsId=self.TEST_ORGANIZATION.name[len('organizations/'):],
+        getIamPolicyRequest=self.messages.GetIamPolicyRequest())
+
+  def RunRemoveIamPolicyBinding(self, *args, **kwargs):
+    command = ['organizations', 'remove-iam-policy-binding']
+    command.extend(args)
+    track = kwargs.get('track')
+    return self.Run(command, track=track)
 
 
 if __name__ == '__main__':

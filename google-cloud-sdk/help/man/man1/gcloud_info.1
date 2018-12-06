@@ -11,7 +11,7 @@ gcloud info \- display information about the current gcloud environment
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud info\fR [\fB\-\-anonymize\fR] [\fB\-\-run\-diagnostics\fR] [\fB\-\-show\-log\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud info\fR [\fB\-\-anonymize\fR] [\fB\-\-run\-diagnostics\fR\ |\ \fB\-\-show\-log\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -21,15 +21,14 @@ gcloud info displays information about the current gcloud environment.
 
 .RS 2m
 .IP "\(bu" 2m
-gcloud info will print information about the current active configuration,
-including the Google Cloud Platform account, project and directory paths for
-logs.
+gcloud info prints information about the current active configuration, including
+the Google Cloud Platform account, project and directory paths for logs.
 .RE
 .sp
 
 .RS 2m
 .IP "\(bu" 2m
-gcloud info \-\-run\-diagnostics will run a checks on network connectivity.
+gcloud info \-\-run\-diagnostics checks network connectivity.
 .RE
 .sp
 
@@ -50,6 +49,11 @@ Minimize any personal identifiable information. Use it when sharing output with
 others.
 
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-run\-diagnostics\fR
 Run diagnostics on your installation of the Cloud SDK.
 
@@ -59,11 +63,12 @@ Print the contents of the last log file.
 
 
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.

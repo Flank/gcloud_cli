@@ -1,17 +1,31 @@
 NAME
     gcloud beta tasks queues remove-iam-policy-binding - remove IAM policy
-        binding for a queue
+        binding of tasks queue
 
 SYNOPSIS
-    gcloud beta tasks queues remove-iam-policy-binding QUEUE --member=MEMBER
-        --role=ROLE [GCLOUD_WIDE_FLAG ...]
+    gcloud beta tasks queues remove-iam-policy-binding
+        (QUEUE : --location=LOCATION) --member=MEMBER --role=ROLE
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Remove an IAM policy binding from a queue's access policy.
+    (BETA) Remove an IAM policy binding of a tasks queue's access policy.
 
 POSITIONAL ARGUMENTS
-     QUEUE
-        The queue to remove the IAM policy binding from.
+     Queue resource - The task queue for which to remove IAM policy binding
+     from. The arguments in this group can be used to specify the attributes of
+     this resource. (NOTE) Some attributes are not given arguments in this
+     group but can be set in other ways. To set the [project] attribute:
+     provide the argument [queue] on the command line with a fully specified
+     name; provide the argument [--project] on the command line; set the
+     property [core/project]. This must be specified.
+
+       QUEUE
+          ID of the queue or fully qualified identifier for the queue. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --location=LOCATION
+          The location name.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -33,25 +47,22 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the cloudtasks/v2beta2 API. The full documentation for
+    this API can be found at: https://cloud.google.com/tasks/
 
 EXAMPLES
-    The following command will remove an IAM policy binding for the role of
-    'roles/cloudtasks.queueAdmin' for the user 'test-user@gmail.com' on queue
-    with identifier 'my-queue'
+    To remove an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' with queue 'my-queue' and location='my-location',
+    run:
 
         $ gcloud beta tasks queues remove-iam-policy-binding my-queue \
-            --member='user:test-user@gmail.com' \
-            --role='roles/cloudtasks.queueAdmin'
-
-    The following command will remove an IAM policy binding for the role of
-    'roles/cloudtasks.queueAdmin' from all authenticated users on queue
-    'my-queue':
-
-        $ gcloud beta tasks queues remove-iam-policy-binding my-queue \
-            --member='allAuthenticatedUsers' \
-            --role='roles/cloudtasks.queueAdmin'
+            --location='my-location' --member='user:test-user@gmail.com' \
+            --role='roles/editor'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

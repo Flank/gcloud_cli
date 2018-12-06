@@ -198,7 +198,7 @@ class ConsoleAttrOsGetTermsizeEnvironmentTests(test_case.Base):
     self.imports.SetImport('ctypes', None)
     self.imports.SetImport('fcntl', None)
     self.imports.SetImport('termios', None)
-    self.StartEnvPatch(os.environ)
+    self.StartEnvPatch({})
     encoding.SetEncodedValue(os.environ, 'COLUMNS', '83')
     encoding.SetEncodedValue(os.environ, 'LINES', '27')
     self.check_output = self.StartObjectPatch(subprocess, 'check_output')
@@ -226,7 +226,7 @@ class ConsoleAttrOsGetTermsizeTputTests(test_case.Base):
     self.imports.SetImport('ctypes', None)
     self.imports.SetImport('fcntl', None)
     self.imports.SetImport('termios', None)
-    self.StartEnvPatch(os.environ)
+    self.StartEnvPatch({})
     encoding.SetEncodedValue(os.environ, 'COLUMNS', None)
     self.check_output = self.StartObjectPatch(subprocess, 'check_output')
     self.check_output.side_effect = self.MockCheckOutput
@@ -246,7 +246,7 @@ class ConsoleAttrOsGetTermsizeFallBackTests(test_case.Base):
     self.imports.SetImport('ctypes', None)
     self.imports.SetImport('fcntl', None)
     self.imports.SetImport('termios', None)
-    self.StartEnvPatch(os.environ)
+    self.StartEnvPatch({})
     encoding.SetEncodedValue(os.environ, 'COLUMNS', None)
     self.check_output = self.StartObjectPatch(subprocess, 'check_output')
     self.check_output.side_effect = OSError
@@ -410,7 +410,7 @@ class ConsoleAttrOsGetRawKeyFunctionFallBackTests(test_case.Base):
 class ConsoleAttrOsGetTermSizeNativeTests(test_case.Base):
 
   def SetUp(self):
-    self.StartEnvPatch(os.environ)
+    self.StartEnvPatch({})
 
   def Run(self, get_term_size, required=False, value=None):
     try:

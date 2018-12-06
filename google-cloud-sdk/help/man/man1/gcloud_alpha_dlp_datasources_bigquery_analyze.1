@@ -11,7 +11,7 @@ gcloud alpha dlp datasources bigquery analyze \- schedule a risk analysis job fo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dlp datasources bigquery analyze\fR \fIINPUT_TABLE\fR (\fB\-\-categorical\-stat\-field\fR=\fICATEGORICAL_STAT_FIELD\fR\ |\ \fB\-\-numerical\-stat\-field\fR=\fINUMERICAL_STAT_FIELD\fR\ |\ [\fB\-\-quasi\-ids\fR=[\fIQUASI_IDS\fR,...]\ :\ \fB\-\-sensitive\-attribute\fR=\fISENSITIVE_ATTRIBUTE\fR]) (\fB\-\-output\-tables\fR=[\fIOUTPUT_TABLES\fR,...]\ |\ \fB\-\-output\-topics\fR=[\fIOUTPUT_TOPICS\fR,...]) [\fB\-\-job\-id\fR=\fIJOB_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dlp datasources bigquery analyze\fR \fIINPUT_TABLE\fR (\fB\-\-categorical\-stat\-field\fR=\fICATEGORICAL_STAT_FIELD\fR\ |\ \fB\-\-numerical\-stat\-field\fR=\fINUMERICAL_STAT_FIELD\fR\ |\ [\fB\-\-quasi\-ids\fR=[\fIQUASI_IDS\fR,...]\ :\ \fB\-\-sensitive\-attribute\fR=\fISENSITIVE_ATTRIBUTE\fR]) (\fB\-\-output\-table\fR=[\fIOUTPUT_TABLE\fR,...]\ |\ \fB\-\-output\-topics\fR=[\fIOUTPUT_TOPICS\fR,...]) [\fB\-\-job\-id\fR=\fIJOB_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -78,10 +78,11 @@ Exactly one of these must be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-output\-tables\fR=[\fIOUTPUT_TABLES\fR,...]
-Publishes results of a Cloud DLP job to one or more BigQuery tables. BigQuery
-tables are uniquely identified by their project_id, dataset_id, and table_id in
-the format \f5<project_id>.<dataset_id>.<table_id>\fR.
+\fB\-\-output\-table\fR=[\fIOUTPUT_TABLE\fR,...]
+Publishes results of a Cloud DLP job to a BigQuery table. BigQuery tables are
+uniquely identified by their project_id, dataset_id, and table_id in the format
+\f5<project_id>.<dataset_id>.<table_id>\fR. If no table_id is specified, DLP
+will create a new table.
 
 .TP 2m
 \fB\-\-output\-topics\fR=[\fIOUTPUT_TOPICS\fR,...]
@@ -113,9 +114,9 @@ match the regular expression: \f5[a\-zA\-Z\e\ed\-]+\fR. The maximum length is
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

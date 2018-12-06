@@ -15,7 +15,7 @@
 """Tests for the container images add-tag command."""
 
 from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import division
 from __future__ import unicode_literals
 
 from containerregistry.client.v2 import docker_http as v2_docker_http
@@ -33,6 +33,7 @@ from tests.lib import test_case
 
 import httplib2
 import mock
+import six
 import six.moves.http_client
 
 _IMAGE = 'gcr.io/foobar/baz'
@@ -208,7 +209,7 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     err = v2_docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.NOT_FOUND
-        }), '')
+        }), ''.encode('utf8'))
 
     self.push_mock.upload.side_effect = err
 
@@ -224,7 +225,7 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     err = v2_docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.FORBIDDEN
-        }), '')
+        }), ''.encode('utf8'))
 
     self.push_mock.upload.side_effect = err
 
@@ -246,8 +247,8 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
       with self.assertRaises(util.TokenRefreshError):
         self.AddTag(image_name, _GetImageName('tag3'))
     except Exception as e:
-      print('Exeptions type: ', type(e))
-      raise Exception(e)
+      raise Exception('Uncaught exception type [{}] message [{}]'.format(
+          type(e), six.text_type(e)))
 
   def testProjectRootDestionationImage(self):
     image_name = _GetImageName('latest')

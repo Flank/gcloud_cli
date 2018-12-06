@@ -1,0 +1,89 @@
+NAME
+    gcloud alpha iam service-accounts identity-bindings create - create a
+        service account identity binding
+
+SYNOPSIS
+    gcloud alpha iam service-accounts identity-bindings create
+        --service-account=SERVICE_ACCOUNT
+        [--acceptance-filter=ACCEPTANCE_FILTER]
+        [--attribute-translator-cel=OUT_ATTR=IN_ATTR,[...]]
+        [--oidc-issuer-url=OIDC_ISSUER_URL : --oidc-audience=OIDC_AUDIENCE
+          --oidc-max-token-lifetime=OIDC_MAX_TOKEN_LIFETIME]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a service account identity binding.
+
+REQUIRED FLAGS
+     --service-account=SERVICE_ACCOUNT
+        The service account for which to create an identity binding.
+
+OPTIONAL FLAGS
+     --acceptance-filter=ACCEPTANCE_FILTER
+        A CEL expression that is evaluated to determine whether a credential
+        should be accepted. To accept any credential, specify
+        --acceptance-filter=true.
+
+        This field supports a subset of the CEL functionality to select fields
+        and evaluate boolean expressions based on the input (no functions or
+        arithmetics). See the CEL specification
+        (https://github.com/google/cel-spec) for more details.
+
+        The values for input claims are available using inclaim.attribute_name
+        or inclaim["attribute_name"]. The values for output attributes
+        calculated by the translator are available using
+        outclaim.attribute_name or outclaim["attribute_name"].
+
+     --attribute-translator-cel=OUT_ATTR=IN_ATTR,[...]
+        Specifies a list of output attribute names and the corresponding input
+        attribute to use for that output attribute. Each defined output
+        attribute is populated with the value of the specified input attribute.
+        Each entry specifies the desired output attribute and a CEL field
+        selector expression for the corresponding input to read. This field
+        supports a subset of the CEL functionality to select fields from the
+        input (no boolean expressions, functions or arithmetics).
+
+        Output attributes must match (google.sub|[a-z][a-z0-9]).
+
+        The output attribute google.sub is interpreted to be the "identity" of
+        the requesting user.
+
+        For example, to copy the inbound attribute "sub" into the output
+        "google.sub" add the translation google.sub -> inclaim.sub (or
+        google.sub -> inclaim["sub"]). For example:
+
+        --attribute-translator-cel="google.sub=inclaim.sub"
+
+        See the CEL specification (https://github.com/google/cel-spec) for more
+        details.
+
+        If the input does not exist the output attribute will be null.
+
+     OIDC Identity Provider
+
+       --oidc-issuer-url=OIDC_ISSUER_URL
+          The OpenID Provider Issuer URL. This flag must be specified if any of
+          the other arguments in this group are specified.
+
+       --oidc-audience=OIDC_AUDIENCE
+          The acceptable audience. Default is the numeric ID of the service
+          account.
+
+       --oidc-max-token-lifetime=OIDC_MAX_TOKEN_LIFETIME
+          The maximum lifetime for tokens, in seconds. The default is 3600 (1
+          hour).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

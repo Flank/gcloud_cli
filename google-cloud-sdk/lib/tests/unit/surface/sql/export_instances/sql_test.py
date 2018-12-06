@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests that exercise instance exports to sql."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util

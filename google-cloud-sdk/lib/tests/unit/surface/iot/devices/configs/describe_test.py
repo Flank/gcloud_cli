@@ -20,18 +20,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class ConfigsDescribeTest(base.CloudIotBase):
+class ConfigsDescribeTestGA(base.CloudIotBase):
 
-  def testDescribe(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testDescribe(self):
     device_config = self.messages.DeviceConfig(binaryData=b'a')
     self._ExpectGet(config=device_config)
 
@@ -44,8 +42,7 @@ class ConfigsDescribeTest(base.CloudIotBase):
 
     self.assertEqual(results, device_config)
 
-  def testDescribe_Output(self, track):
-    self.track = track
+  def testDescribe_Output(self):
     device_config = self.messages.DeviceConfig(
         binaryData=b'a',
         cloudUpdateTime='2017-01-01T00:00Z',
@@ -67,8 +64,7 @@ class ConfigsDescribeTest(base.CloudIotBase):
         version: '42'
         """, normalize_space=True)
 
-  def testDescribe_NoneConfig(self, track):
-    self.track = track
+  def testDescribe_NoneConfig(self):
     self._ExpectGet()
 
     self.Run(
@@ -78,8 +74,7 @@ class ConfigsDescribeTest(base.CloudIotBase):
         '    --region us-central1')
     self.AssertOutputEquals('')
 
-  def testDescribe_RelativeName(self, track):
-    self.track = track
+  def testDescribe_RelativeName(self):
     self._ExpectGet()
 
     device_name = ('projects/{}/locations/us-central1/registries/my-registry/'
@@ -90,6 +85,18 @@ class ConfigsDescribeTest(base.CloudIotBase):
                       '--device {}'.format(device_name))
 
     self.assertIs(result, None)
+
+
+class ConfigsDescribeTestBeta(ConfigsDescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ConfigsDescribeTestAlpha(ConfigsDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

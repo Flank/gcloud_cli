@@ -13,40 +13,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud access-context-manager perimeters describe`."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class PerimetersDescribeTest(accesscontextmanager.Base):
+class PerimetersDescribeTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def _ExpectGet(self, perimeter, policy):
+  def _ExpectGet(self, perimeter):
     m = self.messages
-    request_type = m.AccesscontextmanagerAccessPoliciesAccessZonesGetRequest
-    self.client.accessPolicies_accessZones.Get.Expect(
+    request_type = (
+        m.AccesscontextmanagerAccessPoliciesServicePerimetersGetRequest)
+    self.client.accessPolicies_servicePerimeters.Get.Expect(
         request_type(name=perimeter.name), perimeter)
 
-  def testDescribe_MissingRequired(self, track):
-    self.SetUpForTrack(track)
+  def testDescribe_MissingRequired(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager perimeters describe --policy MY_POLICY')
 
-  def testDescribe(self, track):
-    self.SetUpForTrack(track)
+  def testDescribe(self):
+    self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter('my_perimeter')
-    self._ExpectGet(perimeter, 'my_policy')
+    self._ExpectGet(perimeter)
 
     result = self.Run(
         'access-context-manager perimeters describe my_perimeter '
@@ -55,17 +58,24 @@ class PerimetersDescribeTest(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter)
 
-  def testDescribe_PolicyFromProperty(self, track):
-    self.SetUpForTrack(track)
+  def testDescribe_PolicyFromProperty(self):
+    self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter('my_perimeter')
     policy = 'my_acm_policy'
-    perimeter.name = 'accessPolicies/my_acm_policy/accessZones/my_perimeter'
+    perimeter.name = (
+        'accessPolicies/my_acm_policy/servicePerimeters/my_perimeter')
     properties.VALUES.access_context_manager.policy.Set(policy)
-    self._ExpectGet(perimeter, policy)
+    self._ExpectGet(perimeter)
 
     result = self.Run('access-context-manager perimeters describe my_perimeter')
 
     self.assertEqual(result, perimeter)
+
+
+class PerimetersDescribeTestAlpha(PerimetersDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

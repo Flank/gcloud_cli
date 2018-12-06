@@ -1,0 +1,101 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_MACHINE\-IMAGES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute machine\-images create \- create Google Compute Engine machine images
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute machine\-images create\fR \fIIMAGE\fR \fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-source\-instance\-zone\fR=\fISOURCE_INSTANCE_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create Google Compute Engine machine images.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE\fR
+Name of the machineImage to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR
+The source instance to create a machine image from.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Specifies a textual description of the machine image.
+
+.TP 2m
+\fB\-\-source\-instance\-zone\fR=\fISOURCE_INSTANCE_ZONE\fR
+Zone of the instance to operate on. If not specified and the
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
+zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

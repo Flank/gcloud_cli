@@ -24,6 +24,7 @@ from googlecloudsdk.command_lib.spanner.sql import DisplayQueryPlan
 from googlecloudsdk.command_lib.spanner.sql import DisplayQueryResults
 from googlecloudsdk.command_lib.spanner.sql import Node
 from googlecloudsdk.command_lib.spanner.sql import QueryHasAggregateStats
+from googlecloudsdk.command_lib.spanner.sql import QueryHasDml
 from googlecloudsdk.core import log
 from tests.lib.surface.spanner import base
 import six
@@ -223,8 +224,184 @@ class SqlTest(base.SpannerTestBase):
         ]))
     return self.msgs.ResultSet(stats=result_set_stats)
 
+  def _GivenResultSetStatsForNestedChildLinks(self):
+    """Creates query statistics of type spanner_v1_messages.ResultSetStats."""
+    result_set_stats = self.msgs.ResultSetStats(
+        queryPlan=self.msgs.QueryPlan(planNodes=[
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('RELATIONAL'),
+                displayName='Distributed Union',
+                childLinks=[
+                    self.msgs.ChildLink(childIndex=1),
+                    self.msgs.ChildLink(childIndex=10)
+                ]),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('RELATIONAL'),
+                displayName='Distributed Union',
+                childLinks=[self.msgs.ChildLink(childIndex=2)],
+                index=1),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('RELATIONAL'),
+                displayName='Serialize Result',
+                childLinks=[
+                    self.msgs.ChildLink(childIndex=3),
+                    self.msgs.ChildLink(childIndex=7)
+                ],
+                index=2),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('RELATIONAL'),
+                displayName='FilterScan',
+                childLinks=[self.msgs.ChildLink(childIndex=6)],
+                index=3),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Function',
+                childLinks=[
+                    self.msgs.ChildLink(childIndex=8),
+                    self.msgs.ChildLink(childIndex=5)
+                ],
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='($Balance < 1000)'),
+                index=4),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Reference',
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='$Balance'),
+                index=5),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Function',
+                childLinks=[self.msgs.ChildLink(childIndex=4)],
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='($Balance < 1000)'),
+                index=6),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Reference',
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='$CustomerNumber'),
+                index=7),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Function',
+                childLinks=[self.msgs.ChildLink(childIndex=9)],
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='($CustomerNumber > 5)'),
+                index=8),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Reference',
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='5'),
+                index=9),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Constant',
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='true'),
+                index=10)
+        ]))
+    return self.msgs.ResultSet(stats=result_set_stats)
+
+  def _GivenResultSetStatsForCondition(self):
+    """Creates query statistics of type spanner_v1_messages.ResultSetStats."""
+    result_set_stats = self.msgs.ResultSetStats(
+        queryPlan=self.msgs.QueryPlan(planNodes=[
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('RELATIONAL'),
+                displayName='Distributed Union',
+                childLinks=[
+                    self.msgs.ChildLink(childIndex=1),
+                    self.msgs.ChildLink(childIndex=8)
+                ]),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('RELATIONAL'),
+                displayName='Distributed Union',
+                childLinks=[self.msgs.ChildLink(childIndex=2)],
+                index=1),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('RELATIONAL'),
+                displayName='Serialize Result',
+                childLinks=[
+                    self.msgs.ChildLink(childIndex=3),
+                    self.msgs.ChildLink(childIndex=7)
+                ],
+                index=2),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('RELATIONAL'),
+                displayName='FilterScan',
+                childLinks=[self.msgs.ChildLink(childIndex=6)],
+                index=3),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Function',
+                childLinks=[self.msgs.ChildLink(childIndex=5)],
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='($Balance < 1000)'),
+                index=4),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Reference',
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='$Balance'),
+                index=5),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Function',
+                childLinks=[self.msgs.ChildLink(childIndex=4)],
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='($Balance < 1000)'),
+                index=6),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Reference',
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='$CustomerNumber'),
+                index=7),
+            self.msgs.PlanNode(
+                kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
+                displayName='Constant',
+                shortRepresentation=self.msgs.ShortRepresentation(
+                    description='true'),
+                index=8)
+        ]))
+    return self.msgs.ResultSet(stats=result_set_stats)
+
   def _AssertOutputEqualsStripNewlines(self, output):
     self.AssertOutputEquals(output, normalize_space='\n')
+
+  def testQueryHasDmlInsert(self):
+    sql = ' INSERT abc (a, b, c) VALUES (1, 2, 3)'
+    self.assertEqual(QueryHasDml(sql), True)
+
+  def testQueryHasDmlUpdate(self):
+    sql = ' update abc SET b = 1 WHERE a = 1'
+    self.assertEqual(QueryHasDml(sql), True)
+
+  def testQueryHasDmlDelete(self):
+    sql = ' DELETE abc WHERE a = 1'
+    self.assertEqual(QueryHasDml(sql), True)
+
+  def testQueryHasDmlWithDashComment(self):
+    sql = '-- Comment.\nupdate abc SET b = 1 WHERE a = 1'
+    self.assertEqual(QueryHasDml(sql), True)
+
+  def testQueryHasDmlWithHashComment(self):
+    sql = '# Comment.\nupdate abc SET b = 1 WHERE a = 1'
+    self.assertEqual(QueryHasDml(sql), True)
+
+  def testQueryHasDmlWithMultilineComment(self):
+    sql = '/*\nComment.\n*/\n/* Comment. */ update abc SET b = 1 WHERE a = 1'
+    self.assertEqual(QueryHasDml(sql), True)
+
+  def testQueryHasDmlWithHint(self):
+    sql = '@ { hint } \nUPDATE abc SET b = 1 WHERE a = 1'
+    self.assertEqual(QueryHasDml(sql), True)
+
+  def testQueryDoesNotHaveDml(self):
+    sql = 'select * from abc'
+    self.assertEqual(QueryHasDml(sql), False)
 
   def testKindAndName(self):
     root = self._GivenLeafNode('Leaf')
@@ -413,6 +590,68 @@ class SqlTest(base.SpannerTestBase):
        1"""
     self._AssertOutputEqualsStripNewlines(output)
 
+  def testDisplayQueryPlanWithNestedChildLinks(self):
+    query_plan = self._GivenResultSetStatsForNestedChildLinks()
+    DisplayQueryPlan(query_plan, self.out)
+
+    output = r""" RELATIONAL Distributed Union
+    |
+    +- RELATIONAL Distributed Union
+    |   |
+    |   \- RELATIONAL Serialize Result
+    |       |
+    |       +- RELATIONAL FilterScan
+    |       |   |
+    |       |   \- SCALAR Function
+    |       |      ($Balance < 1000)
+    |       |       |
+    |       |       \- SCALAR Function
+    |       |          ($Balance < 1000)
+    |       |           |
+    |       |           +- SCALAR Function
+    |       |           |  ($CustomerNumber > 5)
+    |       |           |   |
+    |       |           |   \- SCALAR Reference
+    |       |           |      5
+    |       |           |
+    |       |           \- SCALAR Reference
+    |       |              $Balance
+    |       |
+    |       \- SCALAR Reference
+    |          $CustomerNumber
+    |
+    \- SCALAR Constant
+       true"""
+    self._AssertOutputEqualsStripNewlines(output)
+
+  def testDisplayQueryPlanWithCondition(self):
+    query_plan = self._GivenResultSetStatsForCondition()
+    DisplayQueryPlan(query_plan, self.out)
+
+    output = r""" RELATIONAL Distributed Union
+    |
+    +- RELATIONAL Distributed Union
+    |   |
+    |   \- RELATIONAL Serialize Result
+    |       |
+    |       +- RELATIONAL FilterScan
+    |       |   |
+    |       |   \- SCALAR Function
+    |       |      ($Balance < 1000)
+    |       |       |
+    |       |       \- SCALAR Function
+    |       |          ($Balance < 1000)
+    |       |           |
+    |       |           \- SCALAR Reference
+    |       |              $Balance
+    |       |
+    |       \- SCALAR Reference
+    |          $CustomerNumber
+    |
+    \- SCALAR Constant
+       true"""
+    self._AssertOutputEqualsStripNewlines(output)
+
   def testDisplayQueryResults(self):
     metadata = self.msgs.ResultSetMetadata(rowType=self.msgs.StructType(
         fields=[
@@ -438,3 +677,45 @@ class SqlTest(base.SpannerTestBase):
     self.AssertOutputEquals('colA  colB  (Unspecified)\n'
                             'A1    B1    C1\n'
                             'A2    B2    C2\n')
+
+  def _SetupDmlResultSet(self, stats):
+    metadata = self.msgs.ResultSetMetadata(
+        transaction=self.msgs.Transaction(id=bytes(123)),
+        rowType=self.msgs.StructType(fields=[]))
+    return self.msgs.ResultSet(metadata=metadata, stats=stats, rows=[])
+
+  def testDisplayQueryResultsDml(self):
+    stats = self.msgs.ResultSetStats(rowCountExact=1)
+    results = self._SetupDmlResultSet(stats)
+    DisplayQueryResults(results, self.out)
+    self.AssertOutputEquals('Statement modified 1 row\n')
+
+  def testDisplayQueryResultsDmlMultipleResults(self):
+    stats = self.msgs.ResultSetStats(rowCountExact=3)
+    results = self._SetupDmlResultSet(stats)
+    DisplayQueryResults(results, self.out)
+    self.AssertOutputEquals('Statement modified 3 rows\n')
+
+  def testDisplayQueryResultsDmlNoResults(self):
+    stats = self.msgs.ResultSetStats(rowCountExact=None)
+    results = self._SetupDmlResultSet(stats)
+    DisplayQueryResults(results, self.out)
+    self.AssertOutputEquals('')
+
+  def testDisplayQueryResultsPartitionedDmlNoResults(self):
+    stats = self.msgs.ResultSetStats(rowCountLowerBound=None)
+    results = self._SetupDmlResultSet(stats)
+    DisplayQueryResults(results, self.out)
+    self.AssertOutputEquals('')
+
+  def testDisplayQueryResultsPartitionedDml(self):
+    stats = self.msgs.ResultSetStats(rowCountLowerBound=1)
+    results = self._SetupDmlResultSet(stats)
+    DisplayQueryResults(results, self.out)
+    self.AssertOutputEquals('Statement modified a lower bound of 1 row\n')
+
+  def testDisplayQueryResultsPartitionedDmlMultipleResults(self):
+    stats = self.msgs.ResultSetStats(rowCountLowerBound=3)
+    results = self._SetupDmlResultSet(stats)
+    DisplayQueryResults(results, self.out)
+    self.AssertOutputEquals('Statement modified a lower bound of 3 rows\n')

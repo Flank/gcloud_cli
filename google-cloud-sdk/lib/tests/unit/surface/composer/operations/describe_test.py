@@ -19,18 +19,17 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class OperationsDescribeTest(base.OperationsUnitTest, parameterized.TestCase):
+class OperationsDescribeGATest(base.OperationsUnitTest):
 
-  def testSuccessfulDescribe(self, track):
-    self.SetTrack(track)
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
+
+  def testSuccessfulDescribe(self):
     expected = self.MakeOperation(self.TEST_PROJECT, self.TEST_LOCATION,
                                   self.TEST_OPERATION_UUID)
     self.ExpectOperationGet(
@@ -43,8 +42,7 @@ class OperationsDescribeTest(base.OperationsUnitTest, parameterized.TestCase):
                                 self.TEST_OPERATION_UUID)
     self.assertEqual(expected, actual)
 
-  def testDescribeOperationNotFound(self, track):
-    self.SetTrack(track)
+  def testDescribeOperationNotFound(self):
     self.ExpectOperationGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -56,8 +54,7 @@ class OperationsDescribeTest(base.OperationsUnitTest, parameterized.TestCase):
                          '--location', self.TEST_LOCATION,
                          self.TEST_OPERATION_UUID)
 
-  def testDescribeEnvironmentInsufficientPermissions(self, track):
-    self.SetTrack(track)
+  def testDescribeEnvironmentInsufficientPermissions(self):
     self.ExpectOperationGet(
         self.TEST_PROJECT,
         self.TEST_LOCATION,
@@ -69,6 +66,18 @@ class OperationsDescribeTest(base.OperationsUnitTest, parameterized.TestCase):
       self.RunOperations('describe', '--project', self.TEST_PROJECT,
                          '--location', self.TEST_LOCATION,
                          self.TEST_OPERATION_UUID)
+
+
+class OperationsDescribeBetaTest(OperationsDescribeGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+
+class OperationsDescribeAlphaTest(OperationsDescribeBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

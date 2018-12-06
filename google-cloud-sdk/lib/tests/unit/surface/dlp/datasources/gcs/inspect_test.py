@@ -28,6 +28,7 @@ from tests.lib.surface.dlp import base
 class InspectTest(base.DlpUnitTestBase):
   """dlp datasources gcs inspect tests."""
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testInspectDefaults(self, track):
     self.track = track
@@ -38,8 +39,7 @@ class InspectTest(base.DlpUnitTestBase):
         mintime=None,
         maxtime=None)
     create_job_request = self.MakeJobCreateRequest(
-        None,
-        inspect_config=job.inspectDetails.requestedOptions.jobConfig)
+        None, inspect_config=job.inspectDetails.requestedOptions.jobConfig)
     self.client.projects_dlpJobs.Create.Expect(
         request=create_job_request, response=job)
     self.Run('dlp datasources gcs inspect gs://my-bucket/ '
@@ -50,12 +50,11 @@ class InspectTest(base.DlpUnitTestBase):
           'PHONE_NUMBER', 'LAST_NAME'
       ], ['mytopic1', 'mytopic2'], None, 100, True, False, 500, 10, 'LIKELY',
        '2018-05-01T12:00:00.000Z', '2018-05-31T12:00:00.000Z'),
-      ('TableOutput', calliope_base.ReleaseTrack.ALPHA, 'gs://mybucket/*', [
-          'PHONE_NUMBER', 'LAST_NAME'
-      ], None, ['fakeproject.myds.mytable1', 'fakeproject.myds.mytable2'], 1000,
+      ('TableOutput', calliope_base.ReleaseTrack.ALPHA, 'gs://mybucket/*',
+       ['PHONE_NUMBER', 'LAST_NAME'], None, 'fakeproject.myds.mytable1', 1000,
        False, True, 100, 5, 'VERY-LIKELY', '2018-05-01T12:00:00.000Z', None))
   def testInspectWithOptionalParams(
-      self, track, input_gcs_path, info_types, output_topics, output_tables,
+      self, track, input_gcs_path, info_types, output_topics, output_table,
       file_size_limit, exclude_info_types, include_quote, max_findings,
       max_findings_per_item, min_likelihood, mintime, maxtime):
     self.track = track
@@ -69,7 +68,7 @@ class InspectTest(base.DlpUnitTestBase):
         info_types=info_types,
         input_gcs_path=input_gcs_path,
         output_topics=output_topics,
-        output_tables=output_tables,
+        output_table=output_table,
         file_size_limit=file_size_limit,
         exclude_info_types=exclude_info_types,
         include_quote=include_quote,
@@ -87,16 +86,16 @@ class InspectTest(base.DlpUnitTestBase):
 
     include_qt_flag = '--include-quote' if include_quote else ''
     exclude_it_flag = '--exclude-info-types' if exclude_info_types else ''
-    likelihood_flag = (
-        '--min-likelihood ' + min_likelihood if min_likelihood else '')
+    likelihood_flag = ('--min-likelihood ' + min_likelihood
+                       if min_likelihood else '')
     info_type_values = ','.join(info_types)
     max_findings_flag = '--max-findings {}'.format(max_findings)
     max_item_findings_flag = '--max-findings-per-item {}'.format(
         max_findings_per_item)
-    min_time_flag = '--min-time '+ mintime if mintime else ''
+    min_time_flag = '--min-time ' + mintime if mintime else ''
     max_time_flag = '--max-time ' + maxtime if maxtime else ''
-    if output_tables:
-      output_flag = '--output-tables {}'.format(','.join(output_tables))
+    if output_table:
+      output_flag = '--output-table ' + output_table
     else:  # topics
       output_flag = '--output-topics {}'.format(','.join(output_topics))
     likelihood_flag = (
@@ -116,8 +115,7 @@ class InspectTest(base.DlpUnitTestBase):
                  maxfindings=max_findings_flag,
                  maxitemfindings=max_item_findings_flag,
                  mintime=min_time_flag,
-                 maxtime=max_time_flag
-             ))
+                 maxtime=max_time_flag))
 
 
 if __name__ == '__main__':

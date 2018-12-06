@@ -1,0 +1,80 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_NETWORKS_PEERINGS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute networks peerings update \- update a Google Compute Engine network peering
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute networks peerings update\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-export\-custom\-routes\fR] [\fB\-\-import\-custom\-routes\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update a Google Compute Engine network peering.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the peering.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The name of the network in the current project to be peered with the peer
+network.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-export\-custom\-routes\fR
+If set, the network will export custom routes to peer network. Use
+\-\-no\-export\-custom\-routes to disable it.
+
+.TP 2m
+\fB\-\-import\-custom\-routes\fR
+If set, the network will import custom routes from peer network. Use
+\-\-no\-import\-custom\-routes to disable it.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

@@ -11,7 +11,7 @@ gcloud alpha spanner instances update \- update a Cloud Spanner instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha spanner instances update\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-nodes\fR=\fINODES\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha spanner instances update\fR [\fIINSTANCE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-nodes\fR=\fINODES\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,10 +25,21 @@ gcloud alpha spanner instances update \- update a Cloud Spanner instance
 
 .RS 2m
 .TP 2m
-\fIINSTANCE\fR
-Cloud Spanner instance ID.
+
+Instance resource \- The Cloud Spanner instance to update. This represents a
+Cloud resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[instance] on the command line with a fully specified name; set the property
+[spanner/instance] with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line.
+
+.RS 2m
+.TP 2m
+[\fIINSTANCE\fR]
+ID of the instance or fully qualified identifier for the instance.
 
 
+.RE
 .RE
 .sp
 
@@ -42,11 +53,12 @@ operation to complete.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
-Description of the instance.
+The descriptive name for this instance as it appears in UIs. Must be unique per
+project and between 4 and 30 characters in length.
 
 .TP 2m
 \fB\-\-nodes\fR=\fINODES\fR
-Number of nodes for the instance.
+The number of nodes allocated to this instance to update.
 
 
 .RE
@@ -55,9 +67,16 @@ Number of nodes for the instance.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBspanner/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/spanner/
 
 
 

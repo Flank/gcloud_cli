@@ -43,7 +43,8 @@ OPTIONAL FLAGS
      --device-name=DEVICE_NAME
         An optional name that indicates the disk name the guest operating
         system will see. (Note: Device name does not correspond to mounted
-        volume name)
+        volume name). Must match the disk name if the disk is going to be
+        mounted to a container with --container-mount-disk (alpha feature).
 
      --mode=MODE; default="rw"
         Specifies the mode of the disk. MODE must be one of:
@@ -79,8 +80,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

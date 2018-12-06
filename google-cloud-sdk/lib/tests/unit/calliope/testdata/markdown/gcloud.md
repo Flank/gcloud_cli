@@ -8,7 +8,7 @@ gcloud - markdown top group docstring index
 
 ## SYNOPSIS
 
-`gcloud` _GROUP_ [*--configuration*=_CONFIGURATION_] [*--flatten*=[_KEY_,...]] [*--format*=_FORMAT_] [*--help*] [*--verbosity*=_VERBOSITY_; default="warning"] [*-h*] [*--log-http*] [*--top-group-flag*=_TOP_GROUP_FLAG_] [*--no-user-output-enabled*]
+`gcloud` _GROUP_ [*--configuration*=_CONFIGURATION_] [*--flags-file*=_YAML_FILE_] [*--flatten*=[_KEY_,...]] [*--format*=_FORMAT_] [*--help*] [*--verbosity*=_VERBOSITY_; default="warning"] [*-h*] [*--log-http*] [*--top-group-flag*=_TOP_GROUP_FLAG_] [*--no-user-output-enabled*]
 
 
 ## DESCRIPTION
@@ -25,6 +25,14 @@ information on how to use configurations, run:
 `gcloud topic configurations`.  You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment
 variable to set the equivalent of this flag for a terminal
 session.
+
+*--flags-file*=_YAML_FILE_::
+
+A YAML or JSON file that specifies a *--flag*:*value* dictionary.
+Useful for specifying complex flag values with special characters
+that work with any command interpreter. Additionally, each
+*--flags-file* arg is replaced by its constituent flags. See
+$ link:gcloud[gcloud] topic flags-file for more information.
 
 *--flatten*=[_KEY_,...]::
 

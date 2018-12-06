@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,15 +62,15 @@ def MakeRepeatMock(num_tries):
 
 class ParallelUploadTestBase(sdk_test_base.WithOutputCapture):
 
-  _TEST_BUCKET = 'gs://my-bucket'
-  _TEST_BUCKET_REF = storage_util.BucketReference.FromBucketUrl(_TEST_BUCKET)
+  _TEST_BUCKET = 'my-bucket'
   _DEFAULT_NUM_TASKS = 10
 
   def _MakeTestTasks(self, count):
     tasks = []
     for n in range(count):
       tasks.append(storage_parallel.FileUploadTask(
-          'local{0}'.format(n), self._TEST_BUCKET, 'remote{0}'.format(n)))
+          'local{0}'.format(n), storage_util.ObjectReference(
+              self._TEST_BUCKET, 'remote{0}'.format(n))))
     return tasks
 
   def SetUp(self):
@@ -147,7 +147,9 @@ class ParallelUploadTest(ParallelUploadTestBase):
     storage_parallel.UploadFiles(tasks, num_threads=num_threads)
     for n in range(self._DEFAULT_NUM_TASKS):
       self.copy_file_mock.assert_any_call(
-          self._TEST_BUCKET_REF, 'local{0}'.format(n), 'remote{0}'.format(n))
+          'local{0}'.format(n),
+          storage_util.ObjectReference(self._TEST_BUCKET,
+                                       'remote{0}'.format(n)))
     self.assertEqual(self.copy_file_mock.call_count, self._DEFAULT_NUM_TASKS)
     self.get_pool_mock.assert_called_once_with(num_threads)
 
@@ -167,7 +169,9 @@ class ParallelUploadTest(ParallelUploadTestBase):
     for n in range(self._DEFAULT_NUM_TASKS):
       for _ in range(num_tries):
         calls.append(mock.call(
-            self._TEST_BUCKET_REF, 'local{0}'.format(n), 'remote{0}'.format(n)))
+            'local{0}'.format(n),
+            storage_util.ObjectReference(self._TEST_BUCKET,
+                                         'remote{0}'.format(n))))
     self.copy_file_mock.assert_has_calls(calls, any_order=True)
     self.get_pool_mock.assert_called_once_with(16)
 
@@ -199,22 +203,23 @@ class ParallelUploadTest(ParallelUploadTestBase):
   def testUploadFile_OneFile(self):
     tasks = self._MakeTestTasks(1)
     storage_parallel.UploadFiles(tasks)
-    self.copy_file_mock.assert_called_once_with(self._TEST_BUCKET_REF, 'local0',
-                                                'remote0')
+    self.copy_file_mock.assert_called_once_with(
+        'local0',
+        storage_util.ObjectReference(self._TEST_BUCKET, 'remote0'))
     self.get_pool_mock.assert_called_once_with(16)
 
 
 class ParallelDeleteTestBase(sdk_test_base.WithOutputCapture):
 
-  _TEST_BUCKET = 'gs://my-bucket'
-  _TEST_BUCKET_REF = storage_util.BucketReference.FromBucketUrl(_TEST_BUCKET)
+  _TEST_BUCKET = 'my-bucket'
   _DEFAULT_NUM_TASKS = 100
 
   def _MakeTestTasks(self, count):
     tasks = []
     for n in range(count):
-      tasks.append(storage_parallel.ObjectDeleteTask(self._TEST_BUCKET,
-                                                     'remote{0}'.format(n)))
+      tasks.append(storage_parallel.ObjectDeleteTask(
+          storage_util.ObjectReference(
+              self._TEST_BUCKET, 'remote{0}'.format(n))))
     return tasks
 
   def SetUp(self):
@@ -290,8 +295,9 @@ class ParallelDeleteTest(ParallelDeleteTestBase):
     tasks = self._MakeTestTasks(self._DEFAULT_NUM_TASKS)
     storage_parallel.DeleteObjects(tasks, num_threads=num_threads)
     for n in range(self._DEFAULT_NUM_TASKS):
-      self.delete_object_mock.assert_any_call(self._TEST_BUCKET_REF,
-                                              'remote{0}'.format(n))
+      self.delete_object_mock.assert_any_call(
+          storage_util.ObjectReference(
+              self._TEST_BUCKET, 'remote{0}'.format(n)))
     self.assertEqual(self.delete_object_mock.call_count,
                      self._DEFAULT_NUM_TASKS)
     self.get_pool_mock.assert_called_once_with(num_threads)
@@ -311,7 +317,9 @@ class ParallelDeleteTest(ParallelDeleteTestBase):
                      self._DEFAULT_NUM_TASKS * num_tries)
     for n in range(self._DEFAULT_NUM_TASKS):
       for _ in range(num_tries):
-        calls.append(mock.call(self._TEST_BUCKET_REF, 'remote{0}'.format(n)))
+        calls.append(mock.call(
+            storage_util.ObjectReference(
+                self._TEST_BUCKET, 'remote{0}'.format(n))))
     self.delete_object_mock.assert_has_calls(calls, any_order=True)
     self.get_pool_mock.assert_called_once_with(16)
 
@@ -343,8 +351,8 @@ class ParallelDeleteTest(ParallelDeleteTestBase):
   def testDeleteObject_OneFile(self):
     tasks = self._MakeTestTasks(1)
     storage_parallel.DeleteObjects(tasks)
-    self.delete_object_mock.assert_called_once_with(self._TEST_BUCKET_REF,
-                                                    'remote0')
+    self.delete_object_mock.assert_called_once_with(
+        storage_util.ObjectReference(self._TEST_BUCKET, 'remote0'))
     self.get_pool_mock.assert_called_once_with(16)
 
 

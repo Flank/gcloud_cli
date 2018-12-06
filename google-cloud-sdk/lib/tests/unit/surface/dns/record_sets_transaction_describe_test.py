@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import os
 import shutil
 from googlecloudsdk.api_lib.dns import transaction_util
-from googlecloudsdk.calliope.exceptions import ToolException
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.dns import base
@@ -39,11 +38,11 @@ class RecordSetsTransactionDescribeTest(base.DnsMockTest):
 
   def testTransactionDescribeBeforeStart(self):
     test_zone = util.GetManagedZones()[0]
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(transaction_util.TransactionFileNotFound) as context:
       self.Run(
           'dns record-sets transaction describe -z {0}'.format(test_zone.name))
       self.assertEqual(context.exception.message,
-                       'transaction not found at [{0}]'.format(
+                       'Transaction not found at [{0}]'.format(
                            transaction_util.DEFAULT_PATH))
 
   def testTransactionDescribe(self):
@@ -62,16 +61,16 @@ class RecordSetsTransactionDescribeBetaTest(base.DnsMockBetaTest):
 
   def SetUp(self):
     self.transaction_file = sdk_test_base.SdkBase.Resource(
-        'tests', 'unit', 'surface', 'dns', 'test_data', 'v2beta1',
+        'tests', 'unit', 'surface', 'dns', 'test_data', 'v1beta2',
         'zone.com-transaction.yaml')
 
   def testTransactionDescribeBeforeStart(self):
     test_zone = util_beta.GetManagedZones()[0]
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(transaction_util.TransactionFileNotFound) as context:
       self.Run(
           'dns record-sets transaction describe -z {0}'.format(test_zone.name))
       self.assertEqual(context.exception.message,
-                       'transaction not found at [{0}]'.format(
+                       'Transaction not found at [{0}]'.format(
                            transaction_util.DEFAULT_PATH))
 
   def testTransactionDescribe(self):

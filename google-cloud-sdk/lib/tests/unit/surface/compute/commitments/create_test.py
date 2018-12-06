@@ -183,8 +183,9 @@ class CommitmentsCreateAlphaTest(CommitmentsCreateTest,
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
 
-  def MakeCommitment(self):
+  def MakeCommitment(self, allocations=None):
     return self.messages.Commitment(
+        allocations=allocations or [],
         name='pledge',
         plan=self.messages.Commitment.PlanValueValuesEnum.TWELVE_MONTH,
         resources=[
@@ -201,6 +202,34 @@ class CommitmentsCreateAlphaTest(CommitmentsCreateTest,
         ],
         type=self.messages.Commitment.TypeValueValuesEnum.GENERAL_PURPOSE
     )
+
+  def _MakeAllocation(self, name):
+    ssd_msgs = (
+        self.
+        messages.
+        AllocationSpecificSKUAllocationAllocatedInstancePropertiesAllocatedDisk)
+    return self.messages.Allocation(
+        name=name,
+        zone='fake-zone',
+        specificAllocationRequired=True,
+        specificAllocation=self.messages.AllocationSpecificSKUAllocation(
+            count=1,
+            instanceProperties=self.messages
+            .AllocationSpecificSKUAllocationAllocatedInstanceProperties(
+                machineType='n1-standard-1',
+                minCpuPlatform='Intel Haswell',
+                guestAccelerators=[
+                    self.messages.AcceleratorConfig(
+                        acceleratorCount=1, acceleratorType='nvidia-tesla-k80'),
+                ],
+                localSsds=[
+                    ssd_msgs(
+                        diskSizeGb=375,
+                        interface=ssd_msgs.InterfaceValueValuesEnum.SCSI),
+                    ssd_msgs(
+                        diskSizeGb=375,
+                        interface=ssd_msgs.InterfaceValueValuesEnum.NVME),
+                ])))
 
   @parameterized.named_parameters(
       ('DefaultSpecified', '--type general-purpose', 'GENERAL_PURPOSE'),
@@ -229,6 +258,101 @@ class CommitmentsCreateAlphaTest(CommitmentsCreateTest,
               commitment=commitment,
               project='my-project',
               region='erech-stone',
+          )
+         )],
+    )
+
+  def testCreateWithAllocation(self):
+    self.make_requests.side_effect = iter([
+        []
+    ])
+    commitment = self.MakeCommitment(
+        allocations=[self._MakeAllocation('my-allocation')])
+
+    self.Run("""
+        compute commitments create pledge
+        --plan 12-month
+        --resources VCPU=500,MEMORY=12
+        --region commitment-region
+        --allocation my-allocation
+        --allocation-zone=fake-zone
+        --require-specific-allocation
+        --vm-count 1
+        --min-cpu-platform="Intel Haswell"
+        --machine-type=n1-standard-1
+        --accelerator count=1,type=nvidia-tesla-k80
+        --local-ssd interface=scsi,size=375
+        --local-ssd interface=nvme,size=375
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionCommitments,
+          'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=commitment,
+              project='my-project',
+              region='commitment-region',
+          )
+         )],
+    )
+
+  def testCreatWithAllocationsFromFile(self):
+    self.make_requests.side_effect = iter([
+        []
+    ])
+    commitment = self.MakeCommitment(
+        allocations=[
+            self._MakeAllocation('my-allocation'),
+            self._MakeAllocation('another-allocation')])
+    allocation_file = self.Touch(
+        self.temp_path,
+        'allocations.yaml',
+        contents="""\
+-  allocation: my-allocation
+   allocation_zone: fake-zone
+   require_specific_allocation: true
+   vm_count: 1
+   machine_type: n1-standard-1
+   min_cpu_platform: "Intel Haswell"
+   accelerator:
+   - count: 1
+     type: nvidia-tesla-k80
+   local_ssd:
+   - interface: scsi
+     size: 375
+   - interface: nvme
+     size: 375
+-  allocation: another-allocation
+   allocation_zone: fake-zone
+   require_specific_allocation: true
+   vm_count: 1
+   machine_type: n1-standard-1
+   min_cpu_platform: "Intel Haswell"
+   accelerator:
+   - count: 1
+     type: nvidia-tesla-k80
+   local_ssd:
+   - interface: scsi
+     size: 375
+   - interface: nvme
+     size: 375
+""")
+
+    self.Run("""
+        compute commitments create pledge
+        --plan 12-month
+        --resources VCPU=500,MEMORY=12
+        --region commitment-region
+        --allocations-from-file {}
+        """.format(allocation_file))
+
+    self.CheckRequests(
+        [(self.compute.regionCommitments,
+          'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=commitment,
+              project='my-project',
+              region='commitment-region',
           )
          )],
     )

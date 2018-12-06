@@ -20,7 +20,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import datetime
-import os
 import posixpath
 import random
 import re
@@ -32,6 +31,7 @@ from googlecloudsdk.api_lib.firebase.test import util as util
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.core.util import files
 import six
 
 
@@ -389,7 +389,7 @@ def _GenerateUniqueGcsObjectName():
 
 
 def ValidateOsVersions(args, catalog_mgr):
-  """Validate os-version-ids strings against the TestingEnvironmentCatalog.
+  """Validate os-version-ids strings against the TestEnvironmentCatalog.
 
   Also allow users to alternatively specify OS version strings (e.g. '5.1.x')
   but translate them here to their corresponding version IDs (e.g. '22').
@@ -399,7 +399,7 @@ def ValidateOsVersions(args, catalog_mgr):
     args: an argparse namespace. All the arguments that were provided to the
       command invocation (i.e. group and command arguments combined).
     catalog_mgr: an AndroidCatalogManager object for working with the Android
-      TestingEnvironmentCatalog.
+      TestEnvironmentCatalog.
   """
   if not args.os_version_ids:
     return
@@ -408,6 +408,12 @@ def ValidateOsVersions(args, catalog_mgr):
     version_id = catalog_mgr.ValidateDimensionAndValue('version', vers)
     validated_versions.add(version_id)
   args.os_version_ids = sorted(validated_versions)
+
+
+def ValidateXcodeVersion(args, catalog_mgr):
+  """Validates an Xcode version string against the TestEnvironmentCatalog."""
+  if args.xcode_version:
+    catalog_mgr.ValidateXcodeVersion(args.xcode_version)
 
 
 _OBB_FILE_REGEX = re.compile(
@@ -427,7 +433,7 @@ def NormalizeAndValidateObbFileNames(obb_files):
     obb_files[:] = [
         obb_file if not obb_file or
         obb_file.startswith(storage_util.GSUTIL_BUCKET_PREFIX) else
-        os.path.expanduser(obb_file) for obb_file in obb_files
+        files.ExpandHomeDir(obb_file) for obb_file in obb_files
     ]
   for obb_file in (obb_files or []):
     if not _OBB_FILE_REGEX.match(obb_file):

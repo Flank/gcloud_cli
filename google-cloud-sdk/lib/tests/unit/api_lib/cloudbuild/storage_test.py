@@ -48,7 +48,7 @@ class StorageTest(e2e_base.WithMockHttp):
             ),
             project='proj-123',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(name='foo'))
 
     client = storage_api.StorageClient()
     client.CreateBucketIfNotExists('bucket-456', 'proj-123')
@@ -70,7 +70,7 @@ class StorageTest(e2e_base.WithMockHttp):
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket='bucket-456',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(name='foo'))
 
     client = storage_api.StorageClient()
     client.CreateBucketIfNotExists('bucket-456', 'proj-123')
@@ -98,6 +98,41 @@ class StorageTest(e2e_base.WithMockHttp):
     client = storage_api.StorageClient()
 
     with self.assertRaisesRegex(api_exceptions.HttpError, 'Permission denied'):
+      client.CreateBucketIfNotExists('bucket-456', 'proj-123')
+
+  def testCreateWithLocationSuccess(self):
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name='bucket-456',
+                location='EUROPE-NORTH1',
+            ),
+            project='proj-123',
+        ),
+        response=self.storage_v1_messages.Bucket(name='foo'))
+
+    client = storage_api.StorageClient()
+    client.CreateBucketIfNotExists(
+        'bucket-456', 'proj-123', location='EUROPE-NORTH1')
+
+  def testCreateWithInvalidLocationFails(self):
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name='bucket-456',
+            ),
+            project='proj-123',
+        ),
+        exception=http_error.MakeHttpError(
+            code=400, message='Invalid value',
+            url=('https://www.googleapis.com/storage/v1/buckets/'
+                 'bucket-456?alt=json')))
+
+    client = storage_api.StorageClient()
+
+    with self.assertRaisesRegex(api_exceptions.HttpError, 'Invalid value'):
       client.CreateBucketIfNotExists('bucket-456', 'proj-123')
 
 

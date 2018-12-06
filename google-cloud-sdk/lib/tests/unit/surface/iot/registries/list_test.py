@@ -21,15 +21,14 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class RegistriesListTest(base.CloudIotRegistryBase):
+class RegistriesListTestGA(base.CloudIotRegistryBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -37,8 +36,7 @@ class RegistriesListTest(base.CloudIotRegistryBase):
     # For convenience
     self.mqtt_enum = self.registries_client.mqtt_config_enum
 
-  def testList(self, track):
-    self.track = track
+  def testList(self):
     registries = self._MakeRegistries()
     self._ExpectListRegistries(registries)
 
@@ -46,8 +44,7 @@ class RegistriesListTest(base.CloudIotRegistryBase):
 
     self.assertEqual(results, registries)
 
-  def testList_CheckFormat(self, track):
-    self.track = track
+  def testList_CheckFormat(self):
     registries = [
         self.messages.DeviceRegistry(
             name='projects/{}/locations/us-central1/registries/r0'.format(
@@ -77,8 +74,7 @@ class RegistriesListTest(base.CloudIotRegistryBase):
         r2    us-central1  MQTT_STATE_UNSPECIFIED
         """, normalize_space=True)
 
-  def testList_Uri(self, track):
-    self.track = track
+  def testList_Uri(self):
     registries = self._MakeRegistries(n=3)
     self._ExpectListRegistries(registries)
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -90,6 +86,18 @@ class RegistriesListTest(base.CloudIotRegistryBase):
         https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/r1
         https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/r2
         """, normalize_space=True)
+
+
+class RegistriesListTestBeta(RegistriesListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class RegistriesListTestAlpha(RegistriesListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

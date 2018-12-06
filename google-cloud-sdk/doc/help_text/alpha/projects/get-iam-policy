@@ -18,8 +18,7 @@ POSITIONAL ARGUMENTS
      represents a Cloud resource. This must be specified.
 
        PROJECT_ID
-          The ID of the project or a fully qualified identifier for the
-          project.
+          ID of the project or fully qualified identifier for the project.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -49,8 +48,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
     This command uses the cloudresourcemanager/v1 API. The full documentation

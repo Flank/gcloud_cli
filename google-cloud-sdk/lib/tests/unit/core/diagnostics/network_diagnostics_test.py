@@ -147,7 +147,8 @@ class NetworkDiagnosticTests(diagnostics_test_base.DiagnosticTestBase):
     self.assertTrue(network_diagnostics.NetworkDiagnostic().RunChecks())
     self.assertEqual(1, self.run_check_mock.call_count)
     self.assertFalse(self.fixer_mock.called)
-    self.AssertErrContains('Network diagnostic (1/1 checks) passed.')
+    self.AssertErrContains(
+        'Network diagnostic passed (1/1 checks passed).')
 
   def testNetworkIssuesNoProxyChangesMade(self):
     self.run_check_mock.return_value = self._FAIL_RESULT, self.fixer_mock
@@ -155,7 +156,8 @@ class NetworkDiagnosticTests(diagnostics_test_base.DiagnosticTestBase):
     self.assertFalse(network_diagnostics.NetworkDiagnostic().RunChecks())
     self.assertEqual(1, self.run_check_mock.call_count)
     self.assertEqual(1, self.fixer_mock.call_count)
-    self.AssertErrContains('ERROR: Network diagnostic (0/1 checks) failed.')
+    self.AssertErrContains(
+        'ERROR: Network diagnostic failed (0/1 checks passed).')
 
   def testNetworkIssuesProxyChangesMadeStillIssuesExit(self):
     self.run_check_mock.return_value = self._FAIL_RESULT, self.fixer_mock
@@ -163,7 +165,8 @@ class NetworkDiagnosticTests(diagnostics_test_base.DiagnosticTestBase):
     self.assertFalse(network_diagnostics.NetworkDiagnostic().RunChecks())
     self.assertEqual(2, self.run_check_mock.call_count)
     self.assertEqual(2, self.fixer_mock.call_count)
-    self.AssertErrContains('ERROR: Network diagnostic (0/1 checks) failed.')
+    self.AssertErrContains(
+        'ERROR: Network diagnostic failed (0/1 checks passed).')
 
   def testNetworkIssuesProxyChangesMadeIssuesFixed(self):
     self.run_check_mock.side_effect = [
@@ -173,7 +176,8 @@ class NetworkDiagnosticTests(diagnostics_test_base.DiagnosticTestBase):
     self.assertTrue(network_diagnostics.NetworkDiagnostic().RunChecks())
     self.assertEqual(2, self.run_check_mock.call_count)
     self.assertEqual(1, self.fixer_mock.call_count)
-    self.AssertErrContains('Network diagnostic (1/1 checks) passed.')
+    self.AssertErrContains(
+        'Network diagnostic passed (1/1 checks passed).')
 
   def testNetworkIssuesMaxFixRetriesMet(self):
     self.run_check_mock.return_value = (self._FAIL_RESULT, self.fixer_mock)
@@ -184,7 +188,8 @@ class NetworkDiagnosticTests(diagnostics_test_base.DiagnosticTestBase):
     self.assertEqual(max_retries, self.fixer_mock.call_count)
     self.AssertErrContains('Unable to fix Network diagnostic failure after 5 '
                            'attempts.')
-    self.AssertErrContains('ERROR: Network diagnostic (0/1 checks) failed.')
+    self.AssertErrContains(
+        'ERROR: Network diagnostic failed (0/1 checks passed).')
 
 
 class DefaultUrlsTests(test_case.Base):

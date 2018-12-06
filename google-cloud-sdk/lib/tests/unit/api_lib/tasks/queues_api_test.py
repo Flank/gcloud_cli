@@ -27,7 +27,7 @@ from six.moves import range
 from six.moves import zip
 
 
-class QueuesTest(test_base.CloudTasksTestBase):
+class PushQueuesTest(test_base.CloudTasksTestBase):
 
   def SetUp(self):
     self.location_ref = resources.REGISTRY.Parse(
@@ -85,70 +85,45 @@ class QueuesTest(test_base.CloudTasksTestBase):
     self.assertEqual(actual_queue_list, expected_queue_list[:limit])
 
   def _TestQueueCreation(self, retry_config=None, rate_limits=None,
-                         pull_target=None, app_engine_http_target=None):
+                         app_engine_http_queue=None):
     expected_queue = self.messages.Queue(
         name=self.queue_name, retryConfig=retry_config,
-        rateLimits=rate_limits, pullTarget=pull_target,
-        appEngineHttpTarget=app_engine_http_target)
+        rateLimits=rate_limits,
+        appEngineHttpQueue=app_engine_http_queue)
     self.queues_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
             parent=self.location_ref.RelativeName(), queue=expected_queue),
         expected_queue)
     actual_queue = self.queues_client.Create(
         self.location_ref, self.queue_ref, retry_config=retry_config,
-        rate_limits=rate_limits, pull_target=pull_target,
-        app_engine_http_target=app_engine_http_target)
+        rate_limits=rate_limits,
+        app_engine_http_queue=app_engine_http_queue)
     self.assertEqual(actual_queue, expected_queue)
 
   def testCreate_NoOptions(self):
     self._TestQueueCreation()
 
-  def testCreate_AllOptions_PullQueue(self):
-    retry_config = self.messages.RetryConfig(
-        maxAttempts=100, unlimitedAttempts=False, maxRetryDuration='0s',
-        maxDoublings=0, minBackoff='0s', maxBackoff='0s')
-    pull_target = self.messages.PullTarget()
-    self._TestQueueCreation(retry_config=retry_config,
-                            pull_target=pull_target)
-
   def testCreate_AllOptions_AppEngineQueue(self):
     retry_config = self.messages.RetryConfig(
-        maxAttempts=100, unlimitedAttempts=False, maxRetryDuration='0s',
+        maxAttempts=100, maxRetryDuration='0s',
         maxDoublings=16, minBackoff='0.1s', maxBackoff='3600s')
     rate_limits = self.messages.RateLimits(
-        maxConcurrentTasks=10, maxTasksDispatchedPerSecond=1, maxBurstSize=10)
-    app_engine_http_target = self.messages.AppEngineHttpTarget(
+        maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
+    app_engine_http_queue = self.messages.AppEngineHttpQueue(
         appEngineRoutingOverride=self.messages.AppEngineRouting(service='abc'))
     self._TestQueueCreation(retry_config=retry_config,
                             rate_limits=rate_limits,
-                            app_engine_http_target=app_engine_http_target)
-
-  def testCreate_AttemptPullandAppEngineQueue(self):
-    retry_config = self.messages.RetryConfig(
-        maxAttempts=100, unlimitedAttempts=False, maxRetryDuration='0s',
-        maxDoublings=16, minBackoff='0.1s', maxBackoff='3600s')
-    rate_limits = self.messages.RateLimits(
-        maxConcurrentTasks=10, maxTasksDispatchedPerSecond=1, maxBurstSize=10)
-    pull_target = self.messages.PullTarget()
-    app_engine_http_target = self.messages.AppEngineHttpTarget(
-        appEngineRoutingOverride=self.messages.AppEngineRouting(service='abc'))
-
-    with self.assertRaises(queues_api.CreatingPullAndAppEngineQueueError):
-      self.queues_client.Create(self.location_ref, self.queue_ref,
-                                retry_config=retry_config,
-                                rate_limits=rate_limits,
-                                pull_target=pull_target,
-                                app_engine_http_target=app_engine_http_target)
+                            app_engine_http_queue=app_engine_http_queue)
 
   def _TestQueueUpdate(self, retry_config=None, rate_limits=None,
                        app_engine_routing_override=None, update_mask=''):
-    app_engine_http_target = None
+    app_engine_http_queue = None
     if app_engine_routing_override is not None:
-      app_engine_http_target = self.messages.AppEngineHttpTarget(
+      app_engine_http_queue = self.messages.AppEngineHttpQueue(
           appEngineRoutingOverride=app_engine_routing_override)
     expected_queue = self.messages.Queue(
         name=self.queue_name, retryConfig=retry_config,
-        rateLimits=rate_limits, appEngineHttpTarget=app_engine_http_target)
+        rateLimits=rate_limits, appEngineHttpQueue=app_engine_http_queue)
     self.queues_service.Patch.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
             name=self.queue_name, queue=expected_queue, updateMask=update_mask),
@@ -164,36 +139,30 @@ class QueuesTest(test_base.CloudTasksTestBase):
 
   def testPatch_SomeOptions(self):
     rate_limits = self.messages.RateLimits(
-        maxConcurrentTasks=10, maxTasksDispatchedPerSecond=1, maxBurstSize=10)
+        maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
     self._TestQueueUpdate(rate_limits=rate_limits, update_mask='rateLimits')
-
-  def testPatch_AllOptions_PullQueue(self):
-    retry_config = self.messages.RetryConfig(
-        maxAttempts=100, unlimitedAttempts=False, maxRetryDuration='0s',
-        maxDoublings=0, minBackoff='0s', maxBackoff='0s')
-    self._TestQueueUpdate(retry_config=retry_config, update_mask='retryConfig')
 
   def testPatch_AllOptions_AppEngineQueue(self):
     retry_config = self.messages.RetryConfig(
-        maxAttempts=100, unlimitedAttempts=False, maxRetryDuration='0s',
+        maxAttempts=100, maxRetryDuration='0s',
         maxDoublings=16, minBackoff='0.1s', maxBackoff='3600s')
     rate_limits = self.messages.RateLimits(
-        maxConcurrentTasks=10, maxTasksDispatchedPerSecond=1, maxBurstSize=10)
+        maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
     app_engine_routing_override = self.messages.AppEngineRouting(service='abc')
     self._TestQueueUpdate(
         retry_config=retry_config, rate_limits=rate_limits,
         app_engine_routing_override=app_engine_routing_override,
         update_mask=('retryConfig,rateLimits,'
-                     'appEngineHttpTarget.appEngineRoutingOverride'))
+                     'appEngineHttpQueue.appEngineRoutingOverride'))
 
   def testDelete(self):
     expected_queue = self.messages.Queue(name=self.queue_name)
     self.queues_service.Delete.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesDeleteRequest(
             name=expected_queue.name),
-        expected_queue)
+        self.messages.Empty())
     actual_queue = self.queues_client.Delete(self.queue_ref)
-    self.assertEqual(actual_queue, expected_queue)
+    self.assertEqual(actual_queue, self.messages.Empty())
 
   def testPurge(self):
     expected_queue = self.messages.Queue(name=self.queue_name)
@@ -242,6 +211,91 @@ class QueuesTest(test_base.CloudTasksTestBase):
     actual_policy = self.queues_client.SetIamPolicy(self.queue_ref,
                                                     expected_policy)
     self.assertEqual(actual_policy, expected_policy)
+
+
+class PullQueuesTest(test_base.CloudTasksAlphaTestBase):
+
+  def SetUp(self):
+    self.location_ref = resources.REGISTRY.Parse(
+        'us-central1', params={'projectsId': self.Project()},
+        collection='cloudtasks.projects.locations')
+    self.queue_ref = resources.REGISTRY.Parse(
+        'my-queue', params={'projectsId': self.Project(),
+                            'locationsId': 'us-central1'},
+        collection='cloudtasks.projects.locations.queues')
+
+    # Define separately from queue_ref because we know that this is what the API
+    # expects
+    self.queue_name = ('projects/{}/locations/us-central1/queues'
+                       '/my-queue'.format(self.Project()))
+
+  def _TestQueueCreation(self, retry_config=None, rate_limits=None,
+                         pull_target=None, app_engine_http_target=None):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name, retryConfig=retry_config,
+        rateLimits=rate_limits, pullTarget=pull_target,
+        appEngineHttpTarget=app_engine_http_target)
+    self.queues_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
+            parent=self.location_ref.RelativeName(), queue=expected_queue),
+        expected_queue)
+    actual_queue = self.queues_client.Create(
+        self.location_ref, self.queue_ref, retry_config=retry_config,
+        rate_limits=rate_limits, pull_target=pull_target,
+        app_engine_http_target=app_engine_http_target)
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testCreate_AllOptions_PullQueue(self):
+    retry_config = self.messages.RetryConfig(
+        maxAttempts=100, unlimitedAttempts=False, maxRetryDuration='0s',
+        maxDoublings=0, minBackoff='0s', maxBackoff='0s')
+    pull_target = self.messages.PullTarget()
+    self._TestQueueCreation(retry_config=retry_config,
+                            pull_target=pull_target)
+
+  def testCreate_AttemptPullandAppEngineQueue(self):
+    retry_config = self.messages.RetryConfig(
+        maxAttempts=100, unlimitedAttempts=False, maxRetryDuration='0s',
+        maxDoublings=16, minBackoff='0.1s', maxBackoff='3600s')
+    rate_limits = self.messages.RateLimits(
+        maxConcurrentTasks=10, maxTasksDispatchedPerSecond=1, maxBurstSize=10)
+    pull_target = self.messages.PullTarget()
+    app_engine_http_target = self.messages.AppEngineHttpTarget(
+        appEngineRoutingOverride=self.messages.AppEngineRouting(service='abc'))
+
+    with self.assertRaises(queues_api.CreatingPullAndAppEngineQueueError):
+      self.queues_client.Create(
+          self.location_ref,
+          self.queue_ref,
+          retry_config=retry_config,
+          rate_limits=rate_limits,
+          pull_target=pull_target,
+          app_engine_http_target=app_engine_http_target)
+
+  def _TestQueueUpdate(self, retry_config=None, rate_limits=None,
+                       app_engine_routing_override=None, update_mask=''):
+    app_engine_http_target = None
+    if app_engine_routing_override is not None:
+      app_engine_http_target = self.messages.AppEngineHttpTarget(
+          appEngineRoutingOverride=app_engine_routing_override)
+    expected_queue = self.messages.Queue(
+        name=self.queue_name, retryConfig=retry_config,
+        rateLimits=rate_limits, appEngineHttpTarget=app_engine_http_target)
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue, updateMask=update_mask),
+        expected_queue)
+    actual_queue = self.queues_client.Patch(
+        self.queue_ref, retry_config=retry_config, rate_limits=rate_limits,
+        app_engine_routing_override=app_engine_routing_override)
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testPatch_AllOptions_PullQueue(self):
+    retry_config = self.messages.RetryConfig(
+        maxAttempts=100, unlimitedAttempts=False, maxRetryDuration='0s',
+        maxDoublings=0, minBackoff='0s', maxBackoff='0s')
+    self._TestQueueUpdate(retry_config=retry_config, update_mask='retryConfig')
+
 
 if __name__ == '__main__':
   test_case.main()

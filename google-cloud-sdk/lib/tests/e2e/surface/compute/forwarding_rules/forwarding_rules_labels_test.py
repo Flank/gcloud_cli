@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import contextlib
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_test_base
@@ -29,7 +29,7 @@ from tests.lib.surface.compute import e2e_test_base
 class ForwardingRulesLabelsTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
 
     self.forwarding_rule_name = next(
         e2e_utils.GetResourceNameGenerator(

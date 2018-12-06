@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import textwrap
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
@@ -413,7 +413,7 @@ class InstanceGroupsListAlphaTest(InstanceGroupsListTestBase):
     return 'alpha'
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testRegionalTableOutput(self):
     self.Run('compute instance-groups list --regions=region-1')

@@ -11,8 +11,11 @@ DESCRIPTION
     project ID and the binding.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to add IAM policy binding to.
+     Project resource - The project to add the IAM policy binding. This
+     represents a Cloud resource. This must be specified.
+
+       PROJECT_ID
+          ID of the project or fully qualified identifier for the project.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -34,13 +37,18 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the cloudresourcemanager/v1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/resource-manager
 
 EXAMPLES
     The following command will add an IAM policy binding for the role of
     'roles/editor' for the user 'test-user@gmail.com' on a project with
-    identifier 'example-project-id-1'
+    identifier 'example-project-id-1':
 
         $ gcloud beta projects add-iam-policy-binding example-project-id-1 \
             --member='user:test-user@gmail.com' --role='roles/editor'

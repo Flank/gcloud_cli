@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 _UNICODE_TEST_STRING = 'いろはにほへとちりぬるを'
+_ASCII_TEST_STRING = 'Test Error Message'
 
 
 class MyException(Exception):
@@ -63,26 +64,26 @@ def _ReturnNone(_):
   return None
 
 
-def _RaiseError(_):
-  raise MyException(_UNICODE_TEST_STRING)
+def _RaiseError(error_message):
+  raise MyException(error_message)
 
 
 def _ReturnUnpickleableObject(_):
   return lambda: None  # non-module-level functions are not pickleable
 
 
-def _RaiseUnpickleableError(_):
-  raise UnpickleableError(_UNICODE_TEST_STRING)
+def _RaiseUnpickleableError(error_message):
+  raise UnpickleableError(error_message)
 
 
 try:
-  _RaiseError(None)
+  _RaiseError(_UNICODE_TEST_STRING)
 except MyException:
   _REFERENCE_EXC_INFO = sys.exc_info()
 
 
 try:
-  _RaiseUnpickleableError(None)
+  _RaiseUnpickleableError(_UNICODE_TEST_STRING)
 except UnpickleableError:
   _REFERENCE_UNPICKLEABLE_EXC_INFO = sys.exc_info()
 
@@ -113,7 +114,10 @@ class MultiErrorTest(test_case.TestCase):
                      'RuntimeError: ')
 
 
-class PoolTestBase(object):
+class DummyPoolTest(test_case.TestCase):
+
+  def SetUp(self):
+    self.pool = parallel.DummyPool()
 
   def testApply_InvalidState(self):
     with self.assertRaises(parallel.InvalidStateException):
@@ -228,7 +232,7 @@ class PoolTestBase(object):
   def testApply_Error(self):
     with self.pool:
       with self._AssertRaisesSimilarTraceback(_REFERENCE_EXC_INFO):
-        self.pool.Apply(_RaiseError, (None,))
+        self.pool.Apply(_RaiseError, (_UNICODE_TEST_STRING,))
 
   def testApply_UnpickleableResult(self):
     with self.pool:
@@ -239,13 +243,13 @@ class PoolTestBase(object):
   def testApply_UnpickleableError(self):
     with self.pool:
       with self._AssertRaisesSimilarTraceback(_REFERENCE_UNPICKLEABLE_EXC_INFO):
-        self.pool.Apply(_RaiseUnpickleableError, (None,))
+        self.pool.Apply(_RaiseUnpickleableError, (_UNICODE_TEST_STRING,))
 
   def testMap_Error(self):
     with self.pool:
       with self._AssertRaisesMultiError([MyException(_UNICODE_TEST_STRING),
                                          MyException(_UNICODE_TEST_STRING)]):
-        self.pool.Map(_RaiseError, [None, None])
+        self.pool.Map(_RaiseError, [_UNICODE_TEST_STRING, _UNICODE_TEST_STRING])
 
   def testMap_UnpickleableResult(self):
     with self.pool:
@@ -257,16 +261,25 @@ class PoolTestBase(object):
       with self._AssertRaisesMultiError([
           UnpickleableError(_UNICODE_TEST_STRING),
           UnpickleableError(_UNICODE_TEST_STRING)]):
-        self.pool.Map(_RaiseUnpickleableError, [None, None])
+        self.pool.Map(_RaiseUnpickleableError,
+                      [_UNICODE_TEST_STRING, _UNICODE_TEST_STRING])
+
+  def testMapEagerFetch(self):
+    with self.pool:
+      results_future = self.pool.MapEagerFetch(_PlusOne, list(range(100)))
+      results = list(results_future)
+      results.sort()
+      self.assertEqual(results, list(range(1, 101)))
+
+  def testMapEagerFetchExceptions(self):
+    with self.pool:
+      result_future = self.pool.MapEagerFetch(
+          _RaiseError, (_ASCII_TEST_STRING, _ASCII_TEST_STRING))
+      with self.assertRaisesRegex(MyException, _ASCII_TEST_STRING):
+        list(result_future)
 
 
-class DummyPoolTest(test_case.TestCase, PoolTestBase):
-
-  def SetUp(self):
-    self.pool = parallel.DummyPool()
-
-
-class ThreadPoolTest(test_case.TestCase, PoolTestBase):
+class ThreadPoolTest(DummyPoolTest):
 
   def SetUp(self):
     self.pool = parallel.ThreadPool(2)

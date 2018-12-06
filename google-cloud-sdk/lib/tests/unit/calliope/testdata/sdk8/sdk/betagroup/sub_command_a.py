@@ -18,13 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.util import completers
 
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-class BetaSubCommandA(base.Command):
+class BetaSubCommandA(calliope_base.Command):
   """gcloud sdk tests command."""
 
   @staticmethod

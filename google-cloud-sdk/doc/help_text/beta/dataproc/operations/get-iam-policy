@@ -52,8 +52,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     The following command prints the IAM policy for an operation with the ID
@@ -62,5 +63,8 @@ EXAMPLES
         $ gcloud beta dataproc operations get-iam-policy example-operation
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc operations get-iam-policy
 

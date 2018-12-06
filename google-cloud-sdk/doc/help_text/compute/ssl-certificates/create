@@ -20,13 +20,13 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --certificate=LOCAL_FILE_PATH
-        The path to a local certificate file. The certificate must be in PEM
+        Path to a local certificate file. The certificate must be in PEM
         format. The certificate chain must be no greater than 5 certs long. The
         chain must include at least one intermediate cert.
 
      --private-key=LOCAL_FILE_PATH
-        The path to a local private key file. The private key must be in PEM
-        format and must use RSA or ECDSA encryption.
+        Path to a local private key file. The private key must be in PEM format
+        and must use RSA or ECDSA encryption.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
@@ -34,8 +34,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

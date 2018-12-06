@@ -12,14 +12,15 @@ POSITIONAL ARGUMENTS
      Function resource - The Cloud function name to describe. The arguments in
      this group can be used to specify the attributes of this resource. (NOTE)
      Some attributes are not given arguments in this group but can be set in
-     other ways. To set the [project] attribute: provide the flag [NAME] on the
-     command line with a fully specified name; provide the flag [--project] on
-     the command line; set the property [core/project]. This must be specified.
+     other ways. To set the [project] attribute: provide the argument [NAME] on
+     the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
 
        NAME
-          The ID of the function or a fully qualified identifier for the
-          function. This positional must be specified if any of the other
-          arguments in this group are specified.
+          ID of the function or fully qualified identifier for the function.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
 
        --region=REGION
           The Cloud region for the function. Overrides the default
@@ -27,8 +28,9 @@ POSITIONAL ARGUMENTS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

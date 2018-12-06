@@ -11,7 +11,7 @@ gcloud beta iot registries create \- create a new device registry
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta iot registries create\fR (\fIREGISTRY\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-no\-enable\-http\-config\fR] [\fB\-\-no\-enable\-mqtt\-config\fR] [\fB\-\-public\-key\-path\fR=\fIPUBLIC_KEY_PATH\fR] [\fB\-\-state\-pubsub\-topic\fR=\fISTATE_PUBSUB_TOPIC\fR] [\fB\-\-event\-notification\-config\fR=[\fIsubfolder\fR=\fISUBFOLDER\fR],[\fItopic\fR=\fITOPIC\fR]\ |\ \fB\-\-event\-pubsub\-topic\fR=\fIEVENT_PUBSUB_TOPIC\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta iot registries create\fR (\fIREGISTRY\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-no\-enable\-http\-config\fR] [\fB\-\-no\-enable\-mqtt\-config\fR] [\fB\-\-event\-notification\-config\fR=[\fIsubfolder\fR=\fISUBFOLDER\fR],[\fItopic\fR=\fITOPIC\fR]] [\fB\-\-log\-level\fR=\fILOG_LEVEL\fR] [\fB\-\-public\-key\-path\fR=\fIPUBLIC_KEY_PATH\fR] [\fB\-\-state\-pubsub\-topic\fR=\fISTATE_PUBSUB_TOPIC\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,23 +26,23 @@ gcloud beta iot registries create \- create a new device registry
 .RS 2m
 .TP 2m
 
-Registry resource \- The device registry to create. The arguments in this group
-can be used to specify the attributes of this resource. (NOTE) Some attributes
-are not given arguments in this group but can be set in other ways. To set the
-[project] attribute: provide the flag [registry] on the command line with a
-fully specified name; provide the flag [\-\-project] on the command line; set
-the property [core/project]. This must be specified.
+Registry resource \- The registry you want to create. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [registry] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fIREGISTRY\fR
-The ID of the registry or a fully qualified identifier for the registry. This
+ID of the registry or fully qualified identifier for the registry. This
 positional must be specified if any of the other arguments in this group are
 specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The Cloud region for the registry.
+The name of the Cloud IoT region.
 
 
 .RE
@@ -63,22 +63,6 @@ Whether to allow MQTT connections to this device registry. Enabled by default,
 use \fB\-\-no\-enable\-mqtt\-config\fR to disable.
 
 .TP 2m
-\fB\-\-public\-key\-path\fR=\fIPUBLIC_KEY_PATH\fR
-Path to a file containing an X.509v3 certificate (RFC5280
-(https://www.ietf.org/rfc/rfc5280.txt)), encoded in base64, and wrapped by
-\f5\-\-\-\-\-BEGIN CERTIFICATE\-\-\-\-\-\fR and \f5\-\-\-\-\-END
-CERTIFICATE\-\-\-\-\-\fR.
-
-.TP 2m
-\fB\-\-state\-pubsub\-topic\fR=\fISTATE_PUBSUB_TOPIC\fR
-A Google Cloud Pub/Sub topic name for state notifications.
-
-.TP 2m
-
-At most one of these may be specified:
-
-.RS 2m
-.TP 2m
 \fB\-\-event\-notification\-config\fR=[\fIsubfolder\fR=\fISUBFOLDER\fR],[\fItopic\fR=\fITOPIC\fR]
 The configuration for notification of telemetry events received from the device.
 This flag can be specified multiple times to add multiple configs to the device
@@ -91,31 +75,67 @@ specified last.
 \fBtopic\fR
 A Google Cloud Pub/Sub topic name for event notifications
 
+.RS 2m
 .TP 2m
 \fBsubfolder\fR
 If the subfolder name matches this string exactly, this configuration will be
 used to publish telemetry events. If empty all strings are matched.
 
 .RE
+.RE
 .sp
 .TP 2m
-\fB\-\-event\-pubsub\-topic\fR=\fIEVENT_PUBSUB_TOPIC\fR
-(DEPRECATED) A Google Cloud Pub/Sub topic name for event notifications
+\fB\-\-log\-level\fR=\fILOG_LEVEL\fR
+The default logging verbosity for activity from devices in this registry. The
+verbosity level can be overridden by setting a specific device's log level.
+\fILOG_LEVEL\fR must be one of:
 
-Flag \-\-event\-pubsub\-topic is deprecated. Use \-\-event\-notification\-config
-instead.
-
-
+.RS 2m
+.TP 2m
+\fBdebug\fR
+All events will be logged.
+.TP 2m
+\fBerror\fR
+Error events will be logged.
+.TP 2m
+\fBinfo\fR
+Informational events will be logged, such as connections and disconnections.
+Also includes error events.
+.TP 2m
+\fBnone\fR
+Disables logging.
 .RE
+.sp
+
+
+.TP 2m
+\fB\-\-public\-key\-path\fR=\fIPUBLIC_KEY_PATH\fR
+Path to a file containing an X.509v3 certificate (RFC5280
+(https://www.ietf.org/rfc/rfc5280.txt)), encoded in base64, and wrapped by
+\f5\-\-\-\-\-BEGIN CERTIFICATE\-\-\-\-\-\fR and \f5\-\-\-\-\-END
+CERTIFICATE\-\-\-\-\-\fR.
+
+.TP 2m
+\fB\-\-state\-pubsub\-topic\fR=\fISTATE_PUBSUB_TOPIC\fR
+A Google Cloud Pub/Sub topic name for state notifications.
+
+
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudiot/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/iot
 
 
 

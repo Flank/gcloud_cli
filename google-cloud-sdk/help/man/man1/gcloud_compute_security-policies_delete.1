@@ -1,0 +1,54 @@
+
+.TH "GCLOUD_COMPUTE_SECURITY\-POLICIES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute security\-policies delete \- delete security policies
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute security\-policies delete\fR \fINAME\fR [\fINAME\fR\ ...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute security\-policies delete\fR deletes Google Compute Engine
+security policies. Security policies can only be deleted when no other resources
+(e.g., backend services) refer to them.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR [\fINAME\fR ...]
+Names of the security policies to delete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute security\-policies delete
+$ gcloud beta compute security\-policies delete
+.RE
+

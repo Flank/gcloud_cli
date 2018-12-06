@@ -14,15 +14,16 @@ POSITIONAL ARGUMENTS
      represents a Cloud resource.
 
        [POLICY]
-          The ID of the policy or a fully qualified identifier for the policy.
+          ID of the policy or fully qualified identifier for the policy.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
-    This command uses the accesscontextmanager/v1alpha API. The full
+    This command uses the accesscontextmanager/v1beta API. The full
     documentation for this API can be found at:
     https://cloud.google.com/access-context-manager/docs/reference/rest/
 
@@ -32,5 +33,8 @@ NOTES
     without notice. If this command fails with API permission errors despite
     specifying the right project, you will have to apply for early access and
     have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/.
+    contact Support at https://cloud.google.com/support/. This variant is also
+    available:
+
+        $ gcloud beta access-context-manager policies describe
 

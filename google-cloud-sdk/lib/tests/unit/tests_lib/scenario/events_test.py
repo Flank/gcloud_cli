@@ -19,10 +19,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import json
+
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.scenario import events
-from tests.lib.scenario import schema
+from tests.lib.scenario import reference_resolver
 from tests.lib.scenario import updates
 
 
@@ -75,7 +77,7 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
     self.assertEqual(update_mode, e.UpdateContext()._update_mode)
 
     self.assertEqual([], e.Handle(None))
-    self.assertEqual(1, len(e.Handle(Exception('foo'))))
+    self.assertEqual(2, len(e.Handle(Exception('foo'))))
 
     backing_data = {'expect_exit': {'code': 0, 'message': None}}
     e = events.ExitEvent.FromData(backing_data)
@@ -197,7 +199,7 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
     backing_data = {
         'api_call': {
             'expect_request': {
-                'uri': 'https://example.com',
+                'uri': {'equals': 'https://example.com'},
                 'method': 'GET',
                 'headers': {'a': 'b', 'c': 'd'},
                 'body': {'json': {'ba': 'bb', 'bc': 'bd'}},
@@ -220,7 +222,8 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
                                   '{"ba": "bb", "bc": "bd"}'))
     response = e.GetResponsePayload()
     self.assertEqual(({'e': 'f', 'g': 'h'}, b'response body'), response)
-    self.assertEqual([], e.HandleResponse(response[0], response[1], None))
+    headers, body = response[0], response[1]
+    self.assertEqual([], e.HandleResponse(headers, body, None))
 
     # Headers and body contain 2 assertions each, plus uri and method.
     failures = e.Handle('https://foo.com', 'POST', {b'y': b'z'}, '{"be": "bf"}')
@@ -251,6 +254,7 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
   def testApiCallEventAddRefExtraction(self):
     backing_data = {
         'api_call': {
+            'poll_operation': False,
             'expect_request': {
                 'uri': 'https://example.com',
                 'method': 'GET',
@@ -266,15 +270,124 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         }
     }
     e = events.ApiCallEvent.FromData(backing_data)
-    response = e.GetResponsePayload()
-    failures = e.HandleResponse(response[0], response[1],
-                                schema.ResourceReferenceResolver())
+    headers, body = e.GetResponsePayload()
+    failures = e.HandleResponse(
+        headers, body, reference_resolver.ResourceReferenceResolver(),
+        generate_extras=True)
     self.assertEqual(1, len(failures))
     failures[0].Update([updates.Mode.API_REQUESTS])
     self.assertEqual(
         {'extract_references': [{'field': 'name', 'reference': 'operation'}],
          'body': {'json': {}}},
         backing_data['api_call']['expect_response'])
+
+  def testApiCallExtractRef(self):
+    e = events.HTTPAssertion.ForResponse(
+        {'extract_references': [
+            {'field': 'name', 'reference': 'operation'},
+            {'field': 'name', 'reference': 'operation-base',
+             'modifiers': {'basename': True}}
+        ]})
+
+    rrr = reference_resolver.ResourceReferenceResolver()
+    e.ExtractReferences(rrr, '{"name": "foo/bar/my-op"}')
+    self.assertEqual(rrr._extracted_ids,
+                     {'operation': 'foo/bar/my-op', 'operation-base': 'my-op'})
+
+  def testApiCallEventAddOptional(self):
+    backing_data = {
+        'api_call': {
+            'poll_operation': False,
+            'expect_request': {
+                'uri': 'https://example.com',
+                'method': 'GET',
+                'body': None,
+            },
+            'return_response': {
+                'body': {
+                    'kind': 'sql#operation',
+                    'name': '460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5',
+                    'status': 'PENDING',
+                }
+            }
+        }
+    }
+    e = events.ApiCallEvent.FromData(backing_data)
+    # Setting the id as previous extracted means that this is a polling event
+    # not an op creation event.
+    rrr = reference_resolver.ResourceReferenceResolver()
+    rrr.SetExtractedId('operation', '460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5')
+    headers, body = e.GetResponsePayload()
+    failures = e.HandleResponse(headers, body, rrr, generate_extras=True)
+    self.assertEqual(2, len(failures))
+    failures[0].Update([updates.Mode.API_REQUESTS])
+    failures[1].Update([updates.Mode.API_REQUESTS])
+    self.assertTrue(backing_data['api_call']['optional'])
+    self.assertEqual({'body': {'json': {'status': 'PENDING'}}},
+                     backing_data['api_call']['expect_response'])
+
+  def testApiCallEventAddPollOperationOld(self):
+    backing_data = {
+        'api_call': {
+            'expect_request': {
+                'uri': 'https://example.com',
+                'method': 'GET',
+                'body': None,
+            },
+            'return_response': {
+                'body': {
+                    'kind': 'sql#operation',
+                    'name': '460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5',
+                    'status': 'PENDING',
+                }
+            }
+        }
+    }
+    e = events.ApiCallEvent.FromData(backing_data)
+    headers, body = e.GetResponsePayload()
+    failures = e.HandleResponse(
+        headers, body,
+        resource_ref_resolver=reference_resolver.ResourceReferenceResolver(),
+        generate_extras=True)
+    self.assertEqual(1, len(failures))
+    failures[0].Update([updates.Mode.API_REQUESTS])
+    self.assertTrue(backing_data['api_call']['poll_operation'])
+
+  @parameterized.parameters([
+      ({'name': '460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5'}, False),
+      ({'name': '460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5', 'done': False}, True),
+      ({'name': '460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5',
+        'metadata': {'@type': 'SomeServiceOperation'}}, True),
+      ({'name': '460b8ba8-34a9-4590-a3ca-7ce5b74cb8d5',
+        'metadata': {'@type': 'foo'}}, False),
+  ])
+  def testApiCallEventAddPollOperationNew(self, body, is_op):
+    backing_data = {
+        'api_call': {
+            'expect_request': {
+                'uri': 'https://example.com',
+                'method': 'GET',
+                'body': None,
+            },
+            'return_response': {
+                'body': body
+            }
+        }
+    }
+    e = events.ApiCallEvent.FromData(backing_data)
+    headers, body = e.GetResponsePayload()
+    failures = e.HandleResponse(
+        headers, body,
+        resource_ref_resolver=reference_resolver.ResourceReferenceResolver(),
+        generate_extras=True)
+
+    if is_op:
+      self.assertEqual(1, len(failures))
+      failures[0].Update([updates.Mode.API_REQUESTS])
+      self.assertTrue(backing_data['api_call']['poll_operation'])
+    else:
+      self.assertEqual(0, len(failures))
+      self.assertFalse('poll_operation' in backing_data['api_call'])
 
   def testApiCallEventNoAddRefExtraction(self):
     backing_data = {
@@ -290,8 +403,8 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         }
     }
     e = events.ApiCallEvent.FromData(backing_data)
-    response = e.GetResponsePayload()
-    self.assertEqual([], e.HandleResponse(response[0], response[1], None))
+    headers, body = e.GetResponsePayload()
+    self.assertEqual([], e.HandleResponse(headers, body, None))
 
   def testApiCallEventOrderedRequestParams(self):
     backing_data = {
@@ -465,6 +578,96 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
         {'uri': 'https://foo.com', 'method': 'POST', 'headers': {},
          'body': {'text': 'asdf'}},  # Generates the text assertion.
         e.UpdateContext().BackingData()['api_call']['expect_request'])
+
+  def testUpdateResponsePayload(self):
+    backing_data = {
+        'api_call': {
+            'expect_request': {
+                'uri': 'https://example.com',
+                'method': 'GET',
+                'headers': {},
+                'body': None,
+            },
+            'return_response': {
+                'omit_fields': ['bad_field'],
+                'headers': {},
+                'body': '',
+            }
+        }
+    }
+    e = events.ApiCallEvent.FromData(backing_data)
+    failures = e.UpdateResponsePayload(
+        headers={'status': '200'},
+        body=json.dumps({'status': 'RUNNING',
+                         'progress': '0',
+                         'bad_field': 'asdf'}).encode('utf8'))
+    self.assertEqual(1, len(failures))
+    failures[0].Update([updates.Mode.API_RESPONSE_PAYLOADS])
+    self.assertEqual(
+        {'headers': {'status': '200'},
+         'body': {'status': 'RUNNING', 'progress': '0'},
+         'omit_fields': ['bad_field']},
+        e.UpdateContext().BackingData()['api_call']['return_response'])
+
+  def testProgressTrackerEvent(self):
+    backing_data = {'expect_progress_tracker': {'message': 'foo',
+                                                'status': 'SUCCESS'}}
+    e = events.ProgressTrackerEvent.FromData(backing_data)
+    self.assertEqual(events.EventType.PROGRESS_TRACKER, e.EventType())
+    update_mode = e.EventType().UpdateMode()
+    self.assertEqual(update_mode, e.UpdateContext()._update_mode)
+
+    self.assertEqual([], e.Handle({'ux': 'PROGRESS_TRACKER',
+                                   'message': 'foo',
+                                   'status': 'SUCCESS'}))
+
+    failures = e.Handle({'ux': 'PROGRESS_TRACKER',
+                         'message': 'bar',
+                         'status': 'FAILED'})
+    self.assertEqual(2, len(failures))
+    for f in failures:
+      f.Update([update_mode])
+    self.assertEqual({'expect_progress_tracker': {'message': 'bar',
+                                                  'status': 'FAILED'}},
+                     backing_data)
+
+  def testProgressTrackerEventMissing(self):
+    e = events.ProgressTrackerEvent.ForMissing(('line', 'col'))
+    failures = e.Handle({'ux': 'PROGRESS_TRACKER',
+                         'message': 'bar',
+                         'status': 'FAILED'})
+    self.assertEqual(2, len(failures))
+    for f in failures:
+      f.Update([e.EventType().UpdateMode()])
+    self.assertEqual({'expect_progress_tracker': {'message': 'bar',
+                                                  'status': 'FAILED'}},
+                     e.UpdateContext().BackingData())
+
+  def testProgressBarEvent(self):
+    backing_data = {'expect_progress_bar': {'message': 'foo'}}
+    e = events.ProgressBarEvent.FromData(backing_data)
+    self.assertEqual(events.EventType.PROGRESS_BAR, e.EventType())
+    update_mode = e.EventType().UpdateMode()
+    self.assertEqual(update_mode, e.UpdateContext()._update_mode)
+
+    self.assertEqual([], e.Handle({'ux': 'PROGRESS_BAR', 'message': 'foo'}))
+
+    failures = e.Handle({'ux': 'PROGRESS_BAR', 'message': 'bar'})
+    self.assertEqual(1, len(failures))
+    for f in failures:
+      f.Update([update_mode])
+    self.assertEqual({'expect_progress_bar': {'message': 'bar'}},
+                     backing_data)
+
+  def testProgressBarEventMissing(self):
+    e = events.ProgressBarEvent.ForMissing(('line', 'col'))
+
+    failures = e.Handle({'ux': 'PROGRESS_BAR', 'message': 'bar'})
+    self.assertEqual(1, len(failures))
+    for f in failures:
+      f.Update([e.EventType().UpdateMode()])
+    self.assertEqual({'expect_progress_bar': {'message': 'bar'}},
+                     e.UpdateContext().BackingData())
 
 
 if __name__ == '__main__':

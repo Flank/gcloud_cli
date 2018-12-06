@@ -11,7 +11,7 @@ gcloud beta compute disks snapshot \- create snapshots of Google Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute disks snapshot\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute disks snapshot\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -84,7 +84,7 @@ numbers.
 .TP 2m
 \fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]
 Names to assign to the created snapshots. Without this option, the name of each
-snapshot will be a random 16\-character hexadecimal number that starts with a
+snapshot will be a random 12\-character alphanumeric string that starts with a
 letter. The values of this option run parallel to the disks specified. For
 example,
 
@@ -94,6 +94,12 @@ gcloud beta compute disks snapshot my\-disk\-1 my\-disk\-2 my\-disk\-3 \-\-snaps
 
 will result in \f5my\-disk\-1\fR being snapshotted as \f5snapshot\-1\fR,
 \f5my\-disk\-2\fR as \f5snapshot\-2\fR, and so on.
+
+.TP 2m
+\fB\-\-storage\-location\fR=\fILOCATION\fR
+Google Cloud Storage location, either regional or multi\-regional, where
+snapshot content is to be stored. If absent, a nearby regional or
+multi\-regional location is chosen automatically.
 
 .TP 2m
 
@@ -163,9 +169,9 @@ Alternatively, the zone can be stored in the environment variable
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

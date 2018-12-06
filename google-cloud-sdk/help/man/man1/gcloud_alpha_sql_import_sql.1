@@ -17,8 +17,11 @@ gcloud alpha sql import sql \- imports data into a Cloud SQL instance from a SQL
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Imports data into a Cloud SQL instance from a SQL dump file in
-Google Cloud Storage.
+\fB(ALPHA)\fR gcloud alpha sql import sql imports data into a Cloud SQL instance
+from a SQL dump file in Google Cloud Storage.
+
+For detailed help on importing data into Cloud SQL, refer to this guide:
+https://cloud.google.com/sql/docs/mysql/import\-export/importing
 
 
 
@@ -49,12 +52,12 @@ operation to complete.
 
 .TP 2m
 \fB\-\-database\fR=\fIDATABASE\fR, \fB\-d\fR \fIDATABASE\fR
-The database (for example, guestbook) to which the import is made. If not set,
-it is assumed that the database is specified in the file to be imported.
+Database (for example, guestbook) to which the import is made. If not set, it is
+assumed that the database is specified in the file to be imported.
 
 .TP 2m
 \fB\-\-user\fR=\fIUSER\fR
-The PostgreSQL user for this import operation
+PostgreSQL user for this import operation.
 
 
 .RE
@@ -63,9 +66,21 @@ The PostgreSQL user for this import operation
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To import data from a SQL dump file into a database, \f5testdb\fR, on the
+specified Cloud SQL instance \f5test\-instance\-1\fR, run:
+
+.RS 2m
+$  gcloud sql import sql test\-instance\-1 \e
+    gs://test\-bucket/test\-file.sql.gz \-\-database=testdb
+.RE
 
 
 

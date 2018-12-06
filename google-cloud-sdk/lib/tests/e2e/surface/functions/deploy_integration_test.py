@@ -108,6 +108,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run('functions list')
     self.AssertOutputContains(self.function_name)
 
+  @test_case.Filters.SkipOnPy3('They are broken', 'b/114745758')
   def testDeployRespectingGcloudIgnoreToSucceed(self):
     self._dirs_size_limit_method = 513 * (2 **20)
     self._CreateOversizedFile(self.function_path, 'trash')

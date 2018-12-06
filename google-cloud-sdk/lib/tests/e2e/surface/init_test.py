@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.core import resources
-from googlecloudsdk.core.util import platforms
+from googlecloudsdk.core.util import files
 
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
@@ -36,7 +36,7 @@ class InitTest(sdk_test_base.BundledBase,
     self.requires_refresh_token = True
 
   def SetUp(self):
-    self.boto_path = platforms.ExpandHomePath(os.path.join('~', '.boto'))
+    self.boto_path = os.path.join(files.GetHomeDir(), '.boto')
     self._CleanupBotoConfig()
 
   def TearDown(self):

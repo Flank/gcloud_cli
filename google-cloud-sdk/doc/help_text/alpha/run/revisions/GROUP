@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha run revisions - view and manage your Cloud Run revisions
+
+SYNOPSIS
+    gcloud alpha run revisions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This set of commands can be used to view and manage your existing
+    Cloud Run revisions.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (ALPHA) Delete a revision.
+
+     describe
+        (ALPHA) Obtain details about revisions.
+
+     list
+        (ALPHA) List available revisions.
+
+EXAMPLES
+    To list your existing revisions, run:
+
+        $ gcloud alpha run revisions list
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

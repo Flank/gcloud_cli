@@ -234,6 +234,37 @@ class InstallerTests(util.Base):
     # 5 files, 0 empty directories.
     self.assertEqual(5, callback_mock.call_count)
 
+  def testRemovedComponent(self):
+    component_tuples = [('a', 1, ['b']), ('b', 1, ['a'])]
+    snapshot, paths = (self.CreateSnapshotFromComponentsGenerateTars(
+        1, component_tuples))
+    # Make component 'a' a configuration component with no real data.
+    for c in snapshot.sdk_definition.components:
+      if c.id == 'a':
+        c.data = None
+    # Make component 'b' hidden as is usually the case for configuration deps.
+    for c in snapshot.sdk_definition.components:
+      if c.id == 'b':
+        c.is_hidden = True
+
+    install_state = local_state.InstallationState(self.sdk_root_path)
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
+
+    install_state.Install(snapshot, 'a')
+    install_state.Install(snapshot, 'b')
+    self.CheckPathsExist(paths['a'], exists=False)  # 'a' doesn't have any data.
+    self.CheckPathsExist(paths['b'], exists=True)
+    self.assertEqual(
+        {'a', 'b'}, set(install_state.InstalledComponents().keys()))
+
+    component_tuples = []
+    snapshot, paths = (self.CreateSnapshotFromComponentsGenerateTars(
+        2, component_tuples))
+    # This should calculate the size data without crashing, even though size
+    # data is missing.
+    diff = install_state.DiffCurrentState(snapshot)
+    self.assertEqual(['a', 'b'], [d.id for d in diff.Removed()])
+
   def SetupSymlinkTest(self):
     tar_dir = tempfile.mkdtemp(dir=self.staging_path)
     target = os.path.join(tar_dir, 'realdir/realfile')

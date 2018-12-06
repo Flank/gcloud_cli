@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for deploy_command_util."""
+"""Unit tests for app.cloud_build."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -28,22 +28,22 @@ import tarfile
 from apitools.base.py.testing import mock as api_mock
 
 from googlecloudsdk.api_lib.app import cloud_build
-from googlecloudsdk.api_lib.app import yaml_parsing
+from googlecloudsdk.api_lib.app import util
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.command_lib.app import source_files_util
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.app import source_context_util
 from tests.lib.surface.app import util as test_util
 import mock
+import six
 
 # pylint: disable=anomalous-backslash-in-string
 _APP_DATA = """\
@@ -92,6 +92,7 @@ class TarfileTest(cli_test_base.CliTestBase,
     self.get_size.return_value = 1
     self.object_ref = storage_util.ObjectReference.FromUrl('gs://bucket/object')
     self.SetSdkRoot('FakeRoot')
+    self.re = re.compile('$a')  # never matches
 
   def _ExpectUpload(self, exception=None):
     if exception:
@@ -111,31 +112,35 @@ class TarfileTest(cli_test_base.CliTestBase,
 
   def testUpload(self):
     """Test basic upload with single file."""
-    tmp = self.CreateTempDir('project')
+    tmp = self.CreateTempDir()
     self.WriteFile(os.path.join(tmp, 'Dockerfile'), 'empty')
     self._ExpectUpload()
-    cloud_build.UploadSource(tmp, self.object_ref)
+    cloud_build.UploadSource(
+        tmp, util.FileIterator(tmp, self.re), self.object_ref)
 
   def testUploadWithGenFiles(self):
     """Test that generated files passed to UploadSource don't raise error."""
-    tmp = self.CreateTempDir('project')
+    tmp = self.CreateTempDir()
     self.WriteFile(os.path.join(tmp, 'main.py'), 'empty')
     gen_files = {'Dockerfile': 'empty'}
     self._ExpectUpload()
-    cloud_build.UploadSource(tmp, self.object_ref, gen_files=gen_files)
+    cloud_build.UploadSource(
+        tmp, util.FileIterator(tmp, self.re), self.object_ref,
+        gen_files=gen_files)
 
   def testFailure(self):
     """Test HttpError raises to user."""
-    tmp = self.CreateTempDir('project')
+    tmp = self.CreateTempDir()
     self.WriteFile(os.path.join(tmp, 'Dockerfile'), 'empty')
     self._ExpectUpload(
         exception=http_error.MakeHttpError())
-    with self.assertRaises(exceptions.BadFileException):
-      cloud_build.UploadSource(tmp, self.object_ref)
+    with self.assertRaises(storage_api.UploadError):
+      cloud_build.UploadSource(
+          tmp, util.FileIterator(tmp, self.re), self.object_ref)
 
   def testUploadWithGeneratedDockerignore(self):
     """Test that UploadSource correctly interprets generated .dockerignore."""
-    tmp = self.CreateTempDir('project')
+    tmp = self.CreateTempDir()
     create_tar_mock = self.StartObjectPatch(cloud_build, '_CreateTar')
     create_tar_mock.return_value = 1
     self.WriteFile(os.path.join(tmp, 'Dockerfile'), 'empty')
@@ -145,19 +150,20 @@ class TarfileTest(cli_test_base.CliTestBase,
     self.WriteFile(os.path.join(tmp, 'tmpsubdir', 'fake2.zip'), 'Dummy')
     gen_files = {'.dockerignore': 'main.py'}
     self._ExpectUpload()
-    cloud_build.UploadSource(tmp, self.object_ref, gen_files)
+    cloud_build.UploadSource(
+        tmp, util.FileIterator(tmp, self.re), self.object_ref, gen_files)
     # Test that _CreateTar was called with the correct directory, files, and
     # exclusions
     create_tar_mock.assert_called_once_with(
         tmp,
         gen_files,
-        {'Dockerfile', 'fake.zip', 'tmpsubdir',
+        {'Dockerfile', 'fake.zip',
          os.path.join('tmpsubdir', 'fake2.zip')},
         mock.ANY)
 
   def testUploadWithDockerignore(self):
     """Test that UploadSource correctly interprets .dockerignore on disk."""
-    tmp = self.CreateTempDir('project')
+    tmp = self.CreateTempDir()
     create_tar_mock = self.StartObjectPatch(cloud_build, '_CreateTar')
     create_tar_mock.return_value = 1
     self.WriteFile(os.path.join(tmp, 'Dockerfile'), 'empty')
@@ -167,136 +173,30 @@ class TarfileTest(cli_test_base.CliTestBase,
     os.mkdir(os.path.join(tmp, 'tmpsubdir'))
     self.WriteFile(os.path.join(tmp, 'tmpsubdir', 'fake2.zip'), 'Dummy')
     self._ExpectUpload()
-    cloud_build.UploadSource(tmp, self.object_ref)
+    cloud_build.UploadSource(
+        tmp, util.FileIterator(tmp, self.re), self.object_ref)
     self.assertEqual(create_tar_mock.call_count, 1)
     # Test that _CreateTar was called with the correct directory, files, and
     # exclusions
     create_tar_mock.assert_called_once_with(
         tmp,
         {},
-        {'Dockerfile', '.dockerignore', 'fake.zip', 'tmpsubdir',
+        {'Dockerfile', '.dockerignore', 'fake.zip',
          os.path.join('tmpsubdir', 'fake2.zip')},
-        mock.ANY)
-
-  def testUploadWithSkipFilesRegex(self):
-    """Test that UploadSource correctly skips files when regex is given."""
-    tmp = self.CreateTempDir('project')
-    create_tar_mock = self.StartObjectPatch(cloud_build, '_CreateTar')
-    create_tar_mock.return_value = 1
-    self.WriteFile(os.path.join(tmp, 'app.yaml'), _APP_DATA)
-    self.WriteFile(os.path.join(tmp, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(tmp, 'main.py'), 'empty')
-    self.WriteFile(os.path.join(tmp, 'fake.zip'), 'Dummy')
-    os.mkdir(os.path.join(tmp, 'tmpsubdir'))
-    self.WriteFile(os.path.join(tmp, 'tmpsubdir', 'fake2.zip'), 'Dummy')
-    # Read app data to get the skip files regex.
-    info = yaml_parsing.ServiceYamlInfo.FromFile(os.path.join(tmp, 'app.yaml'))
-    self._ExpectUpload()
-    cloud_build.UploadSource(tmp, self.object_ref, info=info)
-    # Assert that _CreateTar was called with the correct directory, files, and
-    # exclusions
-    create_tar_mock.assert_called_once_with(
-        tmp, {}, {'app.yaml', 'Dockerfile', 'main.py'}, mock.ANY)
-
-  def testUploadWithGcloudIgnore(self):
-    """Test that UploadSource correctly skips files listed in gcloudignore."""
-    tmp = self.CreateTempDir('project')
-    create_tar_mock = self.StartObjectPatch(cloud_build, '_CreateTar')
-    create_tar_mock.return_value = 1
-    self.WriteFile(os.path.join(tmp, 'app.yaml'), _APP_DATA_NOSKIP)
-    self.WriteFile(os.path.join(tmp, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(tmp, 'main.py'), 'empty')
-    self.WriteFile(os.path.join(tmp, '.gcloudignore'), '__pycache__/')
-    os.mkdir(os.path.join(tmp, '__pycache__'))
-    self.WriteFile(os.path.join(tmp, '__pycache__', 'fake2.pyc'), 'Dummy')
-    # Read app data to get the `.gcloudignore` regex.
-    info = yaml_parsing.ServiceYamlInfo.FromFile(os.path.join(tmp, 'app.yaml'))
-    self._ExpectUpload()
-    cloud_build.UploadSource(tmp, self.object_ref, info=info)
-    # Assert that _CreateTar was called with the correct directory, files, and
-    # exclusions
-    create_tar_mock.assert_called_once_with(
-        tmp, {}, {'app.yaml', 'Dockerfile', 'main.py', '.gcloudignore'},
-        mock.ANY)
-
-  def testUploadWithGcloudignoreAndSkipFiles(self):
-    """Test that UploadSource raises error."""
-    tmp = self.CreateTempDir('project')
-    self.WriteFile(os.path.join(tmp, 'app.yaml'), _APP_DATA)
-    self.WriteFile(os.path.join(tmp, '.gcloudignore'), '__pycache__/')
-    # Read app data to get the skip files and gcloudignore regex.
-    info = yaml_parsing.ServiceYamlInfo.FromFile(os.path.join(tmp, 'app.yaml'))
-    with self.assertRaises(source_files_util.SkipFilesError):
-      cloud_build.UploadSource(tmp, self.object_ref, info=info)
-
-  def testUploadWithSkipFilesRegexAndDockerignore(self):
-    """Test that UploadSource works with both skip_files and dockerignore."""
-    tmp = self.CreateTempDir('project')
-    create_tar_mock = self.StartObjectPatch(cloud_build, '_CreateTar')
-    create_tar_mock.return_value = 1
-    self.WriteFile(os.path.join(tmp, 'app.yaml'), _APP_DATA)
-    self.WriteFile(os.path.join(tmp, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(tmp, 'main.py'), 'empty')
-    self.WriteFile(os.path.join(tmp, '.dockerignore'), 'main.py')
-    self.WriteFile(os.path.join(tmp, 'fake.zip'), 'Dummy')
-    os.mkdir(os.path.join(tmp, 'tmpsubdir'))
-    self.WriteFile(os.path.join(tmp, 'tmpsubdir', 'fake2.zip'), 'Dummy')
-    # Make sure subdirectories that aren't supposed to be ignored are
-    # included.
-    os.mkdir(os.path.join(tmp, 'anothersubdir'))
-    self.WriteFile(os.path.join(tmp, 'anotherdir', 'fake3.txt'), 'Dummy')
-    # Read app data to get the skip files regex.
-    info = yaml_parsing.ServiceYamlInfo.FromFile(os.path.join(tmp, 'app.yaml'))
-    self._ExpectUpload()
-    cloud_build.UploadSource(tmp, self.object_ref, info=info)
-    # Assert that _CreateTar was called with the correct directory, files, and
-    # exclusions
-    create_tar_mock.assert_called_once_with(
-        tmp, {},
-        {'app.yaml', 'Dockerfile', '.dockerignore',
-         os.path.join('anotherdir', 'fake3.txt')},
-        mock.ANY)
-
-  def testUploadWithGcloudignoreAndDockerignore(self):
-    """Test that UploadSource works with both gcloudignore and dockerignore."""
-    tmp = self.CreateTempDir('project')
-    create_tar_mock = self.StartObjectPatch(cloud_build, '_CreateTar')
-    create_tar_mock.return_value = 1
-    self.WriteFile(os.path.join(tmp, 'app.yaml'), _APP_DATA_NOSKIP)
-    self.WriteFile(os.path.join(tmp, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(tmp, 'main.py'), 'empty')
-    self.WriteFile(os.path.join(tmp, '.dockerignore'), 'main.py')
-    self.WriteFile(os.path.join(tmp, 'fake.zip'), 'Dummy')
-    os.mkdir(os.path.join(tmp, 'tmpsubdir'))
-    self.WriteFile(os.path.join(tmp, 'tmpsubdir', 'fake2.zip'), 'Dummy')
-    # Make sure subdirectories that aren't supposed to be ignored are
-    # included.
-    os.mkdir(os.path.join(tmp, 'anothersubdir'))
-    self.WriteFile(os.path.join(tmp, 'anotherdir', 'fake3.txt'), 'Dummy')
-    self.WriteFile(os.path.join(tmp, '.gcloudignore'), '*.zip')
-    # Read app data to get the skip files regex.
-    info = yaml_parsing.ServiceYamlInfo.FromFile(os.path.join(tmp, 'app.yaml'))
-    self._ExpectUpload()
-    cloud_build.UploadSource(tmp, self.object_ref, info=info)
-    # Assert that _CreateTar was called with the correct directory, files, and
-    # exclusions
-    create_tar_mock.assert_called_once_with(
-        tmp, {},
-        {'app.yaml', 'Dockerfile', '.dockerignore', '.gcloudignore',
-         os.path.join('anotherdir', 'fake3.txt')},
         mock.ANY)
 
   def testCreateTar(self):
     """Test _CreateTar correctly creates tarfile incl. subdirectories."""
     # Create directory
-    tmp = self.CreateTempDir('project')
+    tmp = self.CreateTempDir()
     self.WriteFile(os.path.join(tmp, 'app.yaml'), 'empty')
     self.WriteFile(os.path.join(tmp, 'main.py'), 'empty')
     self.WriteFile(os.path.join(tmp, 'fake.zip'), 'Dummy')
     os.mkdir(os.path.join(tmp, 'tmpsubdir'))
     self.WriteFile(os.path.join(tmp, 'tmpsubdir', 'fake2.zip'), 'Dummy')
     # Create generated files
-    source_context = json.dumps(source_context_util.FAKE_CONTEXTS)
+    source_context = six.text_type(
+        json.dumps(source_context_util.FAKE_CONTEXTS))
     gen_files = {'Dockerfile': 'empty',
                  'source-context.json': source_context}
     # Call _CreateTar
@@ -304,7 +204,7 @@ class TarfileTest(cli_test_base.CliTestBase,
       with gzip.GzipFile(mode='wb', fileobj=f) as gz:
         cloud_build._CreateTar(tmp,
                                gen_files,
-                               {'app.yaml', 'main.py', 'fake.zip', 'tmpsubdir',
+                               {'app.yaml', 'main.py', 'fake.zip',
                                 os.path.join('tmpsubdir', 'fake2.zip')},
                                gz)
     # Extract tar to check contents
@@ -325,14 +225,15 @@ class TarfileTest(cli_test_base.CliTestBase,
   def testCreateTar_SomeFilesExcluded(self):
     """Test _CreateTar correctly creates tarfile from subset of root dir."""
     # Create directory
-    tmp = self.CreateTempDir('project')
+    tmp = self.CreateTempDir()
     self.WriteFile(os.path.join(tmp, 'app.yaml'), 'empty')
     self.WriteFile(os.path.join(tmp, 'main.py'), 'empty')
     self.WriteFile(os.path.join(tmp, 'fake.zip'), 'Dummy')
     os.mkdir(os.path.join(tmp, 'tmpsubdir'))
     self.WriteFile(os.path.join(tmp, 'tmpsubdir', 'fake2.zip'), 'Dummy')
     # Create generated files
-    source_context = json.dumps(source_context_util.FAKE_CONTEXTS)
+    source_context = six.text_type(
+        json.dumps(source_context_util.FAKE_CONTEXTS))
     gen_files = {'Dockerfile': 'empty',
                  'source-context.json': source_context}
     # Call _CreateTar
@@ -443,6 +344,29 @@ class CloudBuildTest(test_case.TestCase):
         'Field [logsBucket] was provided, but should not have been. '
         'You may be using an improper Cloud Build pipeline.')):
       cloud_build.FixUpBuild(basic_build, self.object_ref)
+
+
+class GetServiceTimeTest(parameterized.TestCase):
+
+  @parameterized.parameters(
+      (None, None),
+      ('1s', 1),
+      ('2s', '2'),
+      ('3s', '3s'),
+      ('240s', '4m'),
+  )
+  def testGetServiceTimeoutString(self, expected, timeout):
+    self.assertEqual(expected, cloud_build.GetServiceTimeoutString(timeout))
+
+  @parameterized.parameters(
+      (None, None),
+      (1, 1),
+      (2, '2'),
+      (3, '3s'),
+      (240, '4m'),
+  )
+  def testGetServiceTimeoutSeconds(self, expected, timeout):
+    self.assertEqual(expected, cloud_build.GetServiceTimeoutSeconds(timeout))
 
 
 if __name__ == '__main__':

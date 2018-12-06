@@ -511,6 +511,60 @@ class ParsingTests(concepts_test_base.MultitypeTestBase,
       ('Names', '--book', False,
        ['--book', 'b1', '--shelf', 's1', '--book-project', 'p1'],
        'projects/p1/shelves/s1/books/b1'),
+      ('NamesWithExtra', '--book', False,
+       ['--book', 'b1', '--shelf', 's1', '--case', 'c1',
+        '--book-project', 'p1'],
+       'projects/p1/cases/c1/shelves/s1/books/b1'),
+      ('Full', '--book', False,
+       ['--book', 'projects/p1/shelves/s1/books/b1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('FullWithExtra', '--book', False,
+       ['--book', 'projects/p1/cases/c1/shelves/s1/books/b1'],
+       'projects/p1/cases/c1/shelves/s1/books/b1'),
+      ('Required', '--book', True,
+       ['--book', 'projects/p1/shelves/s1/books/b1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('RequiredWithExtra', '--book', True,
+       ['--book', 'projects/p1/cases/c1/shelves/s1/books/b1'],
+       'projects/p1/cases/c1/shelves/s1/books/b1'),
+      ('Positional', 'book', False,
+       ['b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('PositionalWithExtra', 'book', False,
+       ['b1', '--case', 'c1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/cases/c1/shelves/s1/books/b1'),
+      ('PositionalRequired', 'book', True,
+       ['b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('PositionalRequiredWithExtra', 'book', True,
+       ['b1', '--case', 'c1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/cases/c1/shelves/s1/books/b1'),
+      ('PositionalRequiredFullySpecified', 'book', True,
+       ['projects/p1/shelves/s1/books/b1'],
+       'projects/p1/shelves/s1/books/b1'),
+      ('PositionalRequiredFullySpecifiedWithExtra', 'book', True,
+       ['projects/p1/cases/c1/shelves/s1/books/b1'],
+       'projects/p1/cases/c1/shelves/s1/books/b1'))
+  def testParseMultitypeExtraAttribute(self, name, required, args, expected):
+    resource = self.PresentationSpecType(is_multitype=True)(
+        name,
+        self.multitype_extra_attribute_in_path,
+        'Group Help',
+        flag_name_overrides={'project': '--book-project'},
+        prefixes=False,
+        required=required,
+        plural=False)
+    concept_parsers.ConceptParser([resource]).AddToParser(self.parser)
+
+    namespace = self.parser.parser.parse_args(args)
+
+    self.AssertParsedResultEquals(
+        expected, namespace.CONCEPTS.book.Parse(), is_multitype=True)
+
+  @parameterized.named_parameters(
+      ('Names', '--book', False,
+       ['--book', 'b1', '--shelf', 's1', '--book-project', 'p1'],
+       'projects/p1/shelves/s1/books/b1'),
       ('Full', '--book', False,
        ['--book', 'projects/p1/shelves/s1/books/b1'],
        'projects/p1/shelves/s1/books/b1'),

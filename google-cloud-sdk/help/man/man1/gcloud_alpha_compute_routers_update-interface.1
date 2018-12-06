@@ -53,7 +53,9 @@ The link local address of the router for this interface.
 
 .TP 2m
 \fB\-\-mask\-length\fR=\fIMASK_LENGTH\fR
-The mask for network used for the server IP address.
+The subnet mask for the link\-local IP range of the interface. The interface IP
+address and BGP peer IP address must be selected from the subnet defined by this
+link\-local range.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -115,9 +117,9 @@ for this command invocation.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

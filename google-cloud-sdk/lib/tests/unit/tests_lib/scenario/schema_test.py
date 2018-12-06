@@ -21,15 +21,21 @@ from __future__ import unicode_literals
 
 import sys
 
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import http
 from googlecloudsdk.core import properties
 from tests.lib import e2e_utils
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.scenario import reference_resolver
 from tests.lib.scenario import schema
 from tests.lib.scenario import session
 from tests.lib.scenario import test_base
 from tests.lib.scenario import updates
+
+import mock
 
 
 class SchemaTests(sdk_test_base.WithOutputCapture,
@@ -39,7 +45,8 @@ class SchemaTests(sdk_test_base.WithOutputCapture,
 
   def SetUp(self):
     self.scenario_context = schema.ScenarioContext(
-        None, None, None, None, None, None, None)
+        None, None, None, calliope_base.ReleaseTrack.GA, None, None, None, None,
+        None)
 
   def testSetPropertyAction(self):
     a = schema.SetPropertyAction.FromData(
@@ -82,6 +89,18 @@ class SchemaTests(sdk_test_base.WithOutputCapture,
     self.assertEqual(
         self.scenario_context.resource_ref_resolver._resource_ids, {})
 
+  def testGenerateResourceIdActionNoCleanup(self):
+    a = schema.GenerateResourceIdAction.FromData(
+        {'generate_resource_id': {'reference': 'instance1',
+                                  'prefix': 'compute-vm',
+                                  'requires_cleanup': False}})
+    a.Execute(self.scenario_context)
+    self.assertNotIn(
+        'instance1', self.scenario_context.resource_ref_resolver._resource_ids)
+    resource_id = self.scenario_context.resource_ref_resolver._references[
+        'instance1']
+    self.assertTrue(resource_id.startswith('compute-vm'))
+
   def testResolveResourceReferences(self):
     for x in range(3):
       a = schema.GenerateResourceIdAction.FromData(
@@ -99,6 +118,16 @@ class SchemaTests(sdk_test_base.WithOutputCapture,
         r'some command {id} --flag={id} {id}'.format(id=id_regex))
     self.assertEqual(
         3, len(self.scenario_context.resource_ref_resolver._resource_ids))
+
+  def testReverseResolveResourceReferencesLongestFirst(self):
+    rrr = reference_resolver.ResourceReferenceResolver()
+    rrr.SetExtractedId('ref1', 'my-group-instance-subthing')
+    rrr.SetExtractedId('ref2', 'my-group')
+    rrr.SetExtractedId('ref3', 'my-group-instance')
+
+    data = 'my-group-instance my-group my-group-instance-subthing'
+    resolved = rrr.ReverseResolve(data)
+    self.assertEqual(resolved, '$$ref3$$ $$ref2$$ $$ref1$$')
 
   @parameterized.parameters(
       (0, 0),
@@ -133,10 +162,32 @@ class SchemaTests(sdk_test_base.WithOutputCapture,
         {'generate_resource_id': {'reference': 'instance1',
                                   'prefix': 'compute-vm'}})
     a.Execute(self.scenario_context)
-    with self.assertRaisesRegex(ValueError,
-                                r'Unknown resource reference: \[instance0\]'):
+    with self.assertRaisesRegex(
+        reference_resolver.UnknownReferenceError,
+        r'Unknown reference \[Line: \?, Col: \?\]: \[instance0\]'):
       self.scenario_context.resource_ref_resolver.Resolve(
           'some command $$instance0$$')
+
+  def testDefineReference(self):
+    a1 = schema.DefineReferenceAction.FromData(
+        {'define_reference': {
+            'reference': 'foo', 'value': 'a', 'track_values': {'ALPHA': 'b'}}})
+    a2 = schema.DefineReferenceAction.FromData(
+        {'define_reference': {
+            'reference': 'bar', 'value': 'a', 'track_values': {'GA': 'b'}}})
+    a3 = schema.DefineReferenceAction.FromData(
+        {'define_reference': {
+            'reference': 'baz', 'track_values': {'ALPHA': 'b'}}})
+    a4 = schema.DefineReferenceAction.FromData(
+        {'define_reference': {
+            'reference': 'empty', 'value': 'a', 'track_values': {'GA': ''}}})
+    a1.Execute(self.scenario_context)
+    a2.Execute(self.scenario_context)
+    a3.Execute(self.scenario_context)
+    a4.Execute(self.scenario_context)
+    self.assertEqual(
+        self.scenario_context.resource_ref_resolver._references,
+        {'foo': 'a', 'bar': 'b', 'empty': ''})
 
 
 class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
@@ -146,12 +197,41 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
 
   def SetUp(self):
     self.rewrite_mock = self.StartObjectPatch(
-        schema.CommandExecutionAction, '_RewriteScenario')
+        schema.ScenarioContext, 'RewriteScenario')
 
-  def _MakeContext(self, run_func):
+  def _MakeContext(self, run_func, execution_mode=session.ExecutionMode.LOCAL,
+                   update_modes=None):
     return schema.ScenarioContext(
-        None, None, None, session.ExecutionMode.LOCAL, [updates.Mode.RESULT],
+        None, None, None, calliope_base.ReleaseTrack.GA,
+        execution_mode,
+        update_modes if update_modes is not None else [updates.Mode.RESULT],
         test_base.CreateStreamMocker(self), run_func)
+
+  def testExecuteCommandUntil(self):
+    stdout_values = ['first', 'second', 'done']
+    stderr_values = ['firsterr', 'seconderr', 'doneerr']
+    def _Run(command):
+      self.assertEqual('foo bar FAKE0', command)
+      sys.stdout.write(stdout_values.pop(0))
+      sys.stderr.write(stderr_values.pop(0))
+      if stdout_values:
+        raise exceptions.Error('error')
+
+    context = self._MakeContext(
+        _Run, execution_mode=session.ExecutionMode.REMOTE)
+    context.resource_ref_resolver.AddGeneratedResourceId('instance0', 'FAKE0')
+    a = schema.ExecuteCommandUntilAction.FromData({
+        'execute_command_until': {
+            'command': 'foo bar $$instance0$$',
+            'stdout': 'done',
+            'stderr': 'doneerr',
+            'exit_code': 0,
+        }
+    })
+    a.Execute(context)
+    # All values were consumed.
+    self.assertEqual([], stdout_values)
+    self.assertEqual([], stderr_values)
 
   def testExecute(self):
     """Basic tests of all functionality in the command execution action.
@@ -175,6 +255,7 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
         'command': 'some command $$instance0$$ --flag=$$instance1$$ '
                    '$$instance2$$',
         'cleanup_for': 'instance0',
+        'label': 'Test label.',
         'events': [
             {'expect_stdout': 'some command $$instance0$$ --flag=$$instance1$$ '
                               '$$instance2$$'},
@@ -198,9 +279,74 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
     self.assertEqual(
         'some command $$instance0$$ --flag=$$instance1$$ $$instance2$$',
         data['execute_command']['events'][0]['expect_stdout'])
+    self.assertEqual('Test label.', data['execute_command']['label'])
 
     # Check that the file is rewritten.
     self.rewrite_mock.assert_called_once()
+
+  def testValidationOnlyLocal(self):
+    """Validation only commands are not run in LOCAL mode."""
+    run_mock = mock.MagicMock()
+    context = self._MakeContext(
+        run_mock, execution_mode=session.ExecutionMode.LOCAL)
+    data = {'execute_command': {
+        'command': 'some command',
+        'validation_only': True,
+        'events': [{'expect_exit': {'code': 0}},]
+    }}
+    a = schema.CommandExecutionAction.FromData(data)
+    a.Execute(context)
+    run_mock.assert_not_called()
+
+  def testValidateRemoteAPICallsLocal(self):
+    """In LOCAL mode validate_remote_api_calls set to False has no effect."""
+    def _Run(command):
+      del command
+      http.Http().request(
+          'https://example.com', method='GET', body='{"body": "foo"}',
+          headers={'foo': 'bar'})
+
+    context = self._MakeContext(
+        _Run, execution_mode=session.ExecutionMode.LOCAL,
+        update_modes=[updates.Mode.API_REQUESTS])
+    data = {'execute_command': {
+        'command': 'some command',
+        'validate_remote_api_calls': False,
+        'events': [{'expect_exit': {'code': 0}},]
+    }}
+    a = schema.CommandExecutionAction.FromData(data)
+    with self.assertRaises(session.PauseError):
+      # A pause error indicates that the session is validating the API request,
+      # added it to the scenario, but doesn't have response data for it yet.
+      a.Execute(context)
+
+  @parameterized.named_parameters([
+      ('ValidationOnly', {'validation_only': True}),
+      ('ValidateRemoteAPICalls', {'validate_remote_api_calls': False}),
+  ])
+  def testAPICallValidationRemote(self, settings):
+    """In REMOTE mode, don't validate api calls for either of these settings."""
+    def _Run(command):
+      del command
+      http.Http().request('https://example.com', method='GET')
+
+    context = self._MakeContext(
+        _Run, execution_mode=session.ExecutionMode.REMOTE, update_modes=[])
+    # Disabling validation makes API calls just pass through.
+    request_mock = self.StartPatch('httplib2.Http.request')
+    request_mock.return_value = ({'status': '200'}, None)
+
+    data = {'execute_command': {
+        'command': 'some command',
+        'events': [{'expect_exit': {'code': 0}},]
+    }}
+    data['execute_command'].update(settings)
+
+    a = schema.CommandExecutionAction.FromData(data)
+    # No errors are raised because we don't validate api calls.
+    a.Execute(context)
+    # Real call is made.
+    self.assertEqual(1, request_mock.call_count)
 
 
 class ValidationTests(sdk_test_base.WithOutputCapture):
@@ -211,7 +357,8 @@ class ValidationTests(sdk_test_base.WithOutputCapture):
   def testBadSchema(self):
     data = {'title': '', 'actions': [], 'foo': 'bar'}
     validator = schema.Validator(data)
-    self.assertFalse(validator.Validate())
+    with self.assertRaises(schema.ValidationError):
+      validator.Validate()
 
   def testMissingCleanup(self):
     data = {
@@ -223,10 +370,13 @@ class ValidationTests(sdk_test_base.WithOutputCapture):
             {'execute_command': {'command': '', 'events': []}}
         ]}
     validator = schema.Validator(data)
-    self.assertFalse(validator.Validate())
-    self.AssertErrEquals(
-        'No cleanup_for rules found for generate_resource_id action: '
-        '[my-device, my-device2]\n')
+    with self.assertRaisesRegex(
+        schema.ValidationError,
+        r'No cleanup_for rules found for generate_resource_id action: '
+        r'\[my-device\]\n'
+        r'No cleanup_for rules found for generate_resource_id action: '
+        r'\[my-device2\]\n'):
+      validator.Validate()
 
   def testDuplicateGenerated(self):
     data = {
@@ -238,11 +388,12 @@ class ValidationTests(sdk_test_base.WithOutputCapture):
             {'execute_command': {'command': '', 'events': []}}
         ]}
     validator = schema.Validator(data)
-    self.assertFalse(validator.Validate())
-    self.AssertErrEquals("""\
-Duplicate generate_resource_id reference found: [my-device]
-No cleanup_for rules found for generate_resource_id action: [my-device]
-""")
+    with self.assertRaisesRegex(
+        schema.ValidationError,
+        r'Duplicate generate_resource_id reference found: \[my-device\]\n'
+        r'No cleanup_for rules found for generate_resource_id action: '
+        r'\[my-device\]'):
+      validator.Validate()
 
   def testMissingMissingGenerated(self):
     data = {
@@ -251,10 +402,11 @@ No cleanup_for rules found for generate_resource_id action: [my-device]
                                  'events': []}}
         ]}
     validator = schema.Validator(data)
-    self.assertFalse(validator.Validate())
-    self.AssertErrEquals(
-        'cleanup_for reference [asdf] was not found in a generate_resource_id '
-        'action\n')
+    with self.assertRaisesRegex(
+        schema.ValidationError,
+        r'cleanup_for reference \[asdf\] was not found in a '
+        r'generate_resource_id action'):
+      validator.Validate()
 
   def testDuplicateCleanup(self):
     data = {
@@ -267,8 +419,26 @@ No cleanup_for rules found for generate_resource_id action: [my-device]
                                  'events': []}},
         ]}
     validator = schema.Validator(data)
-    self.assertFalse(validator.Validate())
-    self.AssertErrEquals('Duplicate cleanup_for reference found: [my-device]\n')
+    with self.assertRaisesRegex(
+        schema.ValidationError,
+        r'Duplicate cleanup_for reference found: \[my-device\]'):
+      validator.Validate()
+
+  def testUnnecessaryCleanup(self):
+    data = {
+        'title': '', 'actions': [
+            {'generate_resource_id': {'reference': 'my-device',
+                                      'prefix': 'iot-device',
+                                      'requires_cleanup': False}},
+            {'execute_command': {'command': '', 'cleanup_for': 'my-device',
+                                 'events': []}},
+        ]}
+    validator = schema.Validator(data)
+    with self.assertRaisesRegex(
+        schema.ValidationError,
+        r'cleanup_for reference \[my-device\] was marked as not requiring '
+        r'cleanup'):
+      validator.Validate()
 
 
 if __name__ == '__main__':

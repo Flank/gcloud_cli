@@ -119,7 +119,7 @@ class Configuration(_messages.Message):
   Revisions, and optionally how the containers those revisions reference are
   built. Users create new Revisions by updating the Configuration's spec. The
   "latest created" revision's name is available under status, as is the
-  "latest ready" revision's name. See also: https://github.com/elafros/elafros
+  "latest ready" revision's name. See also: https://github.com/knative/serving
   /blob/master/docs/spec/overview.md#configuration
 
   Fields:
@@ -155,7 +155,7 @@ class ConfigurationCondition(_messages.Message):
     status: Status of the condition, one of True, False, Unknown.
     type: ConfigurationConditionType is used to communicate the status of the
       reconciliation process. See also:
-      https://github.com/elafros/elafros/blob/master/docs/spec/errors.md
+      https://github.com/knative/serving/blob/master/docs/spec/errors.md
       #error-conditions-and-reporting Types include:"LatestRevisionReady"
   """
 
@@ -172,7 +172,7 @@ class ConfigurationSpec(_messages.Message):
 
   Fields:
     generation: For open Knative: metadata.generation does not work yet, this
-      is a stopgap way of specifying generation IGNORED BY GSE. +optional
+      is a stopgap way of specifying generation +optional
     revisionTemplate: RevisionTemplate holds the latest specification for the
       Revision to be stamped out. If a Build specification is provided, then
       the RevisionTemplate's BuildName field will be populated with the name
@@ -814,12 +814,8 @@ class ObjectMeta(_messages.Message):
       intended for creation idempotence and configuration definition. Cannot
       be updated. More info: http://kubernetes.io/docs/user-
       guide/identifiers#names +optional
-    namespace: Namespace defines the space within each name must be unique. An
-      empty namespace is equivalent to the "default" namespace, but "default"
-      is the canonical representation. Not all objects are required to be
-      scoped to a namespace - the value of this field for those objects will
-      be empty.  Must be a DNS_LABEL. Cannot be updated. More info:
-      http://kubernetes.io/docs/user-guide/namespaces +optional
+    namespace: Namespace defines the space within each name must be unique. In
+      Cloud Run this must be equal to either the project ID or project number.
     ownerReferences: List of objects that own this object. If ALL objects in
       the list have been deleted, this object will be garbage collected.
       +optional
@@ -1065,7 +1061,7 @@ class ResourceRequirements(_messages.Message):
 
 class Revision(_messages.Message):
   r"""Revision is an immutable snapshot of code and configuration. See also: h
-  ttps://github.com/elafros/elafros/blob/master/docs/spec/overview.md#revision
+  ttps://github.com/knative/serving/blob/master/docs/spec/overview.md#revision
 
   Fields:
     apiVersion: The API version for this call such as "v1alpha1".
@@ -1099,9 +1095,12 @@ class RevisionCondition(_messages.Message):
     status: Status of the condition, one of True, False, Unknown.
     type: RevisionConditionType is used to communicate the status of the
       reconciliation process. See also:
-      https://github.com/elafros/elafros/blob/master/docs/spec/errors.md
-      #error-conditions-and-reporting Types include: "Ready", "Failed",
-      "BuildComplete", "BuildFailed"
+      https://github.com/knative/serving/blob/master/docs/spec/errors.md
+      #error-conditions-and-reporting Types include:  * "Ready": True when the
+      Revision is ready. * "ResourcesAvailable": True when underlying
+      resources have been provisioned. * "ContainerHealthy": True when the
+      Revision readiness check completes. * "Active": True when the Revision
+      may receive traffic.
   """
 
   lastTransitionTime = _messages.StringField(1)
@@ -1121,15 +1120,19 @@ class RevisionSpec(_messages.Message):
       that the system will manipulate this based on routability and load.
 
   Fields:
-    buildName: BuildName optionally holds the name of the Build responsible
-      for producing the container image for its Revision.
     concurrencyModel: ConcurrencyModel specifies the desired concurrency model
-      (Single or Multi) for the Revision. Defaults to Multi. +optional
+      (Single or Multi) for the Revision. Defaults to Multi. Deprecated in
+      favor of ContainerConcurrency. +optional
     container: Container defines the unit of execution for this Revision. In
       the context of a Revision, we disallow a number of the fields of this
       Container, including: name, resources, ports, and volumeMounts.
+    containerConcurrency: ContainerConcurrency specifies the maximum allowed
+      in-flight (concurrent) requests per container of the Revision. Values
+      are: - `0` thread-safe, the system should manage the max concurrency.
+      This is    the default value. - `1` not-thread-safe. Single concurrency
+      - `2-N` thread-safe, max concurrency of N
     generation: For open Knative: metadata.generation does not work yet, this
-      is a stopgap way of specifying generation IGNORED BY GSE. +optional
+      is a stopgap way of specifying generation +optional
     serviceAccountName: ServiceAccountName holds the name of the Kubernetes
       service account as which the underlying K8s resources should be run. If
       unspecified this will default to the "default" service account for the
@@ -1141,8 +1144,6 @@ class RevisionSpec(_messages.Message):
       Kubernetes resources should be in for this Revision. Users must not
       specify this when creating a revision. It is expected that the system
       will manipulate this based on routability and load.
-    timeoutSeconds: Maximum time the instance is allowed for responding to a
-      request. +optional
   """
 
   class ServingStateValueValuesEnum(_messages.Enum):
@@ -1170,13 +1171,12 @@ class RevisionSpec(_messages.Message):
     RESERVE = 2
     RETIRED = 3
 
-  buildName = _messages.StringField(1)
-  concurrencyModel = _messages.StringField(2)
-  container = _messages.MessageField('Container', 3)
+  concurrencyModel = _messages.StringField(1)
+  container = _messages.MessageField('Container', 2)
+  containerConcurrency = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   generation = _messages.IntegerField(4, variant=_messages.Variant.INT32)
   serviceAccountName = _messages.StringField(5)
   servingState = _messages.EnumField('ServingStateValueValuesEnum', 6)
-  timeoutSeconds = _messages.IntegerField(7, variant=_messages.Variant.INT32)
 
 
 class RevisionStatus(_messages.Message):
@@ -1185,7 +1185,15 @@ class RevisionStatus(_messages.Message):
 
   Fields:
     conditions: List of observed RevisionConditions, indicating the current
-      state of the Revision.
+      state of the Revision. As a Revision is being prepared, it will
+      incrementally update conditions "ResourcesAvailable",
+      "ContainerHealthy", and "Active", which contribute to the overall
+      "Ready" condition.
+    imageDigest: ImageDigest holds the resolved digest for the image specified
+      within .Spec.Container.Image. The digest is resolved during the creation
+      of Revision. This field holds the digest value regardless of whether a
+      tag or digest was originally specified in the Container object. It may
+      be empty if the image comes from a registry listed to skip resolution.
     logUrl: URL to access logs generated by this revision.
     observedGeneration: ObservedGeneration is the 'Generation' of the
       Configuration that was last processed by the controller. The observed
@@ -1198,9 +1206,10 @@ class RevisionStatus(_messages.Message):
   """
 
   conditions = _messages.MessageField('RevisionCondition', 1, repeated=True)
-  logUrl = _messages.StringField(2)
-  observedGeneration = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  serviceName = _messages.StringField(4)
+  imageDigest = _messages.StringField(2)
+  logUrl = _messages.StringField(3)
+  observedGeneration = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  serviceName = _messages.StringField(5)
 
 
 class RevisionTemplate(_messages.Message):
@@ -1226,7 +1235,7 @@ class Route(_messages.Message):
   these cases the Route is additionally responsible for monitoring the
   Configuration for "latest ready" revision changes, and smoothly rolling out
   latest revisions. See also:
-  https://github.com/elafros/elafros/blob/master/docs/spec/overview.md#route
+  https://github.com/knative/serving/blob/master/docs/spec/overview.md#route
 
   Fields:
     apiVersion: The API version for this call such as "v1alpha1".
@@ -1260,7 +1269,7 @@ class RouteCondition(_messages.Message):
     status: Status of the condition, one of "True", "False", "Unknown".
     type: RouteConditionType is used to communicate the status of the
       reconciliation process. See also:
-      https://github.com/elafros/elafros/blob/master/docs/spec/errors.md
+      https://github.com/knative/serving/blob/master/docs/spec/errors.md
       #error-conditions-and-reporting Types include: "RolloutInProgress",
       "TrafficDropped".
   """
@@ -1277,9 +1286,9 @@ class RouteSpec(_messages.Message):
 
   Fields:
     generation: For open Knative: metadata.generation does not work yet, this
-      is a stopgap way of specifying generation IGNORED BY GSE. +optional
+      is a stopgap way of specifying generation +optional
     traffic: Traffic specifies how to distribute traffic over a collection of
-      Elafros Revisions and Configurations.
+      Knative Revisions and Configurations.
   """
 
   generation = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1295,8 +1304,8 @@ class RouteStatus(_messages.Message):
       reconciliation processes that bring the "spec" inline with the observed
       state of the world.
     domain: Domain holds the top-level domain that will distribute traffic
-      over the provided targets. It generally has the form {route-name
-      }.{route-namespace}.{cluster-level-suffix}
+      over the provided targets. It generally has the form https://{route-hash
+      }-{project-hash}-{cluster-level-suffix}.a.run.app
     domainInternal: DomainInternal holds the top-level domain that will
       distribute traffic over the provided targets from inside the cluster. It
       generally has the form {route-name}.{route-namespace}.svc.cluster.local
@@ -1434,8 +1443,8 @@ class ServerlessExtensionsK8sApisListRequest(_messages.Message):
   timeout = _messages.StringField(1)
 
 
-class ServerlessExtensionsK8sGroupsServingKnativeDevListRequest(_messages.Message):
-  r"""A ServerlessExtensionsK8sGroupsServingKnativeDevListRequest object.
+class ServerlessExtensionsK8sGroupsServingknativedevListRequest(_messages.Message):
+  r"""A ServerlessExtensionsK8sGroupsServingknativedevListRequest object.
 
   Fields:
     labelSelector: A string attribute.
@@ -1476,12 +1485,13 @@ class ServerlessNamespacesConfigurationsListRequest(_messages.Message):
     fieldSelector: Allows to filter resources based on a specific value for a
       field name. k8s will send this in a query string format. i.e.
       'metadata.name%3Dlorem'
-    includeUninitialized: Kubernetes-compatible parameter. Not used by GSE.
+    includeUninitialized: Kubernetes-compatible parameter. Not used by Cloud
+      Run.
     labelSelector: Allows to filter resources based on a label. Supported
       operations are =, !=, exists, in, and notIn.
     limit: The maximum number of records that should be returned.
-    parent: The project and location from which the configurations should be
-      listed.
+    parent: The project ID or project number from which the configurations
+      should be listed.
     resourceVersion: The baseline resource version from which the list or
       watch operation should start.
     watch: Flag that indicates that kubectl expects to watch this resource as
@@ -1516,9 +1526,9 @@ class ServerlessNamespacesRevisionsDeleteRequest(_messages.Message):
   Fields:
     name: The name of the revision being deleted.
     orphanDependents: Kubernetes-compatible attribute that specifies the
-      cascade behavior on delete. GSE only supports cascading behavior, so
-      this must be false. This attribute is deprecated, and might be replaced
-      with PropagationPolicy See
+      cascade behavior on delete. Cloud Run only supports cascading behavior,
+      so this must be false. This attribute is deprecated, and might be
+      replaced with PropagationPolicy See
       https://github.com/kubernetes/kubernetes/issues/46659 for more info.
   """
 
@@ -1544,12 +1554,13 @@ class ServerlessNamespacesRevisionsListRequest(_messages.Message):
     fieldSelector: Allows to filter resources based on a specific value for a
       field name. k8s will send this in a query string format. i.e.
       'metadata.name%3Dlorem'
-    includeUninitialized: Kubernetes-compatible parameter. Not used by GSE.
+    includeUninitialized: Kubernetes-compatible parameter. Not used by Cloud
+      Run.
     labelSelector: Allows to filter resources based on a label. Supported
       operations are =, !=, exists, in, and notIn.
     limit: The maximum number of records that should be returned.
-    parent: The project and location from which the revisions should be
-      listed.
+    parent: The project ID or project number from which the revisions should
+      be listed.
     resourceVersion: The baseline resource version from which the list or
       watch operation should start.
     watch: Flag that indicates that kubectl expects to watch this resource as
@@ -1584,11 +1595,13 @@ class ServerlessNamespacesRoutesListRequest(_messages.Message):
     fieldSelector: Allows to filter resources based on a specific value for a
       field name. k8s will send this in a query string format. i.e.
       'metadata.name%3Dlorem'
-    includeUninitialized: Kubernetes-compatible parameter. Not used by GSE.
+    includeUninitialized: Kubernetes-compatible parameter. Not used by Cloud
+      Run.
     labelSelector: Allows to filter resources based on a label. Supported
       operations are =, !=, exists, in, and notIn.
     limit: The maximum number of records that should be returned.
-    parent: The project and location from which the routes should be listed.
+    parent: The project ID or project number from which the routes should be
+      listed.
     resourceVersion: The baseline resource version from which the list or
       watch operation should start.
     watch: Flag that indicates that kubectl expects to watch this resource as
@@ -1609,8 +1622,8 @@ class ServerlessNamespacesServicesCreateRequest(_messages.Message):
   r"""A ServerlessNamespacesServicesCreateRequest object.
 
   Fields:
-    parent: The project and location in which the service should be created,
-      specified in the format `projects/*/locations/*`.
+    parent: The project ID or project number in which this service should be
+      created.
     service: A Service resource to be passed as the request body.
   """
 
@@ -1624,9 +1637,9 @@ class ServerlessNamespacesServicesDeleteRequest(_messages.Message):
   Fields:
     name: The name of the service being deleted.
     orphanDependents: Deprecated. Kubernetes-compatible attribute that
-      specifies the cascade behavior on delete. GSE only supports cascading
-      behavior, so this must be false. This attribute is deprecated, and might
-      be replaced with PropagationPolicy See
+      specifies the cascade behavior on delete. Cloud Run only supports
+      cascading behavior, so this must be false. This attribute is deprecated,
+      and might be replaced with PropagationPolicy See
       https://github.com/kubernetes/kubernetes/issues/46659 for more info.
   """
 
@@ -1652,11 +1665,13 @@ class ServerlessNamespacesServicesListRequest(_messages.Message):
     fieldSelector: Allows to filter resources based on a specific value for a
       field name. k8s will send this in a query string format. i.e.
       'metadata.name%3Dlorem'
-    includeUninitialized: Kubernetes-compatible parameter. Not used by GSE.
+    includeUninitialized: Kubernetes-compatible parameter. Not used by Cloud
+      Run.
     labelSelector: Allows to filter resources based on a label. Supported
       operations are =, !=, exists, in, and notIn.
     limit: The maximum number of records that should be returned.
-    parent: The project and location from which the services should be listed.
+    parent: The project ID or project number from which the services should be
+      listed.
     resourceVersion: The baseline resource version from which the list or
       watch operation should start.
     watch: Flag that indicates that kubectl expects to watch this resource as
@@ -1715,12 +1730,13 @@ class ServerlessProjectsLocationsConfigurationsListRequest(_messages.Message):
     fieldSelector: Allows to filter resources based on a specific value for a
       field name. k8s will send this in a query string format. i.e.
       'metadata.name%3Dlorem'
-    includeUninitialized: Kubernetes-compatible parameter. Not used by GSE.
+    includeUninitialized: Kubernetes-compatible parameter. Not used by Cloud
+      Run.
     labelSelector: Allows to filter resources based on a label. Supported
       operations are =, !=, exists, in, and notIn.
     limit: The maximum number of records that should be returned.
-    parent: The project and location from which the configurations should be
-      listed.
+    parent: The project ID or project number from which the configurations
+      should be listed.
     resourceVersion: The baseline resource version from which the list or
       watch operation should start.
     watch: Flag that indicates that kubectl expects to watch this resource as
@@ -1743,9 +1759,9 @@ class ServerlessProjectsLocationsRevisionsDeleteRequest(_messages.Message):
   Fields:
     name: The name of the revision being deleted.
     orphanDependents: Kubernetes-compatible attribute that specifies the
-      cascade behavior on delete. GSE only supports cascading behavior, so
-      this must be false. This attribute is deprecated, and might be replaced
-      with PropagationPolicy See
+      cascade behavior on delete. Cloud Run only supports cascading behavior,
+      so this must be false. This attribute is deprecated, and might be
+      replaced with PropagationPolicy See
       https://github.com/kubernetes/kubernetes/issues/46659 for more info.
   """
 
@@ -1771,12 +1787,13 @@ class ServerlessProjectsLocationsRevisionsListRequest(_messages.Message):
     fieldSelector: Allows to filter resources based on a specific value for a
       field name. k8s will send this in a query string format. i.e.
       'metadata.name%3Dlorem'
-    includeUninitialized: Kubernetes-compatible parameter. Not used by GSE.
+    includeUninitialized: Kubernetes-compatible parameter. Not used by Cloud
+      Run.
     labelSelector: Allows to filter resources based on a label. Supported
       operations are =, !=, exists, in, and notIn.
     limit: The maximum number of records that should be returned.
-    parent: The project and location from which the revisions should be
-      listed.
+    parent: The project ID or project number from which the revisions should
+      be listed.
     resourceVersion: The baseline resource version from which the list or
       watch operation should start.
     watch: Flag that indicates that kubectl expects to watch this resource as
@@ -1811,11 +1828,13 @@ class ServerlessProjectsLocationsRoutesListRequest(_messages.Message):
     fieldSelector: Allows to filter resources based on a specific value for a
       field name. k8s will send this in a query string format. i.e.
       'metadata.name%3Dlorem'
-    includeUninitialized: Kubernetes-compatible parameter. Not used by GSE.
+    includeUninitialized: Kubernetes-compatible parameter. Not used by Cloud
+      Run.
     labelSelector: Allows to filter resources based on a label. Supported
       operations are =, !=, exists, in, and notIn.
     limit: The maximum number of records that should be returned.
-    parent: The project and location from which the routes should be listed.
+    parent: The project ID or project number from which the routes should be
+      listed.
     resourceVersion: The baseline resource version from which the list or
       watch operation should start.
     watch: Flag that indicates that kubectl expects to watch this resource as
@@ -1836,8 +1855,8 @@ class ServerlessProjectsLocationsServicesCreateRequest(_messages.Message):
   r"""A ServerlessProjectsLocationsServicesCreateRequest object.
 
   Fields:
-    parent: The project and location in which the service should be created,
-      specified in the format `projects/*/locations/*`.
+    parent: The project ID or project number in which this service should be
+      created.
     service: A Service resource to be passed as the request body.
   """
 
@@ -1851,9 +1870,9 @@ class ServerlessProjectsLocationsServicesDeleteRequest(_messages.Message):
   Fields:
     name: The name of the service being deleted.
     orphanDependents: Deprecated. Kubernetes-compatible attribute that
-      specifies the cascade behavior on delete. GSE only supports cascading
-      behavior, so this must be false. This attribute is deprecated, and might
-      be replaced with PropagationPolicy See
+      specifies the cascade behavior on delete. Cloud Run only supports
+      cascading behavior, so this must be false. This attribute is deprecated,
+      and might be replaced with PropagationPolicy See
       https://github.com/kubernetes/kubernetes/issues/46659 for more info.
   """
 
@@ -1879,11 +1898,13 @@ class ServerlessProjectsLocationsServicesListRequest(_messages.Message):
     fieldSelector: Allows to filter resources based on a specific value for a
       field name. k8s will send this in a query string format. i.e.
       'metadata.name%3Dlorem'
-    includeUninitialized: Kubernetes-compatible parameter. Not used by GSE.
+    includeUninitialized: Kubernetes-compatible parameter. Not used by Cloud
+      Run.
     labelSelector: Allows to filter resources based on a label. Supported
       operations are =, !=, exists, in, and notIn.
     limit: The maximum number of records that should be returned.
-    parent: The project and location from which the services should be listed.
+    parent: The project ID or project number from which the services should be
+      listed.
     resourceVersion: The baseline resource version from which the list or
       watch operation should start.
     watch: Flag that indicates that kubectl expects to watch this resource as
@@ -1928,7 +1949,7 @@ class Service(_messages.Message):
   r"""Service is a convenience resource to create, group and manipulate a
   Route, Configuration(s), and Revision(s) that represent a single function,
   application, or microservice. The Service spec has several modes/types that
-  represent different patterns for interacting the underlying Elafros
+  represent different patterns for interacting the underlying Knative
   resources, from always deploying the latest Revision, pinning specific
   revisions, to canarying gradual rollouts.
 
@@ -1964,7 +1985,7 @@ class ServiceCondition(_messages.Message):
     status: Status of the condition, one of True, False, Unknown.
     type: ServiceConditionType is used to communicate the status of the
       reconciliation process. See also:
-      https://github.com/elafros/elafros/blob/master/docs/spec/errors.md
+      https://github.com/knative/serving/blob/master/docs/spec/errors.md
       #error-conditions-and-reporting Types include: "Ready", "Failed".
   """
 
@@ -2027,13 +2048,28 @@ class ServiceStatus(_messages.Message):
     conditions: Array of observed ServiceCondition, indicating the current
       state of the Service.
     domain: The top-level domain from the underlying Route.
+    latestCreatedRevisionName: From ConfigurationStatus.
+      LatestCreatedRevisionName is the last revision that was created from
+      this Service's Configuration. It might not be ready yet, for that use
+      LatestReadyRevisionName. +optional
+    latestReadyRevisionName: From ConfigurationStatus. LatestReadyRevisionName
+      holds the name of the latest Revision stamped out from this Service's
+      Configuration that has had its "Ready" condition become "True".
+      +optional
     observedGeneration: Generation of the service that was last processed by
       the controller.
+    traffic: Traffic holds the configured traffic distribution from the
+      related Route. These entries will always contain RevisionName
+      references. When ConfigurationName appears in the spec for runLatest,
+      this will hold the LatestReadyRevisionName that was last observed.
   """
 
   conditions = _messages.MessageField('ServiceCondition', 1, repeated=True)
   domain = _messages.StringField(2)
-  observedGeneration = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  latestCreatedRevisionName = _messages.StringField(3)
+  latestReadyRevisionName = _messages.StringField(4)
+  observedGeneration = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  traffic = _messages.MessageField('TrafficTarget', 6, repeated=True)
 
 
 class StandardQueryParameters(_messages.Message):

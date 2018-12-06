@@ -524,6 +524,7 @@ bq,2.0.27,1,CONFIG/bq.json,
 gcloud,TEST,1,INSTALL/gcloud.json,
 gcloud-branch,TEST,1,INSTALL/gcloud-branch.json,
 gcloud-deserialized,TEST,1,INSTALL/gcloud-deserialized.json,
+gcloud_commands,UNKNOWN,UNKNOWN,INSTALL/gcloud_commands.py,
 gcloud_completions_branch,UNKNOWN,UNKNOWN,INSTALL/gcloud_completions_branch.golden,
 gsutil,4.27,1,CONFIG/gsutil.json,
 kubectl,v1.7.6,1,CONFIG/kubectl.json,
@@ -823,6 +824,7 @@ Run 'bq help <command>' to get help for <command>.
 This is BigQuery CLI 2.0.27
 
 """,
+    'unicode': u'Ṳᾔḯ¢◎ⅾℯ',
 }
 
 _MAN_URL_OUTPUT = {
@@ -1258,6 +1260,17 @@ alt="website statistics" /></a></div></noscript>
 }
 
 
+class ManCommandCollectorTest(calliope_test_base.CalliopeTestBase):
+
+  def testManCommandCollectorDecodeOutput(self):
+    check_out_mock = self.StartObjectPatch(subprocess, 'check_output')
+    check_out_mock.return_value = _MAN_COMMAND_OUTPUT['unicode'].encode('utf8')
+
+    collector = generate_cli_trees._ManCommandCollector('unicode')
+    self.assertEqual(_MAN_COMMAND_OUTPUT['unicode'],
+                     collector._GetRawManPageText())
+
+
 class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
 
   def testManPageCliTreeGeneratorConfigDirNotInitialized(self):
@@ -1265,7 +1278,8 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command: command in ('man', 'ls'))
+        side_effect=
+        lambda command, allow_extensions=False: command in ('man', 'ls'))
     self.StartObjectPatch(
         generate_cli_trees._ManCommandCollector,
         '_GetRawManPageText',
@@ -1282,11 +1296,16 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command: command in ('man', 'ls'))
+        side_effect=
+        lambda command, allow_extensions=False: command in ('man', 'ls'))
     self.StartObjectPatch(
         generate_cli_trees._ManCommandCollector,
         '_GetRawManPageText',
         side_effect=lambda: _MAN_COMMAND_OUTPUT['ls'])
+    self.StartObjectPatch(
+        generate_cli_trees,
+        '_GetDirectories',
+        return_value=[os.path.join(self.temp_path, '-_no-such-dir_-')])
 
     tree = generate_cli_trees.LoadOrGenerate('ls', warn_on_exceptions=True)
     self.assertIsNone(tree)
@@ -1301,7 +1320,8 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command: command in ('man', 'ls'))
+        side_effect=
+        lambda command, allow_extensions=False: command in ('man', 'ls'))
     self.StartObjectPatch(
         generate_cli_trees._ManCommandCollector,
         '_GetRawManPageText',
@@ -1314,7 +1334,8 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command: command != 'no-such-command')
+        side_effect=
+        lambda command, allow_extensions=False: command != 'no-such-command')
     tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
     self.assertIsNone(tree)
     self.AssertErrContains('Command [no-such-command] not found.')
@@ -1336,7 +1357,8 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
       self.StartObjectPatch(
           files,
           'FindExecutableOnPath',
-          side_effect=lambda command: command != 'no-such-command')
+          side_effect=
+          lambda command, allow_extensions=False: command != 'no-such-command')
 
       tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
       self.assertIsNone(tree)
@@ -1357,7 +1379,7 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command: command == 'ls')
+        side_effect=lambda command, allow_extensions=False: command == 'ls')
     self.StartObjectPatch(
         httplib2,
         'Http',
@@ -1370,7 +1392,8 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command: command not in ('man', 'no-such-command'))
+        side_effect=
+        lambda command, allow_extensions=False: command not in ('man', 'no-such-command'))  # pylint: disable=line-too-long
     tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
     self.assertIsNone(tree)
     self.AssertErrContains('Command [no-such-command] not found.')
@@ -1379,7 +1402,7 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command: command == 'grep')
+        side_effect=lambda command, allow_extensions=False: command == 'grep')
     self.StartObjectPatch(
         httplib2,
         'Http',
@@ -1419,7 +1442,8 @@ class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command: command in ('bq', 'gsutil', 'kubectl'))
+        side_effect=
+        lambda command, allow_extensions=False: command in ('bq', 'gsutil', 'kubectl'))  # pylint: disable=line-too-long
 
   def testUpdateCliTrees(self):
     # The first update should create the trees.
@@ -1466,8 +1490,11 @@ class LoadAllTest(calliope_test_base.CalliopeTestBase):
     os.makedirs(cli_tree_config_dir)
     self.StartObjectPatch(cli_tree, 'CliTreeConfigDir',
                           return_value=cli_tree_config_dir)
-    self.StartObjectPatch(files, 'FindExecutableOnPath',
-                          side_effect=lambda command: command in ('man', 'cat'))
+    self.StartObjectPatch(
+        files,
+        'FindExecutableOnPath',
+        side_effect=
+        lambda command, allow_extensions=False: command in ('man', 'cat'))
 
     cat_tree = cli_tree.Node(command='cat')
     cat_tree[cli_tree.LOOKUP_VERSION] = cli_tree.VERSION

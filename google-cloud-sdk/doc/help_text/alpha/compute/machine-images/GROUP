@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha compute machine-images - read and manage Google Compute Engine
+        machine image resources
+
+SYNOPSIS
+    gcloud alpha compute machine-images COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Read and manage Google Compute Engine machine image resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create Google Compute Engine machine images.
+
+     delete
+        (ALPHA) Delete Google Compute Engine machine images.
+
+     describe
+        (ALPHA) Display detailed information about a machine images.
+
+     list
+        (ALPHA) List Google Compute Engine machine_images.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

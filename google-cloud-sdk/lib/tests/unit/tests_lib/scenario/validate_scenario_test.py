@@ -43,19 +43,28 @@ class ValidateScenarioTests(cli_test_base.CliTestBase):
     val = pkg_resources.GetResourceFromFile(SCENARIO_TEMPLATE_PATH)
     template = yaml.load(val)
     validator = scenario_schema.Validator(template)
-    self.assertTrue(validator.Validate())
+    try:
+      validator.Validate()
+    except scenario_schema.ValidationError as e:
+      self.fail(e)
 
   def testValidateDescribeExample(self):
     example = yaml.load(
         pkg_resources.GetResourceFromFile(DESCRIBE_EXAMPLE_PATH))
     validator = scenario_schema.Validator(example)
-    self.assertTrue(validator.Validate())
+    try:
+      validator.Validate()
+    except scenario_schema.ValidationError as e:
+      self.fail(e)
 
   def testValidateCreateExample(self):
     example = yaml.load(
         pkg_resources.GetResourceFromFile(CREATE_EXAMPLE_PATH))
     validator = scenario_schema.Validator(example)
-    self.assertTrue(validator.Validate())
+    try:
+      validator.Validate()
+    except scenario_schema.ValidationError as e:
+      self.fail(e)
 
 if __name__ == '__main__':
   cli_test_base.main()

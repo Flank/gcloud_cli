@@ -20,17 +20,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class StatesListTest(base.CloudIotBase):
+class StatesListTestGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _MakeStates(self, num=10):
     states = []
@@ -68,8 +67,7 @@ class StatesListTest(base.CloudIotBase):
         self.messages.ListDeviceStatesResponse(deviceStates=states)
     )
 
-  def testList(self, track):
-    self.track = track
+  def testList(self):
     states = self._MakeStates()
     self._ExpectListStates(states)
 
@@ -82,8 +80,7 @@ class StatesListTest(base.CloudIotBase):
 
     self.assertEqual(list(results), states)
 
-  def testList_Limit(self, track):
-    self.track = track
+  def testList_Limit(self):
     states = self._MakeStates()
     self._ExpectListStates(states[-3:], num_states=3)
 
@@ -100,8 +97,7 @@ class StatesListTest(base.CloudIotBase):
         2017-01-10T00:00Z
         """, normalize_space=True)
 
-  def testList_RelativeName(self, track):
-    self.track = track
+  def testList_RelativeName(self):
     states = self._MakeStates()
     device_name = ('projects/{}/'
                    'locations/us-central1/'
@@ -115,6 +111,18 @@ class StatesListTest(base.CloudIotBase):
         '    --device {}'.format(device_name))
 
     self.assertEqual(list(results), states)
+
+
+class StatesListTestBeta(StatesListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class StatesListTestAlpha(StatesListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

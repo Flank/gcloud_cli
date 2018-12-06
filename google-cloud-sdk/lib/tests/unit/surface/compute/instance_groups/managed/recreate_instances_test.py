@@ -18,9 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+from mock import patch
 
 API_VERSION = 'v1'
 
@@ -134,6 +136,17 @@ class InstanceGroupManagersRecreateInstancesTest(test_base.BaseTest):
     self.make_requests.side_effect = MakeRequests
 
     with self.AssertRaisesToolExceptionRegexp('Some requests did not succeed:'):
+      self.Run("""
+          compute instance-groups managed recreate-instances group-1
+              --instances inst-1
+              --zone us-central1-a
+          """)
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
       self.Run("""
           compute instance-groups managed recreate-instances group-1
               --instances inst-1

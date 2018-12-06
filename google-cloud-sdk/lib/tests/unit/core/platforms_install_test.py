@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +41,7 @@ class PlatformsInstallTest(test_case.WithInput,
     self.sdk_root_path = self.CreateTempDir('cloudsdk')
     self.home_path = self.CreateTempDir('home')
     self.restore_env = {}
-    self.StartPatch('googlecloudsdk.core.util.platforms.GetHomePath',
+    self.StartPatch('googlecloudsdk.core.util.files.GetHomeDir',
                     return_value=self.home_path)
     self.StartEnvPatch(
         {'ENV': '', 'HOME': self.home_path, 'SHELL': '/bin/bash'})
@@ -120,10 +120,10 @@ class PlatformsInstallTest(test_case.WithInput,
 # Empty ⚡️⚡️⚡
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.bash.inc'),
            completion=os.path.join(
                self.sdk_root_path, 'completion.bash.inc'))
@@ -172,7 +172,7 @@ if [ -f '{completion}' ]; then source '{completion}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.bash.inc'))
     self.AssertFileExistsWithContents(expected_content, rc_path)
     # No prompt.
@@ -203,10 +203,10 @@ if [ -f '{path}' ]; then source '{path}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.bash.inc'),
            completion=os.path.join(
                self.sdk_root_path, 'completion.bash.inc'))
@@ -238,7 +238,7 @@ if [ -f '{completion}' ]; then source '{completion}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.bash.inc'))
     self.AssertFileExistsWithContents(expected_content, rc_path)
     # No prompt.
@@ -270,10 +270,10 @@ if [ -f '{path}' ]; then source '{path}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.bash.inc'),
            completion=os.path.join(
                self.sdk_root_path, 'completion.bash.inc'))
@@ -309,7 +309,7 @@ if [ -f '{completion}' ]; then source '{completion}'; fi
 # Empty
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(completion=os.path.join(self.sdk_root_path, 'completion.bash.inc'))
 
     self.AssertFileExistsWithContents(expected_content, rc_path)
@@ -340,10 +340,10 @@ if [ -f '{completion}' ]; then source '{completion}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.bash.inc'),
            completion=os.path.join(
                self.sdk_root_path, 'completion.bash.inc'))
@@ -394,10 +394,10 @@ source '/another/dir/path.bash.inc'
 # tail
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.bash.inc'),
            completion=os.path.join(
                self.sdk_root_path, 'completion.bash.inc'))
@@ -426,7 +426,7 @@ if [ -f '{completion}' ]; then source '{completion}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.bash.inc'))
 
     self.AssertFileExistsWithContents(expected_content, rc_path)
@@ -455,7 +455,7 @@ if [ -f '{path}' ]; then source '{path}'; fi
 # Empty
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'completion.bash.inc'))
 
     self.AssertFileExistsWithContents(expected_content, rc_path)
@@ -479,7 +479,7 @@ if [ -f '{path}' ]; then source '{path}'; fi
     self.AssertFileExistsWithContents("""\
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.bash.inc')), rc_path)
     os_mock.reset_mock()
 
@@ -576,12 +576,12 @@ if [ -f '{path}' ]; then source '{path}'; fi
 
     # File is unchanged
     self.AssertFileExistsWithContents('# Empty\n', rc_path)
-    expected_err = """\
-The Google Cloud SDK installer will now prompt you to update an rc
-file to bring the Google Cloud CLIs into your environment.
-
-Enter a path to an rc file to update, or leave blank to use
-[{0}]:""".format(os.path.join(self.home_path, '.kshrc'))
+    expected_err = (
+        '{"ux": "PROMPT_RESPONSE", "message": "The Google Cloud SDK installer '
+        'will now prompt you to update an rc file to bring the Google Cloud '
+        'CLIs into your environment.\\n\\nEnter a path to an rc file to '
+        'update, or leave blank to use [%s]: "}' % os.path.join(
+            self.home_path, '.kshrc').replace('\\', '\\\\'))
     self.AssertErrEquals(expected_err, normalize_space=True)
     self.AssertOutputContains(os.path.join(self.home_path, '.kshrc'))
     os_mock.reset_mock()
@@ -605,19 +605,19 @@ Enter a path to an rc file to update, or leave blank to use
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
-""".format(path=os.path.join(self.sdk_root_path, 'path.ksh.inc'),
-           completion=os.path.join(self.sdk_root_path, 'completion.ksh.inc'))
+if [ -f '{completion}' ]; then . '{completion}'; fi
+""".format(path=os.path.join(self.sdk_root_path, 'path.bash.inc'),
+           completion=os.path.join(self.sdk_root_path, 'completion.bash.inc'))
     self.AssertFileExistsWithContents(expected_content, rc_path)
-    expected_err = """\
-The Google Cloud SDK installer will now prompt you to update an rc
-file to bring the Google Cloud CLIs into your environment.
-
-Enter a path to an rc file to update, or leave blank to use
-[{0}]:""".format(rc_path)
+    expected_err = (
+        '{"ux": "PROMPT_RESPONSE", "message": "The Google Cloud SDK installer '
+        'will now prompt you to update an rc file to bring the Google Cloud '
+        'CLIs into your environment.\\n\\nEnter a path to an rc file to '
+        'update, or leave blank to use [%s]: "}' % os.path.join(
+            rc_path.replace('\\', '\\\\')))
     self.AssertErrEquals(expected_err, normalize_space=True)
     expected_out = """\
 Backing up [{0}] to [{0}.backup].
@@ -695,10 +695,10 @@ Backing up [{0}] to [{0}.backup].
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.zsh.inc'),
            completion=os.path.join(
                self.sdk_root_path, 'completion.zsh.inc'))
@@ -728,10 +728,10 @@ if [ -f '{completion}' ]; then source '{completion}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.zsh.inc'),
            completion=os.path.join(self.sdk_root_path, 'completion.zsh.inc'))
 
@@ -760,7 +760,7 @@ if [ -f '{completion}' ]; then source '{completion}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.zsh.inc'))
 
     self.AssertFileExistsWithContents(expected_content, rc_path)
@@ -790,7 +790,7 @@ if [ -f '{path}' ]; then source '{path}'; fi
 # Empty
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'completion.zsh.inc'))
 
     self.AssertFileExistsWithContents(expected_content, rc_path)
@@ -863,10 +863,10 @@ if [ -f '{path}' ]; then source '{path}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.zsh.inc'),
            completion=os.path.join(
                self.sdk_root_path, 'completion.zsh.inc'))
@@ -895,10 +895,10 @@ if [ -f '{completion}' ]; then source '{completion}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{completion}' ]; then source '{completion}'; fi
+if [ -f '{completion}' ]; then . '{completion}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.zsh.inc'),
            completion=os.path.join(self.sdk_root_path, 'completion.zsh.inc'))
 
@@ -926,7 +926,7 @@ if [ -f '{completion}' ]; then source '{completion}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'path.zsh.inc'))
 
     self.AssertFileExistsWithContents(expected_content, rc_path)
@@ -955,7 +955,7 @@ if [ -f '{path}' ]; then source '{path}'; fi
 # Empty
 
 # The next line enables shell command completion for gcloud.
-if [ -f '{path}' ]; then source '{path}'; fi
+if [ -f '{path}' ]; then . '{path}'; fi
 """.format(path=os.path.join(self.sdk_root_path, 'completion.zsh.inc'))
 
     self.AssertFileExistsWithContents(expected_content, rc_path)
@@ -987,7 +987,7 @@ if [ -f '{path}' ]; then source '{path}'; fi
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; if type source > /dev/null; source '{path}'; else; . '{path}'; end; end
+if [ -f '{path}' ]; . '{path}'; end
 """.format(path=os.path.join(self.sdk_root_path, 'path.fish.inc'))
 
     self.AssertFileExistsWithContents(expected_content, rc_path)
@@ -1006,7 +1006,7 @@ if [ -f '{path}' ]; if type source > /dev/null; source '{path}'; else; . '{path}
 # Empty
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '{path}' ]; if type source > /dev/null; source '{path}'; else; . '{path}'; end; end
+if [ -f '{path}' ]; . '{path}'; end
 """.format(path=os.path.join(self.sdk_root_path, 'path.fish.inc'))
 
     rc_path = self.Touch(
@@ -1132,7 +1132,7 @@ class RcUpdaterTest(subtests.Base, sdk_test_base.SdkBase):
           "if [ -f '{path}' ]; then".format(
               path=os.path.join(sdk_root, 'path.bash.inc')),
           add_then,
-          "source '{path}'".format(
+          ". '{path}'".format(
               path=os.path.join(sdk_root, 'path.bash.inc')),
           add_fi,
           'fi\n',
@@ -1144,7 +1144,7 @@ class RcUpdaterTest(subtests.Base, sdk_test_base.SdkBase):
           "if [ -f '{path}' ]; then".format(
               path=os.path.join(sdk_root, 'completion.bash.inc')),
           add_then,
-          "source '{path}'".format(
+          ". '{path}'".format(
               path=os.path.join(sdk_root, 'completion.bash.inc')),
           add_fi,
           'fi\n',

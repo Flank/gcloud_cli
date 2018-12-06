@@ -28,6 +28,7 @@ from tests.lib import test_case
 from tests.lib.surface.app import util as test_util
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.GA,
                           calliope_base.ReleaseTrack.BETA,
                           calliope_base.ReleaseTrack.ALPHA)
@@ -56,24 +57,24 @@ class CleanupTests(test_util.AppTestBase, test_util.WithAppData,
     self.track = track
     f = self.Touch(self.temp_path, 'index.yaml', 'indexes:\n')
     self.WriteInput('y\n')
-    cat_index = ('- kind: Cat\n'
-                 '  properties:\n'
-                 '  - direction: asc\n'
-                 '    name: whiskers\n')
-    diff_response_body = ('indexes:\n' '---\n' 'indexes:\n' + cat_index)
+    cat_index = (b'- kind: Cat\n'
+                 b'  properties:\n'
+                 b'  - direction: asc\n'
+                 b'    name: whiskers\n')
+    diff_response_body = (b'indexes:\n' b'---\n' b'indexes:\n' + cat_index)
 
     self.AddResponse(
         'https://appengine.google.com/api/datastore/index/diff',
         expected_params={'app_id': [self.PROJECT]},
-        expected_body='{}\n',
+        expected_body=b'{}\n',
         response_code=200,
         response_body=diff_response_body)
     self.AddResponse(
         'https://appengine.google.com/api/datastore/index/delete',
         expected_params={'app_id': [self.PROJECT]},
-        expected_body='indexes:\n' + cat_index,
+        expected_body=b'indexes:\n' + cat_index,
         response_code=200,
-        response_body='indexes:\n')
+        response_body=b'indexes:\n')
     self.Run('datastore indexes cleanup ' + f)
 
 

@@ -4,11 +4,12 @@ NAME
 SYNOPSIS
     gcloud alpha genomics pipelines run [--command-line=COMMAND_LINE]
         [--cpus=CPUS] [--disk-size=DISK_SIZE]
-        [--docker-image=DOCKER_IMAGE; default="google/cloud-sdk:alpine"]
-        [--inputs=[NAME=VALUE,...]] [--inputs-from-file=[NAME=FILE,...]]
-        [--logging=LOGGING] [--memory=MEMORY] [--outputs=[NAME=VALUE,...]]
-        [--preemptible] [--labels=[KEY=VALUE,...]]
-        [--pipeline-file=PIPELINE_FILE] [--regions=[REGION,...]]
+        [--docker-image=DOCKER_IMAGE; default="google/cloud-sdk:slim"]
+        [--env-vars=[NAME=VALUE,...]] [--inputs=[NAME=VALUE,...]]
+        [--inputs-from-file=[NAME=FILE,...]] [--logging=LOGGING]
+        [--memory=MEMORY] [--outputs=[NAME=VALUE,...]] [--preemptible]
+        [--labels=[KEY=VALUE,...]] [--pipeline-file=PIPELINE_FILE]
+        [--regions=[REGION,...]]
         [--service-account-email=SERVICE_ACCOUNT_EMAIL; default="default"]
         [--service-account-scopes=[SCOPE,...]] [--zones=[ZONE,...]]
         [GCLOUD_WIDE_FLAG ...]
@@ -31,9 +32,12 @@ COMMONLY USED FLAGS
         disk name and size. For example: --disk-size "name:size,name2:size2".
         Overrides any values specified in the pipeline-file.
 
-     --docker-image=DOCKER_IMAGE; default="google/cloud-sdk:alpine"
+     --docker-image=DOCKER_IMAGE; default="google/cloud-sdk:slim"
         v2alpha1 only. A docker image to run. Requires --command-line to be
         specified and cannot be used with --pipeline-file.
+
+     --env-vars=[NAME=VALUE,...]
+        List of key-value pairs to set as environment variables.
 
      --inputs=[NAME=VALUE,...]
         Map of input PipelineParameter names to values. Used to pass literal
@@ -138,8 +142,9 @@ OTHER FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

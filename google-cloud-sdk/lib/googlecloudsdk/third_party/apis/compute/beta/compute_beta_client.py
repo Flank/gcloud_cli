@@ -37,6 +37,7 @@ class ComputeBeta(base_api.BaseApiClient):
         response_encoding=response_encoding)
     self.acceleratorTypes = self.AcceleratorTypesService(self)
     self.addresses = self.AddressesService(self)
+    self.allocations = self.AllocationsService(self)
     self.autoscalers = self.AutoscalersService(self)
     self.backendBuckets = self.BackendBucketsService(self)
     self.backendServices = self.BackendServicesService(self)
@@ -372,6 +373,224 @@ class ComputeBeta(base_api.BaseApiClient):
         relative_path=u'projects/{project}/regions/{region}/addresses/{resource}/testIamPermissions',
         request_field=u'testPermissionsRequest',
         request_type_name=u'ComputeAddressesTestIamPermissionsRequest',
+        response_type_name=u'TestPermissionsResponse',
+        supports_download=False,
+    )
+
+  class AllocationsService(base_api.BaseApiService):
+    """Service class for the allocations resource."""
+
+    _NAME = u'allocations'
+
+    def __init__(self, client):
+      super(ComputeBeta.AllocationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def AggregatedList(self, request, global_params=None):
+      r"""Retrieves an aggregated list of allocations.
+
+      Args:
+        request: (ComputeAllocationsAggregatedListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (AllocationAggregatedList) The response message.
+      """
+      config = self.GetMethodConfig('AggregatedList')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AggregatedList.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.allocations.aggregatedList',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/aggregated/allocations',
+        request_field='',
+        request_type_name=u'ComputeAllocationsAggregatedListRequest',
+        response_type_name=u'AllocationAggregatedList',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes the specified allocation.
+
+      Args:
+        request: (ComputeAllocationsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'DELETE',
+        method_id=u'compute.allocations.delete',
+        ordered_params=[u'project', u'zone', u'allocation'],
+        path_params=[u'allocation', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/allocations/{allocation}',
+        request_field='',
+        request_type_name=u'ComputeAllocationsDeleteRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Retrieves all information of the specified allocation.
+
+      Args:
+        request: (ComputeAllocationsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Allocation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.allocations.get',
+        ordered_params=[u'project', u'zone', u'allocation'],
+        path_params=[u'allocation', u'project', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/allocations/{allocation}',
+        request_field='',
+        request_type_name=u'ComputeAllocationsGetRequest',
+        response_type_name=u'Allocation',
+        supports_download=False,
+    )
+
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
+
+      Args:
+        request: (ComputeAllocationsGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.allocations.getIamPolicy',
+        ordered_params=[u'project', u'zone', u'resource'],
+        path_params=[u'project', u'resource', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/allocations/{resource}/getIamPolicy',
+        request_field='',
+        request_type_name=u'ComputeAllocationsGetIamPolicyRequest',
+        response_type_name=u'Policy',
+        supports_download=False,
+    )
+
+    def Insert(self, request, global_params=None):
+      r"""Creates a new allocation.
+
+      Args:
+        request: (ComputeAllocationsInsertRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Insert')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Insert.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.allocations.insert',
+        ordered_params=[u'project', u'zone'],
+        path_params=[u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/allocations',
+        request_field=u'allocation',
+        request_type_name=u'ComputeAllocationsInsertRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""A list all the allocations that have been configured for the specified project in specified zone.
+
+      Args:
+        request: (ComputeAllocationsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (AllocationList) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.allocations.list',
+        ordered_params=[u'project', u'zone'],
+        path_params=[u'project', u'zone'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/zones/{zone}/allocations',
+        request_field='',
+        request_type_name=u'ComputeAllocationsListRequest',
+        response_type_name=u'AllocationList',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeAllocationsSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.allocations.setIamPolicy',
+        ordered_params=[u'project', u'zone', u'resource'],
+        path_params=[u'project', u'resource', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/allocations/{resource}/setIamPolicy',
+        request_field=u'zoneSetPolicyRequest',
+        request_type_name=u'ComputeAllocationsSetIamPolicyRequest',
+        response_type_name=u'Policy',
+        supports_download=False,
+    )
+
+    def TestIamPermissions(self, request, global_params=None):
+      r"""Returns permissions that a caller has on the specified resource.
+
+      Args:
+        request: (ComputeAllocationsTestIamPermissionsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (TestPermissionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('TestIamPermissions')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    TestIamPermissions.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.allocations.testIamPermissions',
+        ordered_params=[u'project', u'zone', u'resource'],
+        path_params=[u'project', u'resource', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/allocations/{resource}/testIamPermissions',
+        request_field=u'testPermissionsRequest',
+        request_type_name=u'ComputeAllocationsTestIamPermissionsRequest',
         response_type_name=u'TestPermissionsResponse',
         supports_download=False,
     )
@@ -927,7 +1146,7 @@ class ComputeBeta(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      r"""Returns the specified BackendService resource. Gets a list of available backend services by making a list() request.
+      r"""Returns the specified BackendService resource. Gets a list of available backend services.
 
       Args:
         request: (ComputeBackendServicesGetRequest) input message
@@ -3311,7 +3530,7 @@ If an empty request body is given, clears the deprecation status instead.
           }
 
     def AbandonInstances(self, request, global_params=None):
-      r"""Schedules a group action to remove the specified instances from the managed instance group. Abandoning an instance does not delete the instance, but it does remove the instance from any target pools that are applied by the managed instance group. This method reduces the targetSize of the managed instance group by the number of instances that you abandon. This operation is marked as DONE when the action is scheduled even if the instances have not yet been removed from the group. You must separately verify the status of the abandoning action with the listmanagedinstances method.
+      r"""Flags the specified instances to be removed from the managed instance group. Abandoning an instance does not delete the instance, but it does remove the instance from any target pools that are applied by the managed instance group. This method reduces the targetSize of the managed instance group by the number of instances that you abandon. This operation is marked as DONE when the action is scheduled even if the instances have not yet been removed from the group. You must separately verify the status of the abandoning action with the listmanagedinstances method.
 
 If the group is part of a backend service that has enabled connection draining, it can take up to 60 seconds after the connection draining duration has elapsed before the VM instance is removed or deleted.
 
@@ -3393,7 +3612,7 @@ You can specify a maximum of 1000 instances with this method per request.
     )
 
     def DeleteInstances(self, request, global_params=None):
-      r"""Schedules a group action to delete the specified instances in the managed instance group. The instances are also removed from any target pools of which they were a member. This method reduces the targetSize of the managed instance group by the number of instances that you delete. This operation is marked as DONE when the action is scheduled even if the instances are still being deleted. You must separately verify the status of the deleting action with the listmanagedinstances method.
+      r"""Flags the specified instances in the managed instance group for immediate deletion. The instances are also removed from any target pools of which they were a member. This method reduces the targetSize of the managed instance group by the number of instances that you delete. This operation is marked as DONE when the action is scheduled even if the instances are still being deleted. You must separately verify the status of the deleting action with the listmanagedinstances method.
 
 If the group is part of a backend service that has enabled connection draining, it can take up to 60 seconds after the connection draining duration has elapsed before the VM instance is removed or deleted.
 
@@ -3449,7 +3668,7 @@ You can specify a maximum of 1000 instances with this method per request.
     )
 
     def Insert(self, request, global_params=None):
-      r"""Creates a managed instance group using the information that you specify in the request. After the group is created, it schedules an action to create instances in the group using the specified instance template. This operation is marked as DONE when the group is created even if the instances in the group have not yet been created. You must separately verify the status of the individual instances with the listmanagedinstances method.
+      r"""Creates a managed instance group using the information that you specify in the request. After the group is created, instances in the group are created using the specified instance template. This operation is marked as DONE when the group is created even if the instances in the group have not yet been created. You must separately verify the status of the individual instances with the listmanagedinstances method.
 
 A managed instance group can have up to 1000 VM instances per group. Please contact Cloud Support if you need an increase in this limit.
 
@@ -3555,7 +3774,7 @@ A managed instance group can have up to 1000 VM instances per group. Please cont
     )
 
     def RecreateInstances(self, request, global_params=None):
-      r"""Schedules a group action to recreate the specified instances in the managed instance group. The instances are deleted and recreated using the current instance template for the managed instance group. This operation is marked as DONE when the action is scheduled even if the instances have not yet been recreated. You must separately verify the status of the recreating action with the listmanagedinstances method.
+      r"""Flags the specified instances in the managed instance group to be immediately recreated. The instances are deleted and recreated using the current instance template for the managed instance group. This operation is marked as DONE when the flag is set even if the instances have not yet been recreated. You must separately verify the status of the recreating action with the listmanagedinstances method.
 
 If the group is part of a backend service that has enabled connection draining, it can take up to 60 seconds after the connection draining duration has elapsed before the VM instance is removed or deleted.
 
@@ -3586,6 +3805,12 @@ You can specify a maximum of 1000 instances with this method per request.
 
     def Resize(self, request, global_params=None):
       r"""Resizes the managed instance group. If you increase the size, the group creates new instances using the current instance template. If you decrease the size, the group deletes instances. The resize operation is marked DONE when the resize actions are scheduled even if the group has not yet added or deleted any instances. You must separately verify the status of the creating or deleting actions with the listmanagedinstances method.
+
+When resizing down, the instance group arbitrarily chooses the order in which VMs are deleted. The group takes into account some VM attributes when making the selection including:
+
++ The status of the VM instance. + The health of the VM instance. + The instance template version the VM is based on. + For regional managed instance groups, the location of the VM instance.
+
+This list is subject to change.
 
 If the group is part of a backend service that has enabled connection draining, it can take up to 60 seconds after the connection draining duration has elapsed before the VM instance is removed or deleted.
 
@@ -3643,7 +3868,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def SetAutoHealingPolicies(self, request, global_params=None):
-      r"""Modifies the autohealing policies.
+      r"""Modifies the autohealing policies. [Deprecated] This method is deprecated. Please use Patch instead.
 
       Args:
         request: (ComputeInstanceGroupManagersSetAutoHealingPoliciesRequest) input message
@@ -4428,6 +4653,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def GetGuestAttributes(self, request, global_params=None):
+      r"""Returns the specified guest attributes entry.
+
+      Args:
+        request: (ComputeInstancesGetGuestAttributesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GuestAttributes) The response message.
+      """
+      config = self.GetMethodConfig('GetGuestAttributes')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetGuestAttributes.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.instances.getGuestAttributes',
+        ordered_params=[u'project', u'zone', u'instance'],
+        path_params=[u'instance', u'project', u'zone'],
+        query_params=[u'queryPath', u'variableKey'],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/getGuestAttributes',
+        request_field='',
+        request_type_name=u'ComputeInstancesGetGuestAttributesRequest',
+        response_type_name=u'GuestAttributes',
+        supports_download=False,
+    )
+
     def GetIamPolicy(self, request, global_params=None):
       r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
 
@@ -4477,6 +4728,32 @@ If the group is part of a backend service that has enabled connection draining, 
         request_field='',
         request_type_name=u'ComputeInstancesGetSerialPortOutputRequest',
         response_type_name=u'SerialPortOutput',
+        supports_download=False,
+    )
+
+    def GetShieldedVmIdentity(self, request, global_params=None):
+      r"""Returns the Shielded VM Identity of an instance.
+
+      Args:
+        request: (ComputeInstancesGetShieldedVmIdentityRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ShieldedInstanceIdentity) The response message.
+      """
+      config = self.GetMethodConfig('GetShieldedVmIdentity')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetShieldedVmIdentity.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.instances.getShieldedVmIdentity',
+        ordered_params=[u'project', u'zone', u'instance'],
+        path_params=[u'instance', u'project', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/getShieldedVmIdentity',
+        request_field='',
+        request_type_name=u'ComputeInstancesGetShieldedVmIdentityRequest',
+        response_type_name=u'ShieldedInstanceIdentity',
         supports_download=False,
     )
 
@@ -4533,7 +4810,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def ListReferrers(self, request, global_params=None):
-      r"""Retrieves the list of referrers to instances contained within the specified zone.
+      r"""Retrieves the list of referrers to instances contained within the specified zone. For more information, read Viewing Referrers to VM Instances.
 
       Args:
         request: (ComputeInstancesListReferrersRequest) input message
@@ -4580,6 +4857,32 @@ If the group is part of a backend service that has enabled connection draining, 
         relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/reset',
         request_field='',
         request_type_name=u'ComputeInstancesResetRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Resume(self, request, global_params=None):
+      r"""Resumes an instance that was suspended using the instances().suspend method.
+
+      Args:
+        request: (ComputeInstancesResumeRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Resume')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Resume.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.instances.resume',
+        ordered_params=[u'project', u'zone', u'instance'],
+        path_params=[u'instance', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/resume',
+        request_field=u'instancesResumeRequest',
+        request_type_name=u'ComputeInstancesResumeRequest',
         response_type_name=u'Operation',
         supports_download=False,
     )
@@ -4871,7 +5174,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def SetTags(self, request, global_params=None):
-      r"""Sets tags for the specified instance to the data included in the request.
+      r"""Sets network tags for the specified instance to the data included in the request.
 
       Args:
         request: (ComputeInstancesSetTagsRequest) input message
@@ -5000,6 +5303,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def Suspend(self, request, global_params=None):
+      r"""This method suspends a running instance, saving its state to persistent storage, and allows you to resume the instance at a later time. Suspended instances incur reduced per-minute, virtual machine usage charges while they are suspended. Any resources the virtual machine is using, such as persistent disks and static IP addresses, will continue to be charged until they are deleted.
+
+      Args:
+        request: (ComputeInstancesSuspendRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Suspend')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Suspend.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.instances.suspend',
+        ordered_params=[u'project', u'zone', u'instance'],
+        path_params=[u'instance', u'project', u'zone'],
+        query_params=[u'discardLocalSsd', u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/suspend',
+        request_field='',
+        request_type_name=u'ComputeInstancesSuspendRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def TestIamPermissions(self, request, global_params=None):
       r"""Returns permissions that a caller has on the specified resource.
 
@@ -5048,6 +5377,32 @@ If the group is part of a backend service that has enabled connection draining, 
         relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/updateAccessConfig',
         request_field=u'accessConfig',
         request_type_name=u'ComputeInstancesUpdateAccessConfigRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def UpdateDisplayDevice(self, request, global_params=None):
+      r"""Updates the Display config for a VM instance. You can only use this method on a stopped VM instance. This method supports PATCH semantics and uses the JSON merge patch format and processing rules.
+
+      Args:
+        request: (ComputeInstancesUpdateDisplayDeviceRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('UpdateDisplayDevice')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UpdateDisplayDevice.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'PATCH',
+        method_id=u'compute.instances.updateDisplayDevice',
+        ordered_params=[u'project', u'zone', u'instance'],
+        path_params=[u'instance', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/updateDisplayDevice',
+        request_field=u'displayDevice',
+        request_type_name=u'ComputeInstancesUpdateDisplayDeviceRequest',
         response_type_name=u'Operation',
         supports_download=False,
     )
@@ -5446,6 +5801,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def GetDiagnostics(self, request, global_params=None):
+      r"""Returns the interconnectDiagnostics for the specified interconnect.
+
+      Args:
+        request: (ComputeInterconnectsGetDiagnosticsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (InterconnectsGetDiagnosticsResponse) The response message.
+      """
+      config = self.GetMethodConfig('GetDiagnostics')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetDiagnostics.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.interconnects.getDiagnostics',
+        ordered_params=[u'project', u'interconnect'],
+        path_params=[u'interconnect', u'project'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/interconnects/{interconnect}/getDiagnostics',
+        request_field='',
+        request_type_name=u'ComputeInterconnectsGetDiagnosticsRequest',
+        response_type_name=u'InterconnectsGetDiagnosticsResponse',
+        supports_download=False,
+    )
+
     def Insert(self, request, global_params=None):
       r"""Creates a Interconnect in the specified project using the data included in the request.
 
@@ -5723,6 +6104,32 @@ If the group is part of a backend service that has enabled connection draining, 
         request_field='',
         request_type_name=u'ComputeLicensesListRequest',
         response_type_name=u'LicensesListResponse',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeLicensesSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.licenses.setIamPolicy',
+        ordered_params=[u'project', u'resource'],
+        path_params=[u'project', u'resource'],
+        query_params=[],
+        relative_path=u'projects/{project}/global/licenses/{resource}/setIamPolicy',
+        request_field=u'globalSetPolicyRequest',
+        request_type_name=u'ComputeLicensesSetIamPolicyRequest',
+        response_type_name=u'Policy',
         supports_download=False,
     )
 
@@ -6198,6 +6605,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def ListPeeringRoutes(self, request, global_params=None):
+      r"""Lists the peering routes exchanged over peering connection.
+
+      Args:
+        request: (ComputeNetworksListPeeringRoutesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ExchangedPeeringRoutesList) The response message.
+      """
+      config = self.GetMethodConfig('ListPeeringRoutes')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListPeeringRoutes.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.networks.listPeeringRoutes',
+        ordered_params=[u'project', u'network'],
+        path_params=[u'network', u'project'],
+        query_params=[u'direction', u'filter', u'maxResults', u'orderBy', u'pageToken', u'peeringName', u'region'],
+        relative_path=u'projects/{project}/global/networks/{network}/listPeeringRoutes',
+        request_field='',
+        request_type_name=u'ComputeNetworksListPeeringRoutesRequest',
+        response_type_name=u'ExchangedPeeringRoutesList',
+        supports_download=False,
+    )
+
     def Patch(self, request, global_params=None):
       r"""Patches the specified network with the data included in the request. Only the following fields can be modified: routingConfig.routingMode.
 
@@ -6299,6 +6732,32 @@ If the group is part of a backend service that has enabled connection draining, 
         request_field=u'testPermissionsRequest',
         request_type_name=u'ComputeNetworksTestIamPermissionsRequest',
         response_type_name=u'TestPermissionsResponse',
+        supports_download=False,
+    )
+
+    def UpdatePeering(self, request, global_params=None):
+      r"""Updates the specified network peering with the data included in the request Only the following fields can be modified: NetworkPeering.export_custom_routes, and NetworkPeering.import_custom_routes.
+
+      Args:
+        request: (ComputeNetworksUpdatePeeringRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('UpdatePeering')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UpdatePeering.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'PATCH',
+        method_id=u'compute.networks.updatePeering',
+        ordered_params=[u'project', u'network'],
+        path_params=[u'network', u'project'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/global/networks/{network}/updatePeering',
+        request_field=u'networksUpdatePeeringRequest',
+        request_type_name=u'ComputeNetworksUpdatePeeringRequest',
+        response_type_name=u'Operation',
         supports_download=False,
     )
 
@@ -8145,7 +8604,7 @@ If the group is part of a backend service that has enabled connection draining, 
           }
 
     def AbandonInstances(self, request, global_params=None):
-      r"""Schedules a group action to remove the specified instances from the managed instance group. Abandoning an instance does not delete the instance, but it does remove the instance from any target pools that are applied by the managed instance group. This method reduces the targetSize of the managed instance group by the number of instances that you abandon. This operation is marked as DONE when the action is scheduled even if the instances have not yet been removed from the group. You must separately verify the status of the abandoning action with the listmanagedinstances method.
+      r"""Flags the specified instances to be immediately removed from the managed instance group. Abandoning an instance does not delete the instance, but it does remove the instance from any target pools that are applied by the managed instance group. This method reduces the targetSize of the managed instance group by the number of instances that you abandon. This operation is marked as DONE when the action is scheduled even if the instances have not yet been removed from the group. You must separately verify the status of the abandoning action with the listmanagedinstances method.
 
 If the group is part of a backend service that has enabled connection draining, it can take up to 60 seconds after the connection draining duration has elapsed before the VM instance is removed or deleted.
 
@@ -8201,7 +8660,7 @@ You can specify a maximum of 1000 instances with this method per request.
     )
 
     def DeleteInstances(self, request, global_params=None):
-      r"""Schedules a group action to delete the specified instances in the managed instance group. The instances are also removed from any target pools of which they were a member. This method reduces the targetSize of the managed instance group by the number of instances that you delete. This operation is marked as DONE when the action is scheduled even if the instances are still being deleted. You must separately verify the status of the deleting action with the listmanagedinstances method.
+      r"""Flags the specified instances in the managed instance group to be immediately deleted. The instances are also removed from any target pools of which they were a member. This method reduces the targetSize of the managed instance group by the number of instances that you delete. The deleteInstances operation is marked DONE if the deleteInstances request is successful. The underlying actions take additional time. You must separately verify the status of the deleting action with the listmanagedinstances method.
 
 If the group is part of a backend service that has enabled connection draining, it can take up to 60 seconds after the connection draining duration has elapsed before the VM instance is removed or deleted.
 
@@ -8257,7 +8716,7 @@ You can specify a maximum of 1000 instances with this method per request.
     )
 
     def Insert(self, request, global_params=None):
-      r"""Creates a managed instance group using the information that you specify in the request. After the group is created, it schedules an action to create instances in the group using the specified instance template. This operation is marked as DONE when the group is created even if the instances in the group have not yet been created. You must separately verify the status of the individual instances with the listmanagedinstances method.
+      r"""Creates a managed instance group using the information that you specify in the request. After the group is created, instances in the group are created using the specified instance template. This operation is marked as DONE when the group is created even if the instances in the group have not yet been created. You must separately verify the status of the individual instances with the listmanagedinstances method.
 
 A regional managed instance group can contain up to 2000 instances.
 
@@ -8363,7 +8822,7 @@ A regional managed instance group can contain up to 2000 instances.
     )
 
     def RecreateInstances(self, request, global_params=None):
-      r"""Schedules a group action to recreate the specified instances in the managed instance group. The instances are deleted and recreated using the current instance template for the managed instance group. This operation is marked as DONE when the action is scheduled even if the instances have not yet been recreated. You must separately verify the status of the recreating action with the listmanagedinstances method.
+      r"""Flags the specified instances in the managed instance group to be immediately recreated. The instances are deleted and recreated using the current instance template for the managed instance group. This operation is marked as DONE when the flag is set even if the instances have not yet been recreated. You must separately verify the status of the recreating action with the listmanagedinstances method.
 
 If the group is part of a backend service that has enabled connection draining, it can take up to 60 seconds after the connection draining duration has elapsed before the VM instance is removed or deleted.
 
@@ -8393,7 +8852,9 @@ You can specify a maximum of 1000 instances with this method per request.
     )
 
     def Resize(self, request, global_params=None):
-      r"""Changes the intended size for the managed instance group. If you increase the size, the group schedules actions to create new instances using the current instance template. If you decrease the size, the group schedules delete actions on one or more instances. The resize operation is marked DONE when the resize actions are scheduled even if the group has not yet added or deleted any instances. You must separately verify the status of the creating or deleting actions with the listmanagedinstances method.
+      r"""Changes the intended size of the managed instance group. If you increase the size, the group creates new instances using the current instance template. If you decrease the size, the group deletes one or more instances.
+
+The resize operation is marked DONE if the resize request is successful. The underlying actions take additional time. You must separately verify the status of the creating or deleting actions with the listmanagedinstances method.
 
 If the group is part of a backend service that has enabled connection draining, it can take up to 60 seconds after the connection draining duration has elapsed before the VM instance is removed or deleted.
 
@@ -8421,7 +8882,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def SetAutoHealingPolicies(self, request, global_params=None):
-      r"""Modifies the autohealing policy for the instances in this managed instance group.
+      r"""Modifies the autohealing policy for the instances in this managed instance group. [Deprecated] This method is deprecated. Please use Patch instead.
 
       Args:
         request: (ComputeRegionInstanceGroupManagersSetAutoHealingPoliciesRequest) input message
@@ -8961,7 +9422,7 @@ If the group is part of a backend service that has enabled connection draining, 
         request: (ComputeResourcePoliciesListRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (ResourcePoliciesList) The response message.
+        (ResourcePolicyList) The response message.
       """
       config = self.GetMethodConfig('List')
       return self._RunMethod(
@@ -8976,7 +9437,7 @@ If the group is part of a backend service that has enabled connection draining, 
         relative_path=u'projects/{project}/regions/{region}/resourcePolicies',
         request_field='',
         request_type_name=u'ComputeResourcePoliciesListRequest',
-        response_type_name=u'ResourcePoliciesList',
+        response_type_name=u'ResourcePolicyList',
         supports_download=False,
     )
 
@@ -9091,6 +9552,32 @@ If the group is part of a backend service that has enabled connection draining, 
         request_field='',
         request_type_name=u'ComputeRoutersGetRequest',
         response_type_name=u'Router',
+        supports_download=False,
+    )
+
+    def GetNatMappingInfo(self, request, global_params=None):
+      r"""Retrieves runtime Nat mapping information of VM endpoints.
+
+      Args:
+        request: (ComputeRoutersGetNatMappingInfoRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (VmEndpointNatMappingsList) The response message.
+      """
+      config = self.GetMethodConfig('GetNatMappingInfo')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetNatMappingInfo.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.routers.getNatMappingInfo',
+        ordered_params=[u'project', u'region', u'router'],
+        path_params=[u'project', u'region', u'router'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/regions/{region}/routers/{router}/getNatMappingInfo',
+        request_field='',
+        request_type_name=u'ComputeRoutersGetNatMappingInfoRequest',
+        response_type_name=u'VmEndpointNatMappingsList',
         supports_download=False,
     )
 
@@ -9444,7 +9931,7 @@ If the group is part of a backend service that has enabled connection draining, 
         method_id=u'compute.securityPolicies.addRule',
         ordered_params=[u'project', u'securityPolicy'],
         path_params=[u'project', u'securityPolicy'],
-        query_params=[],
+        query_params=[u'validateOnly'],
         relative_path=u'projects/{project}/global/securityPolicies/{securityPolicy}/addRule',
         request_field=u'securityPolicyRule',
         request_type_name=u'ComputeSecurityPoliciesAddRuleRequest',
@@ -9548,7 +10035,7 @@ If the group is part of a backend service that has enabled connection draining, 
         method_id=u'compute.securityPolicies.insert',
         ordered_params=[u'project'],
         path_params=[u'project'],
-        query_params=[u'requestId'],
+        query_params=[u'requestId', u'validateOnly'],
         relative_path=u'projects/{project}/global/securityPolicies',
         request_field=u'securityPolicy',
         request_type_name=u'ComputeSecurityPoliciesInsertRequest',
@@ -9652,7 +10139,7 @@ If the group is part of a backend service that has enabled connection draining, 
         method_id=u'compute.securityPolicies.patchRule',
         ordered_params=[u'project', u'securityPolicy'],
         path_params=[u'project', u'securityPolicy'],
-        query_params=[u'priority'],
+        query_params=[u'priority', u'validateOnly'],
         relative_path=u'projects/{project}/global/securityPolicies/{securityPolicy}/patchRule',
         request_field=u'securityPolicyRule',
         request_type_name=u'ComputeSecurityPoliciesPatchRuleRequest',
@@ -9751,7 +10238,7 @@ If the group is part of a backend service that has enabled connection draining, 
     def Delete(self, request, global_params=None):
       r"""Deletes the specified Snapshot resource. Keep in mind that deleting a single snapshot might not necessarily delete all the data on that snapshot. If any data on the snapshot that is marked for deletion is needed for subsequent snapshots, the data will be moved to the next corresponding snapshot.
 
-For more information, see Deleting snaphots.
+For more information, see Deleting snapshots.
 
       Args:
         request: (ComputeSnapshotsDeleteRequest) input message
@@ -10483,7 +10970,7 @@ For more information, see Deleting snaphots.
     )
 
     def Patch(self, request, global_params=None):
-      r"""Patches the specified subnetwork with the data included in the request. Only the following fields within the subnetwork resource can be specified in the request: secondary_ip_range, allow_subnet_cidr_routes_overlap and role. It is also mandatory to specify the current fingeprint of the subnetwork resource being patched.
+      r"""Patches the specified subnetwork with the data included in the request. Only certain fields can up updated with a patch request as indicated in the field descriptions. You must specify the current fingeprint of the subnetwork resource being patched.
 
       Args:
         request: (ComputeSubnetworksPatchRequest) input message

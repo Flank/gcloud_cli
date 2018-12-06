@@ -18,12 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.compute import lister
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import cli_test_base
-from tests.lib import sdk_test_base
+from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -103,41 +100,30 @@ class PeeringsCreateTest(test_base.BaseTest):
                'network-1')
 
 
-class PeeringsCreateAlphaTest(sdk_test_base.WithFakeAuth,
-                              cli_test_base.CliTestBase):
+class PeeringsCreateAlphaTest(test_base.BaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.messages = core_apis.GetMessagesModule('compute', 'alpha')
-    self.mock_client = mock.Client(
-        core_apis.GetClientClass('compute', 'alpha'),
-        real_client=core_apis.GetClientInstance(
-            'compute', 'alpha', no_http=True))
-    self.mock_client.Mock()
-    self.addCleanup(self.mock_client.Unmock)
+    self.SelectApi(self.track.prefix)
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
 
   def testCreatePeeringWithCustomRoutesFlags(self):
-    expected = self.messages.Network()
-    self.mock_client.networks.AddPeering.Expect(
-        self.messages.ComputeNetworksAddPeeringRequest(
-            network='network-1',
-            networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
-                autoCreateRoutes=True,
-                exportCustomRoutes=True,
-                importCustomRoutes=True,
-                name='peering-1',
-                peerNetwork='projects/project-2/global/networks/network-2'),
-            project='fake-project'), expected)
+    self.Run('compute networks peerings create peering-1 --network '
+             'network-1 --peer-network network-2 --auto-create-routes '
+             '--export-custom-routes --import-custom-routes')
 
-    self.Run("""
-        compute networks peerings create peering-1
-          --network network-1
-          --peer-project project-2
-          --peer-network network-2
-          --auto-create-routes
-          --export-custom-routes
-          --import-custom-routes
-        """)
+    self.CheckRequests(
+        [(self.compute_alpha.networks, 'AddPeering',
+          self.messages.ComputeNetworksAddPeeringRequest(
+              network='network-1',
+              networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
+                  autoCreateRoutes=True,
+                  name='peering-1',
+                  peerNetwork='projects/my-project/global/networks/network-2',
+                  exportCustomRoutes=True,
+                  importCustomRoutes=True),
+              project='my-project'))],)
 
 
 if __name__ == '__main__':

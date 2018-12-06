@@ -51,16 +51,20 @@ class SqlIntegrationTestBaseWithNewInstance(SqlIntegrationTestBase):
   """Base class for all SQL e2e tests that need a fresh SQL instance."""
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
-  def CreateInstance(self):
+  def CreateInstance(self, tier):
     self.test_instance = next(
         e2e_utils.GetResourceNameGenerator(prefix='gcloud-sql-test'))
     self.instance_created = False
-    self.RunCreateInstanceCmd()
+    operation = self.RunCreateInstanceCmd(tier)
+    self.WaitOnOperation(operation.name)
     self.instance_created = True
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def DeleteInstance(self):
     self.Run('sql instances delete {0}'.format(self.test_instance))
+
+  def WaitOnOperation(self, operation_id):
+    self.Run('sql operations wait {0} --timeout=unlimited'.format(operation_id))
 
   def SetUp(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -73,19 +77,20 @@ class SqlIntegrationTestBaseWithNewInstance(SqlIntegrationTestBase):
 class MysqlIntegrationTestBase(SqlIntegrationTestBaseWithNewInstance):
   # Base class for all SQL e2e tests that need a fresh MySQL instance.
 
-  def RunCreateInstanceCmd(self):
-    self.Run('sql instances create {0} --tier D1 --backup --enable-bin-log '
-             '--backup-start-time 00:00'.format(self.test_instance))
+  def RunCreateInstanceCmd(self, tier):
+    return self.Run(
+        'sql instances create {0} --tier {1} --backup --enable-bin-log '
+        '--backup-start-time 00:00 --async'.format(self.test_instance, tier))
 
 
 class PsqlIntegrationTestBase(SqlIntegrationTestBaseWithNewInstance):
   # Base class for all SQL e2e tests that need a fresh PSQL instance.
 
-  def RunCreateInstanceCmd(self):
-    self.Run(
+  def RunCreateInstanceCmd(self, tier):
+    return self.Run(
         'sql instances create {0} --database-version POSTGRES_9_6 '
-        '--tier db-g1-small --activation-policy ALWAYS'
-        .format(self.test_instance),
+        '--tier {1} --activation-policy ALWAYS --async'
+        .format(self.test_instance, tier),
         track=calliope_base.ReleaseTrack.BETA)
 
 

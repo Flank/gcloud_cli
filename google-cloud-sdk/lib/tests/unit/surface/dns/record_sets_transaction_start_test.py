@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import os
 from googlecloudsdk.api_lib.dns import transaction_util
-from googlecloudsdk.calliope.exceptions import ToolException
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.dns import base
@@ -39,11 +38,12 @@ class RecordSetsTransactionStartTest(base.DnsMockTest):
   def testTransactionStartAlreadyExists(self):
     open(transaction_util.DEFAULT_PATH, 'w').close()
     test_zone = util.GetManagedZones()[0]
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(
+        transaction_util.TransactionFileAlreadyExists) as context:
       self.Run(
           'dns record-sets transaction start -z {0}'.format(test_zone.name))
       self.assertEqual(context.exception.message,
-                       'transaction already exists at [{0}]'.format(
+                       'Transaction already exists at [{0}]'.format(
                            transaction_util.DEFAULT_PATH))
       os.remove(transaction_util.DEFAULT_PATH)
 
@@ -81,17 +81,18 @@ class RecordSetsTransactionStartBetaTest(base.DnsMockBetaTest):
 
   def SetUp(self):
     self.initial_transaction = sdk_test_base.SdkBase.Resource(
-        'tests', 'unit', 'surface', 'dns', 'test_data', 'v2beta1',
+        'tests', 'unit', 'surface', 'dns', 'test_data', 'v1beta2',
         'zone.com-initial-transaction.yaml')
 
   def testTransactionStartAlreadyExists(self):
     open(transaction_util.DEFAULT_PATH, 'w').close()
     test_zone = util_beta.GetManagedZones()[0]
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(
+        transaction_util.TransactionFileAlreadyExists) as context:
       self.Run(
           'dns record-sets transaction start -z {0}'.format(test_zone.name))
       self.assertEqual(context.exception.message,
-                       'transaction already exists at [{0}]'.format(
+                       'Transaction already exists at [{0}]'.format(
                            transaction_util.DEFAULT_PATH))
       os.remove(transaction_util.DEFAULT_PATH)
 

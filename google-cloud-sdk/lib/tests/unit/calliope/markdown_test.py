@@ -23,6 +23,7 @@ import os
 
 from googlecloudsdk.calliope import cli
 from googlecloudsdk.calliope import markdown
+from googlecloudsdk.calliope import usage_text
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -203,6 +204,102 @@ $ python \\
    int(mktime(strptime('01 July 2015', '%d %B %Y')))"\
 """
     actual = markdown.ExampleCommandLineSplitter().Split(example)
+    self.assertEqual(expected, actual)
+
+
+class MarkdownHelpTextTest(sdk_test_base.SdkBase, parameterized.TestCase):
+
+  def SetUp(self):
+    calliope_test_home = self.Resource('tests', 'unit', 'calliope', 'testdata')
+    loader = cli.CLILoader(
+        name='gcloud',
+        command_root_directory=os.path.join(calliope_test_home, 'sdk3'))
+    self.generator = markdown.CommandMarkdownGenerator(
+        loader.Generate()._TopElement())
+
+  def testParentGrandparentMarkdown(self):
+    self.generator._command_path = ['gcloud', 'markdown', 'grandparent']
+    self.generator._command_name = 'gcloud markdown grandparent'
+    doc = """\
+command : {command}
+parent_command : {parent_command}
+grandparent_command : {grandparent_command}
+"""
+    expected = """\
+command : gcloud markdown grandparent
+parent_command : gcloud markdown
+grandparent_command : gcloud
+"""
+    actual = self.generator._ExpandHelpText(doc)
+    self.assertEqual(expected, actual)
+
+  def testNoParentNoGrandparentMarkdown(self):
+    self.generator._command_path = ['gcloud']
+    self.generator._command_name = 'gcloud'
+    doc = """\
+command:{command}
+parent_command:{parent_command}
+grandparent_command:{grandparent_command}
+"""
+    expected = """\
+command:gcloud
+parent_command:
+grandparent_command:
+"""
+    actual = self.generator._ExpandHelpText(doc)
+    self.assertEqual(expected, actual)
+
+  def testPeelCurlyBracesMarkdown(self):
+    self.generator._command_path = ['gcloud']
+    self.generator._command_name = 'gcloud'
+    doc = 'command:{{command}}'
+    expected = 'command:{command}'
+    actual = self.generator._ExpandHelpText(doc)
+    self.assertEqual(expected, actual)
+
+
+class MarkdownPrintArgumentsTest(sdk_test_base.SdkBase,
+                                 parameterized.TestCase):
+
+  def SetUp(self):
+    calliope_test_home = self.Resource('tests', 'unit', 'calliope', 'testdata')
+    loader = cli.CLILoader(
+        name='gcloud',
+        command_root_directory=os.path.join(calliope_test_home, 'sdk3'))
+    self.generator = markdown.CommandMarkdownGenerator(
+        loader.Generate()._TopElement())
+    self.generator._SetArgSections()
+    self.arg = sorted(self.generator._arg_sections[0].args.arguments,
+                      key=usage_text.GetArgSortKey)[0]
+
+  def testPrintPositionalDefinition(self):
+    self.generator.PrintPositionalDefinition(self.arg)
+    expected = """\
+
+_CONFIGURATION_::
+
+The configuration to use for this command invocation. For more
+information on how to use configurations, run:
+`gcloud topic configurations`.  You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment
+variable to set the equivalent of this flag for a terminal
+session.
+"""
+    actual = self.generator.Edit()
+    self.assertEqual(expected, actual)
+
+  def testPrintFlagDefinition(self):
+    self.generator.PrintFlagDefinition(self.arg)
+    expected = """\
+
+*--configuration*=_CONFIGURATION_::
+
+The configuration to use for this command invocation. For more
+information on how to use configurations, run:
+`gcloud topic configurations`.  You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment
+variable to set the equivalent of this flag for a terminal
+session.
+"""
+    actual = self.generator.Edit()
     self.assertEqual(expected, actual)
 
 

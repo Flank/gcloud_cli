@@ -96,7 +96,7 @@ class ResultsBucketOpsTests(unit_base.AndroidMockClientTest):
 
   def _ExpectBucketsGet(self, bucket_name):
     get_req = self.storage_msgs.StorageBucketsGetRequest(bucket=bucket_name)
-    get_resp = self.storage_msgs.BucketAccessControl()
+    get_resp = self.storage_msgs.Bucket()
     self.storage_client.buckets.Get.Expect(request=get_req, response=get_resp)
 
 

@@ -18,8 +18,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -31,7 +32,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding for a service account.
+        (ALPHA) Add an IAM policy binding to an IAM Service Account.
 
      create
         (ALPHA) Create a service account for a project.
@@ -49,7 +50,7 @@ COMMANDS
         (ALPHA) List all of a project's service accounts.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding for a service account.
+        (ALPHA) Remove IAM policy binding of a service account.
 
      set-iam-policy
         (ALPHA) Set IAM policy for a service account.
@@ -61,7 +62,7 @@ COMMANDS
         (ALPHA) Sign a JWT with a managed service account key.
 
      update
-        (ALPHA) Update the metadata of an IAM service account.
+        (ALPHA) Update an IAM service account.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

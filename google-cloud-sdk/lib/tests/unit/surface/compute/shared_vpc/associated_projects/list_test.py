@@ -18,17 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
-from tests.lib.surface.compute import xpn_test_base
+from tests.lib.surface.compute import shared_vpc_test_base
 
 
 @parameterized.parameters(
-    (base.ReleaseTrack.ALPHA, 'alpha'),
-    (base.ReleaseTrack.BETA, 'beta'),
-    (base.ReleaseTrack.GA, 'v1'))
-class ListTest(xpn_test_base.XpnApitoolsTestBase):
+    (calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+    (calliope_base.ReleaseTrack.BETA, 'beta'),
+    (calliope_base.ReleaseTrack.GA, 'v1'))
+class ListTest(shared_vpc_test_base.SharedVpcApitoolsTestBase):
 
   def testList_NoProject(self, track, api_version):
     self._SetUp(track, api_version)
@@ -38,13 +38,6 @@ class ListTest(xpn_test_base.XpnApitoolsTestBase):
 
   def testList(self, track, api_version):
     self._SetUp(track, api_version)
-    self._testList('shared-vpc')
-
-  def testList_xpn(self, track, api_version):
-    self._SetUp(track, api_version)
-    self._testList('xpn')
-
-  def _testList(self, module_name):
     xpn_types = self.messages.XpnResourceId.TypeValueValuesEnum
     self.apitools_client.projects.GetXpnResources.Expect(
         self.messages.ComputeProjectsGetXpnResourcesRequest(project='foo'),
@@ -59,7 +52,7 @@ class ListTest(xpn_test_base.XpnApitoolsTestBase):
                     type=xpn_types.XPN_RESOURCE_TYPE_UNSPECIFIED),
             ]))
 
-    self.Run('compute {} associated-projects list foo'.format(module_name))
+    self.Run('compute shared-vpc associated-projects list foo')
 
     self.AssertOutputEquals("""\
         RESOURCE_ID            RESOURCE_TYPE

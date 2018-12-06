@@ -9,14 +9,15 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        Add an IAM policy binding to a Cloud Spanner instance.
+        Add IAM policy binding to a Cloud Spanner instance.
 
      create
         Create a Cloud Spanner instance.
@@ -34,7 +35,7 @@ COMMANDS
         List the Cloud Spanner instances in this project.
 
      remove-iam-policy-binding
-        Remove an IAM policy binding from a Cloud Spanner instance.
+        Remove IAM policy binding of a Cloud Spanner instance.
 
      set-iam-policy
         Set the IAM policy for a Cloud Spanner instance.

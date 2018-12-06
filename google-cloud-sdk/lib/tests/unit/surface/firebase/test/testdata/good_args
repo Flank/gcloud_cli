@@ -32,6 +32,8 @@ ios-group:
   results-dir: my/ios/results
   results-history-name: history2
   timeout: 25m
+  xctestrun-file: .xctestrun2
+  xcode-version: 9.1.1
 
 ios-xctest:
   type: xctest

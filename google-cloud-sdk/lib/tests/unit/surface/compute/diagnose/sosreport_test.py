@@ -15,12 +15,14 @@
 """Tests for compute diagnose sosreport command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
+from __future__ import unicode_literals
 
 import os
 
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.util.ssh import ssh
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -79,7 +81,7 @@ class SosReportTest(test_base.BaseSSHTest, test_case.WithInput):
   ###################################
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
     self.make_requests.side_effect = iter([
         [INSTANCE],

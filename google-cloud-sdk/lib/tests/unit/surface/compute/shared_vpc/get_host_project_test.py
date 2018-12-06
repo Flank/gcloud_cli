@@ -18,15 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
-from tests.lib.surface.compute import xpn_test_base
+from tests.lib.surface.compute import shared_vpc_test_base
 
 
-@parameterized.parameters(
-    base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
-class GetHostProjectTest(xpn_test_base.XpnTestBase):
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class GetHostProjectTest(shared_vpc_test_base.SharedVpcTestBase):
 
   def testGetHostProject_NoProject(self, track):
     self._SetUp(track)
@@ -37,13 +39,6 @@ class GetHostProjectTest(xpn_test_base.XpnTestBase):
 
   def testGetHostProject(self, track):
     self._SetUp(track)
-    self._testGetHostProject('shared-vpc')
-
-  def testGetHostProject_xpn(self, track):
-    self._SetUp(track)
-    self._testGetHostProject('xpn')
-
-  def _testGetHostProject(self, module_name):
     project_status_enum = self.messages.Project.XpnProjectStatusValueValuesEnum
     project = self.messages.Project(
         name='xpn-host',
@@ -53,7 +48,7 @@ class GetHostProjectTest(xpn_test_base.XpnTestBase):
     )
     self.xpn_client.GetHostProject.return_value = project
 
-    self.Run('compute {} get-host-project foo'.format(module_name))
+    self.Run('compute shared-vpc get-host-project foo')
 
     self.AssertOutputEquals("""\
         creationTimestamp: '2013-09-06T17:54:10.636-07:00'

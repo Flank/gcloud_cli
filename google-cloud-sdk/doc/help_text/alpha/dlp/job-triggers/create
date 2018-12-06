@@ -3,13 +3,13 @@ NAME
 
 SYNOPSIS
     gcloud alpha dlp job-triggers create JOB_TRIGGER
-        --info-types=[INFOTYPE,...] --trigger-schedule=TRIGGER_SCHEDULE
+        --trigger-schedule=TRIGGER_SCHEDULE
         (--datastore-kind=DATASTORE_KIND | --input-table=INPUT_TABLE
           | --path=PATH)
-        (--output-tables=[OUTPUT_TABLES,...]
+        (--output-table=[OUTPUT_TABLE,...]
           | --output-topics=[OUTPUT_TOPICS,...]) [--description=DESCRIPTION]
         [--display-name=DISPLAY_NAME] [--exclude-info-types] [--include-quote]
-        [--max-findings=MAX_FINDINGS; default=1000]
+        [--info-types=[INFOTYPE,...]] [--max-findings=MAX_FINDINGS]
         [--max-findings-per-item=MAX_FINDINGS_PER_ITEM]
         [--min-likelihood=MIN_LIKELIHOOD; default="possible"]
         [GCLOUD_WIDE_FLAG ...]
@@ -24,21 +24,15 @@ POSITIONAL ARGUMENTS
      The maximum length is 100 characters. If not supplied, the system
      generates one. This represents a Cloud resource. (NOTE) Some attributes
      are not given arguments in this group but can be set in other ways. To set
-     the [project] attribute: provide the flag [job_trigger] on the command
-     line with a fully specified name; provide the flag [--project] on the
+     the [project] attribute: provide the argument [job_trigger] on the command
+     line with a fully specified name; provide the argument [--project] on the
      command line; set the property [core/project]. This must be specified.
 
        JOB_TRIGGER
-          The ID of the job_trigger or a fully qualified identifier for the
+          ID of the job_trigger or fully qualified identifier for the
           job_trigger.
 
 REQUIRED FLAGS
-     --info-types=[INFOTYPE,...]
-        Which infoTypes to scan input for. The values must correspond to
-        infoType values found in documentation. For more information about
-        valid infoTypes, see infoTypes Reference
-        (https://cloud.google.com/dlp/docs/infotypes-reference)
-
      --trigger-schedule=TRIGGER_SCHEDULE
         Duration specifying how often the triggered job will be run. A
         scheduled start time will be skipped if the previous execution has not
@@ -65,12 +59,10 @@ REQUIRED FLAGS
 
      Exactly one of these must be specified:
 
-       --output-tables=[OUTPUT_TABLES,...]
-          Publishes results of a Cloud DLP job to one or more BigQuery tables.
-
-          BigQuery tables are uniquely identified by their project_id,
-          dataset_id, and table_id in the format
-          <project_id>.<dataset_id>.<table_id>.
+       --output-table=[OUTPUT_TABLE,...]
+          Publishes results of a Cloud DLP job a BigQuery table. BigQuery
+          tables are uniquely identified by their project_id, dataset_id, and
+          table_id in the format <project_id>.<dataset_id>.<table_id>.
 
        --output-topics=[OUTPUT_TOPICS,...]
           Publishes the results of a Cloud DLP job to one or more Cloud Pub/Sub
@@ -95,11 +87,16 @@ OPTIONAL FLAGS
         all but the initial character in each filtered word with asterisks,
         e.g. "f**".
 
-     --max-findings=MAX_FINDINGS; default=1000
+     --info-types=[INFOTYPE,...]
+        Which infoTypes to scan input for. The values must correspond to
+        infoType values found in documentation. For more information about
+        valid infoTypes, see infoTypes Reference
+        (https://cloud.google.com/dlp/docs/infotypes-reference)
+
+     --max-findings=MAX_FINDINGS
         Maximum number of findings that will be returned per execution.
 
-        If not specified, will return up to the system maximum of 1000
-        findings.
+        If not specified, no limits are applied.
 
      --max-findings-per-item=MAX_FINDINGS_PER_ITEM
         Maximum number of findings that will be returned for each item scanned.
@@ -112,8 +109,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
     This command uses the dlp/v2 API. The full documentation for this API can

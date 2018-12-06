@@ -8,10 +8,13 @@ SYNOPSIS
         [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
         [--enable-autoupgrade] [--image-type=IMAGE_TYPE]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
-        [--max-pods-per-node=MAX_PODS_PER_NODE] [--min-cpu-platform=PLATFORM]
-        [--node-labels=[NODE_LABEL,...]] [--node-taints=[NODE_TAINT,...]]
-        [--node-version=NODE_VERSION] [--num-nodes=NUM_NODES; default=3]
-        [--preemptible] [--tags=TAG,[TAG,...]]
+        [--max-pods-per-node=MAX_PODS_PER_NODE]
+        [--metadata=KEY=VALUE,[KEY=VALUE,...]]
+        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
+        [--min-cpu-platform=PLATFORM] [--node-labels=[NODE_LABEL,...]]
+        [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
+        [--num-nodes=NUM_NODES; default=3] [--preemptible]
+        [--tags=TAG,[TAG,...]]
         [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--local-ssd-count=LOCAL_SSD_COUNT
@@ -49,7 +52,7 @@ FLAGS
         container/cluster property value for this command invocation.
 
      --disk-size=DISK_SIZE
-        Size in GB for node VM boot disks. Defaults to 100GB.
+        Size for node VM boot disks. Defaults to 100GB.
 
      --disk-type=DISK_TYPE
         Type of the node VM boot disk. Defaults to pd-standard. DISK_TYPE must
@@ -62,7 +65,7 @@ FLAGS
                 --cluster=example-cluster --enable-autorepair
 
         Node autorepair is enabled by default for node pools using COS as a
-        base image.
+        base image, use --no-enable-autorepair to disable.
 
         See
         https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
@@ -98,11 +101,11 @@ FLAGS
             $ gcloud compute machine-types list
 
         You can also specify custom machine types with the string
-        "custom-CPUS-RAM" where ``CPUS`` is the number of virtual CPUs and
-        ``RAM`` is the amount of RAM in MiB.
+        "custom-CPUS-RAM" where CPUS is the number of virtual CPUs and RAM is
+        the amount of RAM in MiB.
 
         For example, to create a node pool using custom machines with 2 vCPUs
-        and 12 GiB of RAM:
+        and 12 GB of RAM:
 
             $ gcloud alpha container node-pools create high-mem-pool \
                 --machine-type=custom-2-12288
@@ -116,12 +119,49 @@ FLAGS
 
         Must be used in conjunction with '--enable-ip-alias'.
 
+     --metadata=KEY=VALUE,[KEY=VALUE,...]
+        Compute Engine metadata to be made available to the guest operating
+        system running on nodes within the node pool.
+
+        Each metadata entry is a key/value pair separated by an equals sign.
+        Metadata keys must be unique and less than 128 bytes in length. Values
+        must be less than or equal to 32,768 bytes in length. The total size of
+        all keys and values must be less than 512 KB. Multiple arguments can be
+        passed to this flag. For example:
+
+        --metadata key-1=value-1,key-2=value-2,key-3=value-3
+
+        Additionally, the following keys are reserved for use by Kubernetes
+        Engine:
+
+        * cluster-location
+        * cluster-name
+        * cluster-uid
+        * configure-sh
+        * enable-os-login
+        * gci-update-strategy
+        * gci-ensure-gke-docker
+        * instance-template
+        * kube-env
+        * startup-script
+        * user-data
+
+    See also Compute Engine's documentation
+    (https://cloud.google.com/compute/docs/storing-retrieving-metadata) on
+    storing and retrieving instance metadata.
+
+     --metadata-from-file=KEY=LOCAL_FILE_PATH,[...]
+        Same as --metadata except that the value for the entry will be read
+        from a local file.
+
      --min-cpu-platform=PLATFORM
         When specified, the nodes for the new node pool will be scheduled on
         host with specified CPU architecture or a newer one.
 
-        Examples: $ gcloud alpha container node-pools create node-pool-1 \
-        --cluster=example-cluster --min-cpu-platform=PLATFORM
+        Examples:
+
+            $ gcloud alpha container node-pools create node-pool-1 \
+                --cluster=example-cluster --min-cpu-platform=PLATFORM
 
         To list available CPU platforms in given zone, run:
 
@@ -322,12 +362,13 @@ FLAGS
          --scopes=[SCOPE,...]; default="gke-default"
             Specifies scopes for the node instances. Examples:
 
-            $ gcloud alpha container node-pools create node-pool-1 \
-            --cluster=example-cluster \
-            --scopes=https://www.googleapis.com/auth/devstorage.read_only
+                $ gcloud alpha container node-pools create node-pool-1 \
+                    --cluster=example-cluster \
+                    --scopes=https://www.googleapis.com/auth/devstorage.read_only
 
-            $ gcloud alpha container node-pools create node-pool-1 \
-            --cluster=example-cluster \ --scopes=bigquery,storage-rw,compute-ro
+                $ gcloud alpha container node-pools create node-pool-1 \
+                    --cluster=example-cluster \
+                    --scopes=bigquery,storage-rw,compute-ro
 
             Multiple SCOPEs can be specified, separated by commas.
             logging-write and/or monitoring are added unless Cloud Logging
@@ -344,55 +385,56 @@ FLAGS
             service-management are all included in the default scopes. In a
             future release, this will be the default behavior.
 
-            SCOPE can be either the full URI of the scope or an alias.
-            Available aliases are:
+            SCOPE can be either the full URI of the scope or an alias. default
+            scopes are assigned to all instances. Available aliases are:
 
-              Alias                 URI
-              bigquery              https://www.googleapis.com/auth/bigquery
-              cloud-platform        https://www.googleapis.com/auth/cloud-platform
-              cloud-source-repos    https://www.googleapis.com/auth/source.full_control
-              cloud-source-repos-ro https://www.googleapis.com/auth/source.read_only
-              compute-ro            https://www.googleapis.com/auth/compute.readonly
-              compute-rw            https://www.googleapis.com/auth/compute
-              datastore             https://www.googleapis.com/auth/datastore
-              default               https://www.googleapis.com/auth/devstorage.read_only
-                                    https://www.googleapis.com/auth/logging.write
-                                    https://www.googleapis.com/auth/monitoring.write
-                                    https://www.googleapis.com/auth/pubsub
-                                    https://www.googleapis.com/auth/service.management.readonly
-                                    https://www.googleapis.com/auth/servicecontrol
-                                    https://www.googleapis.com/auth/trace.append
-              gke-default           https://www.googleapis.com/auth/devstorage.read_only
-                                    https://www.googleapis.com/auth/logging.write
-                                    https://www.googleapis.com/auth/monitoring
-                                    https://www.googleapis.com/auth/service.management.readonly
-                                    https://www.googleapis.com/auth/servicecontrol
-                                    https://www.googleapis.com/auth/trace.append
-              logging-write         https://www.googleapis.com/auth/logging.write
-              monitoring            https://www.googleapis.com/auth/monitoring
-              monitoring-write      https://www.googleapis.com/auth/monitoring.write
-              pubsub                https://www.googleapis.com/auth/pubsub
-              service-control       https://www.googleapis.com/auth/servicecontrol
-              service-management    https://www.googleapis.com/auth/service.management.readonly
-              sql                   https://www.googleapis.com/auth/sqlservice
-              sql-admin             https://www.googleapis.com/auth/sqlservice.admin
-              storage-full          https://www.googleapis.com/auth/devstorage.full_control
-              storage-ro            https://www.googleapis.com/auth/devstorage.read_only
-              storage-rw            https://www.googleapis.com/auth/devstorage.read_write
-              taskqueue             https://www.googleapis.com/auth/taskqueue
-              trace                 https://www.googleapis.com/auth/trace.append
-              userinfo-email        https://www.googleapis.com/auth/userinfo.email
+              Alias                  URI
+              bigquery               https://www.googleapis.com/auth/bigquery
+              cloud-platform         https://www.googleapis.com/auth/cloud-platform
+              cloud-source-repos     https://www.googleapis.com/auth/source.full_control
+              cloud-source-repos-ro  https://www.googleapis.com/auth/source.read_only
+              compute-ro             https://www.googleapis.com/auth/compute.readonly
+              compute-rw             https://www.googleapis.com/auth/compute
+              datastore              https://www.googleapis.com/auth/datastore
+              default                https://www.googleapis.com/auth/devstorage.read_only
+                                     https://www.googleapis.com/auth/logging.write
+                                     https://www.googleapis.com/auth/monitoring.write
+                                     https://www.googleapis.com/auth/pubsub
+                                     https://www.googleapis.com/auth/service.management.readonly
+                                     https://www.googleapis.com/auth/servicecontrol
+                                     https://www.googleapis.com/auth/trace.append
+              gke-default            https://www.googleapis.com/auth/devstorage.read_only
+                                     https://www.googleapis.com/auth/logging.write
+                                     https://www.googleapis.com/auth/monitoring
+                                     https://www.googleapis.com/auth/service.management.readonly
+                                     https://www.googleapis.com/auth/servicecontrol
+                                     https://www.googleapis.com/auth/trace.append
+              logging-write          https://www.googleapis.com/auth/logging.write
+              monitoring             https://www.googleapis.com/auth/monitoring
+              monitoring-write       https://www.googleapis.com/auth/monitoring.write
+              pubsub                 https://www.googleapis.com/auth/pubsub
+              service-control        https://www.googleapis.com/auth/servicecontrol
+              service-management     https://www.googleapis.com/auth/service.management.readonly
+              sql (deprecated)       https://www.googleapis.com/auth/sqlservice
+              sql-admin              https://www.googleapis.com/auth/sqlservice.admin
+              storage-full           https://www.googleapis.com/auth/devstorage.full_control
+              storage-ro             https://www.googleapis.com/auth/devstorage.read_only
+              storage-rw             https://www.googleapis.com/auth/devstorage.read_write
+              taskqueue              https://www.googleapis.com/auth/taskqueue
+              trace                  https://www.googleapis.com/auth/trace.append
+              userinfo-email         https://www.googleapis.com/auth/userinfo.email
 
-            DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice'
+            DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice
             account scope and sql alias do not provide SQL instance management
             capabilities and have been deprecated. Please, use
-            'https://www.googleapis.com/auth/sqlservice.admin' or sql-admin to
+            https://www.googleapis.com/auth/sqlservice.admin or sql-admin to
             manage your Google SQL Service instances.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To create a new node pool "node-pool-1" with the default options in the

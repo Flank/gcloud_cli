@@ -18,10 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import io
 import json
 import logging
 import os
-import StringIO
 import textwrap
 
 from gae_ext_runtime import ext_runtime
@@ -110,6 +110,7 @@ class TestBase(sdk_test_base.SdkBase):
     self.log_print_patch.stop()
 
 
+@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
 class GetRuntimeDefDirTest(sdk_test_base.SdkBase):
 
   def SetUp(self):
@@ -130,6 +131,7 @@ class GetRuntimeDefDirTest(sdk_test_base.SdkBase):
       ext_runtime_adapter._GetRuntimeDefDir()
 
 
+@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
 class LowLevelTests(TestBase):
 
   def SetUp(self):
@@ -149,7 +151,7 @@ class LowLevelTests(TestBase):
     # Verify that we get the default value when issue query_user while running
     # non-interactively.
     self.can_prompt = False
-    result = StringIO.StringIO()
+    result = io.BytesIO()
     self.rt._ProcessMessage(result,
                             {'type': 'query_user', 'prompt': 'hi user',
                              'default': 'my default value'}, None, None, None)
@@ -160,7 +162,7 @@ class LowLevelTests(TestBase):
     # Verify that we get an error when we issue query_user with no default
     # while running interactively.
     self.can_prompt = False
-    result = StringIO.StringIO()
+    result = io.BytesIO()
     self.rt._ProcessMessage(result,
                             {'type': 'query_user', 'prompt': 'hi user'},
                             None, None, None)
@@ -169,6 +171,7 @@ class LowLevelTests(TestBase):
                        ext_runtime._NO_DEFAULT_ERROR.format('hi user'))])
 
 
+@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
 class CommunicationTests(TestBase):
 
   # pylint:disable=unused-argument
@@ -207,6 +210,7 @@ class CommunicationTests(TestBase):
                    ext_runtime.Params())
 
 
+@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
 class PluginTests(TestBase):
 
   def testDetect(self):

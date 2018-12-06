@@ -17,12 +17,14 @@
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 from __future__ import unicode_literals
 
 import abc
 import re
 import sys
 
+from googlecloudsdk.core import yaml
 from googlecloudsdk.core.resource import resource_transform
 from tests.lib.scenario import updates
 
@@ -43,7 +45,7 @@ class Error(Exception):
     self.failures = failures
 
 
-def _FormatLocation(location):
+def FormatLocation(location):
   line, col = location
   return '[Line: {line}, Col: {col}]'.format(line=line, col=col)
 
@@ -101,8 +103,8 @@ class Failure(object):
         '{title} - {location} - [Field: {section}{field}]{msg}'
         .format(
             title=title,
-            location=_FormatLocation(update_context.Location()),
-            section=(section + '.') if section else '',
+            location=FormatLocation(update_context.Location()),
+            section=(str(section) + '.') if section else '',
             field=update_context.Field(),
             msg=(' - ' + msg) if msg else ''))
 
@@ -110,6 +112,8 @@ class Failure(object):
   def _FormatValue(cls, value):
     if value is None:
       return 'None'
+    if value is MISSING_VALUE:
+      return 'No Assertion'
     return '<<<{}>>>'.format(value)
 
   def __init__(self, update_context, actual, msg='', details=None):
@@ -165,7 +169,7 @@ class FailureCollector(object):
           '\n\n▶▶ Processing updates for spec: {}\n'
           '  ▶▶ For action: {}\n\n'.format(
               self._spec_name,
-              _FormatLocation(self._action_location)))
+              FormatLocation(self._action_location)))
     unhandled = []
     for f in self._failures:
       if f.Update(self._update_modes):
@@ -190,6 +194,36 @@ class Assertion(six.with_metaclass(abc.ABCMeta, object)):
 
   ABSENT = object()
 
+  @classmethod
+  def ForComplex(cls, value):
+    """Generates the correct type of assertion for the given assertion value.
+
+    If value is just a string, it will default to Equals. Otherwise, it expects
+    value to be a dictionary with one of [equals, matches, is_none, in] and
+    the corresponding value will be the assertion value.
+
+    Args:
+      value: The assertion value.
+
+    Raises:
+      ValueError: If the given value cannot be converted to an assertion.
+
+    Returns:
+      Assertion, The correct assertion type.
+    """
+    if not yaml.dict_like(value):
+      return EqualsAssertion(value)
+    elif 'equals' in value:
+      return EqualsAssertion(value['equals'])
+    elif 'matches' in value:
+      return MatchesAssertion(value['matches'])
+    elif 'is_none' in value:
+      return IsNoneAssertion(value['is_none'])
+    elif 'in' in value:
+      return InAssertion(value['in'])
+    # This should never happen for things that pass schema validation.
+    raise ValueError('Assertion type is invalid.')
+
   @abc.abstractmethod
   def Check(self, context, value):
     """Check the assertion against an actual value.
@@ -205,6 +239,18 @@ class Assertion(six.with_metaclass(abc.ABCMeta, object)):
     """
     return []
 
+  def ValueRepr(self):
+    """Gets a string representing the value the assertion expects.
+
+    This should only ever be used for informational purposes / error messages /
+    debugging, because it might not be possible to fully represent the
+    expectation as a simple string.
+
+    Returns:
+      str, The representation of the expected value.
+    """
+    return '!!! Unknown Assertion Value Representation !!!'
+
 
 class EqualsAssertion(Assertion):
   """Asserts that a scalar equals a specific value."""
@@ -214,8 +260,14 @@ class EqualsAssertion(Assertion):
 
   def Check(self, context, value):
     if self._value != value:
-      return [Failure.ForScalar(context, self._value, value)]
+      return [Failure.ForScalar(context, self.ValueRepr(), value)]
     return []
+
+  def __str__(self):
+    return 'Equals Assertion: [{}]'.format(self._value)
+
+  def ValueRepr(self):
+    return self._value
 
 
 class MatchesAssertion(Assertion):
@@ -228,8 +280,11 @@ class MatchesAssertion(Assertion):
 
   def Check(self, context, value):
     if not value or not re.match(self._regex, value, flags=re.DOTALL):
-      return [Failure.ForScalar(context, self._regex, value)]
+      return [Failure.ForScalar(context, self.ValueRepr(), value)]
     return []
+
+  def ValueRepr(self):
+    return self._regex
 
 
 class IsNoneAssertion(Assertion):
@@ -240,9 +295,11 @@ class IsNoneAssertion(Assertion):
 
   def Check(self, context, value):
     if (value is None) != self._is_none:
-      return [Failure.ForScalar(
-          context, 'Is None: {}'.format(self._is_none), value)]
+      return [Failure.ForScalar(context, self.ValueRepr(), value)]
     return []
+
+  def ValueRepr(self):
+    return 'Is None: {}'.format(self._is_none)
 
 
 class InAssertion(Assertion):
@@ -256,8 +313,11 @@ class InAssertion(Assertion):
       if i == value:
         break
     else:
-      return [Failure.ForScalar(context, 'In: {}'.format(self._items), value)]
+      return [Failure.ForScalar(context, self.ValueRepr(), value)]
     return []
+
+  def ValueRepr(self):
+    return 'In: {}'.format(self._items)
 
 
 class DictAssertion(Assertion):
@@ -331,53 +391,42 @@ class JsonAssertion(Assertion):
   def _CheckNode(self, context, field, node, expected):
     # TODO(b/78588819): There is a lot of duplication in here. Needs to be
     # completely refactored.
-    if isinstance(expected, dict):
+    if yaml.dict_like(expected):
       return self._CheckDictValue(context, field, node, expected)
-    elif isinstance(expected, list):
+    elif yaml.list_like(expected):
       return self._CheckListValue(context, field, node, expected)
-    elif isinstance(expected, six.string_types):
-      return self._CheckScalarValue(context, field, node, expected)
-    else:  # If not list or Scalar or Dict, do absolute comparison
+    else:  # If not a list or Dict, do absolute comparison of the scalar value.
       if node != expected:
         return [Failure.ForDict(context, field, expected, node,
                                 key_as_path=False)]
       return []
 
-  def _CheckScalarValue(self, context, field, actual, expected):
-    """Validate actual scalar value against expected."""
-    if not isinstance(actual, six.string_types):
-      return [Failure.ForDict(context, field, 'type(string)', actual,
-                              msg='Expected type(string).',
-                              key_as_path=False)]
-    if not re.match(expected, actual):
-      return [Failure.ForDict(context, field, expected, actual,
-                              key_as_path=False)]
-    return []
-
   def _CheckListValue(self, context, field, actual, expected):
     """Validate actual list value against expected."""
-    if not isinstance(actual, list):
-      return [Failure.ForDict(context, field, 'type(list)', actual,
+    if not yaml.list_like(actual):
+      return [Failure.ForDict(context, field, expected, actual,
                               msg='Expected type(list).',
                               key_as_path=False)]
     if len(expected) != len(actual):
-      return [Failure.ForDict(context, field, len(expected), len(actual),
+      return [Failure.ForDict(context, field, expected, actual,
                               msg='List are different sizes.',
                               key_as_path=False)]
     failures = []
+    context = context.ForKey(field, key_as_path=False)
     for x, item in enumerate(expected):
-      failures.extend(self._CheckNode(context, field, actual[x], item))
+      failures.extend(self._CheckNode(context, x, actual[x], item))
     return failures
 
   def _CheckDictValue(self, context, field, actual, expected):
     """Validate actual dict value against expected."""
-    if not isinstance(actual, dict):
-      return [Failure.ForDict(context, field, 'type(dict)', actual,
+    if not yaml.dict_like(actual):
+      return [Failure.ForDict(context, field, expected, actual,
                               msg='Expected type(dict).',
                               key_as_path=False)]
     failures = []
+    context = context.ForKey(field, key_as_path=False)
     for key, value in six.iteritems(expected):
-      failures.extend(self._CheckNode(context, field, actual.get(key), value))
+      failures.extend(self._CheckNode(context, key, actual.get(key), value))
     return failures
 
   def _GetJsonValueForKey(self, json_object, key_path):

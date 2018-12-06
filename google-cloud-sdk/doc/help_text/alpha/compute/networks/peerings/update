@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha compute networks peerings update - update a Google Compute
+        Engine network peering
+
+SYNOPSIS
+    gcloud alpha compute networks peerings update NAME --network=NETWORK
+        [--export-custom-routes] [--import-custom-routes]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Update a Google Compute Engine network peering.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the peering.
+
+REQUIRED FLAGS
+     --network=NETWORK
+        The name of the network in the current project to be peered with the
+        peer network.
+
+OPTIONAL FLAGS
+     --export-custom-routes
+        If set, the network will export custom routes to peer network. Use
+        --no-export-custom-routes to disable it.
+
+     --import-custom-routes
+        If set, the network will import custom routes from peer network. Use
+        --no-import-custom-routes to disable it.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

@@ -14,6 +14,8 @@
 # limitations under the License.
 
 """General console printing utilities used by the Cloud SDK."""
+# TODO(b/71388306): Unskip pytype on this file.
+# pytype: skip-file
 
 from __future__ import absolute_import
 from __future__ import division
@@ -340,7 +342,11 @@ def PromptResponse(message=None, choices=None):
     return None
   if choices and IsInteractive(error=True):
     return prompt_completer.PromptCompleter(message, choices=choices).Input()
-  sys.stderr.write(_DoWrap(message))
+  if (properties.VALUES.core.interactive_ux_style.Get() ==
+      properties.VALUES.core.InteractiveUXStyles.TESTING.name):
+    sys.stderr.write(JsonUXStub(UXElementType.PROMPT_RESPONSE, message=message))
+  else:
+    sys.stderr.write(_DoWrap(message))
   return _GetInput()
 
 
@@ -931,14 +937,16 @@ def More(contents, out=None, prompt=None, check_pager=True):
           pager = command
           break
     if pager:
-      less = encoding.GetEncodedValue(os.environ, 'LESS', None)
-      if less is None:
-        encoding.SetEncodedValue(os.environ, 'LESS', '-R')
+      # If the pager is less(1) then instruct it to display raw ANSI escape
+      # sequences to enable colors and font embellishments.
+      less_orig = encoding.GetEncodedValue(os.environ, 'LESS', None)
+      less = '-R' + (less_orig or '')
+      encoding.SetEncodedValue(os.environ, 'LESS', less)
       p = subprocess.Popen(pager, stdin=subprocess.PIPE, shell=True)
       enc = console_attr.GetConsoleAttr().GetEncoding()
       p.communicate(input=contents.encode(enc))
       p.wait()
-      if less is None:
+      if less_orig is None:
         encoding.SetEncodedValue(os.environ, 'LESS', None)
       return
   # Fall back to the internal pager.
@@ -984,13 +992,19 @@ def JsonUXStub(ux_type, **kwargs):
 
 class UXElementType(enum.Enum):
   """Describes the type of a ux element."""
-  PROGRESS_BAR = (['message'])
-  PROGRESS_TRACKER = (['message', 'aborted_message', 'status'])
-  PROMPT_CONTINUE = (['message', 'prompt_string', 'cancel_string'])
-  PROMPT_RESPONSE = (['choices'])
-  PROMPT_CHOICE = (['message', 'prompt_string', 'choices'])
+  PROGRESS_BAR = (0, 'message')
+  PROGRESS_TRACKER = (1, 'message', 'aborted_message', 'status')
+  STAGED_PROGRESS_TRACKER = (2, 'message', 'status',
+                             'succeeded_stages', 'failed_stage')
+  PROMPT_CONTINUE = (3, 'message', 'prompt_string', 'cancel_string')
+  PROMPT_RESPONSE = (4, 'message')
+  PROMPT_CHOICE = (5, 'message', 'prompt_string', 'choices')
 
-  def __init__(self, data_fields):
+  def __init__(self, ordinal, *data_fields):
+    # We need to pass in something unique here because if two event types
+    # happen to have the same attributes, the Enum class interprets them to be
+    # the same and sets one value as an alias of the other.
+    del ordinal
     self._data_fields = data_fields
 
   def GetDataFields(self):

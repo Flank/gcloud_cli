@@ -24,9 +24,9 @@ gcloud beta pubsub subscriptions \- manage Cloud Pubsub subscriptions
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -41,7 +41,7 @@ help\fR for details.
 
 .TP 2m
 \fBadd\-iam\-policy\-binding\fR
-\fB(BETA)\fR Add IAM policy binding for a subscription.
+\fB(BETA)\fR Add IAM policy binding to a subscription.
 
 .TP 2m
 \fBcreate\fR
@@ -82,11 +82,20 @@ Pub/Sub message.
 
 .TP 2m
 \fBremove\-iam\-policy\-binding\fR
-\fB(BETA)\fR Remove IAM policy binding for a subscription.
+\fB(BETA)\fR Remove IAM policy binding of a subscription.
+
+.TP 2m
+\fBseek\fR
+\fB(BETA)\fR Resets a subscription's backlog to a point in time or to a given
+snapshot.
 
 .TP 2m
 \fBset\-iam\-policy\fR
 \fB(BETA)\fR Set IAM policy for a subscription.
+
+.TP 2m
+\fBupdate\fR
+\fB(BETA)\fR Updates an existing Cloud Pub/Sub subscription.
 
 
 .RE

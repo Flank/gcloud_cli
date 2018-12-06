@@ -11,7 +11,7 @@ gcloud beta tasks queues create\-app\-engine\-queue \- create an App Engine queu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta tasks queues create\-app\-engine\-queue\fR \fIQUEUE\fR [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta tasks queues create\-app\-engine\-queue\fR \fIQUEUE\fR [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR] [\fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,10 +53,14 @@ The maximum amount of time to wait before retrying a task after it fails. Must
 be a string that ends in 's', such as "5s".
 
 .TP 2m
-\fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR
+\fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR
 The maximum number of concurrent tasks that Cloud Tasks allows to be dispatched
 for this queue. After this threshold has been reached, Cloud Tasks stops
 dispatching tasks until the number of outstanding requests decreases.
+
+.TP 2m
+\fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR
+The maximum rate at which tasks are dispatched from this queue.
 
 .TP 2m
 \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR
@@ -83,10 +87,6 @@ task will be deleted.
 Must be a string that ends in 's', such as "5s".
 
 .TP 2m
-\fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR
-The maximum rate at which tasks are dispatched from this queue.
-
-.TP 2m
 \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR
 The minimum amount of time to wait before retrying a task after it fails. Must
 be a string that ends in 's', such as "5s".
@@ -106,9 +106,9 @@ use the default.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

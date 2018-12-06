@@ -11,7 +11,7 @@ gcloud markdown \- markdown group docstring index
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud markdown\fR \fICOMMAND\fR [\fB\-\-optional\-flag\fR\ \fIOPTIONAL_FLAG\fR] \fB\-\-required\-flag\fR \fIREQUIRED_FLAG\fR [\fIGLOBAL\-FLAG\ ...\fR]
+\f5gcloud markdown\fR \fICOMMAND\fR [\fB\-\-optional\-flag\fR\ \fIOPTIONAL_FLAG\fR] \fB\-\-required\-flag\fR \fIREQUIRED_FLAG\fR [\fIGCLOUD\-WIDE\-FLAG\ ...\fR]
 
 
 .SH "DESCRIPTION"
@@ -48,17 +48,17 @@ Last sub\-item for now.
 .RE
 .sp
 
-Did the end of list work? Also, format="csv" tables are recognized:
+Did the end of list work? Also, tables are recognized:
 
 
 .TS
-tab(,);
-lB lB
-l l.
-Alias,Project,Image Name
-a1a1a,p1p1p,i1ii1
-a222,p2,i22222i2222
-a3aaaa3a3a3,p3p3pp3p,iii3i3i
+tab(	);
+lB lB lB
+l l l.
+Alias	Project	Image Name
+a1a1a	p1p1p	i1ii1
+a222	p2	i22222i2222
+a3aaaa3a3a3	p3p3pp3p	iii3i3i
 .TE
 
 Did the end of table work?
@@ -147,7 +147,7 @@ Required flag.
 .RE
 .sp
 
-.SH "GLOBAL FLAGS"
+.SH "GCLOUD WIDE FLAGS"
 
 Run \fB$ gcloud help\fR for a description of flags available to all commands.
 

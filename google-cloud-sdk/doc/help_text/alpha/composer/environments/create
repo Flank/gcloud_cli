@@ -1,0 +1,162 @@
+NAME
+    gcloud alpha composer environments create - create and initialize a Cloud
+        Composer environment
+
+SYNOPSIS
+    gcloud alpha composer environments create
+        (ENVIRONMENT : --location=LOCATION) [--airflow-configs=[KEY=VALUE,...]]
+        [--async] [--disk-size=DISK_SIZE; default="100GB"]
+        [--env-variables=[NAME=VALUE,...]] [--labels=[KEY=VALUE,...]]
+        [--machine-type=MACHINE_TYPE] [--node-count=NODE_COUNT]
+        [--oauth-scopes=[SCOPE,...]] [--python-version=PYTHON_VERSION]
+        [--service-account=SERVICE_ACCOUNT] [--tags=[TAG,...]] [--zone=ZONE]
+        [--airflow-version=AIRFLOW_VERSION | --image-version=IMAGE_VERSION]
+        [--network=NETWORK : --subnetwork=SUBNETWORK] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) If run asynchronously with --async, exits after printing an
+    operation that can be used to poll the status of the creation operation
+    via:
+
+        gcloud composer operations describe
+
+POSITIONAL ARGUMENTS
+     Environment resource - The environment to create. The arguments in this
+     group can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument [environment]
+     on the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
+
+       ENVIRONMENT
+          ID of the environment or fully qualified identifier for the
+          environment. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          Compute Engine region in which to create the environment.
+
+FLAGS
+     --airflow-configs=[KEY=VALUE,...]
+        A list of Airflow software configuration override KEY=VALUE pairs to
+        set. For information on how to structure KEYs and VALUEs, run $ gcloud
+        help composer environments update.
+
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --disk-size=DISK_SIZE; default="100GB"
+        The disk size for each VM node in the environment. The minimum size is
+        20GB, and the maximum is 64TB. Specified value must be an integer
+        multiple of gigabytes. Cannot be updated after the environment has been
+        created. If units are not provided, defaults to GB.
+
+     --env-variables=[NAME=VALUE,...]
+        A comma-delimited list of environment variable NAME=VALUE pairs to
+        provide to the Airflow scheduler, worker, and webserver processes. NAME
+        may contain upper and lowercase letters, digits, and underscores, but
+        they may not begin with a digit. To include commas as part of a VALUE,
+        see gcloud topics escaping for information about overriding the
+        delimiter.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --machine-type=MACHINE_TYPE
+        The Compute Engine machine type
+        (https://cloud.google.com/compute/docs/machine-types) to use for nodes.
+        For example --machine-type=n1-standard-1.
+
+     --node-count=NODE_COUNT
+        The number of nodes to create to run the environment.
+
+     --oauth-scopes=[SCOPE,...]
+        The set of Google API scopes to be made available on all of the node
+        VMs. Defaults to ['https://www.googleapis.com/auth/cloud-platform'].
+        Cannot be updated.
+
+     --python-version=PYTHON_VERSION
+        The Python version to be used within the created environment. Supplied
+        value should represent the desired major Python version. Cannot be
+        updated. PYTHON_VERSION must be one of:
+
+         2
+            Created environment will use Python 2
+         3
+            Created environment will use Python 3
+
+     --service-account=SERVICE_ACCOUNT
+        The Google Cloud Platform service account to be used by the node VMs.
+        If a service account is not specified, the "default" Compute Engine
+        service account for the project is used. Cannot be updated.
+
+     --tags=[TAG,...]
+        The set of instance tags applied to all node VMs. Tags are used to
+        identify valid sources or targets for network firewalls. Each tag
+        within the list must comply with RFC 1035. Cannot be updated.
+
+     --zone=ZONE
+        The Compute Engine zone in which the environment will be created. For
+        example --zone=us-central1-a.
+
+     At most one of these may be specified:
+
+       --airflow-version=AIRFLOW_VERSION
+          Version of Airflow to run in the environment.
+
+              Must be of the form `X.Y[.Z]`.
+
+              Cannot be updated.
+
+       --image-version=IMAGE_VERSION
+          Version of the image to run in the environment.
+
+              This encapsulates the versions of both Cloud Composer and Apache
+              Airflow. Must be of the form `composer-A.B.C-airflow-X.Y[.Z]`.
+
+              The Cloud Composer and Airflow versions are semantic versions.
+              `latest` can be provided instead of an explicit Cloud Composer
+              version number indicating that the server will replace `latest`
+              with the current Cloud Composer version. For the Apache Airflow
+              portion, the patch version can be omitted and the current
+              version will be selected. The version numbers that are used will
+              be stored.
+
+              Cannot be updated.
+
+     Virtual Private Cloud networking
+
+       --network=NETWORK
+          The Compute Engine Network to which the environment will be
+          connected. If a 'Custom Subnet Network' is provided, --subnetwork
+          must be specified as well. This flag must be specified if any of the
+          other arguments in this group are specified.
+
+       --subnetwork=SUBNETWORK
+          The Compute Engine subnetwork
+          (https://cloud.google.com/compute/docs/subnetworks) to which the
+          environment will be connected.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud composer environments create
+        $ gcloud beta composer environments create
+

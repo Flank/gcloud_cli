@@ -22,7 +22,7 @@ import textwrap
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import cli_test_base
 from tests.lib import completer_test_base
@@ -87,8 +87,9 @@ class CompletionTest(test_base.BaseTest, completer_test_base.CompleterBase):
                        ['disk-1', 'disk-2', 'disk-3'])
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
-                          (base.ReleaseTrack.BETA, 'beta'))
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                          (calliope_base.ReleaseTrack.BETA, 'beta'))
 class RegionalDisksDescribeTest(sdk_test_base.WithFakeAuth,
                                 cli_test_base.CliTestBase,
                                 parameterized.TestCase):

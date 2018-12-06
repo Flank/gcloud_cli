@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import io
-import os
 import socket
 import uuid
 
@@ -31,8 +29,8 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
-from googlecloudsdk.core.resource import session_capturer
 from googlecloudsdk.core.util import platforms
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import httplib2
@@ -52,7 +50,8 @@ class _UncopyableObject(object):
     return self.__copy__()
 
 
-class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
+class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture,
+               parameterized.TestCase):
 
   def SetUp(self):
     self.old_version = config.CLOUD_SDK_VERSION
@@ -124,6 +123,31 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
         '10.0.0', cmd_path, uuid_mock.return_value.hex, python_version, False)
     request_mock.assert_called_once_with(
         url, headers={b'user-agent': expect_user_agent})
+
+  @parameterized.parameters(('USER-AGENT', b'my.user.agent'),
+                            ('user-agent', b'my.user.agent'),
+                            ('User-Agent', b'my.user.agent'))
+  def testUserAgent_AllSpellings(self, ua_header, ua_value):
+    request_mock = self.StartObjectPatch(httplib2.Http, 'request')
+    uuid_mock = self.StartObjectPatch(uuid, 'uuid4')
+    uuid_mock.return_value = uuid.UUID('12345678123456781234567812345678')
+    is_interactive_mock = self.StartObjectPatch(console_io, 'IsInteractive')
+    is_interactive_mock.return_value = False
+    python_version = '2.7.6'
+    self.StartPatch('platform.python_version').return_value = python_version
+
+    headers = {}
+    http_client = http.Http()
+    url = 'http://foo.com'
+    request_mock.return_value = self.default_response
+    headers[ua_header] = ua_value
+    http_client.request(url, headers=headers, uncopyable=_UncopyableObject())
+    expect_user_agent = ua_value + b' '  + self.UserAgent(
+        '10.0.0', 'None', uuid_mock.return_value.hex, python_version, False)
+
+    request_mock.assert_called_once_with(
+        url, headers={b'user-agent': expect_user_agent}, uncopyable=mock.ANY)
+    request_mock.reset_mock()
 
   def testUserAgent_SpacesInVersion(self):
     # This is similar to what the versions look like for some internal builds
@@ -217,9 +241,6 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     user_agent_header = {b'user-agent': expect_user_agent}
     log_mock = self.StartObjectPatch(log.status, 'Print')
     properties.VALUES.core.log_http.Set(True)
-    capture_session_file = os.path.join(self.CreateTempDir(), 'session.yaml')
-    capturer = session_capturer.SessionCapturer(capture_streams=False)
-    session_capturer.SessionCapturer.capturer = capturer
     http_client = http.Http()
     url = 'http://foo.com'
     time_mock = self.StartPatch('time.time', autospec=True)
@@ -289,18 +310,6 @@ total round trip time (request+response): 4.000 secs
 ---- response end ----
 ----------------------""".format(self._FormatHeaderOutput(request_headers),
                                  self._FormatHeaderOutput(response_headers))
-
-    with io.open(capture_session_file, 'wt') as fp:
-      session_capturer.SessionCapturer.capturer.Print(fp)
-    self.AssertFileExists(capture_session_file)
-    self.AssertFileContains('uri: http://foo.com', capture_session_file)
-    self.AssertFileContains('header1: value1', capture_session_file)
-    self.AssertFileContains('header2: value2', capture_session_file)
-    self.AssertFileContains('req_header1: val1', capture_session_file)
-    self.AssertFileContains('Request Body', capture_session_file)
-    self.AssertFileContains('response content', capture_session_file)
-
-    session_capturer.SessionCapturer.capturer = None
 
     log_mock.assert_has_calls(
         [mock.call(line) for line in expected_output.split('\n')])

@@ -7,8 +7,8 @@ foo:
     g: h
 
 list:
-  - k: l
-  - m: n
+- k: l
+- m: n
 list2:
-  - o: p
-  - q: r
+- o: p
+- q: r

@@ -29,14 +29,15 @@ YAML file.
 
 Model resource \- The model to set the IAM policy for. This represents a Cloud
 resource. (NOTE) Some attributes are not given arguments in this group but can
-be set in other ways. To set the [project] attribute: provide the flag [model]
-on the command line with a fully specified name; provide the flag [\-\-project]
-on the command line; set the property [core/project]. This must be specified.
+be set in other ways. To set the [project] attribute: provide the argument
+[model] on the command line with a fully specified name; provide the argument
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
 
 .RS 2m
 .TP 2m
 \fIMODEL\fR
-The ID of the model or a fully qualified identifier for the model.
+ID of the model or fully qualified identifier for the model.
 
 .RE
 .sp
@@ -55,9 +56,9 @@ or YAML file conforming to the structure of a Policy
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

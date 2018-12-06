@@ -7,6 +7,6 @@ metricDescriptor:
   valueType: DOUBLE
   metricKind: DELTA
   labels:
-    - key: label1
-      valueType: STRING
+  - key: label1
+    valueType: STRING
 valueExtractor: REGEXP_EXTRACT(jsonPayload.request, ".*quantity=(\d+).*")

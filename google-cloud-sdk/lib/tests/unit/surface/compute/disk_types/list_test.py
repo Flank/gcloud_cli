@@ -109,6 +109,7 @@ class AlphaBetaDiskTypesListTest(sdk_test_base.WithFakeAuth,
         ),
     )
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                             calliope_base.ReleaseTrack.BETA)
   def testAggregatedList(self, track):
@@ -140,6 +141,7 @@ class AlphaBetaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd                            10GB-1TB
             """), normalize_space=True)
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                             calliope_base.ReleaseTrack.BETA)
   def testZonalList(self, track):
@@ -172,6 +174,7 @@ class AlphaBetaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd      antactic-south2-b zone  10GB-1TB
             """), normalize_space=True)
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                             calliope_base.ReleaseTrack.BETA)
   def testRegionalList(self, track):
@@ -204,6 +207,7 @@ class AlphaBetaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd                     10GB-1TB
             """), normalize_space=True)
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                             calliope_base.ReleaseTrack.BETA)
   def testNamesFilter(self, track):
@@ -236,6 +240,7 @@ class AlphaBetaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd                     10GB-1TB
             """), normalize_space=True)
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                             calliope_base.ReleaseTrack.BETA)
   def testRegexFilter(self, track):
@@ -268,6 +273,7 @@ class AlphaBetaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd                     10GB-1TB
             """), normalize_space=True)
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                             calliope_base.ReleaseTrack.BETA)
   def testMultiFilter(self, track):

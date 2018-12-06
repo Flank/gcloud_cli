@@ -21,16 +21,15 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.cloudiot import registries as registries_api
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class RegistriesUpdateTest(base.CloudIotRegistryBase):
+class RegistriesUpdateTestGA(base.CloudIotRegistryBase, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _ExpectUpdate(self, registry_name, registry, update_mask):
     self.client.projects_locations_registries.Patch.Expect(
@@ -41,15 +40,13 @@ class RegistriesUpdateTest(base.CloudIotRegistryBase):
         ),
         registry)
 
-  def testUpdate_NoOptions(self, track):
-    self.track = track
+  def testUpdate_NoOptions(self):
     with self.AssertRaisesExceptionMatches(
         registries_api.NoFieldsSpecifiedError,
         'Must specify at least one field to update.'):
       self.Run('iot registries update my-registry --region us-central1')
 
-  def testUpdate_PubSubFullUri(self, track):
-    self.track = track
+  def testUpdate_PubSubFullUri(self):
     registry_name = self._GetRegistryRef(
         self.Project(), 'my-registry').RelativeName()
     event_pubsub_topic_ref = self._CreatePubsubTopic('event-topic')
@@ -75,8 +72,7 @@ class RegistriesUpdateTest(base.CloudIotRegistryBase):
     self.assertEqual(result, registry)
     self.AssertLogContains('Updated registry [my-registry].')
 
-  def testUpdate_AllOptions(self, track):
-    self.track = track
+  def testUpdate_AllOptions(self):
     registry_name = self._GetRegistryRef(
         self.Project(), 'my-registry').RelativeName()
     event_pubsub_topic_name = self._CreatePubsubTopic(
@@ -107,8 +103,7 @@ class RegistriesUpdateTest(base.CloudIotRegistryBase):
     self.assertEqual(result, registry)
     self.AssertLogContains('Updated registry [my-registry].')
 
-  def testUpdate_RelativeName(self, track):
-    self.track = track
+  def testUpdate_RelativeName(self):
     registry_name = self._GetRegistryRef(
         self.Project(), 'my-registry').RelativeName()
     registry = self._CreateDeviceRegistry()
@@ -124,8 +119,7 @@ class RegistriesUpdateTest(base.CloudIotRegistryBase):
 
     self.assertEqual(result, registry)
 
-  def testUpdate_MultipleEventNotificationConfigs(self, track):
-    self.track = track
+  def testUpdate_MultipleEventNotificationConfigs(self):
     registry_name = self._GetRegistryRef(
         self.Project(), 'my-registry').RelativeName()
     event_pubsub_topic_name = self._CreatePubsubTopic(
@@ -162,8 +156,7 @@ class RegistriesUpdateTest(base.CloudIotRegistryBase):
     self.assertEqual(result, registry)
     self.AssertLogContains('Updated registry [my-registry].')
 
-  def testUpdate_EventConfigWithOnlySubfolder(self, track):
-    self.track = track
+  def testUpdate_EventConfigWithOnlySubfolder(self):
     event_pubsub_topic_name = self._CreatePubsubTopic(
         'event-topic', project='other-project').RelativeName()
 
@@ -177,79 +170,38 @@ class RegistriesUpdateTest(base.CloudIotRegistryBase):
           '    --event-notification-config topic={0} '
           .format(event_pubsub_topic_name))
 
-
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class RegistriesUpdateDeprecatedTest(base.CloudIotRegistryBase):
-
-  def _ExpectUpdate(self, registry_name, registry, update_mask):
-    self.client.projects_locations_registries.Patch.Expect(
-        self.messages.CloudiotProjectsLocationsRegistriesPatchRequest(
-            name=registry_name,
-            deviceRegistry=registry,
-            updateMask=update_mask
-        ),
-        registry)
-
-  def testUpdate_EventPubsubDeprecated(self, track):
-    self.track = track
-    registry_name = self._GetRegistryRef(
-        self.Project(), 'my-registry').RelativeName()
-    event_pubsub_topic_name = self._CreatePubsubTopic(
-        'event-topic', project='other-project').RelativeName()
-    registry = self._CreateDeviceRegistry(
-        event_notification_configs=[(event_pubsub_topic_name, None)])
-    update_mask = ','.join([
-        'event_notification_configs',
-        'mqtt_config.mqtt_enabled_state',
-        'http_config.http_enabled_state'])
+  @parameterized.parameters(
+      ('none', 'NONE'), ('info', 'INFO'), ('error', 'ERROR'), ('Info', 'INFO'),
+      ('ErRoR', 'ERROR'), ('NONE', 'NONE'), ('debug', 'DEBUG'),
+      ('dEbUg', 'DEBUG'), ('DEBUG', 'DEBUG'))
+  def testUpdate_LogLevel(self, log_level, log_level_enum):
+    registry_name = ('projects/my-project/locations/us-central1/registries/'
+                     'my-registry')
+    registry = self.messages.DeviceRegistry(
+        logLevel=self.messages.DeviceRegistry.LogLevelValueValuesEnum(
+            log_level_enum))
+    update_mask = 'logLevel'
     self._ExpectUpdate(registry_name, registry, update_mask)
 
-    result = self.Run(
-        'iot registries update {0} '
-        '    --event-pubsub-topic {1} '
-        '    --enable-mqtt-config '
-        '    --enable-http-config'.format(registry_name,
-                                          event_pubsub_topic_name))
+    result = self.Run('iot registries update my-registry '
+                      '    --region us-central1'
+                      '    --project my-project'
+                      '    --log-level {}'.format(log_level))
 
     self.assertEqual(result, registry)
-    self.AssertErrContains('Flag --event-pubsub-topic is deprecated. '
-                           'Use --event-notification-config instead.')
+    self.AssertLogContains('Updated registry [my-registry].')
 
-  def testUpdate_PubsubRemoved(self, track):
-    self.track = track
-    registry_name = self._GetRegistryRef(
-        self.Project(), 'my-registry').RelativeName()
-    event_pubsub_topic_name = self._CreatePubsubTopic(
-        'event-topic', project='other-project').RelativeName()
 
-    with self.AssertRaisesArgumentErrorMatches(
-        'Flag --pubsub-topic is removed. Use --event-notification-config '
-        'instead.'):
-      self.Run(
-          'iot registries update {0} '
-          '    --pubsub-topic {1} '
-          '    --enable-mqtt-config '
-          '    --enable-http-config'.format(registry_name,
-                                            event_pubsub_topic_name))
+class RegistriesUpdateTestBeta(RegistriesUpdateTestGA):
 
-  def testUpdate_PubsubFlagsMutuallyExclusive(self, track):
-    self.track = track
-    registry_name = self._GetRegistryRef(
-        self.Project(), 'my-registry').RelativeName()
-    event_pubsub_topic_name = self._CreatePubsubTopic(
-        'event-topic', project='other-project').RelativeName()
-    with self.AssertRaisesExceptionMatches(
-        cli_test_base.MockArgumentError,
-        'argument --event-notification-config: At most one of '
-        '--event-notification-config | --event-pubsub-topic | '
-        '--pubsub-topic may be specified.'):
-      self.Run(
-          'iot registries update {0} '
-          '    --event-pubsub-topic {1} '
-          '    --event-notification-config topic={1} '
-          '    --enable-mqtt-config'.format(registry_name,
-                                            event_pubsub_topic_name))
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class RegistriesUpdateTestAlpha(RegistriesUpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

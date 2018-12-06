@@ -1,0 +1,186 @@
+title: Create Http Jobs Test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      scheduler jobs create http my-job --schedule "every tuesday"
+      --uri http://www.example.com/endpoint
+      --message-body my-payload
+- execute:
+  - command: |
+      scheduler jobs create http my-job --schedule "every tuesday"
+      --uri https://www.example.com:8000/
+      --message-body my-payload
+- execute:
+  - command: |
+      scheduler jobs create http my-job --schedule "every tuesday"
+      --time-zone America/New_York --description "my super cool job"
+      --max-retry-attempts 5 --max-retry-duration 2h --min-backoff 0.2s
+      --max-backoff 10s --uri http://www.example.com/endpoint
+      --max-doublings 2 --http-method gEt
+      --headers Header1=Value1,Header2=Value2
+      --message-body-from-file payload_file
+actions:
+- write_file:
+    path: payload_file
+    contents: my-payload-2
+- execute_command:
+    label: test create base case
+    command: |
+      scheduler jobs create http my-job --schedule "every tuesday"
+      --uri http://www.example.com/endpoint
+      --message-body my-payload
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            dispatchRules: []
+            locationId: us-central1
+            name: apps/fake-project
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              httpTarget:
+                body: bXktcGF5bG9hZA==
+                httpMethod: POST
+                uri: http://www.example.com/endpoint
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+                minBackoffDuration: 5s
+                retryCount: 0
+              schedule: every tuesday
+              timeZone: Etc/UTC
+        return_response:
+          headers:
+            status: '200'
+          body:
+            httpTarget:
+              body: bXktcGF5bG9hZA==
+              httpMethod: POST
+              uri: http://www.example.com/endpoint
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            retryConfig:
+              maxBackoffDuration: 3600s
+              maxDoublings: 16
+              minBackoffDuration: 5s
+              retryCount: 0
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: test create other valid uri
+    command: |
+      scheduler jobs create http my-job --schedule "every tuesday"
+      --uri https://www.example.com:8000/
+      --message-body my-payload
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              httpTarget:
+                body: bXktcGF5bG9hZA==
+                httpMethod: POST
+                uri: https://www.example.com:8000/
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+                minBackoffDuration: 5s
+                retryCount: 0
+              schedule: every tuesday
+              timeZone: Etc/UTC
+        return_response:
+          headers:
+            status: '200'
+          body:
+            httpTarget:
+              body: bXktcGF5bG9hZA==
+              httpMethod: POST
+              uri: https://www.example.com:8000/
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            retryConfig:
+              maxBackoffDuration: 3600s
+              maxDoublings: 16
+              minBackoffDuration: 5s
+              retryCount: 0
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: test create all arguments
+    command: |
+      scheduler jobs create http my-job --schedule "every tuesday"
+      --time-zone America/New_York --description "my super cool job"
+      --max-retry-attempts 5 --max-retry-duration 2h --min-backoff 0.2s
+      --max-backoff 10s --uri http://www.example.com/endpoint
+      --max-doublings 2 --http-method gEt
+      --headers Header1=Value1,Header2=Value2
+      --message-body-from-file payload_file
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              description: my super cool job
+              httpTarget:
+                body: bXktcGF5bG9hZC0y
+                headers:
+                  Header1: Value1
+                  Header2: Value2
+                httpMethod: GET
+                uri: http://www.example.com/endpoint
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                maxBackoffDuration: 10s
+                maxDoublings: 2
+                maxRetryDuration: 7200s
+                minBackoffDuration: 0.2s
+                retryCount: 5
+              schedule: every tuesday
+              timeZone: America/New_York
+        return_response:
+          headers:
+            status: '200'
+          body:
+            description: my super cool job
+            httpTarget:
+              body: bXktcGF5bG9hZC0y
+              headers:
+                Header1: Value1
+                Header2: Value2
+              httpMethod: GET
+              uri: http://www.example.com/endpoint
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            retryConfig:
+              maxBackoffDuration: 10s
+              maxDoublings: 2
+              maxRetryDuration: 7200s
+              minBackoffDuration: 0.2s
+              retryCount: 5
+            schedule: every tuesday
+            timeZone: America/New_York
+    - expect_exit:
+        code: 0

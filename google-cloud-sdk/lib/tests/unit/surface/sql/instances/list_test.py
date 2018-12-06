@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -51,12 +52,61 @@ class _BaseInstancesListTest(object):
 
     mocked_database_instances.assert_called_once()
 
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME                 DATABASE_VERSION LOCATION      TIER ADDRESS STATUS
-testinstance         MYSQL_5_5        us-central    D0   -       RUNNABLE
-backupless-instance1 MYSQL_5_5        us-central1-a D1   -       RUNNABLE
-backupless-instance2 MYSQL_5_5        us-central    D1   -       RUNNABLE
+NAME                 DATABASE_VERSION LOCATION      TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+testinstance         MYSQL_5_5        us-central    D0   -               -               RUNNABLE
+backupless-instance1 MYSQL_5_5        us-central1-a D1   -               -               RUNNABLE
+backupless-instance2 MYSQL_5_5        us-central    D1   -               -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testInstancesListWithIpAddresses(self):
+    instances_list = data.GetDatabaseInstancesListOfTwo()
+    instances_list[0].ipAddresses = [
+        self.messages.IpMapping(
+            ipAddress='11.11.11.11',
+            timeToRetire=None,
+            type='PRIVATE',
+        ),
+        self.messages.IpMapping(
+            ipAddress='10.10.10.10',
+            timeToRetire=None,
+            type='PRIMARY',
+        ),
+    ]
+    instances_list[1].ipAddresses = [
+        self.messages.IpMapping(
+            ipAddress='20.20.20.20',
+            timeToRetire=None,
+            type='PRIMARY',
+        ),
+        self.messages.IpMapping(
+            ipAddress='23.23.23.23',
+            timeToRetire=None,
+            type='OUTGOING',
+        ),
+        self.messages.IpMapping(
+            ipAddress='21.21.21.21',
+            timeToRetire=None,
+            type='PRIVATE',
+        ),
+    ]
+    mocked_database_instances = self.StartObjectPatch(instances._BaseInstances,
+                                                      'GetDatabaseInstances')
+    mocked_database_instances.return_value = instances_list
+
+    self.Run('sql instances list')
+
+    mocked_database_instances.assert_called_once()
+
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME                 DATABASE_VERSION LOCATION      TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+testinstance         MYSQL_5_5        us-central    D0   10.10.10.10     11.11.11.11     RUNNABLE
+backupless-instance1 MYSQL_5_5        us-central1-a D1   20.20.20.20     21.21.21.21     RUNNABLE
 """,
         normalize_space=True)
 
@@ -72,11 +122,12 @@ backupless-instance2 MYSQL_5_5        us-central    D1   -       RUNNABLE
     mocked_database_instances.assert_called_once()
     mocked_database_instances.assert_called_with(limit=2, batch_size=None)
 
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME                 DATABASE_VERSION LOCATION      TIER ADDRESS STATUS
-testinstance         MYSQL_5_5        us-central    D0   -       RUNNABLE
-backupless-instance1 MYSQL_5_5        us-central1-a D1   -       RUNNABLE
+NAME                 DATABASE_VERSION LOCATION      TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+testinstance         MYSQL_5_5        us-central    D0   -               -               RUNNABLE
+backupless-instance1 MYSQL_5_5        us-central1-a D1   -               -               RUNNABLE
 """,
         normalize_space=True)
     self.AssertOutputNotContains('backupless-instance2')
@@ -93,16 +144,17 @@ backupless-instance1 MYSQL_5_5        us-central1-a D1   -       RUNNABLE
     mocked_database_instances.assert_called_once()
     mocked_database_instances.assert_called_with(limit=None, batch_size=1)
 
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME                 DATABASE_VERSION LOCATION   TIER ADDRESS STATUS
-testinstance         MYSQL_5_5        us-central D0   -       RUNNABLE
+NAME                 DATABASE_VERSION LOCATION   TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+testinstance         MYSQL_5_5        us-central D0   -               -               RUNNABLE
 
-NAME                 DATABASE_VERSION LOCATION      TIER ADDRESS STATUS
-backupless-instance1 MYSQL_5_5        us-central1-a D1   -       RUNNABLE
+NAME                 DATABASE_VERSION LOCATION      TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+backupless-instance1 MYSQL_5_5        us-central1-a D1   -               -               RUNNABLE
 
-NAME                 DATABASE_VERSION LOCATION   TIER ADDRESS STATUS
-backupless-instance2 MYSQL_5_5        us-central D1   -       RUNNABLE
+NAME                 DATABASE_VERSION LOCATION   TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+backupless-instance2 MYSQL_5_5        us-central D1   -               -               RUNNABLE
 """,
         normalize_space=True)
 

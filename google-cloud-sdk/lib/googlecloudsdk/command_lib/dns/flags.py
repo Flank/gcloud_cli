@@ -19,12 +19,24 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope.concepts import concepts
-from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
 from googlecloudsdk.command_lib.util import completers
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
+
+
+class BetaKeyCompleter(completers.ListCommandCompleter):
+
+  def __init__(self, **kwargs):
+    super(BetaKeyCompleter, self).__init__(
+        collection='dns.dnsKeys',
+        api_version='v1beta2',
+        list_command=('beta dns dns-keys list --format=value(keyTag)'),
+        parse_output=True,
+        flags=['zone'],
+        **kwargs)
 
 
 class KeyCompleter(completers.ListCommandCompleter):
@@ -32,8 +44,8 @@ class KeyCompleter(completers.ListCommandCompleter):
   def __init__(self, **kwargs):
     super(KeyCompleter, self).__init__(
         collection='dns.dnsKeys',
-        api_version='v2beta1',
-        list_command=('beta dns dns-keys list --format=value(keyTag)'),
+        api_version='v1',
+        list_command=('dns dns-keys list --format=value(keyTag)'),
         parse_output=True,
         flags=['zone'],
         **kwargs)
@@ -48,11 +60,11 @@ class ManagedZoneCompleter(completers.ListCommandCompleter):
         **kwargs)
 
 
-def GetKeyArg(help_text='The DNS key identifier.'):
+def GetKeyArg(help_text='The DNS key identifier.', is_beta=False):
   return base.Argument(
       'key_id',
       metavar='KEY-ID',
-      completer=KeyCompleter,
+      completer=BetaKeyCompleter if is_beta else KeyCompleter,
       help=help_text)
 
 
@@ -74,7 +86,7 @@ def GetZoneResourceSpec():
       'dns.managedZones',
       resource_name='zone',
       managedZone=ZoneAttributeConfig(),
-      project=project_resource_args.PROJECT_ATTRIBUTE_CONFIG,
+      project=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
       disable_auto_completers=False)
 
 
@@ -149,20 +161,20 @@ def GetDoeFlagMapper(messages):
       help_str='Requires DNSSEC enabled.')
 
 
+def GetKeyAlgorithmFlag(key_type, messages):
+  return arg_utils.ChoiceEnumMapper(
+      '--{}-algorithm'.format(key_type),
+      messages.DnsKeySpec.AlgorithmValueValuesEnum,
+      help_str='String mnemonic specifying the DNSSEC algorithm of the '
+               'key-signing key. Requires DNSSEC enabled')
+
+
 def AddCommonManagedZonesDnssecArgs(parser, messages):
   """Add Common DNSSEC flags for the managed-zones group."""
   GetDnsSecStateFlagMapper(messages).choice_arg.AddToParser(parser)
   GetDoeFlagMapper(messages).choice_arg.AddToParser(parser)
-  parser.add_argument(
-      '--ksk-algorithm',
-      help='String mnemonic specifying the DNSSEC algorithm of the '
-           'key-signing key. Requires DNSSEC enabled. Example algorithms: '
-           'RSASHA1, RSASHA256, RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384')
-  parser.add_argument(
-      '--zsk-algorithm',
-      help='String mnemonic specifying the DNSSEC algorithm of the '
-           'zone-signing key. Requires DNSSEC enabled. Example algorithms: '
-           'RSASHA1, RSASHA256, RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384')
+  GetKeyAlgorithmFlag('ksk', messages).choice_arg.AddToParser(parser)
+  GetKeyAlgorithmFlag('zsk', messages).choice_arg.AddToParser(parser)
   parser.add_argument(
       '--ksk-key-length',
       type=int,
@@ -172,5 +184,33 @@ def AddCommonManagedZonesDnssecArgs(parser, messages):
       type=int,
       help='Length of the zone-signing key in bits. Requires DNSSEC enabled.')
 
+
+def GetManagedZoneVisibilityArg():
+  return base.Argument(
+      '--visibility',
+      choices=['public', 'private'],
+      default='public',
+      help='Visibility of the zone. Public zones are visible to the public '
+      'internet. Private zones are only visible in your internal '
+      'networks denoted by the `--networks` flag.')
+
+
+def GetManagedZoneNetworksArg():
+  return base.Argument(
+      '--networks',
+      metavar='NETWORK',
+      type=arg_parsers.ArgList(),
+      help='List of networks that the zone should be visible in if the zone '
+      'visibility is [private].')
+
+
+def GetForwardingTargetsArg():
+  return base.Argument(
+      '--forwarding-targets',
+      type=arg_parsers.ArgList(),
+      required=False,
+      metavar='IP_ADDRESSES',
+      help=('List of IPv4 addresses of target name servers that the zone '
+            'will forward queries to. Ignored for `private` visibility.'))
 
 CHANGES_FORMAT = 'table(id, startTime, status)'

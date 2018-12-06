@@ -19,16 +19,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import completers
 
 
-class ListGoodAsyncWithGetUri(base.ListCommand):
+class ListGoodAsyncWithGetUri(calliope_base.ListCommand):
   """List command with GetUriFunc."""
 
   @staticmethod
   def Args(parser):
-    base.ASYNC_FLAG.AddToParser(parser)
+    calliope_base.ASYNC_FLAG.AddToParser(parser)
     parser.display_info.AddFormat('table(good, async)')
     parser.display_info.AddUriFunc(lambda x, undefined='': 'URI({0})'.format(x))
     parser.display_info.AddCacheUpdater(completers.InstancesCompleter)

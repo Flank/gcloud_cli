@@ -1,0 +1,49 @@
+NAME
+    gcloud compute routers nats list - lists the NATs on a Google Compute
+        Engine router
+
+SYNOPSIS
+    gcloud compute routers nats list --router=ROUTER [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute routers nats list is used to list the NATs on a Google
+    Compute Engine router.
+
+REQUIRED FLAGS
+     --router=ROUTER
+        The Router to use for NAT.
+
+OPTIONAL FLAGS
+     --region=REGION
+        Region of the NATs to list. If not specified, you may be prompted to
+        select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute routers nats list
+        $ gcloud beta compute routers nats list
+

@@ -17,8 +17,8 @@
 
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import progress_tracker
@@ -82,10 +82,12 @@ class Diagnostic(object):
         num_checks_passed += 1
 
     num_checks = len(self.checklist)
-    passed = (num_checks_passed == num_checks)
-    summary = '{check} ({num_passed}/{num_checks} checks) {passed}.\n'.format(
-        check=self.title, num_passed=num_checks_passed, num_checks=num_checks,
-        passed='passed' if passed else 'failed')
+    passed = num_checks_passed == num_checks
+    summary = ('{check} {status} ({num_passed}/{num_checks} checks passed).\n'.
+               format(check=self.title,
+                      num_passed=num_checks_passed,
+                      num_checks=num_checks,
+                      status='passed' if passed else 'failed'))
     self._Print(summary, as_error=not passed)
     return passed
 
@@ -102,4 +104,3 @@ class Diagnostic(object):
 
   def _PrintResult(self, result):
     self._Print(result.message, not result.passed)
-

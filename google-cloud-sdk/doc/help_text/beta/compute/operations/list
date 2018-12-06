@@ -77,8 +77,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To list all operations in a project in table form, run:
@@ -102,11 +103,24 @@ EXAMPLES
 
         $ gcloud beta compute operations list --regions ""
 
+    To list all operations with names prefixed with operation, run:
+
+        $ gcloud beta compute operations list --filter="name:operation"
+
     To list all operations in the us-central1 and europe-west1 regions and all
     operations in the us-central1-a zone, run:
 
         $ gcloud beta compute operations list --zones us-central1-a \
            --regions us-central1,europe-west1
+
+    To list all operations with a specified target, filter on the targetLink
+    field (run gcloud beta compute operations list --format=json to see a full,
+    well-structured list of available fields). Additionally, use scope() which
+    extracts the last part of the URL to get the required target information,
+    and run:
+
+        $ gcloud beta compute operations list \
+           --filter="targetLink.scope():default-12345abc"
 
 NOTES
     This command is currently in BETA and may change without notice. These

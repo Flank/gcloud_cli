@@ -48,9 +48,6 @@ def _GetOpenFds():
 class _CoshellTestBase(sdk_test_base.SdkBase, test_case.WithContentAssertions):
 
   def SetUp(self):
-    self.StartDictPatch(os.environ)
-    if 'ENV' in os.environ:
-      del os.environ['ENV']
     self.coshell = None
     self.tmp = self.CreateTempDir()
     self.output_file = os.path.join(self.tmp, 'coshell.out')
@@ -138,7 +135,6 @@ class _CoshellTestBase(sdk_test_base.SdkBase, test_case.WithContentAssertions):
 class UnixCoshellTest(_CoshellTestBase):
 
   def testUnixCoshellEditMode(self):
-    self.assertEqual('emacs', self.coshell.edit_mode)
     self.coshell.Run('set -o vi')
     self.assertEqual('vi', self.coshell.edit_mode)
     self.coshell.Run('set -o emacs')
@@ -154,10 +150,10 @@ class UnixCoshellTest(_CoshellTestBase):
   def testUnixCoshellStateIsPreserved(self):
     self.assertTrue(self.coshell.state_is_preserved)
 
-  def testUnixCoshellENV(self):
-    os.environ['ENV'] = self.Touch(
-        directory=self.tmp,
-        name='coshell.env',
+  def testUnixCoshellBashrc(self):
+    self.Touch(
+        directory=os.environ.get('HOME'),
+        name='.bashrc',
         contents='set -o vi\nset -o ignoreeof\n')
     self.CoOpen()
     self.assertEqual('vi', self.coshell.edit_mode)
@@ -250,36 +246,36 @@ class UnixCoshellTest(_CoshellTestBase):
     self.AssertOutputMatches('^INTERRUPTED$', normalize_space=True)
 
   def testUnixCoshellExit(self):
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit')
     self.assertEqual(0, self.coshell.Close())
 
   def testUnixCoshellExit0(self):
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit 0')
     self.assertEqual(0, self.coshell.Close())
 
   @test_case.Filters.skip('rare annoying exit 0 flakes', 'b/65456434')
   def testUnixCoshellExit1(self):
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit 1')
     self.assertEqual(1, self.coshell.Close())
 
   def testUnixCoshellRunAfterExit(self):
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit')
       self.coshell.Run(':')
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('echo oops')
     self.assertEqual(0, self.coshell.Close())
 
   def testUnixCoshellRunAfterClose(self):
     self.assertEqual(0, self.coshell.Close())
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('echo oops')
 
   def testUnixCoshellDied(self):
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('kill -TERM $$')
     # 15 = index(SIGTERM); 271 = 256 + 15
     status = self.coshell.Close()
@@ -345,6 +341,67 @@ class UnixCoshellTest(_CoshellTestBase):
     if old_shell_stdin_fd >= 0:
       os.dup2(old_shell_stdin_fd, coshell._UnixCoshellBase.SHELL_STDIN_FD)
 
+  def testUnixCoshellGetCompletionsArgsVars(self):
+    self.coshell._encoding = 'utf-8'
+    self.coshell.Run("""\
+__coshell_test_completer__() {
+  # Defines a test COMPREPLY array with A:<index>:<value> for the positional
+  # args and W:<index>:<value> for the COMP_WORDS array passed as input to this
+  # function.
+  (( i = 0 ))
+  while (( $# )); do
+    (( i += 1 ))
+    COMPREPLY+=( A:$i:$1 )
+    shift
+  done
+  for ((i = 0; i < ${#COMP_WORDS[@]}; i++ )); do
+    COMPREPLY+=( W:$i:${COMP_WORDS[$i]} )
+  done
+}
+
+complete -o nospace -F __coshell_test_completer__ tst
+""")
+
+    completions = self.coshell.GetCompletions(['tst'])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:tst', 'A:3:', 'W:0:tst'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', ''])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:', 'A:3:', 'W:0:tst', 'W:1:'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a'])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:a', 'A:3:', 'W:0:tst', 'W:1:a'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a', ''])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:', 'A:3:a', 'W:0:tst', 'W:1:a', 'W:2:'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a', 'b'])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:b', 'A:3:a', 'W:0:tst', 'W:1:a', 'W:2:b'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a', 'b', ''])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:', 'A:3:b', 'W:0:tst', 'W:1:a', 'W:2:b', 'W:3:'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a', 'b', 'c'])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:c', 'A:3:b', 'W:0:tst', 'W:1:a', 'W:2:b', 'W:3:c'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'Ṳᾔḯ¢◎ⅾℯ'])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:Ṳᾔḯ¢◎ⅾℯ', 'A:3:', 'W:0:tst', 'W:1:Ṳᾔḯ¢◎ⅾℯ'],
+        completions)
+
 
 @test_case.Filters.DoNotRunOnWindows  # UNIX specific tests.
 @test_case.Filters.DoNotRunOnMac  # Config based output capture flakes?
@@ -388,7 +445,7 @@ class UnixCoshellInteractiveTest(_CoshellTestBase):
           continue
         try:
           cosh.Run(command)
-        except coshell.CoshellExitException:
+        except coshell.CoshellExitError:
           break
 
     finally:
@@ -497,7 +554,6 @@ class MingWCoshellOnUnixTest(_CoshellTestBase):
     os.close(old_err_fd)
 
   def testMinGWCoshellEditMode(self):
-    self.assertEqual('emacs', self.coshell.edit_mode)
     self.coshell.Run('set -o vi')
     self.assertEqual('vi', self.coshell.edit_mode)
     self.coshell.Run('set -o emacs')
@@ -556,33 +612,88 @@ class MingWCoshellOnUnixTest(_CoshellTestBase):
   @test_case.Filters.SkipInDebPackage('Flakes', 'b/67582029')
   @test_case.Filters.SkipInRpmPackage('Flakes', 'b/67582029')
   def testMinGWCoshellExit(self):
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit')
     self.assertEqual(0, self.coshell.Close())
 
   def testMinGWCoshellExit0(self):
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit 0')
     self.assertEqual(0, self.coshell.Close())
 
   def testMinGWCoshellExit1(self):
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit 1')
     # EPIPE before status can be retrieved.
     # self.assertEqual(1, self.coshell.Close())
 
   def testMinGWCoshellRunAfterExit(self):
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit')
       self.coshell.Run(':')
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('echo oops')
     self.assertEqual(0, self.coshell.Close())
 
   def testMinGWCoshellRunAfterClose(self):
     self.assertEqual(0, self.coshell.Close())
-    with self.assertRaises(coshell.CoshellExitException):
+    with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('echo oops')
+
+  def testMinGWCoshellGetCompletionsArgsVars(self):
+    self.coshell.Run("""\
+__coshell_test_completer__() {
+  # Defines a test COMPREPLY array with A:<index>:<value> for the positional
+  # args and W:<index>:<value> for the COMP_WORDS array passed as input to this
+  # function.
+  (( i = 0 ))
+  while (( $# )); do
+    (( i += 1 ))
+    COMPREPLY+=( A:$i:$1 )
+    shift
+  done
+  for ((i = 0; i < ${#COMP_WORDS[@]}; i++ )); do
+    COMPREPLY+=( W:$i:${COMP_WORDS[$i]} )
+  done
+}
+
+complete -o nospace -F __coshell_test_completer__ tst
+""")
+
+    completions = self.coshell.GetCompletions(['tst'])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:tst', 'A:3:', 'W:0:tst'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', ''])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:', 'A:3:', 'W:0:tst', 'W:1:'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a'])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:a', 'A:3:', 'W:0:tst', 'W:1:a'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a', ''])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:', 'A:3:a', 'W:0:tst', 'W:1:a', 'W:2:'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a', 'b'])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:b', 'A:3:a', 'W:0:tst', 'W:1:a', 'W:2:b'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a', 'b', ''])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:', 'A:3:b', 'W:0:tst', 'W:1:a', 'W:2:b', 'W:3:'],
+        completions)
+
+    completions = self.coshell.GetCompletions(['tst', 'a', 'b', 'c'])
+    self.assertEqual(
+        ['A:1:tst', 'A:2:c', 'A:3:b', 'W:0:tst', 'W:1:a', 'W:2:b', 'W:3:c'],
+        completions)
 
 
 class WindowsCoshellTest(_CoshellTestBase):

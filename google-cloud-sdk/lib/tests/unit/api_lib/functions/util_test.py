@@ -31,7 +31,7 @@ _UNICODE_MESSAGE = ".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"
 class _MockHttpException(object):
 
   def __init__(self, status='STATUS', code=404, message='MESSAGE',
-               content='CONTENT'):
+               content='CONTENT', url='https://dummy.url/'):
     self.status = status
     self.code = code
     self.content = content
@@ -39,6 +39,7 @@ class _MockHttpException(object):
     self.response = httplib2.Response({'status': status, 'response': code})
     self.response.status = status
     self.response.reason = code
+    self.url = url
 
 
 class FunctionsUtilTest(test_case.TestCase):

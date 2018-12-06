@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base as cal_base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
@@ -36,4 +36,20 @@ class SpannerTestBase(sdk_test_base.WithFakeAuth,
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.msgs = apis.GetMessagesModule('spanner', 'v1')
-    self.track = cal_base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
+
+
+class SpannerTestBeta(SpannerTestBase):
+  """Base class for Cloud Spanner BETA unit tests."""
+
+  def Run(self, cmd, track=None):
+    return super(SpannerTestBeta, self).Run(
+        cmd, track=calliope_base.ReleaseTrack.BETA)
+
+
+class SpannerTestAlpha(SpannerTestBase):
+  """Base class for Cloud Spanner ALPHA unit tests."""
+
+  def Run(self, cmd, track=None):
+    return super(SpannerTestAlpha, self).Run(
+        cmd, track=calliope_base.ReleaseTrack.ALPHA)

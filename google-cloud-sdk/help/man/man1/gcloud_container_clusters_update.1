@@ -88,8 +88,8 @@ through HTTPS. Besides these blocks, the following have access as well:
 
 .RS 2m
 1) The private network the cluster connects to if
-`\-\-private\-cluster` is specified.
-2) Google Compute Engine Public IPs if `\-\-private\-cluster` is not
+`\-\-enable\-private\-nodes` is specified.
+2) Google Compute Engine Public IPs if `\-\-enable\-private\-nodes` is not
 specified.
 .RE
 
@@ -231,7 +231,10 @@ Enable basic (username/password) auth for the cluster.
 \f5\-\-enable\-basic\-auth\fR is an alias for \f5\-\-username=admin\fR;
 \f5\-\-no\-enable\-basic\-auth\fR is an alias for \f5\-\-username=""\fR. Use
 \f5\-\-password\fR to specify a password; if not, the server will randomly
-generate one.
+generate one. For cluster versions before 1.12, if neither
+\f5\-\-enable\-basic\-auth\fR nor \f5\-\-username\fR is specified,
+\f5\-\-enable\-basic\-auth\fR will default to \f5true\fR. After 1.12,
+\f5\-\-enable\-basic\-auth\fR will default to \f5false\fR.
 
 .TP 2m
 \fB\-\-username\fR=\fIUSERNAME\fR, \fB\-u\fR \fIUSERNAME\fR
@@ -308,9 +311,9 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

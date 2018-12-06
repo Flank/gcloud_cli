@@ -18,8 +18,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -34,10 +35,13 @@ COMMANDS
         (BETA) Add a Pig job to the workflow template.
 
      pyspark
-        (BETA) Add a PySPark job to the workflow template.
+        (BETA) Add a PySpark job to the workflow template.
 
      spark
         (BETA) Add a Spark job to the workflow template.
+
+     spark-r
+        (BETA) Add a SparkR job to the workflow template.
 
      spark-sql
         (BETA) Add a SparkSql job to the workflow template.
@@ -77,5 +81,8 @@ EXAMPLES
             --workflow-template my_template --file my_queries.q
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc workflow-templates add-job
 

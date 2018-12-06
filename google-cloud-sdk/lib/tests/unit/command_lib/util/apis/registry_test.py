@@ -360,7 +360,8 @@ class CallTests(sdk_test_base.WithFakeAuth):
     self.MockAPI('compute', 'v1')
     request = self.messages.ComputeInstancesGetRequest(
         instance='testinstance', zone='zone1', project='foo')
-    self.mocked_client.instances.Get.Expect(request, response={'foo': 'bar'})
+    self.mocked_client.instances.Get.Expect(request, response={'foo': 'bar'},
+                                            enable_type_checking=False)
     registry.GetMethod('compute.instances', 'get').Call(request)
 
   def testRawList(self):

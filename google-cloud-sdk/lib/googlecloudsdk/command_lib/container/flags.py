@@ -30,19 +30,13 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
 
-def AddBasicAuthFlags(parser,
-                      username_default='admin',
-                      enable_basic_auth_default=True):
+def AddBasicAuthFlags(parser):
   """Adds basic auth flags to the given parser.
 
   Basic auth flags are: --username, --enable-basic-auth, and --password.
 
   Args:
     parser: A given parser.
-    username_default: The default username to use for this parser (create is
-        'admin', update is None).
-    enable_basic_auth_default: The default value for --enable-basic-auth (create
-        is True, update is None).
   """
   basic_auth_group = parser.add_group(help='Basic auth')
   username_group = basic_auth_group.add_group(
@@ -50,19 +44,20 @@ def AddBasicAuthFlags(parser,
   username_help_text = """\
 The user name to use for basic auth for the cluster. Use `--password` to specify
 a password; if not, the server will randomly generate one."""
-  username_group.add_argument(
-      '--username', '-u', help=username_help_text, default=username_default)
+  username_group.add_argument('--username', '-u', help=username_help_text)
 
   enable_basic_auth_help_text = """\
 Enable basic (username/password) auth for the cluster.  `--enable-basic-auth` is
 an alias for `--username=admin`; `--no-enable-basic-auth` is an alias for
 `--username=""`. Use `--password` to specify a password; if not, the server will
-randomly generate one."""
+randomly generate one. For cluster versions before 1.12, if neither
+`--enable-basic-auth` nor `--username` is specified, `--enable-basic-auth` will
+default to `true`. After 1.12, `--enable-basic-auth` will default to `false`."""
   username_group.add_argument(
       '--enable-basic-auth',
       help=enable_basic_auth_help_text,
       action='store_true',
-      default=enable_basic_auth_default)
+      default=None)
 
   basic_auth_group.add_argument(
       '--password',
@@ -87,8 +82,6 @@ def MungeBasicAuthFlags(args):
     if not args.enable_basic_auth:
       args.username = ''
     else:
-      # Even though this is the default for `clusters create`, we still need to
-      # set it for `clusters update`.
       args.username = 'admin'
   if not args.username and args.IsSpecified('password'):
     raise util.Error(constants.USERNAME_PASSWORD_ERROR_MSG)
@@ -316,19 +309,42 @@ def AddAutoprovisioningFlags(parser, hidden=False):
       help="""\
 Enables  node autoprovisioning for a cluster.
 
-Cluster Autoscaler will be able to create new node pools. Requires --max-cpu
-and --max-memory to be specified.""",
+Cluster Autoscaler will be able to create new node pools. Requires maximum CPU
+and memory limits to be specified.""",
       hidden=hidden,
       action='store_true')
-  group.add_argument(
+
+  limits_group = group.add_mutually_exclusive_group()
+  limits_group.add_argument(
+      '--autoprovisioning-config-file',
+      type=arg_parsers.BufferedFileInput(),
+      hidden=hidden,
+      help="""\
+Path of the JSON/YAML file which contains information about the
+cluster's autoscaling configuration. Currently it only contains
+a list of resource limits of the cluster.
+
+Each resource limits definition contains three fields:
+resourceType, maximum and minimum.
+Resource type can be "cpu", "memory" or an accelerator (e.g.
+"nvidia-tesla-k80" for nVidia Tesla K80). Use gcloud compute accelerator-types
+list to learn about available accelerator types.
+Maximum is the maximum allowed amount with the unit of the resource.
+Minimum is the minimum allowed amount with the unit of the resource.
+""")
+
+  from_flags_group = limits_group.add_argument_group('Flags to configure '
+                                                     'resource limits:')
+  from_flags_group.add_argument(
       '--max-cpu',
+      required=True,
       help="""\
 Maximum number of cores in the cluster.
 
 Maximum number of cores to which the cluster can scale.""",
       hidden=hidden,
       type=int)
-  group.add_argument(
+  from_flags_group.add_argument(
       '--min-cpu',
       help="""\
 Minimum number of cores in the cluster.
@@ -336,15 +352,16 @@ Minimum number of cores in the cluster.
 Minimum number of cores to which the cluster can scale.""",
       hidden=hidden,
       type=int)
-  group.add_argument(
+  from_flags_group.add_argument(
       '--max-memory',
+      required=True,
       help="""\
 Maximum memory in the cluster.
 
 Maximum number of gigabytes of memory to which the cluster can scale.""",
       hidden=hidden,
       type=int)
-  group.add_argument(
+  from_flags_group.add_argument(
       '--min-memory',
       help="""\
 Minimum memory in the cluster.
@@ -352,8 +369,8 @@ Minimum memory in the cluster.
 Minimum number of gigabytes of memory to which the cluster can scale.""",
       hidden=hidden,
       type=int)
-  accelerator_group = group.add_argument_group('Arguments to set limits on '
-                                               'accelerators:')
+  accelerator_group = from_flags_group.add_argument_group(
+      'Arguments to set limits on accelerators:')
   accelerator_group.add_argument(
       '--max-accelerator',
       type=arg_parsers.ArgDict(spec={
@@ -364,8 +381,7 @@ Minimum number of gigabytes of memory to which the cluster can scale.""",
       metavar='type=TYPE,count=COUNT',
       hidden=hidden,
       help="""\
-Sets maximum limit for a single type of accelerators (e.g. GPUs) in cluster. Defaults
-to 0 for all accelerator types if it isn't set.
+Sets maximum limit for a single type of accelerators (e.g. GPUs) in cluster.
 
 *type*::: (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80)
 of accelerator for which the limit is set. Use ```gcloud compute
@@ -395,7 +411,7 @@ to which the cluster can be scaled.
 """)
 
 
-def AddEnableBinAuthzFlag(parser, hidden=True):
+def AddEnableBinAuthzFlag(parser, hidden=False):
   """Adds a --enable-binauthz flag to parser."""
   help_text = """Enable Binary Authorization for this cluster."""
   parser.add_argument(
@@ -626,7 +642,8 @@ Enable node autorepair feature for a node-pool.
 """
     if for_create:
       help_text += """
-Node autorepair is enabled by default for node pools using COS as a base image.
+Node autorepair is enabled by default for node pools using COS as a base image,
+use --no-enable-autorepair to disable.
 """
   else:
     help_text = """\
@@ -636,7 +653,8 @@ Enable node autorepair feature for a cluster's default node-pool(s).
 """
     if for_create:
       help_text += """
-Node autorepair is enabled by default for clusters using COS as a base image.
+Node autorepair is enabled by default for clusters using COS as a base image,
+use --no-enable-autorepair to disable.
 """
   help_text += """
 See https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair for \
@@ -715,8 +733,8 @@ Allow only specified set of CIDR blocks (specified by the
 `--master-authorized-networks` flag) to connect to Kubernetes master through
 HTTPS. Besides these blocks, the following have access as well:\n
   1) The private network the cluster connects to if
-  `--private-cluster` is specified.
-  2) Google Compute Engine Public IPs if `--private-cluster` is not
+  `--enable-private-nodes` is specified.
+  2) Google Compute Engine Public IPs if `--enable-private-nodes` is not
   specified.\n
 When disabled, public internet (0.0.0.0/0) is allowed to connect to Kubernetes
 master through HTTPS.
@@ -724,9 +742,7 @@ master through HTTPS.
       action='store_true')
   master_flag_group.add_argument(
       '--master-authorized-networks',
-      type=arg_parsers.ArgList(
-          min_length=1,
-          max_length=api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS),
+      type=arg_parsers.ArgList(min_length=1),
       metavar='NETWORK',
       help='The list of CIDR blocks (up to {max}) that are allowed to connect '
       'to Kubernetes master through HTTPS. Specified in CIDR notation (e.g. '
@@ -748,25 +764,38 @@ def AddNetworkPolicyFlags(parser, hidden=False):
       '--update-addons=NetworkPolicy=ENABLED flag.')
 
 
-def AddPrivateClusterFlags(parser, hidden=False):
-  """Adds --private-cluster flag to parser and --master-ipv4-cidr to parser."""
+def AddPrivateClusterFlags(parser, with_deprecated=False):
+  """Adds flags related to private clusters to parser."""
   group = parser.add_argument_group('Private Clusters')
+  if with_deprecated:
+    group.add_argument(
+        '--private-cluster',
+        help=('Cluster is created with no public IP addresses on the cluster '
+              'nodes.'),
+        default=None,
+        action=actions.DeprecationAction(
+            'private-cluster',
+            warn='The --private-cluster flag is deprecated and will be removed '
+            'in a future release. Use --enable-private-nodes instead.',
+            action='store_true'))
   group.add_argument(
-      '--private-cluster',
+      '--enable-private-nodes',
       help=('Cluster is created with no public IP addresses on the cluster '
             'nodes.'),
       default=None,
-      action='store_true',
-      required=True,
-      hidden=hidden)
+      action='store_true')
+  group.add_argument(
+      '--enable-private-endpoint',
+      help=('Cluster is managed using the private IP address of the master '
+            'API endpoint.'),
+      default=None,
+      action='store_true')
   group.add_argument(
       '--master-ipv4-cidr',
-      help=('IPv4 CIDR range to use for the master network.  This should be a '
-            '/28 and should be used in conjunction with the --private-cluster '
-            'flag.'),
-      default=None,
-      required=True,
-      hidden=hidden)
+      help=('IPv4 CIDR range to use for the master network.  This should have '
+            'a netmask of size /28 and should be used in conjunction with the '
+            '--enable-private-nodes flag.'),
+      default=None)
 
 
 def AddEnableLegacyAuthorizationFlag(parser, hidden=False):
@@ -1134,6 +1163,7 @@ When specified, the nodes for the new node pool will be scheduled on host with
 specified CPU architecture or a newer one.
 
 Examples:
+
   $ {command} node-pool-1 --cluster=example-cluster --min-cpu-platform=PLATFORM
 
 """
@@ -1143,6 +1173,7 @@ When specified, the nodes for the new cluster's default node pool will be
 scheduled on host with specified CPU architecture or a newer one.
 
 Examples:
+
   $ {command} example-cluster --min-cpu-platform=PLATFORM
 
 """
@@ -1195,6 +1226,7 @@ def AddTagOrDigestPositional(parser,
                              tags_only=False,
                              arg_name=None,
                              metavar=None):
+  """Adds a tag or digest positional arg."""
   digest_str = '*.gcr.io/PROJECT_ID/IMAGE_PATH@sha256:DIGEST or'
   if tags_only:
     digest_str = ''
@@ -1335,30 +1367,20 @@ behavior.
       help="""\
 Specifies scopes for the node instances. Examples:
 
-$ {{command}} {example_target} --scopes=https://www.googleapis.com/auth/devstorage.read_only
+  $ {{command}} {example_target} --scopes=https://www.googleapis.com/auth/devstorage.read_only
 
-$ {{command}} {example_target} --scopes=bigquery,storage-rw,compute-ro
+  $ {{command}} {example_target} --scopes=bigquery,storage-rw,compute-ro
 
 Multiple SCOPEs can be specified, separated by commas. `logging-write`
 and/or `monitoring` are added unless Cloud Logging and/or Cloud Monitoring
 are disabled (see `--enable-cloud-logging` and `--enable-cloud-monitoring`
 for more information).
 {track_help}
-SCOPE can be either the full URI of the scope or an alias. Available
-aliases are:
-
-[format="csv",options="header"]
-|========
-Alias,URI
-{aliases}
-|========
-
-{scope_deprecation_msg}
+{scopes_help}
 """.format(
-    aliases=compute_constants.ScopesForHelp(),
-    scope_deprecation_msg=compute_constants.DEPRECATED_SCOPES_MESSAGES,
     example_target=example_target,
-    track_help=track_help))
+    track_help=track_help,
+    scopes_help=compute_constants.ScopesHelp()))
 
   cloud_endpoints_help_text = """\
 Automatically enable Google Cloud Endpoints to take advantage of API management
@@ -1472,6 +1494,11 @@ def AddAlphaAddonsFlags(parser):
   AddAddonsFlagsWithOptions(parser, api_adapter.ALPHA_ADDONS_OPTIONS)
 
 
+def AddBetaAddonsFlags(parser):
+  """Adds the --addons flag to the parser for the beta track."""
+  AddAddonsFlagsWithOptions(parser, api_adapter.BETA_ADDONS_OPTIONS)
+
+
 def AddPodSecurityPolicyFlag(parser, hidden=False):
   """Adds a --enable-pod-security-policy flag to parser."""
   help_text = """\
@@ -1506,12 +1533,14 @@ When enabled, `--cluster-ipv4-cidr` must be fully specified (e.g. `10.96.0.0/14`
       help=help_text)
 
 
-def AddTpuFlags(parser, hidden=False):
+def AddTpuFlags(parser, hidden=False, enable_tpu_service_networking=False):
   """Adds flags related to TPUs to the parser.
 
   Args:
     parser: A given parser.
     hidden: Whether or not to hide the help text.
+    enable_tpu_service_networking: Whether to add the
+    enable_tpu_service_networking flag.
   """
 
   tpu_group = parser.add_group(help='Flags relating to Cloud TPUs:')
@@ -1527,7 +1556,23 @@ Can not be specified unless `--enable-kubernetes-alpha` and `--enable-ip-alias`
 are also specified.
 """)
 
-  tpu_group.add_argument(
+  group = tpu_group
+
+  if enable_tpu_service_networking:
+    group = tpu_group.add_mutually_exclusive_group()
+    group.add_argument(
+        '--enable-tpu-service-networking',
+        action='store_true',
+        hidden=hidden,
+        help="""\
+Enable Cloud TPU's Service Networking mode. In this mode, the CIDR blocks used
+by the Cloud TPUs will be allocated and managed by Service Networking, instead
+of Kubernetes Engine.
+
+This cannot be specified if `tpu-ipv4-cidr` is specified.
+""")
+
+  group.add_argument(
       '--tpu-ipv4-cidr',
       metavar='CIDR',
       hidden=hidden,
@@ -1551,12 +1596,14 @@ def AddIssueClientCertificateFlag(parser):
 Issue a TLS client certificate with admin permissions.
 
 When enabled, the certificate and private key pair will be present in
-MasterAuth field of the Cluster object.
+MasterAuth field of the Cluster object. For cluster versions before 1.12, a
+client certificate will be issued by default. As of 1.12, client certificates
+are disabled by default.
 """
   parser.add_argument(
       '--issue-client-certificate',
       action='store_true',
-      default=True,
+      default=None,
       help=help_text)
 
 
@@ -1569,16 +1616,17 @@ def AddIstioConfigFlag(parser, suppressed=False):
   """
 
   help_text = """\
-Configurations for Istio addon, requires --addons contains Istio.
+Configurations for Istio addon, requires --addons contains Istio for create,
+or --update-addons Istio=ENABLED for update.
 
-*auth*:::Optional Type of auth NONE or MUTUAL_TLS
+*auth*:::Optional Type of auth MTLS_PERMISSIVE or MTLS_STRICT
 Example:
 
-  $ {command} example-cluster --addons=Istio --istio-config=auth=NONE
+  $ {command} example-cluster --istio-config=auth=MTLS_PERMISSIVE
 """
   parser.add_argument(
       '--istio-config',
-      metavar='auth=NONE',
+      metavar='auth=MTLS_PERMISSIVE',
       type=arg_parsers.ArgDict(
           spec={
               'auth': (lambda x: x.upper()),
@@ -1587,26 +1635,49 @@ Example:
       hidden=suppressed)
 
 
-def ValidateIstioConfigArgs(istio_config_args, addons_args):
-  """Validates flags specifying Istio config.
+def ValidateIstioConfigCreateArgs(istio_config_args, addons_args):
+  """Validates flags specifying Istio config for create.
 
   Args:
     istio_config_args: parsed comandline arguments for --istio_config.
     addons_args: parsed comandline arguments for --addons.
   Raises:
-    InvalidArgumentException: when auth is not NONE nor MUTUAL_TLS, or
-    --addon=Istio is not specified
+    InvalidArgumentException: when auth is not MTLS_PERMISSIVE nor MTLS_STRICT,
+    or --addon=Istio is not specified
   """
   if istio_config_args:
     auth = istio_config_args.get('auth', '')
-    if auth not in ['NONE', 'MUTUAL_TLS']:
+    if auth not in ['MTLS_PERMISSIVE', 'MTLS_STRICT']:
       raise exceptions.InvalidArgumentException(
-          '--istio-config', 'auth is either NONE or MUTUAL_TLS '
-          'e.g. --istio-config auth=NONE')
+          '--istio-config', 'auth is either MTLS_PERMISSIVE or MTLS_STRICT'
+          'e.g. --istio-config auth=MTLS_PERMISSIVE')
     if 'Istio' not in addons_args:
       raise exceptions.InvalidArgumentException(
           '--istio-config', '--addon=Istio must be specified when '
           '--istio-config is given')
+
+
+def ValidateIstioConfigUpdateArgs(istio_config_args, disable_addons_args):
+  """Validates flags specifying Istio config for update.
+
+  Args:
+    istio_config_args: parsed comandline arguments for --istio_config.
+    disable_addons_args: parsed comandline arguments for --update-addons.
+  Raises:
+    InvalidArgumentException: when auth is not MTLS_PERMISSIVE nor MTLS_STRICT,
+    or --update-addons=Istio=ENABLED is not specified
+  """
+  if istio_config_args:
+    auth = istio_config_args.get('auth', '')
+    if auth not in ['MTLS_PERMISSIVE', 'MTLS_STRICT']:
+      raise exceptions.InvalidArgumentException(
+          '--istio-config', 'auth must be one of MTLS_PERMISSIVE or '
+          'MTLS_STRICT e.g. --istio-config auth=MTLS_PERMISSIVE')
+    disable_istio = disable_addons_args.get('Istio')
+    if disable_istio is None or disable_istio:
+      raise exceptions.InvalidArgumentException(
+          '--istio-config', '--update-addons=Istio=ENABLED must be specified '
+          'when --istio-config is given')
 
 
 def AddConcurrentNodeCountFlag(parser):
@@ -1647,10 +1718,10 @@ The list of predefined machine types is available using the following command:
   $ gcloud compute machine-types list
 
 You can also specify custom machine types with the string "custom-CPUS-RAM"
-where ``CPUS`` is the number of virtual CPUs and ``RAM`` is the amount of RAM in
-MiB.
+where ```CPUS``` is the number of virtual CPUs and ```RAM``` is the amount of
+RAM in MiB.
 
-For example, to create a node pool using custom machines with 2 vCPUs and 12 GiB
+For example, to create a node pool using custom machines with 2 vCPUs and 12 GB
 of RAM:
 
   $ {command} high-mem-pool --machine-type=custom-2-12288
@@ -1661,9 +1732,9 @@ of RAM:
       help=help_text)
 
 
-def AddManagedPodIdentityFlag(parser):
-  """Adds --enable-managed-pod-identity flag to the parser."""
-  help_text = """\
+def AddManagedPodIdentityFlags(parser):
+  """Adds Managed Pod Identity flags to the parser."""
+  enable_help_text = """\
 Enable Managed Pod Identity on the cluster.
 
 When enabled, pods with cloud.google.com/service-account annotations will be
@@ -1676,14 +1747,38 @@ specified in the annotation.
       default=False,
       # TODO(b/109942548): unhide this flag for Beta
       hidden=True,
-      help=help_text)
+      help=enable_help_text)
+  sa_help_text = """\
+Federating Service Account to use with Managed Pod Identity.
+
+Sets the name (email) of the GCP Service Account used to connect
+Kubernetes Service Accounts to GCP Service Accounts.
+
+Must be set with `--enable-managed-pod-identity`.
+"""
+  parser.add_argument(
+      '--federating-service-account',
+      default=None,
+      # TODO(b/109942548): unhide this flag for Beta
+      hidden=True,
+      help=sa_help_text)
 
 
-def AddResourceUsageBigqueryDatasetFlag(parser, add_clear_flag=False):
+def AddResourceUsageExportFlags(parser, add_clear_flag=False, hidden=False):
   """Adds flags about exporting cluster resource usage to BigQuery."""
 
-  group = parser.add_mutually_exclusive_group(
-      "Exports cluster's usage of cloud resources")
+  group = parser.add_group(
+      "Exports cluster's usage of cloud resources",
+      hidden=hidden)
+  if add_clear_flag:
+    group.is_mutex = True
+    group.add_argument(
+        '--clear-resource-usage-bigquery-dataset',
+        action='store_true',
+        hidden=hidden,
+        default=None,
+        help='Disables exporting cluster resource usage to BigQuery.')
+    group = group.add_group()
 
   dataset_help_text = """\
 The name of the BigQuery dataset to which the cluster's usage of cloud
@@ -1698,13 +1793,25 @@ Example:
 
   group.add_argument(
       '--resource-usage-bigquery-dataset',
+      default=None,
+      hidden=hidden,
       help=dataset_help_text)
 
-  if add_clear_flag:
-    group.add_argument(
-        '--clear-resource-usage-bigquery-dataset',
-        action='store_true',
-        help='Disables exporting cluster resource usage to BigQuery.')
+  network_egress_help_text = """`
+Enable network egress metering on this cluster.
+
+When enabled, a DaemonSet is deployed into the cluster. Each DaemonSet pod
+meters network egress traffic by collecting data from the conntrack table, and
+exports the metered metrics to the specified destination.
+
+Network egress metering is disabled if this flag is omitted, or when
+`--no-enable-network-egress-metering` is set.
+"""
+  group.add_argument(
+      '--enable-network-egress-metering',
+      action='store_true',
+      default=None,
+      help=network_egress_help_text)
 
 
 def AddVerticalPodAutoscalingFlag(parser, hidden=False):
@@ -1750,3 +1857,200 @@ Enables the requested sandbox on all nodes in the node-pool. Example:
 
 The only supported type is 'gvisor'.
       """)
+
+
+def AddSecurityProfileForCreateFlags(parser, hidden=False):
+  """Adds flags related to Security Profile to the parser for cluster creation.
+
+  Args:
+    parser: A given parser.
+    hidden: Whether or not to hide the help text.
+  """
+
+  group = parser.add_group(help='Flags for Security Profile:')
+
+  group.add_argument(
+      '--security-profile',
+      hidden=hidden,
+      help="""\
+Name and version of the security profile to be applied to the cluster.
+
+Example:
+
+  $ {command} example-cluster --security-profile=default-1.0-gke.0
+""")
+
+  group.add_argument(
+      '--security-profile-runtime-rules',
+      default=True,
+      action='store_true',
+      hidden=hidden,
+      help="""\
+Apply runtime rules in the specified security profile to the cluster.
+When enabled (by default), a security profile controller and webhook
+are deployed on the cluster to enforce the runtime rules. If
+--no-security-profile-runtime-rules is specified to disable this
+feature, only bootstrapping rules are applied, and no security profile
+controller or webhook are installed.
+""")
+
+
+def AddSecurityProfileForUpdateFlag(parser, hidden=False):
+  """Adds --security-profile to specify security profile for cluster update.
+
+  Args:
+    parser: A given parser.
+    hidden: Whether or not to hide the help text.
+  """
+
+  parser.add_argument(
+      '--security-profile',
+      hidden=hidden,
+      help="""\
+Name and version of the security profile to be applied to the cluster.
+If not specified, the current setting of security profile will be
+preserved.
+
+Example:
+
+  $ {command} example-cluster --security-profile=default-1.0-gke.1
+""")
+
+
+def AddSecurityProfileForUpgradeFlags(parser, hidden=False):
+  """Adds flags related to Security Profile to the parser for cluster upgrade.
+
+  Args:
+    parser: A given parser.
+    hidden: Whether or not to hide the help text.
+  """
+
+  group = parser.add_group(help='Flags for Security Profile:')
+
+  group.add_argument(
+      '--security-profile',
+      hidden=hidden,
+      help="""\
+Name and version of the security profile to be applied to the cluster.
+If not specified, the current security profile settings are preserved.
+If the current security profile is not supported in the new cluster
+version, this option must be explicitly specified with a supported
+security profile, otherwise the operation will fail.
+
+Example:
+
+  $ {command} example-cluster --security-profile=default-1.0-gke.1
+""")
+
+  group.add_argument(
+      '--security-profile-runtime-rules',
+      default=None,
+      action='store_true',
+      hidden=hidden,
+      help="""\
+Apply runtime rules in the specified security profile to the cluster.
+When enabled, a security profile controller and webhook
+are deployed on the cluster to enforce the runtime rules. If
+--no-security-profile-runtime-rules is specified to disable this
+feature, only bootstrapping rules are applied, and no security profile
+controller or webhook are installed.
+""")
+
+
+def AddNodeGroupFlag(parser):
+  """Adds --node-group flag to the parser."""
+  help_text = """\
+Assign instances of this pool to run on the specified GCE node group.
+This is useful for running workloads on sole tenant nodes.
+
+To see available sole tenant node-groups, run:
+
+  $ gcloud compute sole-tenancy node-groups list
+
+To create a sole tenant node group, run:
+
+  $ gcloud compute sole-tenancy node-groups create [GROUP_NAME] \
+    --zone [ZONE] --node-template [TEMPLATE_NAME] --target-size [TARGET_SIZE]
+
+See https://cloud.google.com/compute/docs/nodes for more
+information on sole tenancy and node groups.
+"""
+
+  parser.add_argument(
+      '--node-group',
+      hidden=True,
+      help=help_text)
+
+
+def AddInitialNodePoolNameArg(parser, hidden=True):
+  """Adds --node-pool-name argument to the parser."""
+  help_text = """\
+Name of the initial node pool that will be created for the cluster.
+
+Specifies the name to use for the initial node pool that will be created
+with the cluster.  If the settings specified require multiple node pools
+to be created, the name for each pool will be prefixed by this name.  For
+example running the following will result in three node pools being
+created, example-node-pool-0, example-node-pool-1 and
+example-node-pool-2:
+
+  $ {command} example-cluster --num-nodes 9 --max-nodes-per-pool 3 \
+    --node-pool-name example-node-pool
+"""
+
+  parser.add_argument('--node-pool-name', hidden=hidden, help=help_text)
+
+
+def AddMetadataFlags(parser):
+  """Adds --metadata and --metadata-from-file flags to the given parser."""
+  metadata_help = """\
+      Compute Engine metadata to be made available to the guest operating system
+      running on nodes within the node pool.
+
+      Each metadata entry is a key/value pair separated by an equals sign.
+      Metadata keys must be unique and less than 128 bytes in length. Values
+      must be less than or equal to 32,768 bytes in length. The total size of
+      all keys and values must be less than 512 KB. Multiple arguments can be
+      passed to this flag. For example:
+
+      ``--metadata key-1=value-1,key-2=value-2,key-3=value-3''
+
+      Additionally, the following keys are reserved for use by Kubernetes
+      Engine:
+
+      * ``cluster-location''
+      * ``cluster-name''
+      * ``cluster-uid''
+      * ``configure-sh''
+      * ``enable-os-login''
+      * ``gci-update-strategy''
+      * ``gci-ensure-gke-docker''
+      * ``instance-template''
+      * ``kube-env''
+      * ``startup-script''
+      * ``user-data''
+
+      See also Compute Engine's
+      link:https://cloud.google.com/compute/docs/storing-retrieving-metadata[documentation]
+      on storing and retrieving instance metadata.
+      """
+
+  parser.add_argument(
+      '--metadata',
+      type=arg_parsers.ArgDict(min_length=1),
+      default={},
+      help=metadata_help,
+      metavar='KEY=VALUE',
+      action=arg_parsers.StoreOnceAction)
+
+  metadata_from_file_help = """\
+      Same as ``--metadata'' except that the value for the entry will
+      be read from a local file.
+      """
+
+  parser.add_argument(
+      '--metadata-from-file',
+      type=arg_parsers.ArgDict(min_length=1),
+      default={},
+      help=metadata_from_file_help,
+      metavar='KEY=LOCAL_FILE_PATH')

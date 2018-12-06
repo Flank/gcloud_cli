@@ -28,7 +28,7 @@ class EndpointsUndeleteTest(unit_test_base.EV1UnitTestBase):
   def testServicesUndelete(self):
     operation_name = 'operation-12345-67890'
     self.mocked_client.services.Undelete.Expect(
-        request=self.services_messages.ServicemanagementServicesDeleteRequest(
+        request=self.services_messages.ServicemanagementServicesUndeleteRequest(
             serviceName=self.DEFAULT_SERVICE_NAME),
         response=self.services_messages.Operation(
             name=operation_name,

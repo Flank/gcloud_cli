@@ -24,14 +24,12 @@ from tests.lib.surface.resource_manager import testbase
 class OrgPoliciesDeleteTest(testbase.OrgPoliciesUnitTestBase):
 
   def testDeleteOrgPolicy(self):
-    test_policy = self.TestPolicy()
-
     self.mock_projects.ClearOrgPolicy.Expect(
-        self.ExpectedClearRequest(self.PROJECT_ARG), test_policy)
+        self.ExpectedClearRequest(self.PROJECT_ARG), self.messages.Empty())
     self.mock_organizations.ClearOrgPolicy.Expect(
-        self.ExpectedClearRequest(self.ORG_ARG), test_policy)
+        self.ExpectedClearRequest(self.ORG_ARG), self.messages.Empty())
     self.mock_folders.ClearOrgPolicy.Expect(
-        self.ExpectedClearRequest(self.FOLDER_ARG), test_policy)
+        self.ExpectedClearRequest(self.FOLDER_ARG), self.messages.Empty())
     self.assertEqual(self.DoRequest(self.PROJECT_ARG), None)
     self.assertEqual(self.DoRequest(self.ORG_ARG), None)
     self.assertEqual(self.DoRequest(self.FOLDER_ARG), None)

@@ -15,18 +15,12 @@ gcloud alpha redis instances \- manage Cloud Memorystore Redis instances
 
 
 
-.SH "DESCRIPTION"
-
-\fB(ALPHA)\fR Manage Cloud Memorystore Redis instances.
-
-
-
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -59,15 +53,53 @@ help\fR for details.
 .RE
 .sp
 
+.SH "EXAMPLES"
+
+To create an instance with the name \f5my\-redis\-instance\fR, run:
+
+.RS 2m
+$ gcloud alpha redis instances create my\-redis\-instance
+.RE
+
+To delete an instance with the name \f5my\-redis\-instance\fR, run:
+
+.RS 2m
+$ gcloud alpha redis instances delete my\-redis\-instance
+.RE
+
+To display the details for an instance with the name \f5my\-redis\-instance\fR,
+run:
+
+.RS 2m
+$ gcloud alpha redis instances describe my\-redis\-instance
+.RE
+
+To list all the instances, run:
+
+.RS 2m
+$ gcloud alpha redis instances list
+.RE
+
+To set the label \f5env\fR to \f5prod\fR for an instance with the name
+\f5my\-redis\-instance\fR, run:
+
+.RS 2m
+$ gcloud alpha redis instances my\-redis\-instance \e
+    \-\-update\-labels=env=prod
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud redis instances
 $ gcloud beta redis instances
 .RE
 

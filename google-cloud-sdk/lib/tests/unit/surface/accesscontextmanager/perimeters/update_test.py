@@ -18,24 +18,26 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class PerimetersUpdateTest(accesscontextmanager.Base):
+class PerimetersUpdateTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def _ExpectGet(self, policy, perimeter):
     m = self.messages
-    get_req_type = m.AccesscontextmanagerAccessPoliciesAccessZonesGetRequest
-    self.client.accessPolicies_accessZones.Get.Expect(
+    get_req_type = (
+        m.AccesscontextmanagerAccessPoliciesServicePerimetersGetRequest)
+    self.client.accessPolicies_servicePerimeters.Get.Expect(
         get_req_type(name=perimeter.name), perimeter)
 
   def _ExpectPatch(self,
@@ -48,24 +50,24 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
     m = self.messages
     if perimeter_before is not None:
       self._ExpectGet(policy, perimeter_before)
-    req_type = m.AccesscontextmanagerAccessPoliciesAccessZonesPatchRequest
-    self.client.accessPolicies_accessZones.Patch.Expect(
+    req_type = m.AccesscontextmanagerAccessPoliciesServicePerimetersPatchRequest
+    self.client.accessPolicies_servicePerimeters.Patch.Expect(
         req_type(
             name=perimeter_name,
-            accessZone=perimeter_update,
+            servicePerimeter=perimeter_update,
             updateMask=update_mask),
         self.messages.Operation(name='operations/my-op', done=False))
     self._ExpectGetOperation('operations/my-op')
     self._ExpectGet(policy, perimeter_after)
 
-  def testUpdate_MissingRequired(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_MissingRequired(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager perimeters update --policy MY_POLICY')
 
-  def testUpdate_NoUpdates(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_NoUpdates(self):
+    self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -73,8 +75,9 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
         restricted_services=[],
         unrestricted_services=[],
         access_levels=[],
-        type_='ZONE_TYPE_REGULAR')
-    self._ExpectPatch(self.messages.AccessZone(), perimeter, '', 'MY_POLICY')
+        type_='PERIMETER_TYPE_REGULAR')
+    self._ExpectPatch(self.messages.ServicePerimeter(), perimeter, '',
+                      'MY_POLICY')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
@@ -83,8 +86,8 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter)
 
-  def testUpdate_NonRepeatingFields(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_NonRepeatingFields(self):
+    self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -92,15 +95,16 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
         restricted_services=[],
         unrestricted_services=[],
         access_levels=[],
-        type_='ZONE_TYPE_BRIDGE')
-    perimeter_types = self.messages.AccessZone.ZoneTypeValueValuesEnum
-    perimeter_update = self.messages.AccessZone(
+        type_='PERIMETER_TYPE_BRIDGE')
+    perimeter_types = (
+        self.messages.ServicePerimeter.PerimeterTypeValueValuesEnum)
+    perimeter_update = self.messages.ServicePerimeter(
         title='My Perimeter Title',
         description='foo bar',
-        zoneType=perimeter_types.ZONE_TYPE_BRIDGE,
+        perimeterType=perimeter_types.PERIMETER_TYPE_BRIDGE,
     )
-    self._ExpectPatch(perimeter_update, perimeter, 'description,title,zoneType',
-                      'MY_POLICY')
+    self._ExpectPatch(perimeter_update, perimeter,
+                      'description,perimeterType,title', 'MY_POLICY')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
@@ -109,8 +113,8 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter)
 
-  def testUpdate_ClearRepeatingFields(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_ClearRepeatingFields(self):
+    self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -118,16 +122,17 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
         restricted_services=[],
         unrestricted_services=[],
         access_levels=[],
-        type_='ZONE_TYPE_BRIDGE')
-    perimeter_update = self.messages.AccessZone(
-        restrictedServices=[],
-        unrestrictedServices=[],
-        accessLevels=[],
-        resources=[])
+        resources=[],
+        type_='PERIMETER_TYPE_BRIDGE')
+    perimeter_update = self.messages.ServicePerimeter(
+        status=self.messages.ServicePerimeterConfig(
+            restrictedServices=[],
+            unrestrictedServices=[],
+            accessLevels=[],
+            resources=[]))
     self._ExpectPatch(
-        perimeter_update, perimeter,
-        'accessLevels,resources,restrictedServices,unrestrictedServices',
-        'MY_POLICY')
+        perimeter_update, perimeter, 'status.accessLevels,status.resources,'
+        'status.restrictedServices,status.unrestrictedServices', 'MY_POLICY')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
@@ -136,8 +141,8 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter)
 
-  def testUpdate_SetRepeatingFields(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_SetRepeatingFields(self):
+    self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -145,19 +150,19 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
         restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
         unrestricted_services=['*'],
         access_levels=['a', 'b'],
-        type_='ZONE_TYPE_BRIDGE')
-    perimeter_update = self.messages.AccessZone(
-        restrictedServices=perimeter.restrictedServices,
-        unrestrictedServices=perimeter.unrestrictedServices,
-        accessLevels=[  # _MakePerimeter has sugar for resource names
-            'accessPolicies/MY_POLICY/accessLevels/a',
-            'accessPolicies/MY_POLICY/accessLevels/b'
-        ],
-        resources=perimeter.resources)
+        type_='PERIMETER_TYPE_BRIDGE')
+    perimeter_update = self.messages.ServicePerimeter(
+        status=self.messages.ServicePerimeterConfig(
+            restrictedServices=perimeter.status.restrictedServices,
+            unrestrictedServices=perimeter.status.unrestrictedServices,
+            accessLevels=[  # _MakePerimeter has sugar for resource names
+                'accessPolicies/MY_POLICY/accessLevels/a',
+                'accessPolicies/MY_POLICY/accessLevels/b'
+            ],
+            resources=perimeter.status.resources))
     self._ExpectPatch(
-        perimeter_update, perimeter,
-        'accessLevels,resources,restrictedServices,unrestrictedServices',
-        'MY_POLICY')
+        perimeter_update, perimeter, 'status.accessLevels,status.resources,'
+        'status.restrictedServices,status.unrestrictedServices', 'MY_POLICY')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
@@ -169,8 +174,8 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter)
 
-  def testUpdate_AddRemoveRepeatingFields(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_AddRemoveRepeatingFields(self):
+    self.SetUpForTrack(self.track)
     perimeter_before = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -179,7 +184,7 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
         unrestricted_services=['baz.googleapis.com'],
         access_levels=['a', 'b'],
         resources=['projects/12345', 'projects/67890'],
-        type_='ZONE_TYPE_BRIDGE')
+        type_='PERIMETER_TYPE_BRIDGE')
     perimeter_after = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -187,13 +192,15 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
         restricted_services=['bar.googleapis.com'],
         unrestricted_services=['baz.googleapis.com'],
         access_levels=['a', 'b', 'c', 'd'],
-        type_='ZONE_TYPE_BRIDGE')
-    perimeter_update = self.messages.AccessZone(
-        restrictedServices=perimeter_after.restrictedServices,
-        accessLevels=perimeter_after.accessLevels)
+        type_='PERIMETER_TYPE_BRIDGE')
+    perimeter_update = self.messages.ServicePerimeter(
+        status=self.messages.ServicePerimeterConfig(
+            restrictedServices=perimeter_after.status.restrictedServices,
+            accessLevels=perimeter_after.status.accessLevels))
     self._ExpectGet('MY_POLICY', perimeter_before)
     self._ExpectPatch(perimeter_update, perimeter_after,
-                      'accessLevels,restrictedServices', 'MY_POLICY')
+                      'status.accessLevels,status.restrictedServices',
+                      'MY_POLICY')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
@@ -205,8 +212,8 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter_after)
 
-  def testUpdate_PolicyFromProperty(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_PolicyFromProperty(self):
+    self.SetUpForTrack(self.track)
     policy = 'my_acm_policy'
     properties.VALUES.access_context_manager.policy.Set(policy)
     perimeter = self._MakePerimeter(
@@ -217,22 +224,30 @@ class PerimetersUpdateTest(accesscontextmanager.Base):
         restricted_services=[],
         unrestricted_services=[],
         access_levels=[],
-        type_='ZONE_TYPE_BRIDGE')
-    perimeter.name = 'accessPolicies/my_acm_policy/accessZones/MY_PERIMETER'
-    perimeter_types = self.messages.AccessZone.ZoneTypeValueValuesEnum
-    perimeter_update = self.messages.AccessZone(
+        type_='PERIMETER_TYPE_BRIDGE')
+    perimeter.name = (
+        'accessPolicies/my_acm_policy/servicePerimeters/MY_PERIMETER')
+    perimeter_types = (
+        self.messages.ServicePerimeter.PerimeterTypeValueValuesEnum)
+    perimeter_update = self.messages.ServicePerimeter(
         title='My Perimeter Title',
         description='foo bar',
-        zoneType=perimeter_types.ZONE_TYPE_BRIDGE,
+        perimeterType=perimeter_types.PERIMETER_TYPE_BRIDGE,
     )
-    self._ExpectPatch(perimeter_update, perimeter, 'description,title,zoneType',
-                      policy)
+    self._ExpectPatch(perimeter_update, perimeter,
+                      'description,perimeterType,title', policy)
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
         '   --type bridge --title "My Perimeter Title" --description "foo bar"')
 
     self.assertEqual(result, perimeter)
+
+
+class PerimetersUpdateTestAlpha(PerimetersUpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

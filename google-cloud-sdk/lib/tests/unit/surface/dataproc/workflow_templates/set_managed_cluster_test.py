@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import copy
 
 from apitools.base.py import encoding
@@ -70,13 +71,6 @@ class WorkflowTemplateSetManagedClusterUnitTest(
     self.ExpectSetManagedCluster(
         workflow_template, response=response, exception=exception)
 
-
-class WorkflowTemplateSetManagedClusterUnitTestBeta(
-    WorkflowTemplateSetManagedClusterUnitTest):
-
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
-
   def testSetManagedCluster(self):
     workflow_template = self.MakeWorkflowTemplate()
     cluster_name = 'test-cluster'
@@ -105,6 +99,159 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
     num_preemptible_workers = 5
     image_version = '1.7'
     network = 'foo-network'
+    network_uri = ('https://www.googleapis.com/compute/v1/projects/'
+                   'fake-project/global/networks/foo-network')
+    action_uris = ['gs://my-bucket/action1.sh', 'gs://my-bucket/action2.sh']
+    initialization_actions = [
+        self.messages.NodeInitializationAction(
+            executableFile=action_uris[0], executionTimeout='120s'),
+        self.messages.NodeInitializationAction(
+            executableFile=action_uris[1], executionTimeout='120s')
+    ]
+    service_account = 'test-account'
+    scope_list = 'https://www.googleapis.com/auth/dataproc-stuff,cloud-platform'
+    scope_uris = [
+        'https://www.googleapis.com/auth/cloud-platform',
+        'https://www.googleapis.com/auth/dataproc-stuff',
+    ]
+    cluster_properties = collections.OrderedDict([
+        ('core:com.foo', 'foo'),
+        ('hdfs:com.bar', 'bar')])
+    cluster_metadata = collections.OrderedDict([
+        ('key1', 'value1'),
+        ('key2', 'value2')])
+
+    managed_cluster = self.MakeManagedCluster(
+        clusterName=cluster_name,
+        configBucket=bucket,
+        imageVersion=image_version,
+        masterMachineTypeUri=master_machine_type,
+        workerMachineTypeUri=worker_machine_type,
+        networkUri=network_uri,
+        masterConfigNumInstances=num_masters,
+        workerConfigNumInstances=num_workers,
+        secondaryWorkerConfigNumInstances=num_preemptible_workers,
+        zoneUri=zone,
+        initializationActions=initialization_actions,
+        serviceAccount=service_account,
+        serviceAccountScopes=scope_uris,
+        properties=encoding.DictToAdditionalPropertyMessage(
+            cluster_properties, self.messages.SoftwareConfig.PropertiesValue),
+        tags=['tag1', 'tag2'],
+        metadata=encoding.DictToAdditionalPropertyMessage(
+            cluster_metadata, self.messages.GceClusterConfig.MetadataValue))
+
+    workflow_template = self.MakeWorkflowTemplate()
+    self.ExpectCallSetManagedCluster(
+        workflow_template=workflow_template, managed_cluster=managed_cluster)
+
+    command = ('workflow-templates set-managed-cluster {template} '
+               '--cluster-name {cluster_name} '
+               '--bucket {bucket} '
+               '--zone {zone} '
+               '--num-masters {num_masters} '
+               '--num-workers {num_workers} '
+               '--master-machine-type {master_machine_type} '
+               '--worker-machine-type {worker_machine_type} '
+               '--network {network} '
+               '--image-version {image_version} '
+               '--initialization-action-timeout 2m '
+               '--initialization-actions {actions} '
+               '--num-preemptible-workers {num_preemptible} '
+               '--service-account {service_account} '
+               '--scopes {scopes} '
+               '--properties core:com.foo=foo,hdfs:com.bar=bar '
+               '--tags tag1,tag2 '
+               '--metadata key1=value1,key2=value2 ').format(
+                   template=self.WORKFLOW_TEMPLATE,
+                   cluster_name=cluster_name,
+                   bucket=bucket,
+                   zone=zone,
+                   num_masters=num_masters,
+                   num_workers=num_workers,
+                   master_machine_type=master_machine_type,
+                   worker_machine_type=worker_machine_type,
+                   network=network,
+                   image_version=image_version,
+                   actions=','.join(action_uris),
+                   num_preemptible=num_preemptible_workers,
+                   service_account=service_account,
+                   scopes=scope_list)
+
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(workflow_template, result)
+
+  def testSetManagedClusterAutoZone(self):
+    properties.VALUES.dataproc.region.Set('us-test1')
+    template_name = self.WorkflowTemplateName(region='us-test1')
+    cluster_name = 'test-cluster'
+    workflow_template = self.MakeWorkflowTemplate(name=template_name)
+    managed_cluster = self.MakeManagedCluster(
+        clusterName=cluster_name, region='us-test1', zoneUri='')
+    self.ExpectCallSetManagedCluster(
+        workflow_template=workflow_template, managed_cluster=managed_cluster)
+    result = self.RunDataproc(
+        'workflow-templates set-managed-cluster {template} '
+        '--cluster-name {cluster_name} '
+        '--zone=""'.format(
+            template=workflow_template.id, cluster_name=cluster_name))
+    self.AssertMessagesEqual(workflow_template, result)
+
+  def testSetManagedClusterNoName(self):
+    workflow_template = self.MakeWorkflowTemplate()
+    project = self.Project()
+    zone = 'foo-zone'
+    managed_cluster = self.MakeManagedCluster(
+        clusterName=workflow_template.id, projectId=project, zoneUri=zone)
+    self.ExpectCallSetManagedCluster(
+        workflow_template=workflow_template, managed_cluster=managed_cluster)
+
+    result = self.RunDataproc(
+        'workflow-templates set-managed-cluster {template} '
+        '--zone {zone}'.format(template=workflow_template.id, zone=zone))
+    self.AssertMessagesEqual(workflow_template, result)
+
+  def testSetManagedClusterOmitZone_globalRegion(self):
+    self.MockCompute()
+    self.ExpectListZones()
+    self.WriteInput('3\n')  # us-central1-a
+
+    template_name = self.WorkflowTemplateName()
+    cluster_name = 'test-cluster'
+    workflow_template = self.MakeWorkflowTemplate(name=template_name)
+    managed_cluster = self.MakeManagedCluster(
+        clusterName=cluster_name, zoneUri='')
+    self.ExpectCallSetManagedCluster(
+        workflow_template=workflow_template, managed_cluster=managed_cluster)
+    result = self.RunDataproc(
+        'workflow-templates set-managed-cluster {template} '
+        '--cluster-name {cluster_name} '
+        '--zone=""'.format(
+            template=workflow_template.id, cluster_name=cluster_name))
+    self.AssertMessagesEqual(workflow_template, result)
+    self.AssertErrContains('PROMPT_CHOICE')
+    self.AssertErrContains(
+        '"choices": ["europe-west1-a", "europe-west1-b (DELETED)", '
+        '"us-central1-a (DEPRECATED)", "us-central1-b"]')
+
+
+class WorkflowTemplateSetManagedClusterUnitTestBeta(
+    WorkflowTemplateSetManagedClusterUnitTest):
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+
+  def testSetManagedClusterFlags(self):
+    cluster_name = 'test-cluster'
+    zone = 'foo-zone'
+    master_machine_type = 'foo-type'
+    worker_machine_type = 'bar-type'
+    bucket = 'foo-bucket'
+    num_masters = 3
+    num_workers = 7
+    num_preemptible_workers = 5
+    image_version = '1.7'
+    network = 'foo-network'
     network_uri = ('https://www.googleapis.com/compute/beta/projects/'
                    'fake-project/global/networks/foo-network')
     action_uris = ['gs://my-bucket/action1.sh', 'gs://my-bucket/action2.sh']
@@ -120,14 +267,12 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/dataproc-stuff',
     ]
-    cluster_properties = {
-        'core:com.foo': 'foo',
-        'hdfs:com.bar': 'bar',
-    }
-    cluster_metadata = {
-        'key1': 'value1',
-        'key2': 'value2',
-    }
+    cluster_properties = collections.OrderedDict([
+        ('core:com.foo', 'foo'),
+        ('hdfs:com.bar', 'bar')])
+    cluster_metadata = collections.OrderedDict([
+        ('key1', 'value1'),
+        ('key2', 'value2')])
     managed_cluster = self.MakeManagedCluster(
         clusterName=cluster_name,
         configBucket=bucket,
@@ -142,10 +287,10 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
         initializationActions=initialization_actions,
         serviceAccount=service_account,
         serviceAccountScopes=scope_uris,
-        properties=encoding.DictToMessage(
+        properties=encoding.DictToAdditionalPropertyMessage(
             cluster_properties, self.messages.SoftwareConfig.PropertiesValue),
         tags=['tag1', 'tag2'],
-        metadata=encoding.DictToMessage(
+        metadata=encoding.DictToAdditionalPropertyMessage(
             cluster_metadata, self.messages.GceClusterConfig.MetadataValue))
 
     workflow_template = self.MakeWorkflowTemplate()
@@ -282,56 +427,3 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                    expiration_time='2017-08-25T00:00:00-07:00')
     result = self.RunDataproc(command)
     self.AssertMessagesEqual(workflow_template, result)
-
-  def testSetManagedClusterAutoZone(self):
-    properties.VALUES.dataproc.region.Set('us-test1')
-    template_name = self.WorkflowTemplateName(region='us-test1')
-    cluster_name = 'test-cluster'
-    workflow_template = self.MakeWorkflowTemplate(name=template_name)
-    managed_cluster = self.MakeManagedCluster(
-        clusterName=cluster_name, region='us-test1', zoneUri='')
-    self.ExpectCallSetManagedCluster(
-        workflow_template=workflow_template, managed_cluster=managed_cluster)
-    result = self.RunDataproc(
-        'workflow-templates set-managed-cluster {template} '
-        '--cluster-name {cluster_name} '
-        '--zone=""'.format(
-            template=workflow_template.id, cluster_name=cluster_name))
-    self.AssertMessagesEqual(workflow_template, result)
-
-  def testSetManagedClusterNoName(self):
-    workflow_template = self.MakeWorkflowTemplate()
-    project = self.Project()
-    zone = 'foo-zone'
-    managed_cluster = self.MakeManagedCluster(
-        clusterName=workflow_template.id, projectId=project, zoneUri=zone)
-    self.ExpectCallSetManagedCluster(
-        workflow_template=workflow_template, managed_cluster=managed_cluster)
-
-    result = self.RunDataproc(
-        'workflow-templates set-managed-cluster {template} '
-        '--zone {zone}'.format(template=workflow_template.id, zone=zone))
-    self.AssertMessagesEqual(workflow_template, result)
-
-  def testSetManagedClusterOmitZone_globalRegion(self):
-    self.MockCompute()
-    self.ExpectListZones()
-    self.WriteInput('3\n')  # us-central1-a
-
-    template_name = self.WorkflowTemplateName()
-    cluster_name = 'test-cluster'
-    workflow_template = self.MakeWorkflowTemplate(name=template_name)
-    managed_cluster = self.MakeManagedCluster(
-        clusterName=cluster_name, zoneUri='')
-    self.ExpectCallSetManagedCluster(
-        workflow_template=workflow_template, managed_cluster=managed_cluster)
-    result = self.RunDataproc(
-        'workflow-templates set-managed-cluster {template} '
-        '--cluster-name {cluster_name} '
-        '--zone=""'.format(
-            template=workflow_template.id, cluster_name=cluster_name))
-    self.AssertMessagesEqual(workflow_template, result)
-    self.AssertErrContains('PROMPT_CHOICE')
-    self.AssertErrContains(
-        '"choices": ["europe-west1-a", "europe-west1-b (DELETED)", '
-        '"us-central1-a (DEPRECATED)", "us-central1-b"]')

@@ -31,8 +31,9 @@ OPTIONAL FLAGS
             Default (Google-managed) BGP advertisements.
 
      --asn=ASN
-        The optional BGP autonomous system number (ASN) for this router. For
-        more information see: https://tools.ietf.org/html/rfc6996.
+        The optional BGP autonomous system number (ASN) for this router. Must
+        be a 16-bit or 32-bit private ASN as defined in
+        https://tools.ietf.org/html/rfc6996, for example --asn=64512.
 
      --async
         Display information about the operation in progress, without waiting
@@ -81,8 +82,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

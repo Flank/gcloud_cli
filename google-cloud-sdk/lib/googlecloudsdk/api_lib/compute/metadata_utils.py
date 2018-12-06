@@ -21,16 +21,16 @@ from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.api_lib.compute import constants
+from googlecloudsdk.api_lib.compute import exceptions
 from googlecloudsdk.calliope import arg_parsers
-from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.core import exceptions as core_exceptions
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core.util import files
 
 import six
 
 
-class InvalidSshKeyException(core_exceptions.Error):
+class InvalidSshKeyException(exceptions.Error):
   """InvalidSshKeyException is for invalid ssh keys in metadata"""
 
 
@@ -115,6 +115,34 @@ def _SshKeyStartsWithKeyType(key):
   return any(key_starts_with_types)
 
 
+def ConstructMetadataDict(metadata=None, metadata_from_file=None):
+  """Returns the dict of metadata key:value pairs based on the given dicts.
+
+  Args:
+    metadata: A dict mapping metadata keys to metadata values or None.
+    metadata_from_file: A dict mapping metadata keys to file names containing
+      the keys' values or None.
+
+  Raises:
+    ToolException: If metadata and metadata_from_file contain duplicate
+      keys or if there is a problem reading the contents of a file in
+      metadata_from_file.
+
+  Returns:
+    A dict of metadata key:value pairs.
+  """
+  metadata = metadata or {}
+  metadata_from_file = metadata_from_file or {}
+
+  new_metadata_dict = copy.deepcopy(metadata)
+  for key, file_path in six.iteritems(metadata_from_file):
+    if key in new_metadata_dict:
+      raise calliope_exceptions.ToolException(
+          'Encountered duplicate metadata key [{0}].'.format(key))
+    new_metadata_dict[key] = files.ReadFileContents(file_path)
+  return new_metadata_dict
+
+
 def ConstructMetadataMessage(message_classes,
                              metadata=None,
                              metadata_from_file=None,
@@ -124,10 +152,10 @@ def ConstructMetadataMessage(message_classes,
   Args:
     message_classes: An object containing API message classes.
     metadata: A dict mapping metadata keys to metadata values or None.
-    metadata_from_file: A dict mapping metadata keys to file names
-      containing the keys' values or None.
-    existing_metadata: If not None, the given metadata values are
-      combined with this Metadata message.
+    metadata_from_file: A dict mapping metadata keys to file names containing
+      the keys' values or None.
+    existing_metadata: If not None, the given metadata values are combined with
+      this Metadata message.
 
   Raises:
     ToolException: If metadata and metadata_from_file contain duplicate
@@ -137,15 +165,7 @@ def ConstructMetadataMessage(message_classes,
   Returns:
     A Metadata protobuf.
   """
-  metadata = metadata or {}
-  metadata_from_file = metadata_from_file or {}
-
-  new_metadata_dict = copy.deepcopy(metadata)
-  for key, file_path in six.iteritems(metadata_from_file):
-    if key in new_metadata_dict:
-      raise exceptions.ToolException(
-          'Encountered duplicate metadata key [{0}].'.format(key))
-    new_metadata_dict[key] = files.ReadFileContents(file_path)
+  new_metadata_dict = ConstructMetadataDict(metadata, metadata_from_file)
 
   existing_metadata_dict = _MetadataMessageToDict(existing_metadata)
   existing_metadata_dict.update(new_metadata_dict)

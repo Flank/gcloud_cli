@@ -128,7 +128,7 @@ class InstanceGroupsAutoHealingTest(e2e_test_base.BaseTest):
     self.GetNewErr()
     self.Run('compute health-checks delete {0} --quiet'.format(name))
     stderr = self.GetNewErr()
-    self.assertStartsWith(stderr, 'Deleted')
+    self.AssertErrContains(stderr, 'Deleted')
     return stderr
 
   def _RunAutohealingTest(self):

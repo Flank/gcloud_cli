@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Module for oslogin test base classes."""
+"""Module for oslogin test calliope_base classes."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -30,9 +30,9 @@ import mock
 class OsloginBaseTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   """Base class for gcloud oslogin tests."""
 
-  VERSION_MAP = {base.ReleaseTrack.ALPHA: 'v1alpha',
-                 base.ReleaseTrack.BETA: 'v1beta',
-                 base.ReleaseTrack.GA: 'v1'}
+  VERSION_MAP = {calliope_base.ReleaseTrack.ALPHA: 'v1alpha',
+                 calliope_base.ReleaseTrack.BETA: 'v1beta',
+                 calliope_base.ReleaseTrack.GA: 'v1'}
 
   def SetUpMockApis(self, release_track):
     self.api = self.VERSION_MAP[release_track]

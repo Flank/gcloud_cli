@@ -31,7 +31,6 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.command_lib.iam import completers as iam_completers
 from googlecloudsdk.command_lib.ml_engine import models_util
-from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.command_lib.util.args import repeated
 from googlecloudsdk.command_lib.util.args import update_util
@@ -164,14 +163,42 @@ Path to the job configuration file. This file should be a YAML document (JSON
 also accepted) containing a Job resource as defined in the API (all fields are
 optional): https://cloud.google.com/ml/reference/rest/v1/projects.jobs
 
+EXAMPLES:\n
+JSON:
+
+  {
+    "jobId": "my_job",
+    "labels": {
+      "type": "prod",
+      "owner": "alice"
+    },
+    "trainingInput": {
+      "scaleTier": "BASIC",
+      "packageUris": [
+        "gs://my/package/path"
+      ],
+      "region": "us-east1"
+    }
+  }
+
+YAML:
+
+  jobId: my_job
+  labels:
+    type: prod
+    owner: alice
+  trainingInput:
+    scaleTier: BASIC
+    packageUris:
+    - gs://my/package/path
+    region: us-east1
+
+
+
 If an option is specified both in the configuration file **and** via command line
 arguments, the command line arguments override the configuration file.
 """)
 JOB_NAME = base.Argument('job', help='Name of the job.')
-MODULE_NAME = base.Argument(
-    '--module-name',
-    required=True,
-    help='Name of the module to run.')
 PACKAGE_PATH = base.Argument(
     '--package-path',
     help="""\
@@ -217,6 +244,13 @@ online prediction. Currently supported machine_types are:
 * `mls1-highmem-1` - A virtual machine with 1 core and 2 Gb RAM (will be deprecated soon).
 * `mls1-highcpu-4` - A virtual machine with 4 core and 2 Gb RAM (will be deprecated soon).
 """)
+
+
+def GetModuleNameFlag(required=True):
+  return base.Argument(
+      '--module-name',
+      required=required,
+      help='Name of the module to run.')
 
 
 def GetJobDirFlag(upload_help=True, allow_local=False):
@@ -440,7 +474,7 @@ def GetVersionResourceSpec():
       resource_name='version',
       versionsId=VersionAttributeConfig(),
       modelsId=ModelAttributeConfig(),
-      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG)
+      projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG)
 
 
 def AddVersionResourceArg(parser, verb):
@@ -499,3 +533,45 @@ def AddUserCodeUpdateArgs(parser):
       ('The fully-qualified name of the custom Model class in the package '
        'provided for custom prediction.\n\n'
        'For example, `my_package.SequenceModel`.'))
+
+
+def GetAcceleratorFlag():
+  return base.Argument(
+      '--accelerator',
+      type=arg_parsers.ArgDict(spec={
+          'type': str,
+          'count': int,
+      }, required_keys=['type', 'count']),
+      help="""\
+Manage the accelerator config for GPU serving. When deploying a model with the
+new Alpha Google Compute Engine Machine Types, a GPU accelerator may also be selected.
+
+*type*::: The type of the accelerator. Choices are 'nvdia-tesla-k80', 'nvdia-tesla-p100', 'nvdia-tesla-v100' and 'nvdia-tesla-p4'.
+
+*count*::: The number of accelerators to attach to each machine running the job.
+""")
+
+
+def ParseAcceleratorFlag(accelerator):
+  """Validates and returns a accelerator config message object."""
+  types = ('nvidia-tesla-k80', 'nvidia-tesla-p100', 'nvidia-tesla-v100',
+           'nvidia-tesla-p4')
+  if accelerator is None:
+    return None
+  raw_type = accelerator.get('type', None)
+  if raw_type not in types:
+    raise ArgumentError("""\
+The type of the accelerator can only be one of the following: 'nvidia-tesla-k80', 'nvidia-tesla-p100', 'nvidia-tesla-v100' and 'nvidia-tesla-p4'.
+""")
+  accelerator_count = accelerator.get('count', 0)
+  if accelerator_count <= 0:
+    raise ArgumentError("""\
+The count of the accelerator must be greater than 0.
+""")
+  accelerator_msg = (versions_api.GetMessagesModule().
+                     GoogleCloudMlV1AcceleratorConfig)
+  accelerator_type = arg_utils.ChoiceToEnum(
+      raw_type, accelerator_msg.TypeValueValuesEnum)
+  return accelerator_msg(
+      count=accelerator_count,
+      type=accelerator_type)

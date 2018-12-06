@@ -28,6 +28,7 @@ from tests.lib.surface.services import unit_test_base
 import mock
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class ConnectTest(unit_test_base.SNUnitTestBase):
@@ -35,6 +36,7 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
   OPERATION_NAME = 'operations/abc.0000000000'
   NETWORK = 'hello'
   RANGES = ['google1', 'google2']
+  RANGE_ARG = ','.join(RANGES)
 
   def testConnect(self, track):
     self.track = track
@@ -42,9 +44,8 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
     self.ExpectOperation(self.OPERATION_NAME, 3)
     self.SetProjectNumber()
 
-    self.Run('services vpc-peerings connect --service=%s --network=%s '
-             '--reserved-ranges=%s' % (self.service, self.NETWORK, ','.join(
-                 self.RANGES)))
+    self.Run('services vpc-peerings connect --service={0} --network={1} '
+             '--ranges={2}'.format(self.service, self.NETWORK, self.RANGE_ARG))
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
@@ -53,9 +54,9 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
     self.ExpectCreateConnection(self.NETWORK, self.RANGES, self.OPERATION_NAME)
     self.SetProjectNumber()
 
-    self.Run('services vpc-peerings connect --service=%s --network=%s '
-             '--reserved-ranges=%s --async' % (self.service, self.NETWORK,
-                                               ','.join(self.RANGES)))
+    self.Run('services vpc-peerings connect --service={0} --network={1} '
+             '--ranges={2} --async'.format(self.service, self.NETWORK,
+                                           self.RANGE_ARG))
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
@@ -65,9 +66,8 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
     self.ExpectCreateConnection(self.NETWORK, self.RANGES, self.OPERATION_NAME)
     self.SetProjectNumber()
 
-    self.Run(
-        'services vpc-peerings connect --network=%s '
-        '--reserved-ranges=%s --async' % (self.NETWORK, ','.join(self.RANGES)))
+    self.Run('services vpc-peerings connect --network={0} '
+             '--ranges={1} --async'.format(self.NETWORK, self.RANGE_ARG))
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
@@ -80,9 +80,9 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
 
     with self.assertRaisesRegex(
         exceptions.CreateConnectionsPermissionDeniedException, r'Error.'):
-      self.Run('services vpc-peerings connect --service=%s --network=%s '
-               '--reserved-ranges=%s' % (self.service, self.NETWORK, ','.join(
-                   self.RANGES)))
+      self.Run('services vpc-peerings connect --service={0} --network={1} '
+               '--ranges={2}'.format(self.service, self.NETWORK,
+                                     self.RANGE_ARG))
 
   def SetProjectNumber(self):
     mock_get = self.StartObjectPatch(projects_api, 'Get')

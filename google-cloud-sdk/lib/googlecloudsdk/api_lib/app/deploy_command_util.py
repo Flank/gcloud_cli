@@ -51,6 +51,7 @@ from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 from googlecloudsdk.third_party.appengine.api import appinfo
 from googlecloudsdk.third_party.appengine.tools import context_util
+import six
 from six.moves import filter  # pylint: disable=redefined-builtin
 from six.moves import zip  # pylint: disable=redefined-builtin
 
@@ -96,9 +97,7 @@ class Error(exceptions.Error):
 
 
 class PrepareFailureError(Error):
-
-  def __init__(self, msg):
-    super(PrepareFailureError, self).__init__(msg)
+  pass
 
 
 class WindowMaxPathError(Error):
@@ -303,7 +302,8 @@ def _GetSourceContextsForUpload(source_dir):
 
   try:
     context = context_util.BestSourceContext(contexts)
-    source_contexts[context_util.CONTEXT_FILENAME] = json.dumps(context)
+    source_contexts[context_util.CONTEXT_FILENAME] = six.text_type(
+        json.dumps(context))
   except KeyError as e:
     log.info(m.format(name=context_util.CONTEXT_FILENAME, error=e))
   return source_contexts
@@ -350,7 +350,7 @@ def _GetYamlPath(source_dir, service_path, skip_files, gen_files):
       return rel_path
   yaml_contents = files.ReadFileContents(service_path)
   # Use a checksum to ensure file uniqueness, not for security reasons.
-  checksum = files.Checksum().AddContents(yaml_contents).HexDigest()
+  checksum = files.Checksum().AddContents(yaml_contents.encode()).HexDigest()
   generated_path = '_app_{}.yaml'.format(checksum)
   gen_files[generated_path] = yaml_contents
   return generated_path
@@ -359,7 +359,8 @@ def _GetYamlPath(source_dir, service_path, skip_files, gen_files):
 def BuildAndPushDockerImage(
     project,
     service,
-    source_dir,
+    upload_dir,
+    source_files,
     version_id,
     code_bucket_ref,
     gcr_domain,
@@ -370,7 +371,8 @@ def BuildAndPushDockerImage(
   Args:
     project: str, The project being deployed to.
     service: ServiceYamlInfo, The parsed service config.
-    source_dir: str, path to the service's source directory
+    upload_dir: str, path to the service's upload directory
+    source_files: [str], relative paths to upload.
     version_id: The version id to deploy these services under.
     code_bucket_ref: The reference to the GCS bucket where the source will be
       uploaded.
@@ -393,7 +395,7 @@ def BuildAndPushDockerImage(
       satisfy the requirements of the specified runtime type.
     ValueError: if an unrecognized runtime_builder_strategy is given
   """
-  needs_dockerfile = _NeedsDockerfile(service, source_dir)
+  needs_dockerfile = _NeedsDockerfile(service, upload_dir)
   use_runtime_builders = ShouldUseRuntimeBuilders(service,
                                                   runtime_builder_strategy,
                                                   needs_dockerfile)
@@ -405,26 +407,27 @@ def BuildAndPushDockerImage(
       'Building and pushing image for service [{service}]'
       .format(service=service.module))
 
-  gen_files = dict(_GetSourceContextsForUpload(source_dir))
+  gen_files = dict(_GetSourceContextsForUpload(upload_dir))
   if needs_dockerfile and not use_runtime_builders:
     # The runtime builders will generate a Dockerfile in the Cloud, so we only
     # need to do this if use_runtime_builders is True
-    gen_files.update(_GetDockerfiles(service, source_dir))
+    gen_files.update(_GetDockerfiles(service, upload_dir))
 
   image = docker_image.Image(
-      dockerfile_dir=source_dir,
+      dockerfile_dir=upload_dir,
       repo=_GetImageName(project, service.module, version_id, gcr_domain),
       nocache=False,
       tag=config.DOCKER_IMAGE_TAG)
 
   metrics.CustomTimedEvent(metric_names.CLOUDBUILD_UPLOAD_START)
-  object_ref = storage_util.ObjectReference(code_bucket_ref, image.tagged_repo)
-  relative_yaml_path = _GetYamlPath(source_dir, service.file,
+  object_ref = storage_util.ObjectReference.FromBucketRef(
+      code_bucket_ref, image.tagged_repo)
+  relative_yaml_path = _GetYamlPath(upload_dir, service.file,
                                     service.parsed.skip_files, gen_files)
 
   try:
-    cloud_build.UploadSource(image.dockerfile_dir, object_ref,
-                             gen_files=gen_files, info=service)
+    cloud_build.UploadSource(upload_dir, source_files, object_ref,
+                             gen_files=gen_files)
   except (OSError, IOError) as err:
     if platforms.OperatingSystem.IsWindows():
       if err.filename and len(err.filename) > _WINDOWS_MAX_PATH:
@@ -433,7 +436,7 @@ def BuildAndPushDockerImage(
   metrics.CustomTimedEvent(metric_names.CLOUDBUILD_UPLOAD)
 
   if use_runtime_builders:
-    builder_reference = runtime_builders.FromServiceInfo(service, source_dir)
+    builder_reference = runtime_builders.FromServiceInfo(service, upload_dir)
     log.info('Using runtime builder [%s]', builder_reference.build_file_uri)
     builder_reference.WarnIfDeprecated()
     yaml_path = util.ConvertToPosixPath(relative_yaml_path)
@@ -459,7 +462,8 @@ def _SubmitBuild(build, image, project, parallel_build):
   Returns:
     BuildArtifact, Representing the pushed container image or in-progress build.
   """
-  build_timeout = properties.VALUES.app.cloud_build_timeout.Get()
+  build_timeout = cloud_build.GetServiceTimeoutSeconds(
+      properties.VALUES.app.cloud_build_timeout.Get())
   if build_timeout and build_timeout > MAX_PARALLEL_BUILD_TIME:
     parallel_build = False
     log.info(
@@ -664,4 +668,3 @@ def GetAppHostname(app=None, app_id=None, service=None, version=None,
 
 
 DEFAULT_DEPLOYABLE = 'app.yaml'
-

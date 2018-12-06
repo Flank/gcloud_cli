@@ -30,8 +30,9 @@ from googlecloudsdk.command_lib.resource_manager import completers
 import six.moves.http_client
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class RemoveIamPolicyBinding(base.Command):
-  """Remove IAM policy binding for a project.
+  """Remove IAM policy binding from the IAM policy of a project.
 
   Removes a policy binding to the IAM policy of a project, given a project ID
   and the binding.
@@ -44,10 +45,13 @@ class RemoveIamPolicyBinding(base.Command):
   def Args(parser):
     flags.GetProjectFlag('remove IAM policy binding from').AddToParser(parser)
     iam_util.AddArgsForRemoveIamPolicyBinding(
-        parser, completer=completers.ProjectsIamRolesCompleter)
+        parser,
+        role_completer=completers.ProjectsIamRolesCompleter)
 
   @http_retry.RetryOnHttpStatus(six.moves.http_client.CONFLICT)
   def Run(self, args):
     project_ref = command_lib_util.ParseProject(args.id)
     return projects_api.RemoveIamPolicyBinding(project_ref,
                                                args.member, args.role)
+
+

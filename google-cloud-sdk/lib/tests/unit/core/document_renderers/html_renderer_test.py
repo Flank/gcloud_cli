@@ -282,8 +282,75 @@ class HTMLMarkdownTests(test_base.Markdown):
         </dl>
         </body>
         </html>
-       """)
+        """)
     self.Run('html', markdown, expected, title='New Title')
+
+  def testHTMLRoot(self):
+    markdown = self.ROOT_MARKDOWN
+    expected = textwrap.dedent("""\
+      <html>
+      <head>
+      <style>
+        code { color: green; }
+      </style>
+      <script>
+        window.onload = function() {
+          if (parent.navigation.navigate) {
+            parent.navigation.navigate(document.location.href);
+          }
+        }
+      </script>
+      <!--
+              THIS DOC IS GENERATED.  DO NOT EDIT.
+        -->
+      <style>
+        dd {
+          margin-bottom: 1ex;
+        }
+        li {
+          margin-top: 1ex; margin-bottom: 1ex;
+        }
+        .hangingindent {
+          padding-left: 1.5em;
+          text-indent: -1.5em;
+        }
+        .normalfont {
+          font-weight: normal;
+        }
+        .notopmargin {
+          margin-top: 0em;
+        }
+        .sectionbody {
+          margin-top: .2em;
+        }
+      </style>
+      </head>
+      <body>
+      <dl>
+
+      <dt><h4>SYNOPSIS</h4></dt>
+      <dd class="sectionbody">
+      <dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
+      gcloud component <nobr>[ <code><var>flags</var></code> ]</nobr> <nobr>[ <code><var>positionals</var></code> ]</nobr>
+      </span></dt></dl>
+      </dd>
+
+      <dt><h4>SECTION</h4></dt>
+      <dd class="sectionbody">
+      Section prose about the gcloud component command.
+      </dd>
+
+      <dt><h4>GCLOUD WIDE FLAGS</h4></dt>
+      <dd class="sectionbody">
+      These are available in all commands: <a href="/#--foo">--foo</a>, <a
+      href="/#--bar">--bar</a> and <a href="/#--verbosity">--verbosity</a>.
+      </dd>
+
+      </dl>
+      </body>
+      </html>
+      """)
+    self.Run('html', markdown, expected)
 
   def testHTMLDeepList(self):
     markdown = self.DEEP_BULLET_MARKDOWN
@@ -410,7 +477,7 @@ class HTMLMarkdownTests(test_base.Markdown):
       </dl>
       </body>
       </html>
-       """)
+      """)
     self.Run('html', markdown, expected)
 
   def testHTMLDeepHeading(self):
@@ -743,7 +810,7 @@ class HTMLMarkdownTests(test_base.Markdown):
         </body>
         </html>
        """)
-    self.maxDiff = 4096
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('html', markdown, expected, title='New Title')
 
   def testHTMLExampleBlock(self):
@@ -917,7 +984,7 @@ class HTMLMarkdownTests(test_base.Markdown):
         </body>
         </html>
        """)
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('html', markdown, expected, title='New Title')
 
   def testHTMLSynopsis(self):
@@ -932,7 +999,7 @@ class HTMLMarkdownTests(test_base.Markdown):
 
         ## SYNOPSIS
 
-        `gcloud compute backend-services update-backend` _NAME_ *--instance-group*=_INSTANCE_GROUP_ [*--balancing-mode*=_BALANCING_MODE_] [*--capacity-scaler*=_CAPACITY_SCALER_] [*--description*=_DESCRIPTION_] [*--max-utilization*=_MAX_UTILIZATION_] [*--instance-group-zone*=_INSTANCE_GROUP_ZONE_ | *--zone*=_ZONE_] [*--max-connections*=_MAX_CONNECTIONS_ | *--max-connections-per-instance*=_MAX_CONNECTIONS_PER_INSTANCE_ | *--max-rate*=_MAX_RATE_ | *--max-rate-per-instance*=_MAX_RATE_PER_INSTANCE_] [_GLOBAL-FLAG ..._]
+        `gcloud compute backend-services update-backend` _NAME_ *--instance-group*=_INSTANCE_GROUP_ [*--balancing-mode*=_BALANCING_MODE_] [*--capacity-scaler*=_CAPACITY_SCALER_] [*--description*=_DESCRIPTION_] [*--max-utilization*=_MAX_UTILIZATION_] [*--instance-group-zone*=_INSTANCE_GROUP_ZONE_ | *--zone*=_ZONE_] [*--max-connections*=_MAX_CONNECTIONS_ | *--max-connections-per-instance*=_MAX_CONNECTIONS_PER_INSTANCE_ | *--max-rate*=_MAX_RATE_ | *--max-rate-per-instance*=_MAX_RATE_PER_INSTANCE_] [_GCLOUD_WIDE_FLAG ..._]
 
 
         ## DESCRIPTION
@@ -995,7 +1062,7 @@ class HTMLMarkdownTests(test_base.Markdown):
         <dt><h4>SYNOPSIS</h4></dt>
         <dd class="sectionbody">
         <dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
-        <code>gcloud compute backend-services update-backend</code> <code><var>NAME</var></code> <code>--instance-group</code>=<code><var>INSTANCE_GROUP</var></code> <nobr>[<code>--balancing-mode</code>=<code><var>BALANCING_MODE</var></code>]</nobr> <nobr>[<code>--capacity-scaler</code>=<code><var>CAPACITY_SCALER</var></code>]</nobr> <nobr>[<code>--description</code>=<code><var>DESCRIPTION</var></code>]</nobr> <nobr>[<code>--max-utilization</code>=<code><var>MAX_UTILIZATION</var></code>]</nobr> <nobr>[<code>--instance-group-zone</code>=<code><var>INSTANCE_GROUP_ZONE</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code>--zone</code>=<code><var>ZONE</var></code>]</nobr> <nobr>[<code>--max-connections</code>=<code><var>MAX_CONNECTIONS</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code>--max-connections-per-instance</code>=<code><var>MAX_CONNECTIONS_PER_INSTANCE</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code>--max-rate</code>=<code><var>MAX_RATE</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code>--max-rate-per-instance</code>=<code><var>MAX_RATE_PER_INSTANCE</var></code>]</nobr> <nobr>[<code><var>GLOBAL-FLAG &hellip;</var></code>]</nobr>
+        <code>gcloud compute backend-services update-backend</code> <code><var><a href="#NAME">NAME</a></var></code> <code><a href="#--instance-group">--instance-group</a></code>=<code><var>INSTANCE_GROUP</var></code> <nobr>[<code><a href="#--balancing-mode">--balancing-mode</a></code>=<code><var>BALANCING_MODE</var></code>]</nobr> <nobr>[<code><a href="#--capacity-scaler">--capacity-scaler</a></code>=<code><var>CAPACITY_SCALER</var></code>]</nobr> <nobr>[<code><a href="#--description">--description</a></code>=<code><var>DESCRIPTION</var></code>]</nobr> <nobr>[<code><a href="#--max-utilization">--max-utilization</a></code>=<code><var>MAX_UTILIZATION</var></code>]</nobr> <nobr>[<code><a href="#--instance-group-zone">--instance-group-zone</a></code>=<code><var>INSTANCE_GROUP_ZONE</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code><a href="#--zone">--zone</a></code>=<code><var>ZONE</var></code>]</nobr> <nobr>[<code><a href="#--max-connections">--max-connections</a></code>=<code><var>MAX_CONNECTIONS</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code><a href="#--max-connections-per-instance">--max-connections-per-instance</a></code>=<code><var>MAX_CONNECTIONS_PER_INSTANCE</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code><a href="#--max-rate">--max-rate</a></code>=<code><var>MAX_RATE</var></code></nobr> <nobr>&nbsp;&nbsp;&nbsp;&nbsp;| <code><a href="#--max-rate-per-instance">--max-rate-per-instance</a></code>=<code><var>MAX_RATE_PER_INSTANCE</var></code>]</nobr> <nobr>[<code><var><a href="#GCLOUD-WIDE-FLAGS">GCLOUD_WIDE_FLAG</a> &hellip;</var></code>]</nobr>
         </span></dt></dl>
         </dd>
 
@@ -1012,7 +1079,7 @@ class HTMLMarkdownTests(test_base.Markdown):
         </body>
         </html>
 """)
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('html', markdown, expected, title='New Title')
 
   def testHTMLDefinitionList(self):
@@ -1112,7 +1179,7 @@ class HTMLMarkdownTests(test_base.Markdown):
         </body>
         </html>
 """)
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('html', markdown, expected, title='New Title')
 
   def testHTMLDefinitionListEmptyItem(self):
@@ -1256,7 +1323,7 @@ class HTMLMarkdownTests(test_base.Markdown):
         </body>
         </html>
 """)
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('html', markdown, expected, title='New Title')
 
 

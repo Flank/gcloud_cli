@@ -1,0 +1,54 @@
+title: Describe a TPU Location
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute tpus locations list
+  - stdout: |
+      LOCATION        LOCATION_NAME
+      asia-east1-c    projects/fake-project/locations/asia-east1-c
+      europe-west4-a  projects/fake-project/locations/europe-west4-a
+      us-central1-b   projects/fake-project/locations/us-central1-b
+      us-central1-c   projects/fake-project/locations/us-central1-c
+actions:
+- execute_command:
+    command: compute tpus locations list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+             "locations": [
+               {
+                 "name": "projects/fake-project/locations/asia-east1-c",
+                 "locationId": "asia-east1-c"
+               },
+               {
+                 "name": "projects/fake-project/locations/europe-west4-a",
+                 "locationId": "europe-west4-a"
+               },
+               {
+                 "name": "projects/fake-project/locations/us-central1-b",
+                 "locationId": "us-central1-b"
+               },
+               {
+                 "name": "projects/fake-project/locations/us-central1-c",
+                 "locationId": "us-central1-c"
+               }
+             ]
+            }
+    - expect_stdout: |
+        LOCATION        LOCATION_NAME
+        asia-east1-c    projects/fake-project/locations/asia-east1-c
+        europe-west4-a  projects/fake-project/locations/europe-west4-a
+        us-central1-b   projects/fake-project/locations/us-central1-b
+        us-central1-c   projects/fake-project/locations/us-central1-c
+    - expect_exit:
+        code: 0

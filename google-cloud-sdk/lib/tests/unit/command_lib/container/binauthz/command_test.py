@@ -56,8 +56,8 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
 
   def testCreateAttestationOccurrence(self):
     self.ExpectProjectsOccurrencesCreate(
-        project_ref=self.project_ref,
         request_occurrence=self.request_occurrence,
+        project_ref=self.project_ref,
     )
     self.ca_client.CreateAttestationOccurrence(
         note_ref=self.note_ref,
@@ -70,6 +70,7 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
   def testYieldAttestations(self):
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
+        expected_filter_content='resourceUrl="{}"'.format(self.artifact_url),
         occurrences_to_return=[self.response_occurrence],
     )
     # We need the list() to force-unroll the returned iterator, otherwise the
@@ -84,29 +85,17 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
     messages = self.containeranalysis_messages
     unmatched_kind_response_occurrence = self.CreateGenericResponseOccurrence(
         project_ref=self.project_ref,
-        kind=messages.Occurrence.KindValueValuesEnum.BUILD_DETAILS,
+        kind=messages.Occurrence.KindValueValuesEnum.BUILD,
         resource_url=self.artifact_url,
         note_name=self.note_ref.RelativeName(),
-        buildDetails=messages.BuildDetails(),
-    )
-
-    # Mock a returned occurrence with the wrong artifact URL.
-    unmatched_artifact_response_occurrence = self.CreateResponseOccurrence(
-        project_ref=self.project_ref,
-        request_occurrence=self.CreateRequestOccurrence(
-            project_ref=self.project_ref,
-            artifact_url=self.GenerateArtifactUrl(),
-            note_ref=self.note_ref,
-            pgp_key_fingerprint=self.pgp_key_fingerprint,
-            signature=self.signature,
-        ),
+        build=messages.GrafeasV1beta1BuildDetails(),
     )
 
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
+        expected_filter_content='resourceUrl="{}"'.format(self.artifact_url),
         occurrences_to_return=[
             self.response_occurrence,
-            unmatched_artifact_response_occurrence,
             unmatched_kind_response_occurrence,
         ],
     )

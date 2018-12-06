@@ -34,20 +34,20 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
-    The following command will remove an IAM policy binding for the role of
-    'roles/editor' for the user 'test-user@gmail.com' on folder with identifier
-    '3589215982'
+    To remove an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' on folder with identifier '3589215982', run:
 
         $ gcloud alpha resource-manager folders remove-iam-policy-binding \
             3589215982 --member='user:test-user@gmail.com' \
             --role='roles/editor'
 
-    The following command will remove an IAM policy binding for the role of
-    'roles/editor' from all authenticated users on folder '3589215982':
+    To remove an IAM policy binding for the role of 'roles/editor' from all
+    authenticated users on folder '3589215982', run:
 
         $ gcloud alpha resource-manager folders remove-iam-policy-binding \
             3589215982 --member='allAuthenticatedUsers' \

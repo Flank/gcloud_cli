@@ -86,7 +86,6 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
                                           projectsId=PROJECT_ID)
   PROJECT_NUM = 123456789012
   NUM_NODES = 3
-  AUTH_USER = 'admin'
   NODE_POOL_NAME = 'my-pool'
   OPERATION_TARGET = '/projects/{0}/zones/{1}/clusters/{2}'
   TARGET_LINK = 'https://container.googleapis.com/{0}/projects/{1}/zones/{2}/clusters/{3}'  # pylint: disable=line-too-long
@@ -97,6 +96,8 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   ENDPOINT = '130.211.191.49'
   VERSION = '1.8.0'
   INSTANCE_GROUP_URL = 'https://www.googleapis.com/compute/v1/projects/{0}/zones/{1}/instanceGroupManagers/gke-{2}-group'  # pylint: disable=line-too-long
+  MASTER_IPV4_CIDR = '172.16.0.0/28'
+  PRIVATE_ENDPOINT = '172.16.0.2'
 
   def SetUp(self):
     self.MOCK_TARGET_LINK = self.TARGET_LINK.format(  # pylint: disable=invalid-name
@@ -178,6 +179,19 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     defaults.update(kwargs)
     return self._RunningCluster(**defaults)
 
+  def _RunningPrivateCluster(self, **kwargs):
+    master_ipv4_cidr = kwargs.get('masterIpv4Cidr', self.MASTER_IPV4_CIDR)
+    private_endpoint = kwargs.get('privateEndpoint', self.PRIVATE_ENDPOINT)
+    config = self._MakePrivateClusterConfig(
+        enablePrivateNodes=True,
+        enablePrivateEndpoint=False,
+        masterIpv4Cidr=master_ipv4_cidr,
+    )
+    config.privateEndpoint = private_endpoint
+    defaults = {'privateClusterConfig': config}
+    defaults.update(kwargs)
+    return self._RunningCluster(**defaults)
+
   def _TestDefaultAuth(self, c_config):
     self._TestGcloudCredentials(c_config)
 
@@ -253,15 +267,6 @@ class TestBase(cli_test_base.CliTestBase):
       kwargs['instanceGroupUrls'] = pool.instanceGroupUrls
 
     c = self.messages.Cluster(
-        masterAuth=self.messages.MasterAuth(
-            password=kwargs.get('password'),
-            username=kwargs.get('username', self.AUTH_USER),
-            clusterCaCertificate=kwargs.get('ca_data'),
-            clientKey=kwargs.get('key_data'),
-            clientCertificate=kwargs.get('cert_data'),
-            clientCertificateConfig=self.messages.ClientCertificateConfig(
-                issueClientCertificate=True,),
-        ),
         name=kwargs.get('name', self.CLUSTER_NAME),
         currentNodeCount=kwargs.get('currentNodeCount'),
         initialNodeCount=kwargs.get('initialNodeCount'),
@@ -289,9 +294,27 @@ class TestBase(cli_test_base.CliTestBase):
         legacyAbac=kwargs.get('legacyAbac'),
         resourceLabels=kwargs.get('labels'),
         maintenancePolicy=kwargs.get('maintenancePolicy'),
+        privateClusterConfig=kwargs.get('privateClusterConfig'),
     )
     if kwargs.get('conditions'):
       c.conditions.extend(kwargs.get('conditions'))
+    if (kwargs.get('issueClientCertificate') is not None or
+        kwargs.get('username') is not None or
+        kwargs.get('password') is not None or
+        kwargs.get('ca_data') is not None or
+        kwargs.get('key_data') is not None or
+        kwargs.get('cert_data') is not None):
+      c.masterAuth = self.messages.MasterAuth(
+          password=kwargs.get('password'),
+          username=kwargs.get('username'),
+          clusterCaCertificate=kwargs.get('ca_data'),
+          clientKey=kwargs.get('key_data'),
+          clientCertificate=kwargs.get('cert_data'),
+      )
+      if kwargs.get('issueClientCertificate') is not None:
+        c.masterAuth.clientCertificateConfig = (
+            self.messages.ClientCertificateConfig(
+                issueClientCertificate=kwargs.get('issueClientCertificate')))
     return c
 
   def _MakeClusterWithAutoscaling(self, **kwargs):
@@ -326,6 +349,7 @@ class TestBase(cli_test_base.CliTestBase):
             accelerators=kwargs.get('accelerators', []),
             minCpuPlatform=kwargs.get('minCpuPlatform'),
             taints=kwargs.get('nodeTaints', []),
+            metadata=kwargs.get('metadata'),
         ),
         instanceGroupUrls=kwargs.get('instanceGroupUrls', []),
         autoscaling=kwargs.get('autoscaling'),
@@ -348,11 +372,23 @@ class TestBase(cli_test_base.CliTestBase):
       policy.servicesIpv4CidrBlock = kwargs['servicesIpv4Cidr']
     if 'tpuIpv4Cidr' in kwargs:
       policy.tpuIpv4CidrBlock = kwargs['tpuIpv4Cidr']
+    if 'tpuUseServiceNetworking' in kwargs:
+      policy.tpuUseServiceNetworking = kwargs['tpuUseServiceNetworking']
     if 'clusterSecondaryRangeName' in kwargs:
       policy.clusterSecondaryRangeName = kwargs['clusterSecondaryRangeName']
     if 'servicesSecondaryRangeName' in kwargs:
       policy.servicesSecondaryRangeName = kwargs['servicesSecondaryRangeName']
     return policy
+
+  def _MakePrivateClusterConfig(self, **kwargs):
+    config = self.messages.PrivateClusterConfig()
+    if 'enablePrivateNodes' in kwargs:
+      config.enablePrivateNodes = kwargs['enablePrivateNodes']
+    if 'enablePrivateEndpoint' in kwargs:
+      config.enablePrivateEndpoint = kwargs['enablePrivateEndpoint']
+    if 'masterIpv4Cidr' in kwargs:
+      config.masterIpv4CidrBlock = kwargs['masterIpv4Cidr']
+    return config
 
   def _ServerConfig(self):
     return self.messages.ServerConfig(defaultClusterVersion=self.VERSION)
@@ -836,8 +872,7 @@ class GATestBase(TestBase):
       response = None
     else:
       response = self.messages.ServerConfig(
-          buildClientInfo='changelist 12345', defaultClusterVersion='1.2.3',
-          validMasterVersions=['1.3.2'])
+          defaultClusterVersion='1.2.3', validMasterVersions=['1.3.2'])
     self.mocked_client.projects_locations.GetServerConfig.Expect(
         self.messages.ContainerProjectsLocationsGetServerConfigRequest(
             name=api_adapter.ProjectLocation(self.PROJECT_ID, location)),
@@ -864,17 +899,19 @@ class BetaTestBase(GATestBase):
 
   def _MakeCluster(self, **kwargs):
     cluster = GATestBase._MakeCluster(self, **kwargs)
-    cluster.auditConfig = kwargs.get('auditConfig')
     cluster.binaryAuthorization = kwargs.get('binaryAuthorization')
     cluster.enableTpu = kwargs.get('enableTpu')
     cluster.autoscaling = kwargs.get('clusterAutoscaling')
     cluster.verticalPodAutoscaling = kwargs.get('verticalPodAutoscaling')
+    cluster.defaultMaxPodsConstraint = kwargs.get('defaultMaxPodsConstraint')
     return cluster
 
   def _MakeNodePool(self, **kwargs):
     node_pool = GATestBase._MakeNodePool(self, **kwargs)
     node_pool.config.workloadMetadataConfig = kwargs.get(
         'workloadMetadataConfig')
+    node_pool.maxPodsConstraint = kwargs.get('maxPodsConstraint')
+    node_pool.config.metadata = kwargs.get('metadata')
     return node_pool
 
   def _MakeIPAllocationPolicy(self, **kwargs):
@@ -883,31 +920,13 @@ class BetaTestBase(GATestBase):
       policy.allowRouteOverlap = kwargs.get('allowRouteOverlap')
     return policy
 
-
-class AlphaTestBase(BetaTestBase):
-  """Mixin class for testing v1alpha1."""
-  API_VERSION = 'v1alpha1'
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def _MakeCluster(self, **kwargs):
-    cluster = super(AlphaTestBase, self)._MakeCluster(**kwargs)
-    cluster.enableTpu = kwargs.get('enableTpu')
-    cluster.defaultMaxPodsConstraint = kwargs.get('defaultMaxPodsConstraint')
-    return cluster
-
-  def _MakeNodePool(self, **kwargs):
-    node_pool = BetaTestBase._MakeNodePool(self, **kwargs)
-    if kwargs.get('localSsdVolumeConfigs') is not None:
-      node_pool.config.localSsdVolumeConfigs = kwargs.get(
-          'localSsdVolumeConfigs')
-    node_pool.maxPodsConstraint = kwargs.get('maxPodsConstraint')
-    node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
-    return node_pool
+  def _MakeUsableSubnetworkSecondaryRange(self, **kwargs):
+    return self.messages.UsableSubnetworkSecondaryRange(
+        rangeName=kwargs.get('rangeName'),
+        ipCidrRange=kwargs.get('ipCidrRange'),
+        status=kwargs.get('status'))
 
   def _MakeUsableSubnet(self, **kwargs):
-    # cluster.auditConfig = kwargs.get('auditConfig')
     # Construct the default pool, if we don't have any passed in. We
     # can't know all the possible permutations, so any tests involving
     # multiple nodepools must construct them prior to _MakeCluster.
@@ -925,8 +944,9 @@ class AlphaTestBase(BetaTestBase):
     return self.messages.UsableSubnetwork(
         subnetwork=subnetwork.RelativeName(),
         network=network.RelativeName(),
-        ipCidrRange=kwargs.get('ipCidrRange')
-    )
+        ipCidrRange=kwargs.get('ipCidrRange'),
+        secondaryIpRanges=kwargs.get('secondaryIpRanges', []),
+        statusMessage=kwargs.get('statusMessage'))
 
   def _MakeListUsableSubnetworksResponse(self, subnets):
     return self.messages.ListUsableSubnetworksResponse(subnetworks=subnets)
@@ -940,6 +960,33 @@ class AlphaTestBase(BetaTestBase):
       response = None
     self.mocked_client.projects_aggregated_usableSubnetworks.List.Expect(
         req, response=response, exception=exception)
+
+
+class AlphaTestBase(BetaTestBase):
+  """Mixin class for testing v1alpha1."""
+  API_VERSION = 'v1alpha1'
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def _MakeCluster(self, **kwargs):
+    cluster = super(AlphaTestBase, self)._MakeCluster(**kwargs)
+    cluster.enableTpu = kwargs.get('enableTpu')
+    if kwargs.get('databaseEncryptionKey'):
+      cluster.databaseEncryption = self.messages.DatabaseEncryption(
+          keyName=kwargs.get('databaseEncryptionKey'),
+          state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
+    return cluster
+
+  def _MakeNodePool(self, **kwargs):
+    node_pool = BetaTestBase._MakeNodePool(self, **kwargs)
+    if kwargs.get('localSsdVolumeConfigs') is not None:
+      node_pool.config.localSsdVolumeConfigs = kwargs.get(
+          'localSsdVolumeConfigs')
+    node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
+    node_pool.config.nodeGroup = kwargs.get('nodeGroup')
+
+    return node_pool
 
 
 class IntegrationTestBase(
@@ -1058,5 +1105,11 @@ class SubnetsTestBase(UnitTestBase):
   """Base class for subnets command tests."""
 
   def SetUp(self):
+    self.SetEncoding('ascii')
     self.subnets_command_base = self.COMMAND_BASE + ' subnets'
     self.msgs = core_apis.GetMessagesModule('container', self.API_VERSION)
+    status_enum = self.msgs.UsableSubnetworkSecondaryRange.StatusValueValuesEnum
+    self.unused = status_enum.UNUSED
+    self.in_use_service = status_enum.IN_USE_SERVICE
+    self.in_use_shareable_pod = status_enum.IN_USE_SHAREABLE_POD
+    self.in_use_managed_pod = status_enum.IN_USE_MANAGED_POD

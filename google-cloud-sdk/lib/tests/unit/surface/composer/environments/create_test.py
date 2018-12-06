@@ -18,20 +18,20 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
+
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.composer import util as command_util
-from tests.lib import parameterized
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 import six
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
+class _EnvironmentsCreateTestBase(base.EnvironmentsUnitTest):
 
   # Must be called after self.SetTrack() for self.messages to be present
   def _SetTestMessages(self):
@@ -86,16 +86,17 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         self.TEST_OPERATION_UUID,
         done=False)
 
-  def testSuccessfulCreate_synchronous(self, track):
+
+class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
+
+  def testSuccessfulCreate_synchronous(self):
     """Tests a successful synchronous creation.
 
     The progress tracker should be activated and terminated.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
     config = self.messages.EnvironmentConfig(nodeConfig=node_config)
@@ -123,16 +124,11 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'be created with \[{}]"'.format(self.TEST_ENVIRONMENT_NAME,
                                          self.TEST_OPERATION_NAME))
 
-  def testFailedCreate_synchronous(self, track):
+  def testFailedCreate_synchronous(self):
     """Tests a failed synchronous creation.
 
     A command_util.Error or a subclass thereof hould be raised.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     # pylint: disable=invalid-name
     ERROR_DESCRIPTION = 'ERROR DESCRIPTION'
@@ -165,9 +161,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                            '--location', self.TEST_LOCATION,
                            self.TEST_ENVIRONMENT_ID)
 
-  def testSuccessfulAsyncCreateWithCustomConfiguration_network(self, track):
+  def testSuccessfulAsyncCreateWithCustomConfiguration_network(self):
     """Tests a successful asynchronous creation with a custom network."""
-    self.SetTrack(track)
     self._SetTestMessages()
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
@@ -185,9 +180,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         self.SUBNETWORK_RELATIVE_NAME, '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testSuccessfulAsyncCreateWithCustomConfiguration_subnetwork(self, track):
+  def testSuccessfulAsyncCreateWithCustomConfiguration_subnetwork(self):
     """Tests a successful asynchronous creation with a custom subnetwork."""
-    self.SetTrack(track)
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(
         location=self.LOCATION_RELATIVE_NAME,
@@ -213,9 +207,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         self.SUBNETWORK_RELATIVE_NAME, '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testSuccessfulAsyncCreateWithLabels(self, track):
+  def testSuccessfulAsyncCreateWithLabels(self):
     """Test that creating an environment with labels works."""
-    self.SetTrack(track)
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
     config = self.messages.EnvironmentConfig(nodeConfig=node_config)
@@ -236,9 +229,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'^Create in progress for environment \[{}] with operation \[{}]'
         .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testSuccessfulAsyncCreateWithEnvVariables(self, track):
+  def testSuccessfulAsyncCreateWithEnvVariables(self):
     """Test that user-provided env variables are conveyed in the API call."""
-    self.SetTrack(track)
     self._SetTestMessages()
     # pylint: disable=invalid-name
     SoftwareConfig = self.messages.SoftwareConfig
@@ -266,9 +258,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'^Create in progress for environment \[{}] with operation \[{}]'
         .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testSuccessfulAsyncCreateWithAirflowConfigOverrides(self, track):
+  def testSuccessfulAsyncCreateWithAirflowConfigOverrides(self):
     """Test that Airflow config property overrides are conveyed to the API."""
-    self.SetTrack(track)
     self._SetTestMessages()
     # pylint: disable=invalid-name
     SoftwareConfig = self.messages.SoftwareConfig
@@ -297,9 +288,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         r'^Create in progress for environment \[{}] with operation '
         r'\[{}]'.format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
-  def testCreateWithoutUserProvidedConfigValues(self, track):
+  def testCreateWithoutUserProvidedConfigValues(self):
     """Test that creating an environment with minimal config values works."""
-    self.SetTrack(track)
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
     config = self.messages.EnvironmentConfig(nodeConfig=node_config)
@@ -315,16 +305,11 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                                      '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testCreateAlreadyExists(self, track):
+  def testCreateAlreadyExists(self):
     """Tests a creation attempt when the environment already exists.
 
     There should be an HTTP 409 ALREADY EXISTS
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
@@ -344,18 +329,16 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                            self.SUBNETWORK_RELATIVE_NAME,
                            self.TEST_ENVIRONMENT_ID)
 
-  def testNameValidation(self, track):
+  def testNameValidation(self):
     """Test that environment name validation fails fast."""
-    self.SetTrack(track)
     self._SetTestMessages()
     with self.AssertRaisesExceptionMatches(command_util.Error,
                                            'Invalid environment name'):
       self.RunEnvironments('create', '--project', self.TEST_PROJECT,
                            '--location', self.TEST_LOCATION, 'foo_bar')
 
-  def testMultipleAirflowConfigsMerged(self, track):
+  def testMultipleAirflowConfigsMerged(self):
     """Test merging when --airflow-configs is provided many times."""
-    self.SetTrack(track)
     self._SetTestMessages()
     # pylint: disable=invalid-name
     SoftwareConfig = self.messages.SoftwareConfig
@@ -365,12 +348,12 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
     software_config = SoftwareConfig(
         airflowConfigOverrides=AirflowConfigOverrides(additionalProperties=[
             AirflowConfigOverrides.AdditionalProperty(key=k, value=v)
-            for k, v in six.iteritems({
-                'a': '1',
-                'b': '2',
-                'c': '3',
-                'd': '4'
-            })
+            for k, v in six.iteritems(collections.OrderedDict([
+                ('a', '1'),
+                ('b', '2'),
+                ('c', '3'),
+                ('d', '4'),
+            ]))
         ]))
     config = self.messages.EnvironmentConfig(
         nodeConfig=node_config, softwareConfig=software_config)
@@ -385,9 +368,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                          '--airflow-configs', 'c=3,d=4',
                          self.TEST_ENVIRONMENT_ID, '--async')
 
-  def testMultipleEnvVarsMerged(self, track):
+  def testMultipleEnvVarsMerged(self):
     """Test merging when --env-variables is provided many times."""
-    self.SetTrack(track)
     self._SetTestMessages()
     # pylint: disable=invalid-name
     SoftwareConfig = self.messages.SoftwareConfig
@@ -395,12 +377,12 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
     software_config = SoftwareConfig(
         envVariables=SoftwareConfig.EnvVariablesValue(additionalProperties=[
             SoftwareConfig.EnvVariablesValue.AdditionalProperty(key=k, value=v)
-            for k, v in six.iteritems({
-                'a': '1',
-                'b': '2',
-                'c': '3',
-                'd': '4'
-            })
+            for k, v in six.iteritems(collections.OrderedDict([
+                ('a', '1'),
+                ('b', '2'),
+                ('c', '3'),
+                ('d', '4'),
+            ]))
         ]))
     node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
     config = self.messages.EnvironmentConfig(
@@ -416,8 +398,7 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
                          '--env-variables', 'c=3,d=4', self.TEST_ENVIRONMENT_ID,
                          '--async')
 
-  def testServiceAccount(self, track):
-    self.SetTrack(track)
+  def testServiceAccount(self):
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(
         serviceAccount=self.SERVICE_ACCOUNT,
@@ -437,8 +418,7 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testOauthScopes(self, track):
-    self.SetTrack(track)
+  def testOauthScopes(self):
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(
         oauthScopes=self.OAUTH_SCOPES, diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
@@ -457,8 +437,7 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testTags(self, track):
-    self.SetTrack(track)
+  def testTags(self):
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(
         tags=self.TAGS, diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
@@ -477,14 +456,9 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testZoneExpansion(self, track):
+  def testZoneExpansion(self):
     """Tests that if --zone is provided as a short name, it is expanded.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(
         location=self.LOCATION_RELATIVE_NAME,
@@ -503,14 +477,9 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testMachineTypeExpansion(self, track):
+  def testMachineTypeExpansion(self):
     """Tests that if --machine-type is provided as a short name, it is expanded.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(
         location=self.LOCATION_RELATIVE_NAME,
@@ -532,14 +501,9 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testNetworkExpansion(self, track):
+  def testNetworkExpansion(self):
     """Tests that if --network is provided as a short name, it is expanded.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(
         network=self.NETWORK_RELATIVE_NAME,
@@ -559,14 +523,9 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testSubnetworkExpansion(self, track):
+  def testSubnetworkExpansion(self):
     """Tests that if --subnetwork is provided as a short name, it is expanded.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     node_config = self.messages.NodeConfig(
         network=self.NETWORK_RELATIVE_NAME,
@@ -588,14 +547,9 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testUrlsReducedToRelativeNames(self, track):
+  def testUrlsReducedToRelativeNames(self):
     """Tests that fully-qualified URLs are provided, they become relative names.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     self._SetTestMessages()
     self.ExpectEnvironmentCreate(
         self.TEST_PROJECT,
@@ -615,9 +569,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testCustomDiskSize(self, track):
+  def testCustomDiskSize(self):
     """Tests that a non-default --disk-size can be used."""
-    self.SetTrack(track)
     self._SetTestMessages()
     disk_size_gb = 123
     disk_size_kb = disk_size_gb << 20
@@ -637,9 +590,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
         '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
-  def testCustomDiskSizeTooSmall(self, track):
+  def testCustomDiskSizeTooSmall(self):
     """Tests error if --disk-size is < 20GB."""
-    self.SetTrack(track)
     self._SetTestMessages()
     with self.AssertRaisesArgumentErrorRegexp(
         'must be greater than or equal to'):
@@ -649,9 +601,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
           '--disk-size', '19GB',
           '--async', self.TEST_ENVIRONMENT_ID)
 
-  def testCustomDiskSizeTooLarge(self, track):
+  def testCustomDiskSizeTooLarge(self):
     """Tests error if --disk-size is > 64TB."""
-    self.SetTrack(track)
     self._SetTestMessages()
     with self.AssertRaisesArgumentErrorRegexp(
         'must be less than or equal to'):
@@ -661,9 +612,8 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
           '--disk-size', '{}GB'.format((64 << 10) + 1),
           '--async', self.TEST_ENVIRONMENT_ID)
 
-  def testCustomDiskSizeNotGigabyteMultiple(self, track):
+  def testCustomDiskSizeNotGigabyteMultiple(self):
     """Tests error if --disk-size is not an integer multiple of gigabytes."""
-    self.SetTrack(track)
     self._SetTestMessages()
     disk_size_kb = (123 << 20) + 10  # 123 GB + 10 KB
     with self.AssertRaisesExceptionRegexp(
@@ -674,6 +624,233 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest, parameterized.TestCase):
           self.TEST_PROJECT, '--location', self.TEST_LOCATION,
           '--disk-size', '{}KB'.format(disk_size_kb),
           '--async', self.TEST_ENVIRONMENT_ID)
+
+
+class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+  def _SetTestMessages(self):
+    # pylint: disable=invalid-name
+    super(EnvironmentsCreateBetaTest, self)._SetTestMessages()
+    self.PYTHON_VERSION = '2'
+    self.IMAGE_VERSION = 'composer-latest-airflow-7.8.9'
+    self.AIRFLOW_VERSION = '7.8.9'
+
+  def testSuccessfulAsyncCreateWithBetaFeatures(self):
+    """Test that creating an environment with a beta features works."""
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    software_config = self.messages.SoftwareConfig(
+        imageVersion=self.IMAGE_VERSION, pythonVersion=self.PYTHON_VERSION)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config,
+        softwareConfig=software_config)
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+
+    actual_op = self.RunEnvironments('create',
+                                     '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--image-version', self.IMAGE_VERSION,
+                                     '--python-version', self.PYTHON_VERSION,
+                                     '--async', self.TEST_ENVIRONMENT_ID)
+    self.assertEqual(self.running_op, actual_op)
+    self.AssertErrMatches(
+        r'^Create in progress for environment \[{}] with operation \[{}]'
+        .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
+
+  def testAirflowVersion_SuccessfulAsyncCreate(self):
+    """Test that creating an environment with an airflow version works."""
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    software_config = self.messages.SoftwareConfig(
+        imageVersion=self.IMAGE_VERSION, pythonVersion=self.PYTHON_VERSION)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config,
+        softwareConfig=software_config)
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+
+    actual_op = self.RunEnvironments('create',
+                                     '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--airflow-version', self.AIRFLOW_VERSION,
+                                     '--python-version', self.PYTHON_VERSION,
+                                     '--async', self.TEST_ENVIRONMENT_ID)
+    self.assertEqual(self.running_op, actual_op)
+    self.AssertErrMatches(
+        r'^Create in progress for environment \[{}] with operation \[{}]'
+        .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
+
+  def testPythonVersionInvalidInput(self):
+    """Tests error if supplied a --python-version that is not supported."""
+    self._SetTestMessages()
+    unsupported_version = '1'
+    with self.AssertRaisesExceptionRegexp(
+        cli_test_base.MockArgumentError,
+        'Invalid choice: \'{}\''.format(unsupported_version)):
+      self.RunEnvironments(
+          'create',
+          '--project', self.TEST_PROJECT,
+          '--location', self.TEST_LOCATION,
+          '--python-version', unsupported_version,
+          '--async', self.TEST_ENVIRONMENT_ID)
+
+  def testImageVersionValidInput(self):
+    """Tests error if supplied am --airflow-version that is not supported."""
+    self._SetTestMessages()
+    valid_image_version_inputs = [
+        'composer-1.2.3-airflow-1.2',
+        'composer-1.2.3-airflow-1.2.3',
+        'composer-11.22.33-airflow-11.22',
+        'composer-11.22.33-airflow-11.22.33',
+        'composer-latest-airflow-1.2.3'
+    ]
+    for test_input in valid_image_version_inputs:
+      node_config = self.messages.NodeConfig(
+          diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+      software_config = self.messages.SoftwareConfig(
+          imageVersion=test_input)
+      config = self.messages.EnvironmentConfig(
+          nodeConfig=node_config,
+          softwareConfig=software_config)
+      self.ExpectEnvironmentCreate(
+          self.TEST_PROJECT,
+          self.TEST_LOCATION,
+          self.TEST_ENVIRONMENT_ID,
+          config=config,
+          response=self.running_op)
+
+      actual_op = self.RunEnvironments('create',
+                                       '--project', self.TEST_PROJECT,
+                                       '--location', self.TEST_LOCATION,
+                                       '--image-version', test_input,
+                                       '--async', self.TEST_ENVIRONMENT_ID)
+      self.assertEqual(self.running_op, actual_op)
+
+  def testImageVersionInvalidInput(self):
+    """Tests error if supplied am --image-version that is not supported."""
+    self._SetTestMessages()
+    bad_image_version_inputs = [
+        'composer-latest-airflow-latest',
+        'composer-1.2.3-airflow-latest',
+        'composer-1-airflow-1',
+        'composer-1.2-airflow-1.2.3',
+        'composer-1.2.3.4-airflow-latest',
+        'a.b.c',
+        'latest'
+    ]
+
+    for test_input in bad_image_version_inputs:
+      with self.AssertRaisesExceptionRegexp(
+          cli_test_base.MockArgumentError,
+          r'Bad value \[{}\]'.format(test_input)):
+        self.RunEnvironments(
+            'create',
+            '--project', self.TEST_PROJECT,
+            '--location', self.TEST_LOCATION,
+            '--image-version', test_input,
+            '--async', self.TEST_ENVIRONMENT_ID)
+
+  def testAirflowVersionValidInput(self):
+    """Tests error if supplied am --airflow-version that is not supported."""
+    self._SetTestMessages()
+    valid_airflow_version_inputs = [
+        '1.2.3',
+        '1.2',
+        '11.22.33'
+    ]
+    for test_input in valid_airflow_version_inputs:
+      node_config = self.messages.NodeConfig(
+          diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+      software_config = self.messages.SoftwareConfig(
+          imageVersion='composer-latest-airflow-{}'.format(test_input))
+      config = self.messages.EnvironmentConfig(
+          nodeConfig=node_config,
+          softwareConfig=software_config)
+      self.ExpectEnvironmentCreate(
+          self.TEST_PROJECT,
+          self.TEST_LOCATION,
+          self.TEST_ENVIRONMENT_ID,
+          config=config,
+          response=self.running_op)
+
+      actual_op = self.RunEnvironments('create',
+                                       '--project', self.TEST_PROJECT,
+                                       '--location', self.TEST_LOCATION,
+                                       '--airflow-version', test_input,
+                                       '--async', self.TEST_ENVIRONMENT_ID)
+      self.assertEqual(self.running_op, actual_op)
+
+  def testAirflowVersionInvalidInput(self):
+    """Tests error if supplied am --airflow-version that is not supported."""
+    self._SetTestMessages()
+    invalid_airflow_version_inputs = [
+        'a.b.c',
+        'composer-latest-airflow-latest',
+        '1',
+        '1.2.',  # with trailing dot
+        '1.2.3.4',
+        'latest'
+    ]
+    for test_input in invalid_airflow_version_inputs:
+      with self.AssertRaisesExceptionRegexp(
+          cli_test_base.MockArgumentError,
+          r'Bad value \[{}\]'.format(test_input)):
+        self.RunEnvironments(
+            'create',
+            '--project', self.TEST_PROJECT,
+            '--location', self.TEST_LOCATION,
+            '--airflow-version', test_input,
+            '--async', self.TEST_ENVIRONMENT_ID)
+
+
+class EnvironmentsCreateAlphaTest(EnvironmentsCreateBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
+
+  def _SetTestMessages(self):
+    # pylint: disable=invalid-name
+    super(EnvironmentsCreateAlphaTest, self)._SetTestMessages()
+    self.AIRFLOW_EXECUTOR_TYPE = 'KUBERNETES'
+
+  def testSuccessfulAsyncCreateWithAlphaFeatures(self):
+    """Test that creating an environment with alpha features works."""
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    software_config = self.messages.SoftwareConfig(
+        airflowExecutorType=self.messages.SoftwareConfig
+        .AirflowExecutorTypeValueValuesEnum.KUBERNETES)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config, softwareConfig=software_config)
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+
+    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--airflow-executor-type',
+                                     self.AIRFLOW_EXECUTOR_TYPE,
+                                     '--async', self.TEST_ENVIRONMENT_ID)
+
+    self.assertEqual(self.running_op, actual_op)
+    self.AssertErrMatches(
+        r'^Create in progress for environment \[{}] with operation \[{}]'
+        .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
 
 if __name__ == '__main__':

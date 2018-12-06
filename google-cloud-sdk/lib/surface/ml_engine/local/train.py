@@ -24,6 +24,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import local_train
 from googlecloudsdk.core import log
+from googlecloudsdk.core.util import files
 
 _BAD_FLAGS_WARNING_MESSAGE = """\
 {flag} is ignored if --distributed is not provided.
@@ -60,7 +61,7 @@ class RunLocal(base.Command):
   def Args(parser):
     """Register flags for this command."""
     flags.PACKAGE_PATH.AddToParser(parser)
-    flags.MODULE_NAME.AddToParser(parser)
+    flags.GetModuleNameFlag().AddToParser(parser)
     flags.DISTRIBUTED.AddToParser(parser)
     flags.PARAM_SERVERS.AddToParser(parser)
     flags.GetJobDirFlag(upload_help=False, allow_local=True).AddToParser(parser)
@@ -78,7 +79,7 @@ class RunLocal(base.Command):
     Returns:
       Some value that we want to have printed later.
     """
-    package_path = args.package_path or os.getcwd()
+    package_path = args.package_path or files.GetCWD()
     # Mimic behavior of ml-engine jobs submit training
     package_root = os.path.dirname(os.path.abspath(package_path))
     user_args = args.user_args or []

@@ -57,6 +57,7 @@ Started draining job [{0}]
 """.format(JOB_1_ID, normalize_space=True))
 
   def testDrainContinuesOnFailure(self):
+    my_region = 'us-central1'
     self.mocked_client.projects_locations_jobs.Update.Expect(
         request=self._DrainReq(JOB_1_ID), response=self.SampleJob(JOB_1_ID))
     self.mocked_client.projects_locations_jobs.Update.Expect(
@@ -72,10 +73,15 @@ Started draining job [{0}]
         JOB_1_ID, JOB_2_ID, JOB_3_ID, JOB_4_ID, normalize_space=True))
     self.AssertErrEquals("""\
 Started draining job [{0}]
-Failed to drain job [{1}]: Resource not found.
+Failed to drain job [{1}]: Resource not found. Please ensure you have \
+permission to access the job and the `--region` flag, {4}, matches the job\'s \
+region.
 Started draining job [{2}]
-Failed to drain job [{3}]: Permission denied.
-""".format(JOB_1_ID, JOB_2_ID, JOB_3_ID, JOB_4_ID, normalize_space=True))
+Failed to drain job [{3}]: Permission denied. Please ensure you have \
+permission to access the job and the `--region` flag, {4}, matches the job\'s \
+region.
+""".format(
+    JOB_1_ID, JOB_2_ID, JOB_3_ID, JOB_4_ID, my_region, normalize_space=True))
 
   def _DrainReq(self, job_id, region=None):
     region = region or base.DEFAULT_REGION

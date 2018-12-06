@@ -18,161 +18,61 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from apitools.base.py import encoding
-from apitools.base.py.testing import mock
-
-from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.api_lib.compute import daisy_utils
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import e2e_base
-from tests.lib import sdk_test_base
+from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
+from tests.lib.surface.compute import daisy_test_base
 
-_DEFAULT_TIMEOUT = '7056s'
 
+class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
 
-class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.mocked_cloudbuild_v1 = mock.Client(
-        core_apis.GetClientClass('cloudbuild', 'v1'),
-    )
-    self.mocked_cloudbuild_v1.Mock()
-    self.addCleanup(self.mocked_cloudbuild_v1.Unmock)
-    self.cloudbuild_v1_messages = core_apis.GetMessagesModule(
-        'cloudbuild', 'v1')
-
-    self.mocked_storage_v1 = mock.Client(
-        core_apis.GetClientClass('storage', 'v1'))
-    self.mocked_storage_v1.Mock()
-    self.addCleanup(self.mocked_storage_v1.Unmock)
-    self.storage_v1_messages = core_apis.GetMessagesModule(
-        'storage', 'v1')
-
-    self.mocked_crm_v1 = mock.Client(
-        core_apis.GetClientClass('cloudresourcemanager', 'v1'))
-    self.mocked_crm_v1.Mock()
-    self.addCleanup(self.mocked_crm_v1.Unmock)
-    self.crm_v1_messages = core_apis.GetMessagesModule(
-        'cloudresourcemanager', 'v1')
-
-    self.mocked_servicemanagement_v1 = mock.Client(
-        core_apis.GetClientClass('servicemanagement', 'v1'))
-    self.mocked_servicemanagement_v1.Mock()
-    self.addCleanup(self.mocked_servicemanagement_v1.Unmock)
-    self.servicemanagement_v1_messages = core_apis.GetMessagesModule(
-        'servicemanagement', 'v1')
-
-    properties.VALUES.core.project.Set('my-project')
-    self._statuses = self.cloudbuild_v1_messages.Build.StatusValueValuesEnum
-
+    self.regionalized = False
+    self.creates_bucket_if_cloudbuild_disabled = False
     self.image_name = 'my-image'
-    self.destination_uri = 'gs://my-bucket/my-image.tar.gz'
+    self.destination_uri = 'gs://31dd/my-image.tar.gz'
     self.daisy_builder = 'gcr.io/compute-image-tools/daisy:release'
+    self.tags = ['gce-daisy', 'gce-daisy-image-export']
 
-    self.project = self.crm_v1_messages.Project(
-        projectId='my-project', projectNumber=123456)
-    admin_permissions_binding = self.crm_v1_messages.Binding(
-        members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
-        role='roles/compute.admin')
-    iam_permissions_binding = self.crm_v1_messages.Binding(
-        members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
-        role='roles/iam.serviceAccountActor')
-    self.permissions = self.crm_v1_messages.Policy(
-        bindings=[admin_permissions_binding, iam_permissions_binding])
-    self.services = self.servicemanagement_v1_messages.ListServicesResponse(
-        services=[self.servicemanagement_v1_messages.ManagedService(
-            serviceName='cloudbuild.googleapis.com')]
-    )
+  def PrepareDaisyMocks(self, daisy_step, timeout='7200s', log_location=None,
+                        permissions=None, async_flag=False, regionalized=True,
+                        source_disk='source-image.vmdk'):
+    super(ImagesExportTestGA, self).PrepareDaisyMocks(
+        daisy_step, timeout=timeout, log_location=log_location,
+        permissions=permissions, async_flag=async_flag,
+        regionalized=regionalized, source_disk=source_disk, is_import=True)
 
-  def PrepareMocks(self, daisy_step):
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[daisy_step],
-        tags=['gce-daisy', 'gce-daisy-image-export'],
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[daisy_step],
-        tags=['gce-daisy', 'gce-daisy-image-export'],
-        status=self._statuses.SUCCESS,
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Cloudbuild output\n[image-export] output\n')
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
+  def GetNetworkStep(self, network=None, subnet=None,
+                     include_zone=True, include_empty_network=False):
+    daisy_vars = (
+        '-variables=source_image=projects/my-project/global/images/{0},'
+        'destination={1}').format(self.image_name, self.destination_uri)
+    return super(ImagesExportTestGA, self).GetNetworkStep(
+        workflow='../workflows/export/image_export.wf.json',
+        daisy_vars=daisy_vars, operation=daisy_utils.ImageOperation.EXPORT,
+        network=network, subnet=subnet, include_zone=include_zone,
+        include_empty_network=include_empty_network)
 
   def testCommonCase(self):
     export_workflow = ('../workflows/export/image_export.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
-        args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
-              '-variables=source_image=projects/my-project/global/images/{0},'
-              'destination={1}'
-              .format(self.image_name, self.destination_uri),
-              export_workflow,],
+        args=[
+            '-gcs_path=gs://{0}/'.format(
+                self.GetScratchBucketName(regionalized=self.regionalized)),
+            '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
+            '-variables=source_image=projects/my-project/global/images/{0},'
+            'destination={1}'.format(self.image_name, self.destination_uri),
+            export_workflow,
+        ],
         name=self.daisy_builder,
     )
 
-    self.PrepareMocks(daisy_step)
+    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
 
     self.Run("""
              compute images export --image {0}
@@ -186,16 +86,19 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
   def testExportFormat(self):
     export_workflow = ('../workflows/export/image_export_ext.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
-        args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
-              '-variables=source_image=projects/my-project/global/images/{0},'
-              'destination={1},format=vmdk'
-              .format(self.image_name, self.destination_uri),
-              export_workflow,],
+        args=[
+            '-gcs_path=gs://{0}/'.format(
+                self.GetScratchBucketName(regionalized=self.regionalized)),
+            '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
+            '-variables=source_image=projects/my-project/global/images/{0},'
+            'destination={1},format=vmdk'
+            .format(self.image_name, self.destination_uri),
+            export_workflow,
+        ],
         name=self.daisy_builder,
     )
 
-    self.PrepareMocks(daisy_step)
+    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
 
     self.Run("""
              compute images export --image {0}
@@ -211,8 +114,9 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     export_workflow = ('../workflows/export/image_export.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-zone={0}'.format(zone),
-              '-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
+              '-gcs_path=gs://{0}/'.format(
+                  self.GetScratchBucketName(regionalized=self.regionalized)),
+              '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
               '-variables=source_image=projects/my-project/global/images/{0},'
               'destination={1}'
               .format(self.image_name, self.destination_uri),
@@ -220,7 +124,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
         name=self.daisy_builder,
     )
 
-    self.PrepareMocks(daisy_step)
+    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
 
     self.Run("""
              compute images export --image {0}
@@ -231,19 +135,57 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
         [image-export] output
         """, normalize_space=True)
 
+  def testServiceNotEnabled(self):
+    self.mocked_servicemanagement_v1.services.List.Expect(
+        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
+            consumerId='project:my-project',
+            pageSize=100,
+        ),
+        response=self.servicemanagement_v1_messages.ListServicesResponse(
+            services=[
+                # Missing 'cloudbuild.googleapis.com'.
+                self.servicemanagement_v1_messages.ManagedService(
+                    serviceName='logging.googleapis.com')
+            ]
+        )
+    )
+
+    self.mocked_crm_v1.projects.Get.Expect(
+        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
+            projectId='my-project',
+        ),
+        response=self.project,
+    )
+
+    if self.creates_bucket_if_cloudbuild_disabled:
+      self.PrepareDaisyBucketMocks(regionalized=self.regionalized)
+
+    with self.assertRaisesRegexp(console_io.UnattendedPromptError,
+                                 ('This prompt could not be answered because '
+                                  'you are not in an interactive session.')):
+      self.Run("""
+               compute images export --image {0}
+               --destination-uri {1}
+               """.format(self.image_name, self.destination_uri))
+
+    self.AssertErrContains('cloudbuild.googleapis.com')
+
   def testImageProject(self):
     export_workflow = ('../workflows/export/image_export.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
-        args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
-              '-variables=source_image=projects/debian-cloud/global/images/{0},'
-              'destination={1}'
-              .format(self.image_name, self.destination_uri),
-              export_workflow,],
+        args=[
+            '-gcs_path=gs://{0}/'.format(
+                self.GetScratchBucketName(regionalized=self.regionalized)),
+            '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
+            '-variables=source_image=projects/debian-cloud/global/images/{0},'
+            'destination={1}'
+            .format(self.image_name, self.destination_uri),
+            export_workflow,
+        ],
         name=self.daisy_builder,
     )
 
-    self.PrepareMocks(daisy_step)
+    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
 
     self.Run("""
              compute images export --image {0}
@@ -255,23 +197,13 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
         """, normalize_space=True)
 
   def testNetworkFlag(self):
-    export_workflow = ('../workflows/export/image_export.wf.json')
-    daisy_step = self.cloudbuild_v1_messages.BuildStep(
-        args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
-              '-variables=source_image=projects/my-project/global/images/{0},'
-              'destination={1},export_network=global/networks/my-network'
-              .format(self.image_name, self.destination_uri),
-              export_workflow,],
-        name=self.daisy_builder,
-    )
-
-    self.PrepareMocks(daisy_step)
+    daisy_step = self.GetNetworkStep(network=self.network, include_zone=False)
+    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
 
     self.Run("""
              compute images export --image {0}
-             --destination-uri {1} --network my-network
-             """.format(self.image_name, self.destination_uri))
+             --destination-uri {1} --network {2}
+             """.format(self.image_name, self.destination_uri, self.network))
 
     self.AssertOutputContains("""\
         [image-export] output
@@ -290,6 +222,94 @@ class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
       self.Run("""
                compute images export --image {0}
                """.format(self.image_name))
+
+
+class ImagesExportTestBeta(ImagesExportTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.regionalized = False
+
+
+class ImagesExportTestAlpha(ImagesExportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def SetUp(self):
+    self.regionalized = True
+    self.creates_bucket_if_cloudbuild_disabled = True
+
+  def testSubnetFlag(self):
+    daisy_step = self.GetNetworkStep(network=self.network, subnet=self.subnet)
+    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+
+    self.Run("""
+             compute images export --image {0} --destination-uri {1}
+             --network {2} --subnet {3} --zone my-region-c
+             """.format(self.image_name, self.destination_uri, self.network,
+                        self.subnet))
+
+    self.AssertOutputContains("""\
+        [image-export] output
+        """, normalize_space=True)
+
+  def testSubnetFlagNetworkVariableClearedIfNetworkFlagNotSpecified(self):
+    daisy_step = self.GetNetworkStep(
+        network='', include_empty_network=True, subnet=self.subnet)
+    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+
+    self.Run("""
+             compute images export --image {0} --destination-uri {1}
+             --subnet {2} --zone my-region-c
+             """.format(self.image_name, self.destination_uri, self.subnet))
+
+    self.AssertOutputContains("""\
+        [image-export] output
+        """, normalize_space=True)
+
+  def testSubnetFlagZoneAndRegionNotSpecified(self):
+    error = r'Region or zone should be specified.'
+    with self.AssertRaisesExceptionRegexp(
+        daisy_utils.SubnetException, error):
+      self.Run("""
+             compute images export --image {0} --destination-uri {1}
+             --subnet {2}
+             """.format(self.image_name, self.destination_uri, self.subnet))
+
+  def testSubnetFlagZoneAsProperty(self):
+    daisy_step = self.GetNetworkStep(network=self.network, subnet=self.subnet)
+    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+
+    properties.VALUES.compute.zone.Set('my-region-c')
+    self.Run("""
+             compute images export --image {0} --destination-uri {1}
+             --network {2} --subnet {3}
+             """.format(self.image_name, self.destination_uri, self.network,
+                        self.subnet))
+
+    self.AssertOutputContains("""\
+        [image-export] output
+        """, normalize_space=True)
+
+  def testSubnetFlagRegionAsProperty(self):
+    daisy_step = self.GetNetworkStep(
+        network=self.network, subnet=self.subnet, include_zone=False)
+    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+
+    properties.VALUES.compute.region.Set('my-region')
+    self.Run("""
+             compute images export --image {0} --destination-uri {1}
+             --network {2} --subnet {3}
+             """.format(self.image_name, self.destination_uri, self.network,
+                        self.subnet))
+
+    self.AssertOutputContains("""\
+        [image-export] output
+        """, normalize_space=True)
+
 
 if __name__ == '__main__':
   test_case.main()

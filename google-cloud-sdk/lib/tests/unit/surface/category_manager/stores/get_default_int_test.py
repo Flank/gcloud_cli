@@ -23,6 +23,7 @@ from tests.lib import parameterized
 from tests.lib.surface.category_manager import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class GetDefaultIntTest(base.CategoryManagerUnitTestBase):
 

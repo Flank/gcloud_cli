@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 import argparse
 
 from googlecloudsdk.api_lib.sql import instances as instances_util
@@ -596,14 +597,6 @@ class _BaseInstancePatchBetaTest(_BaseInstancePatchTest):
       self.Run('sql instances patch custom-instance '
                '--remove-labels=foo --clear-labels')
 
-
-class InstancesPatchBetaTest(_BaseInstancePatchBetaTest, base.SqlMockTestBeta):
-  pass
-
-
-class InstancesPatchAlphaTest(_BaseInstancePatchBetaTest,
-                              base.SqlMockTestAlpha):
-
   def testAddPrivateNetwork(self):
     prompt_mock = self.StartObjectPatch(
         console_io, 'PromptContinue', return_value=True)
@@ -641,6 +634,15 @@ class InstancesPatchAlphaTest(_BaseInstancePatchBetaTest,
     self.AssertErrContains(
         '{"ipConfiguration": {"privateNetwork": "https://www.googleapis.com/'
         'compute/v1/projects/fake-project/global/networks/somenetwork"}}')
+
+
+class InstancesPatchBetaTest(_BaseInstancePatchBetaTest, base.SqlMockTestBeta):
+  pass
+
+
+class InstancesPatchAlphaTest(_BaseInstancePatchBetaTest,
+                              base.SqlMockTestAlpha):
+  pass
 
 
 if __name__ == '__main__':

@@ -27,7 +27,6 @@ from googlecloudsdk.command_lib import info_holder
 from googlecloudsdk.core import config
 from googlecloudsdk.core import log
 from googlecloudsdk.core.util import files as file_utils
-from googlecloudsdk.core.util import platforms
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -259,49 +258,78 @@ class LogDataTest(test_case.Base):
 
 class AnonymizerTest(sdk_test_base.SdkBase):
 
+  def SetUp(self):
+    self.anonymizer = info_holder.Anonymizer()
+
   def testProcessConfigPath(self):
-    anonymizer = info_holder.Anonymizer()
     cfg_paths = config.Paths()
     self.assertEqual(
         os.path.join('${CLOUDSDK_CONFIG}', 'some', 'dir', 'in', 'config'),
-        anonymizer.ProcessPath(
+        self.anonymizer.ProcessPath(
             os.path.join(cfg_paths.global_config_dir,
                          'some', 'dir', 'in', 'config')))
 
   def testProcessFakeHomePath(self):
-    anonymizer = info_holder.Anonymizer()
-    home_path = platforms.GetHomePath() + '_other'
-    self.assertEqual('${HOME}_other', anonymizer.ProcessPath(home_path))
+    home_path = file_utils.GetHomeDir() + '_other'
+    self.assertEqual('${HOME}_other', self.anonymizer.ProcessPath(home_path))
 
   def testProcessHomePath(self):
-    anonymizer = info_holder.Anonymizer()
     self.assertEqual(
         '${HOME}',
-        anonymizer.ProcessPath(platforms.GetHomePath()))
+        self.anonymizer.ProcessPath(file_utils.GetHomeDir()))
 
   def testProcessHomePath_NonNormalized(self):
-    anonymizer = info_holder.Anonymizer()
     self.assertEqual(
         '${HOME}',
-        anonymizer.ProcessPath(
-            os.path.join(platforms.GetHomePath(), 'tmp', '..')))
+        self.anonymizer.ProcessPath(
+            os.path.join(file_utils.GetHomeDir(), 'tmp', '..')))
 
   def testProcessPathWithUser(self):
-    anonymizer = info_holder.Anonymizer()
     self.assertEqual(
         os.path.join('path', 'to', '${USER}'),
-        anonymizer.ProcessPath(
+        self.anonymizer.ProcessPath(
             os.path.join('path', 'to', getpass.getuser())))
 
-  def testProcessNone(self):
-    anonymizer = info_holder.Anonymizer()
-    self.assertIsNone(anonymizer.ProcessPath(None))
+  def testProcessNullPath(self):
+    self.assertIsNone(self.anonymizer.ProcessPath(None))
 
   def testNonMatchingPath(self):
-    anonymizer = info_holder.Anonymizer()
     path = os.path.join('path', 'to', 'nowhere')
-    self.assertEqual(path, anonymizer.ProcessPath(path))
+    self.assertEqual(path, self.anonymizer.ProcessPath(path))
 
+  def testProcessFakeHomeFileURI(self):
+    home_uri = 'file://' + file_utils.GetHomeDir() + '_other'
+    self.assertEqual(
+        'file://${HOME}_other',
+        self.anonymizer.ProcessURL(home_uri))
+
+  def testProcessHomeFileURI(self):
+    self.assertEqual(
+        'file://${HOME}',
+        self.anonymizer.ProcessURL('file://' + file_utils.GetHomeDir()))
+
+  def testProcessHomeFileURI_NonNormalized(self):
+    self.assertEqual(
+        'file://${HOME}',
+        self.anonymizer.ProcessURL(
+            os.path.join('file://' + file_utils.GetHomeDir(), 'tmp', '..')))
+
+  def testProcessFileURIWithUser(self):
+    self.assertEqual(
+        os.path.join('file://path', 'to', '${USER}'),
+        self.anonymizer.ProcessURL(
+            os.path.join('file://path', 'to', getpass.getuser())))
+
+  def testProcessNullURL(self):
+    self.assertIsNone(self.anonymizer.ProcessURL(None))
+
+  def testNonMatchingFileURI(self):
+    uri = os.path.join('file://path', 'to', 'nowhere')
+    self.assertEqual(uri, self.anonymizer.ProcessURL(uri))
+
+  def testProcessRegularURL(self):
+    url = 'http://www.test.com/'
+    self.assertEqual(url, self.anonymizer.ProcessURL(url))
 
 if __name__ == '__main__':
   test_case.main()

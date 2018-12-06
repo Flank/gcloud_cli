@@ -19,8 +19,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -37,8 +38,14 @@ COMMANDS
      diagnose
         Run a detailed diagnostic on a cluster.
 
+     get-iam-policy
+        Get IAM policy for a cluster.
+
      list
         View a list of clusters in a project.
+
+     set-iam-policy
+        Set IAM policy for a cluster.
 
      update
         Update labels and/or the number of worker nodes in a cluster.

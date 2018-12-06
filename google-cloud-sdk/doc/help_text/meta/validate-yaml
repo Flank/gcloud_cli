@@ -1,0 +1,28 @@
+NAME
+    gcloud meta validate-yaml - validate a YAML file against a JSON Schema
+
+SYNOPSIS
+    gcloud meta validate-yaml SCHEMA_FILE YAML_FILE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud meta validate-yaml validates YAML / JSON files against JSON Schemas
+    (https://json-schema.org/).
+
+POSITIONAL ARGUMENTS
+     SCHEMA_FILE
+        The path to a file containing the JSON Schema.
+
+     YAML_FILE
+        The path to a file containing YAML / JSON data. Use - for the standard
+        input.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

@@ -23,8 +23,9 @@ import contextlib
 from apitools.base.py.testing import mock as api_mock
 
 from googlecloudsdk.api_lib.composer import util as api_util
-from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.command_lib.composer import storage_util as composer_storage_util
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 from tests.lib import cli_test_base
@@ -70,9 +71,8 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
                                                    TEST_OPERATION_UUID2)
 
   def _SetTestGcsBucket(self):
+    self.test_gcs_bucket = 'test-bucket'
     self.test_gcs_bucket_path = 'gs://test-bucket'
-    self.test_gcs_bucket = storage_util.BucketReference.FromBucketUrl(
-        self.test_gcs_bucket_path)
 
   def SetTrack(self, track):
     super(ComposerUnitTestBase, self).SetTrack(track)
@@ -409,12 +409,12 @@ class StorageApiCallingUnitTest(EnvironmentsUnitTest):
         config=self.messages.EnvironmentConfig(
             dagGcsPrefix=self.test_gcs_bucket_path + '/dags'))
 
-  def ExpectObjectList(self, bucket_ref, prefix, responses=None,
+  def ExpectObjectList(self, bucket, prefix, responses=None,
                        exception=None):
     if exception:
       self.mock_storage_client.objects.List.Expect(
           self.storage_messages.StorageObjectsListRequest(
-              bucket=bucket_ref.bucket, prefix=prefix),
+              bucket=bucket, prefix=prefix),
           exception=exception)
       return
     if not responses:
@@ -423,28 +423,51 @@ class StorageApiCallingUnitTest(EnvironmentsUnitTest):
     for mock_response in responses:
       self.mock_storage_client.objects.List.Expect(
           self.storage_messages.StorageObjectsListRequest(
-              bucket=bucket_ref.bucket, prefix=prefix, pageToken=page_token),
+              bucket=bucket, prefix=prefix, pageToken=page_token),
           response=mock_response,
           exception=None)
       page_token = mock_response.nextPageToken
 
   def ExpectObjectGet(self, object_ref, response=None, exception=None):
     if response is None and exception is None:
-      response = self.messages.Empty()
+      response = self.storage_messages.Object(bucket=object_ref.bucket,
+                                              name=object_ref.name)
     self.mock_storage_client.objects.Get.Expect(
         self.storage_messages.StorageObjectsGetRequest(
             bucket=object_ref.bucket, object=object_ref.name),
         response=response,
         exception=exception)
 
-  def ExpectObjectInsert(self, object_ref, response=None, exception=None):
+  def ExpectObjectInsert(self, object_ref, file_size=None, response=None,
+                         exception=None):
     if response is None and exception is None:
-      response = self.messages.Empty()
+      response = self.storage_messages.Object(bucket=object_ref.bucket,
+                                              name=object_ref.name)
+    obj = None
+    if file_size is not None:
+      obj = self.storage_messages.Object(size=file_size)
+      response = obj
     self.mock_storage_client.objects.Insert.Expect(
         self.storage_messages.StorageObjectsInsertRequest(
-            bucket=object_ref.bucket, name=object_ref.name),
+            bucket=object_ref.bucket, name=object_ref.name, object=obj),
         response=response,
         exception=exception)
+
+  def ExpectCopy(self, source_ref, dest_ref, response=None):
+    self.mock_storage_client.objects.Copy.Expect(
+        self.storage_messages.StorageObjectsCopyRequest(
+            sourceBucket=source_ref.bucket,
+            sourceObject=source_ref.name,
+            destinationBucket=dest_ref.bucket,
+            destinationObject=dest_ref.name),
+        response=response or self.storage_messages.Object())
+
+  def ExpectObjectDelete(self, target_ref):
+    self.mock_storage_client.objects.Delete.Expect(
+        self.storage_messages.StorageObjectsDeleteRequest(
+            bucket=target_ref.bucket,
+            object=target_ref.name),
+        response=self.storage_messages.StorageObjectsDeleteResponse())
 
 
 class GsutilShellingUnitTest(EnvironmentsUnitTest):
@@ -455,9 +478,21 @@ class GsutilShellingUnitTest(EnvironmentsUnitTest):
 
   def SetUp(self):
     self._SetTestGcsBucket()
+
+  def _SetUpGsutil(self):
+    properties.VALUES.storage.use_gsutil.Set(True)
     self.StartPatch(
         'googlecloudsdk.api_lib.storage.storage_util._GetGsutilPath',
         return_value=self.TEST_GSUTIL_PATH)
+
+  def _SetUpStorageApi(self):
+    properties.VALUES.storage.use_gsutil.Set(False)
+    self.delete_mock = self.StartObjectPatch(composer_storage_util,
+                                             '_DeleteStorageApi')
+    self.import_mock = self.StartObjectPatch(composer_storage_util,
+                                             '_ImportStorageApi')
+    self.export_mock = self.StartObjectPatch(composer_storage_util,
+                                             '_ExportStorageApi')
 
   def MakeEnvironmentWithBucket(self):
     return self.MakeEnvironment(

@@ -13,7 +13,8 @@ SYNOPSIS
         [--description=DESCRIPTION]
         [--disk=[auto-delete=AUTO-DELETE],[boot=BOOT],
           [device-name=DEVICE-NAME],[mode=MODE],[name=NAME],[scope=SCOPE]]
-        [--labels=[KEY=VALUE,...]]
+        [--hostname=HOSTNAME] [--labels=[KEY=VALUE,...]]
+        [--local-nvdimm=[size=SIZE]]
         [--local-ssd=[device-name=DEVICE-NAME],
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
@@ -26,8 +27,11 @@ SYNOPSIS
         [--resource-policies=[RESOURCE_POLICY,...]] [--no-restart-on-failure]
         [--shielded-vm-integrity-monitoring] [--shielded-vm-secure-boot]
         [--shielded-vm-vtpm]
-        [--source-instance-template=SOURCE_INSTANCE_TEMPLATE] [--subnet=SUBNET]
+        [--source-instance-template=SOURCE_INSTANCE_TEMPLATE]
+        [--source-machine-image=SOURCE_MACHINE_IMAGE] [--subnet=SUBNET]
         [--tags=TAG,[TAG,...]] [--zone=ZONE] [--address=ADDRESS | --no-address]
+        [--allocation-affinity=ALLOCATION_AFFINITY;
+          default="any" --allocation-label=[key=KEY],[value=VALUE]]
         [--boot-disk-kms-key=BOOT_DISK_KMS_KEY
           : --boot-disk-kms-keyring=BOOT_DISK_KMS_KEYRING
           --boot-disk-kms-location=BOOT_DISK_KMS_LOCATION
@@ -91,7 +95,7 @@ FLAGS
         Enabled by default, use --no-boot-disk-auto-delete to disable.
 
      --boot-disk-device-name=BOOT_DISK_DEVICE_NAME
-        The name the guest operating system will see for the boot disk as. This
+        The name the guest operating system will see for the boot disk. This
         option can only be specified if a new boot disk is being created (as
         opposed to mounting an existing persistent disk).
 
@@ -121,6 +125,9 @@ FLAGS
          name
             Specifies the name of the disk. This option cannot be specified if
             more than one instance is being created.
+
+         description
+            Optional textual description for the disk being created.
 
          mode
             Specifies the mode of the disk. Supported options are ro for
@@ -271,6 +278,13 @@ FLAGS
             the disk is interpreted as a regional disk in the same region as
             the instance. The default value for this is zonal.
 
+     --hostname=HOSTNAME
+        Specify the hostname of the instance to be created. The specified
+        homename must be RFC1035 compliant. If hostname is not specified, the
+        default hostname is [INSTANCE_NAME].c.[PROJECT_ID].internal when using
+        the global DNS, and [INSTANCE_NAME].[ZONE].c.[PROJECT_ID].internal when
+        using zonal DNS.
+
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
 
@@ -278,6 +292,16 @@ FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     --local-nvdimm=[size=SIZE]
+        Attaches a local NVDIMM to the instances.
+
+         size
+            Optional. Size of the NVDIMM disk. The value must be a whole number
+            followed by a size unit of KB for kilobyte, MB for megabyte, GB for
+            gigabyte, or TB for terabyte. For example, 3TB will produce a 3
+            terabyte disk. Allowed values are: 3TB and 6TB and the default is 3
+            TB.
 
      --local-ssd=[device-name=DEVICE-NAME],[interface=INTERFACE],[size=SIZE]
         Attaches a local SSD to the instances.
@@ -467,6 +491,9 @@ FLAGS
         Users can also override machine type and labels. Values of other flags
         will be ignored and --source-instance-template will be used instead.
 
+     --source-machine-image=SOURCE_MACHINE_IMAGE
+        The name of the machine image that the instance will be created from.
+
      --subnet=SUBNET
         Specifies the subnet that the instances will be part of. If --network
         is also specified subnet must be a subnetwork of network specified by
@@ -518,14 +545,33 @@ FLAGS
           If provided, the instances will not be assigned external IP
           addresses.
 
+    Manage the configuration of desired allocation which this instance could
+    take capacity from.
+
+         --allocation-affinity=ALLOCATION_AFFINITY; default="any"
+            Specifies the configuration of desired allocation which this
+            instance could take capacity from. Choices are 'any', 'none' and
+            'specific', default is 'any'. ALLOCATION_AFFINITY must be one of:
+            any, none, specific.
+
+         --allocation-label=[key=KEY],[value=VALUE]
+            The key and values of the label of the allocation resource.
+            Required if the value of --allocation-affinity is specific.
+
+         key
+            The label key of allocation resource.
+
+         value
+            The label value of allocation resource.
+
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the disk. The arguments in this group can be used to
      specify the attributes of this resource.
 
        --boot-disk-kms-key=BOOT_DISK_KMS_KEY
-          The ID of the key or a fully qualified identifier for the key. This
-          flag must be specified if any of the other arguments in this group
-          are specified.
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
 
        --boot-disk-kms-keyring=BOOT_DISK_KMS_KEYRING
           The KMS keyring of the key.
@@ -555,13 +601,13 @@ FLAGS
      --image-project=IMAGE_PROJECT
         The project against which all image and image family references will be
         resolved. It is best practice to define image-project.
-        * If specifying one of our public images, image-project must be
-          provided.
-        * If there are several of the same image-family value in multiple
-          projects, image-project must be specified to clarify the image to be
-          used.
-        * If not specified and either image or image-family is provided, the
-          current default project is used.
+     o If specifying one of our public images, image-project must be
+       provided.
+     o If there are several of the same image-family value in multiple
+       projects, image-project must be specified to clarify the image to be
+       used.
+     o If not specified and either image or image-family is provided, the
+       current default project is used.
 
      At most one of these may be specified:
 
@@ -590,8 +636,8 @@ FLAGS
           be created from. You can provide this as a full URL to the snapshot
           or just the snapshot name. For example, the following are valid
           values:
-          + https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
-          + snapshot
+       * https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
+       * snapshot
 
      Maintenance Behavior. At most one of these may be specified:
 
@@ -602,22 +648,24 @@ FLAGS
           The --maintenance-policy flag is now deprecated. Please use
           --on-host-maintenance instead. MAINTENANCE_POLICY must be one of:
 
-       MIGRATE
-          The instances should be migrated to a new host. This will temporarily
-          impact the performance of instances during a migration event.
-       TERMINATE
-          The instances should be terminated.
+           MIGRATE
+              The instances should be migrated to a new host. This will
+              temporarily impact the performance of instances during a
+              migration event.
+           TERMINATE
+              The instances should be terminated.
 
        --on-host-maintenance=MAINTENANCE_POLICY
           Specifies the behavior of the instances when their host machines
           undergo maintenance. The default is MIGRATE. MAINTENANCE_POLICY must
           be one of:
 
-       MIGRATE
-          The instances should be migrated to a new host. This will temporarily
-          impact the performance of instances during a migration event.
-       TERMINATE
-          The instances should be terminated.
+           MIGRATE
+              The instances should be migrated to a new host. This will
+              temporarily impact the performance of instances during a
+              migration event.
+           TERMINATE
+              The instances should be terminated.
 
      Sole Tenancy At most one of these may be specified:
 
@@ -682,74 +730,49 @@ FLAGS
           specified and the project has no default service account, then the
           instance will be created with no scopes.
 
-          SCOPE can be either the full URI of the scope or an alias. Available
-          aliases are:
+          SCOPE can be either the full URI of the scope or an alias. default
+          scopes are assigned to all instances. Available aliases are:
 
-              default
-                Scopes assigned to instances by default:
-                - https://www.googleapis.com/auth/devstorage.read_only
-                - https://www.googleapis.com/auth/logging.write
-                - https://www.googleapis.com/auth/monitoring.write
-                - https://www.googleapis.com/auth/pubsub
-                - https://www.googleapis.com/auth/service.management.readonly
-                - https://www.googleapis.com/auth/servicecontrol
-                - https://www.googleapis.com/auth/trace.append
+            Alias                  URI
+            bigquery               https://www.googleapis.com/auth/bigquery
+            cloud-platform         https://www.googleapis.com/auth/cloud-platform
+            cloud-source-repos     https://www.googleapis.com/auth/source.full_control
+            cloud-source-repos-ro  https://www.googleapis.com/auth/source.read_only
+            compute-ro             https://www.googleapis.com/auth/compute.readonly
+            compute-rw             https://www.googleapis.com/auth/compute
+            datastore              https://www.googleapis.com/auth/datastore
+            default                https://www.googleapis.com/auth/devstorage.read_only
+                                   https://www.googleapis.com/auth/logging.write
+                                   https://www.googleapis.com/auth/monitoring.write
+                                   https://www.googleapis.com/auth/pubsub
+                                   https://www.googleapis.com/auth/service.management.readonly
+                                   https://www.googleapis.com/auth/servicecontrol
+                                   https://www.googleapis.com/auth/trace.append
+            gke-default            https://www.googleapis.com/auth/devstorage.read_only
+                                   https://www.googleapis.com/auth/logging.write
+                                   https://www.googleapis.com/auth/monitoring
+                                   https://www.googleapis.com/auth/service.management.readonly
+                                   https://www.googleapis.com/auth/servicecontrol
+                                   https://www.googleapis.com/auth/trace.append
+            logging-write          https://www.googleapis.com/auth/logging.write
+            monitoring             https://www.googleapis.com/auth/monitoring
+            monitoring-write       https://www.googleapis.com/auth/monitoring.write
+            pubsub                 https://www.googleapis.com/auth/pubsub
+            service-control        https://www.googleapis.com/auth/servicecontrol
+            service-management     https://www.googleapis.com/auth/service.management.readonly
+            sql (deprecated)       https://www.googleapis.com/auth/sqlservice
+            sql-admin              https://www.googleapis.com/auth/sqlservice.admin
+            storage-full           https://www.googleapis.com/auth/devstorage.full_control
+            storage-ro             https://www.googleapis.com/auth/devstorage.read_only
+            storage-rw             https://www.googleapis.com/auth/devstorage.read_write
+            taskqueue              https://www.googleapis.com/auth/taskqueue
+            trace                  https://www.googleapis.com/auth/trace.append
+            userinfo-email         https://www.googleapis.com/auth/userinfo.email
 
-              bigquery
-                - https://www.googleapis.com/auth/bigquery
-
-              cloud-platform
-                - https://www.googleapis.com/auth/cloud-platform
-
-              compute-ro
-                - https://www.googleapis.com/auth/compute.readonly
-
-              compute-rw
-                - https://www.googleapis.com/auth/compute
-
-              datastore
-                - https://www.googleapis.com/auth/datastore
-
-              logging-write
-                - https://www.googleapis.com/auth/logging.write
-
-              monitoring
-                - https://www.googleapis.com/auth/monitoring
-
-              monitoring-write
-                - https://www.googleapis.com/auth/monitoring.write
-
-              service-control
-                - https://www.googleapis.com/auth/servicecontrol
-
-              service-management
-                - https://www.googleapis.com/auth/service.management.readonly
-
-              sql (DEPRECATED)
-                - https://www.googleapis.com/auth/sqlservice:
-
-              sql-admin
-                - https://www.googleapis.com/auth/sqlservice.admin
-
-              storage-full
-                - https://www.googleapis.com/auth/devstorage.full_control
-
-              storage-ro
-                - https://www.googleapis.com/auth/devstorage.read_only
-
-              storage-rw
-                - https://www.googleapis.com/auth/devstorage.read_write
-
-              taskqueue
-                - https://www.googleapis.com/auth/taskqueue
-
-              userinfo-email
-                - https://www.googleapis.com/auth/userinfo.email
-
-          DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice'
+          DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice
           account scope and sql alias do not provide SQL instance management
           capabilities and have been deprecated. Please, use
-          'https://www.googleapis.com/auth/sqlservice.admin' or sql-admin to
+          https://www.googleapis.com/auth/sqlservice.admin or sql-admin to
           manage your Google SQL Service instances.
 
        --no-scopes
@@ -773,8 +796,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To create an instance with the latest Red Hat Enterprise Linux 7 image

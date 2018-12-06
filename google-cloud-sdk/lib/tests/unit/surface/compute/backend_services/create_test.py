@@ -657,6 +657,61 @@ class WithSessionAffinityApiTest(BackendServiceCreateTestBase):
                 affinityCookieTtlSec=18),
             project='my-project'))],)
 
+  def testSetIlbSessionAffinity_ClientIpProto(self):
+    self._TestSetILBSessionAffinity('client_ip_proto')
+
+  def testSetIlbSessionAffinity_ClientIpPortProto(self):
+    self._TestSetILBSessionAffinity('client_ip_port_proto')
+
+  # Test ilb setting all supported session affinitys.
+  def _TestSetILBSessionAffinity(self,
+                                 session_affiniy,
+                                 specify_global_health_check=False):
+    messages = self.messages
+    session_affinity_map = {
+        'none':
+            messages.BackendService.SessionAffinityValueValuesEnum.NONE,
+        'client_ip':
+            messages.BackendService.SessionAffinityValueValuesEnum.CLIENT_IP,
+        'client_ip_proto':
+            messages.BackendService.SessionAffinityValueValuesEnum.
+            CLIENT_IP_PROTO,
+        'client_ip_port_proto':
+            messages.BackendService.SessionAffinityValueValuesEnum.
+            CLIENT_IP_PORT_PROTO
+    }
+    self.Run("""compute backend-services create my-backend-service
+        --health-checks=my-health-check-1
+        --protocol=TCP
+        --load-balancing-scheme=internal
+        --description "My backend service"
+        --region=alaska
+        %s
+        --session-affinity %s
+        """ % ('--global-health-checks'
+               if specify_global_health_check else '', session_affiniy))
+
+    self.CheckRequests([
+        (self.compute.regionBackendServices, 'Insert',
+         messages.ComputeRegionBackendServicesInsertRequest(
+             backendService=messages.BackendService(
+                 backends=[],
+                 description='My backend service',
+                 loadBalancingScheme=(
+                     messages.BackendService.LoadBalancingSchemeValueValuesEnum.
+                     INTERNAL),
+                 healthChecks=[
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/healthChecks/my-health-check-1')
+                 ],
+                 name='my-backend-service',
+                 protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
+                 timeoutSec=30,
+                 sessionAffinity=session_affinity_map[session_affiniy]),
+             region='alaska',
+             project='my-project'))
+    ],)
+
 
 class WithSessionAffinityApiBetaTest(WithSessionAffinityApiTest):
 
@@ -668,6 +723,14 @@ class WithSessionAffinityApiAlphaTest(WithSessionAffinityApiBetaTest):
 
   def SetUp(self):
     self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+
+  def testSetIlbSessionAffinity_ClientIpProto(self):
+    self._TestSetILBSessionAffinity(
+        'client_ip_proto', specify_global_health_check=True)
+
+  def testSetIlbSessionAffinity_ClientIpPortProto(self):
+    self._TestSetILBSessionAffinity(
+        'client_ip_port_proto', specify_global_health_check=True)
 
 
 class WithConnectionDrainingTimeoutApiTest(BackendServiceCreateTestBase):
@@ -1698,9 +1761,8 @@ class WithCdnSignedUrlApiTest(BackendServiceCreateTestBase):
   def testSetInvalidCacheMaxAge(self):
     """Tests creating backend service with an invalid cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: '
-        r'invalid-value'):
+        "argument --signed-url-cache-max-age: Failed to parse duration: "
+        "Duration unit 'invalid-value' must be preceded by a number"):
       self.Run("""
           compute backend-services create backend-service-1
           --global
@@ -1711,8 +1773,8 @@ class WithCdnSignedUrlApiTest(BackendServiceCreateTestBase):
   def testSetCacheMaxAgeNegative(self):
     """Tests creating backend service with a negative cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: -1'):
+        'argument --signed-url-cache-max-age: value must be greater than or '
+        'equal to 0; received: -1'):
       self.Run("""
           compute backend-services create backend-service-1
           --global

@@ -20,8 +20,11 @@ from __future__ import unicode_literals
 
 from apitools.base.py import exceptions as apitools_exceptions
 
+from googlecloudsdk.api_lib.compute import metadata_utils
+from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util
+from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.container import constants
@@ -76,8 +79,8 @@ def _Args(parser):
   flags.AddMachineTypeFlag(parser)
   parser.add_argument(
       '--disk-size',
-      type=int,
-      help='Size in GB for node VM boot disks. Defaults to 100GB.')
+      type=arg_parsers.BinarySize(lower_bound='10GB'),
+      help='Size for node VM boot disks. Defaults to 100GB.')
   flags.AddImageTypeFlag(parser, 'node pool')
   flags.AddImageFlag(parser, hidden=True)
   flags.AddImageProjectFlag(parser, hidden=True)
@@ -99,6 +102,7 @@ for examples.
   flags.AddNodeVersionFlag(parser)
   flags.AddAcceleratorArgs(parser)
   flags.AddDiskTypeFlag(parser)
+  flags.AddMetadataFlags(parser)
 
 
 def ParseCreateNodePoolOptionsBase(args):
@@ -115,10 +119,12 @@ def ParseCreateNodePoolOptionsBase(args):
     # repairs, attempting to enable autorepair for them will result in API call
     # failing so don't do it.
     enable_autorepair = ((args.image_type or '').lower() in ['', 'cos'])
+  metadata = metadata_utils.ConstructMetadataDict(args.metadata,
+                                                  args.metadata_from_file)
   return api_adapter.CreateNodePoolOptions(
       accelerators=args.accelerator,
       machine_type=args.machine_type,
-      disk_size_gb=args.disk_size,
+      disk_size_gb=utils.BytesToGb(args.disk_size),
       scopes=args.scopes,
       node_version=args.node_version,
       enable_cloud_endpoints=args.enable_cloud_endpoints,
@@ -139,7 +145,8 @@ def ParseCreateNodePoolOptionsBase(args):
       enable_autorepair=enable_autorepair,
       enable_autoupgrade=args.enable_autoupgrade,
       service_account=args.service_account,
-      disk_type=args.disk_type)
+      disk_type=args.disk_type,
+      metadata=metadata)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -180,6 +187,15 @@ class Create(base.CreateCommand):
     try:
       pool_ref = adapter.ParseNodePool(args.name, location)
       options = self.ParseCreateNodePoolOptions(args)
+
+      if not (options.metadata and
+              'disable-legacy-endpoints' in options.metadata):
+        log.warning('Starting in 1.12, new node pools will be created with '
+                    'their legacy Compute Engine instance metadata APIs '
+                    'disabled by default. To create a node pool with legacy '
+                    'instance metadata endpoints disabled, run '
+                    '`node-pools create` with the flag '
+                    '`--metadata disable-legacy-endpoints=true`.')
 
       if options.enable_autorepair is not None:
         log.status.Print(
@@ -224,12 +240,14 @@ class CreateBeta(Create):
     flags.AddNodeTaintsFlag(parser, for_node_pool=True)
     flags.AddNodePoolNodeIdentityFlags(parser)
     flags.AddNodePoolAutoprovisioningFlag(parser, hidden=True)
+    flags.AddMaxPodsPerNodeFlag(parser, for_node_pool=True)
 
   def ParseCreateNodePoolOptions(self, args):
     ops = ParseCreateNodePoolOptionsBase(args)
     ops.workload_metadata_from_node = args.workload_metadata_from_node
     ops.new_scopes_behavior = True
     ops.enable_autoprovisioning = args.enable_autoprovisioning
+    ops.max_pods_per_node = args.max_pods_per_node
     return ops
 
 
@@ -245,6 +263,7 @@ class CreateAlpha(Create):
     ops.local_ssd_volume_configs = args.local_ssd_volumes
     ops.max_pods_per_node = args.max_pods_per_node
     ops.sandbox = args.sandbox
+    ops.node_group = args.node_group
     return ops
 
   @staticmethod
@@ -261,6 +280,7 @@ class CreateAlpha(Create):
     flags.AddNodePoolNodeIdentityFlags(parser)
     flags.AddMaxPodsPerNodeFlag(parser, for_node_pool=True)
     flags.AddSandboxFlag(parser, hidden=True)
+    flags.AddNodeGroupFlag(parser)
 
 
 Create.detailed_help = DETAILED_HELP

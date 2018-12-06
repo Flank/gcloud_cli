@@ -1,20 +1,35 @@
 NAME
-    gcloud kms keys remove-iam-policy-binding - remove an IAM policy binding
-        from a key
+    gcloud kms keys remove-iam-policy-binding - remove IAM policy binding for a
+        kms key
 
 SYNOPSIS
-    gcloud kms keys remove-iam-policy-binding KEY --member=MEMBER --role=ROLE
-        [--keyring=KEYRING] [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+    gcloud kms keys remove-iam-policy-binding
+        (KEY : --keyring=KEYRING --location=LOCATION) --member=MEMBER
+        --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Removes an IAM policy binding from the given key.
-
-    See https://cloud.google.com/iam/docs/managing-policies for details of
-    policy role and member types.
+    Removes a policy binding from the IAM policy of a kms key. One binding
+    consists of a member and a role.
 
 POSITIONAL ARGUMENTS
-     KEY
-        Name of the key from which to remove a policy binding.
+     Key resource - The key to remove the IAM policy binding. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: provide the argument [key] on
+     the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
+
+       KEY
+          ID of the key or fully qualified identifier for the key. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --keyring=KEYRING
+          The containing keyring.
+
+       --location=LOCATION
+          The location of the key.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -34,27 +49,27 @@ REQUIRED FLAGS
      --role=ROLE
         The role to remove the member from.
 
-OPTIONAL FLAGS
-     --keyring=KEYRING
-        Key ring of the key.
-
-     --location=LOCATION
-        Location of the key.
-
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the cloudkms/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/kms/
 
 EXAMPLES
-    The following command will remove an IAM policy binding for the role of
-    'roles/editor' for the user 'test-user@gmail.com' on the key frodo with the
-    keyring fellowship and location global:
+    To remove an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' on the key frodo with the keyring fellowship and
+    location global, run:
 
         $ gcloud kms keys remove-iam-policy-binding frodo \
-            --keyring fellowship --location global \
-            --member='user:test-user@gmail.com' \
-            --role='roles/editor'
+            --keyring='fellowship' --location='global' \
+            --member='user:test-user@gmail.com' --role='roles/editor'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
 
 NOTES
     These variants are also available:

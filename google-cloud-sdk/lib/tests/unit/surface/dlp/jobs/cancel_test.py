@@ -28,6 +28,7 @@ from tests.lib.surface.dlp import base
 class CancelTest(base.DlpUnitTestBase):
   """dlp jobs cancel tests."""
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testCancel(self, track):
     self.track = track

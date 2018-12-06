@@ -1,0 +1,60 @@
+
+.TH "GCLOUD_BETA_APP_MIGRATE\-CONFIG_DATASTORE\-INDEXES\-XML\-TO\-YAML" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta app migrate\-config datastore\-indexes\-xml\-to\-yaml \- translates a datastore\-indexes.xml into index.yaml
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta app migrate\-config datastore\-indexes\-xml\-to\-yaml\fR \fIXML_FILE\fR [\fB\-\-generated\-indexes\-file\fR=\fIGENERATED_INDEXES_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Convert a datastore\-indexes.xml file to index.yaml.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIXML_FILE\fR
+Path to the datastore\-indexes.xml file.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-generated\-indexes\-file\fR=\fIGENERATED_INDEXES_FILE\fR
+If specified, include the auto\-generated xml file too, and merge the resulting
+entries appropriately. Note that this file is usually named
+\f5WEB\-INF/appengine\-generated/datastore\-indexes\-auto.xml\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

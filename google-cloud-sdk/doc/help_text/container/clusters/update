@@ -70,8 +70,8 @@ REQUIRED FLAGS
           well:
 
               1) The private network the cluster connects to if
-              `--private-cluster` is specified.
-              2) Google Compute Engine Public IPs if `--private-cluster` is not
+              `--enable-private-nodes` is specified.
+              2) Google Compute Engine Public IPs if `--enable-private-nodes` is not
               specified.
 
           When disabled, public internet (0.0.0.0/0) is allowed to connect to
@@ -187,7 +187,10 @@ REQUIRED FLAGS
               --enable-basic-auth is an alias for --username=admin;
               --no-enable-basic-auth is an alias for --username="". Use
               --password to specify a password; if not, the server will
-              randomly generate one.
+              randomly generate one. For cluster versions before 1.12, if
+              neither --enable-basic-auth nor --username is specified,
+              --enable-basic-auth will default to true. After 1.12,
+              --enable-basic-auth will default to false.
 
            --username=USERNAME, -u USERNAME
               The user name to use for basic auth for the cluster. Use
@@ -234,8 +237,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

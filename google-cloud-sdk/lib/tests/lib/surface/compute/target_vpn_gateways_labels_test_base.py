@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -42,7 +42,7 @@ class TargetVpnGatewaysLabelsTestBase(sdk_test_base.WithFakeAuth,
 
     self.resources = resources.Registry()
     self.resources.RegisterApiByName('compute', api_name)
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.region_operations = self.apitools_client.regionOperations
     self.StartPatch('time.sleep')
 

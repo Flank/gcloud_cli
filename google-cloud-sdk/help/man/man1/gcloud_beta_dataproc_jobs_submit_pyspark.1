@@ -106,7 +106,7 @@ https://cloud.google.com/dataproc/docs/concepts/configuring\-clusters/cluster\-p
 .TP 2m
 \fB\-\-py\-files\fR=[\fIPY_FILE\fR,...]
 Comma separated list of Python files to be provided to the job. Must be one of
-the following file formats" .py, ,.zip, or .egg
+the following file formats ".py, .zip, or .egg".
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -125,19 +125,19 @@ invocation.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To submit a PySpark job with a local script, run:
+To submit a PySpark job with a local script and custom flags, run:
 
 .RS 2m
 $ gcloud beta dataproc jobs submit pyspark \-\-cluster my_cluster \e
-    my_script.py
+    my_script.py \-\- \-\-custom\-flag
 .RE
 
 To submit a Spark job that runs a script that is already on the cluster, run:

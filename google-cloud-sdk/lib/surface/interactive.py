@@ -28,6 +28,7 @@ from googlecloudsdk.command_lib.interactive import bindings
 from googlecloudsdk.command_lib.interactive import config as configuration
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.document_renderers import render_document
+from googlecloudsdk.core.util import encoding
 
 import six
 
@@ -65,7 +66,8 @@ def _AppendMetricsEnvironment(tag):
   if metrics_environment:
     metrics_environment += '.'
   metrics_environment += tag
-  os.environ['CLOUDSDK_METRICS_ENVIRONMENT'] = metrics_environment
+  encoding.SetEncodedValue(os.environ, 'CLOUDSDK_METRICS_ENVIRONMENT',
+                           metrics_environment)
 
 
 def _GetKeyBindingsHelp():
@@ -98,8 +100,9 @@ def _GetPropertiesHelp():
   return '\n'.join(lines)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Interactive(base.Command):
+  # pylint: disable=line-too-long
   """Start the gcloud interactive shell.
 
   *{command}* provides an enhanced *bash*(1) command line with features that
@@ -118,14 +121,15 @@ class Interactive(base.Command):
 
   *Command Input*::
 
-  Commands are typed, completed and edited in this section. The default prompt
+  Commands are typed, completed, and edited in this section. The default prompt
   is "$ ". If a context has been set, then its tokens are prepopulated before
   the cursor.
 
   *Active Help*::
 
-  As you type, this section displays in-line help summaries for commands, flags
+  As you type, this section displays in-line help summaries for commands, flags,
   and arguments. You can toggle active help on and off via the *F2* key.
+  Hit *F8* to display the help text in your browser.
 
   *Status Display*::
 
@@ -138,30 +142,52 @@ class Interactive(base.Command):
 
   Command completions are displayed in a scrolling pop-up menu. Use `tab` and
   up/down keys to navigate the completions, and `space` or `/` to select the
-  highlighted completion. Completions for _known_ commands (`gcloud`, `bq`,
-  `gsutil`, `kubectl`, or any command with a man page), flags and static
-  flag values are displayed automatically. Positional and dynamic flag value
-  completions for _known_ commands are displayed after `tab` is entered. `tab`
-  completion for unknown commands defers to *bash*(1), while still using the
-  *interactive* user interface. Absent specific command information, a
+  highlighted completion.
+
+  Completions for _known_ commands, flags, and static flag values are displayed
+  automatically. Positional and dynamic flag value completions for known
+  commands are displayed after `tab` is entered. Known commands include
+  `gcloud`, `bq`, `gsutil`, `kubectl`, and any command with a man page that has
+  been executed at least once in any *interactive* session.
+
+  `tab` completion for unknown commands defers to *bash*(1), while still using
+  the *interactive* user interface. Absent specific command information, a
   file/path completer is used when `tab` is entered for unknown positionals
-  (arguments that do not start with '-').
+  (arguments that do not start with '-'). The default completer handles '~' path
+  notation and embedded _$var_ references, but does not expand their values in
+  completions.
+
+  Configure bash completions as you normally would. *{command}* starts up bash
+  in a mode that sources *~/.bashrc* with the environment variable
+  *COSHELL_VERSION* set to a non-empty version value.
+
+  Command completion resets with each simple command in the command line. Simple
+  commands are separated by '|', ';', '&' and may appear after '$(', '(', '{',
+  '!', *if*, *then*, *elif*, *while*, and _name_=_value_ per command exports.
+  Use `tab` on an empty line to enable command executable search on PATH for
+  the first token in each simple command.
+
+  Currently simple and compound commands must be entered in a single line.
+
+  Refer to
+  [Using gcloud interactive](https://cloud.google.com/sdk/docs/interactive-gcloud)
+  for more information and animated GIFs.
 
   ### Control Characters
 
   Control characters affect the currently running command or the current
   command line being entered at the prompt.
 
-  *^C*::
+  *ctrl-c*::
   If a command is currently running, then that command is interrupted. This
-  terminates the command. Otherwise, if no command is running, ^C clears the
-  current command line.
+  terminates the command. Otherwise, if no command is running, ctrl-c clears
+  the current command line.
 
-  *^D*::
+  *ctrl-d*::
   Exits when entered as the first character at the command prompt. You can
   also run the *exit* command at the prompt.
 
-  *^W*::
+  *ctrl-w*::
   If a command is not currently running, then the last word on the command
   line is deleted. This is handy for "walking back" partial completions.
 
@@ -199,7 +225,7 @@ class Interactive(base.Command):
 
   ### CLI Trees
 
-  *{command}* uses CLI tree data files for typeahead, command line completion
+  *{command}* uses CLI tree data files for typeahead, command line completion,
   and help snippet generation. A few CLI trees are installed with their
   respective Cloud SDK components: *gcloud* (core component), *bq*, *gsutil*,
   and *kubectl*. Trees for commands that have man(1) pages are generated on
@@ -207,13 +233,13 @@ class Interactive(base.Command):
 
   ## EXAMPLES
 
-  Run *{command}* with the command context set to "gcloud ":
+  To set the command context of *{command}* to "gcloud ", run:
 
       {command} --context="gcloud "
 
   ## NOTES
 
-  On Windows install *git*(1) for a *bash*(1) experience. *{command}* will
+  On Windows, install *git*(1) for a *bash*(1) experience. *{command}* will
   then use the *git* (MinGW) *bash* instead of *cmd.exe*.
 
   Please run *$ gcloud feedback* to report bugs or request new features.
@@ -229,10 +255,10 @@ class Interactive(base.Command):
   def Args(parser):
     parser.add_argument(
         '--context',
-        help=('The default command context. This is a string containing a '
-              'command name, flags and arguments. The context is prepopulated '
+        help=('Default command context. This is a string containing a '
+              'command name, flags, and arguments. The context is prepopulated '
               'in each command line. You can inline edit any part of the '
-              'context, or ^C to eliminate it.'))
+              'context, or ctrl-c to eliminate it.'))
     parser.add_argument(
         '--debug',
         hidden=True,

@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Provides sample messages for SQL tests."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 import datetime
 from apitools.base.protorpclite import util as protorpc_util
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -24,6 +25,7 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 sqladmin_v1beta4 = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
 
 DEFAULT_INSTANCE_NAME = 'test-instance'
+DEFAULT_INSTANCE_DATABASE_VERSION = 'MYSQL_5_7'
 DEFAULT_BACKUP_ID = 1234
 
 DEFAULT_CERT_CREATE_TIME = datetime.datetime(
@@ -221,7 +223,7 @@ def GetRequestInstance(project, instance_name):
       backendType=None,
       connectionName=None,
       currentDiskSize=None,
-      databaseVersion='MYSQL_5_6',
+      databaseVersion=None,
       etag=None,
       failoverReplica=None,
       instanceType=None,
@@ -272,7 +274,7 @@ def GetExternalMasterRequestInstance(project, instance_name):
       backendType=None,
       connectionName=None,
       currentDiskSize=None,
-      databaseVersion='MYSQL_5_6',
+      databaseVersion=None,
       etag=None,
       failoverReplica=None,
       gceZone=None,
@@ -357,7 +359,7 @@ def GetV1Instance(project, instance_name):
       backendType='FIRST_GEN',
       connectionName='test-connection-name',
       currentDiskSize=281811817,
-      databaseVersion='MYSQL_5_6',
+      databaseVersion=DEFAULT_INSTANCE_DATABASE_VERSION,
       etag='"7nzH-h2yIa307nzH-h2nzH-h2g/MQ"',
       failoverReplica=None,
       instanceType='CLOUD_SQL_INSTANCE',
@@ -443,7 +445,7 @@ def GetV2Instance(project, instance_name):
       backendType='SECOND_GEN',
       connectionName='test-connection-name',
       currentDiskSize=None,
-      databaseVersion='MYSQL_5_6',
+      databaseVersion=DEFAULT_INSTANCE_DATABASE_VERSION,
       etag='"7nzH-h2yIa30FGKFRs9YFu88s0g/MQ"',
       failoverReplica=None,
       instanceType='CLOUD_SQL_INSTANCE',
@@ -601,7 +603,7 @@ def GetExternalMasterInstance(project, instance_name):
       backendType='EXTERNAL',
       connectionName=None,
       currentDiskSize=None,
-      databaseVersion='MYSQL_5_6',
+      databaseVersion=DEFAULT_INSTANCE_DATABASE_VERSION,
       etag='"7nzH-7nzH-h2yIKFRs9YFu88s0g/MA"',
       failoverReplica=None,
       gceZone=None,

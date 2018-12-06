@@ -149,13 +149,13 @@ class Cardinality(_messages.Message):
   r"""A Cardinality condition for the Waiter resource. A cardinality condition
   is met when the number of variables under a specified path prefix reaches a
   predefined number. For example, if you set a Cardinality condition where the
-  `path` is set to `/foo` and the number of paths is set to 2, the following
+  `path` is set to `/foo` and the number of paths is set to `2`, the following
   variables would meet the condition in a RuntimeConfig resource:  +
   `/foo/variable1 = "value1"` + `/foo/variable2 = "value2"` + `/bar/variable3
-  = "value3"`  It would not would not satisify the same condition with the
-  `number` set to 3, however, because there is only 2 paths that start with
-  `/foo`. Cardinality conditions are recursive; all subtrees under the
-  specific path prefix are counted.
+  = "value3"`  It would not satisfy the same condition with the `number` set
+  to `3`, however, because there is only 2 paths that start with `/foo`.
+  Cardinality conditions are recursive; all subtrees under the specific path
+  prefix are counted.
 
   Fields:
     number: The number variables under the `path` that must exist to meet this
@@ -227,8 +227,10 @@ class Condition(_messages.Message):
       SECURITY_REALM: Any of the security realms in the IAMContext (go
         /security-realms). When used with IN, the condition indicates "any of
         the request's realms match one of the given values; with NOT_IN, "none
-        of the realms match any of the given values". Note that a value can be
-        either a realm or a realm group (go/realm-groups). A match is
+        of the realms match any of the given values". Note that a value can
+        be:  - 'self' (i.e., allow connections from clients that are in the
+        same  security realm)  - a realm (e.g., 'campus-abc')  - a realm group
+        (e.g., 'realms-for-borg-cell-xx', see: go/realm-groups) A match is
         determined by a realm group membership check performed by a
         RealmAclRep object (go/realm-acl-howto). It is not permitted to grant
         access based on the *absence* of a realm, so realm conditions can only
@@ -312,14 +314,17 @@ class CounterOptions(_messages.Message):
   in "_count". Field names should not contain an initial slash. The actual
   exported metric names will have "/iam/policy" prepended.  Field names
   correspond to IAM request parameters and field values are their respective
-  values.  At present the only supported field names are    - "iam_principal",
-  corresponding to IAMContext.principal;    - "" (empty string), resulting in
-  one aggretated counter with no field.  Examples:   counter { metric:
-  "/debug_access_count"  field: "iam_principal" }   ==> increment counter
+  values.  Supported field names:    - "authority", which is "[token]" if
+  IAMContext.token is present,      otherwise the value of
+  IAMContext.authority_selector if present, and      otherwise a
+  representation of IAMContext.principal; or    - "iam_principal", a
+  representation of IAMContext.principal even if a      token or authority
+  selector is present; or    - "" (empty string), resulting in a counter with
+  no fields.  Examples:   counter { metric: "/debug_access_count"  field:
+  "iam_principal" }   ==> increment counter
   /iam/policy/backend_debug_access_count
   {iam_principal=[value of IAMContext.principal]}  At this time we do not
-  support: * multiple field names (though this may be supported in the future)
-  * decrementing the counter * incrementing it by anything other than 1
+  support multiple field names (though this may be supported in the future).
 
   Fields:
     field: The field value to attribute.
@@ -336,16 +341,29 @@ class DataAccessOptions(_messages.Message):
   Enums:
     LogModeValueValuesEnum: Whether Gin logging should happen in a fail-closed
       manner at the caller. This is relevant only in the LocalIAM
-      implementation, for now.
+      implementation, for now.  NOTE: Logging to Gin in a fail-closed manner
+      is currently unsupported while work is being done to satisfy the
+      requirements of go/345. Currently, setting LOG_FAIL_CLOSED mode will
+      have no effect, but still exists because there is active work being done
+      to support it (b/115874152).
 
   Fields:
     logMode: Whether Gin logging should happen in a fail-closed manner at the
       caller. This is relevant only in the LocalIAM implementation, for now.
+      NOTE: Logging to Gin in a fail-closed manner is currently unsupported
+      while work is being done to satisfy the requirements of go/345.
+      Currently, setting LOG_FAIL_CLOSED mode will have no effect, but still
+      exists because there is active work being done to support it
+      (b/115874152).
   """
 
   class LogModeValueValuesEnum(_messages.Enum):
     r"""Whether Gin logging should happen in a fail-closed manner at the
     caller. This is relevant only in the LocalIAM implementation, for now.
+    NOTE: Logging to Gin in a fail-closed manner is currently unsupported
+    while work is being done to satisfy the requirements of go/345. Currently,
+    setting LOG_FAIL_CLOSED mode will have no effect, but still exists because
+    there is active work being done to support it (b/115874152).
 
     Values:
       LOG_MODE_UNSPECIFIED: Client is not required to write a partial Gin log
@@ -360,7 +378,10 @@ class DataAccessOptions(_messages.Message):
         if it succeeds.  If a matching Rule has this directive, but the client
         has not indicated that it will honor such requirements, then the IAM
         check will result in authorization failure by setting
-        CheckPolicyResponse.success=false.
+        CheckPolicyResponse.success=false.  NOTE: This is currently
+        unsupported. See the note on LogMode below. LOG_FAIL_CLOSED shouldn't
+        be used unless the application wants fail-closed logging to be turned
+        on implicitly when b/115874152 is resolved.
     """
     LOG_MODE_UNSPECIFIED = 0
     LOG_FAIL_CLOSED = 1
@@ -1215,7 +1236,7 @@ class Variable(_messages.Message):
   variables).
 
   Enums:
-    StateValueValuesEnum: [Ouput only] The current state of the variable. The
+    StateValueValuesEnum: Output only. The current state of the variable. The
       variable state indicates the outcome of the `variables().watch` call and
       is visible through the `get` and `list` calls.
 
@@ -1223,7 +1244,7 @@ class Variable(_messages.Message):
     name: The name of the variable resource, in the format:
       projects/[PROJECT_ID]/configs/[CONFIG_NAME]/variables/[VARIABLE_NAME]
       The `[PROJECT_ID]` must be a valid project ID, `[CONFIG_NAME]` must be a
-      valid RuntimeConfig reource and `[VARIABLE_NAME]` follows Unix file
+      valid RuntimeConfig resource and `[VARIABLE_NAME]` follows Unix file
       system file path naming.  The `[VARIABLE_NAME]` can contain ASCII
       letters, numbers, slashes and dashes. Slashes are used as path element
       separators and are not part of the `[VARIABLE_NAME]` itself, so
@@ -1233,20 +1254,21 @@ class Variable(_messages.Message):
       regular expression. The length of a `[VARIABLE_NAME]` must be less than
       256 characters.  Once you create a variable, you cannot change the
       variable name.
-    state: [Ouput only] The current state of the variable. The variable state
+    state: Output only. The current state of the variable. The variable state
       indicates the outcome of the `variables().watch` call and is visible
       through the `get` and `list` calls.
     text: The string value of the variable. The length of the value must be
       less than 4096 bytes. Empty values are also accepted. For example,
       `text: "my text value"`. The string must be valid UTF-8.
-    updateTime: Output only. The time of the last variable update.
+    updateTime: Output only. The time of the last variable update. Timestamp
+      will be UTC timestamp.
     value: The binary value of the variable. The length of the value must be
       less than 4096 bytes. Empty values are also accepted. The value must be
       base64 encoded. Only one of `value` or `text` can be set.
   """
 
   class StateValueValuesEnum(_messages.Enum):
-    r"""[Ouput only] The current state of the variable. The variable state
+    r"""Output only. The current state of the variable. The variable state
     indicates the outcome of the `variables().watch` call and is visible
     through the `get` and `list` calls.
 

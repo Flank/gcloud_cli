@@ -18,16 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class LevelsDescribeTest(accesscontextmanager.Base):
+class LevelsDescribeTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -44,14 +45,14 @@ class LevelsDescribeTest(accesscontextmanager.Base):
         ),
         level)
 
-  def testDescribe_MissingRequired(self, track):
-    self.SetUpForTrack(track)
+  def testDescribe_MissingRequired(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager levels describe --policy my_policy')
 
-  def testDescribe(self, track):
-    self.SetUpForTrack(track)
+  def testDescribe(self):
+    self.SetUpForTrack(self.track)
     level = self._MakeBasicLevel('my_level', title='My Level',
                                  combining_function='AND')
     self._ExpectGet(level, 'my_policy')
@@ -61,8 +62,8 @@ class LevelsDescribeTest(accesscontextmanager.Base):
 
     self.assertEqual(result, level)
 
-  def testDelete_PolicyFromProperty(self, track):
-    self.SetUpForTrack(track)
+  def testDelete_PolicyFromProperty(self):
+    self.SetUpForTrack(self.track)
     level = self._MakeBasicLevel('my_level', title='My Level',
                                  combining_function='AND')
     policy = 'my_acm_policy'
@@ -73,6 +74,12 @@ class LevelsDescribeTest(accesscontextmanager.Base):
         'access-context-manager levels describe my_level')
 
     self.assertEqual(result, level)
+
+
+class LevelsDescribeTestAlpha(LevelsDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

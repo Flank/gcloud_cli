@@ -5,7 +5,14 @@ NAME
 SYNOPSIS
     gcloud alpha compute commitments create COMMITMENT --plan=PLAN
         --resources=[RESOURCE=COMMITMENT,...] [--region=REGION]
-        [--type=TYPE; default="general-purpose"] [GCLOUD_WIDE_FLAG ...]
+        [--type=TYPE; default="general-purpose"]
+        [--allocations-from-file=ALLOCATIONS_FROM_FILE
+          | [--allocation=ALLOCATION : --allocation-zone=ALLOCATION_ZONE
+          --accelerator=[count=COUNT],[type=TYPE]
+          --local-ssd=[interface=INTERFACE],[size=SIZE]
+          --machine-type=MACHINE_TYPE --min-cpu-platform=MIN_CPU_PLATFORM
+          --require-specific-allocation --vm-count=VM_COUNT]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create Google Compute Engine commitments.
@@ -53,10 +60,90 @@ OPTIONAL FLAGS
         for memory-optimized VMs. TYPE must be one of: general-purpose,
         memory-optimized.
 
+     Manage the allocations to be created with the commitment. At most one of
+     these may be specified:
+
+       --allocations-from-file=ALLOCATIONS_FROM_FILE
+          The path to a YAML file of multiple allocations' configuration.
+
+       Manage the allocation to be created with the commitment.
+
+         --allocation=ALLOCATION
+            Name of the zonal allocation to operate on. This flag must be
+            specified if any of the other arguments in this group are
+            specified.
+
+         --allocation-zone=ALLOCATION_ZONE
+            Zone of the zonal allocation to operate on. If not specified and
+            the compute/zone property isn't set, you may be prompted to select
+            a zone.
+
+            To avoid prompting when this flag is omitted, you can set the
+            compute/zone property:
+
+                $ gcloud config set compute/zone ZONE
+
+            A list of zones can be fetched by running:
+
+                $ gcloud compute zones list
+
+            To unset the property, run:
+
+                $ gcloud config unset compute/zone
+
+            Alternatively, the zone can be stored in the environment variable
+            CLOUDSDK_COMPUTE_ZONE.
+
+         Manage the specific SKU allocation properties to create.
+
+           --accelerator=[count=COUNT],[type=TYPE]
+              Manage the configuration of the type and number of accelerator
+              cards attached.
+
+       count
+          The number of pieces of the accelerator to attach to the allocation.
+
+       type
+          The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+          accelerator to attach to the allocation. Use 'gcloud compute
+          accelerator-types list' to learn about all available accelerator
+          types.
+
+               --local-ssd=[interface=INTERFACE],[size=SIZE]
+                  Manage the size and the interface of local SSD to use.
+
+       interface
+          The kind of disk interface exposed to the VM for this SSD. Valid
+          values are scsi and nvme. SCSI is the default and is supported by
+          more guest operating systems. NVME may provide higher performance.
+
+       size
+          The size of the local SSD in base-2 GB.
+               --machine-type=MACHINE_TYPE
+                  The type of machine (name only) which has fixed number of
+                  vCPUs and fixed amount of memory. This also includes
+                  specifying custom machine type following
+                  custom-NUMBER_OF_CPUS-AMOUNT_OF_MEMORY pattern.
+
+               --min-cpu-platform=MIN_CPU_PLATFORM
+                  The minimum cpu platform of the allocation.
+
+               --require-specific-allocation
+                  Indicates whether the allocation can be consumed by VMs with
+                  "any allocation" defined. If enabled, then only VMs that
+                  target the allocation by name using --allocation-affinity can
+                  consume this allocation. It also indicates that if true, the
+                  existing instances are also accounted in the allocation.
+
+               --vm-count=VM_COUNT
+                  The number of resources that are allocated to this
+                  allocation.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

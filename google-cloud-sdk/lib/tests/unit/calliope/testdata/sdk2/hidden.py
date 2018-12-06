@@ -18,12 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.GA)
-class HiddenCommand(base.Command):
+@calliope_base.Hidden
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.GA)
+class HiddenCommand(calliope_base.Command):
   """A command that is hidden."""
 
   def Run(self, unused_args):

@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -28,7 +28,7 @@ class InstancesUpdateAccessConfigTest(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('v1')
-    self.track = self.track = base.ReleaseTrack.GA
+    self.track = self.track = calliope_base.ReleaseTrack.GA
 
   def CreateAccessConfig(self, set_ptr, ptr_domain_name):
     access_config = self.messages.AccessConfig(
@@ -267,14 +267,14 @@ class InstancesUpdateAccessConfigBetaTest(InstancesUpdateAccessConfigTest):
 
   def SetUp(self):
     self.SelectApi('beta')
-    self.track = self.track = base.ReleaseTrack.BETA
+    self.track = self.track = calliope_base.ReleaseTrack.BETA
 
 
 class InstancesUpdateAccessConfigAlphaTest(InstancesUpdateAccessConfigTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
-    self.track = self.track = base.ReleaseTrack.ALPHA
+    self.track = self.track = calliope_base.ReleaseTrack.ALPHA
 
   def CreateAccessConfig(self, set_public_dns, dns_name, set_ptr,
                          ptr_domain_name, network_tier='PREMIUM'):

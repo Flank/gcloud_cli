@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import textwrap
 
 from apitools.base.py import encoding
@@ -50,11 +51,10 @@ class JobsSubmitSparkSqlUnitTest(jobs_unit_base.JobsUnitTestBase):
 
   def testSubmitSparkSqlJobWithParams(self):
     spark_sql_job = self.SPARK_SQL_JOB
-    spark_sql_job.scriptVariables = encoding.PyValueToMessage(
-        self.messages.SparkSqlJob.ScriptVariablesValue, {
-            'foo': 'bar',
-            'var': 'value'
-        })
+    spark_sql_job.scriptVariables = encoding.DictToAdditionalPropertyMessage(
+        collections.OrderedDict([('foo', 'bar'), ('var', 'value')]),
+        self.messages.SparkSqlJob.ScriptVariablesValue)
+
     job = self.MakeJob(sparkSqlJob=spark_sql_job)
     self.ExpectSubmitCalls(job)
     self.RunDataproc(

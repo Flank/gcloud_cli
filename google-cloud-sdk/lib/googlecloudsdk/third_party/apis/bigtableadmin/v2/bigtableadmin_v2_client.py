@@ -315,7 +315,7 @@ service.
         method_id=u'bigtableadmin.projects.instances.appProfiles.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageToken'],
+        query_params=[u'pageSize', u'pageToken'],
         relative_path=u'v2/{+parent}/appProfiles',
         request_field='',
         request_type_name=u'BigtableadminProjectsInstancesAppProfilesListRequest',
@@ -695,7 +695,7 @@ for 90 days.
         method_id=u'bigtableadmin.projects.instances.tables.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageToken', u'view'],
+        query_params=[u'pageSize', u'pageToken', u'view'],
         relative_path=u'v2/{+parent}/tables',
         request_field='',
         request_type_name=u'BigtableadminProjectsInstancesTablesListRequest',
@@ -880,7 +880,8 @@ policy if an instance exists but does not have a policy set.
     )
 
     def PartialUpdateInstance(self, request, global_params=None):
-      r"""Partially updates an instance within a project.
+      r"""Partially updates an instance within a project. This method can modify all.
+fields of an Instance and is the preferred way to update an Instance.
 
       Args:
         request: (BigtableadminProjectsInstancesPartialUpdateInstanceRequest) input message
@@ -962,7 +963,9 @@ existing policy.
     )
 
     def Update(self, request, global_params=None):
-      r"""Updates an instance within a project.
+      r"""Updates an instance within a project. This method updates only the display.
+name and type for an Instance. To update other Instance properties, such as
+labels, use PartialUpdateInstance.
 
       Args:
         request: (Instance) input message

@@ -542,5 +542,12 @@ class RoutesCreateAlphaTest(RoutesCreateTest):
     self.CheckRequests()
 
 
+class RoutesCreateBetaTest(RoutesCreateAlphaTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
 if __name__ == '__main__':
   test_case.main()

@@ -46,7 +46,9 @@ OPTIONAL FLAGS
         The link local address of the router for this interface.
 
      --mask-length=MASK_LENGTH
-        The mask for network used for the server IP address.
+        The subnet mask for the link-local IP range of the interface. The
+        interface IP address and BGP peer IP address must be selected from the
+        subnet defined by this link-local range.
 
      --region=REGION
         Region of the router to update. If not specified, you may be prompted
@@ -70,8 +72,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

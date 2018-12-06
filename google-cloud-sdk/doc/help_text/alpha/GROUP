@@ -3,10 +3,11 @@ NAME
 
 SYNOPSIS
     gcloud alpha GROUP | COMMAND [--account=ACCOUNT]
-        [--configuration=CONFIGURATION] [--flatten=[KEY,...]] [--format=FORMAT]
-        [--help] [--project=PROJECT_ID] [--quiet, -q]
-        [--verbosity=VERBOSITY; default="warning"] [--version, -v] [-h]
-        [--log-http] [--trace-token=TRACE_TOKEN] [--no-user-output-enabled]
+        [--configuration=CONFIGURATION] [--flags-file=YAML_FILE]
+        [--flatten=[KEY,...]] [--format=FORMAT] [--help] [--project=PROJECT_ID]
+        [--quiet, -q] [--verbosity=VERBOSITY; default="warning"]
+        [--version, -v] [-h] [--log-http] [--trace-token=TRACE_TOKEN]
+        [--no-user-output-enabled]
 
 DESCRIPTION
     (ALPHA) Alpha versions of gcloud commands.
@@ -22,6 +23,13 @@ GLOBAL FLAGS
         configurations. You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME]
         environment variable to set the equivalent of this flag for a terminal
         session.
+
+     --flags-file=YAML_FILE
+        A YAML or JSON file that specifies a --flag:value dictionary. Useful
+        for specifying complex flag values with special characters that work
+        with any command interpreter. Additionally, each --flags-file arg is
+        replaced by its constituent flags. See $ gcloud topic flags-file for
+        more information.
 
      --flatten=[KEY,...]
         Flatten name[] output resource slices in KEY into separate records for
@@ -92,6 +100,9 @@ GROUPS
      app
         (ALPHA) Manage your App Engine deployments.
 
+     asset
+        (ALPHA) Manage CloudAsset.
+
      auth
         (ALPHA) Manage oauth2 credentials for the Google Cloud SDK.
 
@@ -106,6 +117,9 @@ GROUPS
 
      cloud-shell
         (ALPHA) Manage Google Cloud Shell.
+
+     composer
+        (ALPHA) Create and manage Cloud Composer Environments.
 
      compute
         (ALPHA) Create and manipulate Google Compute Engine resources.
@@ -186,6 +200,9 @@ GROUPS
      resources
         (ALPHA) List and search resources accessible from your account.
 
+     run
+        (ALPHA) Manage your Cloud Run applications.
+
      scheduler
         (ALPHA) Manage Cloud Scheduler jobs and schedules.
 
@@ -207,6 +224,9 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     help
+        (ALPHA) Search gcloud help text.
+
      init
         (ALPHA) Initialize or reinitialize gcloud.
 
@@ -214,7 +234,7 @@ COMMANDS
         (ALPHA) Start the gcloud interactive shell.
 
      search-help
-        (ALPHA) Search the help text of gcloud commands.
+        (ALPHA) (DEPRECATED) Search the help text of gcloud commands.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

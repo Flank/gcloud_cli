@@ -11,7 +11,7 @@ gcloud beta tasks queues update\-app\-engine\-queue \- update an App Engine queu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta tasks queues update\-app\-engine\-queue\fR \fIQUEUE\fR [\fB\-\-clear\-max\-attempts\fR\ |\ \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-clear\-max\-backoff\fR\ |\ \fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-clear\-max\-concurrent\-tasks\fR\ |\ \fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR] [\fB\-\-clear\-max\-doublings\fR\ |\ \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-clear\-max\-retry\-duration\fR\ |\ \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-clear\-max\-tasks\-dispatched\-per\-second\fR\ |\ \fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR] [\fB\-\-clear\-min\-backoff\fR\ |\ \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-clear\-routing\-override\fR\ |\ \fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta tasks queues update\-app\-engine\-queue\fR \fIQUEUE\fR [\fB\-\-clear\-max\-attempts\fR\ |\ \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-clear\-max\-backoff\fR\ |\ \fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-clear\-max\-concurrent\-dispatches\fR\ |\ \fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR] [\fB\-\-clear\-max\-dispatches\-per\-second\fR\ |\ \fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR] [\fB\-\-clear\-max\-doublings\fR\ |\ \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-clear\-max\-retry\-duration\fR\ |\ \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-clear\-min\-backoff\fR\ |\ \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-clear\-routing\-override\fR\ |\ \fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -80,14 +80,29 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-clear\-max\-concurrent\-tasks\fR
-Clear the field corresponding to \f5\-\-max\-concurrent\-tasks\fR.
+\fB\-\-clear\-max\-concurrent\-dispatches\fR
+Clear the field corresponding to \f5\-\-max\-concurrent\-dispatches\fR.
 
 .TP 2m
-\fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR
+\fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR
 The maximum number of concurrent tasks that Cloud Tasks allows to be dispatched
 for this queue. After this threshold has been reached, Cloud Tasks stops
 dispatching tasks until the number of outstanding requests decreases.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-max\-dispatches\-per\-second\fR
+Clear the field corresponding to \f5\-\-max\-dispatches\-per\-second\fR.
+
+.TP 2m
+\fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR
+The maximum rate at which tasks are dispatched from this queue.
 
 .RE
 .sp
@@ -143,21 +158,6 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-clear\-max\-tasks\-dispatched\-per\-second\fR
-Clear the field corresponding to \f5\-\-max\-tasks\-dispatched\-per\-second\fR.
-
-.TP 2m
-\fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR
-The maximum rate at which tasks are dispatched from this queue.
-
-.RE
-.sp
-.TP 2m
-
-At most one of these may be specified:
-
-.RS 2m
-.TP 2m
 \fB\-\-clear\-min\-backoff\fR
 Clear the field corresponding to \f5\-\-min\-backoff\fR.
 
@@ -193,9 +193,9 @@ use the default.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

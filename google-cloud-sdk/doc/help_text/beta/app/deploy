@@ -3,7 +3,7 @@ NAME
         app to App Engine
 
 SYNOPSIS
-    gcloud beta app deploy [DEPLOYABLES ...] [--bucket=BUCKET]
+    gcloud beta app deploy [DEPLOYABLES ...] [--bucket=BUCKET] [--no-cache]
         [--image-url=IMAGE_URL] [--no-promote] [--no-stop-previous-version]
         [--version=VERSION, -v VERSION] [GCLOUD_WIDE_FLAG ...]
 
@@ -34,6 +34,10 @@ FLAGS
         deployment. If this argument is not specified, the application's
         default code bucket is used.
 
+     --no-cache
+        Skip caching mechanisms involved in the deployment process, in
+        particular do not use cached dependencies during the build step.
+
      --image-url=IMAGE_URL
         Deploy with a specific Docker image. Docker url must be from one of the
         valid gcr hostnames.
@@ -56,8 +60,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To deploy a single service, run:

@@ -44,9 +44,10 @@ JOB_FORMAT = 'yaml(jobId,state,startTime.date(tz=LOCAL),endTime.date(tz=LOCAL))'
 # last time)
 _CONTINUE_INTERVAL = 10
 
-
-_TF_RECORD_URL = ('https://www.tensorflow.org/versions/r0.12/how_tos/'
-                  'reading_data/index.html#file-formats')
+_TEXT_FILE_URL = ('https://www.tensorflow.org/guide/datasets'
+                  '#consuming_text_data')
+_TF_RECORD_URL = ('https://www.tensorflow.org/guide/datasets'
+                  '#consuming_tfrecord_data')
 
 
 _PREDICTION_DATA_FORMAT_MAPPER = arg_utils.ChoiceEnumMapper(
@@ -54,8 +55,7 @@ _PREDICTION_DATA_FORMAT_MAPPER = arg_utils.ChoiceEnumMapper(
     jobs.GetMessagesModule(
     ).GoogleCloudMlV1PredictionInput.DataFormatValueValuesEnum,
     custom_mappings={
-        'TEXT': ('text', ('Text files with instances separated '
-                          'by the new-line character.')),
+        'TEXT': ('text', ('Text files; see {}'.format(_TEXT_FILE_URL))),
         'TF_RECORD': ('tf-record',
                       'TFRecord files; see {}'.format(_TF_RECORD_URL)),
         'TF_RECORD_GZIP': ('tf-record-gzip',
@@ -229,7 +229,7 @@ def SubmitTraining(jobs_client, job, job_dir=None, staging_bucket=None,
                    packages=None, package_path=None, scale_tier=None,
                    config=None, module_name=None, runtime_version=None,
                    python_version=None, stream_logs=None, user_args=None,
-                   labels=None):
+                   labels=None, supports_container_training=False):
   """Submit a training job."""
   region = properties.VALUES.compute.region.Get(required=True)
   staging_location = jobs_prep.GetStagingLocation(
@@ -237,8 +237,10 @@ def SubmitTraining(jobs_client, job, job_dir=None, staging_bucket=None,
       job_dir=job_dir)
   try:
     uris = jobs_prep.UploadPythonPackages(
-        packages=packages, package_path=package_path,
-        staging_location=staging_location)
+        packages=packages,
+        package_path=package_path,
+        staging_location=staging_location,
+        supports_container_training=supports_container_training)
   except jobs_prep.NoStagingLocationError:
     raise flags.ArgumentError(
         'If local packages are provided, the `--staging-bucket` or '
@@ -366,11 +368,12 @@ def ParseUpdateLabels(client, job_ref, args):
       args, client.job_class.LabelsValue, GetLabels)
 
 
-def Update(jobs_client, operations_client, args):
+def Update(jobs_client, args):
+  """Update a job."""
   job_ref = _ParseJob(args.job)
   labels_update = ParseUpdateLabels(jobs_client, job_ref, args)
   try:
-    op = jobs_client.Patch(job_ref, labels_update)
+    return jobs_client.Patch(job_ref, labels_update)
   except jobs.NoFieldsSpecifiedError:
     if not any(args.IsSpecified(arg) for arg in ('update_labels',
                                                  'clear_labels',
@@ -378,6 +381,3 @@ def Update(jobs_client, operations_client, args):
       raise
     log.status.Print('No update to perform.')
     return None
-  else:
-    return operations_client.WaitForOperation(
-        op, message='Updating job [{}]'.format(job_ref.Name())).response

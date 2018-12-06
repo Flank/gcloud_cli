@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -27,7 +27,7 @@ from tests.lib.surface.compute import test_base
 class InterconnectAttachmentDeleteTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
     self.SelectApi('v1')
     self.message_version = self.compute_v1
 
@@ -157,7 +157,7 @@ class InterconnectAttachmentDeleteTest(test_base.BaseTest):
 class InterconnectAttachmentDeleteBetaTest(InterconnectAttachmentDeleteTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi('beta')
     self.message_version = self.compute_beta
 
@@ -165,6 +165,6 @@ class InterconnectAttachmentDeleteBetaTest(InterconnectAttachmentDeleteTest):
 class InterconnectAttachmentDeleteAlphaTest(InterconnectAttachmentDeleteTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
     self.message_version = self.compute_alpha

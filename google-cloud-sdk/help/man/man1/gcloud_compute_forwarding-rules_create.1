@@ -34,7 +34,7 @@ forwarding rules are accessible from the internet, while internal forwarding
 rules are only accessible from within their VPC networks. You can specify a
 reserved static external or internal IP address with the
 \f5\fI\-\-address=ADDRESS\fR\fR flag for the forwarding rule. Otherwise if the
-flag is unspecified, an external forwaring rule will be automatically assigned
+flag is unspecified, an external forwarding rule will be automatically assigned
 an ephemeral external IP address (global IP addresses for global forwarding
 rules and regional IP addresses for regional forwarding rules); an internal
 forwarding rule will be automatically assigned an ephemeral internal IP address
@@ -78,25 +78,25 @@ Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR
-The target backend service that will receive the traffic.
+Target backend service that will receive the traffic.
 
 .TP 2m
 \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR
-The target HTTP proxy that will receive the traffic. Acceptable values for
-\-\-ports flag are: 80, 8080.
+Target HTTP proxy that will receive the traffic. Acceptable values for \-\-ports
+flag are: 80, 8080.
 
 .TP 2m
 \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR
-The target HTTPS proxy that will receive the traffic. Acceptable values for
+Target HTTPS proxy that will receive the traffic. Acceptable values for
 \-\-ports flag are: 443.
 
 .TP 2m
 \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR
-The name of the target instance that will receive the traffic. The target
-instance must be in a zone that's in the forwarding rule's region. Global
-forwarding rules may not direct traffic to target instances. If not specified
-and the \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to
-select a zone.
+Name of the target instance that will receive the traffic. The target instance
+must be in a zone that's in the forwarding rule's region. Global forwarding
+rules may not direct traffic to target instances. If not specified and the
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
+zone.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/zone\fR\fR property:
@@ -122,26 +122,24 @@ Alternatively, the zone can be stored in the environment variable
 
 .TP 2m
 \fB\-\-target\-pool\fR=\fITARGET_POOL\fR
-The target pool that will receive the traffic. The target pool must be in the
-same region as the forwarding rule. Global forwarding rules may not direct
-traffic to target pools.
+Target pool that will receive the traffic. The target pool must be in the same
+region as the forwarding rule. Global forwarding rules may not direct traffic to
+target pools.
 
 .TP 2m
 \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR
-The target SSL proxy that will receive the traffic. Acceptable values for
-\-\-ports flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995, 1883,
-5222.
+Target SSL proxy that will receive the traffic. Acceptable values for \-\-ports
+flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995, 1883, 5222.
 
 .TP 2m
 \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR
-The target TCP proxy that will receive the traffic. Acceptable values for
-\-\-ports flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995, 1883,
-5222.
+Target TCP proxy that will receive the traffic. Acceptable values for \-\-ports
+flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995, 1883, 5222.
 
 .TP 2m
 \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR
-The target VPN gateway that will receive forwarded traffic. Acceptable values
-for \-\-ports flag are: 500, 4500.
+Target VPN gateway that will receive forwarded traffic. Acceptable values for
+\-\-ports flag are: 500, 4500.
 
 
 .RE
@@ -153,13 +151,20 @@ for \-\-ports flag are: 500, 4500.
 .RS 2m
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
-An optional textual description for the forwarding rule.
+Optional textual description for the forwarding rule.
 
 .TP 2m
 \fB\-\-ip\-protocol\fR=\fIIP_PROTOCOL\fR
-The IP protocol that the rule will serve. The default is TCP. \fIIP_PROTOCOL\fR
-must be one of: \fBAH\fR, \fBESP\fR, \fBICMP\fR, \fBSCTP\fR, \fBTCP\fR,
-\fBUDP\fR.
+IP protocol that the rule will serve. The default is \f5TCP\fR.
+
+Note that if the load\-balancing scheme is \f5INTERNAL\fR, the protocol must be
+one of: \f5TCP\fR, \f5UDP\fR.
+
+For a load\-balancing scheme that is \f5EXTERNAL\fR, all IP_PROTOCOL options are
+valid.
+
+\fIIP_PROTOCOL\fR must be one of: \fBAH\fR, \fBESP\fR, \fBICMP\fR, \fBSCTP\fR,
+\fBTCP\fR, \fBUDP\fR.
 
 .TP 2m
 \fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR; default="EXTERNAL"
@@ -175,32 +180,32 @@ External load balancing or forwarding, used with one of \-\-target\-http\-proxy,
 .TP 2m
 \fBINTERNAL\fR
 Internal load balancing or forwarding, used with \-\-backend\-service.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
-(Only for \-\-load\-balancing\-scheme=INTERNAL) The network that this forwarding
+(Only for \-\-load\-balancing\-scheme=INTERNAL) Network that this forwarding
 rule applies to. If this field is not specified, the default network will be
 used. In the absence of the default network, this field must be specified.
 
 .TP 2m
 \fB\-\-network\-tier\fR=\fINETWORK_TIER\fR
-The network tier to assign to the forwarding rules. \f5\fINETWORK_TIER\fR\fR
-must be one of: \f5PREMIUM\fR, \f5STANDARD\fR. The default value is
-\f5PREMIUM\fR.
+Network tier to assign to the forwarding rules. \f5\fINETWORK_TIER\fR\fR must be
+one of: \f5PREMIUM\fR, \f5STANDARD\fR. The default value is \f5PREMIUM\fR.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
-(Only for \-\-load\-balancing\-scheme=INTERNAL) The subnetwork that this
-forwarding rule applies to. If the network configured for this forwarding rule
-is in auto subnet mode, this flag is optional and the subnet in the same region
-of the forwarding rule will be used. However, if the network is in custom subnet
-mode, a subnetwork must be specified.
+(Only for \-\-load\-balancing\-scheme=INTERNAL) Subnetwork that this forwarding
+rule applies to. If the network configured for this forwarding rule is in auto
+subnet mode, this flag is optional and the subnet in the same region of the
+forwarding rule will be used. However, if the network is in custom subnet mode,
+a subnetwork must be specified.
 
 .TP 2m
 \fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR
-Region of the subnetwork to operate on. If not specified it will be set the
+Region of the subnetwork to operate on. If not specified, it will be set to the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
@@ -211,13 +216,13 @@ Zone of the target instance to operate on. Overrides the default
 
 .TP 2m
 \fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR
-Region of the target pool to operate on. If not specified it will be set the
+Region of the target pool to operate on. If not specified, it will be set to the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
 \fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR
-Region of the VPN gateway to operate on. If not specified it will be set the
+Region of the VPN gateway to operate on. If not specified, it will be set to the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
@@ -228,7 +233,7 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-address\fR=\fIADDRESS\fR
-The IP address that the forwarding rule will serve. All traffic sent to this IP
+IP address that the forwarding rule will serve. All traffic sent to this IP
 address is directed to the target pointed to by the forwarding rule. Assigned IP
 addresses can be reserved or unreserved.
 
@@ -243,11 +248,11 @@ forwarding rule if the forwarding rule is being configured to point to a
 regional target (target pool) or zonal target (target instance). If this flag is
 omitted, an ephemeral external IP address is automatically assigned.
 
-When the \-\-load\-balancing\-scheme is INTERNAL, this can only be an RFC 1918
-IP address belonging to the network/subnet configured for the forwarding rule.
-If this flag is omitted, an ephemeral internal IP address will be automatically
-allocated from the IP range of the subnet or network configured for this
-forwarding rule.
+When the \-\-load\-balancing\-scheme is INTERNAL or INTERNAL_MANAGED, this can
+only be an RFC 1918 IP address belonging to the network/subnet configured for
+the forwarding rule. If this flag is omitted, an ephemeral internal IP address
+will be automatically allocated from the IP range of the subnet or network
+configured for this forwarding rule.
 
 Note: An IP address must be specified if the traffic is being forwarded to a
 VPN.
@@ -276,7 +281,7 @@ address\-1
 .RS 2m
 .TP 2m
 \fB\-\-ip\-version\fR=\fIIP_VERSION\fR
-The version of the IP address to be allocated if no \-\-address is given. The
+Version of the IP address to be allocated if no \-\-address is given. The
 default is IPv4. \fIIP_VERSION\fR must be one of: \fBIPV4\fR, \fBIPV6\fR.
 
 .TP 2m
@@ -324,8 +329,8 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR
-Region of the backend service to operate on. If not specified it will be set the
-region of the forwarding rule. Overrides the default \fBcompute/region\fR
+Region of the backend service to operate on. If not specified, it will be set to
+the region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
@@ -408,9 +413,9 @@ Individual ports and ranges can be specified, for example (\f5\-\-ports
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

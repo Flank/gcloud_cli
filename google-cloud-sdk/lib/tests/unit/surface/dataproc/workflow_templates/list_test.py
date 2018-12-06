@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'workflow template list' command."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -38,24 +39,16 @@ class WorkflowTemplatesListUnitTest(jobs_unit_base.JobsUnitTestBase):
         response=response,
         exception=exception)
 
-
-class WorkflowTemplatesListUnitTestBeta(WorkflowTemplatesListUnitTest):
-  """Tests for dataproc workflow templates list."""
-
   def SetUp(self):
-    self.SetupForReleaseTrack(calliope_base.ReleaseTrack.BETA)
     ordered_job = self.MakeOrderedJob(
-        step_id='001',
-        start_after=['ABC'],
-        hadoopJob=self.HADOOP_JOB)
+        step_id='001', start_after=['ABC'], hadoopJob=self.HADOOP_JOB)
     self.workflow_templates_list = [
         self.MakeWorkflowTemplate(
             template_id=template_id,
             version=1,
             create_time='2017-08-14T23:49:50.654Z',
             update_time='2017-08-14T23:49:50.654Z',
-            jobs=[ordered_job])
-        for template_id in self.WORKFLOW_TEMPLATE_IDS
+            jobs=[ordered_job]) for template_id in self.WORKFLOW_TEMPLATE_IDS
     ]
 
   def testListWorkflorTemplatesPagination(self):
@@ -93,6 +86,23 @@ test-workflow-template-0  1     2017-08-14T23:49:50.654Z  1
 test-workflow-template-1  1     2017-08-14T23:49:50.654Z  1
 test-workflow-template-2  1     2017-08-14T23:49:50.654Z  1
 """))
+
+
+class WorkflowTemplatesListUnitTestBeta(WorkflowTemplatesListUnitTest):
+  """Tests for dataproc workflow templates list."""
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope_base.ReleaseTrack.BETA)
+    ordered_job = self.MakeOrderedJob(
+        step_id='001', start_after=['ABC'], hadoopJob=self.HADOOP_JOB)
+    self.workflow_templates_list = [
+        self.MakeWorkflowTemplate(
+            template_id=template_id,
+            version=1,
+            create_time='2017-08-14T23:49:50.654Z',
+            update_time='2017-08-14T23:49:50.654Z',
+            jobs=[ordered_job]) for template_id in self.WORKFLOW_TEMPLATE_IDS
+    ]
 
 
 if __name__ == '__main__':

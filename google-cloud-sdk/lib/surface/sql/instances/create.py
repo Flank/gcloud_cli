@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Creates a new Cloud SQL instance."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.sql import api_util as common_api_util
@@ -39,7 +40,7 @@ def AddBaseArgs(parser):
   """Declare flag and positional arguments for this command parser."""
   # TODO(b/35705305): move common flags to command_lib.sql.flags
   base.ASYNC_FLAG.AddToParser(parser)
-  parser.display_info.AddFormat(flags.INSTANCES_FORMAT_BETA)
+  parser.display_info.AddFormat(flags.GetInstanceListFormat())
   flags.AddActivationPolicy(parser)
   flags.AddAssignIp(parser, show_negated_in_help=False)
   flags.AddAuthorizedGAEApps(parser)
@@ -57,9 +58,9 @@ def AddBaseArgs(parser):
   parser.add_argument(
       '--database-version',
       required=False,
-      default='MYSQL_5_6',
       choices=['MYSQL_5_5', 'MYSQL_5_6', 'MYSQL_5_7', 'POSTGRES_9_6'],
-      help='The database engine type and version.')
+      help=('The database engine type and version. If left unspecified, the '
+            'API defaults will be used.'))
   flags.AddEnableBinLog(parser, show_negated_in_help=False)
   parser.add_argument(
       '--failover-replica-name',
@@ -143,6 +144,7 @@ def AddBetaArgs(parser):
   """Declare beta flag and positional arguments for this command parser."""
   flags.AddExternalMasterGroup(parser)
   flags.AddInstanceResizeLimit(parser)
+  flags.AddNetwork(parser)
   labels_util.AddCreateLabelsFlags(parser)
 
 
@@ -266,7 +268,7 @@ class Create(base.Command):
     AddBaseArgs(parser)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class CreateBeta(base.Command):
   """Creates a new Cloud SQL instance."""
 
@@ -278,18 +280,3 @@ class CreateBeta(base.Command):
     """Args is called by calliope to gather arguments for this command."""
     AddBaseArgs(parser)
     AddBetaArgs(parser)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(base.Command):
-  """Creates a new Cloud SQL instance."""
-
-  def Run(self, args):
-    return RunBaseCreateCommand(args, self.ReleaseTrack())
-
-  @staticmethod
-  def Args(parser):
-    """Args is called by calliope to gather arguments for this command."""
-    AddBaseArgs(parser)
-    AddBetaArgs(parser)
-    flags.AddNetwork(parser)

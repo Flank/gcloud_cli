@@ -19,6 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
+
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
@@ -37,7 +39,16 @@ class OperationsListUnitTest(unit_base.DataprocUnitTestBase):
         self.OperationName(op_id) for op_id in self.OPERATION_IDS]
     self.operations = [
         self.MakeCompletedOperation(
-            name=name.format(self.Project()), labels={'k1': 'v1'})
+            name=name.format(self.Project()),
+            metadata=collections.OrderedDict([
+                ('labels', {'k1': 'v1'}),
+                ('operationType', 'CREATE'),
+                ('status', {'state': 'DONE'}),
+                ('statusHistory', [
+                    {'stateStartTime': '2018-09-21T18:18:32.143Z'}]),
+                ('warnings', ['please stop whatever it is youre doing']),
+            ])
+        )
         for name in self.operation_names]
     self.base_name = 'projects/{0}/regions/{1}/operations'.format(
         self.Project(), self.REGION)
@@ -65,9 +76,11 @@ class OperationsListUnitTest(unit_base.DataprocUnitTestBase):
     self.ExpectListOperations(expected)
     self.RunDataproc('operations list', output_format='')
     self.AssertOutputContains(
-        'OPERATION_NAME DONE', normalize_space=True)
+        'NAME TIMESTAMP TYPE STATE ERROR WARNINGS', normalize_space=True)
     self.AssertOutputContains(
-        '{0} True'.format(self.OperationName()), normalize_space=True)
+        '{0} 2018-09-21T18:18:32.143Z CREATE DONE 1'.format(
+            self.OPERATION_IDS[0]),
+        normalize_space=True)
 
   def testListOperationsWithJsonFilter(self):
     expected = self.operations

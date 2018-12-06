@@ -87,26 +87,22 @@ FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
      --session-affinity=SESSION_AFFINITY; default="NONE"
-        The type of session affinity to use for this backend service.
-        SESSION_AFFINITY must be one of:
+        The type of session affinity to use. SESSION_AFFINITY must be one of:
 
          CLIENT_IP
             Route requests to instances based on the hash of the client's IP
             address.
          CLIENT_IP_PROTO
-            Connections from the same client IP with the same IP protocol
-            willgo to the same VM in the pool while that VM remains healthy.
-            This option cannot be used for HTTP(s) load balancing.
-         GENERATED_COOKIE
-            Route requests to instances based on the contents of the "GCLB"
-            cookie set by the load balancer.
+            Connections from the same client IP with the same IP protocol will
+            go to the same VM in the pool while that VM remains healthy.
          NONE
             Session affinity is disabled.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

@@ -137,9 +137,10 @@ class Backup(_messages.Message):
       release.
 
   Fields:
-    createTime: Output only. Time the CreateBackup request was received. The
-      backup will contain an externally consistent copy of the database at the
-      point in time specified by `create_time`.
+    createTime: Output only. The backup will contain an externally consistent
+      copy of the database at the point in time specified by `create_time`.
+      `create_time` is approximately the time the CreateBackup request is
+      received.
     creatingProgress: Output only. The progress of the backup while in the
       `CREATING` state.
     database: Required for the CreateBackup operation. Name of the database
@@ -148,11 +149,12 @@ class Backup(_messages.Message):
       `projects/<project>/instances/<instance>/databases/<database>`.
     expireTime: Required for the CreateBackup operation. The expiration time
       of the backup, with microseconds granularity that must be at least 6
-      hours and at most 366 days from `create_time`. The exact `create_time`
-      is determined by the system when processing the backup creation request,
-      and is approximately the time at which the request is submitted. Once
-      the `expire_time` has passed, Cloud Spanner will delete the backup and
-      free the resources used by the backup.
+      hours and at most 366 days from `creating_progress.start_time`. The
+      exact `creating_progress.start_time` is determined by the system when
+      processing the backup creation request, and is approximately the time
+      the request is received. Once the `expire_time` has passed, Cloud
+      Spanner will delete the backup and free the resources used by the
+      backup.
     labels: The labels for the backup.  Labels are useful for organizing cloud
       resources, by allowing customer specific metadata to be attached to
       resources. See https://goo.gl/xmQnxf for more information on and
@@ -170,9 +172,9 @@ class Backup(_messages.Message):
       release.
     name: Required. A globally unique identifier for the backup which cannot
       be changed.  Values are of the form
-      `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]`. The
-      final segment of the name must be between 6 and 30 characters in length.
-      The backup is stored in the location(s) specified in the instance
+      `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]` The final
+      segment of the name must be between 2 and 60 characters in length.  The
+      backup is stored in the location(s) specified in the instance
       configuration of the instance containing the backup, identified by the
       prefix of the backup name of the form
       `projects/<project>/instances/<instance>`.
@@ -401,8 +403,10 @@ class Condition(_messages.Message):
       SECURITY_REALM: Any of the security realms in the IAMContext (go
         /security-realms). When used with IN, the condition indicates "any of
         the request's realms match one of the given values; with NOT_IN, "none
-        of the realms match any of the given values". Note that a value can be
-        either a realm or a realm group (go/realm-groups). A match is
+        of the realms match any of the given values". Note that a value can
+        be:  - 'self' (i.e., allow connections from clients that are in the
+        same  security realm)  - a realm (e.g., 'campus-abc')  - a realm group
+        (e.g., 'realms-for-borg-cell-xx', see: go/realm-groups) A match is
         determined by a realm group membership check performed by a
         RealmAclRep object (go/realm-acl-howto). It is not permitted to grant
         access based on the *absence* of a realm, so realm conditions can only
@@ -486,14 +490,17 @@ class CounterOptions(_messages.Message):
   in "_count". Field names should not contain an initial slash. The actual
   exported metric names will have "/iam/policy" prepended.  Field names
   correspond to IAM request parameters and field values are their respective
-  values.  At present the only supported field names are    - "iam_principal",
-  corresponding to IAMContext.principal;    - "" (empty string), resulting in
-  one aggretated counter with no field.  Examples:   counter { metric:
-  "/debug_access_count"  field: "iam_principal" }   ==> increment counter
+  values.  Supported field names:    - "authority", which is "[token]" if
+  IAMContext.token is present,      otherwise the value of
+  IAMContext.authority_selector if present, and      otherwise a
+  representation of IAMContext.principal; or    - "iam_principal", a
+  representation of IAMContext.principal even if a      token or authority
+  selector is present; or    - "" (empty string), resulting in a counter with
+  no fields.  Examples:   counter { metric: "/debug_access_count"  field:
+  "iam_principal" }   ==> increment counter
   /iam/policy/backend_debug_access_count
   {iam_principal=[value of IAMContext.principal]}  At this time we do not
-  support: * multiple field names (though this may be supported in the future)
-  * decrementing the counter * incrementing it by anything other than 1
+  support multiple field names (though this may be supported in the future).
 
   Fields:
     field: The field value to attribute.
@@ -504,6 +511,25 @@ class CounterOptions(_messages.Message):
   metric = _messages.StringField(2)
 
 
+class CreateBackupMetadata(_messages.Message):
+  r"""A CreateBackupMetadata object.
+
+  Fields:
+    cancelTime: The time at which this operation was cancelled. If set, this
+      operation is in the process of undoing itself (which is guaranteed to
+      succeed) and cannot be cancelled again.
+    database: The name of the database the backup is taken from.
+    name: The name of the backup being created with the format specified in
+      `Backup.name` in Backup.
+    progress: The progress of the CreateBackup operation.
+  """
+
+  cancelTime = _messages.StringField(1)
+  database = _messages.StringField(2)
+  name = _messages.StringField(3)
+  progress = _messages.MessageField('OperationProgress', 4)
+
+
 class CreateBackupRequest(_messages.Message):
   r"""A CreateBackupRequest object.
 
@@ -512,6 +538,26 @@ class CreateBackupRequest(_messages.Message):
   """
 
   backup = _messages.MessageField('Backup', 1)
+
+
+class CreateDatabaseFromBackupMetadata(_messages.Message):
+  r"""A CreateDatabaseFromBackupMetadata object.
+
+  Fields:
+    backup: Name of the backup being restored.
+    cancelTime: The time at which this operation was cancelled. If set, this
+      operation is in the process of undoing itself (which is guaranteed to
+      succeed) and cannot be cancelled again.
+    name: Name of the database being created and restored to.
+    progress: The progress of the CreateDatabaseFromBackup operation.
+    sourceDatabase: Name of the database the backup was taken from.
+  """
+
+  backup = _messages.StringField(1)
+  cancelTime = _messages.StringField(2)
+  name = _messages.StringField(3)
+  progress = _messages.MessageField('OperationProgress', 4)
+  sourceDatabase = _messages.StringField(5)
 
 
 class CreateDatabaseFromBackupRequest(_messages.Message):
@@ -609,16 +655,29 @@ class DataAccessOptions(_messages.Message):
   Enums:
     LogModeValueValuesEnum: Whether Gin logging should happen in a fail-closed
       manner at the caller. This is relevant only in the LocalIAM
-      implementation, for now.
+      implementation, for now.  NOTE: Logging to Gin in a fail-closed manner
+      is currently unsupported while work is being done to satisfy the
+      requirements of go/345. Currently, setting LOG_FAIL_CLOSED mode will
+      have no effect, but still exists because there is active work being done
+      to support it (b/115874152).
 
   Fields:
     logMode: Whether Gin logging should happen in a fail-closed manner at the
       caller. This is relevant only in the LocalIAM implementation, for now.
+      NOTE: Logging to Gin in a fail-closed manner is currently unsupported
+      while work is being done to satisfy the requirements of go/345.
+      Currently, setting LOG_FAIL_CLOSED mode will have no effect, but still
+      exists because there is active work being done to support it
+      (b/115874152).
   """
 
   class LogModeValueValuesEnum(_messages.Enum):
     r"""Whether Gin logging should happen in a fail-closed manner at the
     caller. This is relevant only in the LocalIAM implementation, for now.
+    NOTE: Logging to Gin in a fail-closed manner is currently unsupported
+    while work is being done to satisfy the requirements of go/345. Currently,
+    setting LOG_FAIL_CLOSED mode will have no effect, but still exists because
+    there is active work being done to support it (b/115874152).
 
     Values:
       LOG_MODE_UNSPECIFIED: Client is not required to write a partial Gin log
@@ -633,7 +692,10 @@ class DataAccessOptions(_messages.Message):
         if it succeeds.  If a matching Rule has this directive, but the client
         has not indicated that it will honor such requirements, then the IAM
         check will result in authorization failure by setting
-        CheckPolicyResponse.success=false.
+        CheckPolicyResponse.success=false.  NOTE: This is currently
+        unsupported. See the note on LogMode below. LOG_FAIL_CLOSED shouldn't
+        be used unless the application wants fail-closed logging to be turned
+        on implicitly when b/115874152 is resolved.
     """
     LOG_MODE_UNSPECIFIED = 0
     LOG_FAIL_CLOSED = 1
@@ -704,6 +766,59 @@ class Empty(_messages.Message):
 
 
 
+class ExecuteBatchDmlRequest(_messages.Message):
+  r"""The request for ExecuteBatchDml
+
+  Fields:
+    seqno: A per-transaction sequence number used to identify this request.
+      This is used in the same space as the seqno in ExecuteSqlRequest. See
+      more details in ExecuteSqlRequest.
+    statements: The list of statements to execute in this batch. Statements
+      are executed serially, such that the effects of statement i are visible
+      to statement i+1. Each statement must be a DML statement. Execution will
+      stop at the first failed statement; the remaining statements will not
+      run.  REQUIRES: statements_size() > 0.
+    transaction: The transaction to use. A ReadWrite transaction is required.
+      Single-use transactions are not supported (to avoid replay).  The caller
+      must either supply an existing transaction ID or begin a new
+      transaction.
+  """
+
+  seqno = _messages.IntegerField(1)
+  statements = _messages.MessageField('Statement', 2, repeated=True)
+  transaction = _messages.MessageField('TransactionSelector', 3)
+
+
+class ExecuteBatchDmlResponse(_messages.Message):
+  r"""The response for ExecuteBatchDml. Contains a list of ResultSet, one for
+  each DML statement that has successfully executed. If a statement fails, the
+  error is returned as part of the response payload. Clients can determine
+  whether all DML statements have run successfully, or if a statement failed,
+  using one of the following approaches:    1. Check if 'status' field is
+  OkStatus.   2. Check if result_sets_size() equals the number of statements
+  in      ExecuteBatchDmlRequest.  Example 1: A request with 5 DML statements,
+  all executed successfully. Result: A response with 5 ResultSets, one for
+  each statement in the same order, and an OK status.  Example 2: A request
+  with 5 DML statements. The 3rd statement has a syntax error. Result: A
+  response with 2 ResultSets, for the first 2 statements that run
+  successfully, and a syntax error (INVALID_ARGUMENT) status. From
+  result_set_size() client can determine that the 3rd statement has failed.
+
+  Fields:
+    resultSets: ResultSets, one for each statement in the request that ran
+      successfully, in the same order as the statements in the request. Each
+      ResultSet will not contain any rows. The ResultSetStats in each
+      ResultSet will contain the number of rows modified by the statement.
+      Only the first ResultSet in the response contains a valid
+      ResultSetMetadata.
+    status: If all DML statements are executed successfully, status will be
+      OK. Otherwise, the error status of the first failed statement.
+  """
+
+  resultSets = _messages.MessageField('ResultSet', 1, repeated=True)
+  status = _messages.MessageField('Status', 2)
+
+
 class ExecuteSqlRequest(_messages.Message):
   r"""The request for ExecuteSql and ExecuteStreamingSql.
 
@@ -759,10 +874,23 @@ class ExecuteSqlRequest(_messages.Message):
       new SQL statement execution to resume where the last one left off. The
       rest of the request parameters must exactly match the request that
       yielded this token.
-    seqno: A string attribute.
+    seqno: A per-transaction sequence number used to identify this request.
+      This makes each request idempotent such that if the request is received
+      multiple times, at most one will succeed.  The sequence number must be
+      monotonically increasing within the transaction. If a request arrives
+      for the first time with an out-of-order sequence number, the transaction
+      may be aborted. Replays of previously handled requests will yield the
+      same response as the first execution.  Required for DML statements.
+      Ignored for queries.
     sql: Required. The SQL string.
     transaction: The transaction to use. If none is provided, the default is a
-      temporary read-only transaction with strong concurrency.
+      temporary read-only transaction with strong concurrency.  The
+      transaction to use.  For queries, if none is provided, the default is a
+      temporary read-only transaction with strong concurrency.  Standard DML
+      statements require a ReadWrite transaction. Single-use transactions are
+      not supported (to avoid replay).  The caller must either supply an
+      existing transaction ID or begin a new transaction.  Partitioned DML
+      requires an existing PartitionedDml transaction ID.
   """
 
   class QueryModeValueValuesEnum(_messages.Enum):
@@ -1159,6 +1287,20 @@ class ListBackupsResponse(_messages.Message):
   nextPageToken = _messages.StringField(2)
 
 
+class ListCreateDatabaseFromBackupMetadataResponse(_messages.Message):
+  r"""A ListCreateDatabaseFromBackupMetadataResponse object.
+
+  Fields:
+    metadata: The list of matching CreateDatabaseFromBackupMetadata.
+    nextPageToken: `next_page_token` can be sent in a subsequent
+      ListCreateDatabaseFromBackupMetadata call to fetch more of the matching
+      metadata.
+  """
+
+  metadata = _messages.MessageField('CreateDatabaseFromBackupMetadata', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
 class ListDatabasesResponse(_messages.Message):
   r"""The response for ListDatabases.
 
@@ -1406,7 +1548,8 @@ class PartialResultSet(_messages.Message):
     stats: Query plan and execution statistics for the statement that produced
       this streaming result set. These can be requested by setting
       ExecuteSqlRequest.query_mode and are sent only once with the last
-      response in the stream.
+      response in the stream. This field will also be present in the last
+      response for DML statements.
     values: A streamed result set consists of a stream of values, which might
       be split into many `PartialResultSet` messages to accommodate large rows
       and/or large values. Every N complete values defines a row, where N is
@@ -1532,7 +1675,9 @@ class PartitionQueryRequest(_messages.Message):
       partitionable query has a single distributed union operator. A
       distributed union operator conceptually divides one or more tables into
       multiple splits, remotely evaluates a subquery independently on each
-      split, and then unions all results.
+      split, and then unions all results.  This must not contain DML commands,
+      such as INSERT, UPDATE, or DELETE. Use ExecuteStreamingSql with a
+      PartitionedDml transaction for large, partition-friendly DML operations.
     transaction: Read only snapshot transactions are supported, read/write and
       single use transactions are not.
   """
@@ -1957,10 +2102,10 @@ class RestoreInfo(_messages.Message):
     r"""The type of the restore source.
 
     Values:
-      UNSPECIFIED: No restore associated.
+      RESTORE_SOURCE_TYPE_UNSPECIFIED: No restore associated.
       BACKUP: A backup was used as the source of the restore.
     """
-    UNSPECIFIED = 0
+    RESTORE_SOURCE_TYPE_UNSPECIFIED = 0
     BACKUP = 1
 
   source = _messages.StringField(1)
@@ -1982,6 +2127,10 @@ class ResultSet(_messages.Message):
       metadata.row_type. Elements are encoded based on type as described here.
     stats: Query plan and execution statistics for the SQL statement that
       produced this result set. These can be requested by setting
+      ExecuteSqlRequest.query_mode. DML statements always produce stats
+      containing the number of rows modified, unless executed using the
+      ExecuteSqlRequest.QueryMode.PLAN ExecuteSqlRequest.query_mode. Other
+      fields may or may not be populated, based on the
       ExecuteSqlRequest.query_mode.
   """
 
@@ -2361,36 +2510,42 @@ class SpannerProjectsInstancesBackupsListRequest(_messages.Message):
     filter: A filter expression that filters resources listed in the response.
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
-      string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <. Filter rules are case insensitive.  The fields eligible
-      for filtering are:   * `name`   * `database_name`   * `labels.key` where
-      key is the name of a label   * `state`   * `create_time` (and values are
-      of the format YYYY-MM-DDTHH:MM:SSZ)   * `expire_time` (and values are of
-      the format YYYY-MM-DDTHH:MM:SSZ)   * `size_bytes`  To filter on multiple
-      expressions, provide each separate expression within parentheses. By
-      default, each expression is an AND expression. However, you can include
-      AND and OR expressions explicitly.  Some examples of using filters are:
-      * `name:Howl` --> The backup's name contains the string "howl".   *
-      `database_name:prod` --> The backup's name contains the string "prod".
-      * `labels.env:*` --> The backup has the label "env".   *
-      `state:CREATING` --> The backup is pending creation.   * `state:READY`
-      --> The backup is fully created and ready for use.   * `(name:howl) AND
-      (create_time < 2018-03-28T14:50:00Z)`          --> The backup name
-      contains the string "howl" and create_time              of the backup is
-      before 2018-03-28T14:50:00Z.   * `size_bytes > 10000000000` --> The
-      backup size is greater than 10GB
+      string, a number, or a boolean. The comparison operator must be <, >,
+      <=, >=, !=, =, or :. Colon ':' represents a HAS operator which is
+      roughly synonymous with equality. Filter rules are case insensitive.
+      The fields eligible for filtering are:   * `name`   * `database_name`
+      * `labels`   * `state`   * `create_time` (and values are of the format
+      YYYY-MM-DDTHH:MM:SSZ)   * `expire_time` (and values are of the format
+      YYYY-MM-DDTHH:MM:SSZ)   * `size_bytes`   *
+      `creating_progress.progress_percent'   *      --> Values are integers
+      between 0 and 100 inclusive.   * `creating_progress.start_time`   *
+      `creating_progress.end_time`  To filter on multiple expressions, provide
+      each separate expression within parentheses. By default, each expression
+      is an AND expression. However, you can include AND, OR, and NOT
+      expressions explicitly.  Some examples of using filters are:    *
+      `name:Howl` --> The backup's name contains the string "howl".   *
+      `database_name:prod`          --> The database's name contains the
+      string "prod".   * `labels.env:*` --> The backup has a label with key
+      "env".   * `labels.env=dev`          --> The backup has a label with key
+      "env" and value "dev"   * `state:CREATING` --> The backup is pending
+      creation.   * `state:READY` --> The backup is fully created and ready
+      for use.   * `(name:howl) AND (create_time < 2018-03-28T14:50:00Z)`
+      --> The backup name contains the string "howl" and create_time
+      of the backup is before 2018-03-28T14:50:00Z.   * `size_bytes >
+      10000000000` --> The backup's size is greater than 10GB
     orderBy: An expression for specifying the sort order of the results of the
       request. The string value should follow SQL syntax: comma separated list
       of fields in Backup. Fields supported are:    * name    * database    *
       expire_time    * create_time    * size_bytes    * state    *
       creating_progress.progress_percent    * creating_progress.start_time
-      * creating_progress.end_time  For example, "foo,bar". The default
-      sorting order is ascending. To specify descending order for a field, a
-      suffix " desc" should be appended to the field name. For example, "foo
-      desc,bar". Redundant space characters in the syntax are insigificant.
-      "foo, bar desc" and " foo , bar desc" are equivalent.  If order_by is
-      empty, results will be sorted by `create_time` in descending order
-      starting from the most recently created backup.
+      * creating_progress.end_time  For example, "create_time,name". The
+      default sorting order is ascending. To specify descending order for a
+      field, a suffix " desc" should be appended to the field name. For
+      example, "create_time desc,name". Redundant space characters in the
+      syntax are insigificant. "create_time desc, name" and " create_time desc
+      , name" are equivalent.  If order_by is empty, results will be sorted by
+      `create_time` in descending order starting from the most recently
+      created backup.
     pageSize: Number of instances to be returned in the response. If 0 or
       less, defaults to the server's maximum allowed page size.
     pageToken: If non-empty, `page_token` should contain a next_page_token
@@ -2413,9 +2568,9 @@ class SpannerProjectsInstancesBackupsPatchRequest(_messages.Message):
   Fields:
     name: Required. A globally unique identifier for the backup which cannot
       be changed.  Values are of the form
-      `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]`. The
-      final segment of the name must be between 6 and 30 characters in length.
-      The backup is stored in the location(s) specified in the instance
+      `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]` The final
+      segment of the name must be between 2 and 60 characters in length.  The
+      backup is stored in the location(s) specified in the instance
       configuration of the instance containing the backup, identified by the
       prefix of the backup name of the form
       `projects/<project>/instances/<instance>`.
@@ -2666,6 +2821,21 @@ class SpannerProjectsInstancesDatabasesSessionsDeleteRequest(_messages.Message):
   name = _messages.StringField(1, required=True)
 
 
+class SpannerProjectsInstancesDatabasesSessionsExecuteBatchDmlRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesDatabasesSessionsExecuteBatchDmlRequest
+  object.
+
+  Fields:
+    executeBatchDmlRequest: A ExecuteBatchDmlRequest resource to be passed as
+      the request body.
+    session: Required. The session in which the DML statements should be
+      performed.
+  """
+
+  executeBatchDmlRequest = _messages.MessageField('ExecuteBatchDmlRequest', 1)
+  session = _messages.StringField(2, required=True)
+
+
 class SpannerProjectsInstancesDatabasesSessionsExecuteSqlRequest(_messages.Message):
   r"""A SpannerProjectsInstancesDatabasesSessionsExecuteSqlRequest object.
 
@@ -2875,6 +3045,69 @@ class SpannerProjectsInstancesGetRequest(_messages.Message):
   name = _messages.StringField(1, required=True)
 
 
+class SpannerProjectsInstancesListCreateDatabaseFromBackupMetadataRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesListCreateDatabaseFromBackupMetadataRequest
+  object.
+
+  Fields:
+    filter: A filter expression that filters what is returned in the response.
+      The response returns a list of CreateDatabaseFromBackupMetadata
+      describing restore operations (database creations from backups).  The
+      expression must specify the field name, a comparison operator, and the
+      value that you want to use for filtering. The value must be a string, a
+      number, or a boolean. The comparison operator must be <, >, <=, >=, !=,
+      =, or :. Colon ':' represents a HAS operator which is roughly synonymous
+      with equality. Filter rules are case insensitive.  The fields eligible
+      for filtering are:   * `name` --> The name of the newly created
+      database.   * `backup` --> The name of the backup that was restored.   *
+      `source_database`   *     --> The name of the database the backup was
+      taken from.   * `progress.progress_percent`         --> Values are
+      integers between 0 and 100 inclusive.   * `progress.start_time`   *
+      `progress.end_time`  To filter on multiple expressions, provide each
+      separate expression within parentheses. By default, each expression is
+      an AND expression. However, you can include AND, OR, and NOT expressions
+      explicitly.  Some examples of using filters are:    * `name:Howl` -->
+      The created database name contains the string "howl".   *
+      `source_database:prod`   *      --> The database the backup was taken
+      from has a name containing   *          the string "prod".   *
+      `(name:howl) AND (progress.start_time < 2018-03-28T14:50:00Z)`
+      --> The created database name contains the string "howl" and
+      the progress.start_time of the restore operation is before
+      2018-03-28T14:50:00Z.
+    instanceId: The ID of the instance that contains the backups from which
+      the restore operations were initiated. The `instance_id` appended to
+      `parent/instances/` forms the full instance name of the form
+      `projects/<project>/instances/<instance_id>`.
+    orderBy: An expression for specifying the sort order of the results of the
+      request. The string value should follow SQL syntax: comma separated list
+      of fields in CreateDatabaseFromBackupMetadata. Fields supported are:
+      * name    * backup    * source_database    * progress.progress_percent
+      * progress.start_time    * progress.end_time  For example,
+      "create_time,name". The default sorting order is ascending. To specify
+      descending order for a field, a suffix " desc" should be appended to the
+      field name. For example, "create_time desc,name". Redundant space
+      characters in the syntax are insigificant. "create_time desc, name" and
+      " create_time desc , name" are equivalent.  If order_by is empty,
+      results will be sorted by `progress.start_time` in descending order
+      starting from the most recently started restore.
+    pageSize: Number of instances to be returned in the response. If 0 or
+      less, defaults to the server's maximum allowed page size.
+    pageToken: If non-empty, `page_token` should contain a next_page_token
+      from a previous ListCreateDatabaseFromBackupMetadataResponse to the same
+      `parent` and with the same `filter`.
+    parent: Required. The project of the instance that contains the backups
+      from which the restore operations were initiated. Values are of the form
+      `projects/<project>`.
+  """
+
+  filter = _messages.StringField(1)
+  instanceId = _messages.StringField(2, required=True)
+  orderBy = _messages.StringField(3)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
+  parent = _messages.StringField(6, required=True)
+
+
 class SpannerProjectsInstancesListRequest(_messages.Message):
   r"""A SpannerProjectsInstancesListRequest object.
 
@@ -3063,6 +3296,112 @@ class StandardQueryParameters(_messages.Message):
   upload_protocol = _messages.StringField(12)
 
 
+class Statement(_messages.Message):
+  r"""A single DML statement.
+
+  Messages:
+    ParamTypesValue: It is not always possible for Cloud Spanner to infer the
+      right SQL type from a JSON value.  For example, values of type `BYTES`
+      and values of type `STRING` both appear in params as JSON strings.  In
+      these cases, `param_types` can be used to specify the exact SQL type for
+      some or all of the SQL statement parameters. See the definition of Type
+      for more information about SQL types.
+    ParamsValue: The DML string can contain parameter placeholders. A
+      parameter placeholder consists of `'@'` followed by the parameter name.
+      Parameter names consist of any combination of letters, numbers, and
+      underscores.  Parameters can appear anywhere that a literal value is
+      expected.  The same parameter name can be used more than once, for
+      example:   `"WHERE id > @msg_id AND id < @msg_id + 100"`  It is an error
+      to execute an SQL statement with unbound parameters.  Parameter values
+      are specified using `params`, which is a JSON object whose keys are
+      parameter names, and whose values are the corresponding parameter
+      values.
+
+  Fields:
+    paramTypes: It is not always possible for Cloud Spanner to infer the right
+      SQL type from a JSON value.  For example, values of type `BYTES` and
+      values of type `STRING` both appear in params as JSON strings.  In these
+      cases, `param_types` can be used to specify the exact SQL type for some
+      or all of the SQL statement parameters. See the definition of Type for
+      more information about SQL types.
+    params: The DML string can contain parameter placeholders. A parameter
+      placeholder consists of `'@'` followed by the parameter name. Parameter
+      names consist of any combination of letters, numbers, and underscores.
+      Parameters can appear anywhere that a literal value is expected.  The
+      same parameter name can be used more than once, for example:   `"WHERE
+      id > @msg_id AND id < @msg_id + 100"`  It is an error to execute an SQL
+      statement with unbound parameters.  Parameter values are specified using
+      `params`, which is a JSON object whose keys are parameter names, and
+      whose values are the corresponding parameter values.
+    sql: Required. The DML string.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ParamTypesValue(_messages.Message):
+    r"""It is not always possible for Cloud Spanner to infer the right SQL
+    type from a JSON value.  For example, values of type `BYTES` and values of
+    type `STRING` both appear in params as JSON strings.  In these cases,
+    `param_types` can be used to specify the exact SQL type for some or all of
+    the SQL statement parameters. See the definition of Type for more
+    information about SQL types.
+
+    Messages:
+      AdditionalProperty: An additional property for a ParamTypesValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type ParamTypesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ParamTypesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A Type attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('Type', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ParamsValue(_messages.Message):
+    r"""The DML string can contain parameter placeholders. A parameter
+    placeholder consists of `'@'` followed by the parameter name. Parameter
+    names consist of any combination of letters, numbers, and underscores.
+    Parameters can appear anywhere that a literal value is expected.  The same
+    parameter name can be used more than once, for example:   `"WHERE id >
+    @msg_id AND id < @msg_id + 100"`  It is an error to execute an SQL
+    statement with unbound parameters.  Parameter values are specified using
+    `params`, which is a JSON object whose keys are parameter names, and whose
+    values are the corresponding parameter values.
+
+    Messages:
+      AdditionalProperty: An additional property for a ParamsValue object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ParamsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  paramTypes = _messages.MessageField('ParamTypesValue', 1)
+  params = _messages.MessageField('ParamsValue', 2)
+  sql = _messages.StringField(3)
+
+
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
@@ -3202,50 +3541,53 @@ class TransactionOptions(_messages.Message):
   a time. After the active transaction is completed, the session can
   immediately be re-used for the next transaction. It is not necessary to
   create a new session for each transaction.  # Transaction Modes  Cloud
-  Spanner supports two transaction modes:    1. Locking read-write. This type
-  of transaction is the only way      to write data into Cloud Spanner. These
-  transactions rely on      pessimistic locking and, if necessary, two-phase
-  commit.      Locking read-write transactions may abort, requiring the
+  Spanner supports three transaction modes:    1. Locking read-write. This
+  type of transaction is the only way      to write data into Cloud Spanner.
+  These transactions rely on      pessimistic locking and, if necessary, two-
+  phase commit.      Locking read-write transactions may abort, requiring the
   application to retry.    2. Snapshot read-only. This transaction type
   provides guaranteed      consistency across several reads, but does not
   allow      writes. Snapshot read-only transactions can be configured to
   read at timestamps in the past. Snapshot read-only      transactions do not
-  need to be committed.   For transactions that only read, snapshot read-only
-  transactions provide simpler semantics and are almost always faster. In
-  particular, read-only transactions do not take locks, so they do not
-  conflict with read-write transactions. As a consequence of not taking locks,
-  they also do not abort, so retry loops are not needed.  Transactions may
-  only read/write data in a single database. They may, however, read/write
-  data in different tables within that database.  ## Locking Read-Write
-  Transactions  Locking transactions may be used to atomically read-modify-
-  write data anywhere in a database. This type of transaction is externally
-  consistent.  Clients should attempt to minimize the amount of time a
-  transaction is active. Faster transactions commit with higher probability
-  and cause less contention. Cloud Spanner attempts to keep read locks active
-  as long as the transaction continues to do reads, and the transaction has
-  not been terminated by Commit or Rollback.  Long periods of inactivity at
-  the client may cause Cloud Spanner to release a transaction's locks and
-  abort it.  Reads performed within a transaction acquire locks on the data
-  being read. Writes can only be done at commit time, after all reads have
-  been completed. Conceptually, a read-write transaction consists of zero or
-  more reads or SQL queries followed by Commit. At any time before Commit, the
-  client can send a Rollback request to abort the transaction.  ### Semantics
-  Cloud Spanner can commit the transaction if all read locks it acquired are
-  still valid at commit time, and it is able to acquire write locks for all
-  writes. Cloud Spanner can abort the transaction for any reason. If a commit
-  attempt returns `ABORTED`, Cloud Spanner guarantees that the transaction has
-  not modified any user data in Cloud Spanner.  Unless the transaction
-  commits, Cloud Spanner makes no guarantees about how long the transaction's
-  locks were held for. It is an error to use Cloud Spanner locks for any sort
-  of mutual exclusion other than between Cloud Spanner transactions
-  themselves.  ### Retrying Aborted Transactions  When a transaction aborts,
-  the application can choose to retry the whole transaction again. To maximize
-  the chances of successfully committing the retry, the client should execute
-  the retry in the same session as the original attempt. The original
-  session's lock priority increases with each consecutive abort, meaning that
-  each attempt has a slightly better chance of success than the previous.
-  Under some circumstances (e.g., many transactions attempting to modify the
-  same row(s)), a transaction can abort many times in a short period before
+  need to be committed.    3. Partitioned DML. This type of transaction is
+  used to execute      a single Partitioned DML statement. Partitioned DML
+  partitions      the key space and runs the DML statement over each partition
+  in parallel using separate, internal transactions that commit
+  independently. Partitioned DML transactions do not need to be
+  committed.  For transactions that only read, snapshot read-only transactions
+  provide simpler semantics and are almost always faster. In particular, read-
+  only transactions do not take locks, so they do not conflict with read-write
+  transactions. As a consequence of not taking locks, they also do not abort,
+  so retry loops are not needed.  Transactions may only read/write data in a
+  single database. They may, however, read/write data in different tables
+  within that database.  ## Locking Read-Write Transactions  Locking
+  transactions may be used to atomically read-modify-write data anywhere in a
+  database. This type of transaction is externally consistent.  Clients should
+  attempt to minimize the amount of time a transaction is active. Faster
+  transactions commit with higher probability and cause less contention. Cloud
+  Spanner attempts to keep read locks active as long as the transaction
+  continues to do reads, and the transaction has not been terminated by Commit
+  or Rollback.  Long periods of inactivity at the client may cause Cloud
+  Spanner to release a transaction's locks and abort it.  Conceptually, a
+  read-write transaction consists of zero or more reads or SQL statements
+  followed by Commit. At any time before Commit, the client can send a
+  Rollback request to abort the transaction.  ### Semantics  Cloud Spanner can
+  commit the transaction if all read locks it acquired are still valid at
+  commit time, and it is able to acquire write locks for all writes. Cloud
+  Spanner can abort the transaction for any reason. If a commit attempt
+  returns `ABORTED`, Cloud Spanner guarantees that the transaction has not
+  modified any user data in Cloud Spanner.  Unless the transaction commits,
+  Cloud Spanner makes no guarantees about how long the transaction's locks
+  were held for. It is an error to use Cloud Spanner locks for any sort of
+  mutual exclusion other than between Cloud Spanner transactions themselves.
+  ### Retrying Aborted Transactions  When a transaction aborts, the
+  application can choose to retry the whole transaction again. To maximize the
+  chances of successfully committing the retry, the client should execute the
+  retry in the same session as the original attempt. The original session's
+  lock priority increases with each consecutive abort, meaning that each
+  attempt has a slightly better chance of success than the previous.  Under
+  some circumstances (e.g., many transactions attempting to modify the same
+  row(s)), a transaction can abort many times in a short period before
   successfully committing. Thus, it is not a good idea to cap the number of
   retries a transaction can attempt; instead, it is better to limit the total
   amount of wall time spent retrying.  ### Idle Transactions  A transaction is
@@ -3322,10 +3664,51 @@ class TransactionOptions(_messages.Message):
   read timestamps more than one hour in the past. This restriction also
   applies to in-progress reads and/or SQL queries whose timestamp become too
   old while executing. Reads and SQL queries with too-old read timestamps fail
-  with the error `FAILED_PRECONDITION`.  ##
+  with the error `FAILED_PRECONDITION`.  ## Partitioned DML Transactions
+  Partitioned DML transactions are used to execute DML statements with a
+  different execution strategy that provides different, and often better,
+  scalability properties for large, table-wide operations than DML in a
+  ReadWrite transaction. Smaller scoped statements, such as an OLTP workload,
+  should prefer using ReadWrite transactions.  Partitioned DML partitions the
+  keyspace and runs the DML statement on each partition in separate, internal
+  transactions. These transactions commit automatically when complete, and run
+  independently from one another.  To reduce lock contention, this execution
+  strategy only acquires read locks on rows that match the WHERE clause of the
+  statement. Additionally, the smaller per-partition transactions hold locks
+  for less time.  That said, Partitioned DML is not a drop-in replacement for
+  standard DML used in ReadWrite transactions.   - The DML statement must be
+  fully-partitionable. Specifically, the statement    must be expressible as
+  the union of many statements which each access only    a single row of the
+  table.   - The statement is not applied atomically to all rows of the table.
+  Rather,    the statement is applied atomically to partitions of the table,
+  in    independent transactions. Secondary index rows are updated atomically
+  with the base table rows.   - Partitioned DML does not guarantee exactly-
+  once execution semantics    against a partition. The statement will be
+  applied at least once to each    partition. It is strongly recommended that
+  the DML statement should be    idempotent to avoid unexpected results. For
+  instance, it is potentially    dangerous to run a statement such as
+  `UPDATE table SET column = column + 1` as it could be run multiple times
+  against some rows.   - The partitions are committed automatically - there is
+  no support for    Commit or Rollback. If the call returns an error, or if
+  the client issuing    the ExecuteSql call dies, it is possible that some
+  rows had the statement    executed on them successfully. It is also possible
+  that statement was    never executed against other rows.   - Partitioned DML
+  transactions may only contain the execution of a single    DML statement via
+  ExecuteSql or ExecuteStreamingSql.   - If any error is encountered during
+  the execution of the partitioned DML    operation (for instance, a UNIQUE
+  INDEX violation, division by zero, or a    value that cannot be stored due
+  to schema constraints), then the    operation is stopped at that point and
+  an error is returned. It is    possible that at this point, some partitions
+  have been committed (or even    committed multiple times), and other
+  partitions have not been run at all.  Given the above, Partitioned DML is
+  good fit for large, database-wide, operations that are idempotent, such as
+  deleting old rows from a very large table.
 
   Fields:
-    partitionedDml: A PartitionedDml attribute.
+    partitionedDml: Partitioned DML transaction.  Authorization to begin a
+      Partitioned DML transaction requires
+      `spanner.databases.beginPartitionedDmlTransaction` permission on the
+      `session` resource.
     readOnly: Transaction will not write.  Authorization to begin a read-only
       transaction requires `spanner.databases.beginReadOnlyTransaction`
       permission on the `session` resource.
@@ -3418,17 +3801,47 @@ class Type(_messages.Message):
 class UpdateBackupRequest(_messages.Message):
   r"""A UpdateBackupRequest object.
 
+  Enums:
+    LabelsUpdateOptionValueValuesEnum: Required if updating labels. Specify
+      how labels should be updated. If the option specified is
+      LABELS_UPDATE_OPTION_UNSPECIFIED, an error will be returned.
+
   Fields:
-    backup: Required. The backup to update.
-    updateMask: Required. A mask specifying which fields in the Backup
-      resource should be updated. This mask is relative to the Backup
-      resource, not to the request message. The field mask must always be
-      specified; this prevents any future fields from being erased
-      accidentally by clients that do not know about them.
+    backup: Required. The backup to update. `backup.name`, and the fields to
+      be updated as specified by `update_mask` are required. Other fields are
+      ignored. Update is only supported for the following fields:  *
+      `backup.labels`  * `backup.expire_time`.
+    labelsUpdateOption: Required if updating labels. Specify how labels should
+      be updated. If the option specified is LABELS_UPDATE_OPTION_UNSPECIFIED,
+      an error will be returned.
+    updateMask: Required. A mask specifying which fields (`backup.labels`
+      and/or `backup.expire_time`) in the Backup resource should be updated.
+      This mask is relative to the Backup resource, not to the request
+      message. The field mask must always be specified; this prevents any
+      future fields from being erased accidentally by clients that do not know
+      about them.
   """
 
+  class LabelsUpdateOptionValueValuesEnum(_messages.Enum):
+    r"""Required if updating labels. Specify how labels should be updated. If
+    the option specified is LABELS_UPDATE_OPTION_UNSPECIFIED, an error will be
+    returned.
+
+    Values:
+      LABELS_UPDATE_OPTION_UNSPECIFIED: Unspecified option
+      SET_LABELS: Set labels with the new labels specified in the update. This
+        option will replace existing labels with the new labels.
+      ADD_LABELS: Add specified labels to the existing set of labels.
+      REMOVE_LABELS: Remove specified labels from the existing set of labels.
+    """
+    LABELS_UPDATE_OPTION_UNSPECIFIED = 0
+    SET_LABELS = 1
+    ADD_LABELS = 2
+    REMOVE_LABELS = 3
+
   backup = _messages.MessageField('Backup', 1)
-  updateMask = _messages.StringField(2)
+  labelsUpdateOption = _messages.EnumField('LabelsUpdateOptionValueValuesEnum', 2)
+  updateMask = _messages.StringField(3)
 
 
 class UpdateDatabaseDdlMetadata(_messages.Message):

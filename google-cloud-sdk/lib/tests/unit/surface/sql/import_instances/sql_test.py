@@ -16,8 +16,8 @@
 
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -133,6 +133,9 @@ class _BaseInstancesImportSqlTest(object):
     self.Run('sql import sql testinstance '
              'gs://speckletest/testinstance.gz')
 
+    self.AssertErrContains(
+        'Data from [gs://speckletest/testinstance.gz] will be imported to '
+        '[testinstance].')
     self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains(
         'Imported data from '
@@ -147,6 +150,9 @@ class _BaseInstancesImportSqlTest(object):
     self.Run('sql import sql testinstance '
              'gs://speckletest/testinstance.gz --async')
 
+    self.AssertErrContains(
+        'Data from [gs://speckletest/testinstance.gz] will be imported to '
+        '[testinstance].')
     self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrNotContains(
         'Imported data from '

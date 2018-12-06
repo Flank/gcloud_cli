@@ -10,8 +10,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -21,6 +22,9 @@ GROUPS
 
      datastore
         (ALPHA) Manage your local datastore emulator.
+
+     firestore
+        (ALPHA) Manage your local firestore emulator.
 
      pubsub
         (ALPHA) Manage your local pubsub emulator.

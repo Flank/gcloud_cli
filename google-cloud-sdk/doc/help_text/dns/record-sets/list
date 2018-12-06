@@ -3,8 +3,8 @@ NAME
         managed-zone
 
 SYNOPSIS
-    gcloud dns record-sets list --zone=ZONE, -z ZONE [--name=NAME]
-        [--type=TYPE] [--filter=EXPRESSION] [--limit=LIMIT]
+    gcloud dns record-sets list --zone=ZONE, -z ZONE
+        [--name=NAME : --type=TYPE] [--filter=EXPRESSION] [--limit=LIMIT]
         [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -55,8 +55,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To see the list of all record-sets in my_zone, run:

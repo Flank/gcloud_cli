@@ -37,10 +37,10 @@ class GenerateHelpDocsDirTest(cli_test_base.CliTestBase):
         walker_util, 'DevSiteGenerator')
     self.help_text_generator = self.StartObjectPatch(
         walker_util, 'HelpTextGenerator')
-    self.help_text_updater = self.StartObjectPatch(
-        help_util.HelpTextUpdater, '__init__', return_value=None)
+    self.help_updater = self.StartObjectPatch(
+        help_util.HelpUpdater, '__init__', return_value=None)
     self.update = self.StartObjectPatch(
-        help_util.HelpTextUpdater, 'Update', return_value=1)
+        help_util.HelpUpdater, 'Update', return_value=1)
     self.html_generator = self.StartObjectPatch(
         walker_util, 'HtmlGenerator')
     self.manpage_generator = self.StartObjectPatch(
@@ -50,7 +50,7 @@ class GenerateHelpDocsDirTest(cli_test_base.CliTestBase):
     self.Run(['meta', 'generate-help-docs'])
     self.assertFalse(self.devsite_generator.called)
     self.assertFalse(self.help_text_generator.called)
-    self.assertFalse(self.help_text_updater.called)
+    self.assertFalse(self.help_updater.called)
     self.assertFalse(self.html_generator.called)
     self.assertFalse(self.manpage_generator.called)
 
@@ -59,7 +59,7 @@ class GenerateHelpDocsDirTest(cli_test_base.CliTestBase):
     self.Run(['meta', 'generate-help-docs', '--devsite-dir=' + devsite_dir])
     self.devsite_generator.assert_called_once_with(self.cli, devsite_dir)
     self.assertFalse(self.help_text_generator.called)
-    self.assertFalse(self.help_text_updater.called)
+    self.assertFalse(self.help_updater.called)
     self.assertFalse(self.html_generator.called)
     self.assertFalse(self.manpage_generator.called)
 
@@ -68,7 +68,7 @@ class GenerateHelpDocsDirTest(cli_test_base.CliTestBase):
     self.Run(['meta', 'generate-help-docs', '--help-text-dir=' + help_text_dir])
     self.assertFalse(self.devsite_generator.called)
     self.help_text_generator.assert_called_once_with(self.cli, help_text_dir)
-    self.assertFalse(self.help_text_updater.called)
+    self.assertFalse(self.help_updater.called)
     self.assertFalse(self.html_generator.called)
     self.assertFalse(self.manpage_generator.called)
 
@@ -77,7 +77,7 @@ class GenerateHelpDocsDirTest(cli_test_base.CliTestBase):
     self.Run(['meta', 'generate-help-docs', '--manpage-dir=' + manpage_dir])
     self.assertFalse(self.devsite_generator.called)
     self.assertFalse(self.help_text_generator.called)
-    self.assertFalse(self.help_text_updater.called)
+    self.assertFalse(self.help_updater.called)
     self.assertFalse(self.html_generator.called)
     self.manpage_generator.assert_called_once_with(self.cli, manpage_dir)
 
@@ -89,31 +89,50 @@ class GenerateHelpDocsDirTest(cli_test_base.CliTestBase):
               '--manpage-dir=' + manpage_dir])
     self.devsite_generator.assert_called_once_with(self.cli, devsite_dir)
     self.assertFalse(self.help_text_generator.called)
-    self.assertFalse(self.help_text_updater.called)
+    self.assertFalse(self.help_updater.called)
     self.assertFalse(self.html_generator.called)
     self.manpage_generator.assert_called_once_with(self.cli, manpage_dir)
 
   def testGenerateHelpDocsHelpTextUpdate(self):
     update_help_text_dir = '/doc/help_text'
     self.Run(['meta', 'generate-help-docs',
+              '--help-text-dir=' + update_help_text_dir,
+              '--update'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_help_text_dir, self.help_text_generator, test=False,
+        hidden=True)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsHelpTextUpdateDeprecated(self):
+    update_help_text_dir = '/doc/help_text'
+    self.Run(['meta', 'generate-help-docs',
               '--update-help-text-dir=' + update_help_text_dir])
     self.assertFalse(self.devsite_generator.called)
     self.assertFalse(self.help_text_generator.called)
-    self.help_text_updater.assert_called_once_with(
-        self.cli, update_help_text_dir, test=False)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_help_text_dir, self.help_text_generator, test=False,
+        hidden=True)
     self.assertFalse(self.html_generator.called)
     self.assertFalse(self.manpage_generator.called)
+    self.AssertErrContains('[--update-help-text-dir=/doc/help_text] is '
+                           'deprecated. Use this instead: --update '
+                           '--help-text-dir=/doc/help_text.')
 
   def testGenerateHelpDocsHelpTextUpdateTestNoChanges(self):
     self.update.return_value = False
     update_help_text_dir = '/doc/help_text'
     self.Run(['meta', 'generate-help-docs',
-              '--update-help-text-dir=' + update_help_text_dir,
+              '--help-text-dir=' + update_help_text_dir,
+              '--update',
               '--test'])
     self.assertFalse(self.devsite_generator.called)
     self.assertFalse(self.help_text_generator.called)
-    self.help_text_updater.assert_called_once_with(
-        self.cli, update_help_text_dir, test=True)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_help_text_dir, self.help_text_generator, test=True,
+        hidden=True)
     self.assertFalse(self.html_generator.called)
     self.assertFalse(self.manpage_generator.called)
 
@@ -121,14 +140,167 @@ class GenerateHelpDocsDirTest(cli_test_base.CliTestBase):
     self.update.return_value = True
     update_help_text_dir = '/doc/help_text'
     with self.assertRaisesRegex(exceptions.Error,
-                                'Help text files must be updated.'):
+                                'document files must be updated.'):
       self.Run(['meta', 'generate-help-docs',
-                '--update-help-text-dir=' + update_help_text_dir,
+                '--help-text-dir=' + update_help_text_dir,
+                '--update',
                 '--test'])
     self.assertFalse(self.devsite_generator.called)
     self.assertFalse(self.help_text_generator.called)
-    self.help_text_updater.assert_called_once_with(
-        self.cli, update_help_text_dir, test=True)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_help_text_dir, self.help_text_generator, test=True,
+        hidden=True)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsDevSiteUpdate(self):
+    update_devsite_dir = '/doc/devsite'
+    self.Run(['meta', 'generate-help-docs',
+              '--devsite-dir=' + update_devsite_dir,
+              '--update'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_devsite_dir, self.devsite_generator, test=False,
+        hidden=False)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsDevSiteUpdateTestNoChanges(self):
+    self.update.return_value = False
+    update_devsite_dir = '/doc/devsite'
+    self.Run(['meta', 'generate-help-docs',
+              '--devsite-dir=' + update_devsite_dir,
+              '--update',
+              '--test'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_devsite_dir, self.devsite_generator, test=True,
+        hidden=False)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsDevSiteUpdateTestChanges(self):
+    self.update.return_value = True
+    update_devsite_dir = '/doc/devsite'
+    with self.assertRaisesRegex(exceptions.Error,
+                                'document files must be updated.'):
+      self.Run(['meta', 'generate-help-docs',
+                '--devsite-dir=' + update_devsite_dir,
+                '--update',
+                '--test'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_devsite_dir, self.devsite_generator, test=True,
+        hidden=False)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsHtmlUpdate(self):
+    update_html_dir = '/doc/www'
+    self.Run(['meta', 'generate-help-docs',
+              '--html-dir=' + update_html_dir,
+              '--update'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_html_dir, self.html_generator, test=False,
+        hidden=False)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsHtmlUpdateTestNoChanges(self):
+    self.update.return_value = False
+    update_html_dir = '/doc/www'
+    self.Run(['meta', 'generate-help-docs',
+              '--html-dir=' + update_html_dir,
+              '--update',
+              '--test'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_html_dir, self.html_generator, test=True,
+        hidden=False)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsHtmlUpdateTestChanges(self):
+    self.update.return_value = True
+    update_html_dir = '/doc/www'
+    with self.assertRaisesRegex(exceptions.Error,
+                                'document files must be updated.'):
+      self.Run(['meta', 'generate-help-docs',
+                '--html-dir=' + update_html_dir,
+                '--update',
+                '--test'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_html_dir, self.html_generator, test=True,
+        hidden=False)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsManPageUpdate(self):
+    update_manpage_dir = '/doc/manpage'
+    self.Run(['meta', 'generate-help-docs',
+              '--manpage-dir=' + update_manpage_dir,
+              '--update'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_manpage_dir, self.manpage_generator, test=False,
+        hidden=False)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsManPageTestNoChangesHidden(self):
+    self.update.return_value = False
+    update_manpage_dir = '/doc/manpage'
+    self.Run(['meta', 'generate-help-docs',
+              '--manpage-dir=' + update_manpage_dir,
+              '--update',
+              '--test',
+              '--hidden'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_manpage_dir, self.manpage_generator, test=True,
+        hidden=True)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsManPageTestNoChanges(self):
+    self.update.return_value = False
+    update_manpage_dir = '/doc/manpage'
+    self.Run(['meta', 'generate-help-docs',
+              '--manpage-dir=' + update_manpage_dir,
+              '--update',
+              '--test'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_manpage_dir, self.manpage_generator, test=True,
+        hidden=False)
+    self.assertFalse(self.html_generator.called)
+    self.assertFalse(self.manpage_generator.called)
+
+  def testGenerateHelpDocsManPageUpdateTestChanges(self):
+    self.update.return_value = True
+    update_manpage_dir = '/doc/manpage'
+    with self.assertRaisesRegex(exceptions.Error,
+                                'document files must be updated.'):
+      self.Run(['meta', 'generate-help-docs',
+                '--manpage-dir=' + update_manpage_dir,
+                '--update',
+                '--test'])
+    self.assertFalse(self.devsite_generator.called)
+    self.assertFalse(self.help_text_generator.called)
+    self.help_updater.assert_called_once_with(
+        self.cli, update_manpage_dir, self.manpage_generator, test=True,
+        hidden=False)
     self.assertFalse(self.html_generator.called)
     self.assertFalse(self.manpage_generator.called)
 
@@ -147,19 +319,19 @@ class GenerateHelpDocsRestrictTest(calliope_test_base.CalliopeTestBase,
   def testGenerateHelpDocsNoRestrictions(self):
     with files.TemporaryDirectory() as devsite_dir:
       self.Run(['meta', 'generate-help-docs', '--devsite-dir=' + devsite_dir])
-      self.walk.assert_called_once_with(None, [])
+      self.walk.assert_called_once_with(False, [])
 
   def testGenerateHelpDocsOneRestriction(self):
     with files.TemporaryDirectory() as devsite_dir:
       self.Run(['meta', 'generate-help-docs', '--devsite-dir=' + devsite_dir,
                 'foo'])
-      self.walk.assert_called_once_with(None, ['foo'])
+      self.walk.assert_called_once_with(False, ['foo'])
 
   def testGenerateHelpDocsTwoRestrictions(self):
     with files.TemporaryDirectory() as devsite_dir:
       self.Run(['meta', 'generate-help-docs',
                 '--devsite-dir=' + devsite_dir, 'foo', 'bar'])
-      self.walk.assert_called_once_with(None, ['foo', 'bar'])
+      self.walk.assert_called_once_with(False, ['foo', 'bar'])
 
   def testGenerateHelpDocsHiddenNoRestrictions(self):
     with files.TemporaryDirectory() as devsite_dir:

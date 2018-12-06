@@ -22,8 +22,7 @@ import re
 import textwrap
 
 from googlecloudsdk.api_lib.compute import csek_utils
-from googlecloudsdk.calliope import base
-from tests.lib import parameterized
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -43,11 +42,15 @@ def SetUp(test_obj, api_version):
                      'Got [{0}].'.format(api_version))
 
 
-class InstancesAttachDiskTest(test_base.BaseTest,
-                              test_case.WithOutputCapture):
+class InstancesAttachDiskTestGA(test_base.BaseTest,
+                                test_case.WithOutputCapture):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def SetUp(self):
-    SetUp(self, 'v1')
+    SetUp(self, self.api_version)
 
   def testWithDefaults(self):
     self.make_requests.side_effect = iter([
@@ -93,7 +96,7 @@ class InstancesAttachDiskTest(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             ---
-            machineType: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
+            machineType: https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
             name: instance-1
             networkInterfaces:
             - accessConfigs:
@@ -105,8 +108,9 @@ class InstancesAttachDiskTest(test_base.BaseTest,
               preemptible: false
             selfLink: {compute_uri}/projects/my-project/zones/zone-1/instances/instance-1
             status: RUNNING
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
-            """.format(compute_uri=self.compute_uri)))
+            zone: https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1
+            """.format(compute_uri=self.compute_uri,
+                       api_version=self.api_version)))
 
   def testJsonOutput(self):
     self.make_requests.side_effect = iter([
@@ -124,7 +128,7 @@ class InstancesAttachDiskTest(test_base.BaseTest,
         textwrap.dedent("""\
             [
               {{
-                "machineType": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
+                "machineType": "https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
                 "name": "instance-1",
                 "networkInterfaces": [
                   {{
@@ -143,10 +147,11 @@ class InstancesAttachDiskTest(test_base.BaseTest,
                 }},
                 "selfLink": "{compute_uri}/projects/my-project/zones/zone-1/instances/instance-1",
                 "status": "RUNNING",
-                "zone": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1"
+                "zone": "https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1"
               }}
             ]
-            """.format(compute_uri=self.compute_uri)))
+            """.format(compute_uri=self.compute_uri,
+                       api_version=self.api_version)))
 
   def testTextOutput(self):
     self.make_requests.side_effect = iter([
@@ -163,7 +168,7 @@ class InstancesAttachDiskTest(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             ---
-            machineType:                                 https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
+            machineType:                                 https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
             name:                                        instance-1
             networkInterfaces[0].accessConfigs[0].natIP: 23.251.133.75
             networkInterfaces[0].networkIP:              10.0.0.1
@@ -172,8 +177,9 @@ class InstancesAttachDiskTest(test_base.BaseTest,
             scheduling.preemptible:                      False
             selfLink:                                    {compute_uri}/projects/my-project/zones/zone-1/instances/instance-1
             status:                                      RUNNING
-            zone:                                        https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
-            """.format(compute_uri=self.compute_uri)))
+            zone:                                        https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1
+            """.format(compute_uri=self.compute_uri,
+                       api_version=self.api_version)))
 
   def testWithDeviceName(self):
     msg = self.messages
@@ -284,12 +290,6 @@ class InstancesAttachDiskTest(test_base.BaseTest,
               zone='central2-a'))],
     )
 
-
-class InstancesCreateWithCsekKey(test_base.BaseTest):
-
-  def SetUp(self):
-    SetUp(self, 'v1')
-
   def testWithKeyFile(self):
     self.make_requests.side_effect = iter([
         [self._instances[0]]
@@ -372,11 +372,11 @@ class InstancesCreateWithCsekKey(test_base.BaseTest):
           """.format(keyfile=csek_key_file))
 
 
-class InstancesCreateWithCsekKeyBeta(test_base.BaseTest):
+class InstancesAttachDiskTestBeta(InstancesAttachDiskTestGA):
 
-  def SetUp(self):
-    SetUp(self, 'beta')
-    self.track = base.ReleaseTrack.BETA
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
 
   def testWithKeyFileRsaWrapped(self):
     csek_key_file = self.WriteKeyFile(include_rsa_encrypted=True)
@@ -401,7 +401,6 @@ class InstancesCreateWithCsekKeyBeta(test_base.BaseTest):
                   type=(msgs.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
                   diskEncryptionKey=msgs.CustomerEncryptionKey(
                       rsaEncryptedKey=test_base.SAMPLE_WRAPPED_CSEK_KEY)),
-              forceAttach=False,
               instance='instance-1',
               project='my-project',
               zone='central2-a'))],
@@ -410,18 +409,7 @@ class InstancesCreateWithCsekKeyBeta(test_base.BaseTest):
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
 
-
-@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
-                          (base.ReleaseTrack.BETA, 'beta'))
-class InstancesAttachDiskWithRegions(test_base.BaseTest,
-                                     parameterized.TestCase):
-
-  def _SetUp(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
-
-  def testRegionalDisk(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testRegionalDisk(self):
     self.Run("""
         compute instances attach-disk instance-1
           --zone central2-a
@@ -440,7 +428,6 @@ class InstancesAttachDiskWithRegions(test_base.BaseTest,
                   source=(self.compute_uri + '/projects/my-project/regions/'
                           'central2/disks/wrappedkeydisk'),
                   type=(msgs.AttachedDisk.TypeValueValuesEnum.PERSISTENT)),
-              forceAttach=False,
               instance='instance-1',
               project='my-project',
               zone='central2-a'))],
@@ -449,8 +436,7 @@ class InstancesAttachDiskWithRegions(test_base.BaseTest,
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
 
-  def testRegionalDiskForceAttach(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testRegionalDiskForceAttach(self):
     self.Run("""
         compute instances attach-disk instance-1
           --zone central2-a
@@ -478,6 +464,42 @@ class InstancesAttachDiskWithRegions(test_base.BaseTest,
 
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
+
+  def testAttachBootDisk(self):
+    self.Run("""
+        compute instances attach-disk instance-1
+          --zone central2-a
+          --disk disk-1
+          --boot
+        """)
+
+    msgs = self.messages  # avoid long lines below
+
+    self.CheckRequests(
+        [(self.compute.instances,
+          'AttachDisk',
+          msgs.ComputeInstancesAttachDiskRequest(
+              attachedDisk=msgs.AttachedDisk(
+                  mode=msgs.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                  source=(self.compute_uri + '/projects/'
+                          'my-project/zones/central2-a/disks/disk-1'),
+                  type=msgs.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+                  boot=True),
+              instance='instance-1',
+              project='my-project',
+              zone='central2-a'))],
+    )
+
+    # By default, the resource should not be displayed
+    self.assertFalse(self.GetOutput())
+
+
+class InstancesAttachDiskTestAlpha(InstancesAttachDiskTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
 
 if __name__ == '__main__':
   test_case.main()

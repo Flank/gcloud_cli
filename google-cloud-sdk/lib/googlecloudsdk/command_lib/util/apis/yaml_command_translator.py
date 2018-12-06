@@ -30,9 +30,11 @@ from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import command_loading
 from googlecloudsdk.command_lib.iam import iam_util
+from googlecloudsdk.command_lib.util import completers
 from googlecloudsdk.command_lib.util.apis import arg_marshalling
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.command_lib.util.apis import registry
+from googlecloudsdk.command_lib.util.apis import update
 from googlecloudsdk.command_lib.util.apis import yaml_command_schema
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
@@ -47,6 +49,38 @@ class Translator(command_loading.YamlCommandTranslator):
     spec = yaml_command_schema.CommandData(path[-1], command_data)
     c = CommandBuilder(spec, path)
     return c.Generate()
+
+
+class DeclarativeIamRolesCompleter(completers.ListCommandCompleter):
+  """An IAM role completer for a resource argument.
+
+  The Complete() method override bypasses the completion cache.
+
+  Attributes:
+    _get_resource_ref: DeclarativeArgumentGenerator.GetRequestResourceRef method
+      to parse the resource ref.
+  """
+
+  def __init__(self, get_resource_ref, **kwargs):
+    super(DeclarativeIamRolesCompleter, self).__init__(**kwargs)
+    self._get_resource_ref = get_resource_ref
+
+  def GetListCommand(self, parameter_info):
+    resource_ref = self._get_resource_ref(parameter_info.parsed_args)
+    resource_uri = resource_ref.SelfLink()
+    return [
+        'iam', 'list-grantable-roles', '--quiet', '--flatten=name',
+        '--format=disable', resource_uri
+    ]
+
+  def Complete(self, prefix, parameter_info):
+    """Bypasses the cache and returns completions matching prefix."""
+    command = self.GetListCommand(parameter_info)
+    items = self.GetAllItems(command, parameter_info)
+    return [
+        item for item in items or []
+        if item is not None and item.startswith(prefix)
+    ]
 
 
 class CommandBuilder(object):
@@ -99,10 +133,10 @@ class CommandBuilder(object):
     elif (self.spec.command_type ==
           yaml_command_schema.CommandType.REMOVE_IAM_POLICY_BINDING):
       command = self._GenerateRemoveIamPolicyBindingCommand()
-    elif self.spec.command_type == yaml_command_schema.CommandType.GENERIC:
-      command = self._GenerateGenericCommand()
     elif self.spec.command_type == yaml_command_schema.CommandType.UPDATE:
       command = self._GenerateUpdateCommand()
+    elif self.spec.command_type == yaml_command_schema.CommandType.GENERIC:
+      command = self._GenerateGenericCommand()
     else:
       raise ValueError('Command [{}] unknown command type [{}].'.format(
           ' '.join(self.path), self.spec.command_type))
@@ -200,7 +234,9 @@ class CommandBuilder(object):
         ref, response = self._CommonRun(args)
         if self.spec.async:
           response = self._HandleAsync(
-              args, ref, response,
+              args,
+              ref,
+              response,
               request_string='Delete request issued for: [{{{}}}]'
               .format(yaml_command_schema.NAME_FORMAT_KEY),
               extract_resource_result=False)
@@ -242,8 +278,10 @@ class CommandBuilder(object):
 
       def Run(self_, args):
         ref, response = self._CommonRun(args)
+        is_parent_resource = (self.spec.arguments.resource and
+                              self.spec.arguments.resource.is_parent_resource)
         if self.spec.async:
-          if ref is not None:
+          if ref is not None and not is_parent_resource:
             request_string = 'Create request issued for: [{{{}}}]'.format(
                 yaml_command_schema.NAME_FORMAT_KEY)
           else:
@@ -255,8 +293,9 @@ class CommandBuilder(object):
             return self._HandleResponse(response, args)
 
         response = self._HandleResponse(response, args)
-        log.CreatedResource(self._GetDisplayName(ref, args),
-                            kind=self.resource_type)
+        if not is_parent_resource:
+          log.CreatedResource(self._GetDisplayName(ref, args),
+                              kind=self.resource_type)
         return response
 
     return Command
@@ -294,6 +333,10 @@ class CommandBuilder(object):
         return response
 
     return Command
+
+  @property
+  def _add_condition(self):
+    return self.spec.iam and self.spec.iam.enable_condition
 
   def _GenerateGetIamPolicyCommand(self):
     """Generates a get-iam-policy command.
@@ -378,12 +421,26 @@ class CommandBuilder(object):
 
     return Command
 
+  def _GenerateDeclarativeIamRolesCompleter(self):
+    """Generate a IAM role completer."""
+
+    get_resource_ref = self.arg_generator.GetRequestResourceRef
+
+    class Completer(DeclarativeIamRolesCompleter):
+
+      def __init__(self, **kwargs):
+        super(Completer, self).__init__(
+            get_resource_ref=get_resource_ref, **kwargs)
+
+    return Completer
+
   def _GenerateAddIamPolicyBindingCommand(self):
     """Generates an add-iam-policy-binding command.
 
-    An add-iam-policy-binding command takes a resource argument, a member to add
-    the binding for, a role to define the role of the member, and two API
-    methods to get and set the policy on the resource.
+    An add-iam-policy-binding command adds a binding to a IAM policy. A
+    binding consists of a member, a role to define the role of the member, and
+    an optional condition to define in what condition the binding is valid.
+    Two API methods are called to get and set the policy on the resource.
 
     Returns:
       calliope.base.Command, The command that implements the spec.
@@ -398,8 +455,11 @@ class CommandBuilder(object):
 
       @staticmethod
       def Args(parser):
+        iam_util.AddArgsForAddIamPolicyBinding(
+            parser,
+            role_completer=self._GenerateDeclarativeIamRolesCompleter(),
+            add_condition=self._add_condition)
         self._CommonArgs(parser)
-        iam_util.AddArgsForAddIamPolicyBinding(parser)
         base.URI_FLAG.RemoveFromParser(parser)
 
       def Run(self_, args):
@@ -412,7 +472,8 @@ class CommandBuilder(object):
               self.spec.iam.set_iam_policy_request_path or policy_request_path)
         policy_field_path = policy_request_path + '.policy'
 
-        policy = self._GetModifiedIamPolicy(args, 'add')
+        policy = self._GetModifiedIamPolicyAddIamBinding(
+            args, add_condition=self._add_condition)
         self.spec.request.static_fields[policy_field_path] = policy
 
         ref, response = self._CommonRun(args)
@@ -424,9 +485,10 @@ class CommandBuilder(object):
   def _GenerateRemoveIamPolicyBindingCommand(self):
     """Generates a remove-iam-policy-binding command.
 
-    A remove-iam-policy-binding command takes a resource argument, a member,
-    a role to remove the member from, and two API methods to get and set the
-    policy on the resource.
+    A remove-iam-policy-binding command removes a binding from a IAM policy. A
+    binding consists of a member, a role to define the role of the member, and
+    an optional condition to define in what condition the binding is valid.
+    Two API methods are called to get and set the policy on the resource.
 
     Returns:
       calliope.base.Command, The command that implements the spec.
@@ -441,8 +503,11 @@ class CommandBuilder(object):
 
       @staticmethod
       def Args(parser):
+        iam_util.AddArgsForRemoveIamPolicyBinding(
+            parser,
+            role_completer=self._GenerateDeclarativeIamRolesCompleter(),
+            add_condition=self._add_condition)
         self._CommonArgs(parser)
-        iam_util.AddArgsForRemoveIamPolicyBinding(parser)
         base.URI_FLAG.RemoveFromParser(parser)
 
       def Run(self_, args):
@@ -455,7 +520,8 @@ class CommandBuilder(object):
               self.spec.iam.set_iam_policy_request_path or policy_request_path)
         policy_field_path = policy_request_path + '.policy'
 
-        policy = self._GetModifiedIamPolicy(args, 'remove')
+        policy = self._GetModifiedIamPolicyRemoveIamBinding(
+            args, add_condition=self._add_condition)
         self.spec.request.static_fields[policy_field_path] = policy
 
         ref, response = self._CommonRun(args)
@@ -481,6 +547,7 @@ class CommandBuilder(object):
     # pylint: disable=protected-access, The linter gets confused about 'self'
     # and thinks we are accessing something protected.
     class Command(base.Command):
+      # pylint: disable=missing-docstring
 
       @staticmethod
       def Args(parser):
@@ -529,7 +596,19 @@ class CommandBuilder(object):
           base.ASYNC_FLAG.AddToParser(parser)
 
       def Run(self_, args):
-        ref, response = self._CommonRun(args)
+        # Check if mask is required for an update request.
+        mask_path = update.GetMaskFieldPath(self.method)
+        if mask_path:
+          mask_string = update.GetMaskString(args, self.spec, mask_path)
+          self.spec.request.static_fields[mask_path] = mask_string
+
+        # Check if the update is full-update, which requires a get request.
+        existing_message = None
+        if self.spec.update:
+          if self.spec.update.read_modify_update:
+            existing_message = self._GetExistingResource(args)
+
+        ref, response = self._CommonRun(args, existing_message)
         if self.spec.async:
           request_string = None
           if ref:
@@ -537,6 +616,9 @@ class CommandBuilder(object):
                 yaml_command_schema.NAME_FORMAT_KEY)
           response = self._HandleAsync(
               args, ref, response, request_string=request_string)
+
+        log.UpdatedResource(
+            self._GetDisplayName(ref, args), kind=self.resource_type)
         return self._HandleResponse(response, args)
 
     return Command
@@ -559,7 +641,7 @@ class CommandBuilder(object):
     if self.spec.output.format:
       parser.display_info.AddFormat(self.spec.output.format)
 
-  def _CommonRun(self, args):
+  def _CommonRun(self, args, existing_message=None):
     """Performs run actions common to all commands.
 
     Parses the resource argument into a resource reference
@@ -568,6 +650,7 @@ class CommandBuilder(object):
 
     Args:
       args: The argparse parser.
+      existing_message: the apitools message returned from previous request.
 
     Returns:
       (resources.Resource, response), A tuple of the parsed resource reference
@@ -590,10 +673,12 @@ class CommandBuilder(object):
     else:
       parse_resource = self.spec.request.parse_resource_into_request
       request = self.arg_generator.CreateRequest(
-          args, self.spec.request.static_fields,
+          args,
+          self.spec.request.static_fields,
           self.spec.request.resource_method_params,
           use_relative_name=self.spec.request.use_relative_name,
-          parse_resource_into_request=parse_resource)
+          parse_resource_into_request=parse_resource,
+          existing_message=existing_message)
       for hook in self.spec.request.modify_request_hooks:
         request = hook(ref, args, request)
 
@@ -631,20 +716,7 @@ class CommandBuilder(object):
     if hasattr(update_request, 'updateMask'):
       self.spec.request.static_fields[mask_field_path] = update_mask
 
-  def _GetModifiedIamPolicy(self, args, policy_binding_type):
-    """Get the current IAM policy and then add/remove bindings as specified.
-
-    An IAM binding is a pair of role and member. If policy_binding_type is add,
-    the member and role specified in args would be added; if policy_binding_type
-    is remove, the member and role specified in args would be removed.
-
-    Args:
-      args: The argparse parser.
-      policy_binding_type: string, add or remove.
-
-    Returns:
-      IAM policy.
-    """
+  def _GetIamPolicy(self, args):
     get_iam_method = registry.GetMethod(self.spec.request.collection,
                                         'getIamPolicy',
                                         self.spec.request.api_version)
@@ -653,16 +725,60 @@ class CommandBuilder(object):
         use_relative_name=self.spec.request.use_relative_name,
         override_method=get_iam_method)
     policy = get_iam_method.Call(get_iam_request)
-
-    if policy_binding_type == 'add':
-      binding = self.method.GetMessageByName('Binding')
-      iam_util.AddBindingToIamPolicy(binding, policy, args.member, args.role)
-    elif policy_binding_type == 'remove':
-      iam_util.RemoveBindingFromIamPolicy(policy, args.member, args.role)
-    else:
-      pass
-
     return policy
+
+  def _GetModifiedIamPolicyAddIamBinding(self, args, add_condition=False):
+    """Get the IAM policy and add the specified binding to it.
+
+    Args:
+      args: an argparse namespace.
+      add_condition: True if support condition.
+
+    Returns:
+      IAM policy.
+    """
+    binding_message_type = self.method.GetMessageByName('Binding')
+    if add_condition:
+      condition = iam_util.ValidateAndExtractConditionMutexRole(args)
+      policy = self._GetIamPolicy(args)
+      condition_message_type = self.method.GetMessageByName('Expr')
+      iam_util.AddBindingToIamPolicyWithCondition(
+          binding_message_type, condition_message_type, policy, args.member,
+          args.role, condition)
+    else:
+      policy = self._GetIamPolicy(args)
+      iam_util.AddBindingToIamPolicy(binding_message_type, policy, args.member,
+                                     args.role)
+    return policy
+
+  def _GetModifiedIamPolicyRemoveIamBinding(self, args, add_condition=False):
+    """Get the IAM policy and remove the specified binding to it.
+
+    Args:
+      args: an argparse namespace.
+      add_condition: True if support condition.
+
+    Returns:
+      IAM policy.
+    """
+    if add_condition:
+      condition = iam_util.ValidateAndExtractCondition(args)
+      policy = self._GetIamPolicy(args)
+      iam_util.RemoveBindingFromIamPolicyWithCondition(
+          policy, args.member, args.role, condition, all_conditions=args.all)
+    else:
+      policy = self._GetIamPolicy(args)
+      iam_util.RemoveBindingFromIamPolicy(policy, args.member, args.role)
+    return policy
+
+  def _GetExistingResource(self, args):
+    get_method = registry.GetMethod(self.spec.request.collection, 'get',
+                                    self.spec.request.api_version)
+    get_arg_generator = arg_marshalling.DeclarativeArgumentGenerator(
+        get_method, [], self.spec.arguments.resource)
+
+    # TODO(b/111069150): Add error handling when get fails.
+    return get_method.Call(get_arg_generator.CreateRequest(args))
 
   def _HandleAsync(self, args, resource_ref, operation,
                    request_string, extract_resource_result=True):

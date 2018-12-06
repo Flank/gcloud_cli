@@ -1,0 +1,18 @@
+<datastore-indexes autoGenerate="true">
+  <datastore-index kind="ApiTransactionInfo" ancestor="false" source="manual">
+    <property name="apiCaller" direction="asc"/>
+    <property name="timestamp" direction="desc"/>
+  </datastore-index>
+
+  <datastore-index kind="ApiTransactionInfo" ancestor="false" source="manual">
+    <property name="apiCaller" direction="asc"/>
+    <property name="timestamp" direction="asc"/>
+  </datastore-index>
+
+  <datastore-index kind="ApiTransactionInfo" ancestor="false" source="manual">
+    <property name="apiCaller" direction="asc"/>
+    <property name="action" direction="asc"/>
+    <property name="timestamp" direction="asc"/>
+  </datastore-index>
+</datastore-indexes>
+

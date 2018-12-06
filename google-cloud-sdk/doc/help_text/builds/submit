@@ -2,12 +2,13 @@ NAME
     gcloud builds submit - submit a build using Google Cloud Build
 
 SYNOPSIS
-    gcloud builds submit [[SOURCE] --no-source]
-        (--config=CONFIG | --tag=TAG, -t TAG) [--async] [--disk-size=DISK_SIZE]
-        [--gcs-log-dir=GCS_LOG_DIR]
+    gcloud builds submit [[SOURCE] --no-source] [--async]
+        [--disk-size=DISK_SIZE] [--gcs-log-dir=GCS_LOG_DIR]
         [--gcs-source-staging-dir=GCS_SOURCE_STAGING_DIR]
         [--machine-type=MACHINE_TYPE] [--substitutions=[KEY=VALUE,...]]
-        [--timeout=TIMEOUT] [GCLOUD_WIDE_FLAG ...]
+        [--timeout=TIMEOUT]
+        [--config=CONFIG; default="cloudbuild.yaml" | --tag=TAG, -t TAG]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Submit a build using Google Cloud Build.
@@ -23,28 +24,12 @@ POSITIONAL ARGUMENTS
           present in the local source directory, gcloud will use a
           Git-compatible .gcloudignore file that respects your .gitignored
           files. The global .gitignore is not respected. For more information
-          on .gcloudignore, see $gcloud topic gcloudignore.
+          on .gcloudignore, see gcloud topic gcloudignore.
 
        --no-source
           Specify that no source should be uploaded with this build.
 
-REQUIRED FLAGS
-     Exactly one of these must be specified:
-
-       --config=CONFIG
-          The .yaml or .json file to use for build configuration.
-
-       --tag=TAG, -t TAG
-          The tag to use with a "docker build" image creation. Cloud Build will
-          run a remote "docker build -t $TAG .", where $TAG is the tag provided
-          by this flag. The tag must be in the gcr.io/* or *.gcr.io/*
-          namespaces. Specify a tag if you want Cloud Build to build using a
-          Dockerfile instead of a build config file. If you specify a tag in
-          this command, your source must include a Dockerfile. For instructions
-          on building using a Dockerfile see
-          https://cloud.google.com/cloud-build/docs/quickstart-docker.
-
-OPTIONAL FLAGS
+FLAGS
      --async
         Display information about the operation in progress, without waiting
         for the operation to complete.
@@ -95,10 +80,26 @@ OPTIONAL FLAGS
         assumed. For example, "10" is 10 seconds. Overrides the default
         builds/timeout property value for this command invocation.
 
+     At most one of these may be specified:
+
+       --config=CONFIG; default="cloudbuild.yaml"
+          The YAML or JSON file to use as the build configuration file.
+
+       --tag=TAG, -t TAG
+          The tag to use with a "docker build" image creation. Cloud Build will
+          run a remote "docker build -t $TAG .", where $TAG is the tag provided
+          by this flag. The tag must be in the gcr.io/* or *.gcr.io/*
+          namespaces. Specify a tag if you want Cloud Build to build using a
+          Dockerfile instead of a build config file. If you specify a tag in
+          this command, your source must include a Dockerfile. For instructions
+          on building using a Dockerfile see
+          https://cloud.google.com/cloud-build/docs/quickstart-docker.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     You can also run a build locally using the separate component: gcloud

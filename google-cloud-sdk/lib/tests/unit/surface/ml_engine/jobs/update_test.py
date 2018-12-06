@@ -67,7 +67,7 @@ class UpdateSurfaceTest(base.MlGaPlatformTestBase, parameterized.TestCase):
             googleCloudMlV1Job=job,
             updateMask=update_mask
         ),
-        self.msgs.GoogleLongrunningOperation(name='opId'))
+        job)
 
   def testUpdateNoUpdateRequested(self, track):
     self.track = track
@@ -86,7 +86,6 @@ class UpdateSurfaceTest(base.MlGaPlatformTestBase, parameterized.TestCase):
 
     self._ExpectGet()
     self._ExpectPatch('labels', labels={'key': 'value'})
-    self._ExpectPoll()
     self.Run('ml-engine jobs update myJob --update-labels key=value')
 
   def testUpdateClearLabels(self, track):
@@ -94,7 +93,6 @@ class UpdateSurfaceTest(base.MlGaPlatformTestBase, parameterized.TestCase):
 
     self._ExpectGet(labels={'key': 'value'})
     self._ExpectPatch('labels', labels={})
-    self._ExpectPoll()
     self.Run('ml-engine jobs update myJob --clear-labels')
 
   def testUpdateRemoveLabels(self, track):
@@ -102,7 +100,6 @@ class UpdateSurfaceTest(base.MlGaPlatformTestBase, parameterized.TestCase):
 
     self._ExpectGet(labels={'a': '1', 'b': '2', 'c': '3'})
     self._ExpectPatch('labels', labels={'a': '1', 'c': '3'})
-    self._ExpectPoll()
     self.Run('ml-engine jobs update myJob --remove-labels b')
 
 

@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import contextlib
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import e2e_base
 from tests.lib import test_case
@@ -30,7 +30,7 @@ from tests.lib.surface.monitoring import test_data
 class MonitoringE2eTests(e2e_base.WithServiceAuth, cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
   @contextlib.contextmanager
   def _CreateAlertPolicy(self):

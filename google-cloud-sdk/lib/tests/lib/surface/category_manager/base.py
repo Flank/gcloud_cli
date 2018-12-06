@@ -76,9 +76,9 @@ class CategoryManagerUnitTestBase(cli_test_base.CliTestBase,
   def ExpectProjectAnnotationDelete(self, annotation_name):
     """Mocks backend call to delete an annotation."""
     self.mock_client.projects_taxonomies_annotations.Delete.Expect(
-        self.messages.CategorymanagerProjectsTaxonomiesDeleteRequest(
+        self.messages.CategorymanagerProjectsTaxonomiesAnnotationsDeleteRequest(
             name=annotation_name),
-        self.messages.Empty())
+        self.messages.Operation())
 
   def ExpectProjectTaxonomyList(self, project_id, expected_taxonomy_list):
     """Mocks backend call to list taxonomies."""
@@ -105,7 +105,7 @@ class CategoryManagerUnitTestBase(cli_test_base.CliTestBase,
     self.mock_client.projects_taxonomies.Delete.Expect(
         self.messages.CategorymanagerProjectsTaxonomiesDeleteRequest(
             name=project_taxonomy_name),
-        self.messages.Empty())
+        self.messages.Operation())
 
   def ExpectGetTaxonomyStore(self, org_id, taxonomy_store_id):
     """Fakes a request to get a taxonomy store for an organization id."""

@@ -16,8 +16,7 @@ POSITIONAL ARGUMENTS
      policy. This represents a Cloud resource. This must be specified.
 
        ACCOUNT
-          The ID of the account or a fully qualified identifier for the
-          account.
+          ID of the account or fully qualified identifier for the account.
 
      POLICY_FILE
         Path to a local JSON or YAML formatted file containing a valid policy.
@@ -28,8 +27,9 @@ POSITIONAL ARGUMENTS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
     This command uses the cloudbilling/v1 API. The full documentation for this

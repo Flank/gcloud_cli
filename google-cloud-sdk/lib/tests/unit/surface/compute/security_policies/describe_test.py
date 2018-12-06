@@ -20,20 +20,20 @@ from __future__ import unicode_literals
 
 import textwrap
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
 
-class SecurityPoliciesDescribeTestAlpha(test_base.BaseTest):
+class SecurityPoliciesDescribeTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', 'v1')
 
   def testSimpleCase(self):
     my_policy = self.resources.Create(
@@ -73,13 +73,22 @@ class SecurityPoliciesDescribeTestAlpha(test_base.BaseTest):
             """.format(self_link=my_policy.SelfLink())))
 
 
-class SecurityPoliciesDescribeTestBeta(SecurityPoliciesDescribeTestAlpha):
+class SecurityPoliciesDescribeTestBeta(SecurityPoliciesDescribeTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'beta')
+
+
+class SecurityPoliciesDescribeTestAlpha(SecurityPoliciesDescribeTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
 
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for 'gcloud category-manager taxonomies create'."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -24,6 +25,7 @@ from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class TaxonomiesCreateIntTest(base.CategoryManagerUnitTestBase):
 

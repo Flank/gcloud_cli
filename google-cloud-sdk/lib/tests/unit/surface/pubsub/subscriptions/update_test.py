@@ -31,7 +31,7 @@ from tests.lib.surface.pubsub import base
 class SubscriptionsUpdateTest(base.CloudPubsubTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.svc = self.client.projects_subscriptions.Patch
     properties.VALUES.core.user_output_enabled.Set(True)
 
@@ -235,6 +235,36 @@ class SubscriptionsUpdateTest(base.CloudPubsubTestBase):
       self.Run('pubsub subscriptions update non-existent'
                '    --ack-deadline 100')
 
+  def testUpdateNoExpiration(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        expirationPolicy=self.msgs.ExpirationPolicy())
 
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub, updateMask='expirationPolicy'),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(request=update_req,
+                    response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub --expiration-period never')
+    self.AssertErrEquals('Updated subscription [{0}].\n'
+                         .format(sub_ref.RelativeName()))
+
+  def testUpdateExpirationPeriod(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        expirationPolicy=self.msgs.ExpirationPolicy(ttl='172800s'))
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub, updateMask='expirationPolicy'),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(request=update_req,
+                    response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub --expiration-period 2d')
+    self.AssertErrEquals('Updated subscription [{0}].\n'
+                         .format(sub_ref.RelativeName()))
 if __name__ == '__main__':
   test_case.main()

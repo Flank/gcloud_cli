@@ -509,6 +509,103 @@ class GlobalForwardingRulesCreateTest(test_base.BaseTest):
     self.CheckRequests()
 
 
+class InternalManagedForwardingRulesCreateTestAlpha(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testInternalManagedWithTargetHttpProxy(self):
+    self.Run("""
+        compute forwarding-rules create forwarding-rule-1
+        --region us-central2
+        --load-balancing-scheme=INTERNAL_MANAGED
+        --target-http-proxy target-proxy-1
+        --target-http-proxy-region us-central2
+        --address '10.140.0.100'
+        --network network1
+        --port-range 80
+    """)
+
+    self.CheckRequests([
+        (self.compute.forwardingRules, 'Insert',
+         self.messages.ComputeForwardingRulesInsertRequest(
+             forwardingRule=self.messages.ForwardingRule(
+                 name='forwarding-rule-1',
+                 target=('{compute_uri}/projects/my-project/regions/'
+                         'us-central2/targetHttpProxies/target-proxy-1').format(
+                             compute_uri=self.compute_uri),
+                 IPAddress='10.140.0.100',
+                 network=('{compute_uri}/projects/my-project/global/networks/'
+                          'network1'.format(compute_uri=self.compute_uri)),
+                 portRange='80',
+                 loadBalancingScheme=self.messages.ForwardingRule
+                 .LoadBalancingSchemeValueValuesEnum.INTERNAL_MANAGED),
+             region='us-central2',
+             project='my-project'))
+    ],)
+
+  def testInternalManagedWithTargetHttpsProxy(self):
+    self.Run("""
+        compute forwarding-rules create forwarding-rule-1
+        --region us-central2
+        --load-balancing-scheme=INTERNAL_MANAGED
+        --target-https-proxy target-proxy-1
+        --target-https-proxy-region us-central2
+        --address '10.140.0.100'
+        --network network1
+        --port-range 80
+    """)
+
+    self.CheckRequests(
+        [(self.compute.forwardingRules, 'Insert',
+          self.messages.ComputeForwardingRulesInsertRequest(
+              forwardingRule=self.messages.ForwardingRule(
+                  name='forwarding-rule-1',
+                  target=('{compute_uri}/projects/my-project/regions/'
+                          'us-central2/targetHttpsProxies/target-proxy-1'
+                         ).format(compute_uri=self.compute_uri),
+                  IPAddress='10.140.0.100',
+                  network=('{compute_uri}/projects/my-project/global/networks/'
+                           'network1'.format(compute_uri=self.compute_uri)),
+                  portRange='80',
+                  loadBalancingScheme=self.messages.ForwardingRule
+                  .LoadBalancingSchemeValueValuesEnum.INTERNAL_MANAGED),
+              region='us-central2',
+              project='my-project'))],)
+
+  def testInternalManagedWithSubnetWithoutAddress(self):
+    self.Run("""
+        compute forwarding-rules create forwarding-rule-1
+        --region us-central2
+        --load-balancing-scheme=INTERNAL_MANAGED
+        --target-https-proxy target-proxy-1
+        --target-https-proxy-region us-central2
+        --subnet subnet1
+        --network network1
+        --port-range 80
+    """)
+
+    self.CheckRequests([(
+        self.compute.forwardingRules, 'Insert',
+        self.messages.ComputeForwardingRulesInsertRequest(
+            forwardingRule=self.messages.ForwardingRule(
+                name='forwarding-rule-1',
+                target=('{compute_uri}/projects/my-project/regions/'
+                        'us-central2/targetHttpsProxies/target-proxy-1').format(
+                            compute_uri=self.compute_uri),
+                network=('{compute_uri}/projects/my-project/global/networks/'
+                         'network1'.format(compute_uri=self.compute_uri)),
+                subnetwork=(
+                    '{compute_uri}/projects/my-project/regions/us-central2/'
+                    'subnetworks/subnet1'.format(compute_uri=self.compute_uri)),
+                portRange='80',
+                loadBalancingScheme=self.messages.ForwardingRule
+                .LoadBalancingSchemeValueValuesEnum.INTERNAL_MANAGED),
+            region='us-central2',
+            project='my-project'))],)
+
+
 class GlobalForwardingRulesCreateTestAlpha(test_base.BaseTest):
   TARGET_HTTPX_PROXY_ERROR_MSG = (
       r'You must specify either \[--target-http-proxy\] or '
@@ -555,6 +652,7 @@ class GlobalForwardingRulesCreateTestAlpha(test_base.BaseTest):
           --load-balancing-scheme=INTERNAL_SELF_MANAGED
           --address {compute_uri}/projects/my-project/global/addresses/foo
           --target-https-proxy target-proxy-1
+          --global-target-https-proxy
           --network network1
           --ports 80-80
         """.format(compute_uri=self.compute_uri))
@@ -1280,6 +1378,34 @@ class RegionalForwardingRulesCreateAlphaTest(test_base.BaseTest):
               project='my-project',
               region='region1'))],)
 
+  def testL7IlbForwardingRuleWithRegionTargetHttpsProxy(self):
+    self.Run("""compute forwarding-rules create forwarding-rule-1
+            --region region1
+            --ports 80,81-82
+            --network default
+            --subnet default
+            --target-https-proxy proxy1
+            --target-https-proxy-region region1
+            --load-balancing-scheme internal""")
+
+    self.CheckRequests(
+        [(self.compute.forwardingRules, 'Insert',
+          self.messages.ComputeForwardingRulesInsertRequest(
+              forwardingRule=self.messages.ForwardingRule(
+                  name='forwarding-rule-1',
+                  ports=['80', '81', '82'],
+                  network=('{0}/projects/my-project/global/networks/default'
+                           .format(self.compute_uri)),
+                  subnetwork=('{0}/projects/my-project/regions/region1/'
+                              'subnetworks/default'.format(self.compute_uri)),
+                  loadBalancingScheme=self.messages.ForwardingRule.
+                  LoadBalancingSchemeValueValuesEnum.INTERNAL,
+                  target='https://www.googleapis.com/compute/alpha/'
+                  'projects/my-project/regions/region1/targetHttpsProxies/'
+                  'proxy1'),
+              project='my-project',
+              region='region1'))],)
+
 
 class RegionalForwardingRulesCreateBackendServicesAlphaTest(test_base.BaseTest):
 
@@ -1647,6 +1773,7 @@ class ForwardingRuleCreateWithNetworkTierAlphaTest(test_base.BaseTest):
           --region us-central2
           --target-https-proxy target-https-proxy-1
           --network-tier standard
+          --global-target-https-proxy
         """)
 
     self.CheckRequests(
@@ -2215,11 +2342,11 @@ class CreateWithIPVersionApiTest(test_base.BaseTest):
               project='my-project'))],)
 
 
-class FlexPortApiAlphaTest(test_base.BaseTest):
+class FlexPortApiBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testFlexPortWithBackendService(self):
     """Tests all ports support in internal load balancing."""

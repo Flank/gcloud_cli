@@ -1,0 +1,158 @@
+title: Test image creation with labels
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute disks create $$disk$$ --zone $$my-zone$$ --size 10 --format="text(name,zone,status)"
+  - stderr: |
+      WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+  - stdout: |
+      ---
+      name:   $$disk$$
+      status: READY
+      zone:   https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
+- execute:
+  - command: compute images create $$image$$ --source-disk $$disk$$ --source-disk-zone
+      $$my-zone$$ --labels x=y,abc=xyz --format="text(name,labels)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+  - stdout: |
+      ---
+      labels.abc: xyz
+      labels.x:   y
+      name:       $$image$$
+- execute:
+  - command: compute images delete $$image$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+- execute:
+  - command: compute disks delete $$disk$$ --zone $$my-zone$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
+- define_reference:
+    reference: my-zone
+    value: us-central1-f
+
+- generate_resource_id:
+    reference: disk
+    prefix: gcloud-compute-images-test
+
+- generate_resource_id:
+    reference: image
+    prefix: gcloud-compute-images-test
+
+- execute_command:
+    command: compute disks create $$disk$$ --zone $$my-zone$$ --size 10 --format="text(name,zone,status)"
+    validation_only: true
+    events:
+    - expect_stderr: |
+        WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+    - expect_stdout: |
+        ---
+        name:   $$disk$$
+        status: READY
+        zone:   https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute images create $$image$$ --source-disk $$disk$$ --source-disk-zone
+      $$my-zone$$ --labels x=y,abc=xyz --format="text(name,labels)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              labels:
+                abc: xyz
+                x: y
+              name: $$image$$
+              sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
+              sourceType: RAW
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '693'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '6661729140031636496'
+            name: operation-1541012222682-5798ade20a390-bcccd15b-60b8b9cd
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
+            targetId: '1714424910986888209'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-10-31T11:57:03.747-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1541012222682-5798ade20a390-bcccd15b-60b8b9cd
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '702'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"cTZWq6RTo2dOma-gFl_DtFAirBM=/fl7UjXPz_hJNAF057lgW3xZH3SE="'
+            status: '200'
+          body:
+            kind: compute#image
+            id: '1714424910986888209'
+            creationTimestamp: '2018-10-31T11:57:03.719-07:00'
+            name: $$image$$
+            description: ''
+            sourceType: RAW
+            status: READY
+            diskSizeGb: '10'
+            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
+            sourceDiskId: '7216730607931638806'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
+            labels:
+              abc: xyz
+              x: y
+            labelFingerprint: ecVX6WS0TtA=
+    - expect_stdout: |
+        ---
+        labels.abc: xyz
+        labels.x:   y
+        name:       $$image$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute images delete $$image$$ --quiet
+    cleanup_for: image
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute disks delete $$disk$$ --zone $$my-zone$$ --quiet
+    cleanup_for: disk
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+    - expect_exit:
+        code: 0

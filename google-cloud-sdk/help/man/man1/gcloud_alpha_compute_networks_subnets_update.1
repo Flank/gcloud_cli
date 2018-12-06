@@ -11,7 +11,7 @@ gcloud alpha compute networks subnets update \- updates properties of an existin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks subnets update\fR \fINAME\fR [\fB\-\-aggregation\-interval\fR=\fIAGGREGATION_INTERVAL\fR] [\fB\-\-drain\-timeout\fR=\fIDRAIN_TIMEOUT\fR;\ default="0s"] [\fB\-\-flow\-sampling\fR=\fIFLOW_SAMPLING\fR] [\fB\-\-metadata\fR=\fIMETADATA\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-role\fR=\fIROLE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks subnets update\fR \fINAME\fR [\fB\-\-aggregation\-interval\fR=\fIAGGREGATION_INTERVAL\fR] [\fB\-\-drain\-timeout\fR=\fIDRAIN_TIMEOUT\fR;\ default="0s"] [\fB\-\-flow\-sampling\fR=\fIFLOW_SAMPLING\fR] [\fB\-\-metadata\fR=\fIMETADATA\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-[no\-]enable\-private\-ipv6\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-role\fR=\fIROLE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -48,10 +48,13 @@ connections. Default is an interval of 5 seconds per connection.
 
 .TP 2m
 \fB\-\-drain\-timeout\fR=\fIDRAIN_TIMEOUT\fR; default="0s"
-The drain timeout specifies the upper bound in seconds on the amount of time
-allowed to drain connections from the current ACTIVE subnetwork to the current
-BACKUP subnetwork. The drain timeout is only applicable when the
-[\-\-set\-role\-active] flag is being used.
+The time period for draining traffic from Internal HTTP(S) Load Balancer proxies
+that are assigned addresses in the current ACTIVE subnetwork. For example,
+\f5\fI1h\fR\fR, \f5\fI60m\fR\fR and \f5\fI3600s\fR\fR each specify a duration of
+1 hour for draining the traffic. Longer times reduce the number of proxies that
+are draining traffic at any one time, and so improve the availability of proxies
+for load balancing. The drain timeout is only applicable when the
+[\-\-role=ACTIVE] flag is being used.
 
 .TP 2m
 \fB\-\-flow\-sampling\fR=\fIFLOW_SAMPLING\fR
@@ -133,6 +136,12 @@ without a public ip address. Use \fB\-\-enable\-private\-ip\-google\-access\fR
 to enable and \fB\-\-no\-enable\-private\-ip\-google\-access\fR to disable.
 
 .TP 2m
+\fB\-\-[no\-]enable\-private\-ipv6\-access\fR
+Enable/disable private IPv6 access for the subnet. Use
+\fB\-\-enable\-private\-ipv6\-access\fR to enable and
+\fB\-\-no\-enable\-private\-ipv6\-access\fR to disable.
+
+.TP 2m
 \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]
 Removes secondary ranges from the subnetwork.
 
@@ -150,9 +159,13 @@ purpose of Internal HTTP(S) Load Balancer.
 
 \fIROLE\fR must be (currently only one value is supported):
 
+.RS 2m
 .TP 2m
 \fBACTIVE\fR
 The ACTIVE subnet that is currently used.
+.RE
+.sp
+
 
 
 .RE
@@ -162,9 +175,9 @@ The ACTIVE subnet that is currently used.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

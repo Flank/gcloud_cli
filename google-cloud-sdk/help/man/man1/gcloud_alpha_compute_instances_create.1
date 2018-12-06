@@ -11,7 +11,7 @@ gcloud alpha compute instances create \- create Google Compute Engine virtual ma
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-vm\-integrity\-monitoring\fR] [\fB\-\-shielded\-vm\-secure\-boot\fR] [\fB\-\-shielded\-vm\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-dns\fR\ |\ \fB\-\-no\-public\-dns\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-vm\-integrity\-monitoring\fR] [\fB\-\-shielded\-vm\-secure\-boot\fR] [\fB\-\-shielded\-vm\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-allocation\-affinity\fR=\fIALLOCATION_AFFINITY\fR;\ default="any"\ \fB\-\-allocation\-label\fR=[\fIkey\fR=\fIKEY\fR],[\fIvalue\fR=\fIVALUE\fR]] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-dns\fR\ |\ \fB\-\-no\-public\-dns\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -83,9 +83,9 @@ default, use \fB\-\-no\-boot\-disk\-auto\-delete\fR to disable.
 
 .TP 2m
 \fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR
-The name the guest operating system will see for the boot disk as. This option
-can only be specified if a new boot disk is being created (as opposed to
-mounting an existing persistent disk).
+The name the guest operating system will see for the boot disk. This option can
+only be specified if a new boot disk is being created (as opposed to mounting an
+existing persistent disk).
 
 .TP 2m
 \fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR
@@ -118,6 +118,10 @@ Creates and attaches persistent disks to the instances.
 \fBname\fR
 Specifies the name of the disk. This option cannot be specified if more than one
 instance is being created.
+
+.TP 2m
+\fBdescription\fR
+Optional textual description for the disk being created.
 
 .TP 2m
 \fBmode\fR
@@ -172,8 +176,8 @@ compute disk\-types list. The default disk type is \f5\fIpd\-standard\fR\fR.
 .TP 2m
 \fBdevice\-name\fR
 An optional name that indicates the disk name the guest operating system will
-see. If omitted, a device name of the form \f5\fIpersistent\-disk\-N\fR\fR will
-be used.
+see. If omitted, a device name of the form \f5persistent\-disk\-N\fR will be
+used.
 
 .TP 2m
 \fBauto\-delete\fR
@@ -283,8 +287,8 @@ default value for this is \f5\fIno\fR\fR.
 .TP 2m
 \fBdevice\-name\fR
 An optional name that indicates the disk name the guest operating system will
-see. If omitted, a device name of the form \f5\fIpersistent\-disk\-N\fR\fR will
-be used.
+see. If omitted, a device name of the form \f5persistent\-disk\-N\fR will be
+used.
 
 .TP 2m
 \fBauto\-delete\fR
@@ -302,6 +306,13 @@ region as the instance. The default value for this is \f5\fIzonal\fR\fR.
 .RE
 .sp
 .TP 2m
+\fB\-\-hostname\fR=\fIHOSTNAME\fR
+Specify the hostname of the instance to be created. The specified homename must
+be RFC1035 compliant. If hostname is not specified, the default hostname is
+[INSTANCE_NAME].c.[PROJECT_ID].internal when using the global DNS, and
+[INSTANCE_NAME].[ZONE].c.[PROJECT_ID].internal when using zonal DNS.
+
+.TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to add.
 
@@ -310,6 +321,21 @@ underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
 only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
 
+.TP 2m
+\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]
+Attaches a local NVDIMM to the instances.
+
+.RS 2m
+.TP 2m
+\fBsize\fR
+Optional. Size of the NVDIMM disk. The value must be a whole number followed by
+a size unit of \f5\fIKB\fR\fR for kilobyte, \f5\fIMB\fR\fR for megabyte,
+\f5\fIGB\fR\fR for gigabyte, or \f5\fITB\fR\fR for terabyte. For example,
+\f5\fI3TB\fR\fR will produce a 3 terabyte disk. Allowed values are: 3TB and 6TB
+and the default is 3 TB.
+
+.RE
+.sp
 .TP 2m
 \fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]
 Attaches a local SSD to the instances.
@@ -532,6 +558,10 @@ Users can also override machine type and labels. Values of other flags will be
 ignored and \f5\-\-source\-instance\-template\fR will be used instead.
 
 .TP 2m
+\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR
+The name of the machine image that the instance will be created from.
+
+.TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
 Specifies the subnet that the instances will be part of. If \-\-network is also
 specified subnet must be a subnetwork of network specified by \-\-network.
@@ -599,6 +629,34 @@ only be used when creating a single instance.
 If provided, the instances will not be assigned external IP addresses.
 
 .RE
+.RE
+.sp
+Manage the configuration of desired allocation which this instance could take
+capacity from.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-allocation\-affinity\fR=\fIALLOCATION_AFFINITY\fR; default="any"
+Specifies the configuration of desired allocation which this instance could take
+capacity from. Choices are 'any', 'none' and 'specific', default is 'any'.
+\fIALLOCATION_AFFINITY\fR must be one of: \fBany\fR, \fBnone\fR, \fBspecific\fR.
+
+.RS 2m
+.TP 2m
+\fB\-\-allocation\-label\fR=[\fIkey\fR=\fIKEY\fR],[\fIvalue\fR=\fIVALUE\fR]
+The key and values of the label of the allocation resource. Required if the
+value of \f5\-\-allocation\-affinity\fR is \f5specific\fR.
+
+.TP 2m
+\fBkey\fR
+The label key of allocation resource.
+
+.TP 2m
+\fBvalue\fR
+The label value of allocation resource.
+.RE
 .sp
 .TP 2m
 
@@ -606,10 +664,11 @@ Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
 used to protect the disk. The arguments in this group can be used to specify the
 attributes of this resource.
 
+
 .RS 2m
 .TP 2m
 \fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR
-The ID of the key or a fully qualified identifier for the key. This flag must be
+ID of the key or fully qualified identifier for the key. This flag must be
 specified if any of the other arguments in this group are specified.
 
 .TP 2m
@@ -629,6 +688,7 @@ The Cloud project for the key.
 .TP 2m
 
 Custom machine type extensions.
+
 
 .RS 2m
 .TP 2m
@@ -652,18 +712,17 @@ Use the extended custom machine type.
 .sp
 .TP 2m
 \fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR
+
 The project against which all image and image family references will be
 resolved. It is best practice to define image\-project.
-.RS 2m
-.IP "\(em" 2m
+.IP "\(bu" 2m
 If specifying one of our public images, image\-project must be provided.
-.IP "\(em" 2m
+.IP "\(bu" 2m
 If there are several of the same image\-family value in multiple projects,
 image\-project must be specified to clarify the image to be used.
-.IP "\(em" 2m
+.IP "\(bu" 2m
 If not specified and either image or image\-family is provided, the current
 default project is used.
-.RE
 .RE
 .sp
 
@@ -671,6 +730,7 @@ default project is used.
 .TP 2m
 
 At most one of these may be specified:
+
 
 .RS 2m
 .TP 2m
@@ -699,13 +759,11 @@ By default, \f5\fIdebian\-9\fR\fR is assumed for this flag.
 The name of the source disk snapshot that the instance boot disk will be created
 from. You can provide this as a full URL to the snapshot or just the snapshot
 name. For example, the following are valid values:
-.RS 2m
-.IP "\(bu" 2m
+.IP "\(em" 2m
 
 https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
-.IP "\(bu" 2m
+.IP "\(em" 2m
 snapshot
-.RE
 .RE
 .RE
 .sp
@@ -714,6 +772,7 @@ snapshot
 .TP 2m
 
 Maintenance Behavior. At most one of these may be specified:
+
 
 .RS 2m
 .TP 2m
@@ -725,6 +784,7 @@ The \-\-maintenance\-policy flag is now deprecated. Please use
 \f5\-\-on\-host\-maintenance\fR instead. \fIMAINTENANCE_POLICY\fR must be one
 of:
 
+.RS 2m
 .TP 2m
 \fBMIGRATE\fR
 The instances should be migrated to a new host. This will temporarily impact the
@@ -732,12 +792,16 @@ performance of instances during a migration event.
 .TP 2m
 \fBTERMINATE\fR
 The instances should be terminated.
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR
 Specifies the behavior of the instances when their host machines undergo
 maintenance. The default is MIGRATE. \fIMAINTENANCE_POLICY\fR must be one of:
 
+.RS 2m
 .TP 2m
 \fBMIGRATE\fR
 The instances should be migrated to a new host. This will temporarily impact the
@@ -745,12 +809,16 @@ performance of instances during a migration event.
 .TP 2m
 \fBTERMINATE\fR
 The instances should be terminated.
+.RE
+.sp
+
 
 .RE
 .sp
 .TP 2m
 
 Sole Tenancy At most one of these may be specified:
+
 
 .RS 2m
 .TP 2m
@@ -789,6 +857,7 @@ The name of the node group to schedule this instance on.
 
 At most one of these may be specified:
 
+
 .RS 2m
 .TP 2m
 \fB\-\-public\-dns\fR
@@ -803,6 +872,7 @@ If provided, the instance will not be assigned a public DNS name.
 .TP 2m
 
 At most one of these may be specified:
+
 
 .RS 2m
 .TP 2m
@@ -819,6 +889,7 @@ Mutually exclusive with public\-ptr\-domain.
 .TP 2m
 
 At most one of these may be specified:
+
 
 .RS 2m
 .TP 2m
@@ -838,6 +909,7 @@ of the instance.
 
 At most one of these may be specified:
 
+
 .RS 2m
 .TP 2m
 \fB\-\-scopes\fR=[\fISCOPE\fR,...]
@@ -846,111 +918,55 @@ below. However, if neither \f5\-\-scopes\fR nor \f5\-\-no\-scopes\fR are
 specified and the project has no default service account, then the instance will
 be created with no scopes.
 
-SCOPE can be either the full URI of the scope or an alias. Available aliases
-are:
-
-.RS 2m
-default
-  Scopes assigned to instances by default:
-  \- https://www.googleapis.com/auth/devstorage.read_only
-  \- https://www.googleapis.com/auth/logging.write
-  \- https://www.googleapis.com/auth/monitoring.write
-  \- https://www.googleapis.com/auth/pubsub
-  \- https://www.googleapis.com/auth/service.management.readonly
-  \- https://www.googleapis.com/auth/servicecontrol
-  \- https://www.googleapis.com/auth/trace.append
-.RE
-
-.RS 2m
-bigquery
-  \- https://www.googleapis.com/auth/bigquery
-.RE
-
-.RS 2m
-cloud\-platform
-  \- https://www.googleapis.com/auth/cloud\-platform
-.RE
-
-.RS 2m
-compute\-ro
-  \- https://www.googleapis.com/auth/compute.readonly
-.RE
-
-.RS 2m
-compute\-rw
-  \- https://www.googleapis.com/auth/compute
-.RE
-
-.RS 2m
-datastore
-  \- https://www.googleapis.com/auth/datastore
-.RE
-
-.RS 2m
-logging\-write
-  \- https://www.googleapis.com/auth/logging.write
-.RE
-
-.RS 2m
-monitoring
-  \- https://www.googleapis.com/auth/monitoring
-.RE
-
-.RS 2m
-monitoring\-write
-  \- https://www.googleapis.com/auth/monitoring.write
-.RE
-
-.RS 2m
-service\-control
-  \- https://www.googleapis.com/auth/servicecontrol
-.RE
-
-.RS 2m
-service\-management
-  \- https://www.googleapis.com/auth/service.management.readonly
-.RE
-
-.RS 2m
-sql (DEPRECATED)
-  \- https://www.googleapis.com/auth/sqlservice:
-.RE
-
-.RS 2m
-sql\-admin
-  \- https://www.googleapis.com/auth/sqlservice.admin
-.RE
-
-.RS 2m
-storage\-full
-  \- https://www.googleapis.com/auth/devstorage.full_control
-.RE
-
-.RS 2m
-storage\-ro
-  \- https://www.googleapis.com/auth/devstorage.read_only
-.RE
-
-.RS 2m
-storage\-rw
-  \- https://www.googleapis.com/auth/devstorage.read_write
-.RE
-
-.RS 2m
-taskqueue
-  \- https://www.googleapis.com/auth/taskqueue
-.RE
-
-.RS 2m
-userinfo\-email
-  \- https://www.googleapis.com/auth/userinfo.email
-.RE
+SCOPE can be either the full URI of the scope or an alias. \fBdefault\fR scopes
+are assigned to all instances. Available aliases are:
 
 
-DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice' account scope
+.TS
+tab(	);
+lB lB
+l l.
+Alias	URI
+bigquery	https://www.googleapis.com/auth/bigquery
+cloud-platform	https://www.googleapis.com/auth/cloud-platform
+cloud-source-repos	https://www.googleapis.com/auth/source.full_control
+cloud-source-repos-ro	https://www.googleapis.com/auth/source.read_only
+compute-ro	https://www.googleapis.com/auth/compute.readonly
+compute-rw	https://www.googleapis.com/auth/compute
+datastore	https://www.googleapis.com/auth/datastore
+default	https://www.googleapis.com/auth/devstorage.read_only
+	https://www.googleapis.com/auth/logging.write
+	https://www.googleapis.com/auth/monitoring.write
+	https://www.googleapis.com/auth/pubsub
+	https://www.googleapis.com/auth/service.management.readonly
+	https://www.googleapis.com/auth/servicecontrol
+	https://www.googleapis.com/auth/trace.append
+gke-default	https://www.googleapis.com/auth/devstorage.read_only
+	https://www.googleapis.com/auth/logging.write
+	https://www.googleapis.com/auth/monitoring
+	https://www.googleapis.com/auth/service.management.readonly
+	https://www.googleapis.com/auth/servicecontrol
+	https://www.googleapis.com/auth/trace.append
+logging-write	https://www.googleapis.com/auth/logging.write
+monitoring	https://www.googleapis.com/auth/monitoring
+monitoring-write	https://www.googleapis.com/auth/monitoring.write
+pubsub	https://www.googleapis.com/auth/pubsub
+service-control	https://www.googleapis.com/auth/servicecontrol
+service-management	https://www.googleapis.com/auth/service.management.readonly
+sql (deprecated)	https://www.googleapis.com/auth/sqlservice
+sql-admin	https://www.googleapis.com/auth/sqlservice.admin
+storage-full	https://www.googleapis.com/auth/devstorage.full_control
+storage-ro	https://www.googleapis.com/auth/devstorage.read_only
+storage-rw	https://www.googleapis.com/auth/devstorage.read_write
+taskqueue	https://www.googleapis.com/auth/taskqueue
+trace	https://www.googleapis.com/auth/trace.append
+userinfo-email	https://www.googleapis.com/auth/userinfo.email
+.TE
+
+DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice account scope
 and \f5sql\fR alias do not provide SQL instance management capabilities and have
-been deprecated. Please, use 'https://www.googleapis.com/auth/sqlservice.admin'
-or \f5sql\-admin\fR to manage your Google SQL Service instances.
+been deprecated. Please, use https://www.googleapis.com/auth/sqlservice.admin or
+\f5sql\-admin\fR to manage your Google SQL Service instances.
 
 
 .TP 2m
@@ -962,6 +978,7 @@ Create instance without scopes
 .TP 2m
 
 At most one of these may be specified:
+
 
 .RS 2m
 .TP 2m
@@ -986,9 +1003,9 @@ Create instance without service account
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

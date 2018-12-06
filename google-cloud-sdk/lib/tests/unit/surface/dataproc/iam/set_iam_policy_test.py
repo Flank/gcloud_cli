@@ -28,12 +28,17 @@ from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
 
 
-class SetIamPolicyTest(parameterized.TestCase,
-                       unit_base.DataprocIAMUnitTestBase,
-                       base.DataprocTestBaseBeta):
+class SetIamPolicyTestBeta(parameterized.TestCase,
+                           unit_base.DataprocIAMUnitTestBase,
+                           base.DataprocTestBaseBeta):
   """Tests for dataproc * set-iam-policy."""
 
-  @parameterized.parameters('cluster', 'job', 'operation', 'workflow-template')
+  @parameterized.named_parameters(
+      ('Cluster', 'cluster'),
+      ('Job', 'job'),
+      ('Operation', 'operation'),
+      ('WorkflowTemplate', 'workflow-template')
+  )
   def testSetIAMPolicy(self, collection):
     self.SetIamPolicyNoError(collection)
     self.SetIamPolicyNotFound(collection)
@@ -85,6 +90,10 @@ class SetIamPolicyTest(parameterized.TestCase,
                               setIamPolicyRequest=set_iam_policy_message),
         response=response,
         exception=exception)
+
+
+class SetIamPolicyTestGA(SetIamPolicyTestBeta, base.DataprocTestBaseGA):
+  """Tests for beta dataproc * set-iam-policy."""
 
 
 if __name__ == '__main__':

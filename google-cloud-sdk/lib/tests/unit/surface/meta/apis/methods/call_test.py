@@ -249,7 +249,7 @@ class HelpTests(base.Base, cli_test_base.CliTestBase):
   def testMockHelp(self):
     # TODO(b/38000796): Write some better tests once this prototype settles
     # down. Right now this just ensures it doesn't crash.
-    self.MockGetListCreateMethods(('foo.projects.clusters', False))
+    self.MockCRUDMethods(('foo.projects.clusters', False))
     with self.assertRaises(SystemExit):
       self.Run('meta apis methods call --collection foo.projects.clusters get '
                '--help')
@@ -265,10 +265,10 @@ class CompletionTests(base.Base, cli_test_base.CliTestBase):
         ['foo.projects.clusters', 'foo.projects.clusters.instances'])
 
   def testMethodCompletion(self):
-    self.MockGetListCreateMethods(('foo.projects.clusters', False))
+    self.MockCRUDMethods(('foo.projects.clusters', False))
     self.RunCompletion(
         'meta apis methods call --collection foo.projects.clusters ',
-        ['get', 'list', 'create'])
+        ['get', 'patch', 'list', 'create'])
     self.RunCompletion(
         'meta apis methods call --collection foo.projects.clusters g', ['get'])
     self.RunCompletion(

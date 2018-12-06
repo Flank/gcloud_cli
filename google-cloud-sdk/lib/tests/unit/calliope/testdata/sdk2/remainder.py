@@ -19,10 +19,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 import argparse
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class Remainder(base.Command):
+class Remainder(calliope_base.Command):
   """A command to test remainder args."""
 
   @staticmethod

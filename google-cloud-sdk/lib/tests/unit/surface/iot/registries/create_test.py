@@ -20,16 +20,15 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class RegistriesCreateTest(base.CloudIotRegistryBase):
+class RegistriesCreateTestGA(base.CloudIotRegistryBase, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _ExpectCreate(self, registry):
     self.client.projects_locations_registries.Create.Expect(
@@ -38,8 +37,7 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
             deviceRegistry=registry),
         registry)
 
-  def testCreate_NoOptions(self, track):
-    self.track = track
+  def testCreate_NoOptions(self):
     registry = self._CreateDeviceRegistry(registry_id='my-registry',)
     self._ExpectCreate(registry)
 
@@ -50,8 +48,7 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
     self.assertEqual(results, registry)
     self.AssertLogContains('Created registry [my-registry].')
 
-  def testCreate_RegistryUri(self, track):
-    self.track = track
+  def testCreate_RegistryUri(self):
     registry = self._CreateDeviceRegistry(registry_id='my-registry',)
     self._ExpectCreate(registry)
 
@@ -63,8 +60,7 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
     self.assertEqual(results, registry)
     self.AssertLogContains('Created registry [my-registry].')
 
-  def testCreate_PubSubTopicId(self, track):
-    self.track = track
+  def testCreate_PubSubTopicId(self):
     event_pubsub_topic_ref = self._CreatePubsubTopic('event-topic')
     state_pubsub_topic_ref = self._CreatePubsubTopic('state-topic')
     registry = self._CreateDeviceRegistry(
@@ -82,8 +78,7 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
             state_pubsub_topic_ref.Name()))
     self.assertEqual(results, registry)
 
-  def testCreate_PubSubFullUri(self, track):
-    self.track = track
+  def testCreate_PubSubFullUri(self):
     event_pubsub_topic_ref = self._CreatePubsubTopic('event-topic')
     state_pubsub_topic_ref = self._CreatePubsubTopic('state-topic')
     registry = self._CreateDeviceRegistry(
@@ -101,8 +96,7 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
             state_pubsub_topic_ref.SelfLink()))
     self.assertEqual(results, registry)
 
-  def testCreate_AllOptions(self, track):
-    self.track = track
+  def testCreate_AllOptions(self):
     event_pubsub_topic_name = self._CreatePubsubTopic(
         'event-topic', project='other-project').RelativeName()
     state_pubsub_topic_name = self._CreatePubsubTopic(
@@ -124,8 +118,7 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
 
     self.assertEqual(results, registry)
 
-  def testCreate_AllOptionsConfigsDisabled(self, track):
-    self.track = track
+  def testCreate_AllOptionsConfigsDisabled(self):
     event_pubsub_topic_name = self._CreatePubsubTopic(
         'event-topic').RelativeName()
     state_pubsub_topic_name = self._CreatePubsubTopic(
@@ -149,8 +142,7 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
 
     self.assertEqual(results, registry)
 
-  def testCreate_MultipleEventNotificationConfigs(self, track):
-    self.track = track
+  def testCreate_MultipleEventNotificationConfigs(self):
     event_pubsub_topic_name = self._CreatePubsubTopic(
         'event-topic').RelativeName()
     event_pubsub_topic_name2 = self._CreatePubsubTopic(
@@ -172,8 +164,7 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
 
     self.assertEqual(results, registry)
 
-  def testCreate_EventConfigWithOnlySubfolder(self, track):
-    self.track = track
+  def testCreate_EventConfigWithOnlySubfolder(self):
     event_pubsub_topic_name = self._CreatePubsubTopic(
         'event-topic').RelativeName()
 
@@ -187,8 +178,7 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
           '    --event-notification-config topic={0} '
           .format(event_pubsub_topic_name))
 
-  def testCreate_WithCredential(self, track):
-    self.track = track
+  def testCreate_WithCredential(self):
     public_key_path = self.Touch(self.temp_path, 'cert1.txt',
                                  self.CERTIFICATE_CONTENTS)
     credentials = [self._CreateRegistryCredential(self.CERTIFICATE_CONTENTS)]
@@ -204,66 +194,40 @@ class RegistriesCreateTest(base.CloudIotRegistryBase):
 
     self.assertEqual(results, registry)
 
-
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class RegistriesCreateDeprecatedTest(base.CloudIotRegistryBase):
-
-  def _ExpectCreate(self, registry):
-    self.client.projects_locations_registries.Create.Expect(
-        self.messages.CloudiotProjectsLocationsRegistriesCreateRequest(
-            parent='projects/{}/locations/us-central1'.format(self.Project()),
-            deviceRegistry=registry),
-        registry)
-
-  def testCreate_EventPubsubDeprecated(self, track):
-    self.track = track
-    event_pubsub_topic_name = self._CreatePubsubTopic(
-        'event-topic').RelativeName()
+  @parameterized.parameters(
+      ('none', 'NONE'), ('info', 'INFO'), ('error', 'ERROR'), ('Info', 'INFO'),
+      ('ErRoR', 'ERROR'), ('NONE', 'NONE'), ('debug', 'DEBUG'),
+      ('dEbUg', 'DEBUG'), ('DEBUG', 'DEBUG'))
+  def testCreate_WithLogLevel(self, log_level, log_level_enum):
     registry = self._CreateDeviceRegistry(
-        registry_id='my-registry',
-        event_notification_configs=[(event_pubsub_topic_name, None)])
+        registry_id='my-registry', log_level=log_level_enum)
     self._ExpectCreate(registry)
 
-    results = self.Run(
-        'iot registries create my-registry '
-        '    --region us-central1 '
-        '    --event-pubsub-topic {} '
-        '    --enable-mqtt-config'.format(event_pubsub_topic_name))
+    results = self.Run('iot registries create my-registry '
+                       '    --region us-central1'
+                       '    --log-level {}'.format(log_level))
 
     self.assertEqual(results, registry)
-    self.AssertErrContains('Flag --event-pubsub-topic is deprecated. '
-                           'Use --event-notification-config instead.')
+    self.AssertLogContains('Created registry [my-registry].')
 
-  def testCreate_PubsubRemoved(self, track):
-    self.track = track
-    event_pubsub_topic_name = self._CreatePubsubTopic(
-        'event-topic').RelativeName()
-
+  def testCreate_WithInvalidLogLevel(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'Flag --pubsub-topic is removed. Use --event-notification-config '
-        'instead.'):
-      self.Run(
-          'iot registries create my-registry '
-          '    --region us-central1 '
-          '    --pubsub-topic {} '
-          '    --enable-mqtt-config'.format(event_pubsub_topic_name))
+        "argument --log-level: Invalid choice: 'just-whenever-dude'"):
+      self.Run('iot registries create my-registry '
+               '    --region us-central1'
+               '    --log-level just-whenever-dude')
 
-  def testCreate_PubsubFlagsMutuallyExclusive(self, track):
-    self.track = track
-    event_pubsub_topic_name = self._CreatePubsubTopic(
-        'event-topic', project='other-project').RelativeName()
-    with self.AssertRaisesExceptionMatches(
-        cli_test_base.MockArgumentError,
-        'argument --event-notification-config: At most one of '
-        '--event-notification-config | --event-pubsub-topic | '
-        '--pubsub-topic may be specified.'):
-      self.Run(
-          'iot registries create my-registry '
-          '    --region us-central1 '
-          '    --event-notification-config topic={0} '
-          '    --event-pubsub-topic {0} '
-          '    --enable-mqtt-config'.format(event_pubsub_topic_name))
+
+class RegistriesCreateTestBeta(RegistriesCreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class RegistriesCreateTestAlpha(RegistriesCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -27,7 +27,6 @@ DIGESTS = {'sha256', 'sha384', 'sha512'}
 
 ALGORITHM_ENUM = MESSAGES.CryptoKeyVersionTemplate.AlgorithmValueValuesEnum
 ALGORITHM_MAPPER = arg_utils.ChoiceEnumMapper('algorithm_enum', ALGORITHM_ENUM)
-ALL_ALGORITHMS = {v.replace('_', '-').lower() for v in ALGORITHM_ENUM.to_dict()}
 
 PURPOSE_ENUM = MESSAGES.CryptoKey.PurposeValueValuesEnum
 PURPOSE_MAP = {
@@ -41,6 +40,7 @@ PROTECTION_LEVEL_ENUM = (
 PROTECTION_LEVEL_MAPPER = arg_utils.ChoiceEnumMapper('protection_level_enum',
                                                      PROTECTION_LEVEL_ENUM)
 
+# Add new algorithms according to their purposes here.
 VALID_ALGORITHMS_MAP = {
     PURPOSE_ENUM.ENCRYPT_DECRYPT: ['google-symmetric-encryption'],
     PURPOSE_ENUM.ASYMMETRIC_SIGN: [
@@ -49,12 +49,22 @@ VALID_ALGORITHMS_MAP = {
         'rsa-sign-pss-2048-sha256',
         'rsa-sign-pss-3072-sha256',
         'rsa-sign-pss-4096-sha256',
+        'rsa-sign-pss-4096-sha512',
         'rsa-sign-pkcs1-2048-sha256',
         'rsa-sign-pkcs1-3072-sha256',
         'rsa-sign-pkcs1-4096-sha256',
+        'rsa-sign-pkcs1-4096-sha512',
     ],
     PURPOSE_ENUM.ASYMMETRIC_DECRYPT: [
         'rsa-decrypt-oaep-2048-sha256',
         'rsa-decrypt-oaep-3072-sha256',
+        'rsa-decrypt-oaep-4096-sha256',
+        'rsa-decrypt-oaep-4096-sha512',
     ],
+}
+
+# Derive available algorithms from VALID_ALGORITHMS_MAP.
+ALL_ALGORITHMS = {
+    algorithm for algorithms in VALID_ALGORITHMS_MAP.values()
+    for algorithm in algorithms
 }

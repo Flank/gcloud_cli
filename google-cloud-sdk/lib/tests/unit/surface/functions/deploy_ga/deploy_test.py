@@ -27,11 +27,13 @@ import zipfile
 from apitools.base.py import http_wrapper
 from googlecloudsdk.api_lib.functions import env_vars as env_vars_api_util
 from googlecloudsdk.api_lib.functions import exceptions
+from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.functions.deploy import trigger_util
 from googlecloudsdk.core import execution_utils
+from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
@@ -150,21 +152,12 @@ class DeployTestBase(base.FunctionsTestBase):
 
   def MockUploadToGCSBucket(self):
     """Mock uploading the function archive to cloud storage."""
-    # Args is different ordering/length for  execution_utils.ArgsForCMDTool vs.
-    # execution_utils.ArgsForExecutableTool
-    if platforms.OperatingSystem.Current() == platforms.OperatingSystem.WINDOWS:
-      file_arg = 4
-    else:
-      file_arg = 2
-    def FakeExec(args, no_exit, out_func, err_func):
-      """Mock implementation for execution_utils.Exec."""
-      del out_func, err_func
-      self.assertTrue(no_exit)
-      self.AssertNodeModulesNotUploaded(args[file_arg])
-      return 0
-
-    self.StartObjectPatch(storage_util, '_GetGsutilPath', return_value='gsutil')
-    self.StartObjectPatch(execution_utils, 'Exec', FakeExec)
+    def FakeCopyFileToGCS(client_obj, local_path, target_obj_ref):
+      del client_obj, target_obj_ref
+      self.AssertNodeModulesNotUploaded(local_path)
+    self.StartObjectPatch(storage_api.StorageClient,
+                          'CopyFileToGCS',
+                          FakeCopyFileToGCS)
     self.StartObjectPatch(storage_util.ObjectReference, 'ToUrl',
                           return_value=_TEST_GS_BUCKET)
 
@@ -1423,10 +1416,7 @@ class UpdateTests(DeployTestBase):
           'functions deploy my-test --remove-labels=deployment ')
 
 
-class DeployAlphaTests(DeployTestBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+class DeployRuntimeTests(DeployTestBase):
 
   def testUpdateRuntime(self):
     """Test update of runtime."""
@@ -1495,7 +1485,7 @@ class EnvVarsTests(DeployTestBase):
   """
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   @parameterized.named_parameters(
       (
@@ -1715,6 +1705,36 @@ class EnvVarsTests(DeployTestBase):
         yaml_load_path.return_value = file_env_vars
 
         self.Run('functions deploy my-test --env-vars-file env.yaml')
+
+
+# TODO(b/109938541): Remove this after new non-gsutil implementation seems
+# stable
+class CoreTestGsutil(CoreTest):
+  """Test deploy workflow with various --source and general argument options."""
+
+  def SetUp(self):
+    properties.VALUES.storage.use_gsutil.Set(True)
+
+  def MockUploadToGCSBucket(self):
+    """Mock uploading the function archive to cloud storage."""
+    # Args is different ordering/length for  execution_utils.ArgsForCMDTool vs.
+    # execution_utils.ArgsForExecutableTool
+    if platforms.OperatingSystem.Current() == platforms.OperatingSystem.WINDOWS:
+      file_arg = 4
+    else:
+      file_arg = 2
+    def FakeExec(args, no_exit, out_func, err_func):
+      """Mock implementation for execution_utils.Exec."""
+      del out_func, err_func
+      self.assertTrue(no_exit)
+      self.AssertNodeModulesNotUploaded(args[file_arg])
+      return 0
+
+    self.StartObjectPatch(storage_util, '_GetGsutilPath', return_value='gsutil')
+    self.StartObjectPatch(execution_utils, 'Exec', FakeExec)
+    self.StartObjectPatch(storage_util.ObjectReference, 'ToUrl',
+                          return_value=_TEST_GS_BUCKET)
+
 
 if __name__ == '__main__':
   test_case.main()

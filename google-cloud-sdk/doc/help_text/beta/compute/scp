@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud beta compute scp [[USER@]INSTANCE:]SRC [[[USER@]INSTANCE:]SRC ...]
         [[USER@]INSTANCE:]DEST [--compress] [--dry-run]
-        [--force-key-file-overwrite] [--plain] [--port=PORT] [--recurse]
-        [--scp-flag=SCP_FLAG] [--ssh-key-file=SSH_KEY_FILE]
+        [--force-key-file-overwrite] [--internal-ip] [--plain] [--port=PORT]
+        [--recurse] [--scp-flag=SCP_FLAG] [--ssh-key-file=SSH_KEY_FILE]
         [--strict-host-key-checking=STRICT_HOST_KEY_CHECKING] [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -51,6 +51,19 @@ FLAGS
         If disabled, the files associated with a broken SSH key will not be
         regenerated and will fail in both interactive and non-interactive
         environments.
+
+     --internal-ip
+        Connect to instances using their internal IP addresses rather than
+        their external IP addresses. Use this to connect from one instance to
+        another on the same VPC network, over a VPN connection, or between two
+        peered VPC networks.
+
+        For this connection to work, you must configure your networks and
+        firewall to allow SSH connections to the internal IP address of the
+        instance to which you want to connect.
+
+        To learn how to use this flag, see
+        https://cloud.google.com/compute/docs/instances/connecting-advanced#sshbetweeninstances.
 
      --plain
         Suppress the automatic addition of ssh(1)/scp(1) flags. This flag is
@@ -101,8 +114,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To copy a remote directory, ~/narnia, from example-instance to the
@@ -122,6 +136,11 @@ EXAMPLES
 
         $ gcloud beta compute scp --recurse example-instance:~/narnia \
             ~/wardrobe --zone us-central1-a
+
+    To specify the project, zone, and recurse all together, run:
+
+        $ gcloud beta compute scp --project "my-gcp-project" \
+            --zone "us-east1-b" --recurse ~/foo-folder/ gcp-instance-name:~/
 
 NOTES
     This command is currently in BETA and may change without notice. These

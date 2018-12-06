@@ -19,7 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -263,7 +263,7 @@ class InstancesSetSchedulingTestAlpha(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
     maintenance_enum = self.messages.Scheduling.OnHostMaintenanceValueValuesEnum
     self.terminate = maintenance_enum.TERMINATE

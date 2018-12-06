@@ -1,0 +1,238 @@
+title: Create TPU
+release_tracks: [BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: compute/zone us-central1-c
+- execute:
+  - command: |
+      compute tpus create mytpu --range 10.20.10.0/29 --version 1.6
+      --network my-tf-network
+  - stderr: |
+      Create request issued for: [mytpu]
+  - progress_tracker:
+    - message: Waiting for operation [create] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created tpu [mytpu].
+- execute:
+  - command: |
+      compute tpus create mytpu --range 10.20.10.0/29 --version 1.6
+      --network my-tf-network
+  - stderr: |
+      Create request issued for: [mytpu]
+  - progress_tracker:
+    - message: Waiting for operation [create] to complete
+    - status: FAILURE
+  - error: '1: .*Create Failed.*$'
+- execute:
+  - command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible
+  - stderr: |
+      Create request issued for: [mytpu]
+  - progress_tracker:
+    - message: Waiting for operation [create] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created tpu [mytpu].
+actions:
+- set_property:
+    compute/zone: us-central1-c
+- execute_command:
+    label: Base Case
+    command: |
+      compute tpus create mytpu --range 10.20.10.0/29 --version 1.6
+      --network my-tf-network
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/us-central1-c/nodes?alt=json&nodeId=mytpu
+          method: POST
+          body:
+            json:
+              tensorflowVersion: '1.6'
+              acceleratorType: v2-8
+              network: my-tf-network
+              cidrBlock: 10.20.10.0/29
+              schedulingConfig:
+                preemptible: false
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              tensorflowVersion: '1.6'
+              acceleratorType: v2-8
+              network: my-tf-network
+              cidrBlock: 10.20.10.0/29
+              schedulingConfig:
+                preemptible: false
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_stderr: |
+        Create request issued for: [mytpu]
+    - api_call:
+        poll_operation: false
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/us-central1-c/operations/create?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              tensorflowVersion: '1.6'
+              acceleratorType: v2-8
+              network: my-tf-network
+              cidrBlock: 10.20.10.0/29
+              schedulingConfig:
+                preemptible: false
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_progress_tracker:
+        message: Waiting for operation [create] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created tpu [mytpu].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Create Failed
+    command: |
+      compute tpus create mytpu --range 10.20.10.0/29 --version 1.6
+      --network my-tf-network
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/us-central1-c/nodes?alt=json&nodeId=mytpu
+          method: POST
+          headers: {}
+          body:
+            json:
+              acceleratorType: v2-8
+              cidrBlock: 10.20.10.0/29
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: false
+              tensorflowVersion: '1.6'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              tensorflowVersion: '1.6'
+              acceleratorType: v2-8
+              network: my-tf-network
+              cidrBlock: 10.20.10.0/29
+              schedulingConfig:
+                preemptible: false
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+            error:
+              status: 500
+              message: Create Failed
+    - expect_stderr: |
+        Create request issued for: [mytpu]
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/us-central1-c/operations/create?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "response": {
+                "tensorflowVersion": "1.6",
+                "acceleratorType": "v2-8",
+                "network": "my-tf-network",
+                "cidrBlock": "10.20.10.0/29",
+                "schedulingConfig": {
+                  "preemptible": false
+                }
+              },
+              "done": true,
+              "name": "projects/fake-project/locations/us-central1-c/operations/create",
+              "error": {
+                "status": 500,
+                "message": "Create Failed"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [create] to complete
+        status: FAILURE
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*Create Failed.*
+- execute_command:
+    label: With Cust Params
+    command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/us-central1-c/nodes?alt=json&nodeId=mytpu
+          method: POST
+          headers: {}
+          body:
+            json:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+              tensorflowVersion: '1.6'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+              tensorflowVersion: '1.6'
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_stderr: |
+        Create request issued for: [mytpu]
+    - api_call:
+        poll_operation: false
+        repeatable: true
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/us-central1-c/operations/create?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+              tensorflowVersion: '1.6'
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_progress_tracker:
+        message: Waiting for operation [create] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created tpu [mytpu].
+    - expect_exit:
+        code: 0

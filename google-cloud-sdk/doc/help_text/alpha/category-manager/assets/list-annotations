@@ -15,7 +15,7 @@ POSITIONAL ARGUMENTS
      This must be specified.
 
        ASSET
-          The ID of the asset or a fully qualified identifier for the asset.
+          ID of the asset or fully qualified identifier for the asset.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -48,8 +48,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is an internal implementation detail and may change or

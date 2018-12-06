@@ -9,14 +9,15 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add IAM policy binding for a topic.
+        (BETA) Add IAM policy binding to a topic.
 
      create
         (BETA) Creates one or more Cloud Pub/Sub topics.
@@ -40,7 +41,7 @@ COMMANDS
         (BETA) Publishes a message to the specified topic.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding for a topic.
+        (BETA) Remove IAM policy binding of a topic.
 
      set-iam-policy
         (BETA) Set IAM policy for a topic.

@@ -98,6 +98,25 @@ class MarkdownMarkdownTests(test_base.Markdown):
         """)
     self.Run('markdown', markdown, expected, title='New Title')
 
+  def testMarkdownRoot(self):
+    markdown = self.ROOT_MARKDOWN
+    expected = textwrap.dedent("""\
+      # GCLOUD COMPONENT(1)
+
+      ## SYNOPSIS
+
+      gcloud component [ _flags_ ] [ _positionals_ ]
+
+      ## SECTION
+
+      Section prose about the gcloud component command.
+
+      ## GCLOUD WIDE FLAGS
+
+      These are available in all commands: --foo, --bar and --verbosity.
+      """)
+    self.Run('markdown', markdown, expected)
+
 
 if __name__ == '__main__':
   test_base.main()

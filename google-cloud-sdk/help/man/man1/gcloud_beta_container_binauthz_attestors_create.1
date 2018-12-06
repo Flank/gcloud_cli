@@ -28,15 +28,15 @@ gcloud beta container binauthz attestors create \- create an Attestor
 
 Attestor resource \- The attestor to be created. This represents a Cloud
 resource. (NOTE) Some attributes are not given arguments in this group but can
-be set in other ways. To set the [project] attribute: provide the flag
-[ATTESTOR] on the command line with a fully specified name; provide the flag
+be set in other ways. To set the [project] attribute: provide the argument
+[ATTESTOR] on the command line with a fully specified name; provide the argument
 [\-\-project] on the command line; set the property [core/project]. This must be
 specified.
 
 .RS 2m
 .TP 2m
 \fIATTESTOR\fR
-The ID of the attestor or a fully qualified identifier for the attestor.
+ID of the attestor or fully qualified identifier for the attestor.
 
 
 .RE
@@ -67,8 +67,8 @@ The arguments in this group can be used to specify the attributes of this resour
 .RS 2m
 .TP 2m
 \fB\-\-attestation\-authority\-note\fR=\fIATTESTATION_AUTHORITY_NOTE\fR
-The ID of the note or a fully qualified identifier for the note. This flag must
-be specified if any of the other arguments in this group are specified.
+ID of the note or fully qualified identifier for the note. This flag must be
+specified if any of the other arguments in this group are specified.
 
 .RS 2m
 .TP 2m
@@ -94,9 +94,9 @@ A description for the attestor
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

@@ -2,7 +2,8 @@ NAME
     gcloud dataproc clusters create - create a cluster
 
 SYNOPSIS
-    gcloud dataproc clusters create NAME [--async] [--bucket=BUCKET]
+    gcloud dataproc clusters create NAME [--no-address] [--async]
+        [--bucket=BUCKET]
         [--initialization-action-timeout=TIMEOUT; default="10m"]
         [--initialization-actions=CLOUD_STORAGE_URI,[...]]
         [--labels=[KEY=VALUE,...]]
@@ -12,6 +13,7 @@ SYNOPSIS
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--num-master-local-ssds=NUM_MASTER_LOCAL_SSDS]
         [--num-masters=NUM_MASTERS]
+        [--num-preemptible-worker-local-ssds=NUM_PREEMPTIBLE_WORKER_LOCAL_SSDS]
         [--num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS]
         [--preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE]
         [--preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE]
@@ -20,6 +22,10 @@ SYNOPSIS
         [--tags=TAG,[TAG,...]] [--worker-boot-disk-size=WORKER_BOOT_DISK_SIZE]
         [--worker-boot-disk-type=WORKER_BOOT_DISK_TYPE]
         [--worker-machine-type=WORKER_MACHINE_TYPE] [--zone=ZONE, -z ZONE]
+        [--gce-pd-kms-key=GCE_PD_KMS_KEY
+          : --gce-pd-kms-key-keyring=GCE_PD_KMS_KEY_KEYRING
+          --gce-pd-kms-key-location=GCE_PD_KMS_KEY_LOCATION
+          --gce-pd-kms-key-project=GCE_PD_KMS_KEY_PROJECT]
         [--image=IMAGE | --image-version=VERSION]
         [--network=NETWORK | --subnet=SUBNET]
         [--single-node | --num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS
@@ -33,6 +39,17 @@ POSITIONAL ARGUMENTS
         The name of this cluster.
 
 FLAGS
+     --no-address
+        If provided, the instances in the cluster will not be assigned external
+        IP addresses.
+
+        If omitted the instances in the cluster will each be assigned an
+        ephemeral external IP address.
+
+        Note: Dataproc VMs need access to the Dataproc API. This can be
+        achieved without external IP addresses using Private Google Access
+        (https://cloud.google.com/compute/docs/private-google-access).
+
      --async
         Display information about the operation in progress, without waiting
         for the operation to complete.
@@ -82,9 +99,13 @@ FLAGS
      --num-masters=NUM_MASTERS
         The number of master nodes in the cluster.
 
-          Number of Masters Cluster Mode
-          1                 Standard
-          3                 High Availability
+          Number of Masters  Cluster Mode
+          1                  Standard
+          3                  High Availability
+
+     --num-preemptible-worker-local-ssds=NUM_PREEMPTIBLE_WORKER_LOCAL_SSDS
+        The number of local SSDs to attach to each preemptible worker in a
+        cluster.
 
      --num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS
         The number of local SSDs to attach to each worker in a cluster.
@@ -107,20 +128,28 @@ FLAGS
         such as "core:io.serializations". The following are supported prefixes
         and their mappings:
 
-          Prefix             File                   Purpose of file
-          capacity-scheduler capacity-scheduler.xml Hadoop YARN Capacity Scheduler configuration
-          core               core-site.xml          Hadoop general configuration
-          distcp             distcp-default.xml     Hadoop Distributed Copy configuration
-          hadoop-env         hadoop-env.sh          Hadoop specific environment variables
-          hdfs               hdfs-site.xml          Hadoop HDFS configuration
-          hive               hive-site.xml          Hive configuration
-          mapred             mapred-site.xml        Hadoop MapReduce configuration
-          mapred-env         mapred-env.sh          Hadoop MapReduce specific environment variables
-          pig                pig.properties         Pig configuration
-          spark              spark-defaults.conf    Spark configuration
-          spark-env          spark-env.sh           Spark specific environment variables
-          yarn               yarn-site.xml          Hadoop YARN configuration
-          yarn-env           yarn-env.sh            Hadoop YARN specific environment variables
+          Prefix              File                    Purpose of file
+          capacity-scheduler  capacity-scheduler.xml  Hadoop YARN Capacity
+                                                      Scheduler configuration
+          core                core-site.xml           Hadoop general
+                                                      configuration
+          distcp              distcp-default.xml      Hadoop Distributed Copy
+                                                      configuration
+          hadoop-env          hadoop-env.sh           Hadoop specific
+                                                      environment variables
+          hdfs                hdfs-site.xml           Hadoop HDFS configuration
+          hive                hive-site.xml           Hive configuration
+          mapred              mapred-site.xml         Hadoop MapReduce
+                                                      configuration
+          mapred-env          mapred-env.sh           Hadoop MapReduce specific
+                                                      environment variables
+          pig                 pig.properties          Pig configuration
+          spark               spark-defaults.conf     Spark configuration
+          spark-env           spark-env.sh            Spark specific environment
+                                                      variables
+          yarn                yarn-site.xml           Hadoop YARN configuration
+          yarn-env            yarn-env.sh             Hadoop YARN specific
+                                                      environment variables
 
         See
         https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties
@@ -148,63 +177,63 @@ FLAGS
         The following minimum scopes are necessary for the cluster to function
         properly and are always added, even if not explicitly specified:
 
-          https://www.googleapis.com/auth/devstorage.read_write
-          https://www.googleapis.com/auth/logging.write
+            https://www.googleapis.com/auth/devstorage.read_write
+            https://www.googleapis.com/auth/logging.write
 
         If the --scopes flag is not specified, the following default scopes are
         also included:
 
-          https://www.googleapis.com/auth/bigquery
-          https://www.googleapis.com/auth/bigtable.admin.table
-          https://www.googleapis.com/auth/bigtable.data
-          https://www.googleapis.com/auth/devstorage.full_control
+            https://www.googleapis.com/auth/bigquery
+            https://www.googleapis.com/auth/bigtable.admin.table
+            https://www.googleapis.com/auth/bigtable.data
+            https://www.googleapis.com/auth/devstorage.full_control
 
         If you want to enable all scopes use the 'cloud-platform' scope.
 
-        SCOPE can be either the full URI of the scope or an alias. Available
-        aliases are:
+        SCOPE can be either the full URI of the scope or an alias. default
+        scopes are assigned to all instances. Available aliases are:
 
-          Alias                 URI
-          bigquery              https://www.googleapis.com/auth/bigquery
-          cloud-platform        https://www.googleapis.com/auth/cloud-platform
-          cloud-source-repos    https://www.googleapis.com/auth/source.full_control
-          cloud-source-repos-ro https://www.googleapis.com/auth/source.read_only
-          compute-ro            https://www.googleapis.com/auth/compute.readonly
-          compute-rw            https://www.googleapis.com/auth/compute
-          datastore             https://www.googleapis.com/auth/datastore
-          default               https://www.googleapis.com/auth/devstorage.read_only
-                                https://www.googleapis.com/auth/logging.write
-                                https://www.googleapis.com/auth/monitoring.write
-                                https://www.googleapis.com/auth/pubsub
-                                https://www.googleapis.com/auth/service.management.readonly
-                                https://www.googleapis.com/auth/servicecontrol
-                                https://www.googleapis.com/auth/trace.append
-          gke-default           https://www.googleapis.com/auth/devstorage.read_only
-                                https://www.googleapis.com/auth/logging.write
-                                https://www.googleapis.com/auth/monitoring
-                                https://www.googleapis.com/auth/service.management.readonly
-                                https://www.googleapis.com/auth/servicecontrol
-                                https://www.googleapis.com/auth/trace.append
-          logging-write         https://www.googleapis.com/auth/logging.write
-          monitoring            https://www.googleapis.com/auth/monitoring
-          monitoring-write      https://www.googleapis.com/auth/monitoring.write
-          pubsub                https://www.googleapis.com/auth/pubsub
-          service-control       https://www.googleapis.com/auth/servicecontrol
-          service-management    https://www.googleapis.com/auth/service.management.readonly
-          sql                   https://www.googleapis.com/auth/sqlservice
-          sql-admin             https://www.googleapis.com/auth/sqlservice.admin
-          storage-full          https://www.googleapis.com/auth/devstorage.full_control
-          storage-ro            https://www.googleapis.com/auth/devstorage.read_only
-          storage-rw            https://www.googleapis.com/auth/devstorage.read_write
-          taskqueue             https://www.googleapis.com/auth/taskqueue
-          trace                 https://www.googleapis.com/auth/trace.append
-          userinfo-email        https://www.googleapis.com/auth/userinfo.email
+          Alias                  URI
+          bigquery               https://www.googleapis.com/auth/bigquery
+          cloud-platform         https://www.googleapis.com/auth/cloud-platform
+          cloud-source-repos     https://www.googleapis.com/auth/source.full_control
+          cloud-source-repos-ro  https://www.googleapis.com/auth/source.read_only
+          compute-ro             https://www.googleapis.com/auth/compute.readonly
+          compute-rw             https://www.googleapis.com/auth/compute
+          datastore              https://www.googleapis.com/auth/datastore
+          default                https://www.googleapis.com/auth/devstorage.read_only
+                                 https://www.googleapis.com/auth/logging.write
+                                 https://www.googleapis.com/auth/monitoring.write
+                                 https://www.googleapis.com/auth/pubsub
+                                 https://www.googleapis.com/auth/service.management.readonly
+                                 https://www.googleapis.com/auth/servicecontrol
+                                 https://www.googleapis.com/auth/trace.append
+          gke-default            https://www.googleapis.com/auth/devstorage.read_only
+                                 https://www.googleapis.com/auth/logging.write
+                                 https://www.googleapis.com/auth/monitoring
+                                 https://www.googleapis.com/auth/service.management.readonly
+                                 https://www.googleapis.com/auth/servicecontrol
+                                 https://www.googleapis.com/auth/trace.append
+          logging-write          https://www.googleapis.com/auth/logging.write
+          monitoring             https://www.googleapis.com/auth/monitoring
+          monitoring-write       https://www.googleapis.com/auth/monitoring.write
+          pubsub                 https://www.googleapis.com/auth/pubsub
+          service-control        https://www.googleapis.com/auth/servicecontrol
+          service-management     https://www.googleapis.com/auth/service.management.readonly
+          sql (deprecated)       https://www.googleapis.com/auth/sqlservice
+          sql-admin              https://www.googleapis.com/auth/sqlservice.admin
+          storage-full           https://www.googleapis.com/auth/devstorage.full_control
+          storage-ro             https://www.googleapis.com/auth/devstorage.read_only
+          storage-rw             https://www.googleapis.com/auth/devstorage.read_write
+          taskqueue              https://www.googleapis.com/auth/taskqueue
+          trace                  https://www.googleapis.com/auth/trace.append
+          userinfo-email         https://www.googleapis.com/auth/userinfo.email
 
-        DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice'
-        account scope and sql alias do not provide SQL instance management
-        capabilities and have been deprecated. Please, use
-        'https://www.googleapis.com/auth/sqlservice.admin' or sql-admin to
-        manage your Google SQL Service instances.
+        DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice account
+        scope and sql alias do not provide SQL instance management capabilities
+        and have been deprecated. Please, use
+        https://www.googleapis.com/auth/sqlservice.admin or sql-admin to manage
+        your Google SQL Service instances.
 
      --service-account=SERVICE_ACCOUNT
         The Google Cloud IAM service account to be authenticated as.
@@ -237,10 +266,30 @@ FLAGS
         The type of machine to use for workers. Defaults to server-specified.
 
      --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. If empty, and
-        --region is set to a value other than 'global', the server will pick a
+        The compute zone (e.g. us-central1-a) for the cluster. If empty and
+        --region is set to a value other than global, the server will pick a
         zone in the region. Overrides the default compute/zone property value
         for this command invocation.
+
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the cluster. The 'Compute Engine Service Agent' service
+     account must hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'.
+     The arguments in this group can be used to specify the attributes of this
+     resource.
+
+       --gce-pd-kms-key=GCE_PD_KMS_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --gce-pd-kms-key-keyring=GCE_PD_KMS_KEY_KEYRING
+          The KMS keyring of the key.
+
+       --gce-pd-kms-key-location=GCE_PD_KMS_KEY_LOCATION
+          The Cloud location for the key.
+
+       --gce-pd-kms-key-project=GCE_PD_KMS_KEY_PROJECT
+          The Cloud project for the key.
 
      At most one of these may be specified:
 
@@ -283,8 +332,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To create a cluster, run:

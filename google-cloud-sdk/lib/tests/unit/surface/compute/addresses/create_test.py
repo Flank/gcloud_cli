@@ -770,13 +770,16 @@ class CreateWithSubnetBetaTest(test_base.BaseTest):
               address=self.messages.Address(
                   address='10.100.1.1',
                   name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
+                  addressType=self.messages.Address.AddressTypeValueValuesEnum
+                  .INTERNAL,
+                  purpose=self.messages.Address.PurposeValueValuesEnum
+                  .GCE_ENDPOINT,
                   subnetwork='https://www.googleapis.com/compute/beta/'
                   'projects/my-project/regions/us-central2/'
                   'subnetworks/default'),
               project='my-project',
-              region='us-central2',))],)
+              region='us-central2',
+          ))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
@@ -794,13 +797,16 @@ class CreateWithSubnetBetaTest(test_base.BaseTest):
               address=self.messages.Address(
                   address='10.100.1.1',
                   name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
+                  addressType=self.messages.Address.AddressTypeValueValuesEnum
+                  .INTERNAL,
+                  purpose=self.messages.Address.PurposeValueValuesEnum
+                  .GCE_ENDPOINT,
                   subnetwork='https://www.googleapis.com/compute/beta/'
                   'projects/my-project/regions/us-central2/'
                   'subnetworks/fancy'),
               project='my-project',
-              region='us-central2',))],)
+              region='us-central2',
+          ))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
@@ -820,13 +826,16 @@ class CreateWithSubnetBetaTest(test_base.BaseTest):
               address=self.messages.Address(
                   address='10.100.1.1',
                   name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
+                  addressType=self.messages.Address.AddressTypeValueValuesEnum
+                  .INTERNAL,
+                  purpose=self.messages.Address.PurposeValueValuesEnum
+                  .GCE_ENDPOINT,
                   subnetwork='https://www.googleapis.com/compute/beta/'
                   'projects/my-project/regions/us-east1/'
                   'subnetworks/fancy'),
               project='my-project',
-              region='us-central2',))],)
+              region='us-central2',
+          ))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
@@ -968,6 +977,127 @@ class GlobalPeeringRangesCreateAlphaTest(test_base.BaseTest):
                   purpose=self.messages.Address.PurposeValueValuesEnum.
                   VPC_PEERING,
                   network='https://www.googleapis.com/compute/alpha/'
+                  'projects/my-project/global/networks/default'),
+              project='my-project'))],)
+
+  def testWithNetworkAndSubnetwork(self):
+    with self.assertRaises(calliope_exceptions.ConflictingArgumentsException):
+      self.Run("""
+          compute addresses create address-1
+            --global
+            --prefix-length 24
+            --network default
+            --subnet fancy
+            --purpose VPC_PEERING
+          """)
+
+  def testPurposeWithoutNetworkAndSubnetwork(self):
+    with self.assertRaises(calliope_exceptions.MinimumArgumentException):
+      self.Run("""
+          compute addresses create address-1
+            --global
+            --prefix-length 24
+            --purpose VPC_PEERING
+          """)
+
+  def testVpcPeeringWithSubnetwork(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      self.Run("""
+          compute addresses create address-1
+            --region us-central2
+            --subnet fancy
+            --purpose VPC_PEERING
+          """)
+
+  def testRegionalWithNetwork(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      self.Run("""
+          compute addresses create address-1
+            --region us-central2
+            --network default
+            --purpose GCE_ENDPOINT
+          """)
+
+  def testGceEndpointWithNetwork(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      self.Run("""
+          compute addresses create address-1
+            --global
+            --prefix-length 24
+            --network default
+            --purpose GCE_ENDPOINT
+          """)
+
+  def testWithoutPrefixLengthForRange(self):
+    with self.assertRaises(calliope_exceptions.RequiredArgumentException):
+      self.Run("""
+          compute addresses create address-1
+            --global
+            --network default
+            --purpose VPC_PEERING
+          """)
+
+  def testSubnetWithPrefixLength(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      self.Run("""
+          compute addresses create address-1
+            --region us-central2
+            --prefix-length 24
+            --subnet fancy
+            --purpose GCE_ENDPOINT
+          """)
+
+  def testPrefixLengthTooSmall(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --prefix-length: Value must be greater than or equal to 8'):
+      self.Run("""
+          compute addresses create address-1
+            --global
+            --prefix-length 7
+            --network default
+            --purpose VPC_PEERING
+          """)
+
+  def testPrefixLengthTooLarge(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --prefix-length: Value must be less than or equal to 30'):
+      self.Run("""
+          compute addresses create address-1
+            --global
+            --prefix-length 31
+            --network default
+            --purpose VPC_PEERING
+          """)
+
+
+class GlobalPeeringRangesCreateBetaTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testReserveRangeForPeering(self):
+    self.Run("""
+        compute addresses create range-1
+          --global
+          --addresses 10.100.1.0
+          --prefix-length 24
+          --network default
+          --purpose VPC_PEERING
+        """)
+
+    self.CheckRequests(
+        [(self.compute.globalAddresses, 'Insert',
+          self.messages.ComputeGlobalAddressesInsertRequest(
+              address=self.messages.Address(
+                  name='range-1',
+                  address='10.100.1.0',
+                  prefixLength=24,
+                  addressType=self.messages.Address.AddressTypeValueValuesEnum
+                  .INTERNAL,
+                  purpose=self.messages.Address.PurposeValueValuesEnum
+                  .VPC_PEERING,
+                  network='https://www.googleapis.com/compute/beta/'
                   'projects/my-project/global/networks/default'),
               project='my-project'))],)
 

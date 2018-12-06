@@ -19,11 +19,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import cli as calliope
 from googlecloudsdk.calliope import usage_text
+from googlecloudsdk.command_lib.util.apis import yaml_command_translator
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.calliope import util
+
+import mock
 
 
 class UsageTextTest(util.WithTestTool):
@@ -248,6 +252,37 @@ For detailed information on this command and its flags, run:
   test sdk2 multiple-positional --help
 """)
 
+  def testCategoricalUsage(self):
+    with self.assertRaises(SystemExit):
+      self.cli.Execute('sdk2'.split())
+    self.AssertErrContains("""\
+ERROR: (test.sdk2) Command name argument expected.
+
+Available commands for test sdk2:
+
+  Category 1
+      arg_groups              Argument groups test command.
+      combinations            A command to test generator / exception
+                              combinations.
+
+  Category 2
+      bool_mutex              A command with a Boolean flag in a mutex group.
+
+""")
+
+  def testCategoricalUsageNoCategories(self):
+    with self.assertRaises(SystemExit):
+      self.cli.Execute('sdk3'.split())
+    self.AssertErrEquals("""\
+ERROR: (test.sdk3) Command name argument expected.
+Usage: test sdk3 [optional flags] <group | command>
+  group may be           newstylegroup
+  command may be         nested
+
+For detailed information on this command and its flags, run:
+  test sdk3 --help
+""")
+
   def testHelpBoolMutex(self):
     with self.assertRaises(SystemExit):
       self.cli.Execute('sdk2 bool-mutex --help'.split())
@@ -276,8 +311,8 @@ FLAGS
           Value flag.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --top-flag, --user-output-enabled,
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
     --verbosity. Run $ test help for details.
 
 NOTES
@@ -346,8 +381,8 @@ OPTIONAL FLAGS
           Hey Moe! Hey Larry!
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --top-flag, --user-output-enabled,
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
     --verbosity. Run $ test help for details.
 
 NOTES
@@ -367,8 +402,8 @@ SYNOPSIS
     test beta sdk2 command2 [TEST_WIDE_FLAG ...]
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --top-flag, --user-output-enabled,
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
     --verbosity. Run $ test help for details.
 
 EXAMPLES
@@ -435,7 +470,7 @@ Flag removed_arg has been removed.
 
 ## TEST WIDE FLAGS
 
-These flags are available to all commands: --configuration, --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled, --verbosity.
+These flags are available to all commands: --configuration, --flags-file, --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled, --verbosity.
 Run *$ link:test/help[test help]* for details.
 
 
@@ -485,8 +520,8 @@ FLAGS
         Flag removed_arg has been removed.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --top-flag, --user-output-enabled,
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
     --verbosity. Run $ test help for details.
 
 NOTES
@@ -531,6 +566,9 @@ This variant is also available:
       self.cli.Execute(
           'sdk2 arg-groups --document=style=markdown'.split())
     self.AssertOutputContains("""\
+# TEST_SDK2_ARG-GROUPS(1)
+
+
 ## NAME
 
 test sdk2 arg-groups - argument groups test command
@@ -553,7 +591,8 @@ Argument groups test command.
 
 _REQUIRED_MODAL_POSITIONAL_:::
 
-Required modal positional. This positional must be specified if any of the other arguments in this group are specified.
+Required modal positional.
+This positional must be specified if any of the other arguments in this group are specified.
 
 *--abc*:::
 
@@ -578,7 +617,8 @@ Optional flag.
 
 *--required-modal-flag*:::
 
-Required modal flag. This flag must be specified if any of the other arguments in this group are specified.
+Required modal flag.
+This flag must be specified if any of the other arguments in this group are specified.
 
 *--ghi*:::
 
@@ -592,7 +632,8 @@ Optional flag.
 
 *--optional-modal-flag*:::
 
-Optional modal flag. This flag must be specified if any of the other arguments in this group are specified.
+Optional modal flag.
+This flag must be specified if any of the other arguments in this group are specified.
 
 *--jkl*:::
 
@@ -807,6 +848,323 @@ class UsageUtilTest(test_case.TestCase):
     self.assertEqual('--bool',
                      usage_text.GetFlagUsage(arg, brief=True))
 
+
+class GcloudUsageTextTest(util.WithTestTool):
+
+  def SetUp(self):
+    self.known_error_handler = mock.MagicMock()
+    self._loader = calliope.CLILoader(
+        name='gcloud',
+        command_root_directory=self.Resource('surface'),
+        allow_non_existing_modules=True,
+        known_error_handler=self.known_error_handler,
+        yaml_command_translator=yaml_command_translator.Translator())
+
+    self.cli = self._loader.Generate()
+
+  def testGcloudUsage(self):
+    with self.assertRaises(SystemExit):
+      self.cli.Execute([])
+    self.AssertErrContains("""\
+ERROR: (gcloud) Command name argument expected.
+
+Available commands for gcloud:
+
+  AI and Machine Learning
+      ml                      Use Google Cloud machine learning capabilities.
+      ml_engine               Manage Cloud ML Engine jobs and models.
+
+  API Platform and Ecosystems
+      endpoints               Create, enable and manage API services.
+      service_management      Create, enable and manage API services.
+      services                List, enable and disable APIs and services.
+
+  Compute
+      app                     Manage your App Engine deployments.
+      container               Deploy and manage clusters of machines for running
+                              containers.
+      functions               Manage Google Cloud Functions.
+
+  Data Analytics
+      composer                Create and manage Cloud Composer Environments.
+      dataflow                Manage Google Cloud Dataflow jobs.
+      dataproc                Create and manage Google Cloud Dataproc clusters
+                              and jobs.
+      pubsub                  Manage Cloud Pub/Sub topics and subscriptions.
+
+  Databases
+      datastore               Manage your Cloud Datastore indexes.
+      spanner                 Command groups for Cloud Spanner.
+      sql                     Create and manage Google Cloud SQL databases.
+
+  Identity and Security
+      auth                    Manage oauth2 credentials for the Google Cloud
+                              SDK.
+      iam                     Manage IAM service accounts and keys.
+      kms                     Manage cryptographic keys in the cloud.
+
+  Internet of Things
+      iot                     Manage Cloud IoT resources.
+
+  Management Tools
+      builds                  Create and manage builds for Google Cloud Build.
+      debug                   Commands for interacting with the Cloud Debugger.
+      deployment_manager      Manage deployments of cloud resources.
+      logging                 Manage Stackdriver Logging.
+      organizations           Create and manage Google Cloud Platform
+                              Organizations.
+      projects                Create and manage project access policies.
+
+  Mobile
+      firebase                Work with Google Firebase.
+
+  Networking
+      dns                     Manage your Cloud DNS managed-zones and
+                              record-sets.
+      domains                 Manage domains for your Google Cloud projects.
+
+  SDK Tools
+      components              List, install, update, or remove Google Cloud SDK
+                              components.
+      config                  View and edit Cloud SDK properties.
+      feedback                Provide feedback to the Google Cloud SDK team.
+      help                    Search gcloud help text.
+      info                    Display information about the current gcloud
+                              environment.
+      init                    Initialize or reinitialize gcloud.
+      meta                    Cloud meta introspection commands.
+      source                  Cloud git repository commands.
+      topic                   gcloud supplementary help.
+      version                 Print version information for Cloud SDK
+                              components.
+
+""")
+
+  def testGcloudComputeUsage(self):
+    with self.assertRaises(SystemExit):
+      self.cli.Execute('compute'.split())
+    self.AssertErrContains("""\
+ERROR: (gcloud.compute) Command name argument expected.
+
+Available commands for gcloud compute:
+
+  Disks
+      disk_types              Read Google Compute Engine virtual disk types.
+      disks                   Read and manipulate Google Compute Engine disks.
+
+  Info
+      accelerator_types       Read Google Compute Engine accelerator types.
+      machine_types           Read Google Compute Engine virtual machine types.
+      operations              Read and manipulate Google Compute Engine
+                              operations.
+      regions                 List Google Compute Engine regions.
+      zones                   List Google Compute Engine zones.
+
+  Instances
+      commitments             Manage Google Compute Engine commitments.
+      diagnose                Debugging tools for Google Compute Engine virtual
+                              machine instances.
+      images                  List, create, and delete Google Compute Engine
+                              images.
+      instance_groups         Read and manipulate Google Compute Engine instance
+                              groups.
+      instance_templates      Read and manipulate Google Compute Engine
+                              instances templates.
+      instances               Read and manipulate Google Compute Engine virtual
+                              machine instances.
+      snapshots               List, describe, and delete Google Compute Engine
+                              snapshots.
+      sole_tenancy            Read and manage Google Compute Engine sole-tenancy
+                              resources.
+      target_instances        Read and manipulate Google Compute Engine virtual
+                              target instances.
+      tpus                    List, create, and delete Cloud TPUs.
+
+  Load Balancing
+      backend_buckets         Read and manipulate backend buckets.
+      backend_services        List, create, and delete backend services.
+      forwarding_rules        Read and manipulate traffic forwarding rules to
+                              network load balancers.
+      health_checks           Read and manipulate health checks for load
+                              balanced instances.
+      http_health_checks      Read and manipulate HTTP health checks for load
+                              balanced instances.
+      https_health_checks     Read and manipulate HTTPS health checks for load
+                              balanced instances.
+      ssl_certificates        List, create, and delete Google Compute Engine SSL
+                              certificates.
+      ssl_policies            List, create, delete and update Google Compute
+                              Engine SSL policies.
+      target_pools            Control Compute Engine target pools for network
+                              load balancing.
+
+  Networking
+      addresses               Read and manipulate Google Compute Engine
+                              addresses.
+      firewall_rules          List, create, update, and delete Google Compute
+                              Engine firewall rules.
+      interconnects           Read and manipulate  Google Compute Engine
+                              interconnects.
+      networks                List, create, and delete Google Compute Engine
+                              networks.
+      routers                 List, create, and delete Google Compute Engine
+                              routers.
+      routes                  Read and manipulate routes.
+      shared_vpc              Configure shared VPC.
+      target_http_proxies     List, create, and delete target HTTP proxies.
+      target_https_proxies    List, create, and delete target HTTPS proxies.
+      target_ssl_proxies      List, create, and delete target SSL proxies.
+      target_tcp_proxies      List, create, and delete target TCP proxies.
+      target_vpn_gateways     Read and manipulate Google Compute Engine VPN
+                              Gateways.
+      url_maps                List, create, and delete URL maps.
+      vpn_tunnels             Read and manipulate Google Compute Engine VPN
+                              Tunnels.
+
+  Tools
+      config_ssh              Populate SSH config files with Host entries from
+                              each instance.
+      connect_to_serial_port  Connect to the serial port of an instance.
+      os_login                Create and manipulate Google Compute Engine OS
+                              Login resources.
+      project_info            Read and manipulate project-level data like quotas
+                              and metadata.
+      reset_windows_password  Reset and return a password for a Windows machine
+                              instance.
+      scp                     Copy files to and from Google Compute Engine
+                              virtual machines via scp.
+      sign_url                Sign specified URL for use with Cloud CDN Signed
+                              URLs.
+      ssh                     SSH into a virtual machine instance.
+
+""")
+
+  def testGcloudComputeUsagePager(self):
+    self.StartObjectPatch(console_io, 'IsInteractive', return_value=True)
+    mock_more = self.StartObjectPatch(console_io, 'More')
+    with self.assertRaises(SystemExit):
+      self.cli.Execute('compute'.split())
+    self.AssertErrEquals(
+        'ERROR: (gcloud.compute) Command name argument expected.\n')
+    contents = """\
+Command name argument expected.
+
+Available commands for gcloud compute:
+
+  Disks
+      disk_types              Read Google Compute Engine virtual disk types.
+      disks                   Read and manipulate Google Compute Engine disks.
+
+  Info
+      accelerator_types       Read Google Compute Engine accelerator types.
+      machine_types           Read Google Compute Engine virtual machine types.
+      operations              Read and manipulate Google Compute Engine
+                              operations.
+      regions                 List Google Compute Engine regions.
+      zones                   List Google Compute Engine zones.
+
+  Instances
+      commitments             Manage Google Compute Engine commitments.
+      diagnose                Debugging tools for Google Compute Engine virtual
+                              machine instances.
+      images                  List, create, and delete Google Compute Engine
+                              images.
+      instance_groups         Read and manipulate Google Compute Engine instance
+                              groups.
+      instance_templates      Read and manipulate Google Compute Engine
+                              instances templates.
+      instances               Read and manipulate Google Compute Engine virtual
+                              machine instances.
+      snapshots               List, describe, and delete Google Compute Engine
+                              snapshots.
+      sole_tenancy            Read and manage Google Compute Engine sole-tenancy
+                              resources.
+      target_instances        Read and manipulate Google Compute Engine virtual
+                              target instances.
+      tpus                    List, create, and delete Cloud TPUs.
+
+  Load Balancing
+      backend_buckets         Read and manipulate backend buckets.
+      backend_services        List, create, and delete backend services.
+      forwarding_rules        Read and manipulate traffic forwarding rules to
+                              network load balancers.
+      health_checks           Read and manipulate health checks for load
+                              balanced instances.
+      http_health_checks      Read and manipulate HTTP health checks for load
+                              balanced instances.
+      https_health_checks     Read and manipulate HTTPS health checks for load
+                              balanced instances.
+      ssl_certificates        List, create, and delete Google Compute Engine SSL
+                              certificates.
+      ssl_policies            List, create, delete and update Google Compute
+                              Engine SSL policies.
+      target_pools            Control Compute Engine target pools for network
+                              load balancing.
+
+  Networking
+      addresses               Read and manipulate Google Compute Engine
+                              addresses.
+      firewall_rules          List, create, update, and delete Google Compute
+                              Engine firewall rules.
+      interconnects           Read and manipulate  Google Compute Engine
+                              interconnects.
+      networks                List, create, and delete Google Compute Engine
+                              networks.
+      routers                 List, create, and delete Google Compute Engine
+                              routers.
+      routes                  Read and manipulate routes.
+      shared_vpc              Configure shared VPC.
+      target_http_proxies     List, create, and delete target HTTP proxies.
+      target_https_proxies    List, create, and delete target HTTPS proxies.
+      target_ssl_proxies      List, create, and delete target SSL proxies.
+      target_tcp_proxies      List, create, and delete target TCP proxies.
+      target_vpn_gateways     Read and manipulate Google Compute Engine VPN
+                              Gateways.
+      url_maps                List, create, and delete URL maps.
+      vpn_tunnels             Read and manipulate Google Compute Engine VPN
+                              Tunnels.
+
+  Tools
+      config_ssh              Populate SSH config files with Host entries from
+                              each instance.
+      connect_to_serial_port  Connect to the serial port of an instance.
+      os_login                Create and manipulate Google Compute Engine OS
+                              Login resources.
+      project_info            Read and manipulate project-level data like quotas
+                              and metadata.
+      reset_windows_password  Reset and return a password for a Windows machine
+                              instance.
+      scp                     Copy files to and from Google Compute Engine
+                              virtual machines via scp.
+      sign_url                Sign specified URL for use with Cloud CDN Signed
+                              URLs.
+      ssh                     SSH into a virtual machine instance.
+
+"""
+    mock_more.assert_called_with(contents, out=mock.ANY)
+
+  def testGcloudComputeInstancesUsage(self):
+    # Expect to see regular usage text since no categories are defined.
+    with self.assertRaises(SystemExit):
+      self.cli.Execute('compute instances'.split())
+    self.AssertErrEquals("""\
+ERROR: (gcloud.compute.instances) Command name argument expected.
+Usage: gcloud compute instances [optional flags] <group | command>
+  group may be           network-interfaces
+  command may be         add-access-config | add-labels | add-metadata |
+                         add-tags | attach-disk | create |
+                         create-with-container | delete | delete-access-config |
+                         describe | detach-disk | get-serial-port-output |
+                         list | move | remove-labels | remove-metadata |
+                         remove-tags | reset | set-disk-auto-delete |
+                         set-machine-type | set-scheduling |
+                         set-service-account | simulate-maintenance-event |
+                         start | stop | tail-serial-port-output | update |
+                         update-access-config | update-container
+
+For detailed information on this command and its flags, run:
+  gcloud compute instances --help
+""")
 
 if __name__ == '__main__':
   test_case.main()

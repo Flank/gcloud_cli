@@ -91,7 +91,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import abc
 import os
 import sys
 import unicodedata
@@ -162,14 +161,8 @@ class BoxLineCharactersAscii(BoxLineCharacters):
   d_vr = '#'
 
 
-@six.add_metaclass(abc.ABCMeta)
 class ProgressTrackerSymbols(object):
   """Characters used by progress trackers."""
-
-  @property
-  @abc.abstractmethod
-  def spin_marks(self):
-    pass
 
 
 class ProgressTrackerSymbolsUnicode(ProgressTrackerSymbols):
@@ -179,6 +172,12 @@ class ProgressTrackerSymbolsUnicode(ProgressTrackerSymbols):
   def spin_marks(self):
     return ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧']
 
+  success = '✓'
+  failed = 'X'
+  interrupted = '-'
+  not_started = '.'
+  prefix_length = 2
+
 
 class ProgressTrackerSymbolsAscii(ProgressTrackerSymbols):
   """Characters used by progress trackers."""
@@ -186,6 +185,12 @@ class ProgressTrackerSymbolsAscii(ProgressTrackerSymbols):
   @property
   def spin_marks(self):
     return ['|', '/', '-', '\\',]
+
+  success = 'OK'
+  failed = 'X'
+  interrupted = '-'
+  not_started = '.'
+  prefix_length = 3
 
 
 class ConsoleAttr(object):
@@ -245,8 +250,7 @@ class ConsoleAttr(object):
     self._term = os.getenv('TERM', '').lower()
 
     # ANSI "standard" attributes.
-    if self._encoding != 'ascii' and ('screen' in self._term or
-                                      'xterm' in self._term):
+    if self.SupportsAnsi():
       # Select Graphic Rendition paramaters from
       # http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
       # Italic '3' would be nice here but its not widely supported.
@@ -530,6 +534,10 @@ class ConsoleAttr(object):
     if chunk or keep:
       lines.append(chunk)
     return lines
+
+  def SupportsAnsi(self):
+    return (self._encoding != 'ascii' and
+            ('screen' in self._term or 'xterm' in self._term))
 
 
 class Colorizer(object):

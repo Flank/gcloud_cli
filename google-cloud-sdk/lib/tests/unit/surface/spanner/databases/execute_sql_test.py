@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,42 +23,56 @@ from googlecloudsdk.core import resources
 from tests.lib.surface.spanner import base
 
 
-class DatabasesQueryTest(base.SpannerTestBase):
-  """Cloud Spanner databases query tests."""
+def SetUp(test_obj):
+  test_obj.db_ref = resources.REGISTRY.Parse(
+      'mydb',
+      params={
+          'projectsId': test_obj.Project(),
+          'instancesId': 'myins',
+      },
+      collection='spanner.projects.instances.databases')
+
+  test_obj.session_ref = resources.REGISTRY.Parse(
+      'mysession',
+      params={
+          'projectsId': test_obj.Project(),
+          'instancesId': 'myins',
+          'databasesId': 'mydb',
+      },
+      collection='spanner.projects.instances.databases.sessions')
+
+
+class _BaseDatabasesQueryTest(object):
 
   def SetUp(self):
-    self.db_ref = resources.REGISTRY.Parse(
-        'mydb',
-        params={
-            'projectsId': self.Project(),
-            'instancesId': 'myins',
-        },
-        collection='spanner.projects.instances.databases')
+    SetUp(self)
 
-    self.session_ref = resources.REGISTRY.Parse(
-        'mysession',
-        params={
-            'projectsId': self.Project(),
-            'instancesId': 'myins',
-            'databasesId': 'mydb',
-        },
-        collection='spanner.projects.instances.databases.sessions')
-
-  def _ExpectSessionCreate(self, session_to_create):
+  def ExpectSessionCreate(self, session_to_create):
     self.client.projects_instances_databases_sessions.Create.Expect(
         request=
         self.msgs.SpannerProjectsInstancesDatabasesSessionsCreateRequest(
             database=self.db_ref.RelativeName()),
         response=session_to_create)
 
-  def _ExpectSessionDelete(self, session_to_delete):
+  def ExpectSessionDelete(self, session_to_delete):
     self.client.projects_instances_databases_sessions.Delete.Expect(
         request=self.msgs.
         SpannerProjectsInstancesDatabasesSessionsDeleteRequest(
             name=session_to_delete.name),
         response=self.msgs.Empty())
 
-  def _GivenQueryResults(self):
+  def ExpectBeginTransaction(self, transaction_options, transaction_to_create):
+    begin_transaction_req = self.msgs.BeginTransactionRequest(
+        options=transaction_options)
+    req = (
+        self.msgs
+        .SpannerProjectsInstancesDatabasesSessionsBeginTransactionRequest(
+            beginTransactionRequest=begin_transaction_req,
+            session=self.session_ref.RelativeName()))
+    self.client.projects_instances_databases_sessions.BeginTransaction.Expect(
+        request=req, response=transaction_to_create)
+
+  def GivenQueryResults(self):
     return [
         self.msgs.ResultSet.RowsValueListEntry(entry=[
             extra_types.JsonValue(string_value='A1'),
@@ -70,11 +84,11 @@ class DatabasesQueryTest(base.SpannerTestBase):
         ])
     ]
 
-  def _GivenMetadataProp(self, key, str_val):
+  def GivenMetadataProp(self, key, str_val):
     return self.msgs.PlanNode.MetadataValue.AdditionalProperty(
         key=key, value=extra_types.JsonValue(string_value=str_val))
 
-  def _GivenQueryPlan(self, has_aggregate_stats):
+  def GivenQueryPlan(self, has_aggregate_stats):
     query_stats = None
     if has_aggregate_stats:
       query_stats = self.msgs.ResultSetStats.QueryStatsValue(
@@ -108,11 +122,10 @@ class DatabasesQueryTest(base.SpannerTestBase):
                     self.msgs.ChildLink(childIndex=2),
                     self.msgs.ChildLink(childIndex=3)
                 ],
-                metadata=self.msgs.PlanNode.MetadataValue(
-                    additionalProperties=[
-                        self._GivenMetadataProp('iterator_type', 'stream'),
-                        self._GivenMetadataProp('scan_target', 'TableScan')
-                    ]),
+                metadata=self.msgs.PlanNode.MetadataValue(additionalProperties=[
+                    self.GivenMetadataProp('iterator_type', 'stream'),
+                    self.GivenMetadataProp('scan_target', 'TableScan')
+                ]),
                 index=1),
             self.msgs.PlanNode(
                 kind=self.msgs.PlanNode.KindValueValuesEnum('SCALAR'),
@@ -129,48 +142,125 @@ class DatabasesQueryTest(base.SpannerTestBase):
         ]),
         queryStats=query_stats)
 
-  def _GivenQueryMetadata(self):
+  def GivenQueryMetadata(self, is_dml=False):
+    if is_dml:
+      return self.msgs.ResultSetMetadata(
+          transaction=self.msgs.Transaction(id=bytes(123)),
+          rowType=self.msgs.StructType(fields=[]))
+
     return self.msgs.ResultSetMetadata(rowType=self.msgs.StructType(
         fields=[self.msgs.Field(name='colA'),
                 self.msgs.Field(name='colB')]))
 
-  def _GivenExecuteRequest(self, sql, query_mode):
+  def GivenExecuteRequest(self,
+                          sql,
+                          query_mode,
+                          is_dml=False,
+                          enable_partitioned_dml=False):
     return self.msgs.SpannerProjectsInstancesDatabasesSessionsExecuteSqlRequest(
         session=self.session_ref.RelativeName(),
         executeSqlRequest=self.msgs.ExecuteSqlRequest(
             sql=sql,
             queryMode=self.msgs.ExecuteSqlRequest.QueryModeValueValuesEnum(
-                query_mode)))
+                query_mode),
+            transaction=self.GivenTransaction(is_dml, enable_partitioned_dml)))
+
+  def GivenTransaction(self, is_dml=False, enable_partitioned_dml=False):
+    if enable_partitioned_dml is True:
+      transaction_options = self.msgs.TransactionOptions(
+          partitionedDml=self.msgs.PartitionedDml())
+      transaction = self.msgs.Transaction(id=bytes(123))
+      self.ExpectBeginTransaction(transaction_options, transaction)
+      return self.msgs.TransactionSelector(id=transaction.id)
+    elif is_dml is True:
+      transaction_options = self.msgs.TransactionOptions(
+          readWrite=self.msgs.ReadWrite())
+      return self.msgs.TransactionSelector(begin=transaction_options)
+    else:
+      transaction_options = self.msgs.TransactionOptions(
+          readOnly=self.msgs.ReadOnly(strong=True))
+      return self.msgs.TransactionSelector(singleUse=transaction_options)
+
+  def GivenCommitRequest(self):
+    return self.msgs.SpannerProjectsInstancesDatabasesSessionsCommitRequest(
+        commitRequest=self.msgs.CommitRequest(
+            mutations=[], transactionId=bytes(123)),
+        session=self.session_ref.RelativeName())
+
+
+class DatabasesQueryTest(_BaseDatabasesQueryTest, base.SpannerTestBase):
+  """Cloud Spanner databases query tests."""
+
+  def SetUp(self):
+    SetUp(self)
 
   def testNormalQuery(self):
     session = self.msgs.Session(name=self.session_ref.RelativeName())
-    self._ExpectSessionCreate(session)
+    self.ExpectSessionCreate(session)
 
     self.client.projects_instances_databases_sessions.ExecuteSql.Expect(
-        request=self._GivenExecuteRequest('SELECT 1', 'NORMAL'),
+        request=self.GivenExecuteRequest('SELECT 1', 'NORMAL', False),
         response=self.msgs.ResultSet(
-            metadata=self._GivenQueryMetadata(),
-            rows=self._GivenQueryResults()))
+            metadata=self.GivenQueryMetadata(), rows=self.GivenQueryResults()))
 
-    self._ExpectSessionDelete(session)
+    self.ExpectSessionDelete(session)
 
     self.Run(
         'spanner databases execute-sql mydb --instance myins --sql "SELECT 1"')
 
     self.AssertOutputEquals('colA  colB\n' 'A1    B1\n' 'A2    B2\n')
 
+  def testDmlQuery(self):
+    session = self.msgs.Session(name=self.session_ref.RelativeName())
+    self.ExpectSessionCreate(session)
+
+    self.client.projects_instances_databases_sessions.ExecuteSql.Expect(
+        request=self.GivenExecuteRequest('INSERT abc (a), VALUES (1)', 'NORMAL',
+                                         True),
+        response=self.msgs.ResultSet(
+            metadata=self.GivenQueryMetadata(True),
+            rows=[],
+            stats=self.msgs.ResultSetStats(rowCountExact=1)))
+
+    self.client.projects_instances_databases_sessions.Commit.Expect(
+        request=self.GivenCommitRequest(), response=self.msgs.CommitResponse())
+
+    self.ExpectSessionDelete(session)
+
+    self.Run('spanner databases execute-sql mydb --instance myins ' +
+             '--sql "INSERT abc (a), VALUES (1)"')
+    self.AssertOutputEquals('Statement modified 1 row\n')
+
+  def testPartitionedDmlQuery(self):
+    session = self.msgs.Session(name=self.session_ref.RelativeName())
+    self.ExpectSessionCreate(session)
+
+    self.client.projects_instances_databases_sessions.ExecuteSql.Expect(
+        request=self.GivenExecuteRequest('update abc set d=13 where d=1',
+                                         'NORMAL', True, True),
+        response=self.msgs.ResultSet(
+            metadata=self.GivenQueryMetadata(True),
+            rows=[],
+            stats=self.msgs.ResultSetStats(rowCountLowerBound=100)))
+
+    self.ExpectSessionDelete(session)
+
+    self.Run('spanner databases execute-sql mydb --instance myins ' +
+             '--enable-partitioned-dml --sql "update abc set d=13 where d=1"')
+
+    self.AssertOutputEquals('Statement modified a lower bound of 100 rows\n')
+
   def testUnicodeQuery(self):
     self.SetEncoding('utf8')
     session = self.msgs.Session(name=self.session_ref.RelativeName())
-    self._ExpectSessionCreate(session)
+    self.ExpectSessionCreate(session)
 
     self.client.projects_instances_databases_sessions.ExecuteSql.Expect(
-        request=self._GivenExecuteRequest('SELECT Ṳᾔḯ¢◎ⅾℯ', 'NORMAL'),
+        request=self.GivenExecuteRequest('SELECT Ṳᾔḯ¢◎ⅾℯ', 'NORMAL'),
         response=self.msgs.ResultSet(
-            metadata=self._GivenQueryMetadata(),
-            rows=self._GivenQueryResults()))
+            metadata=self.GivenQueryMetadata(), rows=self.GivenQueryResults()))
 
-    self._ExpectSessionDelete(session)
+    self.ExpectSessionDelete(session)
 
     self.Run(
         'spanner databases execute-sql mydb --instance myins --sql "SELECT '
@@ -184,16 +274,16 @@ class DatabasesQueryTest(base.SpannerTestBase):
   def testPlanQuery(self):
     session = self.msgs.Session(name=self.session_ref.RelativeName())
     has_aggregate_stats = False
-    self._ExpectSessionCreate(session)
+    self.ExpectSessionCreate(session)
 
     query_response = self.msgs.ResultSet(
-        metadata=self._GivenQueryMetadata(),
-        stats=self._GivenQueryPlan(has_aggregate_stats))
+        metadata=self.GivenQueryMetadata(),
+        stats=self.GivenQueryPlan(has_aggregate_stats))
     self.client.projects_instances_databases_sessions.ExecuteSql.Expect(
-        request=self._GivenExecuteRequest('SELECT 1', 'PLAN'),
+        request=self.GivenExecuteRequest('SELECT 1', 'PLAN'),
         response=query_response)
 
-    self._ExpectSessionDelete(session)
+    self.ExpectSessionDelete(session)
 
     query_request = self.Run("""
         spanner databases execute-sql mydb --instance myins
@@ -219,17 +309,17 @@ class DatabasesQueryTest(base.SpannerTestBase):
   def testProfileQuery(self):
     session = self.msgs.Session(name=self.session_ref.RelativeName())
     has_aggregate_stats = True
-    self._ExpectSessionCreate(session)
+    self.ExpectSessionCreate(session)
 
     query_response = self.msgs.ResultSet(
-        metadata=self._GivenQueryMetadata(),
-        rows=self._GivenQueryResults(),
-        stats=self._GivenQueryPlan(has_aggregate_stats))
+        metadata=self.GivenQueryMetadata(),
+        rows=self.GivenQueryResults(),
+        stats=self.GivenQueryPlan(has_aggregate_stats))
     self.client.projects_instances_databases_sessions.ExecuteSql.Expect(
-        request=self._GivenExecuteRequest('SELECT 1', 'PROFILE'),
+        request=self.GivenExecuteRequest('SELECT 1', 'PROFILE'),
         response=query_response)
 
-    self._ExpectSessionDelete(session)
+    self.ExpectSessionDelete(session)
 
     query_request = self.Run("""
         spanner databases execute-sql mydb --instance myins
@@ -261,3 +351,11 @@ class DatabasesQueryTest(base.SpannerTestBase):
     \- SCALAR Constant
        1"""
     self.AssertOutputContains(query_plan)
+
+
+class DatabasesQueryBetaTest(_BaseDatabasesQueryTest, base.SpannerTestBeta):
+  pass
+
+
+class DatabasesQueryAlphaTest(DatabasesQueryBetaTest, base.SpannerTestAlpha):
+  pass

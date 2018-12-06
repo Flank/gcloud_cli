@@ -1,17 +1,20 @@
 NAME
     gcloud beta endpoints services add-iam-policy-binding - add IAM policy
-        binding for a service
+        binding to a service
 
 SYNOPSIS
     gcloud beta endpoints services add-iam-policy-binding SERVICE
         --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Adds IAM policy binding to a service's access policy.
+    (BETA) Add an IAM policy binding to a service.
 
 POSITIONAL ARGUMENTS
-     SERVICE
-        The name of the service to which the member is to be added.
+     Service resource - The service for which to add IAM policy binding to.
+     This represents a Cloud resource. This must be specified.
+
+       SERVICE
+          ID of the service or fully qualified identifier for the service.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -33,30 +36,35 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the servicemanagement/v1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/service-management/
 
 EXAMPLES
-    The following command will add an IAM policy binding for the role of
+    To add an IAM policy binding for the role of
     'roles/servicemanagement.serviceConsumer' for the user
-    'test-user@gmail.com' on a service with identifier 'my-service'
+    'test-user@gmail.com' with service 'my-service', run:
 
         $ gcloud beta endpoints services add-iam-policy-binding my-service \
             --member='user:test-user@gmail.com' \
             --role='roles/servicemanagement.serviceConsumer'
 
-    For a service account test-proj1@example.domain.com, the following command
-    will add an IAM policy binding for the role of
-    'roles/servicemanagement.serviceConsumer' to the given service account:
+    To add an IAM policy binding for the role of
+    'roles/servicemanagement.serviceConsumer' to the service account
+    'test-proj1@example.domain.com', run:
 
         $ gcloud beta endpoints services add-iam-policy-binding \
             test-proj1@example.domain.com \
             --member='serviceAccount:test-proj1@example.domain.com' \
             --role='roles/servicemanagement.serviceConsumer'
 
-    The following command will add an IAM policy binding for the role of
+    To add an IAM policy binding for the role of
     'roles/servicemanagement.serviceConsumer' for all authenticated users on a
-    service with identifier 'my-service':
+    service with identifier 'my-service', run:
 
         $ gcloud beta endpoints services add-iam-policy-binding my-service \
             --member='allAuthenticatedUsers' \

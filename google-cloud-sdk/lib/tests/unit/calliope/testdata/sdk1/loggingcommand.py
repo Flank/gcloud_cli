@@ -20,11 +20,12 @@ from __future__ import unicode_literals
 
 import logging
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 
 
-class LoggingCommand(base.Command):
+class LoggingCommand(calliope_base.Command):
+  """Logging Command."""
 
   def Run(self, unused_args):
     """Run this command."""

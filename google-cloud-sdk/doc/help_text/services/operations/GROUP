@@ -9,8 +9,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -19,10 +20,10 @@ COMMANDS
         Describes an operation resource for a given operation name.
 
      list
-        List operations for a project.
+        (DEPRECATED) List operations for a project.
 
      wait
-        Waits for an operation to complete.
+        Waits for an operation to complete for a given operation name.
 
 NOTES
     These variants are also available:

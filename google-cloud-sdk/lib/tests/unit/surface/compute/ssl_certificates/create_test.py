@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ import textwrap
 
 from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -169,12 +170,13 @@ class SslCertificatesCreateTest(test_base.BaseTest):
     self.CheckRequests()
 
 
-class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
+class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
+                                    parameterized.TestCase):
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi('beta')
     self.SetEncoding('utf8')
-    self.prefix = 'alpha'
+    self.prefix = 'beta'
 
   def testSimpleCase(self):
     messages = self.messages
@@ -202,7 +204,11 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
               ),
               project='my-project'))],)
 
-  def helperTestManaged(self, domains):
+  @parameterized.parameters((['example.com'],),
+                            (['one.example.com', 'two.example.com'],),
+                            (['Ṳᾔḯ¢◎ⅾℯ.certsbridge.com'],),
+                            (['xn--8a342m2fai5b18csni3w.certsbridge'],))
+  def testManaged(self, domains):
     messages = self.messages
 
     self.RunVersioned("""
@@ -222,18 +228,6 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
                       domains=domains),
               ),
               project='my-project'))],)
-
-  def testManagedSingleDomain(self):
-    self.helperTestManaged(['example.com'])
-
-  def testManagedMultipleDomains(self):
-    self.helperTestManaged(['one.example.com', 'two.example.com'])
-
-  def testManagedUnicodeDomain(self):
-    self.helperTestManaged(['Ṳᾔḯ¢◎ⅾℯ.certsbridge.com'])
-
-  def testManagedPunycodeDomain(self):
-    self.helperTestManaged(['xn--8a342m2fai5b18csni3w.certsbridge'])
 
   def testUriSupport(self):
     messages = self.messages
@@ -291,6 +285,28 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
 
     self.CheckRequests()
 
+  def testWithoutCertificateFile(self):
+    with self.assertRaisesRegex(
+        files.Error, r'Unable to read file \[not-certificate.crt\]: '
+        r'.*No such file or directory'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --certificate not-certificate.crt
+            --private-key {key_file}
+          """.format(key_file=self.private_key_file))
+
+    self.CheckRequests()
+
+  def testWithoutPrivateKeyFile(self):
+    with self.assertRaisesRegex(
+        files.Error, r'Unable to read file \[non-existent.key\]: '
+        r'.*No such file or directory'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --certificate {certificate_file}
+            --private-key non-existent.key
+          """.format(certificate_file=self.certificate_file))
+
   def testWithDomainsAndCertificate(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.RunVersioned("""
@@ -305,6 +321,200 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.RunVersioned("""
           compute ssl-certificates create my-cert
+            --domains example.com
+            --private-key {key_file}
+          """.format(key_file=self.private_key_file))
+
+    self.CheckRequests()
+
+
+class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest,
+                                     parameterized.TestCase):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.SetEncoding('utf8')
+    self.prefix = 'alpha'
+
+  def testSimpleCase(self):
+    messages = self.messages
+
+    self.RunVersioned("""
+        compute ssl-certificates create my-cert
+          --global
+          --certificate {certificate_file}
+          --private-key {key_file}
+          --description 'Certificate one.'
+        """.format(
+            certificate_file=self.certificate_file,
+            key_file=self.private_key_file))
+
+    self.CheckRequests(
+        [(self.compute.sslCertificates, 'Insert',
+          messages.ComputeSslCertificatesInsertRequest(
+              sslCertificate=messages.SslCertificate(
+                  type=messages.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
+                  name='my-cert',
+                  description='Certificate one.',
+                  selfManaged=messages.SslCertificateSelfManagedSslCertificate(
+                      certificate=CERTIFICATE,
+                      privateKey=PRIVATE_KEY,
+                  ),
+              ),
+              project='my-project'))],)
+
+  @parameterized.parameters((['example.com'],),
+                            (['one.example.com', 'two.example.com'],),
+                            (['Ṳᾔḯ¢◎ⅾℯ.certsbridge.com'],),
+                            (['xn--8a342m2fai5b18csni3w.certsbridge'],))
+  def testManaged(self, domains):
+    messages = self.messages
+
+    self.RunVersioned("""
+        compute ssl-certificates create my-cert-managed
+          --domains {domains}
+          --description 'Managed certificate one.'
+          --global
+        """.format(domains=','.join(domains)))
+
+    self.CheckRequests(
+        [(self.compute.sslCertificates, 'Insert',
+          messages.ComputeSslCertificatesInsertRequest(
+              sslCertificate=messages.SslCertificate(
+                  name='my-cert-managed',
+                  type=messages.SslCertificate.TypeValueValuesEnum.MANAGED,
+                  description='Managed certificate one.',
+                  managed=messages.SslCertificateManagedSslCertificate(
+                      domains=domains),
+              ),
+              project='my-project'))],)
+
+  @parameterized.parameters((['example.com'],),
+                            (['one.example.com', 'two.example.com'],),
+                            (['Ṳᾔḯ¢◎ⅾℯ.certsbridge.com'],),
+                            (['xn--8a342m2fai5b18csni3w.certsbridge'],))
+  def testManagedRegion(self, domains):
+    messages = self.messages
+
+    self.RunVersioned("""
+        compute ssl-certificates create my-cert-managed
+          --domains {domains}
+          --description 'Managed certificate one.'
+          --region us-west-1
+        """.format(domains=','.join(domains)))
+
+    self.CheckRequests(
+        [(self.compute.regionSslCertificates, 'Insert',
+          messages.ComputeRegionSslCertificatesInsertRequest(
+              sslCertificate=messages.SslCertificate(
+                  name='my-cert-managed',
+                  type=messages.SslCertificate.TypeValueValuesEnum.MANAGED,
+                  description='Managed certificate one.',
+                  managed=messages.SslCertificateManagedSslCertificate(
+                      domains=domains),
+              ),
+              region='us-west-1',
+              project='my-project'))],)
+
+  def testUriSupport(self):
+    messages = self.messages
+
+    self.RunVersioned("""
+        compute ssl-certificates create
+            {base_uri}/projects/my-project/regions/us-west-1/sslCertificates/my-cert
+          --certificate {certificate_file}
+          --private-key {key_file}
+        """.format(
+            base_uri=self.compute_uri,
+            certificate_file=self.certificate_file,
+            key_file=self.private_key_file))
+
+    self.CheckRequests(
+        [(self.compute.regionSslCertificates, 'Insert',
+          messages.ComputeRegionSslCertificatesInsertRequest(
+              sslCertificate=messages.SslCertificate(
+                  name='my-cert',
+                  type=messages.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
+                  selfManaged=messages.SslCertificateSelfManagedSslCertificate(
+                      certificate=CERTIFICATE,
+                      privateKey=PRIVATE_KEY,
+                  ),
+              ),
+              region='us-west-1',
+              project='my-project'))],)
+
+  def testNoDomain(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --domains: not enough args'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            '--domains='
+                        """)
+
+    self.CheckRequests()
+
+  def testWithoutCertificate(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --certificate: Must be specified.'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west-1
+            --private-key {key_file}
+          """.format(key_file=self.private_key_file))
+
+    self.CheckRequests()
+
+  def testWithoutPrivateKey(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --private-key: Must be specified.'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west-1
+            --certificate {certificate_file}
+          """.format(certificate_file=self.certificate_file))
+
+    self.CheckRequests()
+
+  def testWithoutCertificateFile(self):
+    with self.assertRaisesRegex(
+        files.Error, r'Unable to read file \[not-certificate.crt\]: '
+        r'.*No such file or directory'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west-1
+            --certificate not-certificate.crt
+            --private-key {key_file}
+          """.format(key_file=self.private_key_file))
+
+    self.CheckRequests()
+
+  def testWithoutPrivateKeyFile(self):
+    with self.assertRaisesRegex(
+        files.Error, r'Unable to read file \[non-existent.key\]: '
+        r'.*No such file or directory'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west-1
+            --certificate {certificate_file}
+            --private-key non-existent.key
+          """.format(certificate_file=self.certificate_file))
+
+  def testWithDomainsAndCertificate(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west-1
+            --certificate {certificate_file}
+            --domains example.com
+          """.format(certificate_file=self.certificate_file))
+
+    self.CheckRequests()
+
+  def testWithDomainsAndPrivateKey(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west-1
             --domains example.com
             --private-key {key_file}
           """.format(key_file=self.private_key_file))

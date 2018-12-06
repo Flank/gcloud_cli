@@ -54,27 +54,30 @@ FLAGS
           The --maintenance-policy flag is now deprecated. Please use
           --on-host-maintenance instead. MAINTENANCE_POLICY must be one of:
 
-       MIGRATE
-          The instances should be migrated to a new host. This will temporarily
-          impact the performance of instances during a migration event.
-       TERMINATE
-          The instances should be terminated.
+           MIGRATE
+              The instances should be migrated to a new host. This will
+              temporarily impact the performance of instances during a
+              migration event.
+           TERMINATE
+              The instances should be terminated.
 
        --on-host-maintenance=MAINTENANCE_POLICY
           Specifies the behavior of the instances when their host machines
           undergo maintenance. The default is MIGRATE. MAINTENANCE_POLICY must
           be one of:
 
-       MIGRATE
-          The instances should be migrated to a new host. This will temporarily
-          impact the performance of instances during a migration event.
-       TERMINATE
-          The instances should be terminated.
+           MIGRATE
+              The instances should be migrated to a new host. This will
+              temporarily impact the performance of instances during a
+              migration event.
+           TERMINATE
+              The instances should be terminated.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

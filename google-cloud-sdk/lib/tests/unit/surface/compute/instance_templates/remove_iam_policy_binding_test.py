@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """compute instance templates remove-iam-policy-binding tests."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -21,7 +22,7 @@ import textwrap
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
@@ -30,8 +31,8 @@ from tests.lib.surface.compute import test_resources
 
 
 @parameterized.parameters(
-    (base.ReleaseTrack.ALPHA, 'alpha'),
-    (base.ReleaseTrack.BETA, 'beta'))
+    (calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+    (calliope_base.ReleaseTrack.BETA, 'beta'))
 class RemoveIamPolicyBindingTest(sdk_test_base.WithFakeAuth,
                                  cli_test_base.CliTestBase,
                                  parameterized.TestCase):

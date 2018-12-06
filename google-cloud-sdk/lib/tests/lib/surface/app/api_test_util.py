@@ -29,7 +29,7 @@ from apitools.base.py.testing import mock as apitools_mock
 
 from googlecloudsdk.api_lib.app.api import appengine_api_client_base as api_client
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files as file_utils
 from tests.lib import cli_test_base
@@ -89,7 +89,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
                              code_bucket=None, hostname=None,
                              location_id=None, serving_status='SERVING',
                              split_health_checks=None,
-                             track=base.ReleaseTrack.GA):
+                             track=calliope_base.ReleaseTrack.GA):
     """Helper function to create response for GetApplication API call."""
     if code_bucket is None:
       code_bucket = '{0}-staging.appspot.com'.format(app)
@@ -107,7 +107,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         servingStatus=serving_status
     )
 
-    if track == base.ReleaseTrack.BETA:
+    if track == calliope_base.ReleaseTrack.BETA:
       if split_health_checks is None:
         application.featureSettings = self.messages.FeatureSettings()
       else:
@@ -120,7 +120,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
                                   exception=None, hostname=None,
                                   location_id=None, serving_status='SERVING',
                                   split_health_checks=None,
-                                  track=base.ReleaseTrack.GA):
+                                  track=calliope_base.ReleaseTrack.GA):
     """Adds expected get-application call and response to mock client."""
     if exception:
       self.mock_client.apps.Get.Expect(
@@ -167,19 +167,22 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     response = self.GetServiceResponse(app, service, split)
     self.mock_client.apps_services.Get.Expect(request, response=response)
 
+  def BetaSettings(self, **kwargs):
+    return self.messages.Version.BetaSettingsValue(
+        additionalProperties=[
+            self.messages.Version.BetaSettingsValue.AdditionalProperty(
+                key=key, value=value)
+            for (key, value) in sorted(kwargs.items())
+        ]
+    )
+
   def VmBetaSettings(self, vm_runtime='java'):
     """Helper function, creates beta settings for a vm runtime."""
     beta_properties = {
         'module_yaml_path': 'app.yaml',
         'vm_runtime': vm_runtime
     }
-    return self.messages.Version.BetaSettingsValue(
-        additionalProperties=[
-            self.messages.Version.BetaSettingsValue.AdditionalProperty(
-                key=key, value=value)
-            for (key, value) in sorted(beta_properties.items())
-        ]
-    )
+    return self.BetaSettings(**beta_properties)
 
   def DefaultHandlers(self, with_static=False):
     """Helper function to create the basic handlers message."""
@@ -251,6 +254,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         id=version_id,
         betaSettings=beta_settings,
         deployment=deployment,
+        entrypoint=self.messages.Entrypoint(shell=''),
         handlers=handlers,
         threadsafe=threadsafe,
         runtimeApiVersion=api_version,
@@ -483,7 +487,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         for version, version_info in six.iteritems(versions):
           # The server only adds a version to this field if split is non-zero.
           traffic = version_info.get('traffic_split', 0)
-          if traffic > 0:
+          if traffic and traffic > 0:
             split.allocations.additionalProperties.append(
                 self.messages.TrafficSplit.AllocationsValue.AdditionalProperty(
                     key=version, value=traffic))

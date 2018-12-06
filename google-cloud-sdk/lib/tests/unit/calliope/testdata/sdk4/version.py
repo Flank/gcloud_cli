@@ -18,10 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class Version(base.Command):
+class Version(calliope_base.Command):
   """Print installation version information."""
 
   def Run(self, unused_args):

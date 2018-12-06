@@ -11,7 +11,7 @@ gcloud alpha compute ssl\-certificates create \- create a Google Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute ssl\-certificates create\fR \fINAME\fR (\fB\-\-domains\fR=\fIDOMAIN\fR,[\fIDOMAIN\fR,...]\ |\ \fB\-\-certificate\fR=\fILOCAL_FILE_PATH\fR\ \fB\-\-private\-key\fR=\fILOCAL_FILE_PATH\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute ssl\-certificates create\fR \fINAME\fR (\fB\-\-domains\fR=\fIDOMAIN\fR,[\fIDOMAIN\fR,...]\ |\ \fB\-\-certificate\fR=\fILOCAL_FILE_PATH\fR\ \fB\-\-private\-key\fR=\fILOCAL_FILE_PATH\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -22,11 +22,11 @@ create SSL certificates which can be used to configure a target HTTPS proxy. An
 SSL certificate consists of a certificate and private key. The private key is
 encrypted before it is stored.
 
-You can create either a managed or a self\-managed SslCertificate. Managed
-SslCertificate will be provisioned and renewed for you, when you specify
-\-\-domains flag. Self\-managed certificate is created by passing certificate
-obtained from Certificate Authority through \-\-certificate and \-\-private\-key
-flags.
+You can create either a managed or a self\-managed SslCertificate. A managed
+SslCertificate will be provisioned and renewed for you, when you specify the
+\f5\-\-domains\fR flag. A self\-managed certificate is created by passing the
+certificate obtained from Certificate Authority through \f5\-\-certificate\fR
+and \f5\-\-private\-key\fR flags.
 
 
 
@@ -61,16 +61,16 @@ Flags for self\-managed certificate
 .RS 2m
 .TP 2m
 \fB\-\-certificate\fR=\fILOCAL_FILE_PATH\fR
-The path to a local certificate file to create a self\-managed certificate. The
+Path to a local certificate file to create a self\-managed certificate. The
 certificate must be in PEM format. The certificate chain must be no greater than
 5 certs long. The chain must include at least one intermediate cert. This flag
 must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-private\-key\fR=\fILOCAL_FILE_PATH\fR
-The path to a local private key file. The private key must be in PEM format and
-must use RSA or ECDSA encryption. This flag must be specified if any of the
-other arguments in this group are specified.
+Path to a local private key file. The private key must be in PEM format and must
+use RSA or ECDSA encryption. This flag must be specified if any of the other
+arguments in this group are specified.
 
 
 .RE
@@ -85,16 +85,53 @@ other arguments in this group are specified.
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the SSL certificate.
 
+.TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the SSL certificate is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the SSL certificate to create. If not specified, you may be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

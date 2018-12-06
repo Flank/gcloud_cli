@@ -28,6 +28,9 @@ from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
 
+_LIST_OUTPUT_COLUMN_NAMES = (
+    'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE')
+
 
 class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
   """Tests for dataproc clusters list."""
@@ -61,15 +64,13 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
                 for name in self.CLUSTER_NAMES]
     self.ExpectListClusters(clusters)
     self.RunDataproc('clusters list', output_format='')
-    self.AssertOutputContains(
-        'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE',
-        normalize_space=True)
+    self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
     # Preemptible worker count is 0
     self.AssertOutputContains(
         'test-cluster-1 2 RUNNING us-central1-a', normalize_space=True)
 
   def testListClustersOutput_singleNode(self):
-    dataproc_properties = encoding.DictToMessage({
+    dataproc_properties = encoding.DictToAdditionalPropertyMessage({
         constants.ALLOW_ZERO_WORKERS_PROPERTY: 'true'
     }, self.messages.SoftwareConfig.PropertiesValue)
     clusters = [
@@ -79,9 +80,7 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
     ]
     self.ExpectListClusters(clusters)
     self.RunDataproc('clusters list', output_format='')
-    self.AssertOutputContains(
-        'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE',
-        normalize_space=True)
+    self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
     # Worker and preemptible worker counts are 0
     self.AssertOutputContains(
         'test-cluster-1 RUNNING us-central1-a', normalize_space=True)
@@ -94,9 +93,7 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
     ]
     self.ExpectListClusters(clusters)
     self.RunDataproc('clusters list', output_format='')
-    self.AssertOutputContains(
-        'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE',
-        normalize_space=True)
+    self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
     self.AssertOutputContains(
         'test-cluster-1 2 4 RUNNING us-central1-a', normalize_space=True)
 
@@ -149,6 +146,21 @@ class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):
   def testBeta(self):
     self.assertEqual(self.messages, self._beta_messages)
     self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
+
+  def testListClustersOutput_scheduledDeleteCluster(self):
+    cluster = self.MakeRunningCluster()
+    cluster.config.lifecycleConfig = self.messages.LifecycleConfig(
+        autoDeleteTtl='1300s', idleDeleteTtl='700s')
+
+    self.ExpectListClusters([cluster])
+    self.RunDataproc('clusters list', output_format='')
+    self.AssertOutputContains(
+        'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE ' +
+        'SCHEDULED_DELETE',
+        normalize_space=True)
+    # SCHEDULED_DELETE column should be marked as enabled.
+    self.AssertOutputContains(
+        'test-cluster 2 RUNNING us-central1-a enabled', normalize_space=True)
 
 
 if __name__ == '__main__':

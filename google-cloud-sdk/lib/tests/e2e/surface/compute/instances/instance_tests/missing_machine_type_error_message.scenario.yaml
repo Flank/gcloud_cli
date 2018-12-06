@@ -1,0 +1,169 @@
+title: missing machine type error message scenario test
+release_tracks:
+- GA
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances create $$instance$$ --zone us-central1-f --machine-type
+      fake-type
+  - error: |-
+      1: Could not fetch resource:
+       - Invalid value for field 'resource.machineType': 'https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/fake-type'. Machine type with name 'fake-type' does not exist in zone 'us-central1-f'.
+
+      Use `gcloud compute machine-types list --zones` to see the available machine  types.
+- execute:
+  - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
+  - error: |
+      1: Could not fetch resource:
+       - The resource 'projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$' was not found
+actions:
+- generate_resource_id:
+    reference: instance
+    prefix: gcloud-compute-missing-machine-type-error
+- execute_command:
+    command: compute instances create $$instance$$ --zone us-central1-f --machine-type
+      fake-type
+    events:
+    - api_call:
+        expect_request:
+          headers: {}
+          body: null
+          method: GET
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            ETag: '"4npQ1DkGhRuOOcsh7w13xmq8zSc=/7HK4_wK7Qq4f1Uql8Q9kZoNzKCQ="'
+            Content-Length: '510'
+            status: '200'
+            Content-Type: application/json; charset=UTF-8
+          body:
+            name: us-central1-f
+            status: UP
+            description: us-central1-f
+            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+            creationTimestamp: '1969-12-31T16:00:00.000-08:00'
+            id: '2004'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            availableCpuPlatforms:
+            - Intel Skylake
+            - Intel Broadwell
+            - Intel Haswell
+            - Intel Ivy Bridge
+            kind: compute#zone
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing?alt=json
+          headers: {}
+          method: GET
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            ETag: '"iwtR37yHpJ_P1fR2DHsR1mKFwQ8=/tTsvWOZjiikC9NSwkk6NNNJq4GQ="'
+            Content-Length: '166447'
+            status: '200'
+            Content-Type: application/json; charset=UTF-8
+          body:
+            name: cloud-sdk-integration-testing
+            usageExportLocation:
+              bucketName: cloud-sdk-integration-test-usage
+              reportNamePrefix: ''
+            xpnProjectStatus: UNSPECIFIED_XPN_PROJECT_STATUS
+            defaultNetworkTier: PREMIUM
+            enabledFeatures:
+            - alpha-api
+            creationTimestamp: '2014-09-30T07:55:22.502-07:00'
+            id: '17966956004057981335'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing
+            defaultServiceAccount: 462803083913-compute@developer.gserviceaccount.com
+            kind: compute#project
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
+          headers: {}
+          method: POST
+          body:
+            json:
+              name: $$instance$$
+              machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/fake-type
+              disks:
+              - mode: READ_WRITE
+                boot: true
+                autoDelete: true
+                initializeParams:
+                  sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
+                type: PERSISTENT
+              canIpForward: false
+              metadata: {}
+              networkInterfaces:
+              - network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                accessConfigs:
+                - name: external-nat
+                  type: ONE_TO_ONE_NAT
+              deletionProtection: false
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+              scheduling:
+                automaticRestart: true
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '636'
+            Content-Type: application/json; charset=UTF-8
+            status: '400'
+          body:
+            error:
+              message: "Invalid value for field 'resource.machineType': 'https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/fake-type'.\
+                \ Machine type with name 'fake-type' does not exist in zone 'us-central1-f'."
+              code: 400
+              errors:
+              - message: "Invalid value for field 'resource.machineType': 'https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/fake-type'.\
+                  \ Machine type with name 'fake-type' does not exist in zone 'us-central1-f'."
+                domain: global
+                reason: invalid
+    - expect_exit:
+        message: "Could not fetch resource:\n - Invalid value for field 'resource.machineType':\
+          \ 'https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/fake-type'.\
+          \ Machine type with name 'fake-type' does not exist in zone 'us-central1-f'.\n\
+          \nUse `gcloud compute machine-types list --zones` to see the available machine\
+          \  types."
+        code: 1
+- execute_command:
+    command: compute instances delete $$instance$$ --zone us-central1-f --quiet
+    cleanup_for: instance
+    events:
+    - api_call:
+        expect_request:
+          headers: {}
+          body: null
+          method: DELETE
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '423'
+            Content-Type: application/json; charset=UTF-8
+            status: '404'
+          body:
+            error:
+              message: The resource 'projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$'
+                was not found
+              code: 404
+              errors:
+              - message: The resource 'projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$'
+                  was not found
+                domain: global
+                reason: notFound
+    - expect_exit:
+        message: "Could not fetch resource:\n - The resource 'projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$'\
+          \ was not found\n"
+        code: 1

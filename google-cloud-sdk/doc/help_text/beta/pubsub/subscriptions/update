@@ -1,0 +1,98 @@
+NAME
+    gcloud beta pubsub subscriptions update - updates an existing Cloud Pub/Sub
+        subscription
+
+SYNOPSIS
+    gcloud beta pubsub subscriptions update SUBSCRIPTION
+        [--ack-deadline=ACK_DEADLINE] [--expiration-period=EXPIRATION_PERIOD]
+        [--message-retention-duration=MESSAGE_RETENTION_DURATION]
+        [--push-endpoint=PUSH_ENDPOINT] [--retain-acked-messages]
+        [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Updates an existing Cloud Pub/Sub subscription.
+
+POSITIONAL ARGUMENTS
+     Subscription resource - Name of the subscription to update. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [subscription] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
+
+       SUBSCRIPTION
+          ID of the subscription or fully qualified identifier for the
+          subscription.
+
+FLAGS
+     --ack-deadline=ACK_DEADLINE
+        The number of seconds the system will wait for a subscriber to
+        acknowledge receiving a message before re-attempting delivery.
+
+     --expiration-period=EXPIRATION_PERIOD
+        The subscription will expire if it is inactive for the given period.
+        Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+        of "s", "m", "h", and "d" for seconds, minutes, hours, and days,
+        respectively. If the unit is omitted, seconds is assumed. This flag
+        additionally accepts the special value "never" to indicate that the
+        subscription will never expire.
+
+     --message-retention-duration=MESSAGE_RETENTION_DURATION
+        How long to retain unacknowledged messages in the subscription's
+        backlog, from the moment a message is published. If
+        --retain-acked-messages is true, this also configures the retention of
+        acknowledged messages. Specify "default" to use the default value.
+        Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+        of "s", "m", "h", and "d" for seconds, seconds, minutes, hours, and
+        days, respectively. If the unit is omitted, seconds is assumed.
+
+     --push-endpoint=PUSH_ENDPOINT
+        A URL to use as the endpoint for this subscription. This will also
+        automatically set the subscription type to PUSH.
+
+     --retain-acked-messages
+        Whether or not to retain acknowledged messages. If true, messages are
+        not expunged from the subscription's backlog until they fall out of the
+        --message-retention-duration window.
+
+     --update-labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to update. If a label exists its value
+        is modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Removes all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud beta pubsub subscriptions update --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud beta pubsub subscriptions update --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          A list of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha pubsub subscriptions update
+

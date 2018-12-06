@@ -1,0 +1,184 @@
+title: Test fail without force flags
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute disks create $$disk$$ --zone $$my-zone$$ --size 10 --format="text(name,zone,status)"
+  - stderr: |
+      WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+  - stdout: |
+      ---
+      name:   $$disk$$
+      status: READY
+      zone:   https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
+- execute:
+  - command: compute instances create $$instance$$ --disk name=$$disk$$,mode=rw,device-name=data
+      --zone $$my-zone$$ --format="text(name,status)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$].
+  - stdout: |
+      ---
+      name:   $$instance$$
+      status: RUNNING
+- execute:
+  - command: compute images create $$image$$ --source-disk $$disk$$ --source-disk-zone
+      $$my-zone$$
+  - error: |
+      1: Could not fetch resource:
+       - The disk resource 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$' is already being used by 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$'
+- execute:
+  - command: compute images delete $$image$$ --quiet
+  - error: |
+      1: Could not fetch resource:
+       - The resource 'projects/cloud-sdk-integration-testing/global/images/$$image$$' was not found
+- execute:
+  - command: compute instances delete $$instance$$ --zone $$my-zone$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$].
+- execute:
+  - command: compute disks delete $$disk$$ --zone $$my-zone$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
+- define_reference:
+    reference: my-zone
+    value: us-central1-f
+
+- generate_resource_id:
+    reference: disk
+    prefix: gcloud-compute-images-test
+
+- generate_resource_id:
+    reference: instance
+    prefix: gcloud-compute-images-test
+
+- generate_resource_id:
+    reference: image
+    prefix: gcloud-compute-images-test
+
+- execute_command:
+    command: compute disks create $$disk$$ --zone $$my-zone$$ --size 10 --format="text(name,zone,status)"
+    validation_only: true
+    events:
+    - expect_stderr: |
+        WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+    - expect_stdout: |
+        ---
+        name:   $$disk$$
+        status: READY
+        zone:   https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances create $$instance$$ --disk name=$$disk$$,mode=rw,device-name=data
+      --zone $$my-zone$$ --format="text(name,status)"
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$].
+    - expect_stdout: |
+        ---
+        name:   $$instance$$
+        status: RUNNING
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute images create $$image$$ --source-disk $$disk$$ --source-disk-zone
+      $$my-zone$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: $$image$$
+              sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
+              sourceType: RAW
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '4673'
+            Content-Type: application/json; charset=UTF-8
+            status: '400'
+          body:
+            error:
+              errors:
+              - domain: global
+                reason: resourceInUseByAnotherResource
+                message: The disk resource 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$'
+                  is already being used by 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$'
+                debugInfo: |
+                  com.google.api.server.core.Fault: ImmutableErrorDefinition{base=INVALID_PARAMETER, category=USER_ERROR, cause=null, debugInfo=null, domain=global, extendedHelp=null, httpHeaders={}, httpStatus=badRequest, internalReason=Reason{arguments={}, cause=null, code=bigcluster.BigClusterErrorDomain.RESOURCE_IN_USE_BY_ANOTHER_RESOURCE, createdByBackend=true, debugMessage=null, errorProtoCode=RESOURCE_IN_USE_BY_ANOTHER_RESOURCE, errorProtoDomain=bigcluster.BigClusterErrorDomain, filteredMessage=null, location=null, message=The disk resource 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$' is already being used by 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$', unnamedArguments=[disk, projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$, projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$]}, location=null, message=The disk resource 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$' is already being used by 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$', reason=resourceInUseByAnotherResource, rpcCode=400} The disk resource 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$' is already being used by 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$'
+                  	at com.google.api.server.core.ErrorCollector.toFault(ErrorCollector.java:54)
+                  	at com.google.api.server.rest.adapter.rosy.RosyErrorConverter.toFault(RosyErrorConverter.java:67)
+                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:258)
+                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:238)
+                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                  	at com.google.api.server.thread.ThreadTrackers$ThreadTrackingRunnable.run(ThreadTrackers.java:126)
+                  	at com.google.tracing.TraceContext$TraceContextRunnable.runInContext(TraceContext.java:453)
+                  	at com.google.api.server.server.CommonModule$ContextCarryingExecutorService$1.runInContext(CommonModule.java:824)
+                  	at com.google.tracing.TraceContext$TraceContextRunnable$1.run(TraceContext.java:460)
+                  	at io.grpc.Context.run(Context.java:565)
+                  	at com.google.tracing.CurrentContext.runInContext(CurrentContext.java:166)
+                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContextNoUnref(TraceContext.java:319)
+                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContext(TraceContext.java:311)
+                  	at com.google.tracing.TraceContext$TraceContextRunnable.run(TraceContext.java:457)
+                  	at com.google.gse.internal.DispatchQueueImpl$WorkerThread.run(DispatchQueueImpl.java:403)
+              code: 400
+              message: The disk resource 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$'
+                is already being used by 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$'
+    - expect_exit:
+        code: 1
+        message: |
+          Could not fetch resource:
+           - The disk resource 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$' is already being used by 'projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$'
+- execute_command:
+    # This is only needed if the image was somehow created successfully
+    command: compute images delete $$image$$ --quiet
+    cleanup_for: image
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 1
+        message: |
+          Could not fetch resource:
+           - The resource 'projects/cloud-sdk-integration-testing/global/images/$$image$$' was not found
+- execute_command:
+    command: compute instances delete $$instance$$ --zone $$my-zone$$ --quiet
+    cleanup_for: instance
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute disks delete $$disk$$ --zone $$my-zone$$ --quiet
+    cleanup_for: disk
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+    - expect_exit:
+        code: 0

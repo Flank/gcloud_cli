@@ -9,8 +9,8 @@ SYNOPSIS
         [--availability-type=AVAILABILITY_TYPE] [--no-backup]
         [--backup-start-time=BACKUP_START_TIME] [--cpu=CPU]
         [--database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
-        [--database-version=DATABASE_VERSION; default="MYSQL_5_6"]
-        [--enable-bin-log] [--failover-replica-name=FAILOVER_REPLICA_NAME]
+        [--database-version=DATABASE_VERSION] [--enable-bin-log]
+        [--failover-replica-name=FAILOVER_REPLICA_NAME]
         [--follow-gae-app=FOLLOW_GAE_APP] [--gce-zone=GCE_ZONE]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
         [--maintenance-window-day=MAINTENANCE_WINDOW_DAY]
@@ -31,15 +31,15 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --activation-policy=ACTIVATION_POLICY
-        The activation policy for this instance. This specifies when the
-        instance should be activated and is applicable only when the instance
-        state is RUNNABLE. The default is on-demand. More information on
-        activation policies can be found here:
+        Activation policy for this instance. This specifies when the instance
+        should be activated and is applicable only when the instance state is
+        RUNNABLE. The default is on-demand. More information on activation
+        policies can be found here:
         https://cloud.google.com/sql/faq#activation_policy. ACTIVATION_POLICY
         must be one of: always, never, on-demand.
 
      --assign-ip
-        The instance must be assigned an IP address.
+        If provided, instance must be assigned an IP address.
 
      --async
         Display information about the operation in progress, without waiting
@@ -70,25 +70,26 @@ FLAGS
         Enables daily backup. Enabled by default, use --no-backup to disable.
 
      --backup-start-time=BACKUP_START_TIME
-        The start time of daily backups, specified in the 24 hour format -
-        HH:MM, in the UTC timezone.
+        Start time of daily backups, specified in the 24 hour format - HH:MM,
+        in the UTC timezone.
 
      --cpu=CPU
-        A whole number value indicating how many cores are desired in the
+        Whole number value indicating how many cores are desired in the
         machine. Both --cpu and --memory must be specified if a custom machine
         type is desired, and the --tier flag must be omitted.
 
      --database-flags=FLAG=VALUE,[FLAG=VALUE,...]
-        A comma-separated list of database flags to set on the instance. Use an
+        Comma-separated list of database flags to set on the instance. Use an
         equals sign to separate flag name and value. Flags without values, like
         skip_grant_tables, can be written out without a value after, e.g.,
         skip_grant_tables=. Use on/off for booleans. View the Instance Resource
         API for allowed flags. (e.g., --database-flags
         max_allowed_packet=55555,skip_grant_tables=,log_output=1)
 
-     --database-version=DATABASE_VERSION; default="MYSQL_5_6"
-        The database engine type and version. DATABASE_VERSION must be one of:
-        MYSQL_5_5, MYSQL_5_6, MYSQL_5_7, POSTGRES_9_6.
+     --database-version=DATABASE_VERSION
+        The database engine type and version. If left unspecified, the API
+        defaults will be used. DATABASE_VERSION must be one of: MYSQL_5_5,
+        MYSQL_5_6, MYSQL_5_7, POSTGRES_9_6.
 
      --enable-bin-log
         Specified if binary log should be enabled. If backup configuration is
@@ -133,7 +134,7 @@ FLAGS
         master instance.
 
      --memory=MEMORY
-        A whole number value indicating how much memory is desired in the
+        Whole number value indicating how much memory is desired in the
         machine. A size unit should be provided (eg. 3072MiB or 9GiB) - if no
         units are specified, GiB is assumed. Both --cpu and --memory must be
         specified if a custom machine type is desired, and the --tier flag must
@@ -152,7 +153,7 @@ FLAGS
         FAILOVER.
 
      --replication=REPLICATION
-        The type of replication this instance uses. The default is synchronous.
+        Type of replication this instance uses. The default is synchronous.
         REPLICATION must be one of: synchronous, asynchronous.
 
      --require-ssl
@@ -183,8 +184,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

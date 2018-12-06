@@ -23,7 +23,7 @@ import logging
 import os
 import sys
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 
 
@@ -67,4 +67,11 @@ class DataprocTestBaseBeta(DataprocTestBase):
   """Base class for all Dataproc beta tests."""
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DataprocTestBaseGA(DataprocTestBase):
+  """Base class for all Dataproc GA tests."""
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA

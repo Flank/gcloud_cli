@@ -13,18 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This is a command for testing flag deprecation."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
 import argparse
 from googlecloudsdk.calliope import actions as calliope_actions
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 
 
-@base.Deprecate(is_removed=False)
-class DeprecationFlagCmdWarningCommand(base.Command):
+@calliope_base.Deprecate(is_removed=False)
+class DeprecationFlagCmdWarningCommand(calliope_base.Command):
   """A simple command to test flag deprecation.
 
    Test for deprecation of command and Flag.

@@ -11,14 +11,15 @@ gcloud alpha container binauthz policy add\-iam\-policy\-binding \- add IAM poli
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container binauthz policy add\-iam\-policy\-binding\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container binauthz policy add\-iam\-policy\-binding\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR See https://cloud.google.com/iam/docs/managing\-policies for
-details of policy role and member types.
+\fB(ALPHA)\fR Add an IAM policy binding to the IAM policy of a Binary
+Authorization policy. One binding consists of a member, a role, and an optional
+condition.
 
 
 
@@ -55,26 +56,95 @@ Define the role of the member.
 .RE
 .sp
 
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+
+Condition of the binding to be added. When condition is explicitly specified as
+\f5None\fR (e.g. \-\-condition=None), a binding without a condition is added.
+When \-\-condition is specified and is not a \f5None\fR condition,
+\f5\-\-role\fR cannot be a primitive role. Primitive roles are
+\f5roles/editor\fR, \f5roles/owner\fR, and \f5roles/viewer\fR.
+
+.TP 2m
+\fBexpression\fR
+(Required) Expression of the condition which evaluates to True or False. This
+uses a subset of Common Expression Language syntax.
+
+.TP 2m
+\fBtitle\fR
+(Required) Title for the expression, i.e. a short string describing its purpose.
+
+.TP 2m
+\fBdescription\fR
+(Optional) Description for the expression. This is a longer text which describes
+the expression.
+
+NOTE: An unsatisfied condition will not allow access via this binding.
+
+.TP 2m
+\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR
+Path to a local JSON or YAML file that defines the condition. To see available
+fields, see the help for \f5\-\-condition\fR.
+
+
+.RE
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBbinaryauthorization/v1alpha2\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/binary\-authorization/
 
 
 
 .SH "EXAMPLES"
 
-The following command will add an IAM policy binding for the role of
+To add an IAM policy binding for the role of
 \'roles/binaryauthorization.attestationAuthoritiesEditor' for the user
-\'test\-user@gmail.com' on the current project's Binary Authorization policy:
+\'test\-user@gmail.com' on the current project's Binary Authorization policy,
+run:
 
 .RS 2m
 $ gcloud alpha container binauthz policy add\-iam\-policy\-binding \e
     \-\-member='user:test\-user@gmail.com' \e
     \-\-role='roles/binaryauthorization.attestationAuthoritiesEditor'
 .RE
+
+To add an IAM policy binding which expires at the end of the year 2018 for the
+role of 'roles/binaryauthorization.attestationAuthoritiesEditor' and the user
+\'test\-user@gmail.com' on the current project's Binary Authorization policy,
+run:
+
+.RS 2m
+$ gcloud alpha container binauthz policy add\-iam\-policy\-binding \e
+    \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/binaryauthorization.attestationAuthoritiesEditor' \e
+\-\-condition='expression=request.time <
+ timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+tion=Expires at midnight on 2018\-12\-31'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
 
 
 

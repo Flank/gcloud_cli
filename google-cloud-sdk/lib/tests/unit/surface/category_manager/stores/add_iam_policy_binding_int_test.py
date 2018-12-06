@@ -24,6 +24,7 @@ from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,])
 class AddIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
   """Tests for category-manager stores add-iam-policy-binding."""

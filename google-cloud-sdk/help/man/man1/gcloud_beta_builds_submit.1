@@ -11,7 +11,7 @@ gcloud beta builds submit \- submit a build using Google Cloud Build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] (\fB\-\-config\fR=\fICONFIG\fR\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR) [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,7 +37,7 @@ is a local directory, this command skips the files specified in the
 \f5.gcloudignore\fR file. If a \f5.gitignore\fR file is present in the local
 source directory, gcloud will use a Git\-compatible \f5.gcloudignore\fR file
 that respects your .gitignored files. The global \f5.gitignore\fR is not
-respected. For more information on \f5.gcloudignore\fR, see \f5$gcloud topic
+respected. For more information on \f5.gcloudignore\fR, see \f5gcloud topic
 gcloudignore\fR.
 
 .TP 2m
@@ -49,34 +49,7 @@ Specify that no source should be uploaded with this build.
 .RE
 .sp
 
-.SH "REQUIRED FLAGS"
-
-.RS 2m
-.TP 2m
-
-Exactly one of these must be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-config\fR=\fICONFIG\fR
-The .yaml or .json file to use for build configuration.
-
-.TP 2m
-\fB\-\-tag\fR=\fITAG\fR, \fB\-t\fR \fITAG\fR
-The tag to use with a "docker build" image creation. Cloud Build will run a
-remote "docker build \-t $TAG .", where $TAG is the tag provided by this flag.
-The tag must be in the gcr.io/* or *.gcr.io/* namespaces. Specify a tag if you
-want Cloud Build to build using a Dockerfile instead of a build config file. If
-you specify a tag in this command, your source must include a Dockerfile. For
-instructions on building using a Dockerfile see
-https://cloud.google.com/cloud\-build/docs/quickstart\-docker.
-
-
-.RE
-.RE
-.sp
-
-.SH "OPTIONAL FLAGS"
+.SH "FLAGS"
 
 .RS 2m
 .TP 2m
@@ -136,16 +109,36 @@ and five seconds. If you don't specify a unit, seconds is assumed. For example,
 "10" is 10 seconds. Overrides the default \fBbuilds/timeout\fR property value
 for this command invocation.
 
+.TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-config\fR=\fICONFIG\fR; default="cloudbuild.yaml"
+The YAML or JSON file to use as the build configuration file.
+
+.TP 2m
+\fB\-\-tag\fR=\fITAG\fR, \fB\-t\fR \fITAG\fR
+The tag to use with a "docker build" image creation. Cloud Build will run a
+remote "docker build \-t $TAG .", where $TAG is the tag provided by this flag.
+The tag must be in the gcr.io/* or *.gcr.io/* namespaces. Specify a tag if you
+want Cloud Build to build using a Dockerfile instead of a build config file. If
+you specify a tag in this command, your source must include a Dockerfile. For
+instructions on building using a Dockerfile see
+https://cloud.google.com/cloud\-build/docs/quickstart\-docker.
+
+
+.RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

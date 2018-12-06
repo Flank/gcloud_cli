@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """dlp images inspect tests."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -103,6 +104,7 @@ class InspectTest(base.DlpUnitTestBase):
                      likelihood=likelihood_flag,
                      maxfindings=max_findings_flag)))
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testInpectWithBadExtensionFails(self, track):
     self.track = track

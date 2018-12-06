@@ -29,8 +29,12 @@ from googlecloudsdk.core.util import platforms
 
 from tests.lib import cli_test_base
 from tests.lib import parameterized
+from tests.lib import parameterized_line_no
 from tests.lib import test_case
 from six.moves import map
+
+
+T = parameterized_line_no.LineNo
 
 
 class ListFilesForUploadSanityTest(cli_test_base.CliTestBase):
@@ -141,58 +145,86 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
     self.assertEqual(set(uploaded_files), set(git_uploaded_files))
 
   @parameterized.named_parameters(
-      ('NoGitFiles', ['a', 'b'], None),
-      ('NoMatches', ['a', 'b'], '.gitignore'),
-      ('Basic1', ['a', 'b'], '.gitignore\na'),
-      ('Basic2', ['a', 'ab'], '.gitignore\na'),
-      ('BlankLine', ['a', 'b', 'c'], '.gitignore\na\n\nb'),
-      ('SubdirMatch', [os.path.join('a', 'b')], '.gitignore\nb'),
-      ('SubdirNoMatch', [os.path.join('a', 'b')], '.gitignore\nc'),
-      ('Negated', ['a'], '.gitignore\na\n!a'),
-      ('NegatedByWildcard', ['foo'], '.gitignore\nfoo\n!f*'),
-      ('EscapedBang', _CombineFormats(['!{}', '{}', '{}!', '!{}!'], 'abcde'),
-       '.gitignore\n\\!a\nb!\nc\\!\nd\n\\!e!\n\\!d\\!'),
-      ('EscapedCrunch', _CombineFormats(['#{}', '{}', '{}#', '#{}#'], 'abcd'),
-       '.gitignore\n\\#a\nb#\nc\\#\n\\#d#'),
-      ('CombinedBangAndCrunch',
-       itertools.chain.from_iterable(list(map(_AddCrunchBangPrefixes, 'abcd'))),
-       '.gitignore\n!#a\n!\\#b\n\\!#c\n\\!\\#d'),
-      ('Comment', ['foo', '#foo'], '.gitignore\n#foo'),
-      ('LeadingConsecutiveStars',
-       ['baz', os.path.join('foo', 'baz'), os.path.join('foo', 'bar', 'baz')],
-       '.gitignore\n**/baz'),
-      ('EscapedConsecutiveStars',
-       _CombineFormats(_CONSECUTIVE_STAR_FMTS, 'abc'),
-       '.gitignore\na[*]*a\nb[*][*]b\nc*[*]c'),
-      ('MustMatchDir',
-       [os.path.join('a', 'b'), 'b', os.path.join('c', 'd'), 'd'],
-       '.gitignore\na/\nc/d/'),
-      ('LeadingSlash',
-       [os.path.join('a', 'b'), os.path.join('a', 'c'), 'b', 'c'],
-       '.gitignore\n/a/b\n/a/c\n/b\n/c'),
-      ('NeedlesslyEscapedCharacters',
-       ['a', 'b', 'c d'],
-       '.gitignore\n\\a\nb\nc\\ d'),
-      ('InvalidConsecutiveStars',
-       _CombineFormats(_CONSECUTIVE_STAR_FMTS, 'abcdefgh'),
-       '.gitignore\na**\n**b\nc**d\ne/**f\ng/h**'),
-      ('TrailingBackslash',
-       _CombineFormats(['{}', '{}\\', r'{}\\'], 'ab'),
-       '.gitignore\na\\\nb\\\\'),
-      ('ShellGlob', _MakeShellGlobCases('abcdefghijklmno'),
-       '.gitignore\n'
-       'a*a\ndir/*b\nc?c\nd[4]d\ne[!4]e\nf]f\ng[[]g\nh[]]h\n'
-       'i[*]i\nj[?]j\nk[-]k\nl[!]l\nm!m\nn[0-9]n\no[!0-9]o'),
-      ('TrailingConsecutiveStars',
-       ['baz', os.path.join('foo', 'baz'), os.path.join('foo', 'bar', 'baz'),
-        os.path.join('bar', 'baz'), os.path.join('qux', 'bar', 'baz')],
-       '.gitignore\nbar/**'),
-      ('MiddleConsecutiveStars',
-       [os.path.join('top-level', 'foo', 'baz', 'qux'),
-        os.path.join('foo', 'bar', 'baz', 'qux')],
-       '.gitignore\nfoo/**/qux'),
+      T('NoGitFiles', ['a', 'b'], None),
+      T('NoMatches', ['a', 'b'], '.gitignore'),
+      T('Basic1', ['a', 'b'], '.gitignore\na'),
+      T('Basic2', ['a', 'ab'], '.gitignore\na'),
+      T('BlankLine', ['a', 'b', 'c'], '.gitignore\na\n\nb'),
+      T('SubdirMatch', [os.path.join('a', 'b')], '.gitignore\nb'),
+      T('SubdirNoMatch', [os.path.join('a', 'b')], '.gitignore\nc'),
+      T('Negated', ['a'], '.gitignore\na\n!a'),
+      T('NegatedByWildcard', ['foo'], '.gitignore\nfoo\n!f*'),
+      T('EscapedBang', _CombineFormats(['!{}', '{}', '{}!', '!{}!'], 'abcde'),
+        '.gitignore\n\\!a\nb!\nc\\!\nd\n\\!e!\n\\!d\\!'),
+      T('EscapedCrunch', _CombineFormats(['#{}', '{}', '{}#', '#{}#'], 'abcd'),
+        '.gitignore\n\\#a\nb#\nc\\#\n\\#d#'),
+      T('CombinedBangAndCrunch',
+        itertools.chain.from_iterable(
+            list(map(_AddCrunchBangPrefixes, 'abcd'))),
+        '.gitignore\n!#a\n!\\#b\n\\!#c\n\\!\\#d'),
+      T('Comment', ['foo', '#foo'], '.gitignore\n#foo'),
+      T('LeadingConsecutiveStars',
+        ['baz', os.path.join('foo', 'baz'), os.path.join('foo', 'bar', 'baz')],
+        '.gitignore\n**/baz'),
+      T('EscapedConsecutiveStars',
+        _CombineFormats(_CONSECUTIVE_STAR_FMTS, 'abc'),
+        '.gitignore\na[*]*a\nb[*][*]b\nc*[*]c'),
+      T('MustMatchDir',
+        [os.path.join('a', 'b'), 'b', os.path.join('c', 'd'), 'd'],
+        '.gitignore\na/\nc/d/'),
+      T('LeadingSlash',
+        [os.path.join('a', 'b'), os.path.join('a', 'c'), 'b', 'c'],
+        '.gitignore\n/a/b\n/a/c\n/b\n/c'),
+      T('NeedlesslyEscapedCharacters',
+        ['a', 'b', 'c d'],
+        '.gitignore\n\\a\nb\nc\\ d'),
+      T('InvalidConsecutiveStars',
+        _CombineFormats(_CONSECUTIVE_STAR_FMTS, 'abcdefgh'),
+        '.gitignore\na**\n**b\nc**d\ne/**f\ng/h**'),
+      T('TrailingBackslash',
+        _CombineFormats(['{}', '{}\\', r'{}\\'], 'ab'),
+        '.gitignore\na\\\nb\\\\'),
+      T('ShellGlob', _MakeShellGlobCases('abcdefghijklmno'),
+        '.gitignore\n'
+        'a*a\ndir/*b\nc?c\nd[4]d\ne[!4]e\nf]f\ng[[]g\nh[]]h\n'
+        'i[*]i\nj[?]j\nk[-]k\nl[!]l\nm!m\nn[0-9]n\no[!0-9]o'),
+      T('TrailingConsecutiveStars',
+        ['baz', os.path.join('foo', 'baz'), os.path.join('foo', 'bar', 'baz'),
+         os.path.join('bar', 'baz'), os.path.join('qux', 'bar', 'baz')],
+        '.gitignore\nbar/**'),
+      T('MiddleConsecutiveStars',
+        [os.path.join('top-level', 'foo', 'baz', 'qux'),
+         os.path.join('foo', 'bar', 'baz', 'qux')],
+        '.gitignore\nfoo/**/qux'),
+      T('BackslashBackslashSlash',
+        [os.path.join('foo', 'bar'),
+         os.path.join('foo\\', 'bar')],
+        '.gitignore\nfoo\\\\/bar'),
+      T('BackslashSlash',
+        [os.path.join('foo', 'bar'),
+         os.path.join('foo\\', 'bar')],
+        '.gitignore\nfoo\\/bar'),
+      T('TrailingBackslashBackslash',
+        ['foo',
+         'foo\\'],
+        '.gitignore\nfoo\\\\'),
   )
-  def testSameResultsAsGit(self, paths, gitignore):
+  def testSameResultsAsGit(self, line, paths, gitignore):
+    self._RunTest(paths, gitignore=gitignore)
+
+  @test_case.Filters.skip('Different results than git.', 'b/73452717')
+  @parameterized.named_parameters(
+      T('BackslashGcloudCorrect',
+        ['foo?',
+         'foo.',
+         'fooX'],
+        '.gitignore\nfoo\\?'),
+      T('SlashClassGitCorrect',
+        [os.path.join('foo', 'bar'),
+         os.path.join('foo[', ']bar')],
+        '.gitignore\nfoo[/]bar'),
+  )
+  def testDifferentResultsThanGit(self, line, paths, gitignore):
     self._RunTest(paths, gitignore=gitignore)
 
   # The version of Git used in our .deb and .rpm packaging tests don't conform
@@ -204,22 +236,23 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
   @test_case.Filters.DoNotRunInDebPackage('DEB git doesn\'t follow spec.')
   @test_case.Filters.DoNotRunInRpmPackage('RPM git doesn\'t follow spec.')
   @parameterized.named_parameters(
-      ('TrailingSpaces',
-       _CombineFormats(['{}', '{} ', '{}\t', r'{}\t', ' {}', '\t{}'], 'abcdef'),
-       '.gitignore\na \nb\\ \nc\t\nc\\\t\\ e\nf'),
-      ('AllTabs', ['\t', '\t\t'], '.gitignore\n\t\n\t\t '),
+      T('TrailingSpaces',
+        _CombineFormats(
+            ['{}', '{} ', '{}\t', r'{}\t', ' {}', '\t{}'], 'abcdef'),
+        '.gitignore\na \nb\\ \nc\t\nc\\\t\\ e\nf'),
+      T('AllTabs', ['\t', '\t\t'], '.gitignore\n\t\n\t\t '),
   )
-  def testDifferentGitVersions(self, paths, gitignore):
+  def testDifferentGitVersions(self, line, paths, gitignore):
     self._RunTest(paths, gitignore=gitignore)
 
   @test_case.Filters.skip('Currently incorrect behavior.', 'b/38300876')
   @parameterized.named_parameters(
       # See <https://marc.info/?l=git&m=150721244311661>; corresponds to an
       # inconsistency in the documentation.
-      ('ShellGlobOpeningBrace', ['[', os.path.join('dir', '[')],
-       '.gitignore\n[\ndir/['),
+      T('ShellGlobOpeningBrace', ['[', os.path.join('dir', '[')],
+        '.gitignore\n[\ndir/['),
   )
-  def testMismatched(self, paths, gitignore):
+  def testMismatched(self, line, paths, gitignore):
     self._RunTest(paths, gitignore=gitignore)
 
 

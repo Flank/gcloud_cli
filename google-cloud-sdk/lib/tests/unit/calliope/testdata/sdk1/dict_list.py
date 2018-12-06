@@ -18,11 +18,11 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 from googlecloudsdk.calliope import arg_parsers
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 import six
 
 
-class DictList(base.Command):  # pylint:disable=missing-docstring
+class DictList(calliope_base.Command):  # pylint:disable=missing-docstring
 
   @staticmethod
   def Args(parser):
@@ -90,7 +90,7 @@ class DictList(base.Command):  # pylint:disable=missing-docstring
       return '[{}]'.format(', '.join([self.repr_all(v) for v in obj]))
     elif isinstance(obj, dict):
       values = []
-      for k, v in sorted(six.iteritems(obj)):
+      for k, v in six.iteritems(obj):
         values.append("'{0}': {1}".format(k, self.repr_all(v)))
       return '{' + ', '.join(values) + '}'
     else:

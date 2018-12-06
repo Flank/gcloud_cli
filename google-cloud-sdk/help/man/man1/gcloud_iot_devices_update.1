@@ -11,7 +11,7 @@ gcloud iot devices update \- update an existing device
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud iot devices update\fR (\fIDEVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR\ \fB\-\-registry\fR=\fIREGISTRY\fR) [\fB\-\-blocked\fR] [\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=[\fIKEY\fR=\fIPATH\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud iot devices update\fR (\fIDEVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR\ \fB\-\-registry\fR=\fIREGISTRY\fR) [\fB\-\-blocked\fR] [\fB\-\-log\-level\fR=\fILOG_LEVEL\fR] [\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=[\fIKEY\fR=\fIPATH\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -29,16 +29,15 @@ Update an existing device.
 Device resource \- The device to update. The arguments in this group can be used
 to specify the attributes of this resource. (NOTE) Some attributes are not given
 arguments in this group but can be set in other ways. To set the [project]
-attribute: provide the flag [device] on the command line with a fully specified
-name; provide the flag [\-\-project] on the command line; set the property
-[core/project]. This must be specified.
+attribute: provide the argument [device] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fIDEVICE\fR
-The ID of the device or a fully qualified identifier for the device. This
-positional must be specified if any of the other arguments in this group are
-specified.
+ID of the device or fully qualified identifier for the device. This positional
+must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -69,6 +68,31 @@ Use \f5\-\-no\-blocked\fR to enable connections and \f5\-\-blocked\fR to
 disable.
 
 .TP 2m
+\fB\-\-log\-level\fR=\fILOG_LEVEL\fR
+The default logging verbosity for activity from devices in this registry. The
+verbosity level can be overridden by setting a specific device's log level.
+
+\fILOG_LEVEL\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBdebug\fR
+All events will be logged
+.TP 2m
+\fBerror\fR
+Error events will be logged.
+.TP 2m
+\fBinfo\fR
+Informational events will be logged, such as connections and disconnections.
+Also includes error events.
+.TP 2m
+\fBnone\fR
+Disables logging.
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 The metadata key/value pairs assigned to devices. This metadata is not
 interpreted or indexed by Cloud IoT Core. It can be used to add contextual
@@ -93,9 +117,9 @@ specified by path.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

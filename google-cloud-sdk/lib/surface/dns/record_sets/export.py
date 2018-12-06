@@ -24,7 +24,7 @@ from googlecloudsdk.api_lib.dns import export_util
 from googlecloudsdk.api_lib.dns import util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
-from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.dns import flags
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
@@ -32,7 +32,7 @@ from googlecloudsdk.core.util import files
 
 
 class Export(base.Command):
-  """Export your record-sets into a file.
+  r"""Export your record-sets into a file.
 
   This command exports the record-sets contained within the specified
   managed-zone into a file.
@@ -51,7 +51,8 @@ class Export(base.Command):
 
   Similarly, to import record-sets into a BIND zone formatted zone file, run:
 
-    $ {command} pathto.zonefile --zone-file-format --zone examplezonename
+    $ gcloud dns record-sets import pathto.zonefile --zone-file-format \
+      --zone examplezonename
   """
 
   @staticmethod
@@ -93,7 +94,7 @@ class Export(base.Command):
               project=zone_ref.project,
               managedZone=zone_ref.managedZone))
     except apitools_exceptions.HttpError as error:
-      raise exceptions.HttpException(error)
+      raise calliope_exceptions.HttpException(error)
 
     # Get all the record-sets.
     record_sets = []
@@ -115,6 +116,6 @@ class Export(base.Command):
     except Exception as exp:
       msg = 'Unable to export record-sets to file [{0}]: {1}'.format(
           args.records_file, exp)
-      raise exceptions.ToolException(msg)
+      raise export_util.UnableToExportRecordsToFile(msg)
 
     log.status.Print('Exported record-sets to [{0}].'.format(args.records_file))

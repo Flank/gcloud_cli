@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta container binauthz policy remove\-iam\-policy\-binding \- remove IAM policy binding to a Binary Authorization policy
+gcloud beta container binauthz policy remove\-iam\-policy\-binding \- remove IAM policy binding of a Binary Authorization policy
 
 
 
@@ -17,8 +17,7 @@ gcloud beta container binauthz policy remove\-iam\-policy\-binding \- remove IAM
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR See https://cloud.google.com/iam/docs/managing\-policies for
-details of policy role and member types.
+\fB(BETA)\fR Remove an IAM policy binding of a Binary Authorization policy.
 
 
 
@@ -58,23 +57,35 @@ The role to remove the member from.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBbinaryauthorization/v1alpha2\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/binary\-authorization/
 
 
 
 .SH "EXAMPLES"
 
-The following command will remove an IAM policy binding for the role of
+To Remove an IAM policy binding for the role of
 \'roles/binaryauthorization.attestationAuthoritiesEditor' for the user
-\'test\-user@gmail.com' on the current project's Binary Authorization policy:
+\'test\-user@gmail.com' on the current project's Binary Authorization policy,
+run:
 
 .RS 2m
 $ gcloud beta container binauthz policy remove\-iam\-policy\-binding \e
     \-\-member='user:test\-user@gmail.com' \e
     \-\-role='roles/binaryauthorization.attestationAuthoritiesEditor'
 .RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
 
 
 

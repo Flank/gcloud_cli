@@ -68,21 +68,41 @@ Include vulnerability metadata in the output.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-Describe container analysis data for a specified image:
+Describe the specified image:
 
 .RS 2m
 $ gcloud alpha container images describe \e
     gcr.io/myproject/myimage@digest
       OR
 $ gcloud alpha container images describe gcr.io/myproject/myimage:tag
+.RE
+
+Find the digest for a tag:
+
+.RS 2m
+$ gcloud alpha container images describe \e
+    gcr.io/myproject/myimage:tag \e
+    \-\-format='value(image_summary.digest)'
+      OR
+$ gcloud alpha container images describe \e
+    gcr.io/myproject/myimage:tag \e
+    \-\-format='value(image_summary.fully_qualified_digest)'
+.RE
+
+See package vulnerabilities found by the Container Analysis API for the
+specified image:
+
+.RS 2m
+$ gcloud alpha container images describe \e
+    gcr.io/myproject/myimage@digest \-\-show\-package\-vulnerability
 .RE
 
 

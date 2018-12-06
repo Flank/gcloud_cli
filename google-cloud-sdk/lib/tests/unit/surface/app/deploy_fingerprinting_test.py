@@ -104,6 +104,7 @@ class FingerprintingTestBase(cli_test_base.CliTestBase, util.WithAppData,
     return mock.MagicMock()
 
 
+@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
 @test_case.Filters.RunOnlyIf(properties.VALUES.app.runtime_root.Get(),
                              'No app runtime root is configured')
 class GenConfigTest(FingerprintingTestBase):

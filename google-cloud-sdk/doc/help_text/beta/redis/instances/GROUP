@@ -4,13 +4,11 @@ NAME
 SYNOPSIS
     gcloud beta redis instances COMMAND [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (BETA) Manage Cloud Memorystore Redis instances.
-
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -30,9 +28,34 @@ COMMANDS
      update
         (BETA) Update Memorystore Redis instances.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    To create an instance with the name my-redis-instance, run:
 
+        $ gcloud beta redis instances create my-redis-instance
+
+    To delete an instance with the name my-redis-instance, run:
+
+        $ gcloud beta redis instances delete my-redis-instance
+
+    To display the details for an instance with the name my-redis-instance,
+    run:
+
+        $ gcloud beta redis instances describe my-redis-instance
+
+    To list all the instances, run:
+
+        $ gcloud beta redis instances list
+
+    To set the label env to prod for an instance with the name
+    my-redis-instance, run:
+
+        $ gcloud beta redis instances my-redis-instance \
+            --update-labels=env=prod
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud redis instances
         $ gcloud alpha redis instances
 

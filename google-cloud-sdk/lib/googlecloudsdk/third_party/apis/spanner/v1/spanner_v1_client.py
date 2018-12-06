@@ -621,6 +621,51 @@ periodically, e.g., `"SELECT 1"`.
         supports_download=False,
     )
 
+    def ExecuteBatchDml(self, request, global_params=None):
+      r"""Executes a batch of SQL DML statements. This method allows many statements.
+to be run with lower latency than submitting them sequentially with
+ExecuteSql.
+
+Statements are executed in order, sequentially.
+ExecuteBatchDmlResponse will contain a
+ResultSet for each DML statement that has successfully executed. If a
+statement fails, its error status will be returned as part of the
+ExecuteBatchDmlResponse. Execution will
+stop at the first failed statement; the remaining statements will not run.
+
+ExecuteBatchDml is expected to return an OK status with a response even if
+there was an error while processing one of the DML statements. Clients must
+inspect response.status to determine if there were any errors while
+processing the request.
+
+See more details in
+ExecuteBatchDmlRequest and
+ExecuteBatchDmlResponse.
+
+      Args:
+        request: (SpannerProjectsInstancesDatabasesSessionsExecuteBatchDmlRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ExecuteBatchDmlResponse) The response message.
+      """
+      config = self.GetMethodConfig('ExecuteBatchDml')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ExecuteBatchDml.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instancesId}/databases/{databasesId}/sessions/{sessionsId}:executeBatchDml',
+        http_method=u'POST',
+        method_id=u'spanner.projects.instances.databases.sessions.executeBatchDml',
+        ordered_params=[u'session'],
+        path_params=[u'session'],
+        query_params=[],
+        relative_path=u'v1/{+session}:executeBatchDml',
+        request_field=u'executeBatchDmlRequest',
+        request_type_name=u'SpannerProjectsInstancesDatabasesSessionsExecuteBatchDmlRequest',
+        response_type_name=u'ExecuteBatchDmlResponse',
+        supports_download=False,
+    )
+
     def ExecuteSql(self, request, global_params=None):
       r"""Executes an SQL statement, returning all results in a single reply. This.
 method cannot be used to return a result set larger than 10 MiB;
@@ -1564,6 +1609,33 @@ resource.
         request_field='',
         request_type_name=u'SpannerProjectsInstancesListRequest',
         response_type_name=u'ListInstancesResponse',
+        supports_download=False,
+    )
+
+    def ListCreateDatabaseFromBackupMetadata(self, request, global_params=None):
+      r"""ListCreateDatabaseFromBackupMetadata method for the projects_instances service.
+
+      Args:
+        request: (SpannerProjectsInstancesListCreateDatabaseFromBackupMetadataRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListCreateDatabaseFromBackupMetadataResponse) The response message.
+      """
+      config = self.GetMethodConfig('ListCreateDatabaseFromBackupMetadata')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListCreateDatabaseFromBackupMetadata.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instanceId}:ListCreateDatabaseFromBackupMetadata',
+        http_method=u'GET',
+        method_id=u'spanner.projects.instances.listCreateDatabaseFromBackupMetadata',
+        ordered_params=[u'parent', u'instanceId'],
+        path_params=[u'instanceId', u'parent'],
+        query_params=[u'filter', u'orderBy', u'pageSize', u'pageToken'],
+        relative_path=u'v1/{+parent}/instances/{instanceId}:ListCreateDatabaseFromBackupMetadata',
+        request_field='',
+        request_type_name=u'SpannerProjectsInstancesListCreateDatabaseFromBackupMetadataRequest',
+        response_type_name=u'ListCreateDatabaseFromBackupMetadataResponse',
         supports_download=False,
     )
 

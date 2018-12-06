@@ -18,7 +18,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.core import log
 
@@ -45,13 +45,13 @@ class AddDynamicFlags(parser_extensions.DynamicPositionalAction):
     if namespace.flags:
       for dest in namespace.flags.split():
         flag = '--' + dest
-        arg = base.Argument(
+        arg = calliope_base.Argument(
             flag,
             dest=dest,
             category='DYNAMIC FLAGS',
             help='`{}` dynamic flag.'.format(dest))
         args.append(arg)
-      arg = base.Argument(
+      arg = calliope_base.Argument(
           'extra',
           nargs='?',
           help='An extra positional.')
@@ -63,7 +63,7 @@ class AddDynamicFlags(parser_extensions.DynamicPositionalAction):
     return ['alpha', 'beta', 'gamma']
 
 
-class DynamiArgs(base.Command):
+class DynamiArgs(calliope_base.Command):
   """parser_extensions.DynamicPositionalAction test command."""
 
   @staticmethod

@@ -256,6 +256,14 @@ class UpgradeTestGA(parameterized.TestCase,
                            'will be upgraded from version [1.1.3] '
                            'to the default cluster version')
 
+  def testUpgradeNodesTimeout(self):
+    self._TestUpgrade(
+        update=self.msgs.ClusterUpdate(desiredNodeVersion='-'),
+        flags='--timeout=100')
+    self.AssertErrContains('All nodes (3 nodes) of cluster [tobeupgraded] '
+                           'will be upgraded from version [1.1.2] '
+                           'to version [1.1.3]')
+
   def testUpgradeNodesNoVersion(self):
     self._TestUpgrade(
         update=self.msgs.ClusterUpdate(desiredNodeVersion='-'),
@@ -393,6 +401,24 @@ class UpgradeTestAlpha(base.AlphaTestBase, UpgradeTestBeta):
                           {'name': 'NodePoolName', 'version': '1.1.4'}]
         })
     self.AssertErrContains(' nodes will be upgraded at a time.')
+
+  @parameterized.parameters(
+      ('--security-profile=test-profile-1', 'test-profile-1', None),
+      ('--security-profile=test-profile-1 --security-profile-runtime-rules',
+       'test-profile-1', False),
+      ('--security-profile=test-profile-1 --no-security-profile-runtime-rules',
+       'test-profile-1', True),
+  )
+  def testUpgradeSecurityProfile(self, flags,
+                                 expect_profile,
+                                 expect_disable_runtime_rules):
+    self._TestUpgrade(
+        update=self.msgs.ClusterUpdate(
+            desiredNodeVersion='-',
+            securityProfile=self.msgs.SecurityProfile(
+                name=expect_profile,
+                disableRuntimeRules=expect_disable_runtime_rules)),
+        flags=flags)
 
 
 if __name__ == '__main__':

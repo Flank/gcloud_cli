@@ -34,7 +34,7 @@ forwarding rules are accessible from the internet, while internal forwarding
 rules are only accessible from within their VPC networks. You can specify a
 reserved static external or internal IP address with the
 \f5\fI\-\-address=ADDRESS\fR\fR flag for the forwarding rule. Otherwise if the
-flag is unspecified, an external forwaring rule will be automatically assigned
+flag is unspecified, an external forwarding rule will be automatically assigned
 an ephemeral external IP address (global IP addresses for global forwarding
 rules and regional IP addresses for regional forwarding rules); an internal
 forwarding rule will be automatically assigned an ephemeral internal IP address
@@ -77,25 +77,25 @@ Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR
-The target backend service that will receive the traffic.
+Target backend service that will receive the traffic.
 
 .TP 2m
 \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR
-The target HTTP proxy that will receive the traffic. Acceptable values for
-\-\-ports flag are: 80, 8080.
+Target HTTP proxy that will receive the traffic. Acceptable values for \-\-ports
+flag are: 80, 8080.
 
 .TP 2m
 \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR
-The target HTTPS proxy that will receive the traffic. Acceptable values for
+Target HTTPS proxy that will receive the traffic. Acceptable values for
 \-\-ports flag are: 443.
 
 .TP 2m
 \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR
-The name of the target instance that will receive the traffic. The target
-instance must be in a zone that's in the forwarding rule's region. Global
-forwarding rules may not direct traffic to target instances. If not specified
-and the \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to
-select a zone.
+Name of the target instance that will receive the traffic. The target instance
+must be in a zone that's in the forwarding rule's region. Global forwarding
+rules may not direct traffic to target instances. If not specified and the
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
+zone.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/zone\fR\fR property:
@@ -121,26 +121,24 @@ Alternatively, the zone can be stored in the environment variable
 
 .TP 2m
 \fB\-\-target\-pool\fR=\fITARGET_POOL\fR
-The target pool that will receive the traffic. The target pool must be in the
-same region as the forwarding rule. Global forwarding rules may not direct
-traffic to target pools.
+Target pool that will receive the traffic. The target pool must be in the same
+region as the forwarding rule. Global forwarding rules may not direct traffic to
+target pools.
 
 .TP 2m
 \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR
-The target SSL proxy that will receive the traffic. Acceptable values for
-\-\-ports flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995, 1883,
-5222.
+Target SSL proxy that will receive the traffic. Acceptable values for \-\-ports
+flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995, 1883, 5222.
 
 .TP 2m
 \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR
-The target TCP proxy that will receive the traffic. Acceptable values for
-\-\-ports flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995, 1883,
-5222.
+Target TCP proxy that will receive the traffic. Acceptable values for \-\-ports
+flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995, 1883, 5222.
 
 .TP 2m
 \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR
-The target VPN gateway that will receive forwarded traffic. Acceptable values
-for \-\-ports flag are: 500, 4500.
+Target VPN gateway that will receive forwarded traffic. Acceptable values for
+\-\-ports flag are: 500, 4500.
 
 
 .RE
@@ -164,26 +162,27 @@ External load balancing or forwarding, used with one of \-\-target\-http\-proxy,
 .TP 2m
 \fBINTERNAL\fR
 Internal load balancing or forwarding, used with \-\-backend\-service.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
-(Only for \-\-load\-balancing\-scheme=INTERNAL) The network that this forwarding
+(Only for \-\-load\-balancing\-scheme=INTERNAL) Network that this forwarding
 rule applies to. If this field is not specified, the default network will be
 used. In the absence of the default network, this field must be specified.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
-(Only for \-\-load\-balancing\-scheme=INTERNAL) The subnetwork that this
-forwarding rule applies to. If the network configured for this forwarding rule
-is in auto subnet mode, this flag is optional and the subnet in the same region
-of the forwarding rule will be used. However, if the network is in custom subnet
-mode, a subnetwork must be specified.
+(Only for \-\-load\-balancing\-scheme=INTERNAL) Subnetwork that this forwarding
+rule applies to. If the network configured for this forwarding rule is in auto
+subnet mode, this flag is optional and the subnet in the same region of the
+forwarding rule will be used. However, if the network is in custom subnet mode,
+a subnetwork must be specified.
 
 .TP 2m
 \fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR
-Region of the subnetwork to operate on. If not specified it will be set the
+Region of the subnetwork to operate on. If not specified, it will be set to the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
@@ -194,13 +193,13 @@ Zone of the target instance to operate on. Overrides the default
 
 .TP 2m
 \fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR
-Region of the target pool to operate on. If not specified it will be set the
+Region of the target pool to operate on. If not specified, it will be set to the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
 \fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR
-Region of the VPN gateway to operate on. If not specified it will be set the
+Region of the VPN gateway to operate on. If not specified, it will be set to the
 region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
@@ -211,8 +210,8 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR
-Region of the backend service to operate on. If not specified it will be set the
-region of the forwarding rule. Overrides the default \fBcompute/region\fR
+Region of the backend service to operate on. If not specified, it will be set to
+the region of the forwarding rule. Overrides the default \fBcompute/region\fR
 property value for this command invocation.
 
 .TP 2m
@@ -265,9 +264,9 @@ Alternatively, the region can be stored in the environment variable
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

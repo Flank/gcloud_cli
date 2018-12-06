@@ -77,7 +77,7 @@ class InstancesCreateTest(base.SpannerTestBase):
                         value=extra_types.JsonValue(
                             string_value='resultname'))])))
     self.client.projects_instances.Get.Expect(
-        request=self.msgs.SpannerProjectsInstancesOperationsGetRequest(
+        request=self.msgs.SpannerProjectsInstancesGetRequest(
             name='resultname'),
         response=self.msgs.Instance())
     self.Run('spanner instances create insId --config cfgId --nodes 3 '

@@ -25,6 +25,7 @@ from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA,
                           calliope_base.ReleaseTrack.GA)
@@ -92,6 +93,7 @@ class GetIamPolicyUnitTest(base.MlGaPlatformTestBase):
         'user:test-owner1@gmail.com\nuser:test-owner2@gmail.com\n')
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA,
                           calliope_base.ReleaseTrack.GA)

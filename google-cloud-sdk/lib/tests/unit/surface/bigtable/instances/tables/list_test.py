@@ -49,6 +49,7 @@ if six.PY2:
 
 
 @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/78118402')
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class ListTests(sdk_test_base.WithFakeAuth,

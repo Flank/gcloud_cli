@@ -50,38 +50,6 @@ class EditDistanceTest(sdk_test_base.SdkBase):
     # Adding an alias for an existing item should not clobber it.
     self.assertEqual('app', tester.GetSuggestion('app'))
 
-  def testSynonyms(self):
-    tester = usage_text.TextChoiceSuggester()
-    tester.AddSynonyms()
-    self.assertEqual(None, tester.GetSuggestion('add'))
-
-    tester = usage_text.TextChoiceSuggester(['add'])
-    self.assertEqual('add', tester.GetSuggestion('add'))
-    # Create doesn't have the smart alias.
-    self.assertEqual(None, tester.GetSuggestion('create'))
-    tester.AddSynonyms()
-    # We now get the smart suggestion.
-    self.assertEqual('add', tester.GetSuggestion('create'))
-    # Add still points to itself.
-    self.assertEqual('add', tester.GetSuggestion('add'))
-
-    tester = usage_text.TextChoiceSuggester(['remove', 'delete'])
-    self.assertEqual('remove', tester.GetSuggestion('remove'))
-    self.assertEqual('delete', tester.GetSuggestion('delete'))
-    tester.AddSynonyms()
-    # No changes to these since they are both present.
-    self.assertEqual('remove', tester.GetSuggestion('remove'))
-    self.assertEqual('delete', tester.GetSuggestion('delete'))
-
-    tester = usage_text.TextChoiceSuggester(['get', 'junk'])
-    tester.AddAliases(['describe'], 'junk')
-    # Describe is an alias match for junk.
-    self.assertEqual('junk', tester.GetSuggestion('describe'))
-    tester.AddSynonyms()
-    # This still maps to junk since it was an explicit alias, even though the
-    # synonym would make it point to 'get'.
-    self.assertEqual('junk', tester.GetSuggestion('describe'))
-
   def testCommandChoice_DistanceTooFar(self):
     tester = usage_text.TextChoiceSuggester(['ssh'])
     self.assertEqual(None, tester.GetSuggestion('help'))

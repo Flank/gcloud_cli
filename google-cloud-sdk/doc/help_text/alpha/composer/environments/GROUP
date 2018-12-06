@@ -1,0 +1,61 @@
+NAME
+    gcloud alpha composer environments - create and manage Cloud Composer
+        environments
+
+SYNOPSIS
+    gcloud alpha composer environments GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The gcloud alpha composer environments command group lets you
+    create Cloud Composer environments containing an Apache Airflow setup.
+    Additionally, the command group supports environment updates including
+    varying number of machines used to run Airflow, setting Airflow configs, or
+    installing Python dependencies used in Airflow DAGs. The command group can
+    also be used to delete Composer environments.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     storage
+        (ALPHA) Manage Cloud Storage objects stored as part of Cloud Composer
+        environments.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create and initialize a Cloud Composer environment.
+
+     delete
+        (ALPHA) Delete one or more Cloud Composer environments.
+
+     describe
+        (ALPHA) Get details about a Cloud Composer environment.
+
+     list
+        (ALPHA) List the Cloud Composer environments under a project and
+        location.
+
+     run
+        (ALPHA) Run an Airflow sub-command remotely in a Cloud Composer
+        environment.
+
+     update
+        (ALPHA) Update properties of a Cloud Composer environment.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud composer environments
+        $ gcloud beta composer environments
+

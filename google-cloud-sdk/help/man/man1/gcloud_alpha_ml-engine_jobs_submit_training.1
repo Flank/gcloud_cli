@@ -11,7 +11,7 @@ gcloud alpha ml\-engine jobs submit training \- submit a Cloud Machine Learning 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml\-engine jobs submit training\fR \fIJOB\fR \fB\-\-module\-name\fR=\fIMODULE_NAME\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
+\f5gcloud alpha ml\-engine jobs submit training\fR \fIJOB\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-module\-name\fR=\fIMODULE_NAME\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
 
 
 
@@ -76,18 +76,7 @@ and USER_ARGS on the right.
 .RE
 .sp
 
-.SH "REQUIRED FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-module\-name\fR=\fIMODULE_NAME\fR
-Name of the module to run.
-
-
-.RE
-.sp
-
-.SH "OPTIONAL FLAGS"
+.SH "FLAGS"
 
 .RS 2m
 .TP 2m
@@ -96,9 +85,49 @@ Path to the job configuration file. This file should be a YAML document (JSON
 also accepted) containing a Job resource as defined in the API (all fields are
 optional): https://cloud.google.com/ml/reference/rest/v1/projects.jobs
 
+EXAMPLES:
+
+JSON:
+
+.RS 2m
+{
+  "jobId": "my_job",
+  "labels": {
+    "type": "prod",
+    "owner": "alice"
+  },
+  "trainingInput": {
+    "scaleTier": "BASIC",
+    "packageUris": [
+      "gs://my/package/path"
+    ],
+    "region": "us\-east1"
+  }
+}
+.RE
+
+YAML:
+
+.RS 2m
+jobId: my_job
+labels:
+  type: prod
+  owner: alice
+trainingInput:
+  scaleTier: BASIC
+  packageUris:
+  \- gs://my/package/path
+  region: us\-east1
+.RE
+
+
+
+.RE
+.sp
 If an option is specified both in the configuration file **and** via command
 line arguments, the command line arguments override the configuration file.
 
+.RS 2m
 .TP 2m
 \fB\-\-job\-dir\fR=\fIJOB_DIR\fR
 Google Cloud Storage path in which to store training outputs and other data
@@ -119,6 +148,10 @@ Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
 underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
 only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
+
+.TP 2m
+\fB\-\-module\-name\fR=\fIMODULE_NAME\fR
+Name of the module to run.
 
 .TP 2m
 \fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR
@@ -222,9 +255,13 @@ Large number of workers with many parameter servers.
 .TP 2m
 \fBstandard\-1\fR
 Many workers and a few parameter servers.
+.RE
+.sp
 
 .RE
 .sp
+
+.RS 2m
 .TP 2m
 \fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR
 Bucket in which to stage training archives.
@@ -262,9 +299,9 @@ $ gcloud ml\-engine jobs cancel JOB_ID
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

@@ -135,7 +135,7 @@ class SubscriptionsTest(base.CloudPubsubTestBase):
             seekRequest=self.msgs.SeekRequest(
                 snapshot=snapshot, time=time),
             subscription=sub_ref.RelativeName()),
-        self.msgs.Empty())
+        self.msgs.SeekResponse())
 
   def testSeek_time(self):
     sub_ref = util.ParseSubscription('sub1', self.Project())

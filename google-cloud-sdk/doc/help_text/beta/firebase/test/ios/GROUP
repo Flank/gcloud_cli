@@ -2,7 +2,7 @@ NAME
     gcloud beta firebase test ios - command group for iOS application testing
 
 SYNOPSIS
-    gcloud beta firebase test ios GROUP [GCLOUD_WIDE_FLAG ...]
+    gcloud beta firebase test ios GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Explore physical iOS devices and iOS versions which are available as
@@ -11,17 +11,28 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
+
+     locales
+        (BETA) Explore iOS locales available for testing.
 
      models
         (BETA) Explore iOS models available in the Test Environment catalog.
 
      versions
         (BETA) Explore iOS versions available for testing.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     run
+        (BETA) Invoke a test in Firebase Test Lab for iOS and view test
+        results.
 
 EXAMPLES
     To see a list of available iOS devices and supported iOS versions, run:
@@ -45,8 +56,9 @@ EXAMPLES
         $ gcloud beta firebase test ios run --help
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud firebase test ios
         $ gcloud alpha firebase test ios
 

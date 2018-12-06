@@ -24,9 +24,9 @@ Read and manipulate Google Compute Engine virtual machine instances.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -71,6 +71,11 @@ Attach a disk to an instance.
 .TP 2m
 \fBcreate\fR
 Create Google Compute Engine virtual machine instances.
+
+.TP 2m
+\fBcreate\-with\-container\fR
+Creates Google Compute engine virtual machine instances running container
+images.
 
 .TP 2m
 \fBdelete\fR
@@ -133,6 +138,10 @@ Set scheduling options for Google Compute Engine virtual machines.
 Set service account and scopes for a Google Compute Engine instance.
 
 .TP 2m
+\fBsimulate\-maintenance\-event\fR
+Simulate maintenance of virtual machine instances.
+
+.TP 2m
 \fBstart\fR
 Start a stopped virtual machine instance.
 
@@ -152,6 +161,11 @@ Update a Google Compute Engine virtual machine.
 .TP 2m
 \fBupdate\-access\-config\fR
 Update a Google Compute Engine virtual machine access configuration.
+
+.TP 2m
+\fBupdate\-container\fR
+Updates Google Compute engine virtual machine instances running container
+images.
 
 
 .RE

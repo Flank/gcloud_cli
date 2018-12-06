@@ -20,7 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.py import encoding
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_base
 from tests.lib import test_case
 
@@ -31,7 +31,7 @@ class SpeechTests(e2e_base.WithServiceAuth):
   def SetUp(self):
     self.testdata = self.Resource('tests', 'unit', 'command_lib', 'ml',
                                   'speech', 'testdata', 'sample.flac')
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testRecognize(self):
     """Test that gcloud ml speech recognize works."""

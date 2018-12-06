@@ -5,18 +5,29 @@ NAME
 SYNOPSIS
     gcloud beta container clusters update NAME
         (--complete-credential-rotation | --complete-ip-rotation
-          | --enable-autoscaling | --enable-legacy-authorization
-          | --enable-master-authorized-networks | --enable-network-policy
-          | --enable-pod-security-policy | --generate-password
-          | --maintenance-window=MAINTENANCE_WINDOW | --remove-labels=[KEY,...]
-          | --set-password | --start-credential-rotation | --start-ip-rotation
+          | --enable-autoscaling | --enable-binauthz
+          | --enable-legacy-authorization | --enable-master-authorized-networks
+          | --enable-network-policy | --enable-pod-security-policy
+          | --generate-password | --maintenance-window=MAINTENANCE_WINDOW
+          | --remove-labels=[KEY,...] | --set-password
+          | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
           | --update-labels=[KEY=VALUE,...] | --additional-zones=[ZONE,...]
           | --node-locations=ZONE,[ZONE,...]
+          | --clear-resource-usage-bigquery-dataset
+          | --enable-network-egress-metering
+          --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
+          | [--enable-autoprovisioning
+          : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
+          | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY : --min-cpu=MIN_CPU
+          --min-memory=MIN_MEMORY
+          [--max-accelerator=[type=TYPE,count=COUNT,...]
+          : --min-accelerator=[type=TYPE,count=COUNT,...]]]]
           | --logging-service=LOGGING_SERVICE
           --monitoring-service=MONITORING_SERVICE
           | --password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME) [--async]
+        [--istio-config=[auth=MTLS_PERMISSIVE,...]]
         [--master-authorized-networks=NETWORK,[NETWORK,...]]
         [--node-pool=NODE_POOL] [--max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -56,6 +67,9 @@ REQUIRED FLAGS
           Enables autoscaling in the node pool specified by --node-pool or the
           default node pool if --node-pool is not provided.
 
+       --enable-binauthz
+          Enable Binary Authorization for this cluster.
+
        --enable-legacy-authorization
           Enables the legacy ABAC authentication for the cluster. User rights
           are granted through the use of policies which combine attributes
@@ -71,8 +85,8 @@ REQUIRED FLAGS
           well:
 
               1) The private network the cluster connects to if
-              `--private-cluster` is specified.
-              2) Google Compute Engine Public IPs if `--private-cluster` is not
+              `--enable-private-nodes` is specified.
+              2) Google Compute Engine Public IPs if `--enable-private-nodes` is not
               specified.
 
           When disabled, public internet (0.0.0.0/0) is allowed to connect to
@@ -141,7 +155,8 @@ REQUIRED FLAGS
           Cluster addons to enable or disable. Options are
           HorizontalPodAutoscaling=ENABLED|DISABLED
           HttpLoadBalancing=ENABLED|DISABLED
-          KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
+          KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
+          NetworkPolicy=ENABLED|DISABLED
 
        --update-labels=[KEY=VALUE,...]
           Labels to apply to the Google Cloud resources in use by the
@@ -199,6 +214,119 @@ REQUIRED FLAGS
                     --zone us-central1-a \
                     --node-locations us-central1-a,us-central1-b
 
+       Exports cluster's usage of cloud resources At most one of these may be
+       specified:
+
+         --clear-resource-usage-bigquery-dataset
+            Disables exporting cluster resource usage to BigQuery.
+
+         --enable-network-egress-metering
+            Enable network egress metering on this cluster.
+
+            When enabled, a DaemonSet is deployed into the cluster. Each
+            DaemonSet pod meters network egress traffic by collecting data from
+            the conntrack table, and exports the metered metrics to the
+            specified destination.
+
+            Network egress metering is disabled if this flag is omitted, or
+            when --no-enable-network-egress-metering is set.
+
+         --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
+            The name of the BigQuery dataset to which the cluster's usage of
+            cloud resources is exported. A table will be created in the
+            specified dataset to store cluster resource usage. The resulting
+            table can be joined with BigQuery Billing Export to produce a
+            fine-grained cost breakdown.
+
+            Example:
+
+                $ gcloud beta container clusters update example-cluster \
+                    --resource-usage-bigquery-dataset=example_bigquery_dataset_name
+
+       Node autoprovisioning
+
+         --enable-autoprovisioning
+            Enables node autoprovisioning for a cluster.
+
+            Cluster Autoscaler will be able to create new node pools. Requires
+            maximum CPU and memory limits to be specified. This flag must be
+            specified if any of the other arguments in this group are
+            specified.
+
+         At most one of these may be specified:
+
+           --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
+              Path of the JSON/YAML file which contains information about the
+              cluster's autoscaling configuration. Currently it only contains a
+              list of resource limits of the cluster.
+
+              Each resource limits definition contains three fields:
+              resourceType, maximum and minimum. Resource type can be "cpu",
+              "memory" or an accelerator (e.g. "nvidia-tesla-k80" for nVidia
+              Tesla K80). Use gcloud compute accelerator-types list to learn
+              about available accelerator types. Maximum is the maximum allowed
+              amount with the unit of the resource. Minimum is the minimum
+              allowed amount with the unit of the resource.
+
+           Flags to configure resource limits:
+
+             --max-cpu=MAX_CPU
+                Maximum number of cores in the cluster.
+
+                Maximum number of cores to which the cluster can scale. This
+                flag must be specified if any of the other arguments in this
+                group are specified.
+
+             --max-memory=MAX_MEMORY
+                Maximum memory in the cluster.
+
+                Maximum number of gigabytes of memory to which the cluster can
+                scale. This flag must be specified if any of the other
+                arguments in this group are specified.
+
+             --min-cpu=MIN_CPU
+                Minimum number of cores in the cluster.
+
+                Minimum number of cores to which the cluster can scale.
+
+             --min-memory=MIN_MEMORY
+                Minimum memory in the cluster.
+
+                Minimum number of gigabytes of memory to which the cluster can
+                scale.
+
+             Arguments to set limits on accelerators:
+
+               --max-accelerator=[type=TYPE,count=COUNT,...]
+                  Sets maximum limit for a single type of accelerators (e.g.
+                  GPUs) in cluster.
+
+       type
+          (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla
+          K80) of accelerator for which the limit is set. Use gcloud compute
+          accelerator-types list to learn about all available accelerator
+          types.
+
+       count
+          (Required) The maximum number of accelerators to which the cluster
+          can be scaled. This flag must be specified if any of the other
+          arguments in this group are specified.
+
+                       --min-accelerator=[type=TYPE,count=COUNT,...]
+                          Sets minimum limit for a single type of accelerators
+                          (e.g. GPUs) in cluster. Defaults to 0 for all
+                          accelerator types if it isn't set.
+
+       type
+          (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla
+          K80) of accelerator for which the limit is set. Use gcloud compute
+          accelerator-types list to learn about all available accelerator
+          types.
+
+       count
+          (Required) The minimum number of accelerators to which the cluster
+          can be scaled.
+
        --logging-service=LOGGING_SERVICE
           Logging service to use for the cluster. Options are:
           "logging.googleapis.com/kubernetes" (the Google Cloud Logging service
@@ -227,7 +355,10 @@ REQUIRED FLAGS
               --enable-basic-auth is an alias for --username=admin;
               --no-enable-basic-auth is an alias for --username="". Use
               --password to specify a password; if not, the server will
-              randomly generate one.
+              randomly generate one. For cluster versions before 1.12, if
+              neither --enable-basic-auth nor --username is specified,
+              --enable-basic-auth will default to true. After 1.12,
+              --enable-basic-auth will default to false.
 
            --username=USERNAME, -u USERNAME
               The user name to use for basic auth for the cluster. Use
@@ -237,6 +368,16 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --async
         Don't wait for the operation to complete.
+
+     --istio-config=[auth=MTLS_PERMISSIVE,...]
+        Configurations for Istio addon, requires --addons contains Istio for
+        create, or --update-addons Istio=ENABLED for update.
+
+         auth
+            Optional Type of auth MTLS_PERMISSIVE or MTLS_STRICT Example:
+
+                $ gcloud beta container clusters update example-cluster \
+                    --istio-config=auth=MTLS_PERMISSIVE
 
      --master-authorized-networks=NETWORK,[NETWORK,...]
         The list of CIDR blocks (up to 20) that are allowed to connect to
@@ -274,8 +415,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -16,7 +16,6 @@ info_type:
   metavar: 'infotype'
   arg_name: info-types
   type: googlecloudsdk.command_lib.dlp.hooks:InfoType
-  required: true
   help_text: |
     Which infoTypes to scan input for. The values must correspond to
     infoType values found in documentation. For more information about
@@ -29,16 +28,16 @@ min_likelihood:
   help_text: |
     Only return findings equal to or above this threshold.
   choices:
-    - arg_value: very-unlikely
-      enum_value: VERY_UNLIKELY
-    - arg_value: unlikely
-      enum_value: UNLIKELY
-    - arg_value: possible
-      enum_value: POSSIBLE
-    - arg_value: likely
-      enum_value: LIKELY
-    - arg_value: very-likely
-      enum_value: VERY_LIKELY
+  - arg_value: very-unlikely
+    enum_value: VERY_UNLIKELY
+  - arg_value: unlikely
+    enum_value: UNLIKELY
+  - arg_value: possible
+    enum_value: POSSIBLE
+  - arg_value: likely
+    enum_value: LIKELY
+  - arg_value: very-likely
+    enum_value: VERY_LIKELY
 
 include_quote:
   api_field: googlePrivacyDlpV2InspectContentRequest.inspectConfig.includeQuote
@@ -63,11 +62,10 @@ max_findings:
   api_field: googlePrivacyDlpV2InspectContentRequest.inspectConfig.limits.maxFindingsPerRequest
   arg_name: max-findings
   type: int
-  default: 1000
   help_text: |
     Maximum number of findings that will be returned per execution.
 
-    If not specified, will return up to the system maximum of 1000 findings.
+    If not specified, no limits are applied.
 
 datastore_kind:
   arg_name: datastore-kind
@@ -75,9 +73,9 @@ datastore_kind:
   type: googlecloudsdk.command_lib.dlp.hooks:DatastoreInputOptions
   is_positional: false
   help_text: |
-     The Cloud Datastore kind or table to scan. The kind can optionally be
-     prefixed with the Cloud Datastore namespace ID - for example
-     `namespace:example-kind` or simply `example-kind`
+    The Cloud Datastore kind or table to scan. The kind can optionally be
+    prefixed with the Cloud Datastore namespace ID - for example
+    `namespace:example-kind` or simply `example-kind`
 
 gcs_path:
   arg_name: path
@@ -85,8 +83,8 @@ gcs_path:
   type: googlecloudsdk.command_lib.dlp.hooks:GcsInputOptions
   is_positional: false
   help_text: |
-      Google Cloud Storage URL to scan for files with optional wildcard
-      character (```*```) -- for example, gs://my-bucket/```*```.
+    Google Cloud Storage URL to scan for files with optional wildcard
+    character (```*```) -- for example, gs://my-bucket/```*```.
 
 big_query_table:
   arg_name: input-table
@@ -94,9 +92,9 @@ big_query_table:
   type: googlecloudsdk.command_lib.dlp.hooks:BigQueryInputOptions
   is_positional: false
   help_text: |
-      BigQuery table to scan. BigQuery tables are uniquely identified by
-      their project_id, dataset_id, and table_id in the format
-      `<project_id>.<dataset_id>.<table_id>`.
+    BigQuery table to scan. BigQuery tables are uniquely identified by
+    their project_id, dataset_id, and table_id in the format
+    `<project_id>.<dataset_id>.<table_id>`.
 
 min_time:
   arg_name: min-time
@@ -105,12 +103,12 @@ min_time:
   processor: googlecloudsdk.command_lib.dlp.hooks:DlpTimeStamp
   is_positional: false
   help_text: |
-      Scan will include items in repository whose age is >= min-time
-      and <= max-time.
+    Scan will include items in repository whose age is >= min-time
+    and <= max-time.
 
-      If max-time is omitted then there is no maximum time limit.
+    If max-time is omitted then there is no maximum time limit.
 
-      See $ gcloud topic datetimes for information on time formats.
+    See $ gcloud topic datetimes for information on time formats.
 
 max_time:
   arg_name: max-time
@@ -119,12 +117,12 @@ max_time:
   processor: googlecloudsdk.command_lib.dlp.hooks:DlpTimeStamp
   is_positional: false
   help_text: |
-      Scan will include items in repository whose age is >= min-time
-      and <= max-time.
+    Scan will include items in repository whose age is >= min-time
+    and <= max-time.
 
-      If max-time is omitted then there is no maximum time limit.
+    If max-time is omitted then there is no maximum time limit.
 
-      See $ gcloud topic datetimes for information on time formats.
+    See $ gcloud topic datetimes for information on time formats.
 
 job_id:
   arg_name: job-id
@@ -132,12 +130,12 @@ job_id:
   is_positional: false
   required: false
   help_text: |
-      Optional job ID to use for the created job. If not provided, a job
-      ID will automatically be generated. Must be unique within the project.
-      The job ID can contain uppercase and lowercase letters, numbers, and
-      hyphens; that is, it must match the regular expression:
-      `[a-zA-Z\\d-]+`. The maximum length is 100 characters. Can be empty to
-      allow the system to generate one.
+    Optional job ID to use for the created job. If not provided, a job
+    ID will automatically be generated. Must be unique within the project.
+    The job ID can contain uppercase and lowercase letters, numbers, and
+    hyphens; that is, it must match the regular expression:
+    `[a-zA-Z\\d-]+`. The maximum length is 100 characters. Can be empty to
+    allow the system to generate one.
 
 max_item_findings:
   arg_name: max-findings-per-item
@@ -153,7 +151,7 @@ max_item_findings:
 jobs_output_group:
   group:
     mutex: true
-    required: true
+    required: false
     params:
     - arg_name: output-topics
       api_field: googlePrivacyDlpV2CreateDlpJobRequest.inspectJob.actions
@@ -164,11 +162,13 @@ jobs_output_group:
 
         Note: The topic must have given publishing access rights to the DLP
         API service account executing the Cloud DLP job.
-    - arg_name: output-tables
+    - arg_name: output-table
+      repeated: false
       api_field: googlePrivacyDlpV2CreateDlpJobRequest.inspectJob.actions
       type: googlecloudsdk.command_lib.dlp.hooks:BigQueryTableAction
       help_text: |
-        Publishes results of a Cloud DLP job to one or more BigQuery tables.
+        Publishes results of a Cloud DLP job a BigQuery table.
         BigQuery tables are uniquely identified by their project_id,
         dataset_id, and table_id in the format
-        `<project_id>.<dataset_id>.<table_id>`.
+        `<project_id>.<dataset_id>.<table_id>` or `<project_id>.<dataset_id>.<table_id>`. If
+        no table_id is specified, DLP will create a table for you.

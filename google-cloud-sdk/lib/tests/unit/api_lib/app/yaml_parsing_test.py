@@ -112,6 +112,31 @@ class YamlParsingTests(util.WithAppData, sdk_test_base.SdkBase):
         r'The \[application\] field is specified'):
       yaml_parsing.ServiceYamlInfo.FromFile(f)
 
+  def testApplicationReadable(self):
+    data = """
+threadsafe: true
+handlers:
+- url: /static
+  static_dir: static
+  application_readable: true
+"""
+    f = self.WriteApp('app.yaml', runtime='python27', data=data)
+    mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
+    self.assertTrue(mod.parsed.handlers[0].application_readable)
+
+  def testApplicationReadableTi(self):
+    data = """
+handlers:
+- url: /static
+  static_dir: static
+  application_readable: false
+"""
+    f = self.WriteApp('app.yaml', runtime='nodejs8', data=data)
+    with self.assertRaisesRegex(
+        yaml_parsing.YamlValidationError,
+        r'The \[application_readable\] field is specified'):
+      yaml_parsing.ServiceYamlInfo.FromFile(f)
+
   def testManagedVMsWarning(self):
     """Assert that we get a deprecation warning for vm: true."""
     f = self.WriteVmRuntime('app.yaml', 'python')
@@ -372,6 +397,21 @@ handlers:
         yaml_parsing.YamlValidationError,
         r'The \[application\] field is specified'):
       yaml_parsing.ConfigYamlInfo.FromFile(f2)
+
+  def testDispatchYaml(self):
+    f = self.WriteConfig(self.DISPATCH_DATA)
+    config_info = yaml_parsing.ConfigYamlInfo.FromFile(f)
+    expected_rules = [
+        {'service': 'module2', 'path': '/tasks/hello_module2', 'domain': '*'},
+    ]
+    self.assertEqual(config_info.GetRules(), expected_rules)
+
+  def testEmptyDispatchYaml(self):
+    """A zero-length dispatch list is the supported way to clear-all."""
+    f = self.WriteConfig(self.DISPATCH_EMPTY_DATA)
+    config_info = yaml_parsing.ConfigYamlInfo.FromFile(f)
+    expected_rules = []
+    self.assertEqual(config_info.GetRules(), expected_rules)
 
   def testBadAppParse(self):
     app_file = self.Touch(self.temp_path, name='app.yaml',

@@ -18,9 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-
+from mock import patch
 
 API_VERSION = 'v1'
 
@@ -122,6 +123,14 @@ class InstanceGroupManagersSetInstanceTemplatesZonalTest(test_base.BaseTest):
         self.zones_list_request,
         [(self.compute.instanceGroupManagers, 'SetInstanceTemplate', request)],
     )
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run('compute instance-groups managed set-instance-template group-1 '
+               '--zone central2-a --template template-1')
 
 
 class InstanceGroupManagersSetInstanceTemplatesRegionalTest(test_base.BaseTest):

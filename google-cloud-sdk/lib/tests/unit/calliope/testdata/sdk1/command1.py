@@ -19,12 +19,12 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import actions
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
 
-class Command1(base.Command):
+class Command1(calliope_base.Command):
   """Test Boolean and StoreProperty flag combinations.
 
   Here are the details: there aren't any.

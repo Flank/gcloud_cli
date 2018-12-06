@@ -18,15 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
-from tests.lib.surface.compute import xpn_test_base
+from tests.lib.surface.compute import shared_vpc_test_base
 
 
-@parameterized.parameters(
-    base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
-class DisableTest(xpn_test_base.XpnTestBase):
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class DisableTest(shared_vpc_test_base.SharedVpcTestBase):
 
   def testDisable_NoProject(self, track):
     self._SetUp(track)
@@ -37,14 +39,7 @@ class DisableTest(xpn_test_base.XpnTestBase):
 
   def testDisableHost(self, track):
     self._SetUp(track)
-    self._testDisableHost('shared-vpc')
-
-  def testDisableHost_xpn(self, track):
-    self._SetUp(track)
-    self._testDisableHost('xpn')
-
-  def _testDisableHost(self, module_name):
-    self.Run('compute {} disable foo'.format(module_name))
+    self.Run('compute shared-vpc disable foo')
     self.xpn_client.DisableHost.assert_called_once_with('foo')
     self.get_xpn_client_mock.assert_called_once_with(self.track)
 

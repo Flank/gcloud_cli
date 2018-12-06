@@ -25,7 +25,6 @@ import json
 import os
 
 from googlecloudsdk.api_lib.app import deploy_app_command_util
-from googlecloudsdk.api_lib.app import yaml_parsing
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.core import properties
@@ -38,7 +37,6 @@ from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.app import cloud_storage_util
 from tests.lib.surface.app import source_context_util
-from googlecloudsdk.third_party.appengine.api import appinfo
 from googlecloudsdk.third_party.appengine.tools import context_util
 
 import mock
@@ -83,52 +81,20 @@ class CopyFilesToCodeBucketTest(
     cloud_storage_util.WithGCSCalls, sdk_test_base.SdkBase):
   """Tests CopyFilesToCodeBucket codepath with threads."""
 
-  _BUCKET = storage_util.BucketReference.FromBucketUrl('gs://somebucket/')
+  _BUCKET = storage_util.BucketReference.FromUrl('gs://somebucket/')
   _BUCKET_NAME = _BUCKET.bucket
 
   def SetUp(self):
     # Initialize some files
     _CreateFiles(self.temp_path)
 
-    default_app_info = appinfo.AppInfoExternal()
-    default_app_info.Set('runtime', 'python27')
-    self.default_module = yaml_parsing.ServiceYamlInfo(
-        os.path.join(self.temp_path, 'app.yaml'),
-        default_app_info)
-    self.default_source_dir = os.path.dirname(self.default_module.file)
+    self.top_dir = self.temp_path
+    self.sub_dir = os.path.join(self.top_dir, 'extra')
 
-    extra_app_info = appinfo.AppInfoExternal()
-    extra_app_info.Set('runtime', 'python27')
-    self.extra_module = yaml_parsing.ServiceYamlInfo(
-        os.path.join(self.temp_path, 'extra', 'app.yaml'),
-        extra_app_info)
-    self.extra_source_dir = os.path.dirname(self.extra_module.file)
-
-    node_app_info = appinfo.AppInfoExternal()
-    node_app_info.Set('runtime', 'nodejs8')
-    self.node_module = yaml_parsing.ServiceYamlInfo(
-        os.path.join(self.temp_path, 'app.yaml'), node_app_info)
-    self.node_source_dir = os.path.dirname(self.node_module.file)
-
-    php_standard_app_info = appinfo.AppInfoExternal()
-    php_standard_app_info.Set('runtime', 'php72')
-    self.php_module_standard = yaml_parsing.ServiceYamlInfo(
-        os.path.join(self.temp_path, 'app.yaml'), php_standard_app_info)
-    self.php_source_dir = os.path.dirname(self.php_module_standard.file)
-
-    php_flex_app_info = appinfo.AppInfoExternal()
-    php_flex_app_info.Set('runtime', 'php72')
-    php_flex_app_info.Set('env', 'flex')
-    self.php_module_flex = yaml_parsing.ServiceYamlInfo(
-        os.path.join(self.temp_path, 'app.yaml'), php_flex_app_info)
-
-    skip_files_app_info = appinfo.AppInfoExternal()
-    skip_files_app_info.Set('runtime', 'python27')
-    skip_files_app_info.Set('skip_files', '^(.*/)?#.*#$')
-    self.skip_files_module = yaml_parsing.ServiceYamlInfo(
-        os.path.join(self.temp_path, 'app.yaml'), skip_files_app_info)
-    self.skip_files_module._has_explicit_skip_files = True
-    self.skip_files_source_dir = os.path.dirname(self.skip_files_module.file)
+    self.top_dir_fnames = _FILES.keys()
+    self.sub_dir_fnames = [
+        os.path.basename(n) for n in
+        self.top_dir_fnames if os.path.dirname(n) == 'extra']
 
     self.lifecycle_patcher = mock.patch.object(
         deploy_app_command_util,
@@ -158,7 +124,7 @@ class CopyFilesToCodeBucketTest(
     self.ExpectUploads(six.iteritems(_FILES))
 
     manifest = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.default_module, self.default_source_dir, self._BUCKET)
+        self.top_dir, self.top_dir_fnames, self._BUCKET)
 
     self._AssertFilesInManifest(
         [filename.replace('\\', '/') for filename in _FILES],
@@ -170,7 +136,7 @@ class CopyFilesToCodeBucketTest(
     self.ExpectUploads(six.iteritems(_FILES))
 
     manifest = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.default_module, self.default_source_dir, self._BUCKET)
+        self.top_dir, self.top_dir_fnames, self._BUCKET)
 
     self._AssertFilesInManifest(
         [filename.replace('\\', '/') for filename in _FILES],
@@ -186,7 +152,7 @@ class CopyFilesToCodeBucketTest(
         r'Cannot upload file \[.*\], which has size \[13\] '
         r'\(greater than maximum allowed size of \[12\]\).'):
       deploy_app_command_util.CopyFilesToCodeBucket(
-          self.default_module, self.default_source_dir, self._BUCKET,
+          self.top_dir, self.top_dir_fnames, self._BUCKET,
           max_file_size=12)
 
   def testSingleModuleEmptyBucketSourceContext(self):
@@ -196,9 +162,8 @@ class CopyFilesToCodeBucketTest(
         context_util, '_GetSourceContexts', autospec=True,
         return_value=source_context_util.FAKE_CONTEXTS) as get_source_context:
       manifest = deploy_app_command_util.CopyFilesToCodeBucket(
-          self.default_module, self.default_source_dir, self._BUCKET)
-    get_source_context.assert_called_once_with(
-        os.path.dirname(self.default_module.file))
+          self.top_dir, self.top_dir_fnames, self._BUCKET)
+    get_source_context.assert_called_once_with(self.top_dir)
     self._AssertFilesInManifest(
         [filename.replace('\\', '/')
          for filename in _FILES_WITH_SOURCE_CONTEXTS],
@@ -214,61 +179,11 @@ class CopyFilesToCodeBucketTest(
     self.ExpectUploads(remaining_files)
 
     manifest = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.default_module, self.default_source_dir, self._BUCKET)
+        self.top_dir, self.top_dir_fnames, self._BUCKET)
 
     self._AssertFilesInManifest(
         [filename.replace('\\', '/') for filename in _FILES],
         manifest)
-
-  def testMultiModuleEmptyBucket(self):
-    self.ExpectList([])
-    self.ExpectUploads(six.iteritems(_FILES))
-    # We'll call List again for the second module, and all files should already
-    # be uploaded.
-    self.ExpectList(six.iteritems(_FILES))
-
-    manifest1 = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.default_module, self.default_source_dir, self._BUCKET)
-    manifest2 = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.extra_module, self.extra_source_dir, self._BUCKET)
-
-    # All files should be in the default manifest
-    self._AssertFilesInManifest(
-        [filename.replace('\\', '/') for filename in _FILES],
-        manifest1)
-    # Only files under extra/ should be in the extra manifest
-    extra_module_files = [f for f in _FILES if os.path.dirname(f) == 'extra']
-    rel_paths = [os.path.relpath(f, 'extra/') for f in extra_module_files]
-    self._AssertFilesInManifest(
-        [rel_path.replace('\\', '/') for rel_path in rel_paths],
-        manifest2)
-
-  def testMultiModulePartialUpload(self):
-    all_files = sorted(six.iteritems(_FILES))
-    # Pretend that some of these are already in the bucket.
-    existing_files = all_files[:4]
-    remaining_files = all_files[4:]
-    self.ExpectList(existing_files)
-    self.ExpectUploads(remaining_files)
-    # We'll call List again for the second module, and all files should already
-    # be uploaded.
-    self.ExpectList(six.iteritems(_FILES))
-
-    manifest1 = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.default_module, self.default_source_dir, self._BUCKET)
-    manifest2 = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.extra_module, self.extra_source_dir, self._BUCKET)
-
-    # All files should be in the default manifest
-    self._AssertFilesInManifest(
-        [filename.replace('\\', '/') for filename in _FILES],
-        manifest1)
-    # Only files under extra/ should be in the extra manifest
-    extra_module_files = [f for f in _FILES if os.path.dirname(f) == 'extra']
-    rel_paths = [os.path.relpath(f, 'extra/') for f in extra_module_files]
-    self._AssertFilesInManifest(
-        [rel_path.replace('\\', '/') for rel_path in rel_paths],
-        manifest2)
 
   def testLifecyclePolicy(self):
     """Check that life cycle policy is inspected.
@@ -313,7 +228,7 @@ class CopyFilesToCodeBucketTest(
     self.ExpectUploads([('app.yaml', 'somecontents5')])
 
     manifest = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.default_module, self.extra_source_dir, self._BUCKET)
+        self.sub_dir, self.sub_dir_fnames, self._BUCKET)
 
     # Only files under extra/ should be in the extra manifest
     extra_module_files = [f for f in _FILES if os.path.dirname(f) == 'extra']
@@ -334,82 +249,18 @@ class CopyFilesToCodeBucketTest(
     self.ExpectListException(exception)
 
     with self.assertRaisesRegex(
-        storage_api.UploadError,
-        r'Error uploading files: B \[missing_bucket\] not found: Not Found'):
+        storage_api.BucketNotFoundError,
+        r'Could not list bucket: \[{}\] bucket does not exist.'.format(
+            'somebucket')):
       deploy_app_command_util.CopyFilesToCodeBucket(
-          self.default_module, self.default_source_dir, self._BUCKET)
-
-  def testNodeModulesNotUploaded(self):
-    files_without_node_modules = {k: v for k, v in _FILES.items()
-                                  if not k.startswith('node_modules')}
-    self.ExpectList([])
-    self.ExpectUploads(six.iteritems(files_without_node_modules))
-
-    manifest = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.node_module, self.node_source_dir, self._BUCKET)
-
-    self._AssertFilesInManifest([
-        filename.replace('\\', '/') for filename in files_without_node_modules
-    ], manifest)
-    self.get_pool_mock.assert_called_once_with(16)
-
-  def testPhpVendorDirNotUploadedStandard(self):
-    files_without_vendor_dir = {k: v for k, v in _FILES.items()
-                                if not k.startswith('vendor')}
-    self.ExpectList([])
-    self.ExpectUploads(six.iteritems(files_without_vendor_dir))
-
-    manifest = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.php_module_standard, self.php_source_dir, self._BUCKET)
-
-    self._AssertFilesInManifest([
-        filename.replace('\\', '/') for filename in files_without_vendor_dir
-    ], manifest)
-    self.get_pool_mock.assert_called_once_with(16)
-
-  def testPhpVendorDirUploadedFlex(self):
-    self.ExpectList([])
-    self.ExpectUploads(six.iteritems(_FILES))
-
-    manifest = deploy_app_command_util.CopyFilesToCodeBucket(
-        self.php_module_flex, self.php_source_dir, self._BUCKET)
-
-    # Since the default skip_files for flex env contains node_modules, instead
-    # of checking that every file was uploaded, just check for vendor/init.php
-    self._AssertFilesInManifest(['vendor/init.php'], manifest)
-    self.get_pool_mock.assert_called_once_with(16)
-
-  def testUsesExistingGcloudignore(self):
-    gcloudignore_path = os.path.join(self.default_source_dir,
-                                     '.gcloudignore')
-    _WriteFile(gcloudignore_path, 'extra/')
-    try:
-      files_with_gcloudignore = _FILES.copy()
-      files_with_gcloudignore['.gcloudignore'] = 'extra/'
-      files_without_extra_dir = {
-          k: v
-          for k, v in files_with_gcloudignore.items()
-          if not k.startswith('extra')
-      }
-      self.ExpectList([])
-      self.ExpectUploads(six.iteritems(files_without_extra_dir))
-
-      manifest = deploy_app_command_util.CopyFilesToCodeBucket(
-          self.default_module, self.default_source_dir, self._BUCKET)
-
-      self._AssertFilesInManifest([
-          filename.replace('\\', '/') for filename in files_without_extra_dir
-      ], manifest)
-      self.get_pool_mock.assert_called_once_with(16)
-    finally:
-      os.remove(gcloudignore_path)
+          self.top_dir, self.top_dir_fnames, self._BUCKET)
 
 
 class LifeCyclePolicyTests(cloud_storage_util.WithGCSCalls):
   """Tests for _GetLifeCycleDeletePolicy."""
 
   def SetUp(self):
-    self.bucket_ref = storage_util.BucketReference.FromBucketUrl('gs://bucko/')
+    self.bucket_ref = storage_util.BucketReference.FromUrl('gs://bucko/')
     self.storage_client = storage_api.StorageClient()
     self.messages = self.storage_client.messages
 

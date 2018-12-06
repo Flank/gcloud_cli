@@ -79,6 +79,11 @@ def _DefaultImageOf(api_version):
           'global/images/family/debian-9').format(ver=api_version)
 
 
+def _NvdimmDiskTypeOf(api_version):
+  return ('https://www.googleapis.com/compute/{ver}/projects/my-project/'
+          'zones/central2-a/diskTypes/aep-nvdimm').format(ver=api_version)
+
+
 def _SsdDiskTypeOf(api_version):
   return ('https://www.googleapis.com/compute/{ver}/projects/my-project/'
           'zones/central2-a/diskTypes/local-ssd').format(ver=api_version)
@@ -105,6 +110,7 @@ def SetUp(test_obj, api_version):
   test_obj._one_to_one_nat = (
       test_obj.messages.AccessConfig.TypeValueValuesEnum.ONE_TO_ONE_NAT)
   test_obj._other_image = _OtherImageOf(api_version)
+  test_obj._nvdimm_disk_type = _NvdimmDiskTypeOf(api_version)
   test_obj._ssd_disk_type = _SsdDiskTypeOf(api_version)
   test_obj._default_network_tier = None
 
@@ -4794,134 +4800,147 @@ class InstancesCreateDiskTest(InstancesCreateTestsMixin):
           --create-disk size=10GB
           --create-disk image=foo
           --create-disk image-family=bar
+          --create-disk description='This is a test disk'
         """)
 
-    self.CheckRequests(
-        self.zone_get_request, self.project_get_request,
-        [(self.compute.instances, 'Insert',
-          m.ComputeInstancesInsertRequest(
-              instance=m.Instance(
-                  canIpForward=False,
-                  deletionProtection=False,
-                  disks=[
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=True,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=self._default_image,),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=False,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              diskSizeGb=10,),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=False,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=(self.compute_uri +
-                                           '/projects/my-project/global/images/'
-                                           'foo'),),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=False,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=(self.compute_uri +
-                                           '/projects/my-project/global/images/'
-                                           'family/bar'),),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-                  ],
-                  machineType=self._default_machine_type,
-                  metadata=m.Metadata(),
-                  name='instance-1',
-                  networkInterfaces=[
-                      m.NetworkInterface(
-                          accessConfigs=[
-                              m.AccessConfig(
-                                  name='external-nat',
-                                  type=self._one_to_one_nat)
-                          ],
-                          network=self._default_network)
-                  ],
-                  serviceAccounts=[
-                      m.ServiceAccount(
-                          email='default',
-                          scopes=_DEFAULT_SCOPES,
-                      ),
-                  ],
-                  scheduling=m.Scheduling(automaticRestart=True),
-              ),
-              project='my-project',
-              zone='central2-a',
-          )),
-         (self.compute.instances, 'Insert',
-          m.ComputeInstancesInsertRequest(
-              instance=m.Instance(
-                  canIpForward=False,
-                  deletionProtection=False,
-                  disks=[
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=True,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=self._default_image,),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=False,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              diskSizeGb=10,),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=False,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=(self.compute_uri +
-                                           '/projects/my-project/global/images/'
-                                           'foo'),),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=False,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=(self.compute_uri +
-                                           '/projects/my-project/global/images/'
-                                           'family/bar'),),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-                  ],
-                  machineType=self._default_machine_type,
-                  metadata=m.Metadata(),
-                  name='instance-2',
-                  networkInterfaces=[
-                      m.NetworkInterface(
-                          accessConfigs=[
-                              m.AccessConfig(
-                                  name='external-nat',
-                                  type=self._one_to_one_nat)
-                          ],
-                          network=self._default_network)
-                  ],
-                  serviceAccounts=[
-                      m.ServiceAccount(
-                          email='default',
-                          scopes=_DEFAULT_SCOPES,
-                      ),
-                  ],
-                  scheduling=m.Scheduling(automaticRestart=True),
-              ),
-              project='my-project',
-              zone='central2-a',
-          ))])
+    self.CheckRequests(self.zone_get_request, self.project_get_request, [
+        (self.compute.instances, 'Insert',
+         m.ComputeInstancesInsertRequest(
+             instance=m.Instance(
+                 canIpForward=False,
+                 deletionProtection=False,
+                 disks=[
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=True,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             sourceImage=self._default_image,),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=False,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             diskSizeGb=10,),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=False,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             sourceImage=(self.compute_uri +
+                                          '/projects/my-project/global/images/'
+                                          'foo'),),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=False,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             sourceImage=(self.compute_uri +
+                                          '/projects/my-project/global/images/'
+                                          'family/bar'),),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=False,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             description='This is a test disk'),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                 ],
+                 machineType=self._default_machine_type,
+                 metadata=m.Metadata(),
+                 name='instance-1',
+                 networkInterfaces=[
+                     m.NetworkInterface(
+                         accessConfigs=[
+                             m.AccessConfig(
+                                 name='external-nat', type=self._one_to_one_nat)
+                         ],
+                         network=self._default_network)
+                 ],
+                 serviceAccounts=[
+                     m.ServiceAccount(
+                         email='default',
+                         scopes=_DEFAULT_SCOPES,
+                     ),
+                 ],
+                 scheduling=m.Scheduling(automaticRestart=True),
+             ),
+             project='my-project',
+             zone='central2-a',
+         )),
+        (self.compute.instances, 'Insert',
+         m.ComputeInstancesInsertRequest(
+             instance=m.Instance(
+                 canIpForward=False,
+                 deletionProtection=False,
+                 disks=[
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=True,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             sourceImage=self._default_image,),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=False,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             diskSizeGb=10,),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=False,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             sourceImage=(self.compute_uri +
+                                          '/projects/my-project/global/images/'
+                                          'foo'),),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=False,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             sourceImage=(self.compute_uri +
+                                          '/projects/my-project/global/images/'
+                                          'family/bar'),),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=False,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             description='This is a test disk'),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                 ],
+                 machineType=self._default_machine_type,
+                 metadata=m.Metadata(),
+                 name='instance-2',
+                 networkInterfaces=[
+                     m.NetworkInterface(
+                         accessConfigs=[
+                             m.AccessConfig(
+                                 name='external-nat', type=self._one_to_one_nat)
+                         ],
+                         network=self._default_network)
+                 ],
+                 serviceAccounts=[
+                     m.ServiceAccount(
+                         email='default',
+                         scopes=_DEFAULT_SCOPES,
+                     ),
+                 ],
+                 scheduling=m.Scheduling(automaticRestart=True),
+             ),
+             project='my-project',
+             zone='central2-a',
+         ))
+    ])
 
   def testImageFamilyFlagCreateDisk(self):
     msg = self.messages
@@ -5355,7 +5374,8 @@ class InstancesCreateCsekTest(InstancesCreateTestsMixin):
   def testNotFoundInstNameKeyFileFail(self):
     private_key_fname = self.WriteKeyFile()
 
-    with self.AssertRaisesToolExceptionRegexp('Key required for resource'):
+    with self.AssertRaisesExceptionMatches(csek_utils.MissingCsekException,
+                                           'Key required for resource'):
       self.Run("""
           compute instances create instance-1
             --csek-key-file {0}
@@ -6825,6 +6845,7 @@ class InstancesCreateScopesDeprecationTestsGa(InstancesCreateTestsMixin,
     )
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
                           (calliope_base.ReleaseTrack.BETA, 'beta'))
 class InstancesCreateAttachRegionalDisk(InstancesCreateTestsMixin,
@@ -7819,12 +7840,131 @@ class InstancesCreateMinCpuPlatformGA(InstancesCreateTestsMixin):
     self.AssertErrEquals('')
 
 
-class InstancesCreateTestAlpha(InstancesCreateTestsMixin,
-                               parameterized.TestCase):
+class InstancesCreateTestBeta(InstancesCreateTestsMixin,
+                              parameterized.TestCase):
+
+  def SetUp(self):
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testHostnameArg(self):
+    m = self.messages
+    self.Run("""
+        compute instances create instance-1
+          --zone central2-a --hostname my-new-hostname
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances,
+          'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[m.AttachedDisk(
+                      autoDelete=True,
+                      boot=True,
+                      initializeParams=m.AttachedDiskInitializeParams(
+                          sourceImage=self._default_image,
+                      ),
+                      mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                      type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+                  hostname='my-new-hostname',
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[m.NetworkInterface(
+                      accessConfigs=[m.AccessConfig(
+                          name='external-nat',
+                          type=self._one_to_one_nat)],
+                      network=self._default_network)],
+                  serviceAccounts=[
+                      m.ServiceAccount(
+                          email='default',
+                          scopes=_DEFAULT_SCOPES
+                      ),
+                  ],
+                  scheduling=m.Scheduling(
+                      automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
+
+class InstancesCreateTestAlpha(InstancesCreateTestBeta):
 
   def SetUp(self):
     SetUp(self, 'alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testLocalNVDIMMRequest(self):
+    m = self.messages
+
+    self.Run("""
+        compute instances create instance
+          --zone central2-a
+          --local-nvdimm ''
+          --local-nvdimm size=3TB
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request, self.project_get_request,
+        [(self.compute.instances, 'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          boot=True,
+                          initializeParams=(m.AttachedDiskInitializeParams(
+                              sourceImage=self._default_image)),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          initializeParams=(m.AttachedDiskInitializeParams(
+                              diskType=self._nvdimm_disk_type)),
+                          interface=(m.AttachedDisk.InterfaceValueValuesEnum
+                                     .NVDIMM),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          diskSizeGb=3072,
+                          initializeParams=(m.AttachedDiskInitializeParams(
+                              diskType=self._nvdimm_disk_type)),
+                          interface=(m.AttachedDisk.InterfaceValueValuesEnum
+                                     .NVDIMM),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
+                  ],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance',
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=(m.AccessConfig.TypeValueValuesEnum
+                                        .ONE_TO_ONE_NAT))
+                          ],
+                          network=self._default_network)
+                  ],
+                  serviceAccounts=[
+                      m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                  ],
+                  scheduling=m.Scheduling(automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))])
 
   def testLocalSSDRequestWithSize(self):
     m = self.messages
@@ -8062,6 +8202,109 @@ class InstancesCreateTestAlpha(InstancesCreateTestsMixin,
             project='my-project',
             zone='central2-a',))],)
 
+  def testAllocationAffinityWithLabels(self):
+    m = self.messages
+    self.Run("""
+        compute instances create instance-1 --zone central2-a
+        --allocation-affinity specific --allocation-label key=a,value=b
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  allocationAffinity=m.AllocationAffinity(
+                      consumeAllocationType=m.AllocationAffinity
+                      .ConsumeAllocationTypeValueValuesEnum.SPECIFIC_ALLOCATION,
+                      key='a',
+                      values=['b']),
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          boot=True,
+                          initializeParams=m.AttachedDiskInitializeParams(
+                              sourceImage=self._default_image,),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                  ],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=self._one_to_one_nat)
+                          ],
+                          network=self._default_network)
+                  ],
+                  serviceAccounts=[
+                      m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                  ],
+                  scheduling=m.Scheduling(automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
+    self.AssertOutputNotContains('Please use --image-family')
+
+  def testAllocationAffinityAny(self):
+    m = self.messages
+    self.Run("""
+        compute instances create instance-1 --zone central2-a
+        --allocation-affinity any
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  allocationAffinity=m.AllocationAffinity(
+                      consumeAllocationType=m.AllocationAffinity.ConsumeAllocationTypeValueValuesEnum.ANY_ALLOCATION),  # pylint: disable=line-too-long
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          boot=True,
+                          initializeParams=m.AttachedDiskInitializeParams(
+                              sourceImage=self._default_image,),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                  ],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=self._one_to_one_nat)
+                          ],
+                          network=self._default_network)
+                  ],
+                  serviceAccounts=[
+                      m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                  ],
+                  scheduling=m.Scheduling(automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
+    self.AssertOutputNotContains('Please use --image-family')
+
 
 class InstancesCreateWithLabelsTest(test_base.BaseTest):
   """Test creation of instances with labels."""
@@ -8179,17 +8422,20 @@ class InstancesCreateSourceInstanceTemplate(InstancesCreateTestsMixin,
             zone='central2-a'))])
 
 
-class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
+class InstancesCreateWithKmsTestGa(InstancesCreateTestsMixin):
 
   GLOBAL_KMS_KEY = ('projects/key-project/locations/global/keyRings/my-ring/'
                     'cryptoKeys/my-key')
   GLOBAL_KMS_KEY_SAME_PROJECT = ('projects/my-project/locations/global/'
                                  'keyRings/my-ring/cryptoKeys/my-key')
 
-  def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def SetupApiAndTrack(self):
+    SetUp(self, 'v1')
+    self._api = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
+  def SetUp(self):
+    self.SetupApiAndTrack()
     self.global_kms_key = self.messages.CustomerEncryptionKey(
         kmsKeyName=self.GLOBAL_KMS_KEY)
     self.global_kms_key_in_same_project = self.messages.CustomerEncryptionKey(
@@ -8204,7 +8450,7 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
         boot=True,
         diskEncryptionKey=expected_key,
         initializeParams=m.AttachedDiskInitializeParams(
-            sourceImage=_DefaultImageOf('alpha'),
+            sourceImage=_DefaultImageOf(self._api),
         ),
         mode=(m.AttachedDisk
               .ModeValueValuesEnum.READ_WRITE),
@@ -8269,18 +8515,6 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
             --zone central2-a
             --boot-disk-kms-location global
           """)
-
-  def testCreateWithImageAndFamilyFlags(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Must specify exactly one of \[image\], \[image-family\] or '
-        r'\[source-snapshot\] for a \[--create-disk\]. '
-        r'These fields are mutually exclusive.'):
-      self.Run("""
-          compute instances create vm
-            --create-disk image=foo,image-family=bar
-          """)
-
-    self.CheckRequests()
 
   def testCreateNonBootDiskWithKmsKey(self):
     self.Run("""
@@ -8392,6 +8626,34 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
               zone='central2-a',
           ))]
     )
+
+
+class InstancesCreateWithKmsTestBeta(InstancesCreateWithKmsTestGa):
+
+  def SetupApiAndTrack(self):
+    SetUp(self, 'beta')
+    self._api = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstancesCreateWithKmsTestAlpha(InstancesCreateWithKmsTestGa):
+
+  def SetupApiAndTrack(self):
+    SetUp(self, 'alpha')
+    self._api = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateWithImageAndFamilyFlags(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Must specify exactly one of \[image\], \[image-family\] or '
+        r'\[source-snapshot\] for a \[--create-disk\]. '
+        r'These fields are mutually exclusive.'):
+      self.Run("""
+          compute instances create vm
+            --create-disk image=foo,image-family=bar
+          """)
+
+    self.CheckRequests()
 
 
 class InstancesCreateDeletionProtection(InstancesCreateTestsMixin,
@@ -8548,6 +8810,7 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
   def SetUp(self):
     SetUp(self, 'alpha')
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testCreateDiskWithAllProperties(self, track):
     self.track = track
@@ -8607,6 +8870,7 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
             project='my-project',
             zone='central2-a',))],)
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testCreateDiskWithSnapshotProperty(self, track):
     msg = self.messages
@@ -8658,6 +8922,7 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
             project='my-project',
             zone='central2-a',))],)
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testCreateDiskSnapshotAndImagePropertyFails(self, track):
     self.track = track
@@ -8670,6 +8935,7 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
             --create-disk image=foo,source-snapshot=my-snapshot
           """)
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([
       (calliope_base.ReleaseTrack.ALPHA, '', 'my-backup'),
       (calliope_base.ReleaseTrack.ALPHA,
@@ -8742,6 +9008,7 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
           ))],
     )
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testCreateBootDiskWithSnapshotAndImageFlagFails(self, track):
     self.track = track
@@ -8753,6 +9020,31 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
           compute instances create vm
             --image=foo --source-snapshot=my-snapshot
           """)
+
+
+class InstancesCreateFromMachineImage(InstancesCreateTestsMixin):
+
+  def testAlpha(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    m = self.messages
+
+    self.Run('compute instances create instance-1 '
+             '--zone central2-a '
+             '--source-machine-image machine-image-1')
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                name='instance-1',
+                deletionProtection=False,
+                sourceMachineImage=(
+                    'https://www.googleapis.com/compute/alpha/projects/'
+                    'my-project/global/machineImages/machine-image-1')),
+            project='my-project',
+            zone='central2-a'))])
 
 
 if __name__ == '__main__':

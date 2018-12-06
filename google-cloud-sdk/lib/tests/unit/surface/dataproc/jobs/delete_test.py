@@ -33,7 +33,7 @@ class JobsDeleteUnitTest(jobs_unit_base.JobsUnitTestBase):
     if not job:
       job = self.MakeCompletedJob()
     if not (response or exception):
-      response = job
+      response = self.messages.Empty()
     self.mock_client.projects_regions_jobs.Delete.Expect(
         self.messages.DataprocProjectsRegionsJobsDeleteRequest(
             region=self.REGION,

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,10 +19,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.py import extra_types
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class InstancesUpdateTest(base.SpannerTestBase):
   """Cloud Spanner instances update tests."""
 
@@ -31,49 +37,60 @@ class InstancesUpdateTest(base.SpannerTestBase):
         'insId',
         params={'projectsId': self.Project()},
         collection='spanner.projects.instances')
-
-  def testAsync(self):
-    self.client.projects_instances.Patch.Expect(
-        request=self.msgs.SpannerProjectsInstancesPatchRequest(
-            name=self.ins_ref.RelativeName(),
-            updateInstanceRequest=self.msgs.UpdateInstanceRequest(
-                fieldMask='displayName,nodeCount',
-                instance=self.msgs.Instance(
-                    displayName='name', nodeCount=3))),
-        response=self.msgs.Operation())
-    self.Run('spanner instances update insId --nodes 3 --description name'
-             ' --async')
-
-  def testSync(self):
-    op_ref = resources.REGISTRY.Parse(
+    self.op_ref = resources.REGISTRY.Parse(
         'opId',
         params={
             'projectsId': self.Project(),
             'instancesId': 'insId',
         },
         collection='spanner.projects.instances.operations')
+
+  def testAsync(self, track):
+    self.track = track
     self.client.projects_instances.Patch.Expect(
         request=self.msgs.SpannerProjectsInstancesPatchRequest(
             name=self.ins_ref.RelativeName(),
             updateInstanceRequest=self.msgs.UpdateInstanceRequest(
                 fieldMask='displayName,nodeCount',
-                instance=self.msgs.Instance(
-                    displayName='name', nodeCount=3))),
-        response=self.msgs.Operation(name=op_ref.RelativeName()))
+                instance=self.msgs.Instance(displayName='name', nodeCount=3))),
+        response=self.msgs.Operation(name=self.op_ref.RelativeName()))
+    self.Run('spanner instances update insId --nodes 3 --description name'
+             ' --async')
+    # The current implementation(update.py) does not include the standard
+    # LRO handling in gcloud, so only test Alpha track for update.yaml.
+    if self.track == calliope_base.ReleaseTrack.ALPHA:
+      self.AssertErrContains('Request issued for: [insId]')
+      self.AssertErrContains('Check operation [opId] for status.')
+      self.AssertErrContains('Updated instance [insId].\n')
+
+  def testSync(self, track):
+    self.track = track
+    self.client.projects_instances.Patch.Expect(
+        request=self.msgs.SpannerProjectsInstancesPatchRequest(
+            name=self.ins_ref.RelativeName(),
+            updateInstanceRequest=self.msgs.UpdateInstanceRequest(
+                fieldMask='displayName,nodeCount',
+                instance=self.msgs.Instance(displayName='name', nodeCount=3))),
+        response=self.msgs.Operation(name=self.op_ref.RelativeName()))
     self.client.projects_instances_operations.Get.Expect(
         request=self.msgs.SpannerProjectsInstancesOperationsGetRequest(
-            name=op_ref.RelativeName()),
+            name=self.op_ref.RelativeName()),
         response=self.msgs.Operation(
-            name=op_ref.RelativeName(),
+            name=self.op_ref.RelativeName(),
             done=True,
-            response=self.msgs.Operation.ResponseValue(
-                additionalProperties=[
-                    self.msgs.Operation.ResponseValue.AdditionalProperty(
-                        key='name',
-                        value=extra_types.JsonValue(
-                            string_value='resultname'))])))
+            response=self.msgs.Operation.ResponseValue(additionalProperties=[
+                self.msgs.Operation.ResponseValue.AdditionalProperty(
+                    key='name',
+                    value=extra_types.JsonValue(
+                        string_value=self.ins_ref.RelativeName()))
+            ])))
     self.client.projects_instances.Get.Expect(
-        request=self.msgs.SpannerProjectsInstancesOperationsGetRequest(
-            name='resultname'),
+        request=self.msgs.SpannerProjectsInstancesGetRequest(
+            name=self.ins_ref.RelativeName()),
         response=self.msgs.Instance())
     self.Run('spanner instances update insId --nodes 3 --description name')
+    # The current implementation(update.py) does not include the standard
+    # LRO handling in gcloud, so only test Alpha track for update.yaml.
+    if self.track == calliope_base.ReleaseTrack.ALPHA:
+      self.AssertErrContains('Request issued for: [insId]')
+      self.AssertErrContains('Updated instance [insId].\n')

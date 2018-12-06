@@ -155,6 +155,7 @@ class BinauthzAttestationsListSurfaceTest(BinauthzAttestationsSurfaceTest):
         req, response=self.attestor)
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
+        expected_filter_content='',
         occurrences_to_return=[self.response_occurrence],
     )
 
@@ -168,22 +169,6 @@ class BinauthzAttestationsListSurfaceTest(BinauthzAttestationsSurfaceTest):
     self.AssertOutputEquals(self.expected_list_output, normalize_space=True)
 
   def testArtifactUrl(self):
-    # Create an occurrence that doesn't have the queried artifact URL.
-    other_request_occurrence = self.CreateRequestOccurrence(
-        project_ref=self.project_ref,
-        artifact_url='not-the-artifact-url',
-        note_ref=resources.REGISTRY.ParseRelativeName(
-            relative_name=self.note_relative_name,
-            collection='containeranalysis.projects.notes',
-        ),
-        pgp_key_fingerprint=self.pgp_key_fingerprint,
-        signature=self.signature,
-    )
-    other_response_occurrence = self.CreateResponseOccurrence(
-        request_occurrence=other_request_occurrence,
-        project_ref=self.project_ref,
-    )
-
     req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
         name=self.attestor_relative_name,
     )
@@ -191,8 +176,8 @@ class BinauthzAttestationsListSurfaceTest(BinauthzAttestationsSurfaceTest):
         req, response=self.attestor)
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
-        occurrences_to_return=[self.response_occurrence,
-                               other_response_occurrence],
+        expected_filter_content='resourceUrl="{}"'.format(self.artifact_url),
+        occurrences_to_return=[self.response_occurrence],
     )
     self.RunBinauthz([
         'attestations',
@@ -213,6 +198,7 @@ class BinauthzAttestationsListSurfaceTest(BinauthzAttestationsSurfaceTest):
         req, response=self.attestor)
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
+        expected_filter_content='resourceUrl="{}"'.format(self.artifact_url),
         occurrences_to_return=[self.response_occurrence],
     )
 

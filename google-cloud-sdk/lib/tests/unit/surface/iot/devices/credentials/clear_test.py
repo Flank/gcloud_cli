@@ -21,18 +21,16 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.console import console_io
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsClearTest(base.CloudIotBase):
+class CredentialsClearTestGA(base.CloudIotBase):
 
-  def testClear(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testClear(self):
     self.WriteInput('y')
     self._ExpectPatch([])
 
@@ -49,8 +47,7 @@ class CredentialsClearTest(base.CloudIotBase):
         'This will delete ALL CREDENTIALS for device [my-device]')
     self.AssertLogContains('Cleared all credentials for device [my-device].')
 
-  def testClear_Cancel(self, track):
-    self.track = track
+  def testClear_Cancel(self):
     self.WriteInput('n')
 
     with self.assertRaises(console_io.OperationCancelledError):
@@ -62,8 +59,7 @@ class CredentialsClearTest(base.CloudIotBase):
     self.AssertErrContains(
         'This will delete ALL CREDENTIALS for device [my-device]')
 
-  def testClear_RelativeName(self, track):
-    self.track = track
+  def testClear_RelativeName(self):
     self.WriteInput('y')
     self._ExpectPatch([])
 
@@ -80,6 +76,18 @@ class CredentialsClearTest(base.CloudIotBase):
         results, self.messages.Device(id='my-device', credentials=[]))
     self.AssertErrContains(
         'This will delete ALL CREDENTIALS for device [my-device]')
+
+
+class CredentialsClearTestBeta(CredentialsClearTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsClearTestAlpha(CredentialsClearTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

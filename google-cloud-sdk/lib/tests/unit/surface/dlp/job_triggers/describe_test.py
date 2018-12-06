@@ -28,6 +28,7 @@ from tests.lib.surface.dlp import base
 class DescribeTest(base.DlpUnitTestBase):
   """dlp job-triggers describe tests."""
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testDescribe(self, track):
     self.track = track

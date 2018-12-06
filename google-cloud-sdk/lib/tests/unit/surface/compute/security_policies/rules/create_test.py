@@ -13,25 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the security policy rules create subcommand."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class SecurityPolicyRulesCreateTestBeta(test_base.BaseTest,
-                                        parameterized.TestCase):
+class SecurityPolicyRulesCreateTest(test_base.BaseTest, parameterized.TestCase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', 'v1')
     self.my_policy_ref = self.resources.Create(
         'compute.securityPolicies',
         securityPolicy='my-policy',
@@ -52,8 +52,8 @@ class SecurityPolicyRulesCreateTestBeta(test_base.BaseTest,
         description='my rule',
         priority=1000,
         match=messages.SecurityPolicyRuleMatcher(
-            versionedExpr=messages.SecurityPolicyRuleMatcher.
-            VersionedExprValueValuesEnum('SRC_IPS_V1'),
+            versionedExpr=messages.SecurityPolicyRuleMatcher
+            .VersionedExprValueValuesEnum('SRC_IPS_V1'),
             config=messages.SecurityPolicyRuleMatcherConfig(
                 srcIpRanges=['1.1.1.1'])),
         action='allow',
@@ -79,8 +79,8 @@ class SecurityPolicyRulesCreateTestBeta(test_base.BaseTest,
         description='my rule',
         priority=1000,
         match=messages.SecurityPolicyRuleMatcher(
-            versionedExpr=messages.SecurityPolicyRuleMatcher.
-            VersionedExprValueValuesEnum('SRC_IPS_V1'),
+            versionedExpr=messages.SecurityPolicyRuleMatcher
+            .VersionedExprValueValuesEnum('SRC_IPS_V1'),
             config=messages.SecurityPolicyRuleMatcherConfig(
                 srcIpRanges=['1.1.1.1'])),
         action=expected_action,
@@ -107,8 +107,8 @@ class SecurityPolicyRulesCreateTestBeta(test_base.BaseTest,
         description='my rule',
         priority=1000,
         match=messages.SecurityPolicyRuleMatcher(
-            versionedExpr=messages.SecurityPolicyRuleMatcher.
-            VersionedExprValueValuesEnum('SRC_IPS_V1'),
+            versionedExpr=messages.SecurityPolicyRuleMatcher
+            .VersionedExprValueValuesEnum('SRC_IPS_V1'),
             config=messages.SecurityPolicyRuleMatcherConfig(
                 srcIpRanges=['1.1.1.1'])),
         action='allow',
@@ -138,11 +138,24 @@ class SecurityPolicyRulesCreateTestBeta(test_base.BaseTest,
         """.format(invalid_priority))
 
 
-class SecurityPolicyRulesCreateTestAlpha(SecurityPolicyRulesCreateTestBeta):
+class SecurityPolicyRulesCreateTestBeta(SecurityPolicyRulesCreateTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.my_policy_ref = self.resources.Create(
+        'compute.securityPolicies',
+        securityPolicy='my-policy',
+        project='my-project')
+
+
+class SecurityPolicyRulesCreateTestAlpha(SecurityPolicyRulesCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'alpha')
     self.my_policy_ref = self.resources.Create(
@@ -169,6 +182,7 @@ class SecurityPolicyRulesCreateTestAlpha(SecurityPolicyRulesCreateTestBeta):
         --preview
         """)
     self.CheckSecurityPolicyRuleRequest(expected_rule)
+
 
 if __name__ == '__main__':
   test_case.main()

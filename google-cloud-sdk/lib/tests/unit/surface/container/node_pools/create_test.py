@@ -168,6 +168,12 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
             'https://www.googleapis.com/auth/servicecontrol',
             'https://www.googleapis.com/auth/trace.append',
         ],
+        'metadata':
+            self.msgs.NodeConfig.MetadataValue(
+                additionalProperties=[
+                    self.msgs.NodeConfig.MetadataValue.AdditionalProperty(
+                        key=key, value=value)
+                    for key, value in [('key', 'value'), ('key2', 'value2')]]),
     }
 
     self.ExpectCreateNodePool(
@@ -210,19 +216,27 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         ' --image-project=gke-node-images'
         ' --preemptible'
         ' --enable-autoupgrade'
-        ' --enable-autorepair'.format(**pool_kwargs))
-    self.AssertErrContains("""This will enable the autorepair feature for \
-nodes. Please see
-https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more
+        ' --enable-autorepair'
+        ' --metadata key=value,key2=value2'.format(**pool_kwargs))
+    # pylint: disable=line-too-long
+    self.AssertErrContains(
+        """WARNING: Starting in 1.12, new node pools will be created with \
+their legacy Compute Engine instance metadata APIs disabled by default. To \
+create a node pool with legacy instance metadata endpoints disabled, run \
+`node-pools create` with the flag `--metadata disable-legacy-endpoints=true`.
+This will enable the autorepair feature for \
+nodes. Please see \
+https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more \
 information on node autorepairs.
-
-This will enable the autoupgrade feature for nodes. Please see
-https://cloud.google.com/kubernetes-engine/docs/node-management for more
+This will enable the autoupgrade feature for nodes. Please see \
+https://cloud.google.com/kubernetes-engine/docs/node-management for more \
 information on node autoupgrades.
-
-{{"ux": "PROGRESS_TRACKER", "message": "Creating node pool my-custom-pool", "status": "SUCCESS"}}
-Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-custom-pool].
+{{"ux": "PROGRESS_TRACKER", "message": "Creating node pool my-custom-pool", \
+"status": "SUCCESS"}}
+Created \
+[https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-custom-pool].
 """.format(self.API_VERSION))
+    # pylint: enable=line-too-long
     self.AssertOutputMatches(
         (r'NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {machine_type} {disk_size} {version}\\n')
@@ -849,10 +863,12 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         'clusterId':
             self.CLUSTER_NAME,
         'workloadMetadataConfig':
-            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig.
-                                     NodeMetadataValueValuesEnum.SECURE),
+            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig
+                                     .NodeMetadataValueValuesEnum.SECURE),
         'management':
             m.NodeManagement(autoRepair=True),
+        'maxPodsConstraint':
+            m.MaxPodsConstraint(maxPodsPerNode=30),
     }
 
     self.ExpectCreateNodePool(
@@ -870,11 +886,57 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
     self.Run(
         self.node_pools_command_base.format(self.ZONE) + ' create {name}'
         ' --cluster={clusterId}'
-        ' --workload-metadata-from-node=secure'.format(**pool_kwargs))
+        ' --workload-metadata-from-node=secure'
+        ' --max-pods-per-node=30'.format(**pool_kwargs))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),
         normalize_space=True)
+
+  def _testWorkloadMetadata(self, flags, config):
+    pool_kwargs = {
+        # Sort the scopes to assert equality of the lists
+        'workloadMetadataConfig': config,
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    # Create node pool expects node pool and returns pending operation.
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    # Get operation returns done operation.
+    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+    # Get returns expected cluster, populated with other fields by server.
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} {flags} '
+             '--cluster {clusterName}'.format(
+                 base=self.node_pools_command_base.format(self.ZONE),
+                 name=self.NODE_POOL_NAME,
+                 flags=flags,
+                 clusterName=self.CLUSTER_NAME))
+
+  def testWorkloadMetadataDefault(self):
+    self._testWorkloadMetadata('', None)
+
+  def testWorkloadMetadataSecure(self):
+    self._testWorkloadMetadata(
+        '--workload-metadata-from-node=secure',
+        self.messages.WorkloadMetadataConfig(
+            nodeMetadata=self.messages.WorkloadMetadataConfig.\
+                NodeMetadataValueValuesEnum.SECURE))
+
+  def testWorkloadMetadataExpose(self):
+    self._testWorkloadMetadata(
+        '--workload-metadata-from-node=exposed',
+        self.messages.WorkloadMetadataConfig(
+            nodeMetadata=self.messages.WorkloadMetadataConfig.\
+                NodeMetadataValueValuesEnum.EXPOSE))
+
+  def testWorkloadMetadataUnspecified(self):
+    self._testWorkloadMetadata(
+        '--workload-metadata-from-node=unspecified',
+        self.messages.WorkloadMetadataConfig(
+            nodeMetadata=self.messages.WorkloadMetadataConfig.\
+                NodeMetadataValueValuesEnum.UNSPECIFIED))
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -893,8 +955,8 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         'clusterId':
             self.CLUSTER_NAME,
         'workloadMetadataConfig':
-            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig.
-                                     NodeMetadataValueValuesEnum.SECURE),
+            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig
+                                     .NodeMetadataValueValuesEnum.SECURE),
         'localSsdVolumeConfigs': [
             m.LocalSsdVolumeConfig(count=2, type='nvme', format=format_enum.FS),
             m.LocalSsdVolumeConfig(
@@ -905,10 +967,10 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         'autoscaling':
             m.NodePoolAutoscaling(
                 enabled=True, maxNodeCount=6, autoprovisioned=True),
-        'maxPodsConstraint':
-            m.MaxPodsConstraint(maxPodsPerNode=30),
         'management':
             m.NodeManagement(autoRepair=True),
+        'nodeGroup':
+            'test-node-group',
     }
 
     self.ExpectCreateNodePool(
@@ -930,8 +992,8 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         ' --local-ssd-volumes count=1,type=scsi,format=block'
         ' --enable-autoscaling --enable-autoprovisioning --max-nodes 6'
         ' --workload-metadata-from-node=secure'
-        ' --max-pods-per-node=30'
-        ' --sandbox type=gvisor'.format(**pool_kwargs))
+        ' --sandbox type=gvisor'
+        ' --node-group {nodeGroup}'.format(**pool_kwargs))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),

@@ -1,0 +1,116 @@
+
+.TH "GCLOUD_DATAPROC_WORKFLOW\-TEMPLATES_ADD\-JOB_HIVE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud dataproc workflow\-templates add\-job hive \- add a Hive job to the workflow template
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud dataproc workflow\-templates add\-job hive\fR \fB\-\-step\-id\fR=\fISTEP_ID\fR \fB\-\-workflow\-template\fR=\fIWORKFLOW_TEMPLATE\fR (\fB\-\-execute\fR=\fIQUERY\fR,\ \fB\-e\fR\ \fIQUERY\fR\ |\ \fB\-\-file\fR=\fIFILE\fR,\ \fB\-f\fR\ \fIFILE\fR) [\fB\-\-continue\-on\-failure\fR] [\fB\-\-jars\fR=[\fIJAR\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-params\fR=[\fIPARAM\fR=\fIVALUE\fR,...]] [\fB\-\-properties\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-start\-after\fR=\fISTEP_ID\fR,[\fISTEP_ID\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Add a Hive job to the workflow template.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-step\-id\fR=\fISTEP_ID\fR
+The step ID of the job in the workflow template.
+
+.TP 2m
+\fB\-\-workflow\-template\fR=\fIWORKFLOW_TEMPLATE\fR
+The dataproc workflow template ID.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-execute\fR=\fIQUERY\fR, \fB\-e\fR \fIQUERY\fR
+A Hive query to execute as part of the job.
+
+.TP 2m
+\fB\-\-file\fR=\fIFILE\fR, \fB\-f\fR \fIFILE\fR
+HCFS URI of file containing Hive script to execute as the job.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-continue\-on\-failure\fR
+Whether to continue if a single query fails.
+
+.TP 2m
+\fB\-\-jars\fR=[\fIJAR\fR,...]
+Comma separated list of jar files to be provided to the Hive and MR. May contain
+UDFs.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-params\fR=[\fIPARAM\fR=\fIVALUE\fR,...]
+A list of key value pairs to set variables in the Hive queries.
+
+.TP 2m
+\fB\-\-properties\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]
+A list of key value pairs to configure Hive.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-start\-after\fR=\fISTEP_ID\fR,[\fISTEP_ID\fR,...]
+(Optional) List of step IDs to start this job after.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta dataproc workflow\-templates add\-job hive
+.RE
+

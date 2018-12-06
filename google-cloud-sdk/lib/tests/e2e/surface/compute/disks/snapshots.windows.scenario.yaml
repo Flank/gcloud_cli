@@ -1,0 +1,201 @@
+title: Create a disk snapshot from a Windows image.
+release_tracks: [GA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances create $$instance$$ --zone us-central1-f --image-project
+      windows-cloud --image-family windows-2012-r2 --format 'yaml(name,zone,status)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+  - stdout: |
+      ---
+      name: $$instance$$
+      status: RUNNING
+      zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+- execute:
+  - command: compute disks snapshot $$instance$$ --snapshot-names $$snapshot$$ --zone
+      us-central1-f --guest-flush
+  - progress_tracker:
+    - message: Creating snapshot(s) $$snapshot$$
+    - status: SUCCESS
+- execute:
+  - command: compute snapshots describe $$snapshot$$ --format 'text(name, status)'
+  - stdout: |
+      name:   $$snapshot$$
+      status: READY
+- execute:
+  - command: compute snapshots delete $$snapshot$$ -q
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
+- execute:
+  - command: compute instances delete $$instance$$ --zone us-central1-f -q
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+
+
+actions:
+
+
+- generate_resource_id:
+    reference: instance
+    prefix: gcloud-compute-test-instance
+
+
+- execute_command:
+    command: compute instances create $$instance$$ --zone us-central1-f --image-project
+      windows-cloud --image-family windows-2012-r2 --format 'yaml(name,zone,status)'
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stdout: |
+        ---
+        name: $$instance$$
+        status: RUNNING
+        zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+    - expect_exit:
+        code: 0
+
+
+- execute_command_until:
+    command: compute instances get-serial-port-output $$instance$$ --zone us-central1-f
+    timeout: 600
+    stdout:
+      matches: .*Instance setup finished.*
+
+
+- generate_resource_id:
+    reference: snapshot
+    prefix: gcloud-compute-test-snapshot
+
+
+- execute_command:
+    command: compute disks snapshot $$instance$$ --snapshot-names $$snapshot$$ --zone
+      us-central1-f --guest-flush
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$/createSnapshot?alt=json&guestFlush=True
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: $$snapshot$$
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '837'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '2976453162028934428'
+            name: operation-1543445490480-57bc16830b381-cabce173-2efb2191
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: createSnapshot
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+            targetId: '9033127721140659688'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-28T14:51:31.218-08:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1543445490480-57bc16830b381-cabce173-2efb2191
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Creating snapshot(s) $$snapshot$$
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '857'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"NX4WSeXH_X9tou6Gyud4cBJ4sxA=/CpWTlXi4uvI1041jcD82_JxMfj0="'
+            status: '200'
+          body:
+            kind: compute#snapshot
+            id: '6923531774955005213'
+            creationTimestamp: '2018-11-28T14:51:31.872-08:00'
+            name: $$snapshot$$
+            status: READY
+            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+            sourceDiskId: '9033127721140659688'
+            diskSizeGb: '50'
+            storageBytes: '8430558336'
+            storageBytesStatus: UP_TO_DATE
+            licenses:
+            - https://www.googleapis.com/compute/v1/projects/windows-cloud/global/licenses/windows-server-2012-r2-dc
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
+            labelFingerprint: 42WmSpB8rSM=
+            licenseCodes:
+            - '1000017'
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute snapshots describe $$snapshot$$ --format 'text(name, status)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '857'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"QfM8SN1kJuWOlJAawyLnNbOym-s=/uDNKmPGOuH5UwPjKYg72K9W-Cxc="'
+            status: '200'
+          body:
+            kind: compute#snapshot
+            id: '6923531774955005213'
+            creationTimestamp: '2018-11-28T14:51:31.872-08:00'
+            name: $$snapshot$$
+            status: READY
+            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+            sourceDiskId: '9033127721140659688'
+            diskSizeGb: '50'
+            storageBytes: '8430558336'
+            storageBytesStatus: UP_TO_DATE
+            licenses:
+            - https://www.googleapis.com/compute/v1/projects/windows-cloud/global/licenses/windows-server-2012-r2-dc
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
+            labelFingerprint: 42WmSpB8rSM=
+            licenseCodes:
+            - '1000017'
+    - expect_stdout: |
+        name:   $$snapshot$$
+        status: READY
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute snapshots delete $$snapshot$$ -q
+    cleanup_for: snapshot
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute instances delete $$instance$$ --zone us-central1-f -q
+    cleanup_for: instance
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_exit:
+        code: 0

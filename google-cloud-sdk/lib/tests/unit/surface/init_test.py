@@ -62,7 +62,6 @@ def _GetCurrentSettings(config_name, log_http=False):
       '  disable_update_check: \'True\'',
       'core:',
       '  account: fake_account',
-      '  allow_py3: \'True\'',
       '  check_gce_metadata: \'False\'',
       '  disable_usage_reporting: \'True\'',
       '  interactive_ux_style: TESTING']
@@ -107,9 +106,10 @@ def _GetPickConfigurationMessage(inactive_configs, current_config=None,
       message='Pick configuration to use:',
       choices=choices)]
   if new_config:
-    lines.append('Enter configuration name. Names start with a lower case '
-                 'letter and contain only lower case letters a-z, digits 0-9, '
-                 'and hyphens \'-\':  ')
+    lines.append(
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter configuration name. Names '
+        'start with a lower case letter and contain only lower case letters '
+        'a-z, digits 0-9, and hyphens \'-\':  "}')
   else:
     # If active config or no config is chosen, a blank line prints.
     lines.append('')
@@ -145,9 +145,10 @@ def _GetNoProjectsMessage():
 
 def _GetEnterProjectMessage():
   return (
-      'Enter a Project ID. Note that a Project ID CANNOT be changed later.\n'
-      'Project IDs must be 6-30 characters (lowercase ASCII, digits, or\n'
-      'hyphens) in length and start with a lowercase letter. ')
+      '{"ux": "PROMPT_RESPONSE", "message": "Enter a Project ID. Note that a '
+      'Project ID CANNOT be changed later.\\nProject IDs must be 6-30 '
+      'characters (lowercase ASCII, digits, or\\nhyphens) in length and start '
+      'with a lowercase letter. "}')
 
 
 def _GetPickProjectMessage(projects, created=None,
@@ -175,9 +176,10 @@ def _GetPickProjectMessage(projects, created=None,
     ])
   if created:
     lines.extend([
-        'Enter a Project ID. Note that a Project ID CANNOT be changed later.',
-        'Project IDs must be 6-30 characters (lowercase ASCII, digits, or',
-        'hyphens) in length and start with a lowercase letter. '])
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter a Project ID. Note that '
+        'a Project ID CANNOT be changed later.\\nProject IDs must be 6-30 '
+        'characters (lowercase ASCII, digits, or\\nhyphens) in length and '
+        'start with a lowercase letter. "}'])
     if create_error:
       lines[-1] += 'WARNING: Project creation failed: {}'.format(create_error)
       lines.extend([
@@ -263,7 +265,7 @@ def _GetBotoMessage(error=False):
       '[https://cloud.google.com/storage/docs/gsutil/commands/config] for '
       'more\n'
       'information about configuring Google Cloud Storage.\n'
-      .format(os.path.join(os.path.expanduser('~'), '.boto')))
+      .format(os.path.join(files.GetHomeDir(), '.boto')))
 
 
 def _GetReadyToUseMessage(account, project, zone=None, region=None):
@@ -417,7 +419,7 @@ class InitNoAuthTest(
     self.fake_sdk_root = 'fakesdkroot'
     self.mock_sdk_root = self.StartPropertyPatch(
         config.Paths, 'sdk_root', return_value=self.fake_sdk_root)
-    self.boto_path = platforms.ExpandHomePath(os.path.join('~', '.boto'))
+    self.boto_path = files.ExpandHomeDir(os.path.join('~', '.boto'))
 
     # Remove the .boto file if it exists, otherwise the test runs won't create
     # it. These tests don't actually create the .boto file, so we don't need to
@@ -1650,7 +1652,8 @@ class InitNoAuthTest(
         _GetLoginPromptMessage() +
         _GetLoggedInAsMessage('foo@google.com') +
         'WARNING: Listing available projects failed: oops\n' +
-        'Enter project id you would like to use:  ',
+        '{"ux": "PROMPT_RESPONSE", "message": "Enter project id you would like '
+        'to use:  "}',
         self.GetErr()
     )
 
@@ -1772,10 +1775,10 @@ class InitNoAuthTest(
 
   def testGsutilConfig_BotoAlreadyExists(self):
     # Create a ~/.boto file.
-    boto_file = self.Touch(platforms.GetHomePath(),
+    boto_file = self.Touch(files.GetHomeDir(),
                            name='.boto',
                            contents='foo')
-    self.StartObjectPatch(platforms, 'ExpandHomePath', return_value=boto_file)
+    self.StartObjectPatch(files, 'ExpandHomeDir', return_value=boto_file)
     self.RunScenario(
         self.WithConfigurations([]) +
         self.WithAuth([], login='foo@google.com') +

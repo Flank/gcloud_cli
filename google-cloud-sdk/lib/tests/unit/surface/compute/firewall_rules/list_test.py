@@ -36,31 +36,9 @@ class FirewallRulesListTest(test_base.BaseTest,
     self.resources.RegisterApiByName('compute', 'v1')
     self.mock_get_global_resources = self.StartPatch(
         'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        return_value=resource_projector.MakeSerializable(self.GetFirewall()))
+        return_value=resource_projector.MakeSerializable(self.GetFirewalls()))
 
-  def testTableOutput(self):
-    self.Run("""
-        compute firewall-rules list
-        """)
-
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.firewalls,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertErrContains(flags.LIST_NOTICE)
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME NETWORK DIRECTION PRIORITY ALLOW DENY
-            default-deny-ingress default INGRESS 65535 all
-            default-allow-internal default INGRESS 65534 tcp:1-65535,udp:1-65535,icmp
-            default-allow-egress default EGRESS all
-            """),
-        normalize_space=True)
-
-  def GetFirewall(self):
+  def GetFirewalls(self):
     network_ref = self.resources.Create(
         'compute.networks', network='default', project='my-project')
 
@@ -77,7 +55,8 @@ class FirewallRulesListTest(test_base.BaseTest,
         selfLink=deny_ingress_ref.SelfLink(),
         sourceRanges=['0.0.0.0/0'],
         priority=65535,
-        direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS)
+        direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
+        disabled=False)
 
     allow_internal_ref = self.resources.Create(
         'compute.firewalls',
@@ -97,7 +76,8 @@ class FirewallRulesListTest(test_base.BaseTest,
         priority=65534,
         direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
         sourceRanges=['10.0.0.0/8'],
-        sourceTags=['tag-1', 'tag-2'])
+        sourceTags=['tag-1', 'tag-2'],
+        disabled=False)
 
     allow_egress_ref = self.resources.Create(
         'compute.firewalls',
@@ -112,8 +92,48 @@ class FirewallRulesListTest(test_base.BaseTest,
         selfLink=allow_egress_ref.SelfLink(),
         destinationRanges=['0.0.0.0/0'],
         direction=self.messages.Firewall.DirectionValueValuesEnum.EGRESS,
-        targetTags=['tag-3', 'tag-4'])
-    return [deny_ingress, allow_internal, allow_egress]
+        targetTags=['tag-3', 'tag-4'],
+        disabled=False)
+
+    disabled_firewall_ref = self.resources.Create(
+        'compute.firewalls', firewall='disabled-firewall', project='my-project')
+    disabled_firewall = self.messages.Firewall(
+        denied=[
+            self.messages.Firewall.DeniedValueListEntry(
+                IPProtocol='tcp', ports=['1000-2000']),
+        ],
+        name='disabled-firewall',
+        network=network_ref.SelfLink(),
+        selfLink=disabled_firewall_ref.SelfLink(),
+        sourceRanges=['0.0.0.0/0'],
+        priority=300,
+        direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
+        disabled=True)
+
+    return [deny_ingress, allow_internal, allow_egress, disabled_firewall]
+
+  def testTableOutput(self):
+    self.Run("""
+        compute firewall-rules list
+        """)
+
+    self.mock_get_global_resources.assert_called_once_with(
+        service=self.compute.firewalls,
+        project='my-project',
+        http=self.mock_http(),
+        filter_expr=None,
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertErrContains(flags.LIST_NOTICE)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME NETWORK DIRECTION PRIORITY ALLOW DENY DISABLED
+            default-deny-ingress default INGRESS 65535 all False
+            default-allow-internal default INGRESS 65534 tcp:1-65535,udp:1-65535,icmp False
+            default-allow-egress default EGRESS all False
+            disabled-firewall default INGRESS 300 tcp:1000-2000 True
+            """),
+        normalize_space=True)
 
   def testTableOutputWithAllFields(self):
     self.Run("""
@@ -128,10 +148,11 @@ class FirewallRulesListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME NETWORK DIRECTION PRIORITY SRC_RANGES DEST_RANGES ALLOW DENY SRC_TAGS SRC_SVC_ACCT TARGET_TAGS TARGET_SVC_ACCT
-            default-deny-ingress default INGRESS 65535 0.0.0.0/0 all
-            default-allow-internal default INGRESS 65534 10.0.0.0/8 tcp:1-65535,udp:1-65535,icmp tag-1,tag-2
-            default-allow-egress default EGRESS 0.0.0.0/0 all tag-3,tag-4
+            NAME NETWORK DIRECTION PRIORITY SRC_RANGES DEST_RANGES ALLOW DENY SRC_TAGS SRC_SVC_ACCT TARGET_TAGS TARGET_SVC_ACCT DISABLED
+            default-deny-ingress default INGRESS 65535 0.0.0.0/0 all False
+            default-allow-internal default INGRESS 65534 10.0.0.0/8 tcp:1-65535,udp:1-65535,icmp tag-1,tag-2 False
+            default-allow-egress default EGRESS 0.0.0.0/0 all tag-3,tag-4 False
+            disabled-firewall default INGRESS 300 0.0.0.0/0 tcp:1000-2000 True
             """),
         normalize_space=True)
 
@@ -149,7 +170,8 @@ class FirewallRulesListTest(test_base.BaseTest,
         expected_completions=[
             'default-allow-egress',
             'default-allow-internal',
-            'default-deny-ingress'
+            'default-deny-ingress',
+            'disabled-firewall',
         ],
         cli=self.cli,
     )
@@ -162,107 +184,6 @@ class BetaFirewallRulesListTest(FirewallRulesListTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'beta')
-    self.mock_get_global_resources = self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        return_value=resource_projector.MakeSerializable(self.GetFirewall()))
-    self.mock_get_global_resources = self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        return_value=resource_projector.MakeSerializable(
-            self.GetDisabledAndEnabledFirewall()))
-
-  def GetDisabledAndEnabledFirewall(self):
-    network_ref = self.resources.Create(
-        'compute.networks', network='default', project='my-project')
-
-    disabled_firewall_ref = self.resources.Create(
-        'compute.firewalls', firewall='disabled-firewall', project='my-project')
-    disabled_firewall = self.messages.Firewall(
-        denied=[
-            self.messages.Firewall.DeniedValueListEntry(
-                IPProtocol='tcp', ports=['1000-2000']),
-        ],
-        name='disabled-firewall',
-        network=network_ref.SelfLink(),
-        selfLink=disabled_firewall_ref.SelfLink(),
-        sourceRanges=['0.0.0.0/0'],
-        priority=300,
-        direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
-        disabled=True)
-
-    enabled_firewall_ref = self.resources.Create(
-        'compute.firewalls', firewall='enabled-firewall', project='my-project')
-    enabled_firewall = self.messages.Firewall(
-        allowed=[
-            self.messages.Firewall.AllowedValueListEntry(
-                IPProtocol='udp', ports=['1000-2000']),
-        ],
-        name='enabled-firewall',
-        network=network_ref.SelfLink(),
-        selfLink=enabled_firewall_ref.SelfLink(),
-        sourceRanges=['0.0.0.0/0'],
-        priority=200,
-        direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
-        disabled=False)
-
-    return [disabled_firewall, enabled_firewall]
-
-  def testTableOutput(self):
-    self.Run("""
-        compute firewall-rules list
-        """)
-
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.firewalls,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertErrContains(flags.LIST_NOTICE)
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME NETWORK DIRECTION PRIORITY ALLOW DENY DISABLED
-            disabled-firewall default INGRESS 300 tcp:1000-2000 True
-            enabled-firewall default INGRESS 200 udp:1000-2000 False
-            """),
-        normalize_space=True)
-
-  def testTableOutputWithAllFields(self):
-    self.Run("""
-        compute firewall-rules list --format="{0}"
-        """.format(flags.LIST_WITH_ALL_FIELDS_FORMAT_BETA))
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.firewalls,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME NETWORK DIRECTION PRIORITY SRC_RANGES DEST_RANGES ALLOW DENY SRC_TAGS SRC_SVC_ACCT TARGET_TAGS TARGET_SVC_ACCT DISABLED
-            disabled-firewall default INGRESS 300 0.0.0.0/0 tcp:1000-2000 True
-            enabled-firewall default INGRESS 200 0.0.0.0/0 udp:1000-2000 False
-            """),
-        normalize_space=True)
-
-  def testFirewallsCompleter(self):
-    self.RunCompleter(
-        flags.FirewallsCompleter,
-        expected_command=[
-            'compute',
-            'firewall-rules',
-            'list',
-            '--uri',
-            '--quiet',
-            '--format=disable',
-        ],
-        expected_completions=[
-            'disabled-firewall',
-            'enabled-firewall',
-        ],
-        cli=self.cli,
-    )
 
 
 class AlphaFirewallRulesListTest(BetaFirewallRulesListTest):
@@ -272,64 +193,6 @@ class AlphaFirewallRulesListTest(BetaFirewallRulesListTest):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'alpha')
-
-  def testTableOutput(self):
-    self.Run("""
-        compute firewall-rules list
-        """)
-
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.firewalls,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertErrContains(flags.LIST_NOTICE)
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME NETWORK DIRECTION PRIORITY ALLOW DENY DISABLED
-            disabled-firewall default INGRESS 300 tcp:1000-2000 True
-            enabled-firewall default INGRESS 200 udp:1000-2000 False
-            """),
-        normalize_space=True)
-
-  def testTableOutputWithAllFields(self):
-    self.Run("""
-        compute firewall-rules list --format="{0}"
-        """.format(flags.LIST_WITH_ALL_FIELDS_FORMAT_BETA))
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.firewalls,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME NETWORK DIRECTION PRIORITY SRC_RANGES DEST_RANGES ALLOW DENY SRC_TAGS SRC_SVC_ACCT TARGET_TAGS TARGET_SVC_ACCT DISABLED
-            disabled-firewall default INGRESS 300 0.0.0.0/0 tcp:1000-2000 True
-            enabled-firewall default INGRESS 200 0.0.0.0/0 udp:1000-2000 False
-            """),
-        normalize_space=True)
-
-  def testFirewallsCompleter(self):
-    self.RunCompleter(
-        flags.FirewallsCompleter,
-        expected_command=[
-            'compute',
-            'firewall-rules',
-            'list',
-            '--uri',
-            '--quiet',
-            '--format=disable',
-        ],
-        expected_completions=[
-            'disabled-firewall',
-            'enabled-firewall',
-        ],
-        cli=self.cli,
-    )
 
 
 if __name__ == '__main__':

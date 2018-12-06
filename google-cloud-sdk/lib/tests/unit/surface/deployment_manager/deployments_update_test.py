@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.deployment_manager import dm_api_util
 from googlecloudsdk.api_lib.deployment_manager import exceptions
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -71,7 +71,7 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
     self.AssertBasicOutputs()
     for i in range(4):
       self.AssertOutputContains('resource-{}'.format(i))
-    if self.track is base.ReleaseTrack.ALPHA:
+    if self.track is calliope_base.ReleaseTrack.ALPHA:
       for i in range(4):
         self.AssertOutputContains('action_name-' + str(i))
       self.AssertOutputContains('RUNTIME_POLICIES')
@@ -379,7 +379,7 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
     self.AssertOutputContains('INTENT')
     for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
-    if self.track is base.ReleaseTrack.ALPHA:
+    if self.track is calliope_base.ReleaseTrack.ALPHA:
       for i in range(4):
         self.AssertOutputContains('action_name-' + str(i))
       self.AssertOutputContains('DELETE/NOT_RUN')
@@ -708,7 +708,7 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
                 state='IN_PREVIEW', intent='UPDATE') if preview else None)
         for i in range(resource_count)
     ]
-    if self.track is base.ReleaseTrack.ALPHA:
+    if self.track is calliope_base.ReleaseTrack.ALPHA:
       runtime_policies = [['UPDATE_ON_CHANGE'], ['DELETE', 'CREATE'],
                           ['UPDATE_ALWAYS'], []]
       action_intent = ['DELETE', 'CREATE_OR_ACQUIRE', 'UPDATE', 'ABANDON']

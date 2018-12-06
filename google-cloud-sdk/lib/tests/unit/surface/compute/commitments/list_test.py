@@ -22,7 +22,7 @@ import textwrap
 
 from apitools.base.py import encoding
 from googlecloudsdk.api_lib.compute import lister
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.compute import test_base
 import mock
 
@@ -30,7 +30,7 @@ import mock
 class CommitmentsListTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
     self.SelectApi('v1')
     lister_patcher = mock.patch.object(lister, 'GetRegionalResourcesDicts',
                                        autospec=True)

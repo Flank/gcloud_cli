@@ -20,12 +20,12 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import actions as calliope_actions
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 
 
-@base.Deprecate(is_removed=True)
-class DeprecationFlagCmdErrorCommand(base.Command):
+@calliope_base.Deprecate(is_removed=True)
+class DeprecationFlagCmdErrorCommand(calliope_base.Command):
   """A simple command to test flag deprecation.
 
    Test for removing of command and Flag.

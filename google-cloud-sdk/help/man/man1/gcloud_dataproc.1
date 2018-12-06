@@ -11,7 +11,7 @@ gcloud dataproc \- create and manage Google Cloud Dataproc clusters and jobs
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud dataproc\fR \fIGROUP\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud dataproc\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -45,29 +45,12 @@ $ gcloud dataproc jobs
 
 
 
-.SH "FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-independent resource namespace constrained to deploying instances into Compute
-Engine zones inside the region. The default value of \f5global\fR is a special
-multi\-region namespace which is capable of deploying instances into all Compute
-Engine zones globally, and is disjoint from other Cloud Dataproc regions.
-Overrides the default \fBdataproc/region\fR property value for this command
-invocation.
-
-
-.RE
-.sp
-
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -87,6 +70,10 @@ Submit and manage Google Cloud Dataproc jobs.
 .TP 2m
 \fBoperations\fR
 View and manage Google Cloud Dataproc operations.
+
+.TP 2m
+\fBworkflow\-templates\fR
+Create and manage Google Cloud Dataproc workflow templates.
 
 
 .RE

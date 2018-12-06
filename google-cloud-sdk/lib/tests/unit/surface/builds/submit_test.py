@@ -24,7 +24,7 @@ import uuid
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
-from googlecloudsdk.api_lib.cloudbuild import config
+from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions as c_exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
@@ -34,6 +34,7 @@ from tests.lib import e2e_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
+from tests.lib.cli_test_base import MockArgumentError
 from six.moves import range  # pylint: disable=redefined-builtin
 
 _CONFIG_STEPS = """\
@@ -105,6 +106,7 @@ class CreateTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     storage_project = storage_project.replace(':', '_')
     storage_project = storage_project.replace('.', '_')
     if gcs:
+      b = self.storage_v1_messages.Bucket(id=storage_project + '_cloudbuild')
       self.mocked_storage_v1.buckets.Insert.Expect(
           self.storage_v1_messages.StorageBucketsInsertRequest(
               bucket=self.storage_v1_messages.Bucket(
@@ -113,16 +115,14 @@ class CreateTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
               ),
               project=build_project,
           ),
-          response='foo')
+          response=b)
       self.mocked_storage_v1.buckets.List.Expect(
           self.storage_v1_messages.StorageBucketsListRequest(
               project=build_project,
               prefix=storage_project+'_cloudbuild',
           ),
           response=self.storage_v1_messages.Buckets(
-              items=[
-                  self.storage_v1_messages.Bucket(
-                      id=storage_project+'_cloudbuild')]
+              items=[b]
           ))
       self.mocked_storage_v1.objects.Rewrite.Expect(
           self.storage_v1_messages.StorageObjectsRewriteRequest(
@@ -154,6 +154,59 @@ class CreateTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
             metadata=encoding.JsonToMessage(
                 self.cloudbuild_v1_messages.Operation.MetadataValue,
                 encoding.MessageToJson(op_metadata))))
+
+  def testSubmitUseKaniko(self):
+    properties.VALUES.builds.use_kaniko.Set(True)
+
+    b_in = self.cloudbuild_v1_messages.Build(
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            ),
+        ),
+        steps=[
+            self.cloudbuild_v1_messages.BuildStep(
+                name='gcr.io/kaniko-project/executor:latest',
+                args=['--destination', 'gcr.io/my-project/image'],
+            ),
+        ])
+    b_out = self.cloudbuild_v1_messages.Build(
+        createTime='2016-03-31T19:12:32.838111Z',
+        id='123-456-789',
+        projectId='my-project',
+        status=self._statuses.QUEUED,
+        logsBucket='gs://my-project_cloudbuild/logs',
+        logUrl='mockLogURL',
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            ),
+        ),
+        steps=[
+            self.cloudbuild_v1_messages.BuildStep(
+                name='gcr.io/kaniko-project/executor:latest',
+                args=['--destination', 'gcr.io/my-project/image'],
+            ),
+        ])
+    self.ExpectMessagesForSimpleBuild(b_in, b_out)
+
+    self._Run(
+        ['builds', 'submit',
+         'gs://bucket/object.zip', '--tag=gcr.io/my-project/image', '--async'])
+    self.AssertErrContains("""\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""", normalize_space=True)
+    self.AssertOutputContains("""\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename), normalize_space=True)
+    self.AssertErrContains('Logs are available at')
+    self.AssertErrContains('mockLogURL')
+    self.AssertErrNotContains('Logs can be found in the Cloud Console')
 
   def testCreateSuccess(self):
     b_out = self.cloudbuild_v1_messages.Build(
@@ -298,7 +351,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -396,7 +449,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -495,7 +548,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -595,7 +648,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -696,7 +749,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -797,7 +850,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -904,7 +957,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket='my-project_cloudbuild',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -1011,7 +1064,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket='my-project_cloudbuild',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -1045,7 +1098,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket='my-project_cloudbuild',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.objects.Rewrite.Expect(
         self.storage_v1_messages.StorageObjectsRewriteRequest(
             destinationBucket='my-project_cloudbuild',
@@ -1176,7 +1229,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket='my-project_cloudbuild',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -1337,7 +1390,7 @@ Here the last line
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket='my-project_cloudbuild',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -1490,7 +1543,7 @@ Here the last line
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -1591,7 +1644,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -1702,7 +1755,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -1810,7 +1863,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -1911,7 +1964,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -1987,7 +2040,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -2255,7 +2308,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             ),
             project='my-project',
         ),
-        response='foo')
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
     self.mocked_storage_v1.buckets.List.Expect(
         self.storage_v1_messages.StorageBucketsListRequest(
             project='my-project',
@@ -2407,10 +2460,127 @@ steps:
     config_path = self.Touch(
         '.', 'config.yaml',
         contents=bad_config)
-    with self.assertRaises(config.BadConfigException):
+    with self.assertRaises(cloudbuild_util.ParseProtoException):
       self._Run(
           ['builds', 'submit', 'gs://bucket/object.zip',
            '--config', config_path])
+
+  def testConfigAndTagExclusive(self):
+    config_path = self.Touch('.', 'config.yaml')
+    with self.assertRaises(MockArgumentError):
+      self._Run(
+          ['builds', 'submit', 'gs://bucket/object.zip',
+           '--config', config_path, '--tag=gcr.io/my-project/image'])
+
+  def testNoEmptyTag(self):
+    with self.assertRaises(c_exceptions.InvalidArgumentException):
+      self._Run(
+          ['builds', 'submit', 'gs://bucket/object.zip', '--tag='])
+
+  def testNoEmptyConfigPath(self):
+    with self.assertRaises(c_exceptions.InvalidArgumentException):
+      self._Run(
+          ['builds', 'submit', 'gs://bucket/object.zip', '--config='])
+
+  def testDefaultConfigPath(self):
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name='my-project_cloudbuild',
+            ),
+            project='my-project',
+        ),
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
+    self.mocked_storage_v1.buckets.List.Expect(
+        self.storage_v1_messages.StorageBucketsListRequest(
+            project='my-project',
+            prefix='my-project_cloudbuild',
+        ),
+        response=self.storage_v1_messages.Buckets(
+            items=[self.storage_v1_messages.Bucket(id='my-project_cloudbuild')]
+        ))
+    self.mocked_storage_v1.objects.Rewrite.Expect(
+        self.storage_v1_messages.StorageObjectsRewriteRequest(
+            destinationBucket='my-project_cloudbuild',
+            destinationObject=self.frozen_zip_filename,
+            sourceBucket='bucket',
+            sourceObject='object.zip',
+        ),
+        response=self.storage_v1_messages.RewriteResponse(
+            resource=self.storage_v1_messages.Object(
+                bucket='my-project_cloudbuild',
+                name=self.frozen_zip_filename,
+                generation=123,
+            ),
+            done=True,
+        ))
+
+    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
+        build=self.cloudbuild_v1_messages.Build(
+            createTime='2016-03-31T19:12:32.838111Z',
+            id='123-456-789',
+            images=[
+                'gcr.io/project/image',
+            ],
+            projectId='my-project',
+            status=self._statuses.QUEUED,
+            logsBucket='gs://my-project_cloudbuild/logs',
+            source=self.cloudbuild_v1_messages.Source(
+                storageSource=self.cloudbuild_v1_messages.StorageSource(
+                    bucket='my-project_cloudbuild',
+                    object=self.frozen_zip_filename,
+                    generation=123,
+                ),
+            ),
+            steps=[
+                self.cloudbuild_v1_messages.BuildStep(
+                    name='gcr.io/cloud-builders/docker',
+                    args=['build', '-t', 'gcr.io/project/image', '.'],
+                ),
+            ],
+            timeout='200.000s'))
+
+    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
+        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
+            build=self.cloudbuild_v1_messages.Build(
+                images=[
+                    'gcr.io/project/image',
+                ],
+                source=self.cloudbuild_v1_messages.Source(
+                    storageSource=self.cloudbuild_v1_messages.StorageSource(
+                        bucket='my-project_cloudbuild',
+                        object=self.frozen_zip_filename,
+                        generation=123,
+                    ),
+                ),
+                steps=[
+                    self.cloudbuild_v1_messages.BuildStep(
+                        name='gcr.io/cloud-builders/docker',
+                        args=['build', '-t', 'gcr.io/project/image', '.'],
+                    ),
+                ],
+                timeout='200s',
+            ),
+            projectId='my-project',
+        ),
+        response=self.cloudbuild_v1_messages.Operation(
+            metadata=encoding.JsonToMessage(
+                self.cloudbuild_v1_messages.Operation.MetadataValue,
+                encoding.MessageToJson(op_metadata))))
+
+    self.Touch(
+        '.', 'cloudbuild.yaml',
+        contents=_MakeConfig(images=['gcr.io/project/image'], timeout=200))
+    self._Run(
+        ['builds', 'submit', 'gs://bucket/object.zip', '--async'])
+    self.AssertErrContains("""\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""", normalize_space=True)
+    self.AssertOutputContains("""\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename), normalize_space=True)
 
   def testCreateMachineTypeSuccess(self):
     b_out = self.cloudbuild_v1_messages.Build(
@@ -2482,6 +2652,12 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
       self._Run(
           ['builds', 'submit', '--tag=gcr.io/my-project/image',
            '--machine-type=n1-wrong-1', '--no-source'])
+
+  def testCreateUnspecifiedMachineType(self):
+    with self.assertRaises(Exception):
+      self._Run(
+          ['builds', 'submit', '--tag=gcr.io/my-project/image',
+           '--machine-type=unspecified', '--no-source'])
 
   def testCreateDiskSizeSuccess(self):
     b_out = self.cloudbuild_v1_messages.Build(

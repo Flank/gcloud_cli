@@ -18,13 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-@base.UnicodeIsSupported
-class OptionalFlags(base.Command):
+@calliope_base.UnicodeIsSupported
+class OptionalFlags(calliope_base.Command):
   """Nothing Happens."""
 
   detailed_help = {
@@ -63,7 +63,10 @@ class Pirate(object):
     return '\u2620{}'.format(self.value)
 
   def __eq__(self, other):
-    return other.value == self.value
+    try:
+      return other.value == self.value
+    except AttributeError:
+      return other is self
 
   def __ne__(self, other):
     return not self == other

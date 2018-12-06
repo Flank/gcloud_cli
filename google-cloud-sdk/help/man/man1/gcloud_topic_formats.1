@@ -253,6 +253,9 @@ reference any of the supported formats.
 \fBno\-heading\fR
 Disables the column headings.
 .TP 2m
+\fBmargin=N\fR
+Right hand side padding when one or more columns are wrapped.
+.TP 2m
 \fBpad=N\fR
 Sets the column horizontal pad to \fIN\fR spaces. The default is 1 for box, 2
 otherwise.
@@ -260,6 +263,10 @@ otherwise.
 \fBtitle=\fITITLE\fR\fR
 Prints a centered \fITITLE\fR at the top of the table, within the table box if
 \fBbox\fR is enabled.
+.TP 2m
+\fBwidth=N\fR
+The table width. The default is the terminal width or 80 if the output is not a
+terminal.
 
 .RE
 .sp
@@ -318,6 +325,9 @@ Disables formatted output and does not consume the resources.
 \fBjson\-decode\fR
 Decodes string values that are JSON compact encodings of list and dictionary
 objects. This may become the default.
+.TP 2m
+\fBpager\fR
+If True, sends output to a pager.
 .TP 2m
 \fBprivate\fR
 Disables log file output. Use this for sensitive resource data that should not

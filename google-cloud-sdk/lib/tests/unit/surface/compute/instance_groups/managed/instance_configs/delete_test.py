@@ -21,11 +21,13 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from mock import patch
 
 
 class InstanceGroupManagerInstanceConfigsDeleteTestBase(
@@ -34,7 +36,7 @@ class InstanceGroupManagerInstanceConfigsDeleteTestBase(
   API_VERSION = 'alpha'
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.client = mock.Client(
         core_apis.GetClientClass('compute', self.API_VERSION))
     self.resources = resources.REGISTRY.Clone()
@@ -158,6 +160,17 @@ class InstanceGroupManagerInstanceConfigsDeleteTest(
           --instances foo,bas
           --force-instance-update
         """)
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run("""
+          compute instance-groups managed instance-configs delete group-1
+            --zone us-central2-a
+            --instances foo
+          """)
 
 
 class RegionInstanceGroupManagerInstanceConfigsDeleteTest(

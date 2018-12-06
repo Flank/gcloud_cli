@@ -53,23 +53,17 @@ class SetIamPolicy(base.Command):
         holder.resources,
         scope_lister=compute_flags.GetDefaultScopeLister(client))
 
-    # TODO(b/78371568): Construct the ZoneSetPolicyRequest directly
-    # out of the parsed policy instead of setting 'bindings' and 'etags'.
-    # This current form is required so gcloud won't break while Compute
-    # roll outs the breaking change to SetIamPolicy (b/75971480)
-
-    # TODO(b/36053578): determine how this output should look when empty.
-
     # SetIamPolicy always returns either an error or the newly set policy.
     # If the policy was just set to the empty policy it returns a valid empty
     # policy (just an etag.)
     # It is not possible to have multiple policies for one resource.
-    return client.MakeRequests(
+    result = client.MakeRequests(
         [(client.apitools_client.instances, 'SetIamPolicy',
           client.messages.ComputeInstancesSetIamPolicyRequest(
               zoneSetPolicyRequest=client.messages.ZoneSetPolicyRequest(
-                  bindings=policy.bindings,
-                  etag=policy.etag),
+                  policy=policy),
               project=instance_ref.project,
               resource=instance_ref.instance,
               zone=instance_ref.zone))])[0]
+    iam_util.LogSetIamPolicy(instance_ref.RelativeName(), 'instance')
+    return result

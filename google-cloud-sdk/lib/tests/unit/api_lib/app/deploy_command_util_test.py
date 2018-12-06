@@ -23,7 +23,6 @@ import io
 import json
 import logging
 import os
-import urllib2
 import uuid
 
 from apitools.base.py.testing import mock as apitools_mock
@@ -59,10 +58,10 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.app import source_context_util
 from tests.lib.surface.app import util
 from googlecloudsdk.third_party.appengine.api import appinfo
-from googlecloudsdk.third_party.appengine.api import validation
 from googlecloudsdk.third_party.appengine.tools import context_util
 
 import mock
+import six.moves.urllib.error
 
 PROJECT = 'fakeproject'
 ACCOUNT = 'fakeaccount'
@@ -113,9 +112,10 @@ class PushTestBase(util.WithAppData, build_base.BuildBase):
     # Pre-created objects/utilities
     self.service_config = self._MakeConfig(module='foo', env='flex',
                                            runtime='python27')
-    self.code_bucket_ref = storage_util.BucketReference.FromBucketUrl(
+    self.code_bucket_ref = storage_util.BucketReference.FromUrl(
         'gs://bucket/')
     self.source_dir = os.path.dirname(self.service_config.file)
+    self.app_files = ['f1.txt', 'f2.png']
     self.messages = cloudbuild_util.GetMessagesModule()
 
     # For briefer typing
@@ -157,7 +157,8 @@ class PushTestRuntimeBuilders(PushTestBase):
     """
     self._MockLoadCloudBuild()
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         code_bucket_ref=self.code_bucket_ref,
         gcr_domain='blah.gcr.io',
         runtime_builder_strategy=runtime_builders.RuntimeBuilderStrategy.ALWAYS)
@@ -192,7 +193,8 @@ class PushTestRuntimeBuilders(PushTestBase):
     self.service_config.file = os.path.join(self.source_dir, 'subdir',
                                             'bar.yaml')
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         code_bucket_ref=self.code_bucket_ref,
         gcr_domain='blah.gcr.io',
         runtime_builder_strategy=runtime_builders.RuntimeBuilderStrategy.ALWAYS)
@@ -236,7 +238,8 @@ class PushTestRuntimeBuilders(PushTestBase):
     self.Touch(os.path.join(self.temp_path, 'subdir'), 'bar.yaml',
                contents='yaml contents', makedirs=True)
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         code_bucket_ref=self.code_bucket_ref,
         gcr_domain='blah.gcr.io',
         runtime_builder_strategy=runtime_builders.RuntimeBuilderStrategy.ALWAYS)
@@ -261,62 +264,12 @@ class PushTestRuntimeBuilders(PushTestBase):
                 substitutionOption=self.substitution_types.ALLOW_LOOSE)),
         project='fakeproject')
     self.upload_mock.assert_called_once_with(
-        self.source_dir, mock.ANY,
-        info=mock.ANY,
+        self.source_dir, self.app_files,
+        mock.ANY,
         gen_files={
             checksum_path: 'yaml contents'
         }
     )
-
-  def testModuleBuildUseRuntimeBuildersAppYamlSkipped(self):
-    """Tests the scenario when app.yaml is in skip_files.
-
-    The differences here from the other test cases:
-    - the application YAML file *is* called "app.yaml", and it *is* in the
-      source directory, but we should still create another .yaml file.
-    """
-    self._MockLoadCloudBuild()
-    self.service_config.file = os.path.join(self.source_dir, 'bar',
-                                            'app.yaml')
-    self.Touch(os.path.join(self.source_dir, 'bar'), 'app.yaml',
-               contents='yaml contents', makedirs=True)
-
-    self.service_config.parsed.skip_files = (
-        validation.RegexStr().Validate(r'^bar/app\.yaml$', 'skip_files'))
-    deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
-        code_bucket_ref=self.code_bucket_ref,
-        gcr_domain='blah.gcr.io',
-        runtime_builder_strategy=runtime_builders.RuntimeBuilderStrategy.ALWAYS)
-
-    self.generate_configs_mock.assert_not_called()
-    # echo -n 'yaml contents' | sha256sum
-    checksum_path = ('_app_f4a49b7a0ea6708939d6f4b149db7bb5597ddbd71855c46c'
-                     '6a9e8d56ec1ca72b.yaml')
-    self.load_cloud_build_mock.assert_called_once_with(
-        {'_OUTPUT_IMAGE': 'blah.gcr.io/fakeproject/appengine/foo.1.2:latest',
-         '_GAE_APPLICATION_YAML_PATH': checksum_path})
-    self.execute_cloud_build_mock.assert_called_once_with(
-        self.messages.Build(
-            images=['blah.gcr.io/fakeproject/appengine/foo.1.2:latest'],
-            logsBucket='bucket',
-            source=self.messages.Source(
-                storageSource=self.messages.StorageSource(
-                    bucket='bucket',
-                    object='blah.gcr.io/fakeproject/appengine/foo.1.2:latest')),
-            steps=[],
-            options=self.messages.BuildOptions(
-                substitutionOption=self.substitution_types.ALLOW_LOOSE)),
-        project='fakeproject')
-    self.upload_mock.assert_called_once_with(
-        self.source_dir, mock.ANY,
-        info=mock.ANY,
-        gen_files={
-            checksum_path: 'yaml contents'
-        }
-    )
-    skip_files = self.upload_mock.call_args[1]['info'].parsed.skip_files.regex
-    self.assertTrue(skip_files.match('bar/app.yaml'))
 
   def testModuleBuildUseRuntimeBuilders_CustomRuntimeDockerfile(self):
     """Tests the scenario when the runtime_builder_strategy flag is turned on.
@@ -329,7 +282,8 @@ class PushTestRuntimeBuilders(PushTestBase):
     self.service_config = self._MakeConfig(runtime='custom')
     self.Touch(self.source_dir, 'Dockerfile', makedirs=True)
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         code_bucket_ref=self.code_bucket_ref, gcr_domain='blah.gcr.io',
         runtime_builder_strategy=runtime_builders.RuntimeBuilderStrategy.ALWAYS)
 
@@ -372,7 +326,8 @@ class PushTestRuntimeBuilders(PushTestBase):
             images: ['$_OUTPUT_IMAGE']
             """)
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         code_bucket_ref=self.code_bucket_ref, gcr_domain='blah.gcr.io',
         runtime_builder_strategy=runtime_builders.RuntimeBuilderStrategy.ALWAYS)
 
@@ -429,7 +384,8 @@ class PushTestRuntimeBuilders(PushTestBase):
         runtime_builders.RuntimeBuilderStrategy.WHITELIST_BETA)
 
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         code_bucket_ref=self.code_bucket_ref,
         gcr_domain='blah.gcr.io',
         runtime_builder_strategy=runtime_builder_strategy)
@@ -468,7 +424,8 @@ class PushTestRuntimeBuilders(PushTestBase):
     for module in modules:
       source_dir = os.path.dirname(module.file)
       deploy_command_util.BuildAndPushDockerImage(
-          'fakeproject', module, source_dir, version_id='1.2',
+          'fakeproject', module, source_dir, self.app_files,
+          version_id='1.2',
           code_bucket_ref=self.code_bucket_ref,
           gcr_domain='blah.gcr.io',
           runtime_builder_strategy=runtime_builder_strategy)
@@ -487,7 +444,8 @@ class PushTestRuntimeBuilders(PushTestBase):
     runtime_builder_strategy = runtime_builders.RuntimeBuilderStrategy.ALWAYS
     with self.assertRaises(deploy_command_util.DockerfileError):
       deploy_command_util.BuildAndPushDockerImage(
-          PROJECT, self.service_config, self.source_dir, version_id='1.2',
+          PROJECT, self.service_config, self.source_dir, self.app_files,
+          version_id='1.2',
           code_bucket_ref=self.code_bucket_ref,
           gcr_domain='blah.gcr.io',
           runtime_builder_strategy=runtime_builder_strategy)
@@ -499,7 +457,8 @@ class PushTestRuntimeBuilders(PushTestBase):
     runtime_builder_strategy = runtime_builders.RuntimeBuilderStrategy.ALWAYS
     with self.assertRaises(deploy_command_util.CloudbuildYamlError):
       deploy_command_util.BuildAndPushDockerImage(
-          PROJECT, self.service_config, self.source_dir, version_id='1.2',
+          PROJECT, self.service_config, self.source_dir, self.app_files,
+          version_id='1.2',
           code_bucket_ref=self.code_bucket_ref,
           gcr_domain='blah.gcr.io',
           runtime_builder_strategy=runtime_builder_strategy)
@@ -529,7 +488,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
     self.service_config = self._MakeConfig(env=None, vm=True)
 
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         gcr_domain='blah.gcr.io',
         code_bucket_ref=self.code_bucket_ref)
 
@@ -547,7 +507,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
     for module in modules:
       source_dir = os.path.dirname(module.file)
       deploy_command_util.BuildAndPushDockerImage(
-          'fakeproject', module, source_dir, version_id='1.2',
+          'fakeproject', module, source_dir, self.app_files,
+          version_id='1.2',
           gcr_domain='blah.gcr.io',
           code_bucket_ref=self.code_bucket_ref)
 
@@ -573,7 +534,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
                                 long_filename):
       source_dir = os.path.dirname(module.file)
       deploy_command_util.BuildAndPushDockerImage(
-          'fakeproject', module, source_dir, version_id='1.2',
+          'fakeproject', module, source_dir, self.app_files,
+          version_id='1.2',
           gcr_domain='blah.gcr.io',
           code_bucket_ref=self.code_bucket_ref)
 
@@ -587,7 +549,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
     with self.assertRaises(OSError):
       source_dir = os.path.dirname(module.file)
       deploy_command_util.BuildAndPushDockerImage(
-          'fakeproject', module, source_dir, version_id='1.2',
+          'fakeproject', module, source_dir, self.app_files,
+          version_id='1.2',
           gcr_domain='blah.gcr.io',
           code_bucket_ref=self.code_bucket_ref)
 
@@ -601,7 +564,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
     with self.assertRaises(OSError):
       source_dir = os.path.dirname(module.file)
       deploy_command_util.BuildAndPushDockerImage(
-          'fakeproject', module, source_dir, version_id='1.2',
+          'fakeproject', module, source_dir, self.app_files,
+          version_id='1.2',
           gcr_domain='blah.gcr.io',
           code_bucket_ref=self.code_bucket_ref)
 
@@ -611,7 +575,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
 
     with self.assertRaises(deploy_command_util.DockerfileError):
       deploy_command_util.BuildAndPushDockerImage(
-          PROJECT, self.service_config, self.source_dir, version_id='1.2',
+          PROJECT, self.service_config, self.source_dir, self.app_files,
+          version_id='1.2',
           gcr_domain='blah.gcr.io', code_bucket_ref=self.code_bucket_ref)
 
   def testDockerfileAndCloudbuildRuntimeCustom(self):
@@ -629,7 +594,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
 
     with self.assertRaises(deploy_command_util.CustomRuntimeFilesError):
       deploy_command_util.BuildAndPushDockerImage(
-          PROJECT, self.service_config, self.source_dir, version_id='1.2',
+          PROJECT, self.service_config, self.source_dir, self.app_files,
+          version_id='1.2',
           gcr_domain='blah.gcr.io', code_bucket_ref=self.code_bucket_ref)
 
   def testDockerfileAndRuntimeCustom(self):
@@ -639,7 +605,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
     fingerprint_mock = self.StartObjectPatch(fingerprinter, 'IdentifyDirectory')
 
     deploy_command_util.BuildAndPushDockerImage(
-        PROJECT, self.service_config, self.source_dir, version_id='1.2',
+        PROJECT, self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         gcr_domain='blah.gcr.io', code_bucket_ref=self.code_bucket_ref)
 
     fingerprint_mock.assert_not_called()
@@ -649,7 +616,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
 
     with self.assertRaises(deploy_command_util.UnsatisfiedRequirementsError):
       deploy_command_util.BuildAndPushDockerImage(
-          PROJECT, self.service_config, self.source_dir, version_id='1.2',
+          PROJECT, self.service_config, self.source_dir, self.app_files,
+          version_id='1.2',
           gcr_domain='blah.gcr.io', code_bucket_ref=self.code_bucket_ref)
 
   def testGetDomainAndDisplayId(self):
@@ -675,9 +643,23 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
                                               PROJECT, False)
     self.assertEqual(result.identifier, self.fake_image.tagged_repo)
 
-  def testSubmitBuildWithTimeout(self):
-    timeout = 1000
+  def testSubmitBuildWithTimeoutInt(self):
+    timeout = '1000'
     properties.VALUES.app.cloud_build_timeout.Set(timeout)
+    log.SetVerbosity(logging.INFO)
+
+    result = deploy_command_util._SubmitBuild(self.fake_build, self.fake_image,
+                                              PROJECT, True)
+    self.assertEqual(result.identifier, self.fake_image.tagged_repo)
+    self.AssertErrContains(
+        'Property cloud_build_timeout configured to [{0}], which exceeds '
+        'the maximum build time for parallelized beta deployments of [{1}] '
+        'seconds. Performing serial deployment.'.format(
+            timeout, deploy_command_util.MAX_PARALLEL_BUILD_TIME))
+
+  def testSubmitBuildWithTimeoutSuffix(self):
+    timeout = '1000'
+    properties.VALUES.app.cloud_build_timeout.Set(timeout + 's')
     log.SetVerbosity(logging.INFO)
 
     result = deploy_command_util._SubmitBuild(self.fake_build, self.fake_image,
@@ -701,7 +683,8 @@ class PushTestSourceContexts(PushTestBase):
   def testModuleBuildWithContext(self):
     """Test BuildAndPushDockerImage uploads correct source context files."""
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         gcr_domain='blah.gcr.io',
         code_bucket_ref=self.code_bucket_ref)
 
@@ -710,8 +693,8 @@ class PushTestSourceContexts(PushTestBase):
         os.path.join(self.source_dir, 'source-context.json')))
     # Check that source context file is sent correctly for upload
     self.upload_mock.assert_called_once_with(
-        self.source_dir, mock.ANY,
-        info=mock.ANY,
+        self.source_dir, self.app_files,
+        mock.ANY,
         gen_files={
             'source-context.json': mock.ANY
         }
@@ -733,15 +716,16 @@ class PushTestGenerateConfigs(PushTestBase):
     log.SetVerbosity(logging.INFO)
 
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         gcr_domain='blah.gcr.io',
         code_bucket_ref=self.code_bucket_ref)
 
     self.context_mock.assert_called_once_with(self.source_dir)
 
     self.upload_mock.assert_called_once_with(
-        self.source_dir, mock.ANY,
-        info=mock.ANY,
+        self.source_dir, self.app_files,
+        mock.ANY,
         gen_files={
             'Dockerfile': (python_compat.PYTHON27_DOCKERFILE_PREAMBLE +
                            python_compat.DOCKERFILE_INSTALL_APP),
@@ -762,13 +746,14 @@ class PushTestGenerateConfigs(PushTestBase):
                           side_effect=go.GoConfigurator)
 
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         gcr_domain='blah.gcr.io',
         code_bucket_ref=self.code_bucket_ref)
 
     self.upload_mock.assert_called_once_with(
-        self.source_dir, mock.ANY,
-        info=mock.ANY,
+        self.source_dir, self.app_files,
+        mock.ANY,
         gen_files={
             'Dockerfile': go.DOCKERFILE,
             '.dockerignore': go.DOCKERIGNORE
@@ -784,7 +769,8 @@ class PushTestGenerateConfigs(PushTestBase):
                           side_effect=RubyConfig)
 
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         gcr_domain='blah.gcr.io',
         code_bucket_ref=self.code_bucket_ref)
 
@@ -795,8 +781,8 @@ class PushTestGenerateConfigs(PushTestBase):
         ruby.DOCKERFILE_GEM_INSTALL,
         ruby.DOCKERFILE_ENTRYPOINT.format(ruby.ENTRYPOINT_FOREMAN)])
     self.upload_mock.assert_called_once_with(
-        self.source_dir, mock.ANY,
-        info=mock.ANY,
+        self.source_dir, self.app_files,
+        mock.ANY,
         gen_files={
             'Dockerfile': dockerfile,
             '.dockerignore': ruby.DOCKERIGNORE_CONTENTS
@@ -808,14 +794,15 @@ class PushTestGenerateConfigs(PushTestBase):
     self.context_mock.return_value = source_context_util.FAKE_CONTEXTS
 
     deploy_command_util.BuildAndPushDockerImage(
-        'fakeproject', self.service_config, self.source_dir, version_id='1.2',
+        'fakeproject', self.service_config, self.source_dir, self.app_files,
+        version_id='1.2',
         gcr_domain='blah.gcr.io',
         code_bucket_ref=self.code_bucket_ref)
 
     self.context_mock.assert_called_once_with(self.source_dir)
     self.upload_mock.assert_called_once_with(
-        self.source_dir, mock.ANY,
-        info=mock.ANY,
+        self.source_dir, self.app_files,
+        mock.ANY,
         gen_files={
             'source-context.json': mock.ANY,
             'Dockerfile': mock.ANY,
@@ -946,7 +933,7 @@ class DoPrepareManagedVmsTest(sdk_test_base.WithOutputCapture,
 
   def testDoPrepareManagedVms_Failure(self):
     """Tests that Flex preparation failure is handled with a warning."""
-    url_error = urllib2.HTTPError(
+    url_error = six.moves.urllib.error.HTTPError(
         'http://www.example.com', 400,
         'HTTP Error 400: Bad Request Unexpected HTTP status 400', {},
         io.BytesIO())

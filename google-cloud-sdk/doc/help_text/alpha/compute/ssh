@@ -6,16 +6,17 @@ SYNOPSIS
         [--container=CONTAINER] [--dry-run] [--force-key-file-overwrite]
         [--internal-ip] [--plain] [--ssh-flag=SSH_FLAG]
         [--ssh-key-file=SSH_KEY_FILE]
-        [--strict-host-key-checking=STRICT_HOST_KEY_CHECKING] [--zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...] [-- SSH_ARGS ...]
+        [--strict-host-key-checking=STRICT_HOST_KEY_CHECKING]
+        [--tunnel-through-iap] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [-- SSH_ARGS ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute ssh is a thin wrapper around the ssh(1)
     command that takes care of authentication and the translation of the
     instance name into an IP address.
 
-    Note, this command does not work for Windows VMs. To connect to a Windows
-    instance using a command-line method, refer to this guide:
+    Note, this command does not work when connecting to Windows VMs. To connect
+    to a Windows instance using a command-line method, refer to this guide:
     https://cloud.google.com/compute/docs/instances/connecting-to-instance#windows_cli
 
     The default network comes preconfigured to allow ssh access to all VMs. If
@@ -116,6 +117,9 @@ FLAGS
         subsequent connections. STRICT_HOST_KEY_CHECKING must be one of: yes,
         no, ask.
 
+     --tunnel-through-iap
+        Tunnel the ssh connection through the Cloud Identity-Aware Proxy.
+
      --zone=ZONE
         Zone of the instance to connect to. If not specified and the
         compute/zone property isn't set, you may be prompted to select a zone.
@@ -138,8 +142,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To SSH into 'example-instance' in zone us-central1-a, run:

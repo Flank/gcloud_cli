@@ -18,150 +18,33 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
-from googlecloudsdk.calliope import parser_errors
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.compute import test_base
 
 
+# TODO(b/79153388): Clean up this test after 3 months of deprecation.
 class InterconnectAttachmentsCreateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
     self.SelectApi('v1')
     self.message_version = self.compute_v1
 
-  def CheckInterconnectAttachmentRequest(self, **kwargs):
-    interconnect_attachment_msg = {}
-    interconnect_attachment_msg.update(kwargs)
-    self.CheckRequests(
-        [(self.message_version.interconnectAttachments, 'Insert',
-          self.messages.ComputeInterconnectAttachmentsInsertRequest(
-              project='my-project',
-              region='us-central1',
-              interconnectAttachment=self.messages.InterconnectAttachment(
-                  **interconnect_attachment_msg)))],)
-
-  def testCreateInterconnectAttachment(self):
-    messages = self.messages
-    self.make_requests.side_effect = iter([
-        [
-            messages.InterconnectAttachment(
-                name='my-attachment',
-                description='',
-                region='us-central1',
-                interconnect=self.compute_uri +
-                '/projects/my-project/global/interconnects/'
-                'my-interconnect',
-                router=self.compute_uri + '/projects/my-project/regions/'
-                'us-central1/routers/my-router')
-        ],
-    ])
-
-    self.Run('compute interconnects attachments create my-attachment --region '
-             'us-central1 --interconnect my-interconnect --router my-router '
-             '--description "this is my attachment" ')
-
-    self.CheckInterconnectAttachmentRequest(
-        name='my-attachment',
-        description='this is my attachment',
-        interconnect=self.compute_uri +
-        '/projects/my-project/global/interconnects/my-interconnect',
-        router=self.compute_uri + '/projects/my-project/regions/us-central1/'
-        'routers/my-router')
-    self.AssertOutputEquals('')
-    self.AssertErrContains('`create` is deprecated. Please use `gcloud compute '
-                           'interconnects attachments dedicated create` '
-                           'instead.')
-
-  def testCreateInterconnectAttachmentWithUri(self):
-    messages = self.messages
-    self.make_requests.side_effect = iter([
-        [
-            messages.InterconnectAttachment(
-                name='my-attachment',
-                description='',
-                region='us-central1',
-                interconnect=self.compute_uri +
-                '/projects/my-project/global/interconnects/'
-                'my-interconnect',
-                router=self.compute_uri + '/projects/my-project/regions/'
-                'us-central1/routers/my-router')
-        ],
-    ])
-
-    self.Run('compute interconnects attachments create '
-             + self.compute_uri +
-             '/projects/my-project/'
-             'regions/us-central1/interconnectAttachments/my-attachment '
-             '--interconnect my-interconnect --router my-router '
-             '--description "this is my attachment" ')
-
-    self.CheckInterconnectAttachmentRequest(
-        name='my-attachment',
-        description='this is my attachment',
-        interconnect=self.compute_uri +
-        '/projects/my-project/global/interconnects/my-interconnect',
-        router=self.compute_uri + '/projects/my-project/regions/us-central1/'
-        'routers/my-router')
-
-  def testWithRouterRegionDifferentAsAttachment(self):
-    with self.assertRaises(parser_errors.ArgumentException):
+  def testCreateInterconnectAttachment_deprecated(self):
+    with self.assertRaisesRegexp(
+        calliope_base.DeprecationException,
+        '`create` has been removed. Please use `gcloud compute interconnects '
+        'attachments dedicated create` instead.'):
       self.Run(
           'compute interconnects attachments create my-attachment --region '
           'us-central1 --interconnect my-interconnect --router my-router '
-          '--router-region us-east1')
-
-  def testSimpleInvocationWithRegionPrompt(self):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    messages = self.messages
-
-    self.WriteInput('2\n')
-    self.make_requests.side_effect = iter([[
-        self.messages.Region(name='region-1'),
-        self.messages.Region(name='region-2'),
-        self.messages.Region(name='region-3'),
-    ], [
-        messages.InterconnectAttachment(
-            name='my-attachment',
-            description='',
-            region='region-2',
-            interconnect=self.compute_uri +
-            '/projects/my-project/global/interconnects/'
-            'my-interconnect',
-            router=self.compute_uri + '/projects/my-project/regions/'
-            'region-2/routers/my-router')
-    ]])
-
-    self.Run('compute interconnects attachments create my-attachment '
-             '--interconnect my-interconnect --router my-router '
-             '--description "this is my attachment" ')
-
-    self.CheckRequests(
-        [(self.compute.regions, 'List', messages.ComputeRegionsListRequest(
-            project='my-project', maxResults=500))],
-        [(self.message_version.interconnectAttachments, 'Insert',
-          self.messages.ComputeInterconnectAttachmentsInsertRequest(
-              project='my-project',
-              region='region-2',
-              interconnectAttachment=self.messages.InterconnectAttachment(
-                  name='my-attachment',
-                  description='this is my attachment',
-                  interconnect=self.compute_uri +
-                  '/projects/my-project/global/interconnects/my-interconnect',
-                  router=self.compute_uri +
-                  '/projects/my-project/regions/region-2/'
-                  'routers/my-router')))],
-    )
-    self.AssertErrContains('PROMPT_CHOICE')
-    self.AssertErrContains('"choices": ["region-1", "region-2", "region-3"]')
-    self.AssertOutputEquals('')
+          '--description "this is my attachment" ')
 
 
 class InterconnectAttachmentsCreateBetaTest(InterconnectAttachmentsCreateTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi('beta')
     self.message_version = self.compute_beta
 
@@ -169,6 +52,6 @@ class InterconnectAttachmentsCreateBetaTest(InterconnectAttachmentsCreateTest):
 class InterconnectAttachmentsCreateAlphaTest(InterconnectAttachmentsCreateTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
     self.message_version = self.compute_alpha

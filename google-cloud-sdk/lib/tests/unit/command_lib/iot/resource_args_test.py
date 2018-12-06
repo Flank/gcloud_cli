@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import resource_args
+from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import properties
 from tests.lib import completer_test_base
 from tests.lib import parameterized
@@ -178,6 +179,63 @@ class ResourceArgCompletersTest(
         args=args,
         projects=['p0', 'p1'],
         expected_completions=expected_completions)
+
+
+class ResourceArgConceptTest(
+    base.CloudIotRegistryBase,
+    base.CloudIotDeviceBase,
+    concepts_test_base.ConceptsTestBase):
+
+  def testCreateDevicePresentationSpecDefaults(self):
+    expected_spec = presentation_specs.ResourcePresentationSpec(
+        '--device',
+        resource_args.GetDeviceResourceSpec(),
+        'The device to test.',
+        required=False,
+        prefixes=True
+    )
+    actual_spec = resource_args.CreateDevicePresentationSpec('to test')
+    self.assertEqual(expected_spec, actual_spec)
+
+  def testCreateDevicePresentationSpecAllParams(self):
+    expected_spec = presentation_specs.ResourcePresentationSpec(
+        'another-device',
+        resource_args.GetDeviceResourceSpec('another-device'),
+        'The other device to test.',
+        required=True,
+        prefixes=True
+    )
+    actual_spec = resource_args.CreateDevicePresentationSpec(
+        'to test',
+        help_text='The other device {}.',
+        name='another-device',
+        required=True,
+        prefixes=True,
+        positional=True)
+    self.assertEqual(expected_spec, actual_spec)
+
+  def testAddBindResourceArgsToParser(self):
+    resource_args.AddBindResourceArgsToParser(self.parser)
+    # Parse Args
+    args = self.parser.parser.parse_args(
+        ['--gateway', 'my-gateway',
+         '--gateway-region', 'us-central-1',
+         '--gateway-registry', 'my-registry',
+         '--device', 'my-device',
+         '--device-region', 'us-central-2',
+         '--device-registry', 'my-other-registry'])
+
+    device_ref = args.CONCEPTS.device.Parse()
+    gateway_ref = args.CONCEPTS.gateway.Parse()
+
+    self.assertEqual(('https://cloudiot.googleapis.com/v1/projects/'
+                      'fake-project/locations/us-central-2/registries'
+                      '/my-other-registry/devices/my-device'),
+                     device_ref.SelfLink())
+    self.assertEqual(('https://cloudiot.googleapis.com/v1/projects/'
+                      'fake-project/locations/us-central-1/registries'
+                      '/my-registry/devices/my-gateway'),
+                     gateway_ref.SelfLink())
 
 
 if __name__ == '__main__':

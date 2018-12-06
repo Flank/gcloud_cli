@@ -69,26 +69,24 @@ Define the role of the member.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-The following command will add an IAM policy binding for the role of
-\'roles/editor' for the user 'test\-user@gmail.com' on a organization with
-identifier '123456789'
+To add an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on a organization with identifier '123456789', run:
 
 .RS 2m
 $ gcloud beta organizations add\-iam\-policy\-binding 123456789 \e
     \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
 .RE
 
-For a service account \f5test\-proj1@example.domain.com\fR, the following
-command will add an IAM policy binding for the role of 'roles/editor' to the
-given service account:
+To add an IAM policy binding for the role of 'roles/editor' to the service
+account 'test\-proj1@example.domain.com', run:
 
 .RS 2m
 $ gcloud beta organizations add\-iam\-policy\-binding \e
@@ -97,9 +95,8 @@ $ gcloud beta organizations add\-iam\-policy\-binding \e
     \-\-role='roles/editor'
 .RE
 
-The following command will add an IAM policy binding for the role of
-\'roles/editor' for all authenticated users on a organization with identifier
-\'123456789':
+To add an IAM policy binding for the role of 'roles/editor' for all
+authenticated users on a organization with identifier '123456789', run:
 
 .RS 2m
 $ gcloud beta organizations add\-iam\-policy\-binding 123456789 \e

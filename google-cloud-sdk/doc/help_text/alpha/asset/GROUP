@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha asset - manage CloudAsset
+
+SYNOPSIS
+    gcloud alpha asset GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage CloudAsset.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     operations
+        (ALPHA) Manage CloudAsset operations.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     export
+        (ALPHA) Export the cloud assets to Google Cloud Storage.
+
+     get-history
+        (ALPHA) Get history of assets that overlaps a time window.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

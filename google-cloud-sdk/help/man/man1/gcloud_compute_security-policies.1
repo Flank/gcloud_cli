@@ -1,0 +1,87 @@
+
+.TH "GCLOUD_COMPUTE_SECURITY\-POLICIES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute security\-policies \- read and manipulate Google Compute Engine security policies. Security policies are used to control access to Google Cloud HTTP/HTTPS load balancers
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute security\-policies\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Read and manipulate Google Compute Engine security policies.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBrules\fR
+Read and manipulate Google Compute Engine security policies rules.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+Create a Google Compute Engine security policy.
+
+.TP 2m
+\fBdelete\fR
+Delete security policies.
+
+.TP 2m
+\fBdescribe\fR
+Describe a Google Compute Engine security policy.
+
+.TP 2m
+\fBexport\fR
+Export security policy configs into yaml files.
+
+.TP 2m
+\fBimport\fR
+Import security policy configs into your project.
+
+.TP 2m
+\fBlist\fR
+List Google Compute Engine security policies.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute security\-policies
+$ gcloud beta compute security\-policies
+.RE
+

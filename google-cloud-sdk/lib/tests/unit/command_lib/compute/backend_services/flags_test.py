@@ -44,14 +44,7 @@ class FlagsTest(test_case.TestCase):
   def testSessionAffinityChoices_InternalLb(self):
     expected_choices = sorted(
         beta_messages.BackendService.SessionAffinityValueValuesEnum.names())
-    flags.AddSessionAffinity(self.parser, internal_lb=True)
-    self.assertEqual(expected_choices, self.choices)
-
-  def testSessionAffinityChoices_Beta(self):
-    expected_choices = sorted(set(
-        beta_messages.BackendService.SessionAffinityValueValuesEnum.names()) -
-                              set(['CLIENT_IP_PROTO', 'CLIENT_IP_PORT_PROTO']))
-    flags.AddSessionAffinity(self.parser, internal_lb=False)
+    flags.AddSessionAffinity(self.parser)
     self.assertEqual(expected_choices, self.choices)
 
 

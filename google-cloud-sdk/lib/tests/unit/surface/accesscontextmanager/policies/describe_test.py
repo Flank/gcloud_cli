@@ -18,17 +18,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as base
-from googlecloudsdk.command_lib.meta import cache_util
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
-from tests.lib.core.cache import fake
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class PoliciesDescribeTest(accesscontextmanager.Base):
+class PoliciesDescribeTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -48,9 +47,8 @@ class PoliciesDescribeTest(accesscontextmanager.Base):
         ),
         policy)
 
-  def testDescribe(self, track):
-    self.SetUpForTrack(track)
-
+  def testDescribe(self):
+    self.SetUpForTrack(self.track)
     organization_id = '12345'
     policy = self._MakePolicy('MY_POLICY',
                               parent='organizations/' + organization_id)
@@ -60,8 +58,8 @@ class PoliciesDescribeTest(accesscontextmanager.Base):
 
     self.assertEqual(result, policy)
 
-  def testDescribe_Format(self, track):
-    self.SetUpForTrack(track)
+  def testDescribe_Format(self):
+    self.SetUpForTrack(self.track)
     properties.VALUES.core.user_output_enabled.Set(True)
 
     organization_id = '12345'
@@ -77,34 +75,11 @@ class PoliciesDescribeTest(accesscontextmanager.Base):
         title: My Policy
         """, normalize_space=True)
 
-  def testDescribe_AutoResolution(self, track):
-    self.SetUpForTrack(track)
 
-    cache = fake.Cache('fake://dummy', create=True)
-    self.StartObjectPatch(cache_util.GetCache, '_OpenCache', return_value=cache)
+class PoliciesDescribeTestAlpha(PoliciesDescribeTestBeta):
 
-    organization_name = 'organizations/12345'
-    organization = self.resource_manager_messages.Organization(
-        name=organization_name,
-        displayName='example.com'
-    )
-    policy = self._MakePolicy('MY_POLICY',
-                              parent=organization_name)
-    self._ExpectSearchOrganizations('domain:example.com', [organization])
-    self._ExpectListPolicies(organization_name, [policy])
-    self._ExpectGet(policy)
-
-    result = self.Run('access-context-manager policies describe')
-
-    self.assertEqual(result, policy)
-
-    # Autoresolution should be cached! Only need to get the policy again.
-    self._ExpectGet(policy)
-
-    result = self.Run('access-context-manager policies describe')
-
-    self.assertEqual(result, policy)
-
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

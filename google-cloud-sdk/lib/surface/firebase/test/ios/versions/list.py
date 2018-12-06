@@ -23,7 +23,6 @@ from googlecloudsdk.api_lib.firebase.test import util
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class List(base.ListCommand):
   """List all iOS versions available for testing."""
 
@@ -40,7 +39,8 @@ class List(base.ListCommand):
             id:label=OS_VERSION_ID:align=center,
             major_version:align=center,
             minor_version:align=center,
-            tags.list().color(green=default,red=deprecated,yellow=preview)
+            tags.list().color(green=default,red=deprecated,yellow=preview),
+            supported_xcode_version_ids.list(undefined="none", separator=', ')
           )
     """)
     base.URI_FLAG.RemoveFromParser(parser)

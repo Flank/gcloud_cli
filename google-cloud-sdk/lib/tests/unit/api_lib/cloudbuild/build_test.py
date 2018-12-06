@@ -142,7 +142,7 @@ class CloudBuildClientTest(e2e_base.WithMockHttp, sdk_test_base.WithLogCapture,
       # Intermediate responses.
       for _ in range(retries):
         self.mock_client.operations.Get.Expect(
-            self.messages.Operation(
+            self.messages.CloudbuildOperationsGetRequest(
                 name=self._PROJECT_NAME,
             ),
             self.messages.Operation(
@@ -179,7 +179,9 @@ class CloudBuildClientTest(e2e_base.WithMockHttp, sdk_test_base.WithLogCapture,
 
       if stream_log:
         self.mock_client.operations.Get.Expect(
-            self.messages.Operation(name=self._PROJECT_NAME,), final_response)
+            self.messages.CloudbuildOperationsGetRequest(
+                name=self._PROJECT_NAME,),
+            final_response)
 
   def _ExpectLogRequest(self, b=0):
     self.AddHTTPResponse(

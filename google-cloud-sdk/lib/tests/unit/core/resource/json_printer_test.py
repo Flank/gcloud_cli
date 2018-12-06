@@ -24,7 +24,9 @@ import sys
 import textwrap
 
 from googlecloudsdk.core import log
+from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_printer
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.core.resource import resource_printer_test_base
 
@@ -842,6 +844,60 @@ class JsonPrinterTest(resource_printer_test_base.Base):
         ]
         """))
 
+  def testWithPager(self):
+    mock_more = self.StartObjectPatch(console_io, 'More')
+    [resource] = self.CreateResourceList(1)
+    resource_printer.Printer('json[pager]').PrintSingleRecord(resource)
+    mock_more.assert_called_once_with(textwrap.dedent("""\
+        {
+          "SelfLink": "http://g/selfie/a-0",
+          "kind": "compute#instance",
+          "labels": {
+            "empty": "",
+            "full": "value",
+            "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+          },
+          "metadata": {
+            "items": [
+              {
+                "key": "a",
+                "value": "b"
+              },
+              {
+                "key": "c",
+                "value": "d"
+              },
+              {
+                "key": "e",
+                "value": "f"
+              },
+              {
+                "key": "g",
+                "value": "h"
+              }
+            ],
+            "kind": "compute#metadata.2"
+          },
+          "name": "my-instance-a-0",
+          "networkInterfaces": [
+            {
+              "accessConfigs": [
+                {
+                  "kind": "compute#accessConfig",
+                  "name": "External NAT",
+                  "natIP": "74.125.239.110",
+                  "type": "ONE_TO_ONE_NAT"
+                }
+              ],
+              "name": "nic0",
+              "network": "default",
+              "networkIP": "10.240.150.0"
+            }
+          ],
+          "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+        }
+        """), out=log.out)
+
 
 class JsonPrintTest(resource_printer_test_base.Base):
 
@@ -1117,67 +1173,95 @@ class JsonPrintTest(resource_printer_test_base.Base):
 
 
 class JsonPrivateAttributeTest(sdk_test_base.WithLogCapture,
-                               resource_printer_test_base.Base):
+                               resource_printer_test_base.Base,
+                               parameterized.TestCase):
 
   _SECRET = 'too many secrets'
   _RESOURCE = [{'message': _SECRET}]
 
-  def testJsonNoPrivateAttributeDefaultOut(self):
-    resource_printer.Print(self._RESOURCE, 'json(message)', out=None)
+  @parameterized.named_parameters(
+      ('', 'json(message)'),
+      ('WithPager', '[pager]json(message)'))
+  def testJsonNoPrivateAttributeDefaultOut(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string, out=None)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogContains(self._SECRET)
 
-  def testJsonNoPrivateAttributeLogOut(self):
-    resource_printer.Print(self._RESOURCE, 'json(message)', out=log.out)
+  @parameterized.named_parameters(
+      ('', 'json(message)'),
+      ('WithPager', '[pager]json(message)'))
+  def testJsonNoPrivateAttributeLogOut(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string, out=log.out)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogContains(self._SECRET)
 
-  def testJsonPrivateAttributeDefaultOut(self):
-    resource_printer.Print(self._RESOURCE, '[private]json(message)',
+  @parameterized.named_parameters(
+      ('', '[private]json(message)'),
+      ('WithPager', '[private,pager]json(message)'))
+  def testJsonPrivateAttributeDefaultOut(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=None)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testJsonPrivateAttributeLogOut(self):
-    resource_printer.Print(self._RESOURCE, '[private]json(message)',
+  @parameterized.named_parameters(
+      ('', '[private]json(message)'),
+      ('WithPager', '[private,pager]json(message)'))
+  def testJsonPrivateAttributeLogOut(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=log.out)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testJsonNoPrivateAttributeLogErr(self):
-    resource_printer.Print(self._RESOURCE, 'json(message)',
+  @parameterized.named_parameters(
+      ('', 'json(message)'),
+      ('WithPager', '[pager]json(message)'))
+  def testJsonNoPrivateAttributeLogErr(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=log.err)
     self.AssertOutputNotContains(self._SECRET)
     self.AssertErrContains(self._SECRET)
     self.AssertLogContains(self._SECRET)
 
-  def testJsonPrivateAttributeLogErr(self):
-    resource_printer.Print(self._RESOURCE, '[private]json(message)',
+  @parameterized.named_parameters(
+      ('', '[private]json(message)'),
+      ('WithPager', '[private,pager]json(message)'))
+  def testJsonPrivateAttributeLogErr(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=log.err)
     self.AssertOutputNotContains(self._SECRET)
     self.AssertErrContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testJsonPrivateAttributeLogStatus(self):
-    resource_printer.Print(self._RESOURCE, '[private]json(message)',
+  @parameterized.named_parameters(
+      ('', '[private]json(message)'),
+      ('WithPager', '[private,pager]json(message)'))
+  def testJsonPrivateAttributeLogStatus(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=log.status)
     self.AssertOutputNotContains(self._SECRET)
     self.AssertErrContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testJsonPrivateAttributeStdout(self):
-    resource_printer.Print(self._RESOURCE, '[private]json(message)',
+  @parameterized.named_parameters(
+      ('', '[private]json(message)'),
+      ('WithPager', '[private,pager]json(message)'))
+  def testJsonPrivateAttributeStdout(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=sys.stdout)
     self.AssertOutputContains(self._SECRET)
     self.AssertErrNotContains(self._SECRET)
     self.AssertLogNotContains(self._SECRET)
 
-  def testJsonPrivateAttributeStderr(self):
-    resource_printer.Print(self._RESOURCE, '[private]json(message)',
+  @parameterized.named_parameters(
+      ('', '[private]json(message)'),
+      ('WithPager', '[private,pager]json(message)'))
+  def testJsonPrivateAttributeStderr(self, format_string):
+    resource_printer.Print(self._RESOURCE, format_string,
                            out=sys.stderr)
     self.AssertOutputNotContains(self._SECRET)
     self.AssertErrContains(self._SECRET)

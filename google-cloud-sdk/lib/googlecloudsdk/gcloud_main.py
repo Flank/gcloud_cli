@@ -30,6 +30,7 @@ import errno
 import os
 import sys
 
+from googlecloudsdk.api_lib.iamcredentials import util as iamcred_util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import cli
 from googlecloudsdk.command_lib import crash_handling
@@ -78,8 +79,8 @@ def CreateCLI(surfaces, translator=None):
   def VersionFunc():
     generated_cli.Execute(['version'])
 
-  def HandleKnownErrorFunc(exc):
-    crash_handling.ReportError(exc, is_crash=False)
+  def HandleKnownErrorFunc():
+    crash_handling.ReportError(is_crash=False)
 
   pkg_root = os.path.dirname(os.path.dirname(surface.__file__))
   loader = cli.CLILoader(
@@ -101,27 +102,12 @@ def CreateCLI(surfaces, translator=None):
   for dot_path, dir_path in surfaces:
     loader.AddModule(dot_path, dir_path, component=None)
 
-  # TODO(b/63771276): Remove cloned xpn commands and PreRunHook after a
-  # suitable deprecation period.
-  # Clone 'compute shared-vpc' surface into 'compute xpn' for backward
-  # compatibility.
-  loader.AddModule('compute.xpn',
-                   os.path.join(pkg_root, 'surface', 'compute', 'shared_vpc'))
-  loader.RegisterPreRunHook(
-      _IssueTestWarning, include_commands=r'gcloud\.compute\.xpn\..*')
-
   # Check for updates on shutdown but not for any of the updater commands.
-  loader.RegisterPostRunHook(UpdateCheck,
-                             exclude_commands=r'gcloud\.components\..*')
+  # Skip update checks for 'gcloud version' command as it does that manually.
+  exclude_commands = r'gcloud\.components\..*|gcloud\.version'
+  loader.RegisterPostRunHook(UpdateCheck, exclude_commands=exclude_commands)
   generated_cli = loader.Generate()
   return generated_cli
-
-
-def _IssueTestWarning(command_path=None):
-  del command_path  # Unused in _IssueTestWarning
-  log.warning(
-      'The `gcloud compute xpn` commands have been renamed and will soon be '
-      'removed. Please use `gcloud compute shared-vpc` instead.')
 
 
 def main(gcloud_cli=None, credential_providers=None):
@@ -143,6 +129,9 @@ def main(gcloud_cli=None, credential_providers=None):
   ]
   for provider in credential_providers:
     provider.Register()
+  # Register support for service account impersonation.
+  creds_store.IMPERSONATION_TOKEN_PROVIDER = (
+      iamcred_util.ImpersonationAccessTokenProvider())
 
   try:
     try:

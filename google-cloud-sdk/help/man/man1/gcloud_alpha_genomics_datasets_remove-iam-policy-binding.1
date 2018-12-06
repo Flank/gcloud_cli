@@ -69,25 +69,24 @@ The role to remove the member from.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-The following command will remove an IAM policy binding for the role of
-\'roles/editor' for the user 'test\-user@gmail.com' on dataset with identifier
-\'1000'
+To remove an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on dataset with identifier '1000', run:
 
 .RS 2m
 $ gcloud alpha genomics datasets remove\-iam\-policy\-binding 1000 \e
     \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
 .RE
 
-The following command will remove an IAM policy binding for the role of
-\'roles/editor' from all authenticated users on dataset '1000':
+To remove an IAM policy binding for the role of 'roles/editor' from all
+authenticated users on dataset '1000', run:
 
 .RS 2m
 $ gcloud alpha genomics datasets remove\-iam\-policy\-binding 1000 \e

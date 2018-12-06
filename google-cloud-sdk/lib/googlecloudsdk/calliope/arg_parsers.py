@@ -17,33 +17,33 @@
 
 For details of how argparse argument pasers work, see:
 
-  http://docs.python.org/dev/library/argparse.html#type
+http://docs.python.org/dev/library/argparse.html#type
 
 Example usage:
 
-  import argparse
-  import arg_parsers
+import argparse
+import arg_parsers
 
-  parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser()
 
-  parser.add_argument(
-      '--metadata',
-      type=arg_parsers.ArgDict())
-  parser.add_argument(
-      '--delay',
-      default='5s',
-      type=arg_parsers.Duration(lower_bound='1s', upper_bound='10s')
-  parser.add_argument(
-      '--disk-size',
-      default='10GB',
-      type=arg_parsers.BinarySize(lower_bound='1GB', upper_bound='10TB')
+parser.add_argument(
+'--metadata',
+type=arg_parsers.ArgDict())
+parser.add_argument(
+'--delay',
+default='5s',
+type=arg_parsers.Duration(lower_bound='1s', upper_bound='10s')
+parser.add_argument(
+'--disk-size',
+default='10GB',
+type=arg_parsers.BinarySize(lower_bound='1GB', upper_bound='10TB')
 
-  res = parser.parse_args(
-      '--names --metadata x=y,a=b,c=d --delay 1s --disk-size 10gb'.split())
+res = parser.parse_args(
+'--names --metadata x=y,a=b,c=d --delay 1s --disk-size 10gb'.split())
 
-  assert res.metadata == {'a': 'b', 'c': 'd', 'x': 'y'}
-  assert res.delay == 1
-  assert res.disk_size == 10737418240
+assert res.metadata == {'a': 'b', 'c': 'd', 'x': 'y'}
+assert res.delay == 1
+assert res.disk_size == 10737418240
 
 """
 
@@ -52,6 +52,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import argparse
+import collections
 import copy
 import re
 
@@ -362,25 +363,17 @@ def CustomFunctionValidator(fn, description, parser=None):
   return Parse
 
 
-def Duration(lower_bound=None, upper_bound=None):
+def Duration(default_unit='s', lower_bound='0', upper_bound=None):
   """Returns a function that can parse time durations.
 
-  Input to the parsing function must be a string of the form:
-
-    INTEGER[UNIT]
-
-  The integer must be non-negative. Valid units are "s", "m", "h", and
-  "d" for seconds, seconds, minutes, hours, and days,
-  respectively. The casing of the units matters.
-
-  If the unit is omitted, seconds is assumed.
-
-  The result is parsed in seconds. For example:
+  See times.ParseDuration() for details. If the unit is omitted, seconds is
+  assumed. The parsed result is in seconds. For example:
 
     parser = Duration()
     assert parser('10s') == 10
 
   Args:
+    default_unit: str, The default duration unit.
     lower_bound: str, An inclusive lower bound for values.
     upper_bound: str, An inclusive upper bound for values.
 
@@ -395,8 +388,40 @@ def Duration(lower_bound=None, upper_bound=None):
     A function that accepts a single time duration as input to be
       parsed.
   """
-  return _ValueParser(_DURATION_SCALES, type_abbr='', default_unit='s',
-                      lower_bound=lower_bound, upper_bound=upper_bound)
+
+  def Parse(value):
+    """Parses a duration from value and returns integer seconds."""
+    try:
+      return int(
+          times.ParseDuration(value, default_suffix=default_unit).total_seconds)
+    except times.Error as e:
+      message = six.text_type(e).rstrip('.')
+      raise ArgumentTypeError(_GenerateErrorMessage(
+          'Failed to parse duration: {0}'.format(message, user_input=value)))
+
+  parsed_lower_bound = Parse(lower_bound)
+
+  if upper_bound is None:
+    parsed_upper_bound = None
+  else:
+    parsed_upper_bound = Parse(upper_bound)
+
+  def ParseWithBoundsChecking(value):
+    """Same as Parse except bound checking is performed."""
+    if value is None:
+      return None
+    parsed_value = Parse(value)
+    if parsed_lower_bound is not None and parsed_value < parsed_lower_bound:
+      raise ArgumentTypeError(_GenerateErrorMessage(
+          'value must be greater than or equal to {0}'.format(lower_bound),
+          user_input=value))
+    if parsed_upper_bound is not None and parsed_value > parsed_upper_bound:
+      raise ArgumentTypeError(_GenerateErrorMessage(
+          'value must be less than or equal to {0}'.format(upper_bound),
+          user_input=value))
+    return parsed_value
+
+  return ParseWithBoundsChecking
 
 
 def BinarySize(lower_bound=None, upper_bound=None,
@@ -780,15 +805,21 @@ class ArgList(ArgType):
 
   def __call__(self, arg_value):  # pylint:disable=missing-docstring
 
-    delim = self.DEFAULT_DELIM_CHAR
-    if (arg_value.startswith(self.ALT_DELIM_CHAR) and
-        self.ALT_DELIM_CHAR in arg_value[1:]):
-      delim, arg_value = arg_value[1:].split(self.ALT_DELIM_CHAR, 1)
-      if not delim:
-        raise ArgumentTypeError(
-            'Invalid delimiter. Please see `gcloud topic escaping` for '
-            'information on escaping list or dictionary flag values.')
-    arg_list = _TokenizeQuotedList(arg_value, delim=delim)
+    if isinstance(arg_value, list):
+      arg_list = arg_value
+    elif not isinstance(arg_value, six.string_types):
+      raise ArgumentTypeError('Invalid type [{}] for flag value [{}]'.format(
+          type(arg_value).__name__, arg_value))
+    else:
+      delim = self.DEFAULT_DELIM_CHAR
+      if (arg_value.startswith(self.ALT_DELIM_CHAR) and
+          self.ALT_DELIM_CHAR in arg_value[1:]):
+        delim, arg_value = arg_value[1:].split(self.ALT_DELIM_CHAR, 1)
+        if not delim:
+          raise ArgumentTypeError(
+              'Invalid delimiter. Please see `gcloud topic escaping` for '
+              'information on escaping list or dictionary flag values.')
+      arg_list = _TokenizeQuotedList(arg_value, delim=delim)
 
     # TODO(b/35944028): These exceptions won't present well to the user.
     if len(arg_list) < self.min_length:
@@ -930,35 +961,50 @@ class ArgDict(ArgList):
                   ', '.join(sorted(self.spec.keys()))),
               user_input=key))
 
-  def __call__(self, arg_value):  # pylint:disable=missing-docstring
-    arg_list = super(ArgDict, self).__call__(arg_value)
+  def _ValidateKeyValue(self, key, value, op='='):
+    """Converts and validates <key,value> and returns (key,value)."""
+    if (not op or value is None) and not self.allow_key_only:
+      raise ArgumentTypeError(
+          'Bad syntax for dict arg: [{0}]. Please see `gcloud topic '
+          'escaping` if you would like information on escaping list or '
+          'dictionary flag values.'.format(key))
+    if self.key_type:
+      try:
+        key = self.key_type(key)
+      except ValueError:
+        raise ArgumentTypeError('Invalid key [{0}]'.format(key))
+    convert_value = self.operators.get(op, None)
+    if convert_value:
+      try:
+        value = convert_value(value)
+      except ValueError:
+        raise ArgumentTypeError('Invalid value [{0}]'.format(value))
+    if self.spec:
+      value = self._ApplySpec(key, value)
+    return key, value
 
-    arg_dict = {}
-    for arg in arg_list:
-      match = self.key_op_value.match(arg)
-      # TODO(b/35944028): These exceptions won't present well to the user.
-      if not match:
-        raise ArgumentTypeError('Invalid flag value [{0}]'.format(arg))
-      key, op, value = match.group(1), match.group(2), match.group(3)
-      if not op and not self.allow_key_only:
-        raise ArgumentTypeError(
-            ('Bad syntax for dict arg: [{0}]. Please see `gcloud topic '
-             'escaping` if you would like information on escaping list or '
-             'dictionary flag values.').format(arg))
-      if self.key_type:
-        try:
-          key = self.key_type(key)
-        except ValueError:
-          raise ArgumentTypeError('Invalid key [{0}]'.format(key))
-      convert_value = self.operators.get(op, None)
-      if convert_value:
-        try:
-          value = convert_value(value)
-        except ValueError:
-          raise ArgumentTypeError('Invalid value [{0}]'.format(value))
-      if self.spec:
-        value = self._ApplySpec(key, value)
-      arg_dict[key] = value
+  def __call__(self, arg_value):  # pylint:disable=missing-docstring
+
+    if isinstance(arg_value, dict):
+      raw_dict = arg_value
+      arg_dict = collections.OrderedDict()
+      for key, value in six.iteritems(raw_dict):
+        key, value = self._ValidateKeyValue(key, value)
+        arg_dict[key] = value
+    elif not isinstance(arg_value, six.string_types):
+      raise ArgumentTypeError('Invalid type [{}] for flag value [{}]'.format(
+          type(arg_value).__name__, arg_value))
+    else:
+      arg_list = super(ArgDict, self).__call__(arg_value)
+      arg_dict = collections.OrderedDict()
+      for arg in arg_list:
+        match = self.key_op_value.match(arg)
+        # TODO(b/35944028): These exceptions won't present well to the user.
+        if not match:
+          raise ArgumentTypeError('Invalid flag value [{0}]'.format(arg))
+        key, op, value = match.group(1), match.group(2), match.group(3)
+        key, value = self._ValidateKeyValue(key, value, op=op)
+        arg_dict[key] = value
 
     for required_key in self.required_keys:
       if required_key not in arg_dict:
@@ -1086,7 +1132,8 @@ class UpdateAction(argparse.Action):
 
     if isinstance(values, dict):
       # Get the existing arg value (if any)
-      items = copy.copy(argparse._ensure_value(namespace, self.dest, {}))
+      items = copy.copy(argparse._ensure_value(
+          namespace, self.dest, collections.OrderedDict()))
       # Merge the new key/value pair(s) in
       for k, v in six.iteritems(values):
         if k in items:
@@ -1165,11 +1212,11 @@ class RemainderAction(argparse._StoreAction):  # pylint: disable=protected-acces
   Primarily, this Action provides two utility parsers to help a modified
   ArgumentParser parse -- properly.
 
-  There is one additional property:
+  There is one additional property kwarg:
     example: A usage statement used to construct nice additional help.
   """
 
-  def __init__(self, example=None, *args, **kwargs):
+  def __init__(self, *args, **kwargs):
     if kwargs['nargs'] is not argparse.REMAINDER:
       raise ValueError(
           'The RemainderAction should only be used when '
@@ -1182,8 +1229,9 @@ class RemainderAction(argparse._StoreAction):  # pylint: disable=protected-acces
     ).format(metavar=kwargs['metavar'])
     if 'help' in kwargs:
       kwargs['help'] += '\n+\n' + self.explanation
-      if example:
-        kwargs['help'] += ' Example:\n\n' + example
+      if 'example' in kwargs:
+        kwargs['help'] += ' Example:\n\n' + kwargs['example']
+        del kwargs['example']
     super(RemainderAction, self).__init__(*args, **kwargs)
 
   def _SplitOnDash(self, args):

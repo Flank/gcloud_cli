@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha container subnets list\-usable \- returns subnets usable for cluster creation in a specific project
+gcloud alpha container subnets list\-usable \- list subnets usable for cluster creation in a specific project
 
 
 
@@ -19,12 +19,12 @@ gcloud alpha container subnets list\-usable \- returns subnets usable for cluste
 
 \fB(ALPHA)\fR Usability of subnetworks for cluster creation is dependent on the
 IAM policy of the project's Google Kubernetes Engine Service Account. Use the
-\fB\-\-project\fR flag to evaluate subnet usability in different projects. This
+\f5\-\-project\fR flag to evaluate subnet usability in different projects. This
 list may differ from the list returned by Google Compute Engine's
-\f5list\-usable\fR command which returns subnets only usable by the caller.
+\f5list\-usable\fR command, which returns subnets only usable by the caller.
 
 To show subnetworks shared from a Shared\-VPC host project, use
-\fB\-\-network\-project\fR to specify the project which owns the subnetworks.
+\f5\-\-network\-project\fR to specify the project that owns the subnetworks.
 
 
 
@@ -86,9 +86,9 @@ Print a list of resource URIs instead of the default output.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -97,7 +97,7 @@ help\fR for details.
 List all subnetworks usable for cluster creation in project \f5my\-project\fR.
 
 .RS 2m
-$ gcloud container subnets list\-usable \e
+$ gcloud alpha container subnets list\-usable \e
   \-\-project my\-project
 .RE
 
@@ -105,7 +105,7 @@ List all subnetworks existing in project \f5my\-shared\-host\-project\fR usable
 for cluster creation in project \f5my\-service\-project\fR.
 
 .RS 2m
-$ gcloud container subnets list\-usable \e
+$ gcloud alpha container subnets list\-usable \e
    \-\-project my\-service\-project \e
    \-\-network\-project my\-shared\-host\-project
 .RE
@@ -118,5 +118,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta container subnets list\-usable
+.RE
 

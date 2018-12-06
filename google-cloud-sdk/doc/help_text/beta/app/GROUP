@@ -20,8 +20,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -37,6 +38,9 @@ GROUPS
 
      logs
         (BETA) Manage your App Engine logs.
+
+     migrate-config
+        (BETA) Convert configuration files from one format to another.
 
      operations
         (BETA) View and manage your App Engine Operations.

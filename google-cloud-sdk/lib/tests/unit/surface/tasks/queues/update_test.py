@@ -29,7 +29,7 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.tasks import test_base
 
 
-class UpdateTestBase(test_base.CloudTasksTestBase):
+class UpdatePullQueueTest(test_base.CloudTasksAlphaTestBase):
 
   def SetUp(self):
     self.queue_ref = resources.REGISTRY.Create(
@@ -42,9 +42,6 @@ class UpdateTestBase(test_base.CloudTasksTestBase):
         parsers.ParseLocation('us-central1').SelfLink())
 
     properties.VALUES.core.user_output_enabled.Set(False)
-
-
-class UpdatePullQueueTest(UpdateTestBase):
 
   def testUpdate_NoOptions(self):
     with self.assertRaises(parsers.NoFieldsSpecifiedError):
@@ -161,7 +158,19 @@ class UpdatePullQueueTest(UpdateTestBase):
     self.AssertErrNotContains('Updated queue [my-queue].')
 
 
-class UpdateAppEngineQueueTest(UpdateTestBase):
+class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
+
+  def SetUp(self):
+    self.queue_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues', locationsId='us-central1',
+        projectsId=self.Project(), queuesId='my-queue')
+    self.queue_name = self.queue_ref.RelativeName()
+
+    resolve_loc_mock = self.StartObjectPatch(app, 'ResolveAppLocation')
+    resolve_loc_mock.return_value = (
+        parsers.ParseLocation('us-central1').SelfLink())
+
+    properties.VALUES.core.user_output_enabled.Set(False)
 
   def testUpdate_NoOptions(self):
     with self.assertRaises(parsers.NoFieldsSpecifiedError):
@@ -170,7 +179,7 @@ class UpdateAppEngineQueueTest(UpdateTestBase):
   def testUpdate_AllOptions(self):
     expected_queue = self.messages.Queue(
         name=self.queue_name,
-        appEngineHttpTarget=self.messages.AppEngineHttpTarget(
+        appEngineHttpQueue=self.messages.AppEngineHttpQueue(
             appEngineRoutingOverride=self.messages.AppEngineRouting(
                 service='abc')),
         retryConfig=self.messages.RetryConfig(maxAttempts=10,
@@ -178,20 +187,20 @@ class UpdateAppEngineQueueTest(UpdateTestBase):
                                               maxDoublings=4, minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxTasksDispatchedPerSecond=100, maxConcurrentTasks=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
     self.queues_service.Patch.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
             name=self.queue_name, queue=expected_queue,
             updateMask=('retryConfig,rateLimits,'
-                        'appEngineHttpTarget.appEngineRoutingOverride')),
+                        'appEngineHttpQueue.appEngineRoutingOverride')),
         response=expected_queue)
 
     actual_queue = self.Run('tasks queues update-app-engine-queue my-queue '
                             '--max-attempts=10 --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '
-                            '--max-tasks-dispatched-per-second=100 '
-                            '--max-concurrent-tasks=10 '
+                            '--max-dispatches-per-second=100 '
+                            '--max-concurrent-dispatches=10 '
                             '--routing-override=service:abc')
 
     self.assertEqual(actual_queue, expected_queue)
@@ -199,28 +208,28 @@ class UpdateAppEngineQueueTest(UpdateTestBase):
   def testUpdate_AllOptions_MaxAttemptsUnlimited(self):
     expected_queue = self.messages.Queue(
         name=self.queue_name,
-        appEngineHttpTarget=self.messages.AppEngineHttpTarget(
+        appEngineHttpQueue=self.messages.AppEngineHttpQueue(
             appEngineRoutingOverride=self.messages.AppEngineRouting(
                 service='abc')),
-        retryConfig=self.messages.RetryConfig(unlimitedAttempts=True,
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
                                               maxRetryDuration='5s',
                                               maxDoublings=4, minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxTasksDispatchedPerSecond=100, maxConcurrentTasks=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
     self.queues_service.Patch.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
             name=self.queue_name, queue=expected_queue,
             updateMask=('retryConfig,rateLimits,'
-                        'appEngineHttpTarget.appEngineRoutingOverride')),
+                        'appEngineHttpQueue.appEngineRoutingOverride')),
         response=expected_queue)
 
     actual_queue = self.Run('tasks queues update-app-engine-queue my-queue '
                             '--max-attempts=unlimited --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '
-                            '--max-tasks-dispatched-per-second=100 '
-                            '--max-concurrent-tasks=10 '
+                            '--max-dispatches-per-second=100 '
+                            '--max-concurrent-dispatches=10 '
                             '--routing-override=service:abc')
 
     self.assertEqual(actual_queue, expected_queue)
@@ -228,22 +237,22 @@ class UpdateAppEngineQueueTest(UpdateTestBase):
   def testUpdate_ClearAll(self):
     expected_queue = self.messages.Queue(
         name=self.queue_name,
-        appEngineHttpTarget=self.messages.AppEngineHttpTarget(),
+        appEngineHttpQueue=self.messages.AppEngineHttpQueue(),
         retryConfig=self.messages.RetryConfig(),
         rateLimits=self.messages.RateLimits())
     self.queues_service.Patch.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
             name=self.queue_name, queue=expected_queue,
             updateMask=('retryConfig,rateLimits,'
-                        'appEngineHttpTarget.appEngineRoutingOverride')),
+                        'appEngineHttpQueue.appEngineRoutingOverride')),
         response=expected_queue)
 
     actual_queue = self.Run('tasks queues update-app-engine-queue my-queue '
                             '--clear-max-attempts --clear-max-retry-duration '
                             '--clear-max-doublings --clear-min-backoff '
                             '--clear-max-backoff '
-                            '--clear-max-tasks-dispatched-per-second '
-                            '--clear-max-concurrent-tasks '
+                            '--clear-max-dispatches-per-second '
+                            '--clear-max-concurrent-dispatches '
                             '--clear-routing-override')
 
     self.assertEqual(actual_queue, expected_queue)
@@ -252,20 +261,20 @@ class UpdateAppEngineQueueTest(UpdateTestBase):
     properties.VALUES.core.user_output_enabled.Set(True)
     expected_queue = self.messages.Queue(
         name=self.queue_name,
-        appEngineHttpTarget=self.messages.AppEngineHttpTarget(
+        appEngineHttpQueue=self.messages.AppEngineHttpQueue(
             appEngineRoutingOverride=self.messages.AppEngineRouting(
                 service='abc')),
-        retryConfig=self.messages.RetryConfig(unlimitedAttempts=True,
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
                                               maxRetryDuration='5s',
                                               maxDoublings=4, minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxTasksDispatchedPerSecond=100, maxConcurrentTasks=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
     self.queues_service.Patch.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
             name=self.queue_name, queue=expected_queue,
             updateMask=('retryConfig,rateLimits,'
-                        'appEngineHttpTarget.appEngineRoutingOverride')),
+                        'appEngineHttpQueue.appEngineRoutingOverride')),
         exception=http_error.MakeDetailedHttpError(
             code=404,
             message='Requested entity was not found.'))
@@ -274,8 +283,8 @@ class UpdateAppEngineQueueTest(UpdateTestBase):
       self.Run('tasks queues update-app-engine-queue my-queue '
                '--max-attempts=unlimited --max-retry-duration=5s '
                '--max-doublings=4 --min-backoff=1s --max-backoff=10s '
-               '--max-tasks-dispatched-per-second=100 '
-               '--max-concurrent-tasks=10 --routing-override=service:abc')
+               '--max-dispatches-per-second=100 '
+               '--max-concurrent-dispatches=10 --routing-override=service:abc')
 
     self.AssertErrNotContains('Updated queue [my-queue].')
     self.AssertErrContains('Requested entity was not found.')
@@ -284,20 +293,20 @@ class UpdateAppEngineQueueTest(UpdateTestBase):
     properties.VALUES.core.user_output_enabled.Set(True)
     expected_queue = self.messages.Queue(
         name=self.queue_name,
-        appEngineHttpTarget=self.messages.AppEngineHttpTarget(
+        appEngineHttpQueue=self.messages.AppEngineHttpQueue(
             appEngineRoutingOverride=self.messages.AppEngineRouting(
                 service='abc')),
-        retryConfig=self.messages.RetryConfig(unlimitedAttempts=True,
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
                                               maxRetryDuration='5s',
                                               maxDoublings=4, minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxTasksDispatchedPerSecond=100, maxConcurrentTasks=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
     self.queues_service.Patch.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
             name=self.queue_name, queue=expected_queue,
             updateMask=('retryConfig,rateLimits,'
-                        'appEngineHttpTarget.appEngineRoutingOverride')),
+                        'appEngineHttpQueue.appEngineRoutingOverride')),
         exception=http_error.MakeDetailedHttpError(
             code=400,
             message='Queue.target_type is immutable.'))
@@ -306,8 +315,8 @@ class UpdateAppEngineQueueTest(UpdateTestBase):
       self.Run('tasks queues update-app-engine-queue my-queue '
                '--max-attempts=unlimited --max-retry-duration=5s '
                '--max-doublings=4 --min-backoff=1s --max-backoff=10s '
-               '--max-tasks-dispatched-per-second=100 '
-               '--max-concurrent-tasks=10 --routing-override=service:abc')
+               '--max-dispatches-per-second=100 '
+               '--max-concurrent-dispatches=10 --routing-override=service:abc')
 
     self.AssertErrNotContains('Updated queue [my-queue].')
 

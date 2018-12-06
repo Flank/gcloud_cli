@@ -59,11 +59,13 @@ class Mode(enum.Enum):
   @classmethod
   def FromEnv(cls):
     """Gets the current set of update modes."""
-    modes = [m for m in encoding.GetEncodedValue(
-        os.environ, UPDATE_MODES_ENV_VAR, '').upper().split(' ') if m]
+    modes = {m for m in encoding.GetEncodedValue(
+        os.environ, UPDATE_MODES_ENV_VAR, '').upper().split(' ') if m}
+    if 'ALL' in modes:
+      return Mode._All()
     # TODO(b/79161265): This should not be a pytype error.
     members = set(cls.__members__)
-    unknown = set(modes) - members
+    unknown = modes - members
     if unknown:
       raise Error(
           'Unknown update mode values: [{}]. '
@@ -74,7 +76,7 @@ class Mode(enum.Enum):
 
   @classmethod
   def _All(cls):
-    return [cls.RESULT, cls.UX, cls.API_REQUESTS]
+    return [cls.RESULT, cls.UX, cls.API_REQUESTS, cls.API_RESPONSE_PAYLOADS]
 
   def __str__(self):
     return self.name
@@ -147,25 +149,35 @@ class Context(object):
     """
     if self._data_dict is None:
       return self
-    if not key:
+    # pylint: disable=g-explicit-bool-comparison, No, key can be 0 which should
+    # not trigger this.
+    if key is None or key == '':
       # Attribute path is empty, just return this node.
       return self
 
     last_section = self._field
     data = self._data_dict[self._field]
+    last_known_location = self.Location()
     if key_as_path:
       parts = key.split('.')
       for attr in parts[:-1]:
         if attr:
           last_section = attr
+          next_location = Location(data, attr)
+          if next_location != ('?', '?'):
+            last_known_location = next_location
           data = data.get(attr)
       new_field = parts[-1]
     else:
       new_field = key
 
+    location = self._location
+    if not location and Location(data, new_field) == ('?', '?'):
+      location = last_known_location
+
     return Context(
         data, new_field, update_mode or self._update_mode, last_section,
-        self._was_missing, self._location,
+        self._was_missing, location,
         custom_update_hook or self._custom_update_hook)
 
   def Field(self):
@@ -182,18 +194,7 @@ class Context(object):
     """
     if self._location:
       return self._location
-    if self._data_dict is None:
-      return '?', '?'
-    lc = getattr(self._data_dict, 'lc', None)
-    if not lc:
-      return '?', '?'
-    if self._field and self._field in lc.data:
-      field_location = lc.data[self._field]
-      line, col = field_location[0] + 1, field_location[1]
-    else:
-      line, col = lc.line, lc.col
-
-    return str(line), str(col)
+    return Location(self._data_dict, self._field)
 
   def Update(self, actual, modes):
     """Triggers the update hook.
@@ -210,18 +211,36 @@ class Context(object):
       # We are not allowed to update given the current modes.
       return False
     if self._custom_update_hook:
-      return self._custom_update_hook(self, actual)
-    return self.StandardUpdateHook(actual)
+      result = self._custom_update_hook(self, actual)
+    else:
+      result = self.StandardUpdateHook(actual)
+    # This conversion operates on either a dict or a list. We want to change
+    # as little of the formatting as possible, so we convert the immediately
+    # enclosing dict of the field that is being changed.
+    yaml.convert_to_block_text(self._data_dict)
+    return result
 
   def StandardUpdateHook(self, actual):
     """Updates the backing data based on the correct actual value."""
-    if actual is None and isinstance(self._data_dict, dict):
+    if actual is None and yaml.dict_like(self._data_dict):
       if self._field in self._data_dict:
         del self._data_dict[self._field]
     else:
       self._data_dict[self._field] = actual
-      # This conversion operates on either a dict or a list. We want to change
-      # as little of the formatting as possible, so we convert the immediately
-      # enclosing dict of the field that is being changed.
-      yaml.convert_to_block_text(self._data_dict)
     return True
+
+
+def Location(data_dict, field):
+  """Extract line and column numbers from a ruamel parsed dictionary."""
+  if data_dict is None:
+    return '?', '?'
+  lc = getattr(data_dict, 'lc', None)
+  if not lc:
+    return '?', '?'
+  if field and lc.data and field in lc.data:
+    field_location = lc.data[field]
+    line, col = field_location[0] + 1, field_location[1]
+  else:
+    line, col = lc.line, lc.col
+
+  return str(line), str(col)

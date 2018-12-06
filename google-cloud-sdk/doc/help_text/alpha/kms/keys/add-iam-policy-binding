@@ -1,21 +1,37 @@
 NAME
-    gcloud alpha kms keys add-iam-policy-binding - add IAM policy binding to a
-        key
+    gcloud alpha kms keys add-iam-policy-binding - add IAM policy binding for a
+        kms key
 
 SYNOPSIS
-    gcloud alpha kms keys add-iam-policy-binding KEY --member=MEMBER
-        --role=ROLE [--keyring=KEYRING] [--location=LOCATION]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms keys add-iam-policy-binding
+        (KEY : --keyring=KEYRING --location=LOCATION) --member=MEMBER
+        --role=ROLE
+        [--condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Adds IAM policy binding to the given key.
-
-    See https://cloud.google.com/iam/docs/managing-policies for details of
-    policy role and member types.
+    (ALPHA) Adds a policy binding to the IAM policy of a kms key. One binding
+    consists of a member, a role, and an optional condition.
 
 POSITIONAL ARGUMENTS
-     KEY
-        Name of the key whose IAM policy to modify.
+     Key resource - The key to add the IAM policy binding. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: provide the argument [key] on
+     the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
+
+       KEY
+          ID of the key or fully qualified identifier for the key. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --keyring=KEYRING
+          The containing keyring.
+
+       --location=LOCATION
+          The location of the key.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -36,27 +52,67 @@ REQUIRED FLAGS
         Define the role of the member.
 
 OPTIONAL FLAGS
-     --keyring=KEYRING
-        Key ring of the key.
+     At most one of these may be specified:
 
-     --location=LOCATION
-        Location of the key.
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be added. When condition is explicitly
+          specified as None (e.g. --condition=None), a binding without a
+          condition is added. When --condition is specified and is not a None
+          condition, --role cannot be a primitive role. Primitive roles are
+          roles/editor, roles/owner, and roles/viewer.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the cloudkms/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/kms/
 
 EXAMPLES
-    The following command will add an IAM policy binding for the role of
-    'roles/editor' for the user 'test-user@gmail.com' on the key frodo with the
-    keyring fellowship and location global:
+    To add an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' on the key frodo with the keyring fellowship and
+    location global, run:
 
         $ gcloud alpha kms keys add-iam-policy-binding frodo \
-            --keyring fellowship \
-            --location global \
+            --keyring='fellowship' --location='global' \
+            --member='user:test-user@gmail.com' --role='roles/editor'
+
+    To add an IAM policy binding which expires at the end of the year 2018 for
+    the role of 'roles/cloudkms.signer' and the user 'test-user@gmail.com' on a
+    the key frodo with the keyring fellowship and location global, run:
+
+        $ gcloud alpha kms keys add-iam-policy-binding frodo \
+            --keyring='fellowship' --location='global' \
             --member='user:test-user@gmail.com' \
-            --role='roles/editor'
+            --role='roles/cloudkms.signer' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

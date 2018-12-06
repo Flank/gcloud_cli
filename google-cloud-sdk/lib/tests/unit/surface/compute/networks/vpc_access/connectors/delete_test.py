@@ -15,6 +15,7 @@
 """Tests of 'gcloud compute networks vpc-access connectors delete' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base

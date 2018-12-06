@@ -125,7 +125,7 @@ class BackendBucketsTestBase(e2e_test_base.BaseTest):
 
   def DeleteGcsBucket(self, name):
     """Deletes the specified GCS bucket."""
-    bucket_ref = storage_util.BucketReference.FromBucketUrl(
+    bucket_ref = storage_util.BucketReference.FromUrl(
         '{0}{1}/'.format(self.GSUTIL_BUCKET_PREFIX, name))
     storage_api.StorageClient().DeleteBucket(bucket_ref)
 

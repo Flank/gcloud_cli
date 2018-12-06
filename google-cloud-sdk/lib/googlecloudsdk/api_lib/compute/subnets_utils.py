@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 import six
 
 
@@ -32,7 +32,8 @@ def MakeSubnetworkUpdateRequest(client,
                                 flow_sampling=None,
                                 metadata=None,
                                 set_role_active=None,
-                                drain_timeout_seconds=None):
+                                drain_timeout_seconds=None,
+                                enable_private_ipv6_access=None):
   """Make the appropriate update request for the args.
 
   Args:
@@ -51,6 +52,8 @@ def MakeSubnetworkUpdateRequest(client,
     set_role_active: Updates the role of a BACKUP subnet to ACTIVE.
     drain_timeout_seconds: The maximum amount of time to drain connections from
       the active subnet to the backup subnet with set_role_active=True.
+    enable_private_ipv6_access: Enable/disable private IPv6 access for the
+      subnet.
 
   Returns:
     response, result of sending the update request for the subnetwork
@@ -92,7 +95,7 @@ def MakeSubnetworkUpdateRequest(client,
 
     for name in remove_secondary_ranges[0]:
       if name not in [r.rangeName for r in subnetwork.secondaryIpRanges]:
-        raise exceptions.UnknownArgumentException(
+        raise calliope_exceptions.UnknownArgumentException(
             'remove-secondary-ranges', 'Subnetwork does not have a range {}, '
             'present ranges are {}.'.format(
                 name, [r.rangeName for r in subnetwork.secondaryIpRanges]))
@@ -108,19 +111,21 @@ def MakeSubnetworkUpdateRequest(client,
       return client.MakeRequests(
           [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
   elif enable_flow_logs is not None:
-    subnetwork = client.MakeRequests(
-        [(client.apitools_client.subnetworks,
-          'Get', client.messages.ComputeSubnetworksGetRequest(
-              **subnet_ref.AsDict()))])[0]
+    subnetwork = client.messages.Subnetwork()
+    subnetwork.fingerprint = client.MakeRequests([
+        (client.apitools_client.subnetworks, 'Get',
+         client.messages.ComputeSubnetworksGetRequest(**subnet_ref.AsDict()))
+    ])[0].fingerprint
 
     subnetwork.enableFlowLogs = enable_flow_logs
     return client.MakeRequests(
         [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
   elif aggregation_interval is not None:
-    subnetwork = client.MakeRequests([
+    subnetwork = client.messages.Subnetwork()
+    subnetwork.fingerprint = client.MakeRequests([
         (client.apitools_client.subnetworks, 'Get',
          client.messages.ComputeSubnetworksGetRequest(**subnet_ref.AsDict()))
-    ])[0]
+    ])[0].fingerprint
 
     subnetwork.aggregationInterval = (
         client.messages.Subnetwork.AggregationIntervalValueValuesEnum(
@@ -128,22 +133,33 @@ def MakeSubnetworkUpdateRequest(client,
     return client.MakeRequests(
         [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
   elif flow_sampling is not None:
-    subnetwork = client.MakeRequests([
+    subnetwork = client.messages.Subnetwork()
+    subnetwork.fingerprint = client.MakeRequests([
         (client.apitools_client.subnetworks, 'Get',
          client.messages.ComputeSubnetworksGetRequest(**subnet_ref.AsDict()))
-    ])[0]
+    ])[0].fingerprint
 
     subnetwork.flowSampling = flow_sampling
     return client.MakeRequests(
         [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
   elif metadata is not None:
+    subnetwork = client.messages.Subnetwork()
+    subnetwork.fingerprint = client.MakeRequests([
+        (client.apitools_client.subnetworks, 'Get',
+         client.messages.ComputeSubnetworksGetRequest(**subnet_ref.AsDict()))
+    ])[0].fingerprint
+
+    subnetwork.metadata = client.messages.Subnetwork.MetadataValueValuesEnum(
+        convert_to_enum(metadata))
+    return client.MakeRequests(
+        [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
+  elif enable_private_ipv6_access is not None:
     subnetwork = client.MakeRequests([
         (client.apitools_client.subnetworks, 'Get',
          client.messages.ComputeSubnetworksGetRequest(**subnet_ref.AsDict()))
     ])[0]
 
-    subnetwork.metadata = client.messages.Subnetwork.MetadataValueValuesEnum(
-        convert_to_enum(metadata))
+    subnetwork.enablePrivateV6Access = enable_private_ipv6_access
     return client.MakeRequests(
         [CreateSubnetworkPatchRequest(client, subnet_ref, subnetwork)])
   elif set_role_active is not None:

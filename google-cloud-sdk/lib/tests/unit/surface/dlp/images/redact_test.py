@@ -115,6 +115,7 @@ class RedactTest(base.DlpUnitTestBase):
       self.Run('dlp images redact {} --redact-color "{}" '
                '--info-types LAST_NAME'.format(test_file, color_string))
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testRedactWithBadExtensionFails(self, track):
     self.track = track
@@ -127,6 +128,7 @@ class RedactTest(base.DlpUnitTestBase):
       self.Run('dlp images redact {} --info-types '
                'PHONE_NUMBER,PERSON_NAME'.format(test_file))
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA,))
   def testRedactWithOutputFile(self, track):
     properties.VALUES.core.user_output_enabled.Set(True)

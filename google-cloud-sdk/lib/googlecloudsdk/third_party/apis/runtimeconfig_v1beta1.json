@@ -238,7 +238,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The name of the variable resource, in the format:\n\n    projects\/[PROJECT_ID]\/configs\/[CONFIG_NAME]\/variables\/[VARIABLE_NAME]\n\nThe `[PROJECT_ID]` must be a valid project ID, `[CONFIG_NAME]` must be a\nvalid RuntimeConfig reource and `[VARIABLE_NAME]` follows Unix file system\nfile path naming.\n\nThe `[VARIABLE_NAME]` can contain ASCII letters, numbers, slashes and\ndashes. Slashes are used as path element separators and are not part of the\n`[VARIABLE_NAME]` itself, so `[VARIABLE_NAME]` must contain at least one\nnon-slash character. Multiple slashes are coalesced into single slash\ncharacter. Each path segment should match\n[0-9A-Za-z](?:[_.A-Za-z0-9-]{0,62}[_.A-Za-z0-9])? regular expression.\nThe length of a `[VARIABLE_NAME]` must be less than 256 characters.\n\nOnce you create a variable, you cannot change the variable name.",
+          "description": "The name of the variable resource, in the format:\n\n    projects\/[PROJECT_ID]\/configs\/[CONFIG_NAME]\/variables\/[VARIABLE_NAME]\n\nThe `[PROJECT_ID]` must be a valid project ID, `[CONFIG_NAME]` must be a\nvalid RuntimeConfig resource and `[VARIABLE_NAME]` follows Unix file system\nfile path naming.\n\nThe `[VARIABLE_NAME]` can contain ASCII letters, numbers, slashes and\ndashes. Slashes are used as path element separators and are not part of the\n`[VARIABLE_NAME]` itself, so `[VARIABLE_NAME]` must contain at least one\nnon-slash character. Multiple slashes are coalesced into single slash\ncharacter. Each path segment should match\n[0-9A-Za-z](?:[_.A-Za-z0-9-]{0,62}[_.A-Za-z0-9])? regular expression.\nThe length of a `[VARIABLE_NAME]` must be less than 256 characters.\n\nOnce you create a variable, you cannot change the variable name.",
           "type": "string"
         },
         "value": {
@@ -251,12 +251,12 @@
           "type": "string"
         },
         "updateTime": {
-          "description": "Output only. The time of the last variable update.",
+          "description": "Output only. The time of the last variable update.\nTimestamp will be UTC timestamp.",
           "type": "string",
           "format": "google-datetime"
         },
         "state": {
-          "description": "[Ouput only] The current state of the variable. The variable state indicates\nthe outcome of the `variables().watch` call and is visible through the\n`get` and `list` calls.",
+          "description": "Output only. The current state of the variable. The variable state indicates\nthe outcome of the `variables().watch` call and is visible through the\n`get` and `list` calls.",
           "enumDescriptions": [
             "Default variable state.",
             "The variable was updated, while `variables().watch` was executing.",
@@ -351,7 +351,7 @@
     },
     "Cardinality": {
       "id": "Cardinality",
-      "description": "A Cardinality condition for the Waiter resource. A cardinality condition is\nmet when the number of variables under a specified path prefix reaches a\npredefined number. For example, if you set a Cardinality condition where\nthe `path` is set to `\/foo` and the number of paths is set to 2, the\nfollowing variables would meet the condition in a RuntimeConfig resource:\n\n+ `\/foo\/variable1 = \"value1\"`\n+ `\/foo\/variable2 = \"value2\"`\n+ `\/bar\/variable3 = \"value3\"`\n\nIt would not would not satisify the same condition with the `number` set to\n3, however, because there is only 2 paths that start with `\/foo`.\nCardinality conditions are recursive; all subtrees under the specific\npath prefix are counted.",
+      "description": "A Cardinality condition for the Waiter resource. A cardinality condition is\nmet when the number of variables under a specified path prefix reaches a\npredefined number. For example, if you set a Cardinality condition where\nthe `path` is set to `\/foo` and the number of paths is set to `2`, the\nfollowing variables would meet the condition in a RuntimeConfig resource:\n\n+ `\/foo\/variable1 = \"value1\"`\n+ `\/foo\/variable2 = \"value2\"`\n+ `\/bar\/variable3 = \"value3\"`\n\nIt would not satisfy the same condition with the `number` set to\n`3`, however, because there is only 2 paths that start with `\/foo`.\nCardinality conditions are recursive; all subtrees under the specific\npath prefix are counted.",
       "type": "object",
       "properties": {
         "path": {
@@ -598,7 +598,7 @@
             "Default non-attribute.",
             "Either principal or (if present) authority selector.",
             "The principal (even if an authority selector is present), which\nmust only be used for attribution, not authorization.",
-            "Any of the security realms in the IAMContext (go\/security-realms).\nWhen used with IN, the condition indicates \"any of the request's realms\nmatch one of the given values; with NOT_IN, \"none of the realms match\nany of the given values\". Note that a value can be either a realm or a\nrealm group (go\/realm-groups). A match is determined by a realm group\nmembership check performed by a RealmAclRep object (go\/realm-acl-howto).\nIt is not permitted to grant access based on the *absence* of a realm, so\nrealm conditions can only be used in a \"positive\" context (e.g., ALLOW\/IN\nor DENY\/NOT_IN).",
+            "Any of the security realms in the IAMContext (go\/security-realms).\nWhen used with IN, the condition indicates \"any of the request's realms\nmatch one of the given values; with NOT_IN, \"none of the realms match\nany of the given values\". Note that a value can be:\n - 'self' (i.e., allow connections from clients that are in the same\n security realm)\n - a realm (e.g., 'campus-abc')\n - a realm group (e.g., 'realms-for-borg-cell-xx', see: go\/realm-groups)\nA match is determined by a realm group\nmembership check performed by a RealmAclRep object (go\/realm-acl-howto).\nIt is not permitted to grant access based on the *absence* of a realm, so\nrealm conditions can only be used in a \"positive\" context (e.g., ALLOW\/IN\nor DENY\/NOT_IN).",
             "An approver (distinct from the requester) that has authorized this\nrequest.\nWhen used with IN, the condition indicates that one of the approvers\nassociated with the request matches the specified principal, or is a\nmember of the specified group. Approvers can only grant additional\naccess, and are thus only used in a strictly positive context\n(e.g. ALLOW\/IN or DENY\/NOT_IN).",
             "What types of justifications have been supplied with this request.\nString values should match enum names from tech.iam.JustificationType,\ne.g. \"MANUAL_STRING\". It is not permitted to grant access based on\nthe *absence* of a justification, so justification conditions can only\nbe used in a \"positive\" context (e.g., ALLOW\/IN or DENY\/NOT_IN).\n\nMultiple justifications, e.g., a Buganizer ID and a manually-entered\nreason, are normal and supported.",
             "What type of credentials have been supplied with this request.\nString values should match enum names from\nsecurity_loas_l2.CredentialsType - currently, only CREDS_TYPE_EMERGENCY\nis supported.\nIt is not permitted to grant access based on the *absence* of a\ncredentials type, so the conditions can only be used in a \"positive\"\ncontext (e.g., ALLOW\/IN or DENY\/NOT_IN)."
@@ -690,7 +690,7 @@
     },
     "CounterOptions": {
       "id": "CounterOptions",
-      "description": "Increment a streamz counter with the specified metric and field names.\n\nMetric names should start with a '\/', generally be lowercase-only,\nand end in \"_count\". Field names should not contain an initial slash.\nThe actual exported metric names will have \"\/iam\/policy\" prepended.\n\nField names correspond to IAM request parameters and field values are\ntheir respective values.\n\nAt present the only supported field names are\n   - \"iam_principal\", corresponding to IAMContext.principal;\n   - \"\" (empty string), resulting in one aggretated counter with no field.\n\nExamples:\n  counter { metric: \"\/debug_access_count\"  field: \"iam_principal\" }\n  ==> increment counter \/iam\/policy\/backend_debug_access_count\n                        {iam_principal=[value of IAMContext.principal]}\n\nAt this time we do not support:\n* multiple field names (though this may be supported in the future)\n* decrementing the counter\n* incrementing it by anything other than 1",
+      "description": "Increment a streamz counter with the specified metric and field names.\n\nMetric names should start with a '\/', generally be lowercase-only,\nand end in \"_count\". Field names should not contain an initial slash.\nThe actual exported metric names will have \"\/iam\/policy\" prepended.\n\nField names correspond to IAM request parameters and field values are\ntheir respective values.\n\nSupported field names:\n   - \"authority\", which is \"[token]\" if IAMContext.token is present,\n     otherwise the value of IAMContext.authority_selector if present, and\n     otherwise a representation of IAMContext.principal; or\n   - \"iam_principal\", a representation of IAMContext.principal even if a\n     token or authority selector is present; or\n   - \"\" (empty string), resulting in a counter with no fields.\n\nExamples:\n  counter { metric: \"\/debug_access_count\"  field: \"iam_principal\" }\n  ==> increment counter \/iam\/policy\/backend_debug_access_count\n                        {iam_principal=[value of IAMContext.principal]}\n\nAt this time we do not support multiple field names (though this may be\nsupported in the future).",
       "type": "object",
       "properties": {
         "metric": {
@@ -709,10 +709,10 @@
       "type": "object",
       "properties": {
         "logMode": {
-          "description": "Whether Gin logging should happen in a fail-closed manner at the caller.\nThis is relevant only in the LocalIAM implementation, for now.",
+          "description": "Whether Gin logging should happen in a fail-closed manner at the caller.\nThis is relevant only in the LocalIAM implementation, for now.\n\nNOTE: Logging to Gin in a fail-closed manner is currently unsupported\nwhile work is being done to satisfy the requirements of go\/345.\nCurrently, setting LOG_FAIL_CLOSED mode will have no effect, but still\nexists because there is active work being done to support it\n(b\/115874152).",
           "enumDescriptions": [
             "Client is not required to write a partial Gin log immediately after\nthe authorization check. If client chooses to write one and it fails,\nclient may either fail open (allow the operation to continue) or\nfail closed (handle as a DENY outcome).",
-            "The application's operation in the context of which this authorization\ncheck is being made may only be performed if it is successfully logged\nto Gin. For instance, the authorization library may satisfy this\nobligation by emitting a partial log entry at authorization check time\nand only returning ALLOW to the application if it succeeds.\n\nIf a matching Rule has this directive, but the client has not indicated\nthat it will honor such requirements, then the IAM check will result in\nauthorization failure by setting CheckPolicyResponse.success=false."
+            "The application's operation in the context of which this authorization\ncheck is being made may only be performed if it is successfully logged\nto Gin. For instance, the authorization library may satisfy this\nobligation by emitting a partial log entry at authorization check time\nand only returning ALLOW to the application if it succeeds.\n\nIf a matching Rule has this directive, but the client has not indicated\nthat it will honor such requirements, then the IAM check will result in\nauthorization failure by setting CheckPolicyResponse.success=false.\n\nNOTE: This is currently unsupported. See the note on LogMode below.\nLOG_FAIL_CLOSED shouldn't be used unless the application wants\nfail-closed logging to be turned on implicitly when b\/115874152 is\nresolved."
           ],
           "type": "string",
           "enum": [

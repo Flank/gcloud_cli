@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -34,13 +34,13 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
                                    cli_test_base.CliTestBase,
                                    waiter_test_base.Base):
 
-  API_VERSION = 'beta'
+  track = calliope_base.ReleaseTrack.GA
+  api_version = 'v1'
   zone = 'zone-2'
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
     self.api_mock = utils.ComputeApiMock(
-        self.API_VERSION, project=self.Project(), zone=self.zone).Start()
+        self.api_version, project=self.Project(), zone=self.zone).Start()
     self.addCleanup(self.api_mock.Stop)
     self.status_enum = self.api_mock.messages.Operation.StatusValueValuesEnum
 
@@ -116,7 +116,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     self.AssertErrContains(
         'Simulating maintenance on instance(s) '
         '[https://www.googleapis.com/compute/{}/projects/fake-project/'
-        'zones/zone-2/instances/instance-1]'.format(self.API_VERSION))
+        'zones/zone-2/instances/instance-1]'.format(self.api_version))
 
   def testAsync(self):
     """Test the asynchronous version of the call."""
@@ -142,7 +142,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
         '[https://www.googleapis.com/compute/{}/'
         'projects/fake-project/zones/zone-2/operations/operation-1] '
         'Use [gcloud compute operations describe] command to check the status '
-        'of this operation.\n'.format(self.API_VERSION))
+        'of this operation.\n'.format(self.api_version))
 
   def testMultipleWithOperationPolling(self):
     """Test the synchronous version of the call with multiple instances."""
@@ -184,7 +184,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
         ' '
         'https://www.googleapis.com/compute/{}/projects/fake-project/'
         'zones/zone-2/instances/instance-2]'.format(
-            self.API_VERSION, self.API_VERSION, self.API_VERSION))
+            self.api_version, self.api_version, self.api_version))
 
   def testMultipleAsync(self):
     """Test the asynchronous version of the call with multiple instances."""
@@ -216,7 +216,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
                        'fake-project/zones/zone-2/operations/operation-{onum}]'
                        ' Use [gcloud compute operations describe] command to '
                        'check the status of this operation.\n').format(
-                           inum=c, onum=c, track=self.API_VERSION)
+                           inum=c, onum=c, track=self.api_version)
     self.AssertErrEquals(expected_err)
 
   def testScopePrompt(self):
@@ -249,6 +249,23 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     self.AssertErrContains('instance-1')
     self.AssertErrContains('zone-1')
     self.AssertErrContains('zone-2')
+
+
+class SimulateMaintenanceEventTestBeta(SimulateMaintenanceEventTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+    super(SimulateMaintenanceEventTestBeta, self).SetUp()
+
+
+class SimulateMaintenanceEventTestAlpha(SimulateMaintenanceEventTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+    super(SimulateMaintenanceEventTestAlpha, self).SetUp()
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -174,9 +174,9 @@ OPTIONAL FLAGS
      specify the attributes of this resource.
 
        --kms-key=KMS_KEY
-          The ID of the key or a fully qualified identifier for the key. This
-          flag must be specified if any of the other arguments in this group
-          are specified.
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
 
        --kms-keyring=KMS_KEYRING
           The KMS keyring of the key.
@@ -189,8 +189,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

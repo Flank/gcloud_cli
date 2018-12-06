@@ -34,6 +34,7 @@ _SPLIT = 78  # Split lines longer than this.
 _SECTION_INDENT = 8  # Section or list within section indent.
 _FIRST_INDENT = 2  # First line indent.
 _SUBSEQUENT_INDENT = 6  # Subsequent line indent.
+_HANGING_OFFSET = 2  # Used to create hanging indentation using markdown.
 
 
 def _GetIndexFromCapsule(capsule):
@@ -298,6 +299,7 @@ class MarkdownGenerator(six.with_metaclass(abc.ABCMeta, object)):
         man_name=self._file_name,
         top_command=self._top,
         parent_command=' '.join(self._command_path[:-1]),
+        grandparent_command=' '.join(self._command_path[:-2]),
         index=self._capsule,
         **self._sections
     )
@@ -418,15 +420,15 @@ class MarkdownGenerator(six.with_metaclass(abc.ABCMeta, object)):
     if not usage:
       return
     self._out('\n{usage}{depth}\n'.format(
-        usage=usage, depth=':' * (depth + 2)))
+        usage=usage, depth=':' * (depth + _HANGING_OFFSET)))
     if arg.is_required and depth and not single:
-      modal = (' This {arg_type} must be specified if any of the other '
+      modal = ('\nThis {arg_type} must be specified if any of the other '
                'arguments in this group are specified.').format(
                    arg_type=self._ArgTypeName(arg))
     else:
       modal = ''
     self._out('\n{details}{modal}\n'.format(
-        details=self.GetArgDetails(arg), modal=modal))
+        details=self.GetArgDetails(arg, depth=depth), modal=modal))
 
   def _PrintArgGroup(self, arg, depth=0, single=False):
     """Prints an arg group definition list at depth."""
@@ -451,7 +453,8 @@ class MarkdownGenerator(six.with_metaclass(abc.ABCMeta, object)):
       if a.is_hidden:
         continue
       if heading:
-        self._out('\n{0} {1}\n\n'.format(':' * (depth + 2), ' '.join(heading)))
+        self._out('\n{0} {1}\n\n'.format(':' * (depth + _HANGING_OFFSET),
+                                         ' '.join(heading)))
         heading = None
         depth += 1
       if a.is_group:
@@ -467,22 +470,25 @@ class MarkdownGenerator(six.with_metaclass(abc.ABCMeta, object)):
       else:
         self._PrintArgDefinition(a, depth=depth, single=single)
 
-  def PrintPositionalDefinition(self, arg):
-    self._out('\n{0}::\n'.format(
-        usage_text.GetPositionalUsage(arg, markdown=True)))
+  def PrintPositionalDefinition(self, arg, depth=0):
+    self._out('\n{usage}{depth}\n'.format(
+        usage=usage_text.GetPositionalUsage(arg, markdown=True),
+        depth=':' * (depth + _HANGING_OFFSET)))
     self._out('\n{arghelp}\n'.format(arghelp=self.GetArgDetails(arg)))
 
-  def PrintFlagDefinition(self, flag, disable_header=False):
+  def PrintFlagDefinition(self, flag, disable_header=False, depth=0):
     """Prints a flags definition list item.
 
     Args:
       flag: The flag object to display.
       disable_header: Disable printing the section header if True.
+      depth: The indentation depth at which to print arg help text.
     """
     if not disable_header:
       self._out('\n')
-    self._out('{0}::\n'.format(
-        usage_text.GetFlagUsage(flag, markdown=True)))
+    self._out('{usage}{depth}\n'.format(
+        usage=usage_text.GetFlagUsage(flag, markdown=True),
+        depth=':' * (depth + _HANGING_OFFSET)))
     self._out('\n{arghelp}\n'.format(arghelp=self.GetArgDetails(flag)))
 
   def PrintFlagSection(self, heading, arg, disable_header=False):
@@ -638,13 +644,13 @@ class MarkdownGenerator(six.with_metaclass(abc.ABCMeta, object)):
       if notes:
         self._out(notes + '\n\n')
 
-  def GetArgDetails(self, arg):
+  def GetArgDetails(self, arg, depth=0):
     """Returns the detailed help message for the given arg."""
     if getattr(arg, 'detailed_help', None):
       raise ValueError(
           '{}: Use add_argument(help=...) instead of detailed_help="""{}""".'
           .format(self._command_name, getattr(arg, 'detailed_help')))
-    return usage_text.GetArgDetails(arg)
+    return usage_text.GetArgDetails(arg, depth=depth)
 
   def _ExpandFormatReferences(self, doc):
     """Expand {...} references in doc."""

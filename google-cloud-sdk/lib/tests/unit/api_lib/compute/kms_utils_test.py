@@ -90,7 +90,8 @@ class KmsKeyUtilsTest(test_case.TestCase):
         EXAMPLE_KEY)
     self.assertEqual(
         kms_utils._DictToKmsKey(
-            {'kms-key': KEY_NAME,
+            {'kms-project': DEFAULT_PROJECT,
+             'kms-key': KEY_NAME,
              'kms-keyring': KEY_KEYRING,
              'kms-location': KEY_LOCATION}).RelativeName(),
         EXAMPLE_KEY_IN_DEFAULT_PROJECT)

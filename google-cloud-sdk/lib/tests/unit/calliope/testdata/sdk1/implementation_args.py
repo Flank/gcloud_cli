@@ -13,17 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This is a command for testing the posix '--' workaround."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
 import argparse
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
-class ImplementationArgs(base.Command):
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.BETA,
+                             calliope_base.ReleaseTrack.GA)
+class ImplementationArgs(calliope_base.Command):
   """A command to test the posix '--' workaround."""
 
   @staticmethod

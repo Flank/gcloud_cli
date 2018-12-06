@@ -25,7 +25,9 @@ import textwrap
 from googlecloudsdk.command_lib import info_holder
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.diagnostics import network_diagnostics
+from googlecloudsdk.core.diagnostics import property_diagnostics
 from googlecloudsdk.core.updater import update_manager
+from surface import info as info_command
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -108,9 +110,12 @@ class InfoTest(cli_test_base.CliTestBase,
   def testRunDiagnosticFlag(self):
     network_check_mock = self.StartObjectPatch(
         network_diagnostics.NetworkDiagnostic, 'RunChecks')
+    property_check_mock = self.StartObjectPatch(
+        property_diagnostics.PropertyDiagnostic, 'RunChecks')
     info_holder_mock = self.StartObjectPatch(info_holder, 'InfoHolder')
     self.Run('info --run-diagnostics')
     self.assertTrue(network_check_mock.called)
+    self.assertTrue(property_check_mock.called)
     self.assertFalse(info_holder_mock.called)
 
   def testInfo_ToolLocation(self):
@@ -142,6 +147,43 @@ class InfoTest(cli_test_base.CliTestBase,
                               'Google Cloud Platform tools on your system '
                               'PATH.\n'
                               '  b.py')
+
+
+class InfoModeTests(cli_test_base.CliTestBase):
+
+  def SetUp(self):
+    self.run_diagnostics = self.StartObjectPatch(
+        info_command, '_RunDiagnostics')
+
+  def testInfo(self):
+    self.Run('info')
+    self.AssertOutputContains('Platform:')
+    self.AssertOutputNotContains('Contents of log file:')
+    self.run_diagnostics.not_called()
+
+  def testInfoShowLog(self):
+    contents = 'test log contents'
+    info = info_holder.InfoHolder()
+    info.logs.last_log = 'test.log'
+    info.logs.LastLogContents = lambda: contents
+    self.StartObjectPatch(info_holder, 'InfoHolder', return_value=info)
+    self.Run('info --show-log')
+    self.AssertOutputNotContains('Platform:')
+    self.AssertOutputContains('Contents of log file:')
+    self.AssertOutputContains(contents)
+    self.run_diagnostics.not_called()
+
+  def testInfoRunDiagnostics(self):
+    self.Run('info --run-diagnostics')
+    self.AssertOutputNotContains('Platform:')
+    self.AssertOutputNotContains('Contents of log file:')
+    self.run_diagnostics.called_once()
+
+  def testModeMutex(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --run-diagnostics: At most one of --run-diagnostics | '
+        '--show-log may be specified.'):
+      self.Run('info --run-diagnostics --show-log')
 
 
 class InfoWithProxyFromEnvironmentTests(cli_test_base.CliTestBase):

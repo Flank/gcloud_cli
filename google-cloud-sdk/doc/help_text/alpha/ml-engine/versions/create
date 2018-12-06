@@ -3,8 +3,9 @@ NAME
         version
 
 SYNOPSIS
-    gcloud alpha ml-engine versions create VERSION --model=MODEL [--async]
-        [--config=CONFIG] [--description=DESCRIPTION] [--framework=FRAMEWORK]
+    gcloud alpha ml-engine versions create VERSION --model=MODEL
+        [--accelerator=[count=COUNT],[type=TYPE]] [--async] [--config=CONFIG]
+        [--description=DESCRIPTION] [--framework=FRAMEWORK]
         [--labels=[KEY=VALUE,...]] [--machine-type=MACHINE_TYPE]
         [--origin=ORIGIN] [--python-version=PYTHON_VERSION]
         [--runtime-version=RUNTIME_VERSION] [--staging-bucket=STAGING_BUCKET]
@@ -26,6 +27,18 @@ REQUIRED FLAGS
         Name of the model.
 
 OPTIONAL FLAGS
+     --accelerator=[count=COUNT],[type=TYPE]
+        Manage the accelerator config for GPU serving. When deploying a model
+        with the new Alpha Google Compute Engine Machine Types, a GPU
+        accelerator may also be selected.
+
+         type
+            The type of the accelerator. Choices are 'nvdia-tesla-k80',
+            'nvdia-tesla-p100', 'nvdia-tesla-v100' and 'nvdia-tesla-p4'.
+
+         count
+            The number of accelerators to attach to each machine running the
+            job.
      --async
         Display information about the operation in progress, without waiting
         for the operation to complete.
@@ -131,8 +144,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

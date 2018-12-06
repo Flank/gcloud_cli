@@ -18,11 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
-class RequiredArgCommand(base.Command):
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.GA)
+class RequiredArgCommand(calliope_base.Command):
   """A command with an underscored flag."""
 
   def Run(self, unused_args):

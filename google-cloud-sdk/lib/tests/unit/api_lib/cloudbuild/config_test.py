@@ -20,11 +20,12 @@ from __future__ import unicode_literals
 
 import io
 
+from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.cloudbuild import config
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
-from tests.lib import subtests
 from tests.lib import test_case
 
 
@@ -34,15 +35,15 @@ class ConfigTest(sdk_test_base.WithTempCWD):
     self.messages = core_apis.GetMessagesModule('cloudbuild', 'v1')
 
   def testNoFile(self):
-    with self.assertRaises(config.NotFoundException):
+    with self.assertRaises(files.MissingFileError):
       config.LoadCloudbuildConfigFromPath('not-here.json', self.messages)
 
   def testBadEncoding(self):
     self.Touch('.', 'garbage.garbage', """
 this file is neither json nor yaml
         """)
-    with self.assertRaisesRegex(
-        config.ParserError, 'Could not parse into a message'):
+    with self.assertRaisesRegex(cloudbuild_util.ParserError,
+                                'Could not parse as a dictionary'):
       config.LoadCloudbuildConfigFromPath('garbage.garbage', self.messages)
 
   def testLoadJson(self):
@@ -169,7 +170,7 @@ timeout: gcr.io/$_DAY_OF_WEEK/$_FAVORITE_COLOR
     build = config.LoadCloudbuildConfigFromPath(
         'basic.yaml', self.messages, {'_DAY_OF_WEEK': 'tuesday',
                                       '_FAVORITE_COLOR': 'blue'})
-        #
+    #
     # Only substitute images/steps, not any other fields (see `timeout`)
     # (there are very few string fields in Build that aren't output only, so use
     # a nonsensical one to test this.)
@@ -204,7 +205,7 @@ steps:
 images: gcr.io/my-project/simple
 }
         """)
-    with self.assertRaisesRegex(config.ParserError, 'error.yaml'):
+    with self.assertRaisesRegex(cloudbuild_util.ParserError, 'error.yaml'):
       config.LoadCloudbuildConfigFromPath('error.yaml', self.messages)
 
   def testBadConfigSource(self):
@@ -215,15 +216,15 @@ source:
     bucket: boo
     object: oo
         """)
-    with self.assertRaisesRegex(
-        config.BadConfigException, 'config cannot specify source'):
+    with self.assertRaisesRegex(config.InvalidBuildConfigException,
+                                'config cannot specify source'):
       config.LoadCloudbuildConfigFromPath('has_source.yaml', self.messages)
 
     self.Touch('.', 'no_steps.yaml', """
 images: foobar
         """)
-    with self.assertRaisesRegex(
-        config.BadConfigException, 'config must list at least one step'):
+    with self.assertRaisesRegex(config.InvalidBuildConfigException,
+                                'config must list at least one step'):
       config.LoadCloudbuildConfigFromPath('no_steps.yaml', self.messages)
 
   def testYamlSubs(self):
@@ -287,8 +288,8 @@ steps:
 images: gcr.io/my-project/simple1
 """)
     with self.assertRaisesRegex(
-        config.BadConfigException,
-        r'error.yaml: .steps\[0\].tags: unused'):
+        cloudbuild_util.ParseProtoException,
+        r'error.yaml as build config: .steps\[0\].tags: unused'):
       config.LoadCloudbuildConfigFromPath('error.yaml', self.messages)
 
   def testJsonUnusedField(self):
@@ -305,8 +306,8 @@ images: gcr.io/my-project/simple1
 }
         """)
     with self.assertRaisesRegex(
-        config.BadConfigException,
-        r'error.json: .steps\[0\].tags: unused'):
+        cloudbuild_util.ParseProtoException,
+        r'error.json as build config: .steps\[0\].tags: unused'):
       config.LoadCloudbuildConfigFromPath('error.json', self.messages)
 
   def testYamlUnusedNested(self):
@@ -324,8 +325,8 @@ extra:
 images: gcr.io/my-project/simple1
         """)
     with self.assertRaisesRegex(
-        config.BadConfigException,
-        r'error\.yaml: \.extra: unused'):
+        cloudbuild_util.ParseProtoException,
+        r'error\.yaml as build config: \.extra: unused'):
       config.LoadCloudbuildConfigFromPath('error.yaml', self.messages)
 
   def testYamlMultipleUnused(self):
@@ -344,8 +345,8 @@ nonsense: "bad as well"
 images: gcr.io/my-project/simple1
         """)
     with self.assertRaisesRegex(
-        config.BadConfigException,
-        r'error\.yaml: \.\{extra,nonsense\}: unused'):
+        cloudbuild_util.ParseProtoException,
+        r'error\.yaml as build config: \.\{extra,nonsense\}: unused'):
       config.LoadCloudbuildConfigFromPath('error.yaml', self.messages)
 
   def testJsonMultipleUnused(self):
@@ -362,8 +363,8 @@ images: gcr.io/my-project/simple1
 }
         """)
     with self.assertRaisesRegex(
-        config.BadConfigException,
-        r'error\.json: \.steps\[0\]\.{bogus,foo}: unused'):
+        cloudbuild_util.ParseProtoException,
+        r'error\.json as build config: \.steps\[0\]\.{bogus,foo}: unused'):
       config.LoadCloudbuildConfigFromPath('error.json', self.messages)
 
   def testLoadJson_FromStream(self):
@@ -377,7 +378,8 @@ images: gcr.io/my-project/simple1
   "images": "gcr.io/my-project/simple"
 }
         """)
-    build = config.LoadCloudbuildConfigFromStream(data, self.messages)
+    build = config.LoadCloudbuildConfigFromStream(data, self.messages, None,
+                                                  'mypath')
     self.assertEqual(build, self.messages.Build(
         steps=[
             self.messages.BuildStep(
@@ -400,9 +402,8 @@ images: gcr.io/my-project/simple1
   "images": "gcr.io/my-project/simple"
 }}
         """)
-    with self.assertRaisesRegex(
-        config.ParserError, 'parsing Cloud Build configuration'):
-      config.LoadCloudbuildConfigFromStream(data, self.messages)
+    with self.assertRaisesRegex(cloudbuild_util.ParserError, 'parsing mypath'):
+      config.LoadCloudbuildConfigFromStream(data, self.messages, None, 'mypath')
 
   def testSubstitution_FromStream(self):
     data = io.StringIO("""
@@ -415,7 +416,8 @@ images: gcr.io/my-project/simple1
   "substitutions": {"_MESSAGE": "hello world"}
 }
         """)
-    build = config.LoadCloudbuildConfigFromStream(data, self.messages)
+    build = config.LoadCloudbuildConfigFromStream(data, self.messages, None,
+                                                  'mypath')
     self.assertEqual(build, self.messages.Build(
         steps=[
             self.messages.BuildStep(
@@ -442,47 +444,10 @@ images: gcr.io/my-project/simple1
   "substitutions": {"COMMIT_SHA": "my-sha"}
 }
         """)
-    with self.assertRaisesRegex(
-        config.BadConfigException,
-        'config cannot specify built-in substitutions'):
-      config.LoadCloudbuildConfigFromStream(data, self.messages)
+    with self.assertRaisesRegex(config.InvalidBuildConfigException,
+                                'config cannot specify built-in substitutions'):
+      config.LoadCloudbuildConfigFromStream(data, self.messages, None, 'mypath')
 
-
-class FieldMappingTest(subtests.Base):
-  """Test the ability to normalize config field names.
-  """
-
-  def testSnakeToCamelString(self):
-    cases = [
-        ('_', '_'),
-        ('__', '__'),
-        ('wait_for', 'waitFor'),
-        ('foozleBop', 'foozleBop'),
-        ('_xyz', '_xyz'),
-        ('__xyz', '__xyz'),
-        ('a__b', 'aB'),
-    ]
-    for input_string, expected in cases:
-      self.assertEqual(config._SnakeToCamelString(input_string), expected)
-
-  def testSnakeToCamel(self):
-    cases = [
-        ({'wait_for': ['x', 'y', 'z']},
-         {'waitFor': ['x', 'y', 'z']}),
-        ({'super_duper': {'wait_for': ['x', 'y', 'z']}},
-         {'superDuper': {'waitFor': ['x', 'y', 'z']}}),
-        ({'super_list': [{'wait_for': ['x', 'y', 'z']}]},
-         {'superList': [{'waitFor': ['x', 'y', 'z']}]}),
-        # If the key is 'secret_env' the value is not transformed, while other
-        # keys, and the key itself, are transformed.
-        ({'camel_me': '', 'secret_env': {'FOO_BAR': 'asdf'}},
-         {'camelMe': '', 'secretEnv': {'FOO_BAR': 'asdf'}}),
-        # If the key is 'secretEnv' the value is not transformed.
-        ({'secretEnv': {'FOO_BAR': 'asdf'}},
-         {'secretEnv': {'FOO_BAR': 'asdf'}}),
-    ]
-    for input_string, expected in cases:
-      self.assertEqual(config._SnakeToCamel(input_string), expected)
 
 if __name__ == '__main__':
   test_case.main()

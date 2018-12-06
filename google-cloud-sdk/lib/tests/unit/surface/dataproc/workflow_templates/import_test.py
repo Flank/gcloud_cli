@@ -20,10 +20,11 @@ from __future__ import unicode_literals
 
 import copy
 import os
+
 from googlecloudsdk import calliope
-from googlecloudsdk.api_lib.dataproc import exceptions
-from googlecloudsdk.api_lib.dataproc import util
+from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import yaml_validator
 from googlecloudsdk.core.util import files
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
@@ -61,12 +62,6 @@ class WorkflowTemplateImportUnitTest(unit_base.DataprocUnitTestBase,
     self.mock_client.projects_regions_workflowTemplates.Update.Expect(
         workflow_template, response=response, exception=exception)
 
-
-class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
-
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
-
   def testImportWorkflowTemplatesFromStdIn(self):
     # Provided template does not have an id or a name.
     provided_template = self.MakeWorkflowTemplate()
@@ -81,7 +76,7 @@ class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
     expected_response = copy.deepcopy(expected_request)
     expected_response.name = self.WorkflowTemplateName()
 
-    self.WriteInput(util.MessageToYaml(provided_template))
+    self.WriteInput(export_util.Export(provided_template))
     self.ExpectGetWorkflowTemplate(
         exception=self.MakeHttpError(status_code=404))
     self.ExpectCreateWorkflowTemplate(expected_request, expected_response)
@@ -91,13 +86,12 @@ class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
 
   def testImportWorkflowTemplatesInvalid(self):
     self.WriteInput('foo: bar')
-    expected_error = ("Validation Error: [Additional properties are not allowed"
-                      " ('foo' was unexpected)]")
-    with self.AssertRaisesExceptionMatches(exceptions.ParseError,
-                                           expected_error):
+    with self.AssertRaisesExceptionMatches(
+        yaml_validator.ValidationError,
+        "Additional properties are not allowed "
+        "('foo' was unexpected)"):
       self.RunDataproc('workflow-templates import {0}'.format(
           self.WORKFLOW_TEMPLATE))
-      self.AssertErrEquals(expected_error)
 
   def testImportWorkflowTemplatesHttpError(self):
     # Provided template does not have an id or a name.
@@ -109,7 +103,7 @@ class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
     expected_request = copy.deepcopy(provided_template)
     expected_request.id = self.WORKFLOW_TEMPLATE
 
-    self.WriteInput(util.MessageToYaml(provided_template))
+    self.WriteInput(export_util.Export(provided_template))
     self.ExpectGetWorkflowTemplate(
         exception=self.MakeHttpError(status_code=403))
     with self.AssertRaisesHttpExceptionMatches(
@@ -134,7 +128,7 @@ class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
     # Write test template to file.
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=provided_template, stream=stream)
+      export_util.Export(message=provided_template, stream=stream)
 
     self.ExpectGetWorkflowTemplate(
         exception=self.MakeHttpError(status_code=404))
@@ -164,7 +158,7 @@ class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
     # Write test template to file.
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=provided_template, stream=stream)
+      export_util.Export(message=provided_template, stream=stream)
 
     self.ExpectGetWorkflowTemplate(
         name=self.WorkflowTemplateName(region='us-test1'),
@@ -204,7 +198,11 @@ class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
     # Write test template to file.
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=provided_template, stream=stream)
+      export_util.Export(
+          message=provided_template,
+          stream=stream,
+          schema_path=export_util.GetSchemaPath(
+              'dataproc', 'v1', 'WorkflowTemplate'))
 
     self.ExpectGetWorkflowTemplate(
         name=self.WorkflowTemplateName(region='us-test1'),
@@ -241,7 +239,7 @@ class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
     # Write test template to file.
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=provided_template, stream=stream)
+      export_util.Export(message=provided_template, stream=stream)
 
     self.ExpectGetWorkflowTemplate(response=get_response)
     self.ExpectUpdateWorkflowTemplate(
@@ -278,7 +276,7 @@ class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
     # Write test template to file.
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=provided_template, stream=stream)
+      export_util.Export(message=provided_template, stream=stream)
 
     self.ExpectGetWorkflowTemplate(
         name=self.WorkflowTemplateName(region='us-test1'),
@@ -290,3 +288,9 @@ class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
         'workflow-templates import {0} --source {1}'.format(
             self.WORKFLOW_TEMPLATE, file_name))
     self.AssertMessagesEqual(expected_response, result)
+
+
+class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)

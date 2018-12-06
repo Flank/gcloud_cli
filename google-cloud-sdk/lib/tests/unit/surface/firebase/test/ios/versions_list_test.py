@@ -43,9 +43,9 @@ class TestIosVersionsListTest(unit_base.IosMockClientTest):
     self.Run(commands.IOS_VERSIONS_LIST)
     self.AssertOutputContains(
         """\
-        | 5.1 | 5 | 1 | old |
-        | 6.0 | 6 | 0 | default |
-        | 7.2 | 7 | 2 | |""",
+        | 5.1 | 5 | 1 | old | 9.2.0 |
+        | 6.0 | 6 | 0 | default | 9.2.0, 10.0.1 |
+        | 7.2 | 7 | 2 | | 9.2.0, 10.0.1 |""",
         normalize_space=True)
 
   def testIosVersionsList_ApiThrowsHttpError(self):

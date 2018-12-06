@@ -1,0 +1,259 @@
+title: Creates a regional MIG but specifies the zones it should be in.
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instance-templates create $$template1$$ --machine-type n1-standard-1
+      --format 'text(name,properties.machineType)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+  - stdout: |
+      ---
+      name:                   $$template1$$
+      properties.machineType: n1-standard-1
+- execute:
+  - command: compute instance-groups managed create $$manager$$ --zones us-central1-f
+      --base-instance-name $$manager$$ --size 0 --template $$template1$$ --format
+      'text(name,region,targetSize)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$].
+  - stdout: |
+      ---
+      name:       $$manager$$
+      region:     https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+      targetSize: 0
+- execute:
+  - command: compute instance-groups managed delete $$manager$$ --region us-central1
+  - prompt:
+    - message: |
+        The following region instance group managers will be deleted:
+         - [$$manager$$] in [us-central1]
+    - input: y
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$].
+  - progress_tracker:
+    - message: Deleting Managed Instance Group
+    - status: SUCCESS
+- execute:
+  - command: compute instance-templates delete $$template1$$
+  - prompt:
+    - message: |
+        The following instance templates will be deleted:
+         - [$$template1$$]
+    - input: y
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+
+actions:
+- generate_resource_id:
+    reference: template1
+    prefix: mig-regional
+- execute_command:
+    command: compute instance-templates create $$template1$$ --machine-type n1-standard-1
+      --format 'text(name,properties.machineType)'
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+    - expect_stdout: |
+        ---
+        name:                   $$template1$$
+        properties.machineType: n1-standard-1
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: manager
+    prefix: mig-regional
+- execute_command:
+    command: compute instance-groups managed create $$manager$$ --zones us-central1-f
+      --base-instance-name $$manager$$ --size 0 --template $$template1$$ --format
+      'text(name,region,targetSize)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              baseInstanceName: $$manager$$
+              distributionPolicy:
+                zones:
+                - zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              instanceTemplate: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+              name: $$manager$$
+              region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+              targetSize: 0
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '861'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '8327634237024237941'
+            name: operation-1536706457544-575a05a86a542-450268d6-85f7b6e5
+            operationType: compute.instanceGroupManagers.insert
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$
+            targetId: '8064500900971280757'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-09-11T15:54:18.756-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1536706457544-575a05a86a542-450268d6-85f7b6e5
+            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1235'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"TuQoK5b7MWZUZsIeAXzde2HtMvQ=/Lr2nqSf8GvuUIaNR3Noa3J0u9cc="'
+            status: '200'
+          body:
+            kind: compute#instanceGroupManager
+            id: '8064500900971280757'
+            creationTimestamp: '2018-09-11T15:54:18.733-07:00'
+            name: $$manager$$
+            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+            distributionPolicy:
+              zones:
+              - zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+            instanceGroup: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$manager$$
+            baseInstanceName: $$manager$$
+            fingerprint: fQwnRR9oWCI=
+            currentActions:
+              none: 0
+              creating: 0
+              creatingWithoutRetries: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            targetSize: 0
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '3073'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"i_jWuwesibHsH_UJzpc7GPNOrog=/pfYEJLvyitDYDqX48lvOYdZ4a84="'
+            status: '200'
+          body:
+            kind: compute#regionInstanceGroupList
+            id: projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups
+            items:
+            - kind: compute#instanceGroup
+              id: '8037623841741469737'
+              creationTimestamp: '2018-09-11T15:50:46.870-07:00'
+              name: mig-instance-configs-regional-20180911-225043-feou
+              description: "This instance group is controlled by Regional Instance\
+                \ Group Manager 'mig-instance-configs-regional-20180911-225043-feou'.\
+                \ To modify instances in this group, use the Regional Instance Group\
+                \ Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-instance-configs-regional-20180911-225043-feou
+              size: 0
+              region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+            - kind: compute#instanceGroup
+              id: '8064500900971280757'
+              creationTimestamp: '2018-09-11T15:54:18.736-07:00'
+              name: $$manager$$
+              description: "This instance group is controlled by Regional Instance\
+                \ Group Manager '$$manager$$'. To modify instances in this group,\
+                \ use the Regional Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$manager$$
+              size: 0
+              region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+            - kind: compute#instanceGroup
+              id: '4635378121123952867'
+              creationTimestamp: '2018-09-11T15:47:40.609-07:00'
+              name: mig-updater-regional-20180911-224737-k9t8
+              description: "This instance group is controlled by Regional Instance\
+                \ Group Manager 'mig-updater-regional-20180911-224737-k9t8'. To modify\
+                \ instances in this group, use the Regional Instance Group Manager\
+                \ API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-updater-regional-20180911-224737-k9t8
+              size: 0
+              region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/autoscalers?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '250'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"Xu-cEYFe8EoP1QOhr2dTSFHpQEw=/UgLmAE_-XTfZ-bn7qrwOTs4nTRM="'
+            status: '200'
+          body:
+            kind: compute#regionAutoscalerList
+            id: projects/cloud-sdk-integration-testing/regions/us-central1/autoscalers
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/autoscalers
+    - expect_stdout: |
+        ---
+        name:       $$manager$$
+        region:     https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+        targetSize: 0
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-groups managed delete $$manager$$ --region us-central1
+    cleanup_for: manager
+    validation_only: true
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following region instance group managers will be deleted:
+           - [$$manager$$] in [us-central1]
+        user_input: y
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$].
+    - expect_progress_tracker:
+        message: Deleting Managed Instance Group
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-templates delete $$template1$$
+    cleanup_for: template1
+    validation_only: true
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following instance templates will be deleted:
+           - [$$template1$$]
+        user_input: y
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+    - expect_exit:
+        code: 0

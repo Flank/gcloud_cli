@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
@@ -39,7 +39,7 @@ class RegionalDisksDescribeTest(
     sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
     self.mock_client = SetUpMockClient('v1')
     self.addCleanup(self.mock_client.Unmock)
     self.messages = core_apis.GetMessagesModule('compute', 'v1')

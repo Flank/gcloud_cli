@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,7 @@ APP_ENTRY_1 = messages.LogEntry(
 APP_ENTRY_1_FORMATTED = '2016-04-06 00:42:05 s1[v1]  Message 1.'
 
 APP_ENTRY_2 = messages.LogEntry(
-    logName=('projects/{0}/logs/appengine.googleapis.com%2Fstderr'
+    logName=('projects/{0}/logs/stderr'
              .format(PROJECT)),
     insertId='ID002',
     resource=messages.MonitoredResource(

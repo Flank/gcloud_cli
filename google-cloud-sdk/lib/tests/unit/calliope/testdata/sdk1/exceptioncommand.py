@@ -18,12 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib.apitools import http_error
 
 
-class ExceptionCommand(base.Command):
+class ExceptionCommand(calliope_base.Command):
+  """Exception Command."""
 
   @staticmethod
   def Args(parser):

@@ -1,0 +1,57 @@
+NAME
+    gcloud alpha compute machine-images create - create Google Compute Engine
+        machine images
+
+SYNOPSIS
+    gcloud alpha compute machine-images create IMAGE
+        --source-instance=SOURCE_INSTANCE [--description=DESCRIPTION]
+        [--source-instance-zone=SOURCE_INSTANCE_ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create Google Compute Engine machine images.
+
+POSITIONAL ARGUMENTS
+     IMAGE
+        Name of the machineImage to create.
+
+REQUIRED FLAGS
+     --source-instance=SOURCE_INSTANCE
+        The source instance to create a machine image from.
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        Specifies a textual description of the machine image.
+
+     --source-instance-zone=SOURCE_INSTANCE_ZONE
+        Zone of the instance to operate on. If not specified and the
+        compute/zone property isn't set, you may be prompted to select a zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

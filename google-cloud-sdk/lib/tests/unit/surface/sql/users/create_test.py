@@ -19,13 +19,13 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
 
 class _BaseUsersCreateTest(object):
 
-  # TODO(b/110486599): Remove the positional host argument.
   def testCreate(self):
     msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
     self.mocked_client.users.Insert.Expect(
@@ -34,19 +34,24 @@ class _BaseUsersCreateTest(object):
             instance='my_instance',
             name='my_username',
             host='my_host',
-            password='my_password'),
-        msgs.Operation(name='op_name'))
+            password='my_password'), msgs.Operation(name='op_name'))
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
         msgs.Operation(name='op_name', status='DONE'))
     self.Run('sql users create --instance my_instance '
-             'my_username my_host --password my_password')
+             'my_username --host my_host --password my_password')
     self.AssertOutputEquals('')
     self.AssertErrContains('Creating Cloud SQL user')
     self.AssertErrContains('Created user [my_username].')
-    # TODO(b/110486599): Remove the deprecation warning.
-    self.AssertErrContains('Positional argument deprecated_host is deprecated')
+
+  # TODO(b/110486599): Remove this when the argument is removed.
+  def testPositionalHostError(self):
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
+                                'Positional argument deprecated_host has been '
+                                'removed'):
+      self.Run('sql users create --instance my_instance '
+               'my_username my_host --password my_password')
 
   def testCreateWithNoHostArgument(self):
     msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
@@ -88,7 +93,6 @@ class _BaseUsersCreateTest(object):
     self.AssertErrContains('Creating Cloud SQL user')
     self.AssertErrContains('Created user [my_username].')
 
-  # TODO(b/110486599): Remove the positional host argument.
   def testCreateAsync(self):
     msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
     self.mocked_client.users.Insert.Expect(
@@ -103,8 +107,8 @@ class _BaseUsersCreateTest(object):
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
         msgs.Operation(name='op_name'))
-    result = self.Run('sql users create --instance my_instance '
-                      'my_username my_host --password my_password --async')
+    result = self.Run('sql users create --instance my_instance my_username '
+                      '--host my_host --password my_password --async')
     self.assertEqual(result.name, 'op_name')
     self.AssertOutputEquals('')
     self.AssertErrContains('Create in progress for user [my_username].\n')

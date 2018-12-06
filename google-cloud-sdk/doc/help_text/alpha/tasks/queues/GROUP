@@ -13,14 +13,15 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding for a queue.
+        (ALPHA) Add IAM policy binding for a tasks queue.
 
      create-app-engine-queue
         (ALPHA) Create an App Engine queue.
@@ -47,7 +48,7 @@ COMMANDS
         (ALPHA) Purge a queue by deleting all of its tasks.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding for a queue.
+        (ALPHA) Remove IAM policy binding of a tasks queue.
 
      resume
         (ALPHA) Request to resume a paused or disabled queue.

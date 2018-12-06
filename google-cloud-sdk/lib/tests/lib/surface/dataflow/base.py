@@ -137,7 +137,7 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
     if parameters:
       params_value = run_job_req_body.ParametersValue
       params_list = []
-      for k, v in sorted(six.iteritems(parameters)):
+      for k, v in six.iteritems(parameters):
         params_list.append(params_value.AdditionalProperty(
             key=six.text_type(k), value=six.text_type(v)))
       additional_properties = params_value(additionalProperties=params_list)

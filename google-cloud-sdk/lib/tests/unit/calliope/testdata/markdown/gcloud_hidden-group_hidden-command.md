@@ -23,10 +23,11 @@ Hidden docstring description.
 
 ## GCLOUD WIDE FLAGS
 
-These flags are available to all commands: --configuration, --flatten, --format, --help, --log-http, --top-group-flag, --user-output-enabled, --verbosity.
+These flags are available to all commands: --configuration, --flags-file, --flatten, --format, --help, --log-http, --top-group-flag, --user-output-enabled, --verbosity.
 Run *$ link:gcloud[gcloud] help* for details.
 
 
 ## NOTES
 
 This command is an internal implementation detail and may change or disappear without notice.
+

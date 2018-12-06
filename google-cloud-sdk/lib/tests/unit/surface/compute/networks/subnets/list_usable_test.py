@@ -29,6 +29,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
                           (calliope_base.ReleaseTrack.BETA, 'beta'),
                           (calliope_base.ReleaseTrack.GA, 'v1'))

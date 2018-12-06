@@ -11,7 +11,7 @@ gcloud \- manage Google Cloud Platform resources and developer workflow
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud\fR \fIGROUP\fR | \fICOMMAND\fR [\fB\-\-account\fR=\fIACCOUNT\fR] [\fB\-\-configuration\fR=\fICONFIGURATION\fR] [\fB\-\-flatten\fR=[\fIKEY\fR,...]] [\fB\-\-format\fR=\fIFORMAT\fR] [\fB\-\-help\fR] [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-quiet\fR,\ \fB\-q\fR] [\fB\-\-verbosity\fR=\fIVERBOSITY\fR;\ default="warning"] [\fB\-\-version\fR,\ \fB\-v\fR] [\fB\-h\fR] [\fB\-\-log\-http\fR] [\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR] [\fB\-\-no\-user\-output\-enabled\fR]
+\f5gcloud\fR \fIGROUP\fR | \fICOMMAND\fR [\fB\-\-account\fR=\fIACCOUNT\fR] [\fB\-\-configuration\fR=\fICONFIGURATION\fR] [\fB\-\-flags\-file\fR=\fIYAML_FILE\fR] [\fB\-\-flatten\fR=[\fIKEY\fR,...]] [\fB\-\-format\fR=\fIFORMAT\fR] [\fB\-\-help\fR] [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-quiet\fR,\ \fB\-q\fR] [\fB\-\-verbosity\fR=\fIVERBOSITY\fR;\ default="warning"] [\fB\-\-version\fR,\ \fB\-v\fR] [\fB\-h\fR] [\fB\-\-log\-http\fR] [\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR] [\fB\-\-no\-user\-output\-enabled\fR]
 
 
 
@@ -36,6 +36,14 @@ The configuration to use for this command invocation. For more information on
 how to use configurations, run: \f5gcloud topic configurations\fR. You can also
 use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment variable to set the equivalent
 of this flag for a terminal session.
+
+.TP 2m
+\fB\-\-flags\-file\fR=\fIYAML_FILE\fR
+A YAML or JSON file that specifies a \fB\-\-flag\fR:\fBvalue\fR dictionary.
+Useful for specifying complex flag values with special characters that work with
+any command interpreter. Additionally, each \fB\-\-flags\-file\fR arg is
+replaced by its constituent flags. See $ gcloud topic flags\-file for more
+information.
 
 .TP 2m
 \fB\-\-flatten\fR=[\fIKEY\fR,...]
@@ -143,6 +151,10 @@ Manage oauth2 credentials for the Google Cloud SDK.
 \fB(BETA)\fR Beta versions of gcloud commands.
 
 .TP 2m
+\fBbigtable\fR
+Manage your Cloud Bigtable storage.
+
+.TP 2m
 \fBbuilds\fR
 Create and manage builds for Google Cloud Build.
 
@@ -243,6 +255,10 @@ Create and manage project access policies.
 Manage Cloud Pub/Sub topics and subscriptions.
 
 .TP 2m
+\fBredis\fR
+Manage Cloud Memorystore Redis resources.
+
+.TP 2m
 \fBservices\fR
 List, enable and disable APIs and services.
 
@@ -256,7 +272,7 @@ Command groups for Cloud Spanner.
 
 .TP 2m
 \fBsql\fR
-Manage Cloud SQL databases.
+Create and manage Google Cloud SQL databases.
 
 .TP 2m
 \fBtopic\fR
@@ -281,7 +297,7 @@ Provide feedback to the Google Cloud SDK team.
 
 .TP 2m
 \fBhelp\fR
-Prints detailed help messages for the specified commands.
+Search gcloud help text.
 
 .TP 2m
 \fBinfo\fR

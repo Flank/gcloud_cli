@@ -1,0 +1,140 @@
+
+.TH "GCLOUD_ALPHA_IAM_POLICIES_LINT\-CONDITION" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha iam policies lint\-condition \- lint an IAM condition
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha iam policies lint\-condition\fR (\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR\ |\ [\fB\-\-expression\fR=\fIEXPRESSION\fR\ \fB\-\-title\fR=\fITITLE\fR\ :\ \fB\-\-description\fR=\fIDESCRIPTION\fR]) [\fB\-\-resource\-name\fR=\fIRESOURCE_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Lint an IAM condition. The problems found by linter will not be
+fixed. Instead, it will show the problems.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR
+The path to a JSON or YAML file containing the condition. See
+https://cloud.google.com/iam/docs/conditions\-overview for schema of the
+condition.
+
+.TP 2m
+
+condition to lint.
+
+.RS 2m
+.TP 2m
+\fB\-\-expression\fR=\fIEXPRESSION\fR
+The expression of the condition which evaluates to True or False. This uses a
+subset of Common Expression Language syntax. This flag must be specified if any
+of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-title\fR=\fITITLE\fR
+A title for the expression, i.e. a short string describing its purpose. This
+flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A description of the expression. This is a longer text which describes the
+expression.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-resource\-name\fR=\fIRESOURCE_NAME\fR
+The full resource name of the policy containing the condition to lint. See
+https://cloud.google.com/apis/design/resource_names for details.
+
+To get a URI from most list commands in gcloud, pass the \-\-uri flag. For
+example:
+
+.RS 2m
+$ gcloud compute instances list \-\-project prj \-\-uri
+.RE
+
+.RS 2m
+https://www.googleapis.com/compute/v1/projects/prj/zones/us\-east1\-c/instances/i1
+https://www.googleapis.com/compute/v1/projects/prj/zones/us\-east1\-d/instances/i2
+.RE
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBiam/v1\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/iam/
+
+
+
+.SH "EXAMPLES"
+
+To lint an IAM condition of resource
+\f5//cloudresourcemanager.googleapis.com/v1/projects/example\-project\fR, and
+the condtion to lint is expression='true', title='title',
+description='description', run:
+
+.RS 2m
+$ gcloud alpha iam policies lint\-condition \e
+    \-\-resource\-name='//cloudresourcemanager.googleapis.com/v1/projec\e
+ts/example\-project' \-\-expression='true' \-\-title='title' \e
+    \-\-description='description'
+.RE
+
+To lint an IAM condition of resource
+\f5//cloudresourcemanager.googleapis.com/v1/projects/example\-project\fR, and
+the condition is read from a local YAML file \f5condition.yaml\fR, run:
+
+.RS 2m
+$ gcloud alpha iam policies lint\-condition \e
+    \-\-resource\-name='//cloudresourcemanager.googleapis.com/v1/projec\e
+ts/example\-project' \-\-condition\-from\-file='condition.yaml'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

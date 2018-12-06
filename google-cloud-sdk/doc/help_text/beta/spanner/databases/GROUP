@@ -9,8 +9,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -25,7 +26,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add an IAM policy binding to a Cloud Spanner database.
+        (BETA) Add IAM policy binding to a Cloud Spanner database.
 
      create
         (BETA) Create a Cloud Spanner database.
@@ -37,7 +38,7 @@ COMMANDS
         (BETA) Describe a Cloud Spanner database.
 
      execute-sql
-        (BETA) Executes a read-only SQL query against a Cloud Spanner database.
+        (BETA) Executes a SQL query against a Cloud Spanner database.
 
      get-iam-policy
         (BETA) Get the IAM policy for a Cloud Spanner database.
@@ -47,7 +48,7 @@ COMMANDS
         instance.
 
      remove-iam-policy-binding
-        (BETA) Remove an IAM policy binding from a Cloud Spanner database.
+        (BETA) Remove IAM policy binding of a Cloud Spanner database.
 
      set-iam-policy
         (BETA) Set the IAM policy for a Cloud Spanner database.

@@ -57,8 +57,9 @@ OPTIONAL FLAGS
         router.
 
      --peer-asn=PEER_ASN
-        The BGP autonomous system number (ASN) for this BGP peer. For more
-        information see: https://tools.ietf.org/html/rfc6996.
+        The BGP autonomous system number (ASN) for this BGP peer. Must be a
+        16-bit or 32-bit private ASN as defined in
+        https://tools.ietf.org/html/rfc6996, for example --asn=64512.
 
      --peer-ip-address=PEER_IP_ADDRESS
         The link-local address of the peer router. Must be a link-local IPv4
@@ -111,8 +112,8 @@ OPTIONAL FLAGS
 
           GROUP must be (currently only one value is supported):
 
-       ALL_SUBNETS
-          Automatically advertise all available subnets.
+           ALL_SUBNETS
+              Automatically advertise all available subnets.
 
        --add-advertisement-ranges=[CIDR_RANGE=DESC,...]
           A list of individual IP ranges, in CIDR format, to dynamically
@@ -131,8 +132,8 @@ OPTIONAL FLAGS
 
           GROUP must be (currently only one value is supported):
 
-       ALL_SUBNETS
-          Automatically advertise all available subnets.
+           ALL_SUBNETS
+              Automatically advertise all available subnets.
 
        --remove-advertisement-ranges=[CIDR_RANGE,...]
           A list of individual IP ranges, in CIDR format, to remove from
@@ -142,8 +143,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

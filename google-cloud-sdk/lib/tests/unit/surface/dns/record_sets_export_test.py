@@ -88,16 +88,23 @@ class RecordSetsExportTest(base.DnsMockTest):
   def testExportToYamlFile(self):
     self._ExportToFileHelper(self.yaml_file_path)
 
+  def testErrorDuringExport(self):
+    write_yaml_mock = self.StartObjectPatch(export_util, 'WriteToYamlFile')
+    write_yaml_mock.side_effect = Exception()
+
+    with self.assertRaises(export_util.UnableToExportRecordsToFile):
+      self._ExportToFileHelper(self.yaml_file_path)
+
 
 class RecordSetsExportBetaTest(base.DnsMockBetaTest):
 
   def SetUp(self):
     self.result_file_path = os.path.join(self.temp_path, 'exported')
     self.zone_file_path = sdk_test_base.SdkBase.Resource(
-        'tests', 'unit', 'surface', 'dns', 'test_data', 'v2beta1',
+        'tests', 'unit', 'surface', 'dns', 'test_data', 'v1beta2',
         'zone.com-exported.zone')
     self.yaml_file_path = sdk_test_base.SdkBase.Resource(
-        'tests', 'unit', 'surface', 'dns', 'test_data', 'v2beta1',
+        'tests', 'unit', 'surface', 'dns', 'test_data', 'v1beta2',
         'zone.com-exported.yaml')
 
   def testWriteToZoneFile(self):

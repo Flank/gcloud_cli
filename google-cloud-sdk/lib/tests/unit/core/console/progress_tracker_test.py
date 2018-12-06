@@ -597,5 +597,602 @@ class CompletionProgressTrackerFdTest(sdk_test_base.SdkBase):
     self.assertEqual(expected, actual)
 
 
+class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
+                                parameterized.TestCase):
+
+  def SetUp(self):
+    self._interactive_mock = self.StartObjectPatch(console_io, 'IsInteractive')
+    self._interactive_mock.return_value = True
+    self.console_size_mock = self.StartObjectPatch(
+        console_attr.ConsoleAttr, 'GetTermSize')
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.NORMAL.name)
+    self.stages = [
+        progress_tracker.Stage('Hello World...'),
+        progress_tracker.Stage('A' + 'h' * 15 + '...')]
+
+  def TearDown(self):
+    # Wait for ProgressTracker ticker thread to end
+    self.JoinAllThreads()
+
+  def SetConsoleSize(self, size):
+    self.console_size_mock.return_value = (size, 'unused size')
+    return size
+
+  def testNoOp(self):
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.OFF.name)
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False):
+      pass
+    self.AssertErrEquals('')
+
+  def testStubNoStages(self):
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.TESTING.name)
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False):
+      pass
+    self.AssertErrEquals('{"ux": "STAGED_PROGRESS_TRACKER", "message": '
+                         '"tracker", "status": "SUCCESS"}\n')
+
+  def testStub(self):
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.TESTING.name)
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.CompleteStage(self.stages[0])
+    self.AssertErrEquals(
+        '{"ux": "STAGED_PROGRESS_TRACKER", "message": "tracker", "status": '
+        '"SUCCESS", "succeeded_stages": ["Hello World..."]}\n')
+
+  def testStubFailedStage(self):
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.TESTING.name)
+    with self.assertRaises(ValueError):
+      with progress_tracker.StagedProgressTracker(
+          'tracker', self.stages, autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.StartStage(self.stages[1])
+        spt.CompleteStage(self.stages[1])
+        spt.FailStage(self.stages[0], ValueError())
+    self.AssertErrEquals(
+        '{"ux": "STAGED_PROGRESS_TRACKER", "message": "tracker", "status": '
+        '"FAILURE", "succeeded_stages": ["Ahhhhhhhhhhhhhhh..."], '
+        '"failed_stage": "Hello World..."}\n')
+
+  def testStubUncaughtError(self):
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.TESTING.name)
+    with self.assertRaises(ValueError):
+      with progress_tracker.StagedProgressTracker(
+          'tracker', self.stages, autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.CompleteStage(self.stages[0])
+        raise ValueError()
+    self.AssertErrEquals('{"ux": "STAGED_PROGRESS_TRACKER", "message": '
+                         '"tracker", "status": "FAILURE", "succeeded_stages": '
+                         '["Hello World..."]}\n')
+
+  def testProgressTrackerDoesNotCrash(self):
+    self.console_size_mock.return_value = (0, 'unused size')
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False):
+      time.sleep(1)
+
+  def testProgressTrackerZeroWidth(self):
+    # To simulate pseudo-TTY
+    self.console_size_mock.return_value = (0, 'unused size')
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.CompleteStage(self.stages[0])
+      spt.Tick()
+      spt.Tick()
+    self.AssertErrEquals('')
+
+  @parameterized.parameters(
+      (1, 0, 0), (0, 1, 0), (0, 0, 1))
+  def testProgressTrackerStageDoesNotBelong(self, start_stage, update_stage,
+                                            complete_stage):
+    self.console_size_mock.return_value = (0, 'unused size')
+    with self.assertRaisesRegex(
+        ValueError, 'This stage does not belong to this progress tracker.'):
+      with progress_tracker.StagedProgressTracker(
+          'tracker', [self.stages[0]], autotick=False) as spt:
+        spt.StartStage(self.stages[start_stage])
+        spt.UpdateStage(self.stages[update_stage], 'new message')
+        spt.CompleteStage(self.stages[complete_stage])
+
+  def testProgressTrackerUpdatingCompletedStage(self):
+    self.console_size_mock.return_value = (0, 'unused size')
+    with self.assertRaisesRegex(
+        ValueError, 'This stage has already completed.'):
+      with progress_tracker.StagedProgressTracker(
+          'tracker', self.stages, autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.CompleteStage(self.stages[0])
+        spt.StartStage(self.stages[0])
+
+  def testProgressTrackerNonInteractive(self):
+    self._interactive_mock.return_value = False
+    self.SetConsoleSize(30)
+    with progress_tracker.StagedProgressTracker(
+        'tracker',
+        self.stages,
+        success_message='Goodbye.',
+        autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.Tick()
+      self.AssertErrEquals(
+          'tracker\n'
+          'Hello World....')
+      spt.CompleteStage(self.stages[0])
+    self.AssertErrEquals(
+        'tracker\n'
+        'Hello World....done\n'
+        'Goodbye.\n')
+
+  def testProgressTrackerNonInteractiveFailedStage(self):
+    self._interactive_mock.return_value = False
+    self.SetConsoleSize(30)
+    with self.assertRaises(ValueError):
+      with progress_tracker.StagedProgressTracker(
+          'tracker',
+          self.stages,
+          failure_message='Badbye.',
+          autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.StartStage(self.stages[1])
+        spt.Tick()
+        self.AssertErrEquals(
+            'tracker\n'
+            'Hello World....')
+        error = ValueError('an error')
+        spt.FailStage(self.stages[0], error)
+    self.AssertErrEquals(
+        'tracker\n'
+        'Hello World....failed\n'
+        'Ahhhhhhhhhhhhhhh...interrupted\n'
+        'Badbye.\n')
+
+  def testProgressTrackerNonInteractiveUncaughtError(self):
+    self._interactive_mock.return_value = False
+    self.SetConsoleSize(30)
+    with self.assertRaises(ValueError):
+      with progress_tracker.StagedProgressTracker(
+          'tracker',
+          self.stages,
+          failure_message='Badbye.',
+          autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.StartStage(self.stages[1])
+        spt.Tick()
+        self.AssertErrEquals(
+            'tracker\n'
+            'Hello World....')
+        raise ValueError('an error')
+    self.AssertErrEquals(
+        'tracker\n'
+        'Hello World....failed\n'
+        'Badbye.\n')
+
+  def testProgressTracker(self):
+    clear_width = self.SetConsoleSize(30) - 1
+    with progress_tracker.StagedProgressTracker(
+        'tracker',
+        self.stages,
+        success_message='Goodbye.',
+        autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.Tick()
+      self.AssertErrEquals(
+          '\r' + ' ' * clear_width + '\r'
+          'tracker'
+          '\r' + ' ' * clear_width + '\r'
+          'tracker\n'
+          '\r' + ' ' * clear_width + '\r'
+          '  Hello World.../')
+      spt.CompleteStage(self.stages[0])
+    self.AssertErrEquals(
+        '\r' + ' ' * clear_width + '\r'
+        'tracker'
+        '\r' + ' ' * clear_width + '\r'
+        'tracker\n'
+        '\r' + ' ' * clear_width + '\r'
+        '  Hello World.../'
+        '\r' + ' ' * clear_width + '\r'
+        '  Hello World...done'
+        '\r' + ' ' * clear_width + '\r'
+        '  Hello World...done\n'
+        '\r' + ' ' * clear_width + '\r'
+        'Goodbye.\n')
+
+  def testProgressTrackerLatterStageCompletedFirst(self):
+    self.SetConsoleSize(30)
+    with progress_tracker.StagedProgressTracker(
+        'tracker',
+        self.stages,
+        success_message='Goodbye.',
+        autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.StartStage(self.stages[1])
+      spt.CompleteStage(self.stages[1])
+      spt.Tick()
+      self.AssertErrContains('tracker\n')
+      self.AssertErrContains('  Hello World.../')
+      self.AssertErrNotContains(self.stages[1].header)
+      spt.CompleteStage(self.stages[0])
+    self.AssertErrContains('tracker\n')
+    self.AssertErrContains('  Hello World...done\n')
+    self.AssertErrContains('  Ahhhhhhhhhhhhhhh...done\n')
+    self.AssertErrContains('Goodbye.\n')
+
+  def testProgressTrackerFailedStage(self):
+    self.SetConsoleSize(30)
+    with self.assertRaises(ValueError):
+      with progress_tracker.StagedProgressTracker(
+          'tracker',
+          self.stages,
+          failure_message='Badbye.',
+          autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.StartStage(self.stages[1])
+        spt.Tick()
+        self.AssertErrContains('tracker\n')
+        self.AssertErrContains('  Hello World.../')
+        error = ValueError('an error')
+        spt.FailStage(self.stages[0], error)
+    self.AssertErrContains('  Hello World...failed\n')
+    self.AssertErrContains('  Ahhhhhhhhhhhhhhh...interrup\n')
+    self.AssertErrContains('  ted\n')
+    self.AssertErrContains('Badbye.\n')
+
+  def testProgressTrackerUncaughtError(self):
+    self.SetConsoleSize(30)
+    with self.assertRaises(ValueError):
+      with progress_tracker.StagedProgressTracker(
+          'tracker',
+          self.stages,
+          failure_message='Badbye.',
+          autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.StartStage(self.stages[1])
+        spt.Tick()
+        self.AssertErrContains('tracker\n')
+        self.AssertErrContains('  Hello World.../')
+        raise ValueError('an error')
+    self.AssertErrContains('  Hello World...failed\n')
+    self.AssertErrContains('Badbye.\n')
+
+  @parameterized.parameters(True, False)
+  def testProgressTrackerDoneMessageCallback(self, interactive):
+    self._interactive_mock.return_value = interactive
+    self.SetConsoleSize(30)
+    msg = ''
+    done_message_callback = lambda: msg
+    with progress_tracker.StagedProgressTracker(
+        'tracker',
+        self.stages,
+        done_message_callback=done_message_callback,
+        autotick=False):
+      msg = 'For more information...'
+    self.AssertErrContains('Done. For more information...\n')
+
+  @test_case.Filters.DoNotRunOnWindows
+  def testCtrlCHandler(self):
+    self.SetConsoleSize(30)
+    # The code under test should work on Windows. However, Python does not
+    # support sending POSIX signals on Windows. The Windows shell catches
+    # CTRL-C and converts it into a SIGINT (which is why the code works).
+    # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
+    with self.assertRaisesRegex(console_io.OperationCancelledError,
+                                'Aborted by user.'):
+      with progress_tracker.StagedProgressTracker(
+          'tracker', self.stages, autotick=False) as spt:
+        spt.Tick()
+        os.kill(os.getpid(), signal.SIGINT)
+        spt.Tick()
+    self.AssertOutputEquals('')
+    self.AssertErrContains('aborted by ctrl-c')
+
+  @test_case.Filters.DoNotRunOnWindows
+  def testCtrlCHandlerCustom(self):
+    self.SetConsoleSize(30)
+    # The code under test should work on Windows. However, Python does not
+    # support sending POSIX signals on Windows. The Windows shell catches
+    # CTRL-C and converts it into a SIGINT (which is why the code works).
+    # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
+    with self.assertRaisesRegex(console_io.OperationCancelledError,
+                                'blah'):
+      with progress_tracker.StagedProgressTracker(
+          'tracker', self.stages, aborted_message='blah', autotick=False) as t:
+        t.Tick()
+        os.kill(os.getpid(), signal.SIGINT)
+        t.Tick()
+    self.AssertOutputEquals('')
+    self.AssertErrContains('aborted by ctrl-c')
+
+  @test_case.Filters.DoNotRunOnWindows
+  def testCtrlCHandlerCustomStub(self):
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.TESTING.name)
+    self.SetConsoleSize(30)
+    # The code under test should work on Windows. However, Python does not
+    # support sending POSIX signals on Windows. The Windows shell catches
+    # CTRL-C and converts it into a SIGINT (which is why the code works).
+    # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
+    with self.assertRaisesRegex(console_io.OperationCancelledError, 'blah'):
+
+      with progress_tracker.StagedProgressTracker(
+          'tracker', self.stages, aborted_message='blah', autotick=False) as t:
+        t.StartStage(self.stages[0])
+        t.CompleteStage(self.stages[0])
+        t.Tick()
+        os.kill(os.getpid(), signal.SIGINT)
+        t.Tick()
+    self.AssertOutputEquals('')
+    self.AssertErrContains('{"ux": "STAGED_PROGRESS_TRACKER", "message": '
+                           '"tracker", "status": "INTERRUPTED", '
+                           '"succeeded_stages": ["Hello World..."]}\n')
+
+  @test_case.Filters.DoNotRunOnWindows
+  def testUnInterruptable(self):
+    self.SetConsoleSize(30)
+    # The code under test should work on Windows. However, Python does not
+    # support sending POSIX signals on Windows. The Windows shell catches
+    # CTRL-C and converts it into a SIGINT (which is why the code works).
+    # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
+
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False, interruptable=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.CompleteStage(self.stages[0])
+      spt.Tick()
+      os.kill(os.getpid(), signal.SIGINT)
+      spt.Tick()
+    self.AssertOutputEquals('')
+    self.AssertErrContains('  Hello World...done\n')
+    self.AssertErrContains('This operation cannot be cancelled')
+
+  @test_case.Filters.DoNotRunOnWindows
+  def testUnInterruptableStub(self):
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.TESTING.name)
+    self.SetConsoleSize(30)
+    # The code under test should work on Windows. However, Python does not
+    # support sending POSIX signals on Windows. The Windows shell catches
+    # CTRL-C and converts it into a SIGINT (which is why the code works).
+    # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False, interruptable=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.CompleteStage(self.stages[0])
+      spt.Tick()
+      os.kill(os.getpid(), signal.SIGINT)
+      spt.Tick()
+    self.AssertOutputEquals('')
+    self.AssertErrEquals('{"ux": "STAGED_PROGRESS_TRACKER", "message": '
+                         '"tracker", "status": "SUCCESS", "succeeded_stages": '
+                         '["Hello World..."]}\n')
+
+  @parameterized.named_parameters(
+      ('Utf8', 'utf8', ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧']),
+      ('Cp437', 'cp437', ['|', '/', '-', '\\']),  # windows
+      ('Ascii', 'ascii', ['|', '/', '-', '\\']))
+  def testProgressTrackerSpinnersByEncoding(self, encoding, spinners):
+    self.SetConsoleSize(30)
+    self.SetEncoding(encoding)
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      for _ in range(len(spinners)):
+        spt.Tick()
+    for tick_mark in spinners:
+      self.AssertErrContains('  Hello World...' + tick_mark)
+
+
+class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
+                                         parameterized.TestCase):
+
+  def SetUp(self):
+    self._interactive_mock = self.StartObjectPatch(console_io, 'IsInteractive')
+    self._interactive_mock.return_value = True
+    self.console_size_mock = self.StartObjectPatch(
+        console_attr.ConsoleAttr, 'GetTermSize')
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.NORMAL.name)
+    self.stages = [
+        progress_tracker.Stage('Hello World...'),
+        progress_tracker.Stage('A' + 'h' * 15 + '...')]
+
+  def TearDown(self):
+    # Wait for ProgressTracker ticker thread to end
+    self.JoinAllThreads()
+
+  def _GetMultilineStagedProgressTracker(self, header, stages, autotick=False,
+                                         interruptable=True):
+    return progress_tracker._MultilineStagedProgressTracker(
+        header, stages, None, None, False, 0.1, interruptable,
+        console_io.OperationCancelledError.DEFAULT_MESSAGE, None, None)
+
+  def SetConsoleSize(self, size):
+    self.console_size_mock.return_value = (size, 'unused size')
+    return size
+
+  def AssertErrContainsLines(self, *lines):
+    for line in lines:
+      self.AssertErrContains(line)
+
+  def testPseudoTty(self):
+    self.SetConsoleSize(0)
+    with self._GetMultilineStagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.CompleteStage(self.stages[0])
+      spt.Tick()
+      spt.Tick()
+    self.AssertErrEquals('')
+
+  def testCompleted(self):
+    self.SetConsoleSize(30)
+    with self._GetMultilineStagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.CompleteStage(self.stages[0])
+      spt.StartStage(self.stages[1])
+      spt.CompleteStage(self.stages[1])
+      spt.Tick()
+    self.AssertErrContainsLines(
+        'OK tracker\n',
+        '  OK Hello World...\n',
+        '  OK Ahhhhhhhhhhhhhhh...\n',
+        'Done.\n')
+
+  def testStageFailed(self):
+    self.SetConsoleSize(30)
+    with self.assertRaises(ValueError):
+      with self._GetMultilineStagedProgressTracker(
+          'tracker', self.stages, autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.StartStage(self.stages[1])
+        spt.FailStage(self.stages[1], ValueError('Oh no!'), 'I failed.')
+        spt.Tick()
+    self.AssertErrContainsLines(
+        'X  tracker\n',
+        '  -  Hello World...\n',
+        '  X  Ahhhhhhhhhhhhhhh... I fa\n',
+        '  iled.\n',
+        'Failed.\n')
+
+  def testUpdateStage(self):
+    self.SetConsoleSize(30)
+    with self._GetMultilineStagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.CompleteStage(self.stages[0])
+      spt.StartStage(self.stages[1])
+      spt.Tick()
+      spt.UpdateStage(self.stages[1], 'whoops')
+      spt.CompleteStage(self.stages[1])
+    self.AssertErrContainsLines(
+        # Before Update (don't test the spinner)
+        '  Ahhhhhhhhhhhhhhh...\n',
+        # Final result
+        'OK tracker\n',
+        '  OK Hello World...\n',
+        '  OK Ahhhhhhhhhhhhhhh... whoo\n',
+        '  ps\n',
+        'Done.\n')
+
+  def testUpdateHeader(self):
+    self.SetConsoleSize(30)
+    with self._GetMultilineStagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.CompleteStage(self.stages[0])
+      spt.StartStage(self.stages[1])
+      spt.UpdateStage(self.stages[1], 'whoops')
+      spt.CompleteStage(self.stages[1])
+      spt.Tick()
+      spt.UpdateHeaderMessage('details')
+      spt.Tick()
+    self.AssertErrContainsLines(
+        '/  tracker\n',
+        # Final result
+        'OK tracker details\n',
+        '  OK Hello World...\n',
+        '  OK Ahhhhhhhhhhhhhhh... whoo\n',
+        '  ps\n',
+        'Done.\n')
+
+  def testUncaughtException(self):
+    self.SetConsoleSize(30)
+    with self.assertRaises(ValueError):
+      with self._GetMultilineStagedProgressTracker(
+          'tracker', self.stages, autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.CompleteStage(self.stages[0])
+        spt.StartStage(self.stages[1])
+        spt.Tick()
+        raise ValueError()
+    self.AssertErrContainsLines(
+        'X  tracker\n',
+        '  OK Hello World...\n',
+        '  -  Ahhhhhhhhhhhhhhh...\n',
+        'Failed.\n')
+
+  @parameterized.named_parameters(
+      ('Utf8', 'utf8', ['⠏', '⠛', '⠹', '⠼', '⠶', '⠧'], 1, '✓ '),
+      ('Cp437', 'cp437', ['|', '/', '-', '\\'], 2, 'OK '),  # windows
+      ('Ascii', 'ascii', ['|', '/', '-', '\\'], 2, 'OK '))
+  def testProgressTrackerSpinnersByEncoding(self, encoding, spinners,
+                                            spaces, success_mark):
+    self.SetConsoleSize(30)
+    self.SetEncoding(encoding)
+    with self._GetMultilineStagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.stages[0])
+      for _ in range(len(spinners)):
+        spt.Tick()
+      spt.CompleteStage(self.stages[0])
+    for tick_mark in spinners:
+      # Header ticks
+      self.AssertErrContains(tick_mark + ' ' * spaces + 'tracker\n')
+      # Stage ticks
+      self.AssertErrContains(tick_mark + ' ' * spaces + 'Hello World...\n')
+    self.AssertErrContains(success_mark + 'tracker\n')
+    self.AssertErrContains(success_mark + 'Hello World...\n')
+
+  @test_case.Filters.DoNotRunOnWindows
+  def testCtrlCHandler(self):
+    self.SetConsoleSize(30)
+    # The code under test should work on Windows. However, Python does not
+    # support sending POSIX signals on Windows. The Windows shell catches
+    # CTRL-C and converts it into a SIGINT (which is why the code works).
+    # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
+    with self.assertRaisesRegex(console_io.OperationCancelledError,
+                                'Aborted by user.'):
+      with self._GetMultilineStagedProgressTracker(
+          'tracker', self.stages, autotick=False) as spt:
+        spt.StartStage(self.stages[0])
+        spt.CompleteStage(self.stages[0])
+        spt.Tick()
+        spt.StartStage(self.stages[1])
+        os.kill(os.getpid(), signal.SIGINT)
+        spt.Tick()
+    self.AssertOutputEquals('')
+    self.AssertErrContainsLines(
+        'X  tracker\n',
+        '  OK Hello World...\n',
+        '  -  Ahhhhhhhhhhhhhhh...\n',
+        'Aborted by user.\n')
+
+  @test_case.Filters.DoNotRunOnWindows
+  def testUnInterruptable(self):
+    self.SetConsoleSize(50)
+    # The code under test should work on Windows. However, Python does not
+    # support sending POSIX signals on Windows. The Windows shell catches
+    # CTRL-C and converts it into a SIGINT (which is why the code works).
+    # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
+
+    with self._GetMultilineStagedProgressTracker(
+        'tracker', self.stages, autotick=False, interruptable=False) as spt:
+      spt.StartStage(self.stages[0])
+      spt.CompleteStage(self.stages[0])
+      spt.Tick()
+      os.kill(os.getpid(), signal.SIGINT)
+      spt.StartStage(self.stages[1])
+      spt.CompleteStage(self.stages[1])
+      spt.Tick()
+    self.AssertOutputEquals('')
+    self.AssertErrContainsLines(
+        'OK tracker This operation cannot be cancelled.\n',
+        '  OK Hello World...\n',
+        '  OK Ahhhhhhhhhhhhhhh...\n',
+        'Done.\n')
+
+
 if __name__ == '__main__':
   sdk_test_base.main()

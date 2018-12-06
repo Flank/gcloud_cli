@@ -20,11 +20,12 @@ from __future__ import unicode_literals
 
 import argparse
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
-class ExtraArgs(base.Command):
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.BETA,
+                             calliope_base.ReleaseTrack.GA)
+class ExtraArgs(calliope_base.Command):
   """A command to test the posix '--' workaround."""
 
   @staticmethod

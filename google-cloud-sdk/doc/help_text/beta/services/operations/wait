@@ -1,5 +1,6 @@
 NAME
     gcloud beta services operations wait - waits for an operation to complete
+        for a given operation name
 
 SYNOPSIS
     gcloud beta services operations wait OPERATION [GCLOUD_WIDE_FLAG ...]
@@ -8,23 +9,20 @@ DESCRIPTION
     (BETA) This command will block until an operation has been marked as
     complete.
 
-    Note that the operations/ prefix of the operation name is optional and may
-    be omitted.
-
 POSITIONAL ARGUMENTS
      OPERATION
         The name of the operation on which to wait.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
-    To wait on an operation named operations/serviceConfigs.my-service.1 to
-    complete, run:
+    To wait on an operation named operations/abc to complete, run:
 
-        $ gcloud beta services operations wait serviceConfigs.my-service.1
+        $ gcloud beta services operations wait operations/abc
 
 NOTES
     This command is currently in BETA and may change without notice. These

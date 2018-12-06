@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 
 import copy
 import os
-import textwrap
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import cli_tree
-from googlecloudsdk.command_lib.search_help import lookup
+from googlecloudsdk.command_lib.help_search import lookup
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_attr
 from tests.lib import calliope_test_base
 from tests.lib import cli_test_base
@@ -35,13 +35,14 @@ from tests.lib import sdk_test_base
 class SearchHelpTest(calliope_test_base.CalliopeTestBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.table_dir_path = self.CreateTempDir('help_text')
     self.StartObjectPatch(
         cli_tree, 'CliTreeDir', return_value=self.table_dir_path)
     # Mock the console width.
     self.StartObjectPatch(
         console_attr.ConsoleAttr, 'GetTermSize', return_value=(80, 100))
+    self.SetEncoding('ascii')
 
     self.table_file_path = cli_tree.CliTreePath()
 
@@ -61,89 +62,178 @@ class SearchHelpTest(calliope_test_base.CalliopeTestBase):
 
   def testResults_OneTermNotFound(self):
     """Test running help search returns empty list if no results match."""
+    properties.VALUES.core.user_output_enabled.Set(False)
     results = self.Run('search-help chandler')
-    self.assertEqual(results, [])
+    self.assertEqual([], list(results))
 
   def testResults(self):
     """Test that results return as expected."""
-    expected_summary = (
-        'SUMMARY DESCRIPTION\n'
-        'A test command with a long help section.\n'
-        'DESCRIPTION\n'
-        '...aren\'t so close to the other terms in the next '
-        'paragraph. On the other hand if they aren\'t looking for '
-        'scary bugs and are searching the word mittens, the excerpt '
-        'should center around this part.')
+    properties.VALUES.core.user_output_enabled.Set(False)
     expected_result = copy.deepcopy(self.long_help)
-    expected_result.update({lookup.COMMANDS: [],
-                            lookup.SUMMARY: expected_summary})
-    results = self.Run('search-help mittens')
-    self.assertEqual(results, [expected_result])
+    expected_result.update(
+        {lookup.COMMANDS: [],
+         lookup.RESULTS: {'mittens': 'sections.DESCRIPTION'},
+         lookup.RELEVANCE: 0.25})
+    actual = self.Run('search-help mittens')
+    self.assertIn(expected_result, actual)
+    self.assertEqual(3, len(actual))
 
   def testOutput_MatchesDescription(self):
     """Test the command output when the description matches the term."""
     self.Run('search-help mittens')
-    self.AssertOutputEquals(textwrap.dedent("""\
-    COMMAND               HELP
-    gcloud sdk long-help  SUMMARY DESCRIPTION
-                          A test command with a long help section.
-                          DESCRIPTION
-                          ...aren't so close to the other terms in the next
-                          paragraph. On the other hand if they aren't looking for
-                          scary bugs and are searching the word mittens, the excerpt
-                          should center around this part.
-    """))
+    self.AssertOutputEquals("""\
++----------------------------+-------------------------------------------------+
+|          COMMAND           |                     SUMMARY                     |
++----------------------------+-------------------------------------------------+
+| gcloud sdk long-help       | A test command with a long help section.        |
+|                            | DESCRIPTION                                     |
+|                            | ...aren't so close to the other terms in the    |
+|                            | next paragraph. On the other hand if they       |
+|                            | aren't looking for scary bugs and are searching |
+|                            | the word MITTENS, the excerpt should center     |
+|                            | around this part.                               |
++----------------------------+-------------------------------------------------+
+| gcloud beta sdk long-help  | (BETA) A test command with a long help section. |
+|                            | DESCRIPTION                                     |
+|                            | ...aren't so close to the other terms in the    |
+|                            | next paragraph. On the other hand if they       |
+|                            | aren't looking for scary bugs and are searching |
+|                            | the word MITTENS, the excerpt should center     |
+|                            | around this part.                               |
++----------------------------+-------------------------------------------------+
+| gcloud alpha sdk long-help | (ALPHA) A test command with a long help         |
+|                            | section.                                        |
+|                            | DESCRIPTION                                     |
+|                            | ...aren't so close to the other terms in the    |
+|                            | next paragraph. On the other hand if they       |
+|                            | aren't looking for scary bugs and are searching |
+|                            | the word MITTENS, the excerpt should center     |
+|                            | around this part.                               |
++----------------------------+-------------------------------------------------+
+""")
 
-  def testOutput_MatchesMultipleLocations(self):
-    """Test the command output when multiple locations in command match."""
-    # Return the examples section for xyzzy, rather than the flags.
-    self.Run('search-help one')
-    self.AssertOutputEquals(textwrap.dedent("""\
-    COMMAND           HELP
-    gcloud            SUMMARY DESCRIPTION
-                      gcloud sdk tests super-group.
-                      FLAGS
-                      --format
-                      ...are: config, csv, default, diff, disable, flattened, get,
-                      json, list, multi, none, object, table, text, value, yaml. For
-                      more details run $ gcloud topic formats.
-    gcloud sdk xyzzy  SUMMARY DESCRIPTION
-                      Brief description of what Nothing Happens means.
-                      EXAMPLES
-                      Try these: $ echo one $ gcloud components list
-    """))
+  def testOutput_MatchesMultipleCommands(self):
+    """Test the command output when multiple commands match."""
+    self.Run('search-help zero')
+    # Matching flag name is more important than matching capsule.
+    self.AssertOutputEquals("""\
++----------------------------------------+-------------------------------------+
+|                COMMAND                 |               SUMMARY               |
++----------------------------------------+-------------------------------------+
+| gcloud sdk xyzzy                       | Brief description of what Nothing   |
+|                                        | Happens means.                      |
+|                                        | FLAGS                               |
+|                                        | --ZERO-or-more                      |
+|                                        | ZERO or more description.           |
++----------------------------------------+-------------------------------------+
+| gcloud sdk second-level-command-1      | gcloud sdk tests command, matches   |
+|                                        | for ZERO.                           |
++----------------------------------------+-------------------------------------+
+| gcloud beta sdk xyzzy                  | (BETA) Brief description of what    |
+|                                        | Nothing Happens means.              |
+|                                        | FLAGS                               |
+|                                        | --ZERO-or-more                      |
+|                                        | ZERO or more description.           |
++----------------------------------------+-------------------------------------+
+| gcloud beta sdk second-level-command-1 | (BETA) gcloud sdk tests command,    |
+|                                        | matches for ZERO.                   |
++----------------------------------------+-------------------------------------+
+| gcloud alpha sdk xyzzy                 | (ALPHA) Brief description of what   |
+|                                        | Nothing Happens means.              |
+|                                        | FLAGS                               |
+|                                        | --ZERO-or-more                      |
+|                                        | ZERO or more description.           |
++----------------------------------------+-------------------------------------+
+""")
 
   def testOutput_MatchesFlag(self):
     """Test the command output when a flag description matches the term."""
     self.Run('search-help phoebe')
-    self.AssertOutputEquals(textwrap.dedent("""\
-    COMMAND           HELP
-    gcloud sdk xyzzy  SUMMARY DESCRIPTION
-                      Brief description of what Nothing Happens means.
-                      FLAGS
-                      --three-choices
-                      Choices description. FRIENDS must be one of: rachel, phoebe,
-                      monica.
-    """))
+    self.AssertOutputEquals("""\
++------------------------+-----------------------------------------------------+
+|        COMMAND         |                       SUMMARY                       |
++------------------------+-----------------------------------------------------+
+| gcloud sdk xyzzy       | Brief description of what Nothing Happens means.    |
+|                        | FLAGS                                               |
+|                        | --three-choices                                     |
+|                        | Choices description. FRIENDS must be one of:        |
+|                        | rachel, PHOEBE, monica.                             |
++------------------------+-----------------------------------------------------+
+| gcloud beta sdk xyzzy  | (BETA) Brief description of what Nothing Happens    |
+|                        | means.                                              |
+|                        | FLAGS                                               |
+|                        | --three-choices                                     |
+|                        | Choices description. FRIENDS must be one of:        |
+|                        | rachel, PHOEBE, monica.                             |
++------------------------+-----------------------------------------------------+
+| gcloud alpha sdk xyzzy | (ALPHA) Brief description of what Nothing Happens   |
+|                        | means.                                              |
+|                        | FLAGS                                               |
+|                        | --three-choices                                     |
+|                        | Choices description. FRIENDS must be one of:        |
+|                        | rachel, PHOEBE, monica.                             |
++------------------------+-----------------------------------------------------+
+""")
 
   def testOutput_MatchesPositional(self):
     """Test the command output when a positional matches the term."""
     self.Run('search-help pdq')
-    self.AssertOutputEquals(textwrap.dedent("""\
-    COMMAND           HELP
-    gcloud sdk xyzzy  SUMMARY DESCRIPTION
-                      Brief description of what Nothing Happens means.
-                      POSITIONALS
-                      pdq
-                      pdq the PDQ.
-    """))
+    self.AssertOutputEquals("""\
++------------------------+-----------------------------------------------------+
+|        COMMAND         |                       SUMMARY                       |
++------------------------+-----------------------------------------------------+
+| gcloud sdk xyzzy       | Brief description of what Nothing Happens means.    |
+|                        | POSITIONALS                                         |
+|                        | PDQ                                                 |
+|                        | PDQ the PDQ.                                        |
++------------------------+-----------------------------------------------------+
+| gcloud beta sdk xyzzy  | (BETA) Brief description of what Nothing Happens    |
+|                        | means.                                              |
+|                        | POSITIONALS                                         |
+|                        | PDQ                                                 |
+|                        | PDQ the PDQ.                                        |
++------------------------+-----------------------------------------------------+
+| gcloud alpha sdk xyzzy | (ALPHA) Brief description of what Nothing Happens   |
+|                        | means.                                              |
+|                        | POSITIONALS                                         |
+|                        | PDQ                                                 |
+|                        | PDQ the PDQ.                                        |
++------------------------+-----------------------------------------------------+
+""")
+
+  def testOutput_MatchesPath(self):
+    """Test the command output when a positional matches the term."""
+    self.Run('search-help xyzzy')
+    self.AssertOutputEquals("""\
++------------------------+-----------------------------------------------------+
+|        COMMAND         |                       SUMMARY                       |
++------------------------+-----------------------------------------------------+
+| gcloud sdk XYZZY       | Brief description of what Nothing Happens means.    |
++------------------------+-----------------------------------------------------+
+| gcloud sdk             | gcloud sdk tests second level group.                |
+|                        | COMMANDS                                            |
+|                        | long-help, second-level-command-1,                  |
+|                        | second-level-command-b, subgroup, XYZZY             |
++------------------------+-----------------------------------------------------+
+| gcloud beta sdk XYZZY  | (BETA) Brief description of what Nothing Happens    |
+|                        | means.                                              |
++------------------------+-----------------------------------------------------+
+| gcloud beta sdk        | (BETA) gcloud sdk tests second level group.         |
+|                        | COMMANDS                                            |
+|                        | betagroup, long-help, second-level-command-1,       |
+|                        | second-level-command-b, subgroup, XYZZY             |
++------------------------+-----------------------------------------------------+
+| gcloud alpha sdk XYZZY | (ALPHA) Brief description of what Nothing Happens   |
+|                        | means.                                              |
++------------------------+-----------------------------------------------------+
+""")
 
 
 class TableBundleTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
   """Bundle tests to make sure help search runs in bundled SDK."""
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testTableExistsAndUsedBySearchHelp(self):
     """Test that in bundled SDK, table already exists and help search runs."""

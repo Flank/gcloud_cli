@@ -1,4 +1,4 @@
-# This Python file uses the following encoding: utf-8
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,6 +92,20 @@ class TextMarkdownTests(test_base.Markdown):
         """)
     self.Run('text', markdown, expected, title='New Title')
 
+  def testTextRoot(self):
+    markdown = self.ROOT_MARKDOWN
+    expected = textwrap.dedent("""\
+      SYNOPSIS
+          gcloud component [ flags ] [ positionals ]
+
+      SECTION
+          Section prose about the gcloud component command.
+
+      GCLOUD WIDE FLAGS
+          These are available in all commands: --foo, --bar and --verbosity.
+      """)
+    self.Run('text', markdown, expected)
+
   def testTextEmptyName(self):
     markdown = textwrap.dedent("""\
         == NAME ==
@@ -112,7 +126,7 @@ class TextMarkdownTests(test_base.Markdown):
         """)
     self.Run('text', markdown, expected)
 
-  def testTextEmptyTable(self):
+  def testTextTableEmpty(self):
     markdown = textwrap.dedent("""\
         == TABLE ==
 
@@ -120,7 +134,95 @@ class TextMarkdownTests(test_base.Markdown):
         """)
     expected = textwrap.dedent("""\
         TABLE
+            [options="header",format="csv",grid="none",frame="none"]
+        """)
+    self.Run('text', markdown, expected)
 
+  def testTextTableNoSpace(self):
+    markdown = textwrap.dedent("""\
+        ## TABLE
+
+        Left | Right
+        --- | ---
+        abc | /def/ghijkl/mnop
+        z | /foo/bar
+
+        Next line.
+        """)
+    expected = textwrap.dedent("""\
+        TABLE
+              Left  Right
+              abc   /def/ghijkl/mnop
+              z     /foo/bar
+
+            Next line.
+        """)
+    self.Run('text', markdown, expected)
+
+  def testTextTableFixedNoSpace(self):
+    markdown = textwrap.dedent("""\
+        ## TABLE
+
+        Left | Right
+        -------- | ---
+        abc | /def/ghijkl/mnop
+        z | /foo/bar
+
+        Next line.
+        """)
+    expected = textwrap.dedent("""\
+        TABLE
+              Left      Right
+              abc       /def/ghijkl/mnop
+              z         /foo/bar
+
+            Next line.
+        """)
+    self.Run('text', markdown, expected)
+
+  def testTextTableSpace(self):
+    markdown = textwrap.dedent("""\
+        ## TABLE
+
+        Left | Right
+        --- | ---
+        abc | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbisit amet elit nulla.
+        z | Sed at cursus risus. Praesent facilisis at ligula at mattis. Vestibulum et quam et ipsum.
+
+        Next line.
+        """)
+    expected = textwrap.dedent("""\
+        TABLE
+              Left  Right
+              abc   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbisit
+                    amet elit nulla.
+              z     Sed at cursus risus. Praesent facilisis at ligula at mattis.
+                    Vestibulum et quam et ipsum.
+
+            Next line.
+        """)
+    self.Run('text', markdown, expected)
+
+  def testTextTableFixedSpace(self):
+    markdown = textwrap.dedent("""\
+        ## TABLE
+
+        Left | Right
+        -------- | ---
+        abc | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbisit amet elit nulla.
+        z | Sed at cursus risus. Praesent facilisis at ligula at mattis. Vestibulum et quam et ipsum.
+
+        Next line.
+        """)
+    expected = textwrap.dedent("""\
+        TABLE
+              Left      Right
+              abc       Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Morbisit amet elit nulla.
+              z         Sed at cursus risus. Praesent facilisis at ligula at mattis.
+                        Vestibulum et quam et ipsum.
+
+            Next line.
         """)
     self.Run('text', markdown, expected)
 
@@ -155,7 +257,7 @@ class TextMarkdownTests(test_base.Markdown):
             gcloud compute images deprecate NAME
                 [--delete-in DELETE_IN | --delete-on DELETE_ON]
                 [--obsolete-in OBSOLETE_IN | --obsolete-on OBSOLETE_ON]
-                [--replacement REPLACEMENT] --state STATE [GLOBAL-FLAG ...]
+                [--replacement REPLACEMENT] --state STATE [GCLOUD_WIDE_FLAG ...]
 
         DESCRIPTION
             gcloud compute images deprecate is used to deprecate images.
@@ -205,7 +307,7 @@ class TextMarkdownTests(test_base.Markdown):
                 [--address ADDRESS | --no-address] [--no-boot-disk-auto-delete]
                 [--no-restart-on-failure] [--preemptible]
                 [--no-scopes | --scopes [ACCOUNT=]SCOPE,[[ACCOUNT=]SCOPE,...]]
-                [--tags TAG,[TAG,...]] [--zone ZONE] [GLOBAL-FLAG ...]
+                [--tags TAG,[TAG,...]] [--zone ZONE] [GCLOUD_WIDE_FLAG ...]
 
         DESCRIPTION
             gcloud compute instances create facilitates the creation of Google Compute
@@ -216,7 +318,7 @@ class TextMarkdownTests(test_base.Markdown):
   def testTextLongSynopsisFlagValue(self):
     markdown = """## SYNOPSIS
 
-`gcloud alpha compute backend-services create` _NAME_ [*--https-health-checks*=_HTTPS_HEALTH_CHECK_,[_HTTPS_HEALTH_CHECK_,...]] [*--iap*=[_disabled_],[_enabled_],[_oauth2-client-id_=_OAUTH2-CLIENT-ID_],[_oauth2-client-secret_=_OAUTH2-CLIENT-SECRET_]] [*--load-balancing-scheme*=_LOAD_BALANCING_SCHEME_; default="EXTERNAL"] [*--port-name*=_PORT_NAME_] [*--protocol*=_PROTOCOL_] [*--cache-key-query-string-blacklist*=[_QUERY_STRING_,...] | *--cache-key-query-string-whitelist*=_QUERY_STRING_,[_QUERY_STRING_,...]] [*--server*=_SERVER_,[_SERVER_,...], *-s* _SERVER_,[_SERVER_,...]; default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,b.gcr.io,bucket.gcr.io,appengine.gcr.io,gcr.kubernetes.io"] [*--global* | *--region*=_REGION_] [_GLOBAL-FLAG ..._]
+`gcloud alpha compute backend-services create` _NAME_ [*--https-health-checks*=_HTTPS_HEALTH_CHECK_,[_HTTPS_HEALTH_CHECK_,...]] [*--iap*=[_disabled_],[_enabled_],[_oauth2-client-id_=_OAUTH2-CLIENT-ID_],[_oauth2-client-secret_=_OAUTH2-CLIENT-SECRET_]] [*--load-balancing-scheme*=_LOAD_BALANCING_SCHEME_; default="EXTERNAL"] [*--port-name*=_PORT_NAME_] [*--protocol*=_PROTOCOL_] [*--cache-key-query-string-blacklist*=[_QUERY_STRING_,...] | *--cache-key-query-string-whitelist*=_QUERY_STRING_,[_QUERY_STRING_,...]] [*--server*=_SERVER_,[_SERVER_,...], *-s* _SERVER_,[_SERVER_,...]; default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,b.gcr.io,bucket.gcr.io,appengine.gcr.io,gcr.kubernetes.io"] [*--global* | *--region*=_REGION_] [_GCLOUD_WIDE_FLAG ..._]
 """
     expected = """SYNOPSIS
     gcloud alpha compute backend-services create NAME
@@ -230,7 +332,7 @@ class TextMarkdownTests(test_base.Markdown):
         [--server=SERVER,[SERVER,...], -s SERVER,[SERVER,...];
           default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,
           b.gcr.io,bucket.gcr.io,appengine.gcr.io,gcr.kubernetes.io"]
-        [--global | --region=REGION] [GLOBAL-FLAG ...]
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 """
     self.Run('text', markdown, expected)
@@ -451,7 +553,7 @@ class TextUTF8Tests(test_base.UTF8):
             \x1b[1mgcloud compute images deprecate\x1b[m \x1b[4mNAME\x1b[m
                 [\x1b[1m--delete-in\x1b[m \x1b[4mDELETE_IN\x1b[m | \x1b[1m--delete-on\x1b[m \x1b[4mDELETE_ON\x1b[m]
                 [\x1b[1m--obsolete-in\x1b[m \x1b[4mOBSOLETE_IN\x1b[m | \x1b[1m--obsolete-on\x1b[m \x1b[4mOBSOLETE_ON\x1b[m]
-                [\x1b[1m--replacement\x1b[m \x1b[4mREPLACEMENT\x1b[m] \x1b[1m--state\x1b[m \x1b[4mSTATE\x1b[m [\x1b[4mGLOBAL-FLAG ...\x1b[m]
+                [\x1b[1m--replacement\x1b[m \x1b[4mREPLACEMENT\x1b[m] \x1b[1m--state\x1b[m \x1b[4mSTATE\x1b[m [\x1b[4mGCLOUD_WIDE_FLAG ...\x1b[m]
 
         \x1b[m\x1b[1mDESCRIPTION\x1b[m
             \x1b[1mgcloud compute images deprecate\x1b[m is used to deprecate images.
@@ -501,7 +603,7 @@ class TextUTF8Tests(test_base.UTF8):
                 [\x1b[1m--address\x1b[m \x1b[4mADDRESS\x1b[m | \x1b[1m--no-address\x1b[m] [\x1b[1m--no-boot-disk-auto-delete\x1b[m]
                 [\x1b[1m--no-restart-on-failure\x1b[m] [\x1b[1m--preemptible\x1b[m]
                 [\x1b[1m--no-scopes\x1b[m | \x1b[1m--scopes\x1b[m [\x1b[4mACCOUNT\x1b[m=]\x1b[4mSCOPE\x1b[m,[[\x1b[4mACCOUNT\x1b[m=]\x1b[4mSCOPE\x1b[m,...]]
-                [\x1b[1m--tags\x1b[m \x1b[4mTAG\x1b[m,[\x1b[4mTAG\x1b[m,...]] [\x1b[1m--zone\x1b[m \x1b[4mZONE\x1b[m] [\x1b[4mGLOBAL-FLAG ...\x1b[m]
+                [\x1b[1m--tags\x1b[m \x1b[4mTAG\x1b[m,[\x1b[4mTAG\x1b[m,...]] [\x1b[1m--zone\x1b[m \x1b[4mZONE\x1b[m] [\x1b[4mGCLOUD_WIDE_FLAG ...\x1b[m]
 
         \x1b[m\x1b[1mDESCRIPTION\x1b[m
             \x1b[1mgcloud compute instances create\x1b[m facilitates the creation of Google Compute

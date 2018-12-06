@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py import encoding
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
@@ -84,9 +84,9 @@ class DetectDocumentBase(vision_base.MlVisionTestBase):
 
 
 @parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA, 'builtin/stable'),
-    ('Beta', base.ReleaseTrack.BETA, 'builtin/stable'),
-    ('GA', base.ReleaseTrack.GA, None))
+    ('Alpha', calliope_base.ReleaseTrack.ALPHA, 'builtin/stable'),
+    ('Beta', calliope_base.ReleaseTrack.BETA, 'builtin/stable'),
+    ('GA', calliope_base.ReleaseTrack.GA, None))
 class DetectDocumentCommonTest(DetectDocumentBase):
 
   def testDetectDocument_Success(self, track, model):
@@ -169,8 +169,8 @@ class DetectDocumentCommonTest(DetectDocumentBase):
 
 
 @parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA),
-    ('Beta', base.ReleaseTrack.BETA))
+    ('Alpha', calliope_base.ReleaseTrack.ALPHA),
+    ('Beta', calliope_base.ReleaseTrack.BETA))
 class DetectDocumentAlphaBetaTest(DetectDocumentBase):
 
   def testDetectDocument_ModelVersion(self, track):

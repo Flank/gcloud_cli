@@ -98,8 +98,8 @@ class WorkflowTemplatesRunUnitTestBeta(WorkflowTemplatesRunUnitTest):
 
   def testRunWorkflowTemplatesBadTimeout(self):
     err_msg = (
-        'argument --timeout: given value must be of the form INTEGER[UNIT]'
-        ' where units can be one of s, m, h, d; received: abc')
+        "argument --timeout: Failed to parse duration: Duration unit 'abc' "
+        "must be preceded by a number")
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            err_msg):
       self.RunDataproc('workflow-templates run {0} --timeout abc'.format(

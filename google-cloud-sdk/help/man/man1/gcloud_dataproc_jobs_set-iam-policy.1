@@ -1,0 +1,91 @@
+
+.TH "GCLOUD_DATAPROC_JOBS_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud dataproc jobs set\-iam\-policy \- set IAM policy for a job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud dataproc jobs set\-iam\-policy\fR \fIJOB\fR \fIPOLICY_FILE\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Sets the IAM policy for a job, given a job ID and the policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+The ID of the job to set the policy on.
+
+.TP 2m
+\fIPOLICY_FILE\fR
+Path to a local JSON or YAML formatted file containing a valid policy.
+
+The output of the \f5get\-iam\-policy\fR command is a valid file, as is any JSON
+or YAML file conforming to the structure of a Policy
+(https://cloud.google.com/iam/reference/rest/v1/Policy).
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will read an IAM policy defined in a JSON file
+\'policy.json' and set it for a job with identifier 'example\-job'
+
+.RS 2m
+$ gcloud dataproc jobs set\-iam\-policy example\-job policy.json
+.RE
+
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta dataproc jobs set\-iam\-policy
+.RE
+

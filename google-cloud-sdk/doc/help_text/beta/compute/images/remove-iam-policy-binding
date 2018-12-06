@@ -34,21 +34,22 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
-    The following command will remove an IAM policy binding for the role of
+    To remove an IAM policy binding for the role of
     'roles/compute.securityAdmin' for the user 'test-user@gmail.com' on image
-    with identifier 'my-image'
+    with identifier 'my-image', run:
 
         $ gcloud beta compute images remove-iam-policy-binding my-image \
             --member='user:test-user@gmail.com' \
             --role='roles/compute.securityAdmin'
 
-    The following command will remove an IAM policy binding for the role of
+    To remove an IAM policy binding for the role of
     'roles/compute.securityAdmin' from all authenticated users on image
-    'my-image':
+    'my-image', run:
 
         $ gcloud beta compute images remove-iam-policy-binding my-image \
             --member='allAuthenticatedUsers' \

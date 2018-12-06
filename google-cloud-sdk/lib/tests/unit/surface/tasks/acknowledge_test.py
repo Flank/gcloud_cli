@@ -29,7 +29,7 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.tasks import test_base
 
 
-class TasksAcknowledgeTest(test_base.CloudTasksTestBase):
+class TasksAcknowledgeTest(test_base.CloudTasksAlphaTestBase):
 
   def SetUp(self):
     self.location_id = 'us-central1'
@@ -51,20 +51,18 @@ class TasksAcknowledgeTest(test_base.CloudTasksTestBase):
         return_value=parsers.ParseLocation('us-central1').SelfLink())
 
   def testAcknowledge(self):
-    expected = self.messages.Task(name=self.task_ref.RelativeName())
     self.tasks_service.Acknowledge.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksAcknowledgeRequest(
             name=self.task_ref.RelativeName(),
             acknowledgeTaskRequest=self.messages.AcknowledgeTaskRequest(
                 scheduleTime=self.schedule_time)
         ),
-        response=expected)
+        response=self.messages.Empty())
 
-    actual = self.Run(
+    self.Run(
         'tasks acknowledge {} --queue {} --schedule-time {}'.format(
             self.task_id, self.queue_id, self.schedule_time))
 
-    self.assertEqual(expected, actual)
     self.resolve_loc_mock.assert_called_once_with()
 
   def testAcknowledge_Location(self):
@@ -75,38 +73,32 @@ class TasksAcknowledgeTest(test_base.CloudTasksTestBase):
         projectsId=self.Project(),
         queuesId=self.queue_id, tasksId=self.task_id)
 
-    expected = self.messages.Task(name=task_ref.RelativeName())
     self.tasks_service.Acknowledge.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksAcknowledgeRequest(
             name=task_ref.RelativeName(),
             acknowledgeTaskRequest=self.messages.AcknowledgeTaskRequest(
                 scheduleTime=self.schedule_time)
         ),
-        response=expected)
+        response=self.messages.Empty())
 
-    actual = self.Run(
+    self.Run(
         'tasks acknowledge {} --queue {} --schedule-time {} '
         '--location=us-central2'.format(
             self.task_id, self.queue_id, self.schedule_time))
 
-    self.assertEqual(expected, actual)
-
   def testAcknowledge_RelativeName(self):
     task_name = ('projects/other-project/locations/us-central1/queues/my-queue'
                  '/tasks/my-task')
-    expected = self.messages.Task(name=self.task_ref.RelativeName())
     self.tasks_service.Acknowledge.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksAcknowledgeRequest(
             name=task_name,
             acknowledgeTaskRequest=self.messages.AcknowledgeTaskRequest(
                 scheduleTime=self.schedule_time)
         ),
-        response=expected)
+        response=self.messages.Empty())
 
-    actual = self.Run('tasks acknowledge {} --schedule-time {}'.format(
+    self.Run('tasks acknowledge {} --schedule-time {}'.format(
         task_name, self.schedule_time))
-
-    self.assertEqual(expected, actual)
 
   def testAcknowledge_NonExistentTask(self):
     self.tasks_service.Acknowledge.Expect(

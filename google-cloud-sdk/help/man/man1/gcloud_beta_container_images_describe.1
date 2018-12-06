@@ -5,13 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud beta container images describe \- lists information about the specified image
+gcloud beta container images describe \- lists container analysis data for a given image
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container images describe\fR \fIIMAGE_NAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container images describe\fR \fIIMAGE_NAME\fR [\fB\-\-metadata\-filter\fR=\fIMETADATA_FILTER\fR] [\fB\-\-show\-all\-metadata\fR] [\fB\-\-show\-build\-details\fR] [\fB\-\-show\-deployment\fR] [\fB\-\-show\-image\-basis\fR] [\fB\-\-show\-package\-vulnerability\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Lists container analysis data for a valid image.
 
 
 
@@ -28,12 +34,43 @@ formatted as *.gcr.io/PROJECT_ID/IMAGE_PATH@sha256:DIGEST or
 .RE
 .sp
 
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-metadata\-filter\fR=\fIMETADATA_FILTER\fR
+Additional filter to fetch metadata for a given fully qualified image reference.
+
+.TP 2m
+\fB\-\-show\-all\-metadata\fR
+Include all metadata in the output.
+
+.TP 2m
+\fB\-\-show\-build\-details\fR
+Include build metadata in the output.
+
+.TP 2m
+\fB\-\-show\-deployment\fR
+Include deployment metadata in the output.
+
+.TP 2m
+\fB\-\-show\-image\-basis\fR
+Include base image metadata in the output.
+
+.TP 2m
+\fB\-\-show\-package\-vulnerability\fR
+Include vulnerability metadata in the output.
+
+
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -58,6 +95,14 @@ $ gcloud beta container images describe \e
 $ gcloud beta container images describe \e
     gcr.io/myproject/myimage:tag \e
     \-\-format='value(image_summary.fully_qualified_digest)'
+.RE
+
+See package vulnerabilities found by the Container Analysis API for the
+specified image:
+
+.RS 2m
+$ gcloud beta container images describe \e
+    gcr.io/myproject/myimage@digest \-\-show\-package\-vulnerability
 .RE
 
 

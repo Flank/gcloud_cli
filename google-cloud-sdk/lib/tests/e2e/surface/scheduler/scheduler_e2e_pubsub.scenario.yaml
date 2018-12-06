@@ -1,0 +1,435 @@
+title: End-to-end tests for the `gcloud scheduler` pubsub job workflow.
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Test PubSub Job (create topic)
+  - command: pubsub topics create $$topic_id$$
+  - stderr: |
+      Created topic [projects/cloud-sdk-integration-testing/topics/$$topic_id$$].
+- execute:
+  - label: Test PubSub Job (create pubsub job)
+  - command: |
+      scheduler jobs create pubsub $$pubsub_job$$
+      --message-body 'my-message-body'
+      --schedule "1 of jan 00:00"
+      --attributes key1=value1,key2=value2
+      --time-zone America/New_York
+      --topic $$topic_id$$
+      --format="yaml(name,pubsubTarget,state,schedule,timeZone)"
+      --max-retry-attempts 4
+      --max-backoff 30m
+      --max-doublings 8
+      --max-retry-duration 10h
+      --min-backoff 0.5s
+  - stdout: |
+      name: projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$
+      pubsubTarget:
+        attributes:
+          key1: value1
+          key2: value2
+        data: bXktbWVzc2FnZS1ib2R5
+        topicName: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+      schedule: 1 of jan 00:00
+      state: ENABLED
+      timeZone: America/New_York
+- execute:
+  - label: Test PubSub Job (run pubsubjob job)
+  - command: scheduler jobs run $$pubsub_job$$
+- execute:
+  - label: Test PubSub Job (validate pubsubjob job)
+  - command: |
+      scheduler jobs describe $$pubsub_job$$
+      --format="yaml(name,pubsubTarget,state,schedule,timeZone)"
+  - stdout: |
+      name: projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$
+      pubsubTarget:
+        attributes:
+          key1: value1
+          key2: value2
+        data: bXktbWVzc2FnZS1ib2R5
+        topicName: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+      schedule: 1 of jan 00:00
+      state: ENABLED
+      timeZone: America/New_York
+- execute:
+  - label: Test PubSub Job (cleanup pubsub job)
+  - command: scheduler jobs delete $$pubsub_job$$
+  - prompt:
+    - message: You are about to delete job [$$pubsub_job$$]
+    - input: y
+  - stderr: |
+      Deleted job [$$pubsub_job$$].
+- execute:
+  - label: Test PubSub Job (cleanup topic)
+  - command: pubsub topics delete $$topic_id$$
+  - stderr: |
+      Deleted topic [projects/cloud-sdk-integration-testing/topics/$$topic_id$$].
+actions:
+- generate_resource_id:
+    reference: topic_id
+    prefix: scheduler
+
+- generate_resource_id:
+    reference: pubsub_job
+    prefix: scheduler
+
+- execute_command:
+    label: Test PubSub Job (create topic)
+    command: pubsub topics create $$topic_id$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://pubsub.googleapis.com/v1/projects/cloud-sdk-integration-testing/topics/$$topic_id$$?alt=json
+          method: PUT
+          headers: {}
+          body:
+            json:
+              name: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '491'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+            messageStoragePolicy:
+              allowedPersistenceRegions:
+              - asia-east1
+              - asia-northeast1
+              - asia-southeast1
+              - australia-southeast1
+              - europe-north1
+              - europe-west1
+              - europe-west2
+              - europe-west3
+              - europe-west4
+              - us-central1
+              - us-central2
+              - us-east1
+              - us-east4
+              - us-west1
+              - us-west2
+    - expect_stderr: |
+        Created topic [projects/cloud-sdk-integration-testing/topics/$$topic_id$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Test PubSub Job (create pubsub job)
+    command: |
+      scheduler jobs create pubsub $$pubsub_job$$
+      --message-body 'my-message-body'
+      --schedule "1 of jan 00:00"
+      --attributes key1=value1,key2=value2
+      --time-zone America/New_York
+      --topic $$topic_id$$
+      --format="yaml(name,pubsubTarget,state,schedule,timeZone)"
+      --max-retry-attempts 4
+      --max-backoff 30m
+      --max-doublings 8
+      --max-retry-duration 10h
+      --min-backoff 0.5s
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/cloud-sdk-integration-testing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '727'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: apps/cloud-sdk-integration-testing
+            id: cloud-sdk-integration-testing
+            dispatchRules:
+            - domain: '*'
+              path: /favicon.ico
+              service: default
+            - domain: simple-sample.appspot.com
+              path: /
+              service: default
+            authDomain: gmail.com
+            locationId: us-central
+            codeBucket: staging.cloud-sdk-integration-testing.appspot.com
+            defaultCookieExpiration: 1209600s
+            servingStatus: SERVING
+            defaultHostname: cloud-sdk-integration-testing.appspot.com
+            defaultBucket: cloud-sdk-integration-testing.appspot.com
+            gcrDomain: us.gcr.io
+            featureSettings:
+              splitHealthChecks: true
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$
+              pubsubTarget:
+                attributes:
+                  key1: value1
+                  key2: value2
+                data: bXktbWVzc2FnZS1ib2R5
+                topicName: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+              schedule: 1 of jan 00:00
+              timeZone: America/New_York
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '484'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$
+            pubsubTarget:
+              topicName: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+              data: bXktbWVzc2FnZS1ib2R5
+              attributes:
+                key1: value1
+                key2: value2
+            userUpdateTime: '2018-09-24T20:13:38Z'
+            state: ENABLED
+            schedule: 1 of jan 00:00
+            timeZone: America/New_York
+    - expect_stdout: |
+        name: projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$
+        pubsubTarget:
+          attributes:
+            key1: value1
+            key2: value2
+          data: bXktbWVzc2FnZS1ib2R5
+          topicName: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+        schedule: 1 of jan 00:00
+        state: ENABLED
+        timeZone: America/New_York
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Test PubSub Job (run pubsubjob job)
+    command: scheduler jobs run $$pubsub_job$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/cloud-sdk-integration-testing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '727'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: apps/cloud-sdk-integration-testing
+            id: cloud-sdk-integration-testing
+            dispatchRules:
+            - domain: '*'
+              path: /favicon.ico
+              service: default
+            - domain: simple-sample.appspot.com
+              path: /
+              service: default
+            authDomain: gmail.com
+            locationId: us-central
+            codeBucket: staging.cloud-sdk-integration-testing.appspot.com
+            defaultCookieExpiration: 1209600s
+            servingStatus: SERVING
+            defaultHostname: cloud-sdk-integration-testing.appspot.com
+            defaultBucket: cloud-sdk-integration-testing.appspot.com
+            gcrDomain: us.gcr.io
+            featureSettings:
+              splitHealthChecks: true
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$:run?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '533'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$
+            pubsubTarget:
+              topicName: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+              data: bXktbWVzc2FnZS1ib2R5
+              attributes:
+                key1: value1
+                key2: value2
+            userUpdateTime: '2018-09-24T20:13:38Z'
+            state: ENABLED
+            scheduleTime: '2019-01-01T05:00:00.945791Z'
+            schedule: 1 of jan 00:00
+            timeZone: America/New_York
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Test PubSub Job (validate pubsubjob job)
+    command: |
+      scheduler jobs describe $$pubsub_job$$
+      --format="yaml(name,pubsubTarget,state,schedule,timeZone)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/cloud-sdk-integration-testing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '727'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: apps/cloud-sdk-integration-testing
+            id: cloud-sdk-integration-testing
+            dispatchRules:
+            - domain: '*'
+              path: /favicon.ico
+              service: default
+            - domain: simple-sample.appspot.com
+              path: /
+              service: default
+            authDomain: gmail.com
+            locationId: us-central
+            codeBucket: staging.cloud-sdk-integration-testing.appspot.com
+            defaultCookieExpiration: 1209600s
+            servingStatus: SERVING
+            defaultHostname: cloud-sdk-integration-testing.appspot.com
+            defaultBucket: cloud-sdk-integration-testing.appspot.com
+            gcrDomain: us.gcr.io
+            featureSettings:
+              splitHealthChecks: true
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '533'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$
+            pubsubTarget:
+              topicName: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+              data: bXktbWVzc2FnZS1ib2R5
+              attributes:
+                key1: value1
+                key2: value2
+            userUpdateTime: '2018-09-24T20:13:38Z'
+            state: ENABLED
+            scheduleTime: '2019-01-01T05:00:00.945791Z'
+            schedule: 1 of jan 00:00
+            timeZone: America/New_York
+    - expect_stdout: |
+        name: projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$
+        pubsubTarget:
+          attributes:
+            key1: value1
+            key2: value2
+          data: bXktbWVzc2FnZS1ib2R5
+          topicName: projects/cloud-sdk-integration-testing/topics/$$topic_id$$
+        schedule: 1 of jan 00:00
+        state: ENABLED
+        timeZone: America/New_York
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Test PubSub Job (cleanup pubsub job)
+    cleanup_for: pubsub_job
+    command: scheduler jobs delete $$pubsub_job$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/cloud-sdk-integration-testing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '727'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: apps/cloud-sdk-integration-testing
+            id: cloud-sdk-integration-testing
+            dispatchRules:
+            - domain: '*'
+              path: /favicon.ico
+              service: default
+            - domain: simple-sample.appspot.com
+              path: /
+              service: default
+            authDomain: gmail.com
+            locationId: us-central
+            codeBucket: staging.cloud-sdk-integration-testing.appspot.com
+            defaultCookieExpiration: 1209600s
+            servingStatus: SERVING
+            defaultHostname: cloud-sdk-integration-testing.appspot.com
+            defaultBucket: cloud-sdk-integration-testing.appspot.com
+            gcrDomain: us.gcr.io
+            featureSettings:
+              splitHealthChecks: true
+    - expect_prompt_continue:
+        message: You are about to delete job [$$pubsub_job$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted job [$$pubsub_job$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Test PubSub Job (cleanup topic)
+    cleanup_for: topic_id
+    command: pubsub topics delete $$topic_id$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://pubsub.googleapis.com/v1/projects/cloud-sdk-integration-testing/topics/$$topic_id$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted topic [projects/cloud-sdk-integration-testing/topics/$$topic_id$$].
+    - expect_exit:
+        code: 0

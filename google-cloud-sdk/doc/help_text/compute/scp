@@ -101,8 +101,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To copy a remote directory, ~/narnia, from example-instance to the
@@ -121,6 +122,11 @@ EXAMPLES
 
         $ gcloud compute scp --recurse example-instance:~/narnia \
             ~/wardrobe --zone us-central1-a
+
+    To specify the project, zone, and recurse all together, run:
+
+        $ gcloud compute scp --project "my-gcp-project" \
+            --zone "us-east1-b" --recurse ~/foo-folder/ gcp-instance-name:~/
 
 NOTES
     These variants are also available:

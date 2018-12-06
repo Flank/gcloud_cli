@@ -20,7 +20,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_base
 from tests.lib import test_case
 
@@ -31,7 +31,7 @@ class VisionTests(e2e_base.WithServiceAuth):
   def SetUp(self):
     self.image = self.Resource('tests', 'e2e', 'surface', 'ml', 'vision',
                                'testdata', 'face-input.png')
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _RunTest(self, command, resource):
     result = self.Run(

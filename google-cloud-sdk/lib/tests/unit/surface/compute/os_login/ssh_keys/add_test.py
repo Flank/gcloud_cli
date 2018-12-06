@@ -49,13 +49,14 @@ class AddTest(test_base.OsloginBaseTest):
                 fingerprint=None,
                 key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
             )),
-        response=self.profiles['profile_with_keys'])
+        response=self.messages.ImportSshPublicKeyResponse(
+            loginProfile=self.profiles['profile_with_keys']))
 
     response = self.Run("""
         compute os-login ssh-keys add --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
         """)
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response.loginProfile, self.profiles['profile_with_keys'])
 
   def testWithKeyFile(self, track):
     self._RunSetUp(track)
@@ -72,13 +73,14 @@ class AddTest(test_base.OsloginBaseTest):
                 fingerprint=None,
                 key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
             )),
-        response=self.profiles['profile_with_keys'])
+        response=self.messages.ImportSshPublicKeyResponse(
+            loginProfile=self.profiles['profile_with_keys']))
 
     response = self.Run("""
         compute os-login ssh-keys add --key-file {0}
         """.format(public_key_fname))
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response.loginProfile, self.profiles['profile_with_keys'])
 
   def testWithBothKeyAndKeyFile(self, track):
     self._RunSetUp(track)
@@ -106,14 +108,15 @@ class AddTest(test_base.OsloginBaseTest):
                 fingerprint=None,
                 key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
             )),
-        response=self.profiles['profile_with_keys'])
+        response=self.messages.ImportSshPublicKeyResponse(
+            loginProfile=self.profiles['profile_with_keys']))
 
     response = self.Run("""
         compute os-login ssh-keys add --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
             --ttl 10s
         """)
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response.loginProfile, self.profiles['profile_with_keys'])
 
   def testWithTtlMinutes(self, track):
     self._RunSetUp(track)
@@ -128,14 +131,15 @@ class AddTest(test_base.OsloginBaseTest):
                 fingerprint=None,
                 key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
             )),
-        response=self.profiles['profile_with_keys'])
+        response=self.messages.ImportSshPublicKeyResponse(
+            loginProfile=self.profiles['profile_with_keys']))
 
     response = self.Run("""
         compute os-login ssh-keys add --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
             --ttl 10m
         """)
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response.loginProfile, self.profiles['profile_with_keys'])
 
   def testWithTtlHours(self, track):
     self._RunSetUp(track)
@@ -150,14 +154,15 @@ class AddTest(test_base.OsloginBaseTest):
                 fingerprint=None,
                 key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
             )),
-        response=self.profiles['profile_with_keys'])
+        response=self.messages.ImportSshPublicKeyResponse(
+            loginProfile=self.profiles['profile_with_keys']))
 
     response = self.Run("""
         compute os-login ssh-keys add --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
             --ttl 10h
         """)
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response.loginProfile, self.profiles['profile_with_keys'])
 
   def testWithTtlDays(self, track):
     self._RunSetUp(track)
@@ -172,14 +177,15 @@ class AddTest(test_base.OsloginBaseTest):
                 fingerprint=None,
                 key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
             )),
-        response=self.profiles['profile_with_keys'])
+        response=self.messages.ImportSshPublicKeyResponse(
+            loginProfile=self.profiles['profile_with_keys']))
 
     response = self.Run("""
         compute os-login ssh-keys add --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
             --ttl 10d
         """)
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response.loginProfile, self.profiles['profile_with_keys'])
 
 
 if __name__ == '__main__':

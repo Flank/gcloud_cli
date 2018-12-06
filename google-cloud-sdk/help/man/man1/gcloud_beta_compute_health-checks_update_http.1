@@ -11,7 +11,7 @@ gcloud beta compute health\-checks update http \- update a HTTP health check
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute health\-checks update http\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR] [\fB\-\-port\fR=\fIPORT\fR\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute health\-checks update http\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR] [\fB\-\-port\fR=\fIPORT\fR\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR\ \fB\-\-use\-serving\-port\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -73,9 +73,10 @@ No proxy header is added.
 .TP 2m
 \fBPROXY_V1\fR
 Adds the header "PROXY UNKNOWN\er\en".
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-request\-path\fR=\fIREQUEST_PATH\fR
 The request path that this health check monitors. For example,
@@ -116,17 +117,30 @@ The TCP port number that this health check monitors.
 The port name that this health check monitors. By default, this is empty.
 Setting this to an empty string will clear any existing port\-name value.
 
+.TP 2m
+\fB\-\-use\-serving\-port\fR
+If given, use the "serving port" for health checks:
 
+.RS 2m
+.IP "\(bu" 2m
+When health checking network endpoints in a Network Endpoint Group, use the port
+specified with each endpoint.
+.IP "\(bu" 2m
+When health checking other backends, use the port or named port of the backend
+service.
+.RE
 .RE
 .RE
 .sp
 
+
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

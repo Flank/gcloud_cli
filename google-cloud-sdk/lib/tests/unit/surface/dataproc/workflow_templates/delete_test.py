@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'workflow template delete' command."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -44,12 +45,6 @@ class WorkflowTemplateDeleteUnitTest(unit_base.DataprocUnitTestBase,
             name=workflow_template_name, version=version),
         response=response,
         exception=exception)
-
-
-class WorkflowTemplateDeleteTestBeta(WorkflowTemplateDeleteUnitTest):
-
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
 
   def testDeleteWorkflowTemplates(self):
     self.ExpectDeleteWorkflowTemplate()
@@ -83,6 +78,12 @@ class WorkflowTemplateDeleteTestBeta(WorkflowTemplateDeleteUnitTest):
         "The workflow template '[test-workflow-template]' will be deleted.")
     self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertMessagesEqual(None, result)
+
+
+class WorkflowTemplateDeleteTestBeta(WorkflowTemplateDeleteUnitTest):
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
 
 
 if __name__ == '__main__':

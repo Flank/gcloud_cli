@@ -29,7 +29,7 @@ class FoldersCreateTest(testbase.FoldersUnitTestBase):
 
   def testCreateFolder(self):
     response_value = operations.ToOperationResponse(self.TEST_FOLDER)
-    test_create_operation = operations.OperationsMessages().Operation(
+    test_create_operation = self.messages.Operation(
         done=False, name='operations/fc.123')
     test_create_operation_done = operations.OperationsMessages().Operation(
         done=True, name='operations/fc.123', response=response_value)
@@ -58,7 +58,7 @@ class FoldersCreateTest(testbase.FoldersUnitTestBase):
       self.DoCommand(use_folder_parent=True)
 
   def testCreateAsync(self):
-    test_create_operation = operations.OperationsMessages().Operation(
+    test_create_operation = self.messages.Operation(
         done=False, name='operations/fc.123')
     self.mock_folders.Create.Expect(self.ExpectedCreateRequest(),
                                     test_create_operation)

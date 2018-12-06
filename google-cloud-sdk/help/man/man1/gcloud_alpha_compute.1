@@ -33,9 +33,9 @@ https://cloud.google.com/compute/docs/
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -51,6 +51,10 @@ help\fR for details.
 .TP 2m
 \fBaddresses\fR
 \fB(ALPHA)\fR Read and manipulate Google Compute Engine addresses.
+
+.TP 2m
+\fBallocations\fR
+\fB(ALPHA)\fR Manage Compute Engine zonal allocations.
 
 .TP 2m
 \fBbackend\-buckets\fR
@@ -116,6 +120,10 @@ instances.
 .TP 2m
 \fBinterconnects\fR
 \fB(ALPHA)\fR Read and manipulate Google Compute Engine interconnects.
+
+.TP 2m
+\fBmachine\-images\fR
+\fB(ALPHA)\fR Read and manage Google Compute Engine machine image resources.
 
 .TP 2m
 \fBmachine\-types\fR
@@ -230,10 +238,6 @@ instances.
 \fB(ALPHA)\fR Read and manipulate Google Compute Engine VPN Tunnels.
 
 .TP 2m
-\fBxpn\fR
-\fB(ALPHA)\fR Configure shared VPC.
-
-.TP 2m
 \fBzones\fR
 \fB(ALPHA)\fR List Google Compute Engine zones.
 
@@ -275,6 +279,12 @@ scp.
 .TP 2m
 \fBssh\fR
 \fB(ALPHA)\fR SSH into a virtual machine instance.
+
+.TP 2m
+\fBstart\-iap\-tunnel\fR
+\fB(ALPHA)\fR Starts a tunnel to the Cloud Identity\-Aware Proxy through which
+another process can create a connection (eg. SSH, RDP) to a Google Compute
+Engine instance.
 
 
 .RE

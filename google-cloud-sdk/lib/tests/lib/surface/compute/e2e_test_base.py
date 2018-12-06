@@ -219,7 +219,7 @@ class BaseTest(e2e_base.WithServiceAuth):
     self.GetNewErr()
     self.Run('compute instance-templates delete {} --quiet'.format(name))
     stderr = self.GetNewErr()
-    self.assertStartsWith(stderr, 'Deleted')
+    self.AssertErrContains(stderr, 'Deleted')
     return stderr
 
   def DeleteTargetPool(self, name):
@@ -236,7 +236,7 @@ class BaseTest(e2e_base.WithServiceAuth):
     self.GetNewErr()
     self.Run('compute http-health-checks delete {0} --quiet'.format(name))
     stderr = self.GetNewErr()
-    self.assertStartsWith(stderr, 'Deleted')
+    self.AssertErrContains(stderr, 'Deleted')
     return stderr
 
   def DeleteHttpsHealthCheck(self, name):
@@ -244,7 +244,7 @@ class BaseTest(e2e_base.WithServiceAuth):
     self.GetNewErr()
     self.Run('compute https-health-checks delete {0} --quiet'.format(name))
     stderr = self.GetNewErr()
-    self.assertStartsWith(stderr, 'Deleted')
+    self.AssertErrContains(stderr, 'Deleted')
     return stderr
 
   def DeleteBackendBucket(self, name):

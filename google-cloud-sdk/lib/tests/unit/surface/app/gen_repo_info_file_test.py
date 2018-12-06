@@ -28,6 +28,7 @@ from tests.lib import test_case
 from googlecloudsdk.third_party.appengine.tools import context_util
 
 
+@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
 class GenRepoInfoFileTest(sdk_test_base.WithTempCWD, cli_test_base.CliTestBase):
 
   def SetUp(self):

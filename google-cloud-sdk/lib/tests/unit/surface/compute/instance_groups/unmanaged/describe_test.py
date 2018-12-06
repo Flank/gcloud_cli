@@ -61,7 +61,7 @@ class UnmanagedInstanceGroupsDescribeTest(test_base.BaseTest,
             description: Test instance group
             fingerprint: MTIz
             instanceGroupManagerUri: https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroupManagers/group-1
-            isManaged: 'Yes'
+            isManaged: Yes
             name: group-1
             namedPorts:
             - name: serv-1
@@ -105,7 +105,7 @@ class UnmanagedInstanceGroupsDescribeTest(test_base.BaseTest,
             creationTimestamp: '2013-09-06T17:54:10.636-07:00'
             description: Test instance group
             fingerprint: MTIz
-            isManaged: 'No'
+            isManaged: No
             name: group-1
             namedPorts:
             - name: serv-1

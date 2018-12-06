@@ -22,23 +22,21 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudiot import registries as registries_api
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class RegistriesDescribeTest(base.CloudIotBase):
+class RegistriesDescribeTestGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.registries_client = registries_api.RegistriesClient(self.client,
                                                              self.messages)
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def testDescribe(self, track):
-    self.track = track
+  def testDescribe(self):
     registry_name = 'projects/{}/locations/us-central1/registries/{}'.format(
         self.Project(), 'my-registry')
     registry = self.messages.DeviceRegistry(name=registry_name)
@@ -52,8 +50,7 @@ class RegistriesDescribeTest(base.CloudIotBase):
 
     self.assertEqual(result, registry)
 
-  def testDescribe_RelativeName(self, track):
-    self.track = track
+  def testDescribe_RelativeName(self):
     registry_name = 'projects/{}/locations/us-central1/registries/{}'.format(
         self.Project(), 'my-registry')
     registry = self.messages.DeviceRegistry(name=registry_name)
@@ -66,6 +63,18 @@ class RegistriesDescribeTest(base.CloudIotBase):
         'iot registries describe {}'.format(registry_name))
 
     self.assertEqual(result, registry)
+
+
+class RegistriesDescribeTestBeta(RegistriesDescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class RegistriesDescribeTestAlpha(RegistriesDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

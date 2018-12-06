@@ -15,9 +15,11 @@
 
 """Command strings for 'gcloud firebase test ios' unit and end-2-end tests."""
 
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
-IOS_PREFIX = 'alpha firebase test ios '
+IOS_PREFIX = 'firebase test ios '
 IOS_TEST_RUN = IOS_PREFIX + 'run '
 IOS_MODELS_LIST = IOS_PREFIX + 'models list '
 IOS_MODELS_DESCRIBE = IOS_PREFIX + 'models describe '

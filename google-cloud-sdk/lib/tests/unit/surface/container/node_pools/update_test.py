@@ -70,10 +70,9 @@ class UpdateTestGA(base.GATestBase, base.NodePoolsTestBase):
     self.assertEqual(result.management.autoUpgrade, None)
 
     self.AssertErrContains("""This will enable the autorepair feature for \
-nodes. Please see
-https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more
+nodes. Please see \
+https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more \
 information on node autorepairs.
-
 {{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/{1}/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION, location))
@@ -109,10 +108,9 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/{1}
     self.assertEqual(result.management.autoRepair, False)
     self.assertEqual(result.management.autoUpgrade, True)
     self.AssertErrContains("""This will disable the autorepair feature for \
-nodes. Please see
-https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more
+nodes. Please see \
+https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more \
 information on node autorepairs.
-
 {{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
@@ -144,10 +142,9 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     self.assertEqual(result.management.autoRepair, None)
     self.assertEqual(result.management.autoUpgrade, True)
     self.AssertErrContains("""This will enable the autoupgrade feature for \
-nodes. Please see
-https://cloud.google.com/kubernetes-engine/docs/node-management for more
+nodes. Please see \
+https://cloud.google.com/kubernetes-engine/docs/node-management for more \
 information on node autoupgrades.
-
 {{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
@@ -179,10 +176,9 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     self.assertEqual(result.management.autoRepair, True)
     self.assertEqual(result.management.autoUpgrade, False)
     self.AssertErrContains("""This will disable the autoupgrade feature for \
-nodes. Please see
-https://cloud.google.com/kubernetes-engine/docs/node-management for more
+nodes. Please see \
+https://cloud.google.com/kubernetes-engine/docs/node-management for more \
 information on node autoupgrades.
-
 {{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
@@ -227,10 +223,9 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     self.assertEqual(result.management.autoRepair, None)
     self.assertEqual(result.management.autoUpgrade, True)
     self.AssertErrContains("""This will enable the autoupgrade feature for \
-nodes. Please see
-https://cloud.google.com/kubernetes-engine/docs/node-management for more
+nodes. Please see \
+https://cloud.google.com/kubernetes-engine/docs/node-management for more \
 information on node autoupgrades.
-
 {{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))

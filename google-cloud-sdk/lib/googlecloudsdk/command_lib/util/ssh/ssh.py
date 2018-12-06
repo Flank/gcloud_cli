@@ -26,6 +26,7 @@ import re
 import enum
 
 from googlecloudsdk.api_lib.oslogin import client as oslogin_client
+from googlecloudsdk.command_lib.oslogin import oslogin_utils
 from googlecloudsdk.command_lib.util import gaia
 from googlecloudsdk.core import config
 from googlecloudsdk.core import exceptions as core_exceptions
@@ -304,7 +305,7 @@ class Keys(object):
           expansion.
       env: Environment, Current environment or None to infer from current.
     """
-    private_key_file = os.path.realpath(os.path.expanduser(key_file))
+    private_key_file = os.path.realpath(files.ExpandHomeDir(key_file))
     self.dir = os.path.dirname(private_key_file)
     self.env = env or Environment.Current()
     # TODO(b/71388306): Enums aren't handled well by pytype.
@@ -530,7 +531,7 @@ class KnownHosts(object):
   """
 
   # TODO(b/33467618): Rename the file itself
-  DEFAULT_PATH = os.path.realpath(os.path.expanduser(
+  DEFAULT_PATH = os.path.realpath(files.ExpandHomeDir(
       os.path.join('~', '.ssh', 'google_compute_known_hosts')))
 
   def __init__(self, known_hosts, file_path):
@@ -698,14 +699,22 @@ def CheckForOsloginAndGetUser(instance, project, requested_user, public_key,
         'in the {0} version of gcloud.'.format(release_track.id))
     return requested_user, use_oslogin
   user_email = properties.VALUES.core.account.Get()
-  login_profile = oslogin.ImportSshPublicKey(user_email, public_key)
+
+  # Check to see if public key is already in profile, and import if not.
+  login_profile = oslogin.GetLoginProfile(user_email, project.name)
+  keys = oslogin_utils.GetKeyDictionaryFromProfile(
+      user_email, oslogin, profile=login_profile)
+  fingerprint = oslogin_utils.FindKeyInKeyList(public_key, keys)
+  if not fingerprint:
+    import_response = oslogin.ImportSshPublicKey(user_email, public_key)
+    login_profile = import_response.loginProfile
   use_oslogin = True
 
   # Get the username for the oslogin user. If the username is the same as the
   # default user, return that one. Otherwise, return the 'primary' username.
   # If no 'primary' exists, return the first username.
   oslogin_user = None
-  for pa in login_profile.loginProfile.posixAccounts:
+  for pa in login_profile.posixAccounts:
     oslogin_user = oslogin_user or pa.username
     if pa.username == requested_user:
       return requested_user, use_oslogin
@@ -854,7 +863,7 @@ class KeygenCommand(object):
     if env.suite is Suite.OPENSSH:
       prompt_passphrase = self.allow_passphrase and console_io.CanPrompt()
       if not prompt_passphrase:
-        args.extend(['-P', ''])  # Empty passphrase
+        args.extend(['-N', ''])  # Empty passphrase
       args.extend(['-t', 'rsa', '-f', self.identity_file])
     else:
       args.append(self.identity_file)
@@ -910,7 +919,7 @@ class SSHCommand(object):
 
     Args:
       remote: Remote, the remote to connect to.
-      port: int, port.
+      port: str, port.
       identity_file: str, path to private key file.
       options: {str: str}, options (`-o`) for OpenSSH, see `ssh_config(5)`.
       extra_flags: [str], extra flags to append to ssh invocation. Both binary
@@ -1057,7 +1066,7 @@ class SCPCommand(object):
         source, this must be local, and vice versa.
       recursive: bool, recursive directory copy.
       compress: bool, enable compression.
-      port: int, port.
+      port: str, port.
       identity_file: str, path to private key file.
       options: {str: str}, options (`-o`) for OpenSSH, see `ssh_config(5)`.
       extra_flags: [str], extra flags to append to scp invocation. Both binary
@@ -1210,7 +1219,7 @@ class SSHPoller(object):
 
     Args:
       remote: Remote, the remote to poll.
-      port: int, port to poll.
+      port: str, port to poll.
       identity_file: str, path to private key file.
       options: {str: str}, options (`-o`) for OpenSSH, see `ssh_config(5)`.
       extra_flags: [str], extra flags to append to ssh invocation. Both binary

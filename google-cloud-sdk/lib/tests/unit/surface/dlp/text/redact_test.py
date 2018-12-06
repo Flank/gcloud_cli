@@ -131,6 +131,7 @@ class RedactTest(base.DlpUnitTestBase):
 
     self.assertEqual(redact_response, self.Run(cmd))
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testRedactWithContentAndFileFails(self, track):
     self.track = track
@@ -142,6 +143,7 @@ class RedactTest(base.DlpUnitTestBase):
                '--content-file {} --info-types PHONE_NUMBER,PERSON_NAME '
                '--remove-findings'.format(test_file))
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testRedactWithMultipleRedactOptionsFails(self, track):
     self.track = track

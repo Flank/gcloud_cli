@@ -32,13 +32,8 @@ class CreateTest(base.DlpUnitTestBase):
   @parameterized.named_parameters(
       ('DefaultGCSTrigger', calliope_base.ReleaseTrack.ALPHA, 'my_gcs_trigger',
        None, None, ['PHONE_NUMBER', 'PERSON_NAME'], None, None, None, None,
-       None, ['test.ds.table'], None, '84000s',
+       None, 'test.ds.table', None, '84000s',
        {'gcs_bucket': 'gs://my-bucket/'}, 'gcs'),
-
-      ('DefaultGCSTriggerMultipleOutput', calliope_base.ReleaseTrack.ALPHA,
-       'my_gcs_trigger', None, None, ['PHONE_NUMBER', 'PERSON_NAME'], None,
-       None, None, None, None, ['test.ds.table1', 'test.ds.table2'], None,
-       '84000s', {'gcs_bucket': 'gs://my-bucket/'}, 'gcs'),
 
       ('DataStoreTrigger', calliope_base.ReleaseTrack.ALPHA,
        'my_ds_trigger', 'My Description', 'My-Trigger',
@@ -46,15 +41,15 @@ class CreateTest(base.DlpUnitTestBase):
        None, ['topic1', 'topic2'], '84000s',
        {'ds_namespace_id': 'My', 'ds_kind': 'dskind'}, 'datastore'),
 
-      ('BigTableTrigger', calliope_base.ReleaseTrack.ALPHA,
+      ('BigQueryTrigger', calliope_base.ReleaseTrack.ALPHA,
        'my_bt_trigger', None, None, ['PHONE_NUMBER', 'PERSON_NAME'], None,
-       None, None, None, None, ['test.ds.table1', 'test.ds.table2'], None,
+       None, None, None, None, 'test.ds.table1', None,
        '84000s', {'bt_data_set_id': 'mydataset', 'bt_table_id': 'mytable'},
        'table'),
   )
   def testCreate(self, track, trigger_name, description, display_name,
                  info_types, min_likelihood, max_findings, max_findings_item,
-                 include_quote, exclude_info_types, output_tables,
+                 include_quote, exclude_info_types, output_table,
                  output_topics, schedule, input_params, input_type):
     self.track = track
     input_params['project_id'] = self.Project()
@@ -75,7 +70,7 @@ class CreateTest(base.DlpUnitTestBase):
         input_params=input_params,
         input_type=input_type,
         output_topics=output_topics,
-        output_tables=output_tables,
+        output_table=output_table,
         duration=schedule
     )
 
@@ -106,8 +101,8 @@ class CreateTest(base.DlpUnitTestBase):
       input_flag = '--datastore-kind {}:{}'.format(
           input_params['ds_namespace_id'], input_params['ds_kind'])
 
-    if output_tables:
-      output_flag = '--output-tables {}'.format(','.join(output_tables))
+    if output_table:
+      output_flag = '--output-table ' + output_table
     else:  # topics
       output_flag = '--output-topics {}'.format(','.join(output_topics))
 
@@ -131,10 +126,13 @@ class CreateTest(base.DlpUnitTestBase):
                              item_findings=item_findings_flag,
                              likelihood=likelihood_flag)))
 
-  @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'foo',
-                             'given value must be of the form INTEGER[UNIT]'),
-                            (calliope_base.ReleaseTrack.ALPHA, '100M',
-                             'unit must be one of s, m, h, d; received: M'))
+  @parameterized.parameters(
+      (calliope_base.ReleaseTrack.ALPHA, 'foo',
+       "argument --trigger-schedule: Failed to parse duration: "
+       "Duration unit 'foo' must be preceded by a number"),
+      (calliope_base.ReleaseTrack.ALPHA, '100X',
+       "argument --trigger-schedule: Failed to parse duration: "
+       "Unknown character 'X' in duration"))
   def testCreateBadScheduleFails(self, track, schedule, error):
     self.track = track
     with self.AssertRaisesExceptionMatches(
@@ -144,6 +142,7 @@ class CreateTest(base.DlpUnitTestBase):
                '--input-table test.fake.foo -output-topics topic'.format(
                    schedule))
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA,
                              'too.many.seg.ments'),
                             (calliope_base.ReleaseTrack.ALPHA,
@@ -160,16 +159,17 @@ class CreateTest(base.DlpUnitTestBase):
                '--input-table {} --output-topics topic'.format(
                    tablename))
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testCreateWithTableNameAndTopicFails(self, track):
     self.track = track
     with self.AssertRaisesExceptionMatches(
         cli_test_base.MockArgumentError,
-        'Exactly one of (--output-tables | --output-topics) '
+        'Exactly one of (--output-table | --output-topics) '
         'must be specified.'):
       self.Run('dlp job-triggers create test-trigger '
                '--info-types PHONE_NUMBER --trigger-schedule 100h '
-               '--input-table my.tab.le --output-tables not.that.good '
+               '--input-table my.tab.le --output-table not.that.good '
                '--output-topics topic')
 
 

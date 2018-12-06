@@ -79,14 +79,14 @@ class DescribeTest(base.Base, cli_test_base.CliTestBase):
         ['foo.projects.clusters', 'foo.projects.clusters.instances'])
 
   def testMethodCompletion(self):
-    self.MockGetListCreateMethods(('foo.projects.clusters', False),
-                                  ('bar.projects.clusters', True))
+    self.MockCRUDMethods(('foo.projects.clusters', False),
+                         ('bar.projects.clusters', True))
     self.RunCompletion(
         'meta apis methods describe --collection foo.projects.clusters ',
-        ['get', 'list', 'create'])
+        ['get', 'patch', 'list', 'create'])
     self.RunCompletion(
         'meta apis methods describe --collection bar.projects.clusters ',
-        ['get', 'list', 'create'])
+        ['get', 'patch', 'list', 'create'])
 
 
 if __name__ == '__main__':

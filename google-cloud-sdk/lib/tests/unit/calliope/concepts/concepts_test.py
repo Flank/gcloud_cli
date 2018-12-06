@@ -46,10 +46,10 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
 
     # Check that attributes have correct defaults, and name and anchor are
     # stored correctly.
-    self.assertEqual([concepts.Attribute(name='projectsId',
+    self.assertEqual([concepts.Attribute(name='projects_id',
                                          help_text=None,
                                          required=True),
-                      concepts.Attribute(name='shelvesId',
+                      concepts.Attribute(name='shelves_id',
                                          help_text=None,
                                          required=True),
                       concepts.Attribute(name='name',
@@ -63,8 +63,8 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
             required=True),
         resource_spec.anchor)
     # Check that the param names for each attribute are stored correctly.
-    self.assertEqual('projectsId', resource_spec.ParamName('projectsId'))
-    self.assertEqual('shelvesId', resource_spec.ParamName('shelvesId'))
+    self.assertEqual('projectsId', resource_spec.ParamName('projects_id'))
+    self.assertEqual('shelvesId', resource_spec.ParamName('shelves_id'))
     self.assertEqual('booksId', resource_spec.ParamName('name'))
 
   @parameterized.named_parameters(
@@ -75,6 +75,16 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
         'example.projects.shelves.books',
         **kwargs)
     self.assertEqual(resource_spec.name, expected_name)
+
+  def testResourceSpecInvalidAttributeName(self):
+    """Raises ValueError if attribute name has a capital letter."""
+    with self.AssertRaisesExceptionMatches(ValueError, '[projectName]'):
+      concepts.ResourceSpec(
+          'example.projects.shelves.books',
+          resource_name='book',
+          projectsId=concepts.ResourceParameterAttributeConfig(
+              name='projectName',
+              help_text='help'))
 
   def testNoParamsCollectionRaises(self):
     """Tests creating resource from the collection with no config overrides."""
@@ -195,6 +205,10 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
     self.assertEqual('projectsId', resource_spec.ParamName('project'))
     self.assertEqual('shelvesId', resource_spec.ParamName('shelf'))
     self.assertEqual('booksId', resource_spec.ParamName('book'))
+    with self.assertRaisesRegex(
+        ValueError,
+        re.escape('[book, project, shelf]')):
+      resource_spec.ParamName('junk')
 
   def testResourceSpecAttributeName(self):
     """Tests using ResourceParameterAttributeConfig to configure resources.
@@ -301,8 +315,8 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
         'The [book] resource is not properly specified.\n'
         'Failed to find attribute [project]. The attribute can be set in the '
         'following ways: \n'
-        '- provide the flag [--book-project] on the command line\n'
-        '- provide the flag [--project] on the command line\n'
+        '- provide the argument [--book-project] on the command line\n'
+        '- provide the argument [--project] on the command line\n'
         '- set the property [core/project]')
     with self.assertRaisesRegex(concepts.InitializationError, msg):
       resource_spec.Initialize(fallthroughs_map, parsed_args=parsed_args)
@@ -353,6 +367,129 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
                                base_fallthroughs_map,
                                parsed_args=parsed_args,
                                allow_empty=False)
+
+  def testCreateAttributeConfigFromData(self):
+    attribute_config = concepts.ResourceParameterAttributeConfig.FromData(
+        {
+            'parameter_name': 'projectsId',
+            'attribute_name': 'project',
+            'help': 'help1',
+            'prop': 'core/project',
+            'completion_id_field': 'id',
+            'completion_request_params': [{
+                'fieldName': 'fieldMask',
+                'value': 'name'}]})
+    self.assertEqual('project', attribute_config.attribute_name)
+    self.assertEqual(None, attribute_config.completer)
+    self.assertEqual('id', attribute_config.completion_id_field)
+    self.assertEqual({'fieldMask': 'name'},
+                     attribute_config.completion_request_params)
+    self.assertEqual('projectsId', attribute_config.parameter_name)
+    self.assertEqual(
+        [
+            deps.ArgFallthrough('--project'),
+            deps.PropertyFallthrough(properties.VALUES.core.project)],
+        attribute_config.fallthroughs)
+
+  def testCreateResourceSpecFromYaml(self):
+    yaml = {
+        'disable_auto_completers':
+            False,
+        'name':
+            'device',
+        'request_id_field':
+            'device.id',
+        'attributes': [{
+            'attribute_name': 'region',
+            'help': 'The name of the Cloud IoT region.',
+            'parameter_name': 'locationsId'
+        },
+                       {
+                           'attribute_name': 'registry',
+                           'help': 'The name of the Cloud IoT registry.',
+                           'parameter_name': 'registriesId'
+                       },
+                       {
+                           'attribute_name':
+                               'device',
+                           'help':
+                               'The name of the Cloud IoT device.,',
+                           'completion_request_params': [{
+                               'value': 'name',
+                               'fieldName': 'fieldMask'
+                           }],
+                           'completion_id_field':
+                               'id',
+                           'parameter_name':
+                               'devicesId'
+                       }],
+        'collection':
+            'cloudiot.projects.locations.registries.devices'
+    }
+    spec = concepts.ResourceSpec.FromYaml(yaml)
+    self.assertEqual(None, spec.plural_name)
+    self.assertEqual('cloudiot.projects.locations.registries.devices',
+                     spec.collection)
+    self.assertEqual(4, len(spec.attributes))
+    self.assertEqual('device', spec.name)
+    self.assertEqual(spec.attributes[3], spec.anchor)
+
+  def testParseAttributesFromData(self):
+    data = [
+        {
+            'attribute_name': 'region',
+            'help': 'The name of the Cloud IoT region.',
+            'parameter_name': 'locationsId'
+        },
+        {
+            'attribute_name': 'registry',
+            'help': 'The name of the Cloud IoT registry.',
+            'parameter_name': 'registriesId'
+        },
+    ]
+    parsed_attributes = concepts.ParseAttributesFromData(
+        data, ['projectsId', 'locationsId', 'registriesId'])
+    self.assertEqual(3, len(parsed_attributes))
+    self.assertEqual('project', parsed_attributes[0].attribute_name)
+    self.assertEqual('projectsId', parsed_attributes[0].parameter_name)
+    self.assertEqual('region', parsed_attributes[1].attribute_name)
+    self.assertEqual('locationsId', parsed_attributes[1].parameter_name)
+    self.assertEqual('registry', parsed_attributes[2].attribute_name)
+    self.assertEqual('registriesId', parsed_attributes[2].parameter_name)
+
+  def testParseAttributesFromDataInvalid(self):
+    with self.assertRaisesRegex(
+        concepts.InvalidResourceArgumentLists,
+        r'Invalid resource arguments: Expected \[\[projectsId\], instancesId\],'
+        r' Found \[\]'):
+      concepts.ParseAttributesFromData([], ['projectsId', 'instancesId'])
+
+    with self.assertRaisesRegex(
+        concepts.InvalidResourceArgumentLists,
+        r'Invalid resource arguments: Expected \[\[projectsId\], instancesId\],'
+        r' Found \[junk\]'):
+      concepts.ParseAttributesFromData(
+          [{
+              'parameter_name': 'junk',
+              'attribute_name': 'junk',
+              'help': 'h'
+          }],
+          ['projectsId', 'instancesId'],
+      )
+
+    with self.assertRaisesRegex(
+        concepts.InvalidResourceArgumentLists,
+        r'Invalid resource arguments: Expected \[\[projectsId\], instancesId\],'
+        r' Found \[instancesId, extraId\]'):
+      concepts.ParseAttributesFromData([{
+          'parameter_name': 'instancesId',
+          'attribute_name': 'instance',
+          'help': 'h'
+      }, {
+          'parameter_name': 'extraId',
+          'attribute_name': 'extra',
+          'help': 'h'
+      }], ['projectsId', 'instancesId'])
 
 
 if __name__ == '__main__':

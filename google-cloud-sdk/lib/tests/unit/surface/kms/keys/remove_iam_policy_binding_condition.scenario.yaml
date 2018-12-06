@@ -1,0 +1,87 @@
+title: kms keys remove-iam-policy-binding scenario test
+release_tracks: [ALPHA]
+
+actions:
+# remove binding with condition from a policy with condition
+- execute_command:
+    command: kms keys remove-iam-policy-binding frodo --project test-project --keyring fellowship --location global --member=user:owner@gmail.com --role=roles/non-primitive --condition=expression=expr,title=title,description=descr
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/test-project/locations/global/keyRings/fellowship/cryptoKeys/frodo:getIamPolicy?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:owner@gmail.com",
+                    "user:newowner@gmail.com"
+                  ],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/test-project/locations/global/keyRings/fellowship/cryptoKeys/frodo:setIamPolicy?alt=json
+          method: POST
+          body:
+            json:
+              policy:
+                bindings:
+                - role: 'roles/non-primitive'
+                  members: ['user:newowner@gmail.com']
+                  condition:
+                    expression: expr
+                    title: title
+                    description: descr
+                etag: 'etag'
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:newowner@gmail.com"
+                  ],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for key [frodo].
+    - expect_stdout: |
+        bindings:
+        - condition:
+            description: descr
+            expression: expr
+            title: title
+          members:
+          - user:newowner@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0

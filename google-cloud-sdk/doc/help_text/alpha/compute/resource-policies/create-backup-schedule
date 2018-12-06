@@ -8,7 +8,7 @@ SYNOPSIS
         (--weekly-schedule-from-file=WEEKLY_CYCLE_FROM_FILE
           | --start-time=START_TIME (--daily-schedule | --hourly-schedule=HOURS
           | --weekly-schedule=WEEKLY_CYCLE)) [--description=DESCRIPTION]
-        [--region=REGION]
+        [--on-source-disk-delete=ON_SOURCE_DISK_DELETE] [--region=REGION]
         [--guest-flush
           --snapshot-labels=[KEY=VALUE,...] --storage-location=LOCATION]
         [GCLOUD_WIDE_FLAG ...]
@@ -64,6 +64,17 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the backend.
 
+     --on-source-disk-delete=ON_SOURCE_DISK_DELETE
+        Retention behavior of automatic snapshots in the event of source disk
+        deletion. ON_SOURCE_DISK_DELETE must be one of:
+
+         apply-retention-policy
+            Continue to apply the retention window to automatically-created
+            snapshots when the source disk is deleted.
+         keep-auto-snapshots
+            Keep automatically-created snapshots when the source disk is
+            deleted. This is the default behavior.
+
      --region=REGION
         Region of the resource policy to operate on. If not specified, you may
         be prompted to select a region.
@@ -107,8 +118,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

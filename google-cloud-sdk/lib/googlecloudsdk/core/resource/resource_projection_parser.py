@@ -14,6 +14,8 @@
 # limitations under the License.
 
 """A class for parsing a resource projection expression."""
+# TODO(b/113319639): Temporary skip to get pytype enabled.
+# pytype: skip-file
 
 from __future__ import absolute_import
 from __future__ import division
@@ -105,6 +107,8 @@ class Parser(object):
       skip_reorder: Don't reorder this attribute in the next _Reorder().
       subformat: Sub-format string.
       transform: obj = func(obj,...) function applied during projection.
+      width: Fixed column width.
+      wrap: Column can be wrapped if True.
     """
 
     def __init__(self, flag):
@@ -118,6 +122,7 @@ class Parser(object):
       self.skip_reorder = False
       self.subformat = None
       self.transform = None
+      self.width = None
       self.wrap = None
 
     def __str__(self):
@@ -253,6 +258,10 @@ class Parser(object):
       attribute.transform = attribute_add.transform
     if attribute_add.subformat:
       attribute.subformat = attribute_add.subformat
+    if attribute_add.width is not None:
+      attribute.width = attribute_add.width
+    elif attribute.width is None:
+      attribute.width = False
     if attribute_add.wrap is not None:
       attribute.wrap = attribute_add.wrap
     elif attribute.wrap is None:
@@ -350,6 +359,8 @@ class Parser(object):
         attribute.reverse = value
       elif name == 'sort':
         attribute.order = value
+      elif name == 'width':
+        attribute.width = value
       elif name == 'wrap':
         attribute.wrap = value
       else:

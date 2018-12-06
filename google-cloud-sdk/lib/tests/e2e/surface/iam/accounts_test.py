@@ -59,7 +59,7 @@ class AccountsTest(e2e_test_base.ServiceAccountBaseTest):
         'iam service-accounts update {email} '
         '--display-name "Updated Account"')
     self.AssertErrEquals(
-        'Updated service account [{0}].\n'.format(self.email))
+        'Updated serviceAccount [{0}].\n'.format(self.email))
 
     self.ClearOutputs()
     self.RunFormat('iam service-accounts describe {email}')

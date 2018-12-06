@@ -298,6 +298,8 @@ class BackendRule(_messages.Message):
       requests is 5 seconds.
     minDeadline: Minimum deadline in seconds needed for this method. Calls
       having deadline value lower than this will be rejected.
+    operationDeadline: The number of seconds to wait for the completion of a
+      long running operation. The default is no deadline.
     selector: Selects the methods to which this rule applies.  Refer to
       selector for syntax details.
   """
@@ -305,7 +307,8 @@ class BackendRule(_messages.Message):
   address = _messages.StringField(1)
   deadline = _messages.FloatField(2)
   minDeadline = _messages.FloatField(3)
-  selector = _messages.StringField(4)
+  operationDeadline = _messages.FloatField(4)
+  selector = _messages.StringField(5)
 
 
 class Billing(_messages.Message):
@@ -400,7 +403,7 @@ class CompositeOperationMetadata(_messages.Message):
       operation will contribute. Each key of the map is the name of a child
       operation. Each value is a field mask that identifies what that child
       operation contributes to the response, for example, "quota_settings",
-      "visiblity_settings", etc.
+      "visibility_settings", etc.
 
   Fields:
     childOperations: The child operations. The details of the asynchronous
@@ -416,7 +419,7 @@ class CompositeOperationMetadata(_messages.Message):
       will contribute. Each key of the map is the name of a child operation.
       Each value is a field mask that identifies what that child operation
       contributes to the response, for example, "quota_settings",
-      "visiblity_settings", etc.
+      "visibility_settings", etc.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -450,7 +453,7 @@ class CompositeOperationMetadata(_messages.Message):
     r"""Defines which part of the response a child operation will contribute.
     Each key of the map is the name of a child operation. Each value is a
     field mask that identifies what that child operation contributes to the
-    response, for example, "quota_settings", "visiblity_settings", etc.
+    response, for example, "quota_settings", "visibility_settings", etc.
 
     Messages:
       AdditionalProperty: An additional property for a ResponseFieldMasksValue
@@ -663,68 +666,6 @@ class Control(_messages.Message):
   """
 
   environment = _messages.StringField(1)
-
-
-class ConvertConfigRequest(_messages.Message):
-  r"""Request message for `ConvertConfig` method.
-
-  Messages:
-    ConfigSpecValue: Input configuration For this version of API, the
-      supported type is OpenApiSpec
-
-  Fields:
-    configSpec: Input configuration For this version of API, the supported
-      type is OpenApiSpec
-    openApiSpec: The OpenAPI specification for an API.
-    serviceName: The service name to use for constructing the normalized
-      service configuration equivalent of the provided configuration
-      specification.
-    swaggerSpec: The swagger specification for an API.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class ConfigSpecValue(_messages.Message):
-    r"""Input configuration For this version of API, the supported type is
-    OpenApiSpec
-
-    Messages:
-      AdditionalProperty: An additional property for a ConfigSpecValue object.
-
-    Fields:
-      additionalProperties: Properties of the object. Contains field @type
-        with type URL.
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a ConfigSpecValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A extra_types.JsonValue attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.MessageField('extra_types.JsonValue', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  configSpec = _messages.MessageField('ConfigSpecValue', 1)
-  openApiSpec = _messages.MessageField('OpenApiSpec', 2)
-  serviceName = _messages.StringField(3)
-  swaggerSpec = _messages.MessageField('SwaggerSpec', 4)
-
-
-class ConvertConfigResponse(_messages.Message):
-  r"""Response message for `ConvertConfig` method.
-
-  Fields:
-    diagnostics: Any errors or warnings that occured during config conversion.
-    serviceConfig: The service configuration. Not set if errors occured during
-      conversion.
-  """
-
-  diagnostics = _messages.MessageField('Diagnostic', 1, repeated=True)
-  serviceConfig = _messages.MessageField('Service', 2)
 
 
 class CustomError(_messages.Message):
@@ -1272,18 +1213,6 @@ class Field(_messages.Message):
   typeUrl = _messages.StringField(10)
 
 
-class File(_messages.Message):
-  r"""A single swagger specification file.
-
-  Fields:
-    contents: The contents of the swagger spec file.
-    path: The relative path of the swagger spec file.
-  """
-
-  contents = _messages.StringField(1)
-  path = _messages.StringField(2)
-
-
 class GenerateConfigReportRequest(_messages.Message):
   r"""Request message for GenerateConfigReport method.
 
@@ -1410,144 +1339,177 @@ class Http(_messages.Message):
 
 
 class HttpRule(_messages.Message):
-  r"""`HttpRule` defines the mapping of an RPC method to one or more HTTP REST
-  API methods. The mapping specifies how different portions of the RPC request
-  message are mapped to URL path, URL query parameters, and HTTP request body.
-  The mapping is typically specified as an `google.api.http` annotation on the
-  RPC method, see "google/api/annotations.proto" for details.  The mapping
-  consists of a field specifying the path template and method kind.  The path
-  template can refer to fields in the request message, as in the example below
-  which describes a REST GET operation on a resource collection of messages:
-  service Messaging {       rpc GetMessage(GetMessageRequest) returns
-  (Message) {         option (google.api.http).get =
-  "/v1/messages/{message_id}/{sub.subfield}";       }     }     message
-  GetMessageRequest {       message SubMessage {         string subfield = 1;
-  }       string message_id = 1; // mapped to the URL       SubMessage sub =
-  2;    // `sub.subfield` is url-mapped     }     message Message {
-  string text = 1; // content of the resource     }  The same http annotation
-  can alternatively be expressed inside the `GRPC API Configuration` YAML
-  file.      http:       rules:         - selector:
-  <proto_package_name>.Messaging.GetMessage           get:
-  /v1/messages/{message_id}/{sub.subfield}  This definition enables an
-  automatic, bidrectional mapping of HTTP JSON to RPC. Example:  HTTP | RPC
-  -----|----- `GET /v1/messages/123456/foo`  | `GetMessage(message_id:
-  "123456" sub: SubMessage(subfield: "foo"))`  In general, not only fields but
-  also field paths can be referenced from a path pattern. Fields mapped to the
-  path pattern cannot be repeated and must have a primitive (non-message)
-  type.  Any fields in the request message which are not bound by the path
-  pattern automatically become (optional) HTTP query parameters. Assume the
-  following definition of the request message:       service Messaging {
-  rpc GetMessage(GetMessageRequest) returns (Message) {         option
-  (google.api.http).get = "/v1/messages/{message_id}";       }     }
-  message GetMessageRequest {       message SubMessage {         string
-  subfield = 1;       }       string message_id = 1; // mapped to the URL
-  int64 revision = 2;    // becomes a parameter       SubMessage sub = 3;
-  // `sub.subfield` becomes a parameter     }   This enables a HTTP JSON to
-  RPC mapping as below:  HTTP | RPC -----|----- `GET
+  r"""# gRPC Transcoding  gRPC Transcoding is a feature for mapping between a
+  gRPC method and one or more HTTP REST endpoints. It allows developers to
+  build a single API service that supports both gRPC APIs and REST APIs. Many
+  systems, including [Google APIs](https://github.com/googleapis/googleapis),
+  [Cloud Endpoints](https://cloud.google.com/endpoints), [gRPC
+  Gateway](https://github.com/grpc-ecosystem/grpc-gateway), and
+  [Envoy](https://github.com/envoyproxy/envoy) proxy support this feature and
+  use it for large scale production services.  `HttpRule` defines the schema
+  of the gRPC/REST mapping. The mapping specifies how different portions of
+  the gRPC request message are mapped to the URL path, URL query parameters,
+  and HTTP request body. It also controls how the gRPC response message is
+  mapped to the HTTP response body. `HttpRule` is typically specified as an
+  `google.api.http` annotation on the gRPC method.  Each mapping specifies a
+  URL path template and an HTTP method. The path template may refer to one or
+  more fields in the gRPC request message, as long as each field is a non-
+  repeated field with a primitive (non-message) type. The path template
+  controls how fields of the request message are mapped to the URL path.
+  Example:      service Messaging {       rpc GetMessage(GetMessageRequest)
+  returns (Message) {         option (google.api.http) = {             get:
+  "/v1/{name=messages/*}"         };       }     }     message
+  GetMessageRequest {       string name = 1; // Mapped to URL path.     }
+  message Message {       string text = 1; // The resource content.     }
+  This enables an HTTP REST to gRPC mapping as below:  HTTP | gRPC -----|-----
+  `GET /v1/messages/123456`  | `GetMessage(name: "messages/123456")`  Any
+  fields in the request message which are not bound by the path template
+  automatically become HTTP query parameters if there is no HTTP request body.
+  For example:      service Messaging {       rpc
+  GetMessage(GetMessageRequest) returns (Message) {         option
+  (google.api.http) = {             get:"/v1/messages/{message_id}"         };
+  }     }     message GetMessageRequest {       message SubMessage {
+  string subfield = 1;       }       string message_id = 1; // Mapped to URL
+  path.       int64 revision = 2;    // Mapped to URL query parameter
+  `revision`.       SubMessage sub = 3;    // Mapped to URL query parameter
+  `sub.subfield`.     }  This enables a HTTP JSON to RPC mapping as below:
+  HTTP | gRPC -----|----- `GET
   /v1/messages/123456?revision=2&sub.subfield=foo` | `GetMessage(message_id:
   "123456" revision: 2 sub: SubMessage(subfield: "foo"))`  Note that fields
-  which are mapped to HTTP parameters must have a primitive type or a repeated
-  primitive type. Message types are not allowed. In the case of a repeated
-  type, the parameter can be repeated in the URL, as in `...?param=A&param=B`.
-  For HTTP method kinds which allow a request body, the `body` field specifies
-  the mapping. Consider a REST update method on the message resource
-  collection:       service Messaging {       rpc
+  which are mapped to URL query parameters must have a primitive type or a
+  repeated primitive type or a non-repeated message type. In the case of a
+  repeated type, the parameter can be repeated in the URL as
+  `...?param=A&param=B`. In the case of a message type, each field of the
+  message is mapped to a separate parameter, such as
+  `...?foo.a=A&foo.b=B&foo.c=C`.  For HTTP methods that allow a request body,
+  the `body` field specifies the mapping. Consider a REST update method on the
+  message resource collection:      service Messaging {       rpc
   UpdateMessage(UpdateMessageRequest) returns (Message) {         option
-  (google.api.http) = {           put: "/v1/messages/{message_id}"
+  (google.api.http) = {           patch: "/v1/messages/{message_id}"
   body: "message"         };       }     }     message UpdateMessageRequest {
   string message_id = 1; // mapped to the URL       Message message = 2;   //
-  mapped to the body     }   The following HTTP JSON to RPC mapping is
-  enabled, where the representation of the JSON in the request body is
-  determined by protos JSON encoding:  HTTP | RPC -----|----- `PUT
-  /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id: "123456"
-  message { text: "Hi!" })`  The special name `*` can be used in the body
-  mapping to define that every field not bound by the path template should be
-  mapped to the request body.  This enables the following alternative
-  definition of the update method:      service Messaging {       rpc
-  UpdateMessage(Message) returns (Message) {         option (google.api.http)
-  = {           put: "/v1/messages/{message_id}"           body: "*"
-  };       }     }     message Message {       string message_id = 1;
-  string text = 2;     }   The following HTTP JSON to RPC mapping is enabled:
-  HTTP | RPC -----|----- `PUT /v1/messages/123456 { "text": "Hi!" }` |
-  `UpdateMessage(message_id: "123456" text: "Hi!")`  Note that when using `*`
-  in the body mapping, it is not possible to have HTTP parameters, as all
-  fields not bound by the path end in the body. This makes this option more
-  rarely used in practice of defining REST APIs. The common usage of `*` is in
-  custom methods which don't use the URL at all for transferring data.  It is
-  possible to define multiple HTTP methods for one RPC by using the
-  `additional_bindings` option. Example:      service Messaging {       rpc
-  GetMessage(GetMessageRequest) returns (Message) {         option
-  (google.api.http) = {           get: "/v1/messages/{message_id}"
-  additional_bindings {             get:
+  mapped to the body     }  The following HTTP JSON to RPC mapping is enabled,
+  where the representation of the JSON in the request body is determined by
+  protos JSON encoding:  HTTP | gRPC -----|----- `PATCH /v1/messages/123456 {
+  "text": "Hi!" }` | `UpdateMessage(message_id: "123456" message { text: "Hi!"
+  })`  The special name `*` can be used in the body mapping to define that
+  every field not bound by the path template should be mapped to the request
+  body.  This enables the following alternative definition of the update
+  method:      service Messaging {       rpc UpdateMessage(Message) returns
+  (Message) {         option (google.api.http) = {           patch:
+  "/v1/messages/{message_id}"           body: "*"         };       }     }
+  message Message {       string message_id = 1;       string text = 2;     }
+  The following HTTP JSON to RPC mapping is enabled:  HTTP | gRPC -----|-----
+  `PATCH /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id:
+  "123456" text: "Hi!")`  Note that when using `*` in the body mapping, it is
+  not possible to have HTTP parameters, as all fields not bound by the path
+  end in the body. This makes this option more rarely used in practice when
+  defining REST APIs. The common usage of `*` is in custom methods which don't
+  use the URL at all for transferring data.  It is possible to define multiple
+  HTTP methods for one RPC by using the `additional_bindings` option. Example:
+  service Messaging {       rpc GetMessage(GetMessageRequest) returns
+  (Message) {         option (google.api.http) = {           get:
+  "/v1/messages/{message_id}"           additional_bindings {             get:
   "/v1/users/{user_id}/messages/{message_id}"           }         };       }
   }     message GetMessageRequest {       string message_id = 1;       string
-  user_id = 2;     }   This enables the following two alternative HTTP JSON to
-  RPC mappings:  HTTP | RPC -----|----- `GET /v1/messages/123456` |
+  user_id = 2;     }  This enables the following two alternative HTTP JSON to
+  RPC mappings:  HTTP | gRPC -----|----- `GET /v1/messages/123456` |
   `GetMessage(message_id: "123456")` `GET /v1/users/me/messages/123456` |
-  `GetMessage(user_id: "me" message_id: "123456")`  # Rules for HTTP mapping
-  The rules for mapping HTTP path, query parameters, and body fields to the
-  request message are as follows:  1. The `body` field specifies either `*` or
-  a field path, or is    omitted. If omitted, it indicates there is no HTTP
-  request body. 2. Leaf fields (recursive expansion of nested messages in the
-  request) can be classified into three types:     (a) Matched in the URL
-  template.     (b) Covered by body (if body is `*`, everything except (a)
-  fields;         else everything under the body field)     (c) All other
-  fields. 3. URL query parameters found in the HTTP request are mapped to (c)
-  fields. 4. Any body sent with an HTTP request can contain only (b) fields.
-  The syntax of the path template is as follows:      Template = "/" Segments
+  `GetMessage(user_id: "me" message_id: "123456")`  ## Rules for HTTP mapping
+  1. Leaf request fields (recursive expansion nested messages in the request
+  message) are classified into three categories:    - Fields referred by the
+  path template. They are passed via the URL path.    - Fields referred by the
+  HttpRule.body. They are passed via the HTTP      request body.    - All
+  other fields are passed via the URL query parameters, and the      parameter
+  name is the field path in the request message. A repeated      field can be
+  represented as multiple query parameters under the same      name.  2. If
+  HttpRule.body is "*", there is no URL query parameter, all fields     are
+  passed via URL path and HTTP request body.  3. If HttpRule.body is omitted,
+  there is no HTTP request body, all     fields are passed via URL path and
+  URL query parameters.  ### Path template syntax      Template = "/" Segments
   [ Verb ] ;     Segments = Segment { "/" Segment } ;     Segment  = "*" |
   "**" | LITERAL | Variable ;     Variable = "{" FieldPath [ "=" Segments ]
   "}" ;     FieldPath = IDENT { "." IDENT } ;     Verb     = ":" LITERAL ;
-  The syntax `*` matches a single path segment. The syntax `**` matches zero
-  or more path segments, which must be the last part of the path except the
-  `Verb`. The syntax `LITERAL` matches literal text in the path.  The syntax
-  `Variable` matches part of the URL path as specified by its template. A
-  variable template must not contain other variables. If a variable matches a
-  single path segment, its template may be omitted, e.g. `{var}` is equivalent
-  to `{var=*}`.  If a variable contains exactly one path segment, such as
-  `"{var}"` or `"{var=*}"`, when such a variable is expanded into a URL path,
-  all characters except `[-_.~0-9a-zA-Z]` are percent-encoded. Such variables
-  show up in the Discovery Document as `{var}`.  If a variable contains one or
-  more path segments, such as `"{var=foo/*}"` or `"{var=**}"`, when such a
-  variable is expanded into a URL path, all characters except `[-_.~/0-9a-
-  zA-Z]` are percent-encoded. Such variables show up in the Discovery Document
-  as `{+var}`.  NOTE: While the single segment variable matches the semantics
-  of [RFC 6570](https://tools.ietf.org/html/rfc6570) Section 3.2.2 Simple
-  String Expansion, the multi segment variable **does not** match RFC 6570
-  Reserved Expansion. The reason is that the Reserved Expansion does not
-  expand special characters like `?` and `#`, which would lead to invalid
-  URLs.  NOTE: the field paths in variables and in the `body` must not refer
-  to repeated fields or map fields.
+  The syntax `*` matches a single URL path segment. The syntax `**` matches
+  zero or more URL path segments, which must be the last part of the URL path
+  except the `Verb`.  The syntax `Variable` matches part of the URL path as
+  specified by its template. A variable template must not contain other
+  variables. If a variable matches a single path segment, its template may be
+  omitted, e.g. `{var}` is equivalent to `{var=*}`.  The syntax `LITERAL`
+  matches literal text in the URL path. If the `LITERAL` contains any reserved
+  character, such characters should be percent-encoded before the matching.
+  If a variable contains exactly one path segment, such as `"{var}"` or
+  `"{var=*}"`, when such a variable is expanded into a URL path on the client
+  side, all characters except `[-_.~0-9a-zA-Z]` are percent-encoded. The
+  server side does the reverse decoding. Such variables show up in the
+  [Discovery
+  Document](https://developers.google.com/discovery/v1/reference/apis) as
+  `{var}`.  If a variable contains multiple path segments, such as
+  `"{var=foo/*}"` or `"{var=**}"`, when such a variable is expanded into a URL
+  path on the client side, all characters except `[-_.~/0-9a-zA-Z]` are
+  percent-encoded. The server side does the reverse decoding, except "%2F" and
+  "%2f" are left unchanged. Such variables show up in the [Discovery
+  Document](https://developers.google.com/discovery/v1/reference/apis) as
+  `{+var}`.  ## Using gRPC API Service Configuration  gRPC API Service
+  Configuration (service config) is a configuration language for configuring a
+  gRPC service to become a user-facing product. The service config is simply
+  the YAML representation of the `google.api.Service` proto message.  As an
+  alternative to annotating your proto file, you can configure gRPC
+  transcoding in your service config YAML files. You do this by specifying a
+  `HttpRule` that maps the gRPC method to a REST endpoint, achieving the same
+  effect as the proto annotation. This can be particularly useful if you have
+  a proto that is reused in multiple services. Note that any transcoding
+  specified in the service config will override any matching transcoding
+  configuration in the proto.  Example:      http:       rules:         #
+  Selects a gRPC method and applies HttpRule to it.         - selector:
+  example.v1.Messaging.GetMessage           get:
+  /v1/messages/{message_id}/{sub.subfield}  ## Special notes  When gRPC
+  Transcoding is used to map a gRPC to JSON REST endpoints, the proto to JSON
+  conversion must follow the [proto3
+  specification](https://developers.google.com/protocol-
+  buffers/docs/proto3#json).  While the single segment variable follows the
+  semantics of [RFC 6570](https://tools.ietf.org/html/rfc6570) Section 3.2.2
+  Simple String Expansion, the multi segment variable **does not** follow RFC
+  6570 Section 3.2.3 Reserved Expansion. The reason is that the Reserved
+  Expansion does not expand special characters like `?` and `#`, which would
+  lead to invalid URLs. As the result, gRPC Transcoding uses a custom encoding
+  for multi segment variables.  The path variables **must not** refer to any
+  repeated or mapped field, because client libraries are not capable of
+  handling such variable expansion.  The path variables **must not** capture
+  the leading "/" character. The reason is that the most common use case
+  "{var}" does not capture the leading "/" character. For consistency, all
+  path variables must share the same behavior.  Repeated message fields must
+  not be mapped to URL query parameters, because no client library can support
+  such complicated mapping.  If an API needs to use a JSON array for request
+  or response body, it can map the request or response body to a repeated
+  field. However, some gRPC Transcoding implementations may not support this
+  feature.
 
   Fields:
     additionalBindings: Additional HTTP bindings for the selector. Nested
       bindings must not contain an `additional_bindings` field themselves
       (that is, the nesting may only be one level deep).
     body: The name of the request field whose value is mapped to the HTTP
-      body, or `*` for mapping all fields not captured by the path pattern to
-      the HTTP body. NOTE: the referred field must not be a repeated field and
-      must be present at the top-level of request message type.
+      request body, or `*` for mapping all request fields not captured by the
+      path pattern to the HTTP body, or omitted for not having any HTTP
+      request body.  NOTE: the referred field must be present at the top-level
+      of the request message type.
     custom: The custom pattern is used for specifying an HTTP method that is
       not included in the `pattern` field, such as HEAD, or "*" to leave the
       HTTP method unspecified for this rule. The wild-card rule is useful for
       services that provide content to Web (HTML) clients.
-    delete: Used for deleting a resource.
-    get: Used for listing and getting information about resources.
-    mediaDownload: Use this only for Scotty Requests. Do not use this for
-      bytestream methods. For media support, add instead
-      [][google.bytestream.RestByteStream] as an API to your configuration.
-    mediaUpload: Use this only for Scotty Requests. Do not use this for media
-      support using Bytestream, add instead
-      [][google.bytestream.RestByteStream] as an API to your configuration for
-      Bytestream methods.
-    patch: Used for updating a resource.
-    post: Used for creating a resource.
-    put: Used for updating a resource.
+    delete: Maps to HTTP DELETE. Used for deleting a resource.
+    get: Maps to HTTP GET. Used for listing and getting information about
+      resources.
+    patch: Maps to HTTP PATCH. Used for updating a resource.
+    post: Maps to HTTP POST. Used for creating a resource or performing an
+      action.
+    put: Maps to HTTP PUT. Used for replacing a resource.
     responseBody: Optional. The name of the response field whose value is
-      mapped to the HTTP body of response. Other response fields are ignored.
-      When not set, the response message will be used as HTTP body of
-      response.
-    selector: Selects methods to which this rule applies.  Refer to selector
+      mapped to the HTTP response body. When omitted, the entire response
+      message will be used as the HTTP response body.  NOTE: The referred
+      field must be present at the top-level of the response message type.
+    selector: Selects a method to which this rule applies.  Refer to selector
       for syntax details.
   """
 
@@ -1556,13 +1518,11 @@ class HttpRule(_messages.Message):
   custom = _messages.MessageField('CustomHttpPattern', 3)
   delete = _messages.StringField(4)
   get = _messages.StringField(5)
-  mediaDownload = _messages.MessageField('MediaDownload', 6)
-  mediaUpload = _messages.MessageField('MediaUpload', 7)
-  patch = _messages.StringField(8)
-  post = _messages.StringField(9)
-  put = _messages.StringField(10)
-  responseBody = _messages.StringField(11)
-  selector = _messages.StringField(12)
+  patch = _messages.StringField(6)
+  post = _messages.StringField(7)
+  put = _messages.StringField(8)
+  responseBody = _messages.StringField(9)
+  selector = _messages.StringField(10)
 
 
 class LabelDescriptor(_messages.Message):
@@ -1743,84 +1703,21 @@ class ManagedService(_messages.Message):
     generation: A server-assigned monotonically increasing number that changes
       whenever a mutation is made to the `ManagedService` or any of its
       components via Google Service Management.
-    operations: Read-only view of pending operations affecting this resource,
-      if requested.
     producerProjectId: ID of the project that produces and owns this service.
     projectSettings: Read-only view of settings for a particular consumer
-      project, if requested.
-    serviceConfig: The service's generated configuration.
+      project, if requested. DEPRECATED, should call GetProjectSettings
+      instead.
+    serviceConfig: The service's generated configuration. DEPRECATED, should
+      call GetServiceConfig instead.
     serviceName: The name of the service. See the [overview](/service-
       management/overview) for naming requirements.
   """
 
   generation = _messages.IntegerField(1)
-  operations = _messages.MessageField('Operation', 2, repeated=True)
-  producerProjectId = _messages.StringField(3)
-  projectSettings = _messages.MessageField('ProjectSettings', 4)
-  serviceConfig = _messages.MessageField('Service', 5)
-  serviceName = _messages.StringField(6)
-
-
-class MediaDownload(_messages.Message):
-  r"""Defines the Media configuration for a service in case of a download. Use
-  this only for Scotty Requests. Do not use this for media support using
-  Bytestream, add instead [][google.bytestream.RestByteStream] as an API to
-  your configuration for Bytestream methods.
-
-  Fields:
-    completeNotification: A boolean that determines whether a notification for
-      the completion of a download should be sent to the backend.
-    downloadService: DO NOT USE FIELDS BELOW THIS LINE UNTIL THIS WARNING IS
-      REMOVED.  Specify name of the download service if one is used for
-      download.
-    dropzone: Name of the Scotty dropzone to use for the current API.
-    enabled: Whether download is enabled.
-    maxDirectDownloadSize: Optional maximum acceptable size for direct
-      download. The size is specified in bytes.
-    useDirectDownload: A boolean that determines if direct download from ESF
-      should be used for download of this media.
-  """
-
-  completeNotification = _messages.BooleanField(1)
-  downloadService = _messages.StringField(2)
-  dropzone = _messages.StringField(3)
-  enabled = _messages.BooleanField(4)
-  maxDirectDownloadSize = _messages.IntegerField(5)
-  useDirectDownload = _messages.BooleanField(6)
-
-
-class MediaUpload(_messages.Message):
-  r"""Defines the Media configuration for a service in case of an upload. Use
-  this only for Scotty Requests. Do not use this for media support using
-  Bytestream, add instead [][google.bytestream.RestByteStream] as an API to
-  your configuration for Bytestream methods.
-
-  Fields:
-    completeNotification: A boolean that determines whether a notification for
-      the completion of an upload should be sent to the backend. These
-      notifications will not be seen by the client and will not consume quota.
-    dropzone: Name of the Scotty dropzone to use for the current API.
-    enabled: Whether upload is enabled.
-    maxSize: Optional maximum acceptable size for an upload. The size is
-      specified in bytes.
-    mimeTypes: An array of mimetype patterns. Esf will only accept uploads
-      that match one of the given patterns.
-    progressNotification: Whether to receive a notification for progress
-      changes of media upload.
-    startNotification: Whether to receive a notification on the start of media
-      upload.
-    uploadService: DO NOT USE FIELDS BELOW THIS LINE UNTIL THIS WARNING IS
-      REMOVED.  Specify name of the upload service if one is used for upload.
-  """
-
-  completeNotification = _messages.BooleanField(1)
-  dropzone = _messages.StringField(2)
-  enabled = _messages.BooleanField(3)
-  maxSize = _messages.IntegerField(4)
-  mimeTypes = _messages.StringField(5, repeated=True)
-  progressNotification = _messages.BooleanField(6)
-  startNotification = _messages.BooleanField(7)
-  uploadService = _messages.StringField(8)
+  producerProjectId = _messages.StringField(2)
+  projectSettings = _messages.MessageField('ProjectSettings', 3)
+  serviceConfig = _messages.MessageField('Service', 4)
+  serviceName = _messages.StringField(5)
 
 
 class Method(_messages.Message):
@@ -2258,16 +2155,6 @@ class OAuthRequirements(_messages.Message):
   canonicalScopes = _messages.StringField(1)
 
 
-class OpenApiSpec(_messages.Message):
-  r"""A collection of OpenAPI specification files.
-
-  Fields:
-    openApiFiles: Individual files.
-  """
-
-  openApiFiles = _messages.MessageField('ConfigFile', 1, repeated=True)
-
-
 class Operation(_messages.Message):
   r"""This resource represents a long-running operation that is the result of
   a network API call.
@@ -2598,14 +2485,15 @@ class Quota(_messages.Message):
   defines a set of metrics. - For API calls, the quota.metric_rules maps
   methods to metrics with   corresponding costs. - The quota.limits defines
   limits on the metrics, which will be used for   quota checks at runtime.  An
-  example quota configuration in yaml format:     quota:       - name:
-  apiWriteQpsPerProject        metric: library.googleapis.com/write_calls
-  unit: "1/min/{project}"  # rate limit for consumer projects        values:
-  STANDARD: 10000        # The metric rules bind all methods to the read_calls
-  metric,      # except for the UpdateBook and DeleteBook methods. These two
-  methods      # are mapped to the write_calls metric, with the UpdateBook
-  method      # consuming at twice rate as the DeleteBook method.
-  metric_rules:      - selector: "*"        metric_costs:
+  example quota configuration in yaml format:     quota:      limits:       -
+  name: apiWriteQpsPerProject        metric:
+  library.googleapis.com/write_calls        unit: "1/min/{project}"  # rate
+  limit for consumer projects        values:          STANDARD: 10000        #
+  The metric rules bind all methods to the read_calls metric,      # except
+  for the UpdateBook and DeleteBook methods. These two methods      # are
+  mapped to the write_calls metric, with the UpdateBook method      #
+  consuming at twice rate as the DeleteBook method.      metric_rules:      -
+  selector: "*"        metric_costs:
   library.googleapis.com/read_calls: 1      - selector:
   google.example.library.v1.LibraryService.UpdateBook        metric_costs:
   library.googleapis.com/write_calls: 2      - selector:
@@ -3208,7 +3096,7 @@ class Service(_messages.Message):
     http: HTTP configuration.
     id: A unique ID for a specific instance of this message, typically
       assigned by the client for tracking purpose. If empty, the server may
-      choose to generate one instead.
+      choose to generate one instead. Must be no longer than 60 characters.
     logging: Logging configuration.
     logs: Defines the logs used by this service.
     metrics: Defines the metrics used by this service.
@@ -3340,7 +3228,9 @@ class ServicemanagementServicesConfigsGetRequest(_messages.Message):
       returned in the response.
 
   Fields:
-    configId: The id of the service configuration resource.
+    configId: The id of the service configuration resource.  This field must
+      be specified for the server to return all fields, including
+      `SourceInfo`.
     serviceName: The name of the service.  See the [overview](/service-
       management/overview) for naming requirements.  For example:
       `example.googleapis.com`.
@@ -3581,7 +3471,9 @@ class ServicemanagementServicesGetConfigRequest(_messages.Message):
       returned in the response.
 
   Fields:
-    configId: The id of the service configuration resource.
+    configId: The id of the service configuration resource.  This field must
+      be specified for the server to return all fields, including
+      `SourceInfo`.
     serviceName: The name of the service.  See the [overview](/service-
       management/overview) for naming requirements.  For example:
       `example.googleapis.com`.
@@ -3631,7 +3523,7 @@ class ServicemanagementServicesGetRequest(_messages.Message):
     consumerProjectId: If project_settings is expanded, return settings for
       the specified consumer project.
     expand: Fields to expand in any results.  By default, the following fields
-      are not present in the result: - `operations` - `project_settings` -
+      are not present in the result: - `project_settings` -
       `project_settings.operations` - `quota_usage` (It requires
       `project_settings`) - `historical_quota_usage` (It requires
       `project_settings`)
@@ -3674,8 +3566,7 @@ class ServicemanagementServicesListRequest(_messages.Message):
       project:<project_id>
     consumerProjectId: Include services consumed by the specified project.  If
       project_settings is expanded, then this field controls which project
-      project_settings is populated for. This field is deprecated. See details
-      go/deprecate-listservices-expand.
+      project_settings is populated for.
     pageSize: Requested size of the next page of data.
     pageToken: Token identifying which result to start with; returned by a
       previous list call.
@@ -3876,25 +3767,6 @@ class ServicemanagementServicesUndeleteRequest(_messages.Message):
   """
 
   serviceName = _messages.StringField(1, required=True)
-
-
-class ServicemanagementServicesUpdateRequest(_messages.Message):
-  r"""A ServicemanagementServicesUpdateRequest object.
-
-  Fields:
-    managedService: A ManagedService resource to be passed as the request
-      body.
-    serviceName: The name of the service.  See the [overview](/service-
-      management/overview) for naming requirements.  For example:
-      `example.googleapis.com`.
-    updateMask: A mask specifying which fields to update. Update mask has been
-      deprecated on UpdateService service method. Please use PatchService
-      method instead to do partial updates.
-  """
-
-  managedService = _messages.MessageField('ManagedService', 1)
-  serviceName = _messages.StringField(2, required=True)
-  updateMask = _messages.StringField(3)
 
 
 class SetIamPolicyRequest(_messages.Message):
@@ -4160,22 +4032,12 @@ class SubmitConfigSourceResponse(_messages.Message):
   r"""Response message for SubmitConfigSource method.
 
   Fields:
-    diagnostics: Diagnostics occured during config conversion.
+    diagnostics: Diagnostics occurred during config conversion.
     serviceConfig: The generated service configuration.
   """
 
   diagnostics = _messages.MessageField('Diagnostic', 1, repeated=True)
   serviceConfig = _messages.MessageField('Service', 2)
-
-
-class SwaggerSpec(_messages.Message):
-  r"""A collection of swagger specification files.
-
-  Fields:
-    swaggerFiles: The individual files.
-  """
-
-  swaggerFiles = _messages.MessageField('File', 1, repeated=True)
 
 
 class SystemParameter(_messages.Message):

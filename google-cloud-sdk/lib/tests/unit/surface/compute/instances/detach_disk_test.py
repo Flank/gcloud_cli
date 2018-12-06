@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -288,8 +288,9 @@ def _GetInstanceWithRegionalDiskMessages(messages_, compute_uri):
       ])]
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
-                          (base.ReleaseTrack.BETA, 'beta'))
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                          (calliope_base.ReleaseTrack.BETA, 'beta'))
 class InstancesDetachDiskWithRegions(test_base.BaseTest,
                                      parameterized.TestCase):
 
@@ -400,7 +401,7 @@ class InstancesDetachDiskTestAlpha(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.make_requests.side_effect = iter([
         _GetInstanceWithRegionalDiskMessages(self.messages, self.compute_uri),
         [],

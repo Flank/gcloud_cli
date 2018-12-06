@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py import encoding
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -83,9 +83,9 @@ class DetectImagePropertiesBase(vision_base.MlVisionTestBase):
 
 
 @parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA, 'builtin/stable'),
-    ('Beta', base.ReleaseTrack.BETA, 'builtin/stable'),
-    ('GA', base.ReleaseTrack.GA, None))
+    ('Alpha', calliope_base.ReleaseTrack.ALPHA, 'builtin/stable'),
+    ('Beta', calliope_base.ReleaseTrack.BETA, 'builtin/stable'),
+    ('GA', calliope_base.ReleaseTrack.GA, None))
 class DetectImagePropertiesCommonTest(DetectImagePropertiesBase):
 
   def testDetectImageProperties_Successful(self, track, model):
@@ -170,8 +170,8 @@ class DetectImagePropertiesCommonTest(DetectImagePropertiesBase):
 
 
 @parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA),
-    ('Beta', base.ReleaseTrack.BETA))
+    ('Alpha', calliope_base.ReleaseTrack.ALPHA),
+    ('Beta', calliope_base.ReleaseTrack.BETA))
 class DetectImagePropertiesAlphaBetaTest(DetectImagePropertiesBase):
 
   def testDetectImageProperties_ModelVersion(self, track):

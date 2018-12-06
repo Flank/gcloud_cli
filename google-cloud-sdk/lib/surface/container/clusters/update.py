@@ -77,6 +77,7 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
             api_adapter.HPA: _ParseAddonDisabled,
             api_adapter.DASHBOARD: _ParseAddonDisabled,
             api_adapter.NETWORK_POLICY: _ParseAddonDisabled,
+            api_adapter.ISTIO: _ParseAddonDisabled,
         }),
         dest='disable_addons',
         metavar='ADDON=ENABLED|DISABLED',
@@ -84,11 +85,13 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
 {hpa}=ENABLED|DISABLED
 {ingress}=ENABLED|DISABLED
 {dashboard}=ENABLED|DISABLED
+{istio}=ENABLED|DISABLED
 {network_policy}=ENABLED|DISABLED""".format(
     hpa=api_adapter.HPA,
     ingress=api_adapter.INGRESS,
     dashboard=api_adapter.DASHBOARD,
-    network_policy=api_adapter.NETWORK_POLICY))
+    network_policy=api_adapter.NETWORK_POLICY,
+    istio=api_adapter.ISTIO,))
 
   else:
     mutex_group.add_argument(
@@ -124,7 +127,7 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
       help='Set the basic auth password to the specified value, keeping the '
       'existing username.')
 
-  flags.AddBasicAuthFlags(mutex_group, None, None)
+  flags.AddBasicAuthFlags(mutex_group)
 
 
 def _AddAdditionalZonesArg(mutex_group, deprecated=True):
@@ -238,7 +241,7 @@ class Update(base.UpdateCommand):
     if hasattr(args, 'node_locations') and args.node_locations is not None:
       locations = sorted(args.node_locations)
 
-    if args.username is not None or args.enable_basic_auth is not None:
+    if args.IsSpecified('username') or args.IsSpecified('enable_basic_auth'):
       flags.MungeBasicAuthFlags(args)
       options = api_adapter.SetMasterAuthOptions(
           action=api_adapter.SetMasterAuthOptions.SET_USERNAME,
@@ -250,7 +253,7 @@ class Update(base.UpdateCommand):
       except apitools_exceptions.HttpError as error:
         raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
     elif (args.generate_password or args.set_password or
-          args.password is not None):
+          args.IsSpecified('password')):
       if args.generate_password:
         password = ''
         options = api_adapter.SetMasterAuthOptions(
@@ -258,7 +261,7 @@ class Update(base.UpdateCommand):
             password=password)
       else:
         password = args.password
-        if args.password is None:
+        if not args.IsSpecified('password'):
           password = input('Please enter the new password:')
         options = api_adapter.SetMasterAuthOptions(
             action=api_adapter.SetMasterAuthOptions.SET_PASSWORD,
@@ -418,15 +421,18 @@ class UpdateBeta(Update):
     flags.AddNetworkPolicyFlags(group)
     flags.AddMaintenanceWindowFlag(group, add_unset_text=True)
     flags.AddPodSecurityPolicyFlag(group)
-    flags.AddEnableBinAuthzFlag(group, hidden=True)
-    flags.AddAutoprovisioningFlags(group, hidden=True)
+    flags.AddEnableBinAuthzFlag(group)
+    flags.AddAutoprovisioningFlags(group)
     flags.AddVerticalPodAutoscalingFlag(group, hidden=True)
+    flags.AddResourceUsageExportFlags(group, add_clear_flag=True)
+    flags.AddIstioConfigFlag(parser)
 
   def ParseUpdateOptions(self, args, locations):
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
     opts.enable_pod_security_policy = args.enable_pod_security_policy
     opts.enable_binauthz = args.enable_binauthz
     opts.enable_autoprovisioning = args.enable_autoprovisioning
+    opts.autoprovisioning_config_file = args.autoprovisioning_config_file
     opts.min_cpu = args.min_cpu
     opts.max_cpu = args.max_cpu
     opts.min_memory = args.min_memory
@@ -434,6 +440,13 @@ class UpdateBeta(Update):
     opts.min_accelerator = args.min_accelerator
     opts.max_accelerator = args.max_accelerator
     opts.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
+    opts.istio_config = args.istio_config
+    opts.resource_usage_bigquery_dataset = args.resource_usage_bigquery_dataset
+    opts.clear_resource_usage_bigquery_dataset = \
+        args.clear_resource_usage_bigquery_dataset
+    opts.enable_network_egress_metering = args.enable_network_egress_metering
+    flags.ValidateIstioConfigUpdateArgs(args.istio_config, args.disable_addons)
+
     return opts
 
 
@@ -468,13 +481,16 @@ class UpdateAlpha(Update):
     flags.AddAutoprovisioningFlags(group, hidden=False)
     flags.AddMaintenanceWindowFlag(group, add_unset_text=True)
     flags.AddPodSecurityPolicyFlag(group)
-    flags.AddEnableBinAuthzFlag(group, hidden=True)
-    flags.AddResourceUsageBigqueryDatasetFlag(group, add_clear_flag=True)
+    flags.AddEnableBinAuthzFlag(group)
+    flags.AddResourceUsageExportFlags(group, add_clear_flag=True)
     flags.AddVerticalPodAutoscalingFlag(group, hidden=True)
+    flags.AddSecurityProfileForUpdateFlag(group)
+    flags.AddIstioConfigFlag(parser)
 
   def ParseUpdateOptions(self, args, locations):
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
     opts.enable_autoprovisioning = args.enable_autoprovisioning
+    opts.autoprovisioning_config_file = args.autoprovisioning_config_file
     opts.min_cpu = args.min_cpu
     opts.max_cpu = args.max_cpu
     opts.min_memory = args.min_memory
@@ -487,4 +503,9 @@ class UpdateAlpha(Update):
     opts.clear_resource_usage_bigquery_dataset = \
         args.clear_resource_usage_bigquery_dataset
     opts.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
+    opts.security_profile = args.security_profile
+    opts.istio_config = args.istio_config
+    opts.enable_network_egress_metering = args.enable_network_egress_metering
+    flags.ValidateIstioConfigUpdateArgs(args.istio_config, args.disable_addons)
+
     return opts

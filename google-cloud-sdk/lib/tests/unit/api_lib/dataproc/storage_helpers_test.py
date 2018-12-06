@@ -23,9 +23,14 @@ import io
 
 from apitools.base.py.testing import mock as apitools_mock
 
+from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.api_lib.dataproc import storage_helpers
+from googlecloudsdk.api_lib.storage import storage_api
+from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import config
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import unit_base
 
@@ -58,6 +63,11 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
         self.BASE_GCS_PATH, self.storage_client)
     self.storage_messages = core_apis.GetMessagesModule('storage', 'v1')
 
+    self.storage_api_client = storage_api.StorageClient()
+    self.copy_file_mock = self.StartObjectPatch(self.storage_api_client,
+                                                'CopyFileToGCS')
+    self.storage_bucket = 'foo'
+
   def MakeObject(self, **kwargs):
     return self.storage_messages.Object(
         bucket=kwargs.get('bucket', self.GCS_BUCKET_NAME),
@@ -78,28 +88,36 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
 
   @sdk_test_base.Filters.DoNotRunOnWindows
   def testUpload(self):
-    expected_command = ['bin/gsutil', 'cp', 'foo', '/tmp/bar',
-                        'baz.txt', 'gs://foo/bar/']
-    self.mock_exec.return_value = 0
-    storage_helpers.Upload(['foo', '/tmp/bar', 'baz.txt'], 'gs://foo/bar/')
-    self.mock_exec.assert_called_once_with(
-        expected_command, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
+    storage_helpers.Upload(
+        ['foo', '/tmp/bar', 'baz.txt'], 'gs://foo/bar/',
+        storage_client=self.storage_api_client)
+    self.copy_file_mock.assert_has_calls(
+        [mock.call('foo', storage_util.ObjectReference(
+            self.storage_bucket, 'bar/foo')),
+         mock.call('/tmp/bar', storage_util.ObjectReference(
+             self.storage_bucket, 'bar/bar')),
+         mock.call('baz.txt', storage_util.ObjectReference(
+             self.storage_bucket, 'bar/baz.txt'))])
 
   @sdk_test_base.Filters.RunOnlyOnWindows
   def testUploadWindows(self):
-    expected_command = ['cmd', '/c', 'bin\\gsutil.cmd', 'cp', '\\temp\\foo',
-                        'C:\\temp\\bar', 'baz.txt', 'gs://foo/bar/']
-    self.mock_exec.return_value = 0
     storage_helpers.Upload(
-        ['\\temp\\foo', 'C:\\temp\\bar', 'baz.txt'], 'gs://foo/bar/')
-    self.mock_exec.assert_called_once_with(
-        expected_command, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
+        ['\\temp\\foo', 'C:\\temp\\bar', 'baz.txt'], 'gs://foo/bar/',
+        storage_client=self.storage_api_client)
+    self.copy_file_mock.assert_has_calls(
+        [mock.call('\\temp\\foo', storage_util.ObjectReference(
+            self.storage_bucket, 'bar/foo')),
+         mock.call('C:\\temp\\bar', storage_util.ObjectReference(
+             self.storage_bucket, 'bar/bar')),
+         mock.call('baz.txt', storage_util.ObjectReference(
+             self.storage_bucket, 'bar/baz.txt'))])
 
   def testUploadException(self):
-    self.mock_exec.return_value = 1
-    with self.AssertRaisesToolExceptionMatches(
-        "Failed to upload files ['foo', '/tmp/bar', 'baz.txt', "
-        "'gs://foo/bar/'] to 'gs://foo/bar/' using gsutil."):
+    self.copy_file_mock.side_effect = calliope_exceptions.BadFileException()
+    with self.AssertRaisesExceptionMatches(
+        exceptions.FileUploadError,
+        r"Failed to upload files ['foo', '/tmp/bar', 'baz.txt'] "
+        r"to 'gs://foo/bar/'."):
       storage_helpers.Upload(['foo', '/tmp/bar', 'baz.txt'], 'gs://foo/bar/')
 
   def testGetObject(self):
@@ -188,6 +206,37 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
     stream = io.StringIO()
     with self.assertRaises(ValueError):
       self.storage_stream.ReadIntoWritable(stream)
+
+  @sdk_test_base.Filters.DoNotRunOnWindows
+  def testUploadWithGsutil(self):
+    properties.VALUES.storage.use_gsutil.Set(True)
+    expected_command = ['bin/gsutil', 'cp', 'foo', '/tmp/bar',
+                        'baz.txt', 'gs://foo/bar/']
+    self.mock_exec.return_value = 0
+    storage_helpers.Upload(['foo', '/tmp/bar', 'baz.txt'], 'gs://foo/bar/')
+    self.mock_exec.assert_called_once_with(
+        expected_command, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
+
+  @sdk_test_base.Filters.RunOnlyOnWindows
+  def testUploadWindowsWithGsutil(self):
+    properties.VALUES.storage.use_gsutil.Set(True)
+    expected_command = ['cmd', '/c', 'bin\\gsutil.cmd', 'cp', '\\temp\\foo',
+                        'C:\\temp\\bar', 'baz.txt', 'gs://foo/bar/']
+    self.mock_exec.return_value = 0
+    storage_helpers.Upload(
+        ['\\temp\\foo', 'C:\\temp\\bar', 'baz.txt'], 'gs://foo/bar/')
+    self.mock_exec.assert_called_once_with(
+        expected_command, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
+
+  def testUploadExceptionWithGsutil(self):
+    properties.VALUES.storage.use_gsutil.Set(True)
+    self.mock_exec.return_value = 1
+    with self.AssertRaisesExceptionMatches(
+        exceptions.FileUploadError,
+        "Failed to upload files ['foo', '/tmp/bar', 'baz.txt', "
+        "'gs://foo/bar/'] to 'gs://foo/bar/' using gsutil."):
+      storage_helpers.Upload(['foo', '/tmp/bar', 'baz.txt'], 'gs://foo/bar/')
+
 
 if __name__ == '__main__':
   sdk_test_base.main()

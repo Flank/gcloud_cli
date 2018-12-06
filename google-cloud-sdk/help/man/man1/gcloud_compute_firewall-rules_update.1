@@ -11,7 +11,7 @@ gcloud compute firewall\-rules update \- update a firewall rule
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute firewall\-rules update\fR \fINAME\fR [\fB\-\-allow\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-source\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute firewall\-rules update\fR \fINAME\fR [\fB\-\-allow\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-disabled\fR] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-source\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -100,6 +100,17 @@ following will clear the existing destination ranges:
 .RS 2m
 $ gcloud compute firewall\-rules update MY\-RULE \-\-destination\-ranges
 .RE
+
+.TP 2m
+\fB\-\-disabled\fR
+Disable a firewall rule and stop it from being enforced in the network. If a
+firewall rule is disabled, the associated network behaves as if the rule did not
+exist. To enable a disabled rule, use:
+
+.RS 2m
+$ gcloud compute firewall\-rules update MY\-RULE \-\-no\-disabled
+.RE
+
 
 .TP 2m
 \fB\-\-priority\fR=\fIPRIORITY\fR
@@ -228,9 +239,9 @@ $ gcloud compute firewall\-rules update MY\-RULE \-\-target\-tags
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

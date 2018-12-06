@@ -19,10 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import actions as calliope_actions
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class DeprecationFlagErrorCommand(base.Command):
+class DeprecationFlagErrorCommand(calliope_base.Command):
   """A simple command to test flag removal.
 
    {command} prints a test message.
@@ -31,7 +31,7 @@ class DeprecationFlagErrorCommand(base.Command):
   @staticmethod
   def Args(parser):
     """Test args for this command."""
-    deparg = base.Argument(
+    deparg = calliope_base.Argument(
         '--testflag',
         action=calliope_actions.DeprecationAction(
             'testflag', removed=True, error='{flag_name} is REMOVED.'),

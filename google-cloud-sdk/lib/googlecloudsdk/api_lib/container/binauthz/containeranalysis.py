@@ -25,7 +25,8 @@ from googlecloudsdk.api_lib.util import apis
 API_NAME = 'containeranalysis'
 
 V1_ALPHA1 = 'v1alpha1'
-DEFAULT_VERSION = V1_ALPHA1
+V1_BETA1 = 'v1beta1'
+DEFAULT_VERSION = V1_BETA1
 
 
 class Client(object):
@@ -59,7 +60,12 @@ class Client(object):
         self.messages.ContaineranalysisProjectsNotesOccurrencesListRequest)
     occurrence_iter = list_pager.YieldFromList(
         self.client.projects_notes_occurrences,
-        request=ListNoteOccurrencesRequest(name=note_ref.RelativeName()),
+        request=ListNoteOccurrencesRequest(
+            name=note_ref.RelativeName(),
+            filter=(
+                'resourceUrl="{}"'.format(artifact_url)
+                if artifact_url is not None else ''),
+        ),
         field='occurrences',
         batch_size=100,
         batch_size_attribute='pageSize',
@@ -68,12 +74,9 @@ class Client(object):
     # TODO(b/69380601): This should be handled by the filter parameter to
     # ListNoteOccurrences, but filtering isn't implemented yet for the fields
     # we care about.
-    attestation_authority_kind = (
-        self.messages.Occurrence.KindValueValuesEnum.ATTESTATION_AUTHORITY)
     def MatchesFilter(occurrence):
-      if occurrence.kind != attestation_authority_kind:
-        return False
-      if artifact_url and occurrence.resourceUrl != artifact_url:
+      if (occurrence.kind !=
+          self.messages.Occurrence.KindValueValuesEnum.ATTESTATION):
         return False
       return True
 
@@ -115,10 +118,10 @@ class Client(object):
             pgpKeyId=pgp_key_fingerprint,
         ))
     occurrence = self.messages.Occurrence(
-        kind=self.messages.Occurrence.KindValueValuesEnum.ATTESTATION_AUTHORITY,
-        resourceUrl=artifact_url,
+        kind=self.messages.Occurrence.KindValueValuesEnum.ATTESTATION,
+        resource=self.messages.Resource(uri=artifact_url),
         noteName=note_ref.RelativeName(),
-        attestation=attestation,
+        attestation=self.messages.Details(attestation=attestation),
     )
     request = self.messages.ContaineranalysisProjectsOccurrencesCreateRequest(
         parent=project_ref.RelativeName(),

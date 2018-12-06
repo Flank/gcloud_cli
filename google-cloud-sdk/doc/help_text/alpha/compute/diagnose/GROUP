@@ -11,11 +11,16 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
+
+     export-logs
+        (ALPHA) Triggers instance to gather logs and upload them to a Cloud
+        Storage Bucket.
 
      routes
         (ALPHA) Routes to/from Google Compute Engine virtual machine instances.

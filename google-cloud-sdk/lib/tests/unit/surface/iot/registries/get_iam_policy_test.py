@@ -20,18 +20,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class GetIamPolicyTest(base.CloudIotBase, test_case.WithOutputCapture):
+class GetIamPolicyTestGA(base.CloudIotBase, test_case.WithOutputCapture):
 
-  def testGetIamPolicy(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testGetIamPolicy(self):
     policy = self.messages.Policy(
         version=1,
         bindings=[
@@ -52,8 +50,7 @@ class GetIamPolicyTest(base.CloudIotBase, test_case.WithOutputCapture):
 
     self.assertEqual(result, policy)
 
-  def testListCommandFilter(self, track):
-    self.track = track
+  def testListCommandFilter(self):
     policy = self.messages.Policy(
         version=1,
         bindings=[
@@ -78,8 +75,7 @@ class GetIamPolicyTest(base.CloudIotBase, test_case.WithOutputCapture):
 
     self.AssertOutputEquals('user:test-user@gmail.com\n')
 
-  def testGetIamPolicy_RelativeName(self, track):
-    self.track = track
+  def testGetIamPolicy_RelativeName(self):
     policy = self.messages.Policy(
         version=1,
         bindings=[
@@ -100,6 +96,19 @@ class GetIamPolicyTest(base.CloudIotBase, test_case.WithOutputCapture):
                       '{}'.format(registry_name))
 
     self.assertEqual(result, policy)
+
+
+class GetIamPolicyTestBeta(GetIamPolicyTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class GetIamPolicyTestAlpha(GetIamPolicyTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

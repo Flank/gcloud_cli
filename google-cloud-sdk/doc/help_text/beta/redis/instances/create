@@ -6,12 +6,11 @@ SYNOPSIS
         [--alternative-zone=ALTERNATIVE_ZONE] [--async]
         [--display-name=DISPLAY_NAME] [--labels=KEY=VALUE]
         [--network=NETWORK; default="default"] [--redis-config=KEY=VALUE]
-        [--redis-version=VERSION] [--reserved-ip-range=RESERVED_IP_RANGE]
-        [--size=SIZE; default=1] [--tier=TIER; default="basic"] [--zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--reserved-ip-range=RESERVED_IP_RANGE] [--size=SIZE; default=1]
+        [--tier=TIER; default="basic"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Create a new Redis instance with the given name.
+    (BETA) Create a new Redis instance.
 
     This command can fail for the following reasons:
       o An instance with the same name already exists.
@@ -22,14 +21,14 @@ POSITIONAL ARGUMENTS
      instance you want to create. The arguments in this group can be used to
      specify the attributes of this resource. (NOTE) Some attributes are not
      given arguments in this group but can be set in other ways. To set the
-     [project] attribute: provide the flag [instance] on the command line with
-     a fully specified name; provide the flag [--project] on the command line;
-     set the property [core/project]. This must be specified.
+     [project] attribute: provide the argument [instance] on the command line
+     with a fully specified name; provide the argument [--project] on the
+     command line; set the property [core/project]. This must be specified.
 
        INSTANCE
-          The ID of the instance or a fully qualified identifier for the
-          instance. This positional must be specified if any of the other
-          arguments in this group are specified.
+          ID of the instance or fully qualified identifier for the instance.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
 
        --region=REGION
           The name of the Redis region of the instance. Overrides the default
@@ -37,8 +36,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --alternative-zone=ALTERNATIVE_ZONE
-        A secondary zone for the Redis instance to create. Only applicable to
-        the standard tier. This protects the instance against zonal failures by
+        A secondary zone for the Redis instance. Only applicable to the
+        standard tier. This protects the instance against zonal failures by
         provisioning it across two zones. If provided, alternative zone must be
         a different zone from the one provided through --zone.
 
@@ -62,13 +61,6 @@ FLAGS
         to http://redis.io/topics/config. Currently, the only supported
         parameters are: maxmemory-policy, notify-keyspace-events.
 
-     --redis-version=VERSION
-        The version of Redis software. VERSION must be (currently only one
-        value is supported):
-
-         redis_3_2
-            Deploy Redis 3.2
-
      --reserved-ip-range=RESERVED_IP_RANGE
         The CIDR range of internal addresses that are reserved for this
         instance. For example, 10.0.0.0/29 or 192.168.0.0/29. Range must be
@@ -88,31 +80,32 @@ FLAGS
             Standard high-availability Redis instance with replication
 
      --zone=ZONE
-        The zone of the Redis instance to create. If not provided the service
-        will pick a random zone in the region. For STANDARD_HA tier, instances
-        will be created across two zones for protection against zonal failures.
-        So if --alternative-zone is also provided, it must be different from
-        --zone.
+        The zone of the Redis instance. If not provided the service will pick a
+        random zone in the region. For the standard tier, instances will be
+        created across two zones for protection against zonal failures. So if
+        --alternative-zone is also provided, it must be different from --zone.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
-    This command uses the redis/v1beta1 API. The full documentation for this
-    API can be found at: https://cloud.google.com/memorystore/docs/redis/
+    This command uses the redis/v1 API. The full documentation for this API can
+    be found at: https://cloud.google.com/memorystore/docs/redis/
 
 EXAMPLES
-    The following command creates a basic tier instance with the name
-    my-redis-instance in region us-central1 with memory size of 5 GiB:
+    To create a basic tier instance with the name my-redis-instance in region
+    us-central-1 with memory size of 5 GiB, run:
 
         $ gcloud beta redis instances create my-redis-instance \
             --region=us-central1 --size=5
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud redis instances create
         $ gcloud alpha redis instances create
 

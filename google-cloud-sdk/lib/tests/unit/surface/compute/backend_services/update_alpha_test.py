@@ -146,7 +146,9 @@ class WithHealthcheckApiTest(AlphaUpdateTestBase):
     ])
 
     self.RunUpdate(
-        'backend-service-1 --health-checks health-check-1,health-check-2')
+        'backend-service-1 '
+        '--health-checks health-check-1,health-check-2 '
+        '--global-health-checks')
 
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
@@ -181,7 +183,9 @@ class WithHealthcheckApiTest(AlphaUpdateTestBase):
         [],
     ])
 
-    self.RunUpdate('backend-service-3 --health-checks health-check-1')
+    self.RunUpdate('backend-service-3 '
+                   '--health-checks health-check-1 '
+                   '--global-health-checks')
 
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
@@ -213,7 +217,9 @@ class WithHealthcheckApiTest(AlphaUpdateTestBase):
         [],
     ])
 
-    self.RunUpdate('backend-service-3 --health-checks new-health-check')
+    self.RunUpdate('backend-service-3 '
+                   '--health-checks new-health-check '
+                   '--global-health-checks')
 
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
@@ -1356,9 +1362,8 @@ class WithCdnSignedUrlApiUpdateTest(AlphaUpdateTestBase):
   def testSetInvalidCacheMaxAge(self):
     """Tests updating backend service with an invalid cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: '
-        r'invalid-value'):
+        "argument --signed-url-cache-max-age: Failed to parse duration: "
+        "Duration unit 'invalid-value' must be preceded by a number"):
       self.RunUpdate("""
           backend-service-1 --signed-url-cache-max-age invalid-value
           """)
@@ -1366,8 +1371,8 @@ class WithCdnSignedUrlApiUpdateTest(AlphaUpdateTestBase):
   def testSetCacheMaxAgeNegative(self):
     """Tests updating backend service with a negative cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: -1'):
+        'argument --signed-url-cache-max-age: value must be greater than or '
+        'equal to 0; received: -1'):
       self.RunUpdate("""
           backend-service-1 --signed-url-cache-max-age -1
           """)
@@ -1409,7 +1414,52 @@ class RegionalTest(test_base.BaseTest):
     ]
 
     self.RunUpdate('backend-service-3 --region alaska '
-                   '--health-checks new-health-check')
+                   '--health-checks new-health-check '
+                   '--global-health-checks')
+
+    self.CheckRequests(
+        [(self.compute.regionBackendServices, 'Get',
+          messages.ComputeRegionBackendServicesGetRequest(
+              backendService='backend-service-3',
+              region='alaska',
+              project='my-project'))],
+        [(self.compute.regionBackendServices, 'Patch',
+          messages.ComputeRegionBackendServicesPatchRequest(
+              backendService='backend-service-3',
+              backendServiceResource=updated_backend_service,
+              region='alaska',
+              project='my-project'))],
+    )
+
+  def testRegionWithHealthChecksUpdatedToRegionHealthChecks(self):
+    messages = self.messages
+    orig_backend_service = messages.BackendService(
+        backends=[],
+        description='my backend service',
+        healthChecks=[
+            (self.compute_uri + '/projects/my-project/region/global'
+             '/httpHealthChecks/my-health-check')
+        ],
+        name='backend-service-3',
+        portName='http',
+        protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+        selfLink=(self.compute_uri + '/projects/my-project'
+                  '/region/alaska/backendServices/backend-service-1'),
+        timeoutSec=30)
+    self.make_requests.side_effect = iter([
+        [orig_backend_service],
+        [],
+    ])
+
+    updated_backend_service = copy.deepcopy(orig_backend_service)
+    updated_backend_service.healthChecks = [
+        self.compute_uri +
+        '/projects/my-project/regions/alaska/healthChecks/new-health-check'
+    ]
+
+    self.RunUpdate('backend-service-3 --region alaska '
+                   '--health-checks new-health-check '
+                   '--health-checks-region alaska')
 
     self.CheckRequests(
         [(self.compute.regionBackendServices, 'Get',

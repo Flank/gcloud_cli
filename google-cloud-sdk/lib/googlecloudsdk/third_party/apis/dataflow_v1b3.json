@@ -211,11 +211,15 @@
           "$ref": "Environment"
         },
         "steps": {
-          "description": "The top-level steps that constitute the entire job.",
+          "description": "Exactly one of step or steps_location should be specified.\n\nThe top-level steps that constitute the entire job.",
           "type": "array",
           "items": {
             "$ref": "Step"
           }
+        },
+        "stepsLocation": {
+          "description": "The GCS location where the steps are stored.",
+          "type": "string"
         },
         "currentState": {
           "description": "The current state of the job.\n\nJobs are created in the `JOB_STATE_STOPPED` state unless otherwise\nspecified.\n\nA job in the `JOB_STATE_RUNNING` state may asynchronously enter a\nterminal state. After a job has reached a terminal state, no\nfurther state updates may be made.\n\nThis field may be mutated by the Cloud Dataflow service;\ncallers cannot mutate it.",
@@ -229,8 +233,9 @@
             "`JOB_STATE_UPDATED` indicates that the job was successfully updated,\nmeaning that this job was stopped and another job was started, inheriting\nstate from this one. This is a terminal job state. This state may only be\nset by the Cloud Dataflow service, and only as a transition from\n`JOB_STATE_RUNNING`.",
             "`JOB_STATE_DRAINING` indicates that the job is in the process of draining.\nA draining job has stopped pulling from its input sources and is processing\nany data that remains in-flight. This state may be set via a Cloud Dataflow\n`UpdateJob` call, but only as a transition from `JOB_STATE_RUNNING`. Jobs\nthat are draining may only transition to `JOB_STATE_DRAINED`,\n`JOB_STATE_CANCELLED`, or `JOB_STATE_FAILED`.",
             "`JOB_STATE_DRAINED` indicates that the job has been drained.\nA drained job terminated by stopping pulling from its input sources and\nprocessing any data that remained in-flight when draining was requested.\nThis state is a terminal state, may only be set by the Cloud Dataflow\nservice, and only as a transition from `JOB_STATE_DRAINING`.",
-            "'JOB_STATE_PENDING' indicates that the job has been created but is not yet\nrunning.  Jobs that are pending may only transition to `JOB_STATE_RUNNING`,\nor `JOB_STATE_FAILED`.",
-            "'JOB_STATE_CANCELLING' indicates that the job has been explicitly cancelled\nand is in the process of stopping.  Jobs that are cancelling may only\ntransition to 'JOB_STATE_CANCELLED' or 'JOB_STATE_FAILED'."
+            "`JOB_STATE_PENDING` indicates that the job has been created but is not yet\nrunning.  Jobs that are pending may only transition to `JOB_STATE_RUNNING`,\nor `JOB_STATE_FAILED`.",
+            "`JOB_STATE_CANCELLING` indicates that the job has been explicitly cancelled\nand is in the process of stopping.  Jobs that are cancelling may only\ntransition to `JOB_STATE_CANCELLED` or `JOB_STATE_FAILED`.",
+            "`JOB_STATE_QUEUED` indicates that the job has been created but is being\ndelayed until launch. Jobs that are queued may only transition to\n`JOB_STATE_PENDING` or `JOB_STATE_CANCELLED`."
           ],
           "type": "string",
           "enum": [
@@ -244,7 +249,8 @@
             "JOB_STATE_DRAINING",
             "JOB_STATE_DRAINED",
             "JOB_STATE_PENDING",
-            "JOB_STATE_CANCELLING"
+            "JOB_STATE_CANCELLING",
+            "JOB_STATE_QUEUED"
           ]
         },
         "currentStateTime": {
@@ -264,8 +270,9 @@
             "`JOB_STATE_UPDATED` indicates that the job was successfully updated,\nmeaning that this job was stopped and another job was started, inheriting\nstate from this one. This is a terminal job state. This state may only be\nset by the Cloud Dataflow service, and only as a transition from\n`JOB_STATE_RUNNING`.",
             "`JOB_STATE_DRAINING` indicates that the job is in the process of draining.\nA draining job has stopped pulling from its input sources and is processing\nany data that remains in-flight. This state may be set via a Cloud Dataflow\n`UpdateJob` call, but only as a transition from `JOB_STATE_RUNNING`. Jobs\nthat are draining may only transition to `JOB_STATE_DRAINED`,\n`JOB_STATE_CANCELLED`, or `JOB_STATE_FAILED`.",
             "`JOB_STATE_DRAINED` indicates that the job has been drained.\nA drained job terminated by stopping pulling from its input sources and\nprocessing any data that remained in-flight when draining was requested.\nThis state is a terminal state, may only be set by the Cloud Dataflow\nservice, and only as a transition from `JOB_STATE_DRAINING`.",
-            "'JOB_STATE_PENDING' indicates that the job has been created but is not yet\nrunning.  Jobs that are pending may only transition to `JOB_STATE_RUNNING`,\nor `JOB_STATE_FAILED`.",
-            "'JOB_STATE_CANCELLING' indicates that the job has been explicitly cancelled\nand is in the process of stopping.  Jobs that are cancelling may only\ntransition to 'JOB_STATE_CANCELLED' or 'JOB_STATE_FAILED'."
+            "`JOB_STATE_PENDING` indicates that the job has been created but is not yet\nrunning.  Jobs that are pending may only transition to `JOB_STATE_RUNNING`,\nor `JOB_STATE_FAILED`.",
+            "`JOB_STATE_CANCELLING` indicates that the job has been explicitly cancelled\nand is in the process of stopping.  Jobs that are cancelling may only\ntransition to `JOB_STATE_CANCELLED` or `JOB_STATE_FAILED`.",
+            "`JOB_STATE_QUEUED` indicates that the job has been created but is being\ndelayed until launch. Jobs that are queued may only transition to\n`JOB_STATE_PENDING` or `JOB_STATE_CANCELLED`."
           ],
           "type": "string",
           "enum": [
@@ -279,7 +286,8 @@
             "JOB_STATE_DRAINING",
             "JOB_STATE_DRAINED",
             "JOB_STATE_PENDING",
-            "JOB_STATE_CANCELLING"
+            "JOB_STATE_CANCELLING",
+            "JOB_STATE_QUEUED"
           ]
         },
         "executionInfo": {
@@ -342,6 +350,15 @@
         "jobMetadata": {
           "description": "This field is populated by the Dataflow service to support filtering jobs\nby the metadata values provided here. Populated for ListJobs and all GetJob\nviews SUMMARY and higher.",
           "$ref": "JobMetadata"
+        },
+        "startTime": {
+          "description": "The timestamp when the job was started (transitioned to JOB_STATE_PENDING).\nFlexible resource scheduling jobs are started with some delay after job\ncreation, so start_time is unset before start and is updated when the\njob is started by the Cloud Dataflow service. For other jobs, start_time\nalways equals to create_time and is immutable and set by the Cloud Dataflow\nservice.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "createdFromSnapshotId": {
+          "description": "If this is specified, the job's initial state is populated from the given\nsnapshot.",
+          "type": "string"
         }
       }
     },
@@ -1085,8 +1102,9 @@
             "`JOB_STATE_UPDATED` indicates that the job was successfully updated,\nmeaning that this job was stopped and another job was started, inheriting\nstate from this one. This is a terminal job state. This state may only be\nset by the Cloud Dataflow service, and only as a transition from\n`JOB_STATE_RUNNING`.",
             "`JOB_STATE_DRAINING` indicates that the job is in the process of draining.\nA draining job has stopped pulling from its input sources and is processing\nany data that remains in-flight. This state may be set via a Cloud Dataflow\n`UpdateJob` call, but only as a transition from `JOB_STATE_RUNNING`. Jobs\nthat are draining may only transition to `JOB_STATE_DRAINED`,\n`JOB_STATE_CANCELLED`, or `JOB_STATE_FAILED`.",
             "`JOB_STATE_DRAINED` indicates that the job has been drained.\nA drained job terminated by stopping pulling from its input sources and\nprocessing any data that remained in-flight when draining was requested.\nThis state is a terminal state, may only be set by the Cloud Dataflow\nservice, and only as a transition from `JOB_STATE_DRAINING`.",
-            "'JOB_STATE_PENDING' indicates that the job has been created but is not yet\nrunning.  Jobs that are pending may only transition to `JOB_STATE_RUNNING`,\nor `JOB_STATE_FAILED`.",
-            "'JOB_STATE_CANCELLING' indicates that the job has been explicitly cancelled\nand is in the process of stopping.  Jobs that are cancelling may only\ntransition to 'JOB_STATE_CANCELLED' or 'JOB_STATE_FAILED'."
+            "`JOB_STATE_PENDING` indicates that the job has been created but is not yet\nrunning.  Jobs that are pending may only transition to `JOB_STATE_RUNNING`,\nor `JOB_STATE_FAILED`.",
+            "`JOB_STATE_CANCELLING` indicates that the job has been explicitly cancelled\nand is in the process of stopping.  Jobs that are cancelling may only\ntransition to `JOB_STATE_CANCELLED` or `JOB_STATE_FAILED`.",
+            "`JOB_STATE_QUEUED` indicates that the job has been created but is being\ndelayed until launch. Jobs that are queued may only transition to\n`JOB_STATE_PENDING` or `JOB_STATE_CANCELLED`."
           ],
           "type": "string",
           "enum": [
@@ -1100,7 +1118,8 @@
             "JOB_STATE_DRAINING",
             "JOB_STATE_DRAINED",
             "JOB_STATE_PENDING",
-            "JOB_STATE_CANCELLING"
+            "JOB_STATE_CANCELLING",
+            "JOB_STATE_QUEUED"
           ]
         },
         "currentStateTime": {
@@ -1331,6 +1350,51 @@
         "name": {
           "description": "The name of the failed location.",
           "type": "string"
+        }
+      }
+    },
+    "SnapshotJobRequest": {
+      "id": "SnapshotJobRequest",
+      "description": "Request to create a snapshot of a job.",
+      "type": "object",
+      "properties": {
+        "ttl": {
+          "description": "TTL for the snapshot.",
+          "type": "string",
+          "format": "google-duration"
+        },
+        "location": {
+          "description": "The location that contains this job.",
+          "type": "string"
+        }
+      }
+    },
+    "Snapshot": {
+      "id": "Snapshot",
+      "description": "Represents a snapshot of a job.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique ID of this snapshot.",
+          "type": "string"
+        },
+        "projectId": {
+          "description": "The project this snapshot belongs to.",
+          "type": "string"
+        },
+        "sourceJobId": {
+          "description": "The job this snapshot was created from.",
+          "type": "string"
+        },
+        "creationTime": {
+          "description": "The time this snapshot was created.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "ttl": {
+          "description": "The time after which this snapshot will be automatically deleted.",
+          "type": "string",
+          "format": "google-duration"
         }
       }
     },
@@ -1612,6 +1676,11 @@
       "description": "The environment values to set at runtime.",
       "type": "object",
       "properties": {
+        "numWorkers": {
+          "description": "The initial number of Google Compute Engine instnaces for the job.",
+          "type": "integer",
+          "format": "int32"
+        },
         "maxWorkers": {
           "description": "The maximum number of Google Compute Engine instances to be made\navailable to your pipeline during execution, from 1 to 1000.",
           "type": "integer",
@@ -1651,6 +1720,13 @@
         "subnetwork": {
           "description": "Subnetwork to which VMs will be assigned, if desired.  Expected to be of\nthe form \"regions\/REGION\/subnetworks\/SUBNETWORK\".",
           "type": "string"
+        },
+        "additionalUserLabels": {
+          "description": "Additional user labels attached to the job.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
@@ -2699,6 +2775,11 @@
           "description": "A fraction at which to split the work item, from 0.0 (beginning of the\ninput) to 1.0 (end of the input).",
           "type": "number",
           "format": "double"
+        },
+        "fractionOfRemainder": {
+          "description": "The fraction of the remainder of work to split the work item at, from 0.0\n(split at the current position) to 1.0 (end of the input).",
+          "type": "number",
+          "format": "double"
         }
       }
     },
@@ -2864,6 +2945,10 @@
         },
         "stageName": {
           "description": "System-defined name of the stage containing this MapTask.\nUnique across the workflow.",
+          "type": "string"
+        },
+        "counterPrefix": {
+          "description": "Counter prefix that can be used to prefix counters. Not currently used in\nDataflow.",
           "type": "string"
         }
       }
@@ -3240,6 +3325,10 @@
         "drain": {
           "description": "The user has requested drain.",
           "type": "boolean"
+        },
+        "snapshotConfig": {
+          "description": "Configures streaming appliance snapshot.",
+          "$ref": "StreamingApplianceSnapshotConfig"
         }
       }
     },
@@ -3476,6 +3565,21 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "StreamingApplianceSnapshotConfig": {
+      "id": "StreamingApplianceSnapshotConfig",
+      "description": "Streaming appliance snapshot configuration.",
+      "type": "object",
+      "properties": {
+        "snapshotId": {
+          "description": "If set, indicates the snapshot id for the snapshot being performed.",
+          "type": "string"
+        },
+        "importStateEndpoint": {
+          "description": "Indicates which endpoint is used to import appliance state.",
+          "type": "string"
         }
       }
     },
@@ -4261,6 +4365,43 @@
               ],
               "description": "List the jobs of a project across all regions."
             },
+            "snapshot": {
+              "id": "dataflow.projects.jobs.snapshot",
+              "path": "v1b3/projects/{projectId}/jobs/{jobId}:snapshot",
+              "flatPath": "v1b3/projects/{projectId}/jobs/{jobId}:snapshot",
+              "httpMethod": "POST",
+              "parameters": {
+                "projectId": {
+                  "description": "The project which owns the job to be snapshotted.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "jobId": {
+                  "description": "The job to be snapshotted.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "projectId",
+                "jobId"
+              ],
+              "request": {
+                "$ref": "SnapshotJobRequest"
+              },
+              "response": {
+                "$ref": "Snapshot"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/compute",
+                "https://www.googleapis.com/auth/compute.readonly",
+                "https://www.googleapis.com/auth/userinfo.email"
+              ],
+              "description": "Snapshot the state of a streaming job."
+            },
             "getMetrics": {
               "id": "dataflow.projects.jobs.getMetrics",
               "path": "v1b3/projects/{projectId}/jobs/{jobId}/metrics",
@@ -4596,7 +4737,17 @@
                   "type": "boolean"
                 },
                 "gcsPath": {
-                  "description": "Required. A Cloud Storage path to the template from which to create\nthe job.\nMust be valid Cloud Storage URL, beginning with 'gs:\/\/'.",
+                  "description": "A Cloud Storage path to the template from which to create\nthe job.\nMust be valid Cloud Storage URL, beginning with 'gs:\/\/'.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "dynamicTemplate.gcsPath": {
+                  "description": "Path to dynamic template spec file on GCS.\nThe file must be a Json serialized DynamicTemplateFieSpec object.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "dynamicTemplate.stagingLocation": {
+                  "description": "Cloud Storage path for staging dependencies.\nMust be a valid Cloud Storage URL, beginning with `gs:\/\/`.",
                   "location": "query",
                   "type": "string"
                 },
@@ -4636,7 +4787,7 @@
                   "type": "string"
                 },
                 "gcsPath": {
-                  "description": "Required. A Cloud Storage path to the template from which to\ncreate the job.\nMust be a valid Cloud Storage URL, beginning with `gs:\/\/`.",
+                  "description": "Required. A Cloud Storage path to the template from which to\ncreate the job.\nMust be valid Cloud Storage URL, beginning with 'gs:\/\/'.",
                   "location": "query",
                   "type": "string"
                 },
@@ -4929,6 +5080,50 @@
                     "https://www.googleapis.com/auth/userinfo.email"
                   ],
                   "description": "List the jobs of a project in a given region."
+                },
+                "snapshot": {
+                  "id": "dataflow.projects.locations.jobs.snapshot",
+                  "path": "v1b3/projects/{projectId}/locations/{location}/jobs/{jobId}:snapshot",
+                  "flatPath": "v1b3/projects/{projectId}/locations/{location}/jobs/{jobId}:snapshot",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "projectId": {
+                      "description": "The project which owns the job to be snapshotted.",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "location": {
+                      "description": "The location that contains this job.",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "jobId": {
+                      "description": "The job to be snapshotted.",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "projectId",
+                    "location",
+                    "jobId"
+                  ],
+                  "request": {
+                    "$ref": "SnapshotJobRequest"
+                  },
+                  "response": {
+                    "$ref": "Snapshot"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/compute",
+                    "https://www.googleapis.com/auth/compute.readonly",
+                    "https://www.googleapis.com/auth/userinfo.email"
+                  ],
+                  "description": "Snapshot the state of a streaming job."
                 },
                 "getMetrics": {
                   "id": "dataflow.projects.locations.jobs.getMetrics",
@@ -5310,7 +5505,17 @@
                       "type": "boolean"
                     },
                     "gcsPath": {
-                      "description": "Required. A Cloud Storage path to the template from which to create\nthe job.\nMust be valid Cloud Storage URL, beginning with 'gs:\/\/'.",
+                      "description": "A Cloud Storage path to the template from which to create\nthe job.\nMust be valid Cloud Storage URL, beginning with 'gs:\/\/'.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "dynamicTemplate.gcsPath": {
+                      "description": "Path to dynamic template spec file on GCS.\nThe file must be a Json serialized DynamicTemplateFieSpec object.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "dynamicTemplate.stagingLocation": {
+                      "description": "Cloud Storage path for staging dependencies.\nMust be a valid Cloud Storage URL, beginning with `gs:\/\/`.",
                       "location": "query",
                       "type": "string"
                     }
@@ -5352,7 +5557,7 @@
                       "type": "string"
                     },
                     "gcsPath": {
-                      "description": "Required. A Cloud Storage path to the template from which to\ncreate the job.\nMust be a valid Cloud Storage URL, beginning with `gs:\/\/`.",
+                      "description": "Required. A Cloud Storage path to the template from which to\ncreate the job.\nMust be valid Cloud Storage URL, beginning with 'gs:\/\/'.",
                       "location": "query",
                       "type": "string"
                     },

@@ -32,8 +32,8 @@ from tests.lib import e2e_base
 from tests.lib import e2e_utils
 from tests.lib import test_case
 
-
-GOOGLE_ORG_ID = 'organizations/433637338589'
+# Folder: /products/cloud-sdk/testing, folders/172367922913
+CLOUD_SDK_TESTING_FOLDER_ID = 'folders/172367922913'
 
 
 class EnablementTest(e2e_base.WithServiceAuth):
@@ -53,7 +53,7 @@ class EnablementTest(e2e_base.WithServiceAuth):
     self.project_ref = command_lib_util.ParseProject(self.project_id)
     create_op = projects_api.Create(
         self.project_ref,
-        parent=projects_api.ParentNameToResourceId(GOOGLE_ORG_ID))
+        parent=projects_api.ParentNameToResourceId(CLOUD_SDK_TESTING_FOLDER_ID))
     log.CreatedResource(self.project_ref, is_async=True)
     operations.WaitForOperation(create_op)
 

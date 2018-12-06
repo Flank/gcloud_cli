@@ -254,6 +254,31 @@ class CreateBackupScheduleTest(resource_policies_base.TestBase,
     self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
     self.assertEqual(result, policy)
 
+  def testCreate_RetentionBehaviorFlags(self):
+    schedule = self.messages.ResourcePolicyBackupSchedulePolicySchedule(
+        hourlySchedule=self.messages.ResourcePolicyHourlyCycle(
+            hoursInCycle=2, startTime='04:00'))
+    policy = self.messages.ResourcePolicy(
+        name='pol1',
+        region=self.region,
+        backupSchedulePolicy=self.messages.ResourcePolicyBackupSchedulePolicy(
+            retentionPolicy=self.messages
+            .ResourcePolicyBackupSchedulePolicyRetentionPolicy(
+                maxRetentionDays=1,
+                onSourceDiskDelete=self.messages
+                .ResourcePolicyBackupSchedulePolicyRetentionPolicy
+                .OnSourceDiskDeleteValueValuesEnum.KEEP_AUTO_SNAPSHOTS),
+            schedule=schedule))
+    request = self._ExpectCreate(policy)
+
+    result = self.Run(
+        'compute resource-policies create-backup-schedule pol1 --region {} '
+        '--start-time 04:00Z --hourly-schedule 2 --max-retention-days 1 '
+        '--on-source-disk-delete keep-auto-snapshots'.format(self.region))
+
+    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
+    self.assertEqual(result, policy)
+
   @parameterized.named_parameters(
       ('WithStorageLocation', '--storage-location us-west1', ['us-west1']),
       ('WithoutStorageLocation', '', []))
@@ -310,10 +335,8 @@ class CreateBackupScheduleTest(resource_policies_base.TestBase,
           .format(self.region))
 
   @parameterized.parameters(
-      ('--start-time 04:00Z --weekly-schedule-from-file myfile.txt'),
-      ('--weekly-schedule monday'),
-      ('--daily-schedule'),
-      ('--hourly-schedule 2'))
+      '--start-time 04:00Z --weekly-schedule-from-file myfile.txt',
+      '--weekly-schedule monday', '--daily-schedule', '--hourly-schedule 2')
   def testCreate_FreqGroupValidation(self, flags):
     with self.AssertRaisesArgumentError():
       self.Run(

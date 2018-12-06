@@ -23,10 +23,10 @@ import filecmp
 import os
 
 from apitools.base.py import exceptions as apitools_exceptions
-from apitools.base.py import transfer
 
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
@@ -50,7 +50,8 @@ class UploadDownloadTest(e2e_base.WithServiceAuth):
         prefix=BUCKET_PREFIX))
 
   def _AssertFileUploaded(self, bucket_ref, expected_file):
-    object_ = storage_util.ObjectReference(bucket_ref, expected_file)
+    object_ = storage_util.ObjectReference.FromBucketRef(
+        bucket_ref, expected_file)
     try:
       self.storage_client.GetObject(object_)
     except apitools_exceptions.HttpError as err:
@@ -63,17 +64,21 @@ class UploadDownloadTest(e2e_base.WithServiceAuth):
                                              self.Project()) as bucket:
       file_path = self.Touch(
           self.temp_path, 'test_file', contents=contents.encode('utf-8'))
-      with storage_e2e_util.GcsFile(self.storage_client, bucket, file_path,
-                                    self.object_path):
+      target_obj_ref = storage_util.ObjectReference.FromBucketRef(
+          bucket, self.object_path)
+      with storage_e2e_util.GcsFile(self.storage_client, file_path,
+                                    target_obj_ref):
         self._AssertFileUploaded(bucket, self.object_path)
 
         download_path = os.path.join(self.temp_path, 'download_file')
-        self.storage_client.CopyFileFromGCS(bucket, self.object_path,
-                                            download_path)
+        source_obj_ref = storage_util.ObjectReference.FromBucketRef(
+            bucket, self.object_path)
+        self.storage_client.CopyFileFromGCS(source_obj_ref, download_path)
 
         # Now download again using ReadObject, the in-memory version of
         # CopyFileFromGCS
-        object_ref = storage_util.ObjectReference(bucket, self.object_path)
+        object_ref = storage_util.ObjectReference.FromBucketRef(
+            bucket, self.object_path)
         stream = self.storage_client.ReadObject(object_ref)
 
     # Check regular file download
@@ -90,12 +95,11 @@ class UploadDownloadTest(e2e_base.WithServiceAuth):
   def testCopyFileToAndFromGcs_NonAscii(self):
     self._TestUploadAndDownload('\u0394')
 
-  @test_case.Filters.skip('Flaky.', 'b/38446187')
   def testCopyFileToAndFromGcs_LargeFile(self):
     """Tests file uploads that require chunking."""
     # Default chunk size isn't available as a constant
     # Need 10 multiples until issue with copied stream chunks appears.
-    file_length = transfer.Upload(None, '').chunksize * 10
+    file_length = properties.VALUES.storage.chunk_size.GetInt() * 10
     # There's a check for large files accidentally left in the temporary
     # directory; we're okay with it in this case, since this deliberately tests
     # a large file.
@@ -105,16 +109,20 @@ class UploadDownloadTest(e2e_base.WithServiceAuth):
     with storage_e2e_util.CloudStorageBucket(self.storage_client,
                                              self.bucket_name,
                                              self.Project()) as bucket:
-      with storage_e2e_util.GcsFile(self.storage_client, bucket, file_path,
-                                    self.object_path):
+      target_obj_ref = storage_util.ObjectReference.FromBucketRef(
+          bucket, self.object_path)
+      with storage_e2e_util.GcsFile(self.storage_client, file_path,
+                                    target_obj_ref):
         self._AssertFileUploaded(bucket, self.object_path)
     # Don't run the download portion of the test as a time-saving measure
 
   @test_case.Filters.RunOnlyIf(_GSUTIL_EXECUTABLE, 'No gsutil found')
+  @test_case.Filters.SkipOnPy3('gsutil does not work on py3', 'b/109938541')
   def testRunGsutilCommand(self):
     self.assertEqual(0, storage_util.RunGsutilCommand('help'))
 
   @test_case.Filters.RunOnlyIf(_GSUTIL_EXECUTABLE, 'No gsutil found')
+  @test_case.Filters.SkipOnPy3('gsutil does not work on py3', 'b/109938541')
   def testGsutilCopy(self):
     file_length = 1024
     file_path = self.Touch(self.temp_path, 'test_file',
@@ -139,7 +147,8 @@ class UploadDownloadTest(e2e_base.WithServiceAuth):
       self.assertTrue(filecmp.cmp(file_path, download_file_path))
 
       # Try to clean up
-      self.storage_client.DeleteObject(bucket, self.object_path)
+      obj_ref = storage_util.ObjectReference.FromUrl(object_uri)
+      self.storage_client.DeleteObject(obj_ref)
 
 if __name__ == '__main__':
   test_case.main()

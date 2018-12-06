@@ -28,9 +28,6 @@ DESCRIPTION
     For information about the JSON/YAML format of an alerting policy:
     https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies
 
-    Note: When specifying the Channel as a YAML/JSON, the use of channelLabels
-    as an alternative name for labels is supported.
-
 FLAGS
      Notification Channel resource - Names of one or more Notification Channels
      to be added to the policy. These should be the resource names (not the
@@ -44,9 +41,9 @@ FLAGS
         https://monitoring.googleapis.com/v3/projects/my-project/notificationChannels/channel-id0
         This represents a Cloud resource. (NOTE) Some attributes are not given
         arguments in this group but can be set in other ways. To set the
-        [project] attribute: provide the flag [--notification-channels] on the
-        command line with a fully specified name; provide the flag [--project]
-        on the command line; set the property [core/project].
+        [project] attribute: provide the argument [--notification-channels] on
+        the command line with a fully specified name; provide the argument
+        [--project] on the command line; set the property [core/project].
 
          --notification-channels=[NOTIFICATION_CHANNELS,...]
             IDs of the Notification Channels or fully qualified identifiers for
@@ -132,8 +129,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

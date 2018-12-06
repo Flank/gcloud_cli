@@ -26,6 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.source import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class ProjectConfigUpdatePushblockTest(base.SourceTestBase):
@@ -59,6 +60,7 @@ class ProjectConfigUpdatePushblockTest(base.SourceTestBase):
     self.Run('source project-configs update --disable-pushblock')
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class ProjectConfigUpdateAddTopicTest(base.SourceTestBase):
@@ -127,6 +129,7 @@ class ProjectConfigUpdateAddTopicTest(base.SourceTestBase):
              '--message-format=protobuf --service-account=b@gmail.com')
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
@@ -209,7 +212,7 @@ class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
 
   def testRemove_Empty(self, track):
     self.track = track
-    initial_project_config = self.messages.Repo(
+    initial_project_config = self.messages.ProjectConfig(
         name=self._GetProjectRef().RelativeName())
     self._ExpectGetProjectConfig(self._GetProjectRef(), initial_project_config)
     error_message = re.escape(
@@ -220,6 +223,7 @@ class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
       self.Run('source project-configs update --remove-topic=foo')
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):

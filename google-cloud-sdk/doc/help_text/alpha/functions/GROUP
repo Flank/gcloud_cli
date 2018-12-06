@@ -9,8 +9,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -28,6 +29,9 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (ALPHA) Add an IAM policy binding for a Google Cloud Function.
+
      call
         (ALPHA) Trigger execution of a Google Cloud Function.
 
@@ -40,8 +44,17 @@ COMMANDS
      describe
         (ALPHA) Display details of a Google Cloud Function.
 
+     get-iam-policy
+        (ALPHA) Get IAM policy for a Google Cloud Function.
+
      list
         (ALPHA) List Google Cloud Functions.
+
+     remove-iam-policy-binding
+        (ALPHA) Removes an IAM policy binding from a Google Cloud Function.
+
+     set-iam-policy
+        (ALPHA) Sets IAM policy for a Google Cloud Function.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -17,17 +17,28 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.command_lib.static_completion import generate
+from googlecloudsdk.command_lib.static_completion import lookup
 from tests.lib import cli_test_base
 from tests.lib import test_case
 
 
 class UpdateTest(cli_test_base.CliTestBase):
 
-  def testUpdateAliasSuggestion(self):
+  def testUpdateSuggestion(self):
+    self.root = generate.GenerateCompletionTree(self.cli,
+                                                ignore_load_errors=True)
+    self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
+                          return_value=self.root)
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.Run('update')
-    self.AssertErrContains('Invalid choice: \'update\'. '
-                           'Did you mean \'gcloud components update\'?')
+    self.AssertErrContains("""\
+ERROR: (gcloud) Invalid choice: 'update'.
+Maybe you meant:
+  gcloud app update
+  gcloud components update
+  gcloud projects update
+""")
 
 
 if __name__ == '__main__':

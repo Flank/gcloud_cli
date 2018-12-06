@@ -1,24 +1,28 @@
 NAME
     gcloud alpha pubsub subscriptions remove-iam-policy-binding - remove IAM
-        policy binding for a subscription
+        policy binding of a subscription
 
 SYNOPSIS
     gcloud alpha pubsub subscriptions remove-iam-policy-binding SUBSCRIPTION
-        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+        --member=MEMBER --role=ROLE
+        [--all | --condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Removes an IAM policy binding for a Cloud Pub/Sub Subscription.
+    (ALPHA) Remove an IAM policy binding from the IAM policy of a Cloud Pub/Sub
+    Subscription. One binding consists of a member, a role, and an optional
+    condition.
 
 POSITIONAL ARGUMENTS
-     Subscription resource - Name of the subscription to remove an IAM policy
-     binding from. This represents a Cloud resource. (NOTE) Some attributes are
-     not given arguments in this group but can be set in other ways. To set the
-     [project] attribute: provide the flag [subscription] on the command line
-     with a fully specified name; provide the flag [--project] on the command
-     line; set the property [core/project]. This must be specified.
+     Subscription resource - The subscription to remove the IAM policy binding
+     from. This represents a Cloud resource. (NOTE) Some attributes are not
+     given arguments in this group but can be set in other ways. To set the
+     [project] attribute: provide the argument [subscription] on the command
+     line with a fully specified name; provide the argument [--project] on the
+     command line; set the property [core/project]. This must be specified.
 
        SUBSCRIPTION
-          The ID of the subscription or a fully qualified identifier for the
+          ID of the subscription or fully qualified identifier for the
           subscription.
 
 REQUIRED FLAGS
@@ -39,15 +43,52 @@ REQUIRED FLAGS
      --role=ROLE
         The role to remove the member from.
 
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --all
+          Remove all bindings with this role and member, irrespective of any
+          conditions.
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be removed. When condition is explicitly
+          specified as None (e.g. --condition=None), it matches a binding
+          without a condition. Otherwise, only the binding with a condition
+          which exactly matches the specified condition (including the optional
+          description) will be removed.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the pubsub/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/pubsub/docs
 
 EXAMPLES
-    The following command will remove an IAM policy binding for the role of
-    'roles/editor' for the user 'test-user@gmail.com' on subscription with
-    identifier 'my-subscription'
+    To remove an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' with subscription 'my-subscription', run:
 
         $ gcloud alpha pubsub subscriptions remove-iam-policy-binding \
             my-subscription --member='user:test-user@gmail.com' \
@@ -60,6 +101,17 @@ EXAMPLES
         $ gcloud alpha pubsub subscriptions remove-iam-policy-binding \
             my-subscription --member='allAuthenticatedUsers' \
             --role='roles/editor'
+
+    To remove an IAM policy binding which expires at the end of the year 2018
+    for the role of 'roles/pubsub.subscriber' and the user
+    'test-user@gmail.com' with subscription 'my-subscription', run:
+
+        $ gcloud alpha pubsub subscriptions remove-iam-policy-binding \
+            my-subscription --member='user:test-user@gmail.com' \
+            --role='roles/pubsub.subscriber' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

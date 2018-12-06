@@ -477,5 +477,191 @@ class SuffixConsoleMessageTest(test_case.TestCase, parameterized.TestCase):
       scm._UpdateSuffix(new_suffix)
 
 
+class MultilineConsoleMessageTest(test_case.TestCase, parameterized.TestCase):
+
+  def SetUp(self):
+    self.console_size_mock = self.StartObjectPatch(
+        console_attr.ConsoleAttr, 'GetTermSize')
+    self.SetConsoleSize(15)
+
+  def SetConsoleSize(self, size):
+    self.console_size_mock.return_value = (size + 1, 'unused size')
+    return size
+
+  @parameterized.parameters(0, 1)
+  def testPrintAddsNewlineToLastLine(self, indentation_level):
+    console_size = self.SetConsoleSize(15 + 2 * indentation_level)
+    indentation = ' ' * 2 * indentation_level
+    stream = io.StringIO()
+    scm = multiline.MultilineConsoleMessage(
+        'My message', stream, indentation_level=indentation_level)
+    scm.Print()
+    scm.Print()
+    self.assertEqual(
+        # Print 1
+        '\r' + ' ' * console_size + '\r' +
+        indentation + 'My message\n' +
+        # Print 2
+        '\r' + ' ' * console_size + '\r' +
+        indentation + 'My message\n',
+        stream.getvalue())
+
+  @parameterized.parameters(0, 1)
+  def testPrintAddsNewlineToLastLineMultipleLines(self, indentation_level):
+    console_size = self.SetConsoleSize(15 + 2 * indentation_level)
+    indentation = ' ' * 2 * indentation_level
+    stream = io.StringIO()
+    scm = multiline.MultilineConsoleMessage(
+        'a' * 20, stream, indentation_level=indentation_level)
+    scm.Print()
+    scm.Print()
+    self.assertEqual(
+        # Print 1
+        '\r' + ' ' * console_size + '\r' +
+        indentation + 'a' * 15 + '\n' +
+        '\r' + ' ' * console_size + '\r' +
+        indentation + 'a' * 5 + '\n' +
+        # Print 2
+        '\r' + ' ' * console_size + '\r' +
+        indentation + 'a' * 15 + '\n' +
+        '\r' + ' ' * console_size + '\r' +
+        indentation + 'a' * 5 + '\n',
+        stream.getvalue())
+
+  @parameterized.parameters(0, 1)
+  def testHasUpdate(self, indentation_level):
+    console_size = self.SetConsoleSize(15 + 2 * indentation_level)
+    indentation = ' ' * 2 * indentation_level
+    stream = io.StringIO()
+    scm = multiline.MultilineConsoleMessage(
+        'My message', stream, indentation_level=indentation_level)
+    self.assertTrue(scm.has_update)
+    scm.Print()
+    self.assertFalse(scm.has_update)
+    scm._UpdateMessage('egassem yM')
+    self.assertTrue(scm.has_update)
+    scm.Print()
+    self.assertFalse(scm.has_update)
+    self.assertEqual(
+        # Print 1
+        '\r' + ' ' * console_size + '\r' +
+        indentation + 'My message\n' +
+        # Print 2
+        '\r' + ' ' * console_size + '\r' +
+        indentation + 'egassem yM\n',
+        stream.getvalue())
+
+
+class MultilineConsoleOutputTest(test_case.TestCase):
+
+  def SetUp(self):
+    self.console_size_mock = self.StartObjectPatch(
+        console_attr.ConsoleAttr, 'GetTermSize')
+    self.console_size = self.SetConsoleSize(15)
+    self.ansi_cursor_up = '\x1b[{}A'
+
+  def SetConsoleSize(self, size):
+    self.console_size_mock.return_value = (size + 1, 'unused size')
+    return size
+
+  def testUpdateNoMessages(self):
+    stream = io.StringIO()
+    mco = multiline.MultilineConsoleOutput(stream)
+    mco.UpdateConsole()
+    self.assertEqual('', stream.getvalue())
+
+  def testAddAndUpdateConsole(self):
+    stream = io.StringIO()
+    mco = multiline.MultilineConsoleOutput(stream)
+    mco.AddMessage('message')
+    self.assertEqual('', stream.getvalue())
+    mco.UpdateConsole()
+    mco.UpdateConsole()
+    self.assertEqual(
+        # Update 1 (Update 2 is empty as no update necessary)
+        '\r' + ' ' * self.console_size + '\r' +
+        'message\n',
+        stream.getvalue())
+
+  def testAddAndUpdateMessage(self):
+    stream = io.StringIO()
+    mco = multiline.MultilineConsoleOutput(stream)
+    message = mco.AddMessage('message')
+    mco.UpdateConsole()
+    mco.UpdateMessage(message, 'egassem')
+    mco.UpdateConsole()
+    self.assertEqual(
+        # Update 1
+        '\r' + ' ' * self.console_size + '\r' +
+        'message\n' +
+        # Update 2
+        self.ansi_cursor_up.format(1) +
+        '\r' + ' ' * self.console_size + '\r' +
+        'egassem\n',
+        stream.getvalue())
+
+  def testAddUpdateAddMessage(self):
+    stream = io.StringIO()
+    mco = multiline.MultilineConsoleOutput(stream)
+    message = mco.AddMessage('message')
+    mco.UpdateConsole()
+    mco.UpdateMessage(message, 'egassem')
+    mco.AddMessage('asdf')
+    mco.UpdateConsole()
+    self.assertEqual(
+        # Update 1
+        '\r' + ' ' * self.console_size + '\r' +
+        'message\n' +
+        # Update 2
+        self.ansi_cursor_up.format(1) +
+        '\r' + ' ' * self.console_size + '\r' +
+        'egassem\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        'asdf\n',
+        stream.getvalue())
+
+  def testMessagesGetShorter(self):
+    stream = io.StringIO()
+    mco = multiline.MultilineConsoleOutput(stream)
+    message1 = mco.AddMessage('a' * 20)
+    message2 = mco.AddMessage('b' * 20)
+    mco.UpdateConsole()
+    mco.UpdateMessage(message1, 'c' * 5)
+    mco.UpdateMessage(message2, 'd' * 5)
+    mco.UpdateConsole()
+    self.assertEqual(
+        # Update 1
+        '\r' + ' ' * self.console_size + '\r' +
+        'a' * 15 + '\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        'a' * 5 + '\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        'b' * 15 + '\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        'b' * 5 + '\n' +
+        # Update 2
+        self.ansi_cursor_up.format(4) +
+        '\r' + ' ' * self.console_size + '\r' +
+        'c' * 5 + '\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        'd' * 5 + '\n',
+        stream.getvalue())
+
+  def testUpdateMessageInvalidMessage(self):
+    stream = io.StringIO()
+    mco = multiline.MultilineConsoleOutput(stream)
+    stray_message = multiline.MultilineConsoleMessage('asdf', stream)
+    with self.assertRaisesRegex(
+        ValueError,
+        'The given message does not belong to this output object.'):
+      mco.UpdateMessage(stray_message, 'fdsa')
+
+  def testUpdateMessageNoMessage(self):
+    stream = io.StringIO()
+    mco = multiline.MultilineConsoleOutput(stream)
+    with self.assertRaisesRegex(ValueError, 'A message must be passed.'):
+      mco.UpdateMessage(None, 'fdsa')
+
+
 if __name__ == '__main__':
   test_case.main()

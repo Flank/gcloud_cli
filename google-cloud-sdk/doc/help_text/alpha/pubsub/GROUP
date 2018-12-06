@@ -9,15 +9,15 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
 
      snapshots
-        (ALPHA) These features are part of an invite-only release of the Cloud
-        Pub/Sub API.
+        (ALPHA) Manage Cloud Pub/Sub snapshots.
 
      subscriptions
         (ALPHA) Manage Cloud Pubsub subscriptions.

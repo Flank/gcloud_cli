@@ -15,27 +15,43 @@
 """Export workflow template command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import sys
 from googlecloudsdk.api_lib.dataproc import dataproc as dp
-from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.dataproc import flags
-from googlecloudsdk.command_lib.dataproc import workflow_templates
+from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core.util import files
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
   """Export a workflow template.
 
   Exports a workflow template's configuration to a file.
-  This configuration can be imported at a later time."""
+  This configuration can be imported at a later time.
+  """
 
-  @staticmethod
-  def Args(parser):
-    flags.AddTemplateResourceArg(parser, 'export')
-    flags.AddTemplateDestinationFlag(parser)
+  @classmethod
+  def GetApiVersion(cls):
+    """Returns the API version based on the release track."""
+    if cls.ReleaseTrack() == base.ReleaseTrack.BETA:
+      return 'v1beta2'
+    return 'v1'
+
+  @classmethod
+  def GetSchemaPath(cls, for_help=False):
+    """Returns the resource schema path."""
+    return export_util.GetSchemaPath(
+        'dataproc', cls.GetApiVersion(), 'WorkflowTemplate', for_help=for_help)
+
+  @classmethod
+  def Args(cls, parser):
+    flags.AddTemplateResourceArg(
+        parser, 'export', api_version=cls.GetApiVersion())
+    export_util.AddExportFlags(parser, cls.GetSchemaPath(for_help=True))
     flags.AddVersionFlag(parser)
 
   def Run(self, args):
@@ -49,12 +65,10 @@ class Describe(base.DescribeCommand):
 
     if args.destination:
       with files.FileWriter(args.destination) as stream:
-        util.WriteYaml(
-            message=workflow_template,
-            stream=stream,
-            filter_function=workflow_templates.Filter)
+        export_util.Export(message=workflow_template,
+                           stream=stream,
+                           schema_path=self.GetSchemaPath())
     else:
-      util.WriteYaml(
-          message=workflow_template,
-          stream=sys.stdout,
-          filter_function=workflow_templates.Filter)
+      export_util.Export(message=workflow_template,
+                         stream=sys.stdout,
+                         schema_path=self.GetSchemaPath())

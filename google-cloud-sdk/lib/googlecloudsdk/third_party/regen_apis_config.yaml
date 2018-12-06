@@ -38,6 +38,10 @@ apis:
   accesscontextmanager:
     v1alpha:
       discovery_doc: accesscontextmanager_v1alpha.json
+      default: false
+    v1beta:
+      discovery_doc: accesscontextmanager_v1beta.json
+      default: true
   apikeys:
     v1:
       discovery_doc: apikeys_v1.json
@@ -107,6 +111,9 @@ apis:
           path: assets/{assetId}/annotationTag
         organizations:
           path: organizations/{organizationId}
+  cloudasset:
+    v1beta1:
+      discovery_doc: cloudasset_v1beta1.json
   cloudbilling:
     v1:
       discovery_doc: cloudbilling_v1.json
@@ -180,10 +187,18 @@ apis:
   cloudtasks:
     v2beta2:
       discovery_doc: cloudtasks_v2beta2.json
+      default: true
+    v2beta3:
+      discovery_doc: cloudtasks_v2beta3.json
   cloudscheduler:
     v1alpha1:
       discovery_doc: cloudscheduler_v1alpha1.json
+    v1beta1:
+      discovery_doc: cloudscheduler_v1beta1.json
+      default: true
   composer:
+    v1alpha2:
+      discovery_doc: composer_v1alpha2.json
     v1beta1:
       discovery_doc: composer_v1beta1.json
     v1:
@@ -212,6 +227,8 @@ apis:
       resources:
         nextHopGateways:
           path: projects/{project}/global/gateways/{nextHopGateway}
+        securityPolicyRules:
+          path: projects/{project}/global/securityPolicies/{securityPolicy}/securityPolicyRules/{securityPolicyRule}
   container:
     v1:
       discovery_doc: container_v1.json
@@ -232,6 +249,9 @@ apis:
   containeranalysis:
     v1alpha1:
       discovery_doc: containeranalysis_v1alpha1.json
+      default: true
+    v1beta1:
+      discovery_doc: containeranalysis_v1beta1.json
   dataflow:
     v1b3:
       discovery_doc: dataflow_v1b3.json
@@ -281,20 +301,19 @@ apis:
     v1:
       discovery_doc: dns_v1.json
       default: true
-    v1alpha2:
-      discovery_doc: dns_v1alpha2.json
-    v1beta1:
-      discovery_doc: dns_v1beta1.json
     v1beta2:
       discovery_doc: dns_v1beta2.json
-    v2beta1:
-      discovery_doc: dns_v2beta1.json
+  eventflow:
+    v1beta2:
+      discovery_doc: eventflow_v1beta2.json
   file:
     v1alpha1:
       discovery_doc: file_v1alpha1.json
       default: true
     v1beta1:
       discovery_doc: file_v1beta1.json
+    v1:
+      discovery_doc: file_v1.json
   firestore:
     v1beta1:
       discovery_doc: firestore_v1beta1.json
@@ -329,6 +348,18 @@ apis:
   iam:
     v1:
       discovery_doc: iam_v1.json
+      resources:
+        iamPolicies:
+          path: iamPolicies
+  iamcredentials:
+    v1:
+      discovery_doc: iamcredentials_v1.json
+      resources:
+        serviceAccounts:
+          path: projects/{projectsId}/serviceAccounts/{serviceAccountsId}
+  iap:
+    v1beta1:
+      discovery_doc: iap_v1beta1.json
   kubernetespolicy:
     v1alpha1:
       discovery_doc: kubernetespolicy_v1alpha1.json
@@ -371,7 +402,10 @@ apis:
       discovery_doc: redis_v1alpha1.json
     v1beta1:
       discovery_doc: redis_v1beta1.json
+    v1:
+      discovery_doc: redis_v1.json
       default: true
+
   replicapoolupdater:
     v1beta1:
       discovery_doc: replicapoolupdater_v1beta1.json
@@ -485,3 +519,12 @@ apis:
   vpcaccess:
     v1alpha1:
       discovery_doc: vpcaccess_v1alpha1.json
+  remotebuildexecution:
+    v1alpha:
+      discovery_doc: remotebuildexecution_v1alpha.json
+  bigquery:
+    v2:
+      discovery_doc: bigquery_v2.json
+  bigquerydatatransfer:
+    v1:
+      discovery_doc: bigquerydatatransfer_v1.json

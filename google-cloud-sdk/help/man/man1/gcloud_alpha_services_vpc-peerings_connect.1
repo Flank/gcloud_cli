@@ -11,7 +11,7 @@ gcloud alpha services vpc\-peerings connect \- connect to a service via VPC peer
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha services vpc\-peerings connect\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-reserved\-ranges\fR=\fIRESERVED_RANGES\fR [\fB\-\-async\fR] [\fB\-\-service\fR=\fISERVICE\fR;\ default="servicenetworking.googleapis.com"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha services vpc\-peerings connect\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-ranges\fR=\fIRANGES\fR [\fB\-\-async\fR] [\fB\-\-service\fR=\fISERVICE\fR;\ default="servicenetworking.googleapis.com"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,8 +30,8 @@ project.
 The network in the current project to be peered with the service
 
 .TP 2m
-\fB\-\-reserved\-ranges\fR=\fIRESERVED_RANGES\fR
-The reserved IP CIDR ranges for service to use
+\fB\-\-ranges\fR=\fIRANGES\fR
+IP CIDR ranges for service to use.
 
 
 .RE
@@ -56,22 +56,22 @@ The service to connect to
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
 To connect a network called \f5my\-network\fR on the current project to a
-service called \f5your\-service\fR with reserved IP CIDR ranges
+service called \f5your\-service\fR with IP CIDR ranges
 \f510.197.0.0/20,10.198.0.0/20\fR for the service to use, run:
 
 .RS 2m
 $ gcloud alpha services vpc\-peerings connect \-\-network my\-network \e
     \-\-service your\-service \e
-    \-\-reserved\-ranges 10.197.0.0/20,10.198.0.0/20
+    \-\-ranges 10.197.0.0/20,10.198.0.0/20
 .RE
 
 To run the same command asynchronously (non\-blocking), run:
@@ -79,7 +79,7 @@ To run the same command asynchronously (non\-blocking), run:
 .RS 2m
 $ gcloud alpha services vpc\-peerings connect \-\-network my\-network \e
     \-\-service your\-service \e
-    \-\-reserved\-ranges 10.197.0.0/20,10.198.0.0/20 \-\-async
+    \-\-ranges 10.197.0.0/20,10.198.0.0/20 \-\-async
 .RE
 
 

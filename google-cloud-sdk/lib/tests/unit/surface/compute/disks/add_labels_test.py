@@ -25,6 +25,7 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.compute import disks_labels_test_base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class AddLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,

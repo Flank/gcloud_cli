@@ -40,8 +40,8 @@ OPTIONAL FLAGS
 
      --ksk-algorithm=KSK_ALGORITHM
         String mnemonic specifying the DNSSEC algorithm of the key-signing key.
-        Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256,
-        RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384
+        Requires DNSSEC enabled. KSK_ALGORITHM must be one of: ecdsap256sha256,
+        ecdsap384sha384, rsasha1, rsasha256, rsasha512.
 
      --ksk-key-length=KSK_KEY_LENGTH
         Length of the key-signing key in bits. Requires DNSSEC enabled.
@@ -55,17 +55,18 @@ OPTIONAL FLAGS
         numbers.
 
      --zsk-algorithm=ZSK_ALGORITHM
-        String mnemonic specifying the DNSSEC algorithm of the zone-signing
-        key. Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256,
-        RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384
+        String mnemonic specifying the DNSSEC algorithm of the key-signing key.
+        Requires DNSSEC enabled. ZSK_ALGORITHM must be one of: ecdsap256sha256,
+        ecdsap384sha384, rsasha1, rsasha256, rsasha512.
 
      --zsk-key-length=ZSK_KEY_LENGTH
         Length of the zone-signing key in bits. Requires DNSSEC enabled.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To create a managed-zone, run:

@@ -37,12 +37,12 @@ class ScpTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         ssh.SCPCommand, "Run", autospec=True, return_value=0)
 
   def testUploadOneFile(self):
-    self.mockConnection(host="my-host", port=123)
+    self.mockConnection(user="my-user", host="my-host", port=123)
     self.Run("alpha cloud-shell scp localhost:foo cloudshell:bar")
     self.scp_init.assert_called_once_with(
         mock.ANY,
         sources=[ssh.FileReference.FromPath("foo")],
-        destination=ssh.FileReference.FromPath("my-host:bar"),
+        destination=ssh.FileReference.FromPath("my-user@my-host:bar"),
         recursive=False,
         compress=False,
         port="123",
@@ -51,11 +51,11 @@ class ScpTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         options={"StrictHostKeyChecking": "no"})
 
   def testDownloadOneFile(self):
-    self.mockConnection(host="my-host", port=123)
+    self.mockConnection(user="my-user", host="my-host", port=123)
     self.Run("alpha cloud-shell scp cloudshell:foo localhost:bar")
     self.scp_init.assert_called_once_with(
         mock.ANY,
-        sources=[ssh.FileReference.FromPath("my-host:foo")],
+        sources=[ssh.FileReference.FromPath("my-user@my-host:foo")],
         destination=ssh.FileReference.FromPath("bar"),
         recursive=False,
         compress=False,
@@ -65,7 +65,7 @@ class ScpTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         options={"StrictHostKeyChecking": "no"})
 
   def testUploadManyFiles(self):
-    self.mockConnection(host="my-host", port=123)
+    self.mockConnection(user="my-user", host="my-host", port=123)
     self.Run("alpha cloud-shell scp localhost:foo localhost:bar cloudshell:baz")
     self.scp_init.assert_called_once_with(
         mock.ANY,
@@ -73,7 +73,7 @@ class ScpTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
             ssh.FileReference.FromPath("foo"),
             ssh.FileReference.FromPath("bar")
         ],
-        destination=ssh.FileReference.FromPath("my-host:baz"),
+        destination=ssh.FileReference.FromPath("my-user@my-host:baz"),
         recursive=False,
         compress=False,
         port="123",
@@ -82,14 +82,14 @@ class ScpTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         options={"StrictHostKeyChecking": "no"})
 
   def testDownloadManyFiles(self):
-    self.mockConnection(host="my-host", port=123)
+    self.mockConnection(user="my-user", host="my-host", port=123)
     self.Run(
         "alpha cloud-shell scp cloudshell:foo cloudshell:bar localhost:baz")
     self.scp_init.assert_called_once_with(
         mock.ANY,
         sources=[
-            ssh.FileReference.FromPath("my-host:foo"),
-            ssh.FileReference.FromPath("my-host:bar")
+            ssh.FileReference.FromPath("my-user@my-host:foo"),
+            ssh.FileReference.FromPath("my-user@my-host:bar")
         ],
         destination=ssh.FileReference.FromPath("baz"),
         recursive=False,
@@ -100,17 +100,17 @@ class ScpTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         options={"StrictHostKeyChecking": "no"})
 
   def testDryRun(self):
-    self.mockConnection(host="my-host", port=123)
+    self.mockConnection(user="my-user", host="my-host", port=123)
     self.Run("alpha cloud-shell scp localhost:foo cloudshell:bar --dry-run")
     self.scp_run.assert_not_called()
 
   def testRecurse(self):
-    self.mockConnection(host="my-host", port=123)
+    self.mockConnection(user="my-user", host="my-host", port=123)
     self.Run("alpha cloud-shell scp localhost:foo cloudshell:bar --recurse")
     self.scp_init.assert_called_once_with(
         mock.ANY,
         sources=[ssh.FileReference.FromPath("foo")],
-        destination=ssh.FileReference.FromPath("my-host:bar"),
+        destination=ssh.FileReference.FromPath("my-user@my-host:bar"),
         recursive=True,
         compress=False,
         port="123",
@@ -119,13 +119,13 @@ class ScpTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         options={"StrictHostKeyChecking": "no"})
 
   def testScpFlag(self):
-    self.mockConnection(host="my-host", port=123)
+    self.mockConnection(user="my-user", host="my-host", port=123)
     self.Run("alpha cloud-shell scp localhost:foo cloudshell:bar "
              "--scp-flag=-someFlag --scp-flag=anotherFlag")
     self.scp_init.assert_called_once_with(
         mock.ANY,
         sources=[ssh.FileReference.FromPath("foo")],
-        destination=ssh.FileReference.FromPath("my-host:bar"),
+        destination=ssh.FileReference.FromPath("my-user@my-host:bar"),
         recursive=False,
         compress=False,
         port="123",

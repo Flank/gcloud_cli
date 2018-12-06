@@ -36,7 +36,7 @@ FLAG_PREFIX = '--'
 
 FLAG_BOOLEAN = 'bool'
 FLAG_DYNAMIC = 'dynamic'
-FLAG_STRING = 'string'
+FLAG_VALUE = 'value'
 
 LOOKUP_COMMANDS = 'commands'
 LOOKUP_FLAGS = 'flags'
@@ -138,7 +138,7 @@ def _FindCompletions(root, cmd_line):
       if flag_mode == FLAG_DYNAMIC:
         raise CannotHandleCompletionError(
             'Dynamic completions are not handled by this module')
-      elif flag_mode == FLAG_STRING:
+      elif flag_mode == FLAG_VALUE:
         return []  # Cannot complete, so nothing to do
       elif flag_mode != FLAG_BOOLEAN:  # Must be list of choices
         for value in flag_mode:
@@ -176,7 +176,7 @@ def CompletionCliTreePath(directory=None):
       directory or _GetCompletionCliTreeDir(), 'gcloud_completions.py')
 
 
-def _LoadCompletionCliTree():
+def LoadCompletionCliTree():
   """Loads and returns the static completion CLI tree."""
   try:
     sys_path = sys.path[:]
@@ -198,7 +198,7 @@ def _OpenCompletionsOutputStream():
 
 def _GetCompletions():
   """Returns the static completions, None if there are none."""
-  root = _LoadCompletionCliTree()
+  root = LoadCompletionCliTree()
   cmd_line = _GetCmdLineFromEnv()
   return _FindCompletions(root, cmd_line)
 

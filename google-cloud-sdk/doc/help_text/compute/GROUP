@@ -19,8 +19,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -100,6 +101,11 @@ GROUPS
      routes
         Read and manipulate routes.
 
+     security-policies
+        Read and manipulate Google Compute Engine security policies. Security
+        policies are used to control access to Google Cloud HTTP/HTTPS load
+        balancers.
+
      shared-vpc
         Configure shared VPC.
 
@@ -144,9 +150,6 @@ GROUPS
 
      vpn-tunnels
         Read and manipulate Google Compute Engine VPN Tunnels.
-
-     xpn
-        Configure shared VPC.
 
      zones
         List Google Compute Engine zones.

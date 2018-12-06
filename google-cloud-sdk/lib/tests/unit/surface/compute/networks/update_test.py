@@ -48,21 +48,20 @@ class UpdateTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         self.messages.ComputeNetworksPatchRequest(
             project='fake-project',
             network='my-network',
-            networkResource=expected), expected)
+            networkResource=expected),
+        self.messages.Operation(name='myop'))
 
     self.Run("""
         compute networks update my-network --bgp-routing-mode=global
         """)
 
   def testUpdate_switchToCustomSubnetMode_yes(self):
-    expected = self.messages.Network()
-    expected.autoCreateSubnetworks = False
-
     self.WriteInput('y\n')
     self.mock_client.networks.SwitchToCustomMode.Expect(
         self.messages.ComputeNetworksSwitchToCustomModeRequest(
             project='fake-project',
-            network='my-network'), expected)
+            network='my-network'),
+        self.messages.Operation(name='myop'))
 
     self.Run("""
         compute networks update my-network --switch-to-custom-subnet-mode

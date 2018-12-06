@@ -11,7 +11,7 @@ gcloud compute disks create \- create Google Compute Engine persistent disks
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -226,6 +226,32 @@ command. This flag is mutually exclusive with \fB\-\-image\fR.
 When using this option, the size of the disks must be at least as large as the
 snapshot size. Use \fB\-\-size\fR to adjust the size of the disks.
 
+.RE
+.sp
+.TP 2m
+
+Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
+used to protect the disk. The arguments in this group can be used to specify the
+attributes of this resource.
+
+.RS 2m
+.TP 2m
+\fB\-\-kms\-key\fR=\fIKMS_KEY\fR
+ID of the key or fully qualified identifier for the key. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR
+The KMS keyring of the key.
+
+.TP 2m
+\fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR
+The Cloud location for the key.
+
+.TP 2m
+\fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR
+The Cloud project for the key.
+
 
 .RE
 .RE
@@ -234,9 +260,9 @@ snapshot size. Use \fB\-\-size\fR to adjust the size of the disks.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

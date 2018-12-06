@@ -5,8 +5,9 @@ NAME
 SYNOPSIS
     gcloud beta tasks create-app-engine-task [TASK_ID] --queue=QUEUE
         [--header=HEADER_FIELD: HEADER_VALUE] [--method=METHOD]
-        [--routing=KEY:VALUE,[...]] [--schedule-time=SCHEDULE_TIME] [--url=URL]
-        [--payload-content=PAYLOAD_CONTENT | --payload-file=PAYLOAD_FILE]
+        [--relative-uri=RELATIVE_URI] [--routing=KEY:VALUE,[...]]
+        [--schedule-time=SCHEDULE_TIME]
+        [--body-content=BODY_CONTENT | --body-file=BODY_FILE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -39,6 +40,11 @@ OPTIONAL FLAGS
         The HTTP method to use for the request. If not specified, "POST" will
         be used.
 
+     --relative-uri=RELATIVE_URI
+        The relative URI of the request. Must begin with "/" and must be a
+        valid HTTP relative URI. It can contain a path and query string
+        arguments. If not specified, then the root path "/" will be used.
+
      --routing=KEY:VALUE,[...]
         The route to be used for this task. KEY must be at least one of:
         [service, version, instance]. Any missing keys will use the default.
@@ -49,24 +55,20 @@ OPTIONAL FLAGS
         The time when the task is scheduled to be first attempted. Defaults to
         "now" if not specified.
 
-     --url=URL
-        The relative URL of the request. Must begin with "/" and must be a
-        valid HTTP relative URL. It can contain a path and query string
-        arguments. If not specified, then the root path "/" will be used.
-
      At most one of these may be specified:
 
-       --payload-content=PAYLOAD_CONTENT
-          Data payload used by the task worker to process the task.
+       --body-content=BODY_CONTENT
+          HTTP Body data sent to the task worker processing the task.
 
-       --payload-file=PAYLOAD_FILE
-          File containing data payload used by the task worker to process the
+       --body-file=BODY_FILE
+          File containing HTTP body data sent to the task worker processing the
           task.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. This

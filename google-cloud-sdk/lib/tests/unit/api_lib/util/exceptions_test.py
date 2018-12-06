@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -832,6 +832,109 @@ Invalid request API reason: Precondition check failed.
     with self.AssertRaisesExceptionMatches(exceptions.HttpException,
                                            'Error [400]'):
       mock_run_with_exception()
+
+  def _GetFieldViolations(self, err):
+    payload = exceptions.HttpErrorPayload(err)
+    return payload.field_violations
+
+  def testGetOneFieldViolation(self):
+    err = http_error.MakeDetailedHttpError(
+        400,
+        url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
+        content={
+            'error': {
+                'code': 400,
+                'message': 'The request has errors.',
+                'status': 'INVALID_ARGUMENT',
+                'details': [{
+                    '@type': 'type.googleapis.com/google.rpc.BadRequest',
+                    'fieldViolations': [{
+                        'field': 'spec.revisionTemplate.spec.container.image',
+                        'description':
+                            'Invalid image provided in the revision'
+                            ' template. Expected [region.]gcr.io/repo-path[:tag'
+                            ' or @digest], obtained really/bad/image',
+                    }]}]}},
+        details=http_error.ExampleErrorDetails())
+    self.assertEquals(
+        self._GetFieldViolations(err),
+        {'spec.revisionTemplate.spec.container.image':
+             'Invalid image provided in the revision'
+             ' template. Expected [region.]gcr.io/repo-path[:tag'
+             ' or @digest], obtained really/bad/image'})
+
+  def testGetSeveralFieldViolations(self):
+    err = http_error.MakeDetailedHttpError(
+        400,
+        url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
+        content={
+            'error': {
+                'code': 400,
+                'message': 'The request has errors.',
+                'status': 'INVALID_ARGUMENT',
+                'details': [{
+                    '@type': 'type.googleapis.com/google.rpc.BadRequest',
+                    'fieldViolations': [
+                        {'field': 'blog.blug', 'description': 'hahaha'},
+                        {'field': 'doop.doop', 'description': 'lol'},
+                    ]}]}},
+        details=http_error.ExampleErrorDetails())
+    self.assertEquals(
+        self._GetFieldViolations(err),
+        {'blog.blug': 'hahaha', 'doop.doop': 'lol'})
+
+  def testGetSeveralFieldViolationsOtherDetails(self):
+    err = http_error.MakeDetailedHttpError(
+        400,
+        url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
+        content={
+            'error': {
+                'code': 400,
+                'message': 'The request has errors.',
+                'status': 'INVALID_ARGUMENT',
+                'details': [
+                    {
+                        '@type': 'type.googleapis.com/google.rpc.violations',
+                        'violations': [
+                            {
+                                'type': 'type.googleapis.com/google.rpc.lien',
+                                'subject': 'liens/123-456-abc',
+                            }]},
+                    {
+                        '@type': 'type.googleapis.com/google.rpc.BadRequest',
+                        'fieldViolations': [
+                            {'field': 'blog.blug', 'description': 'hahaha'},
+                            {'field': 'doop.doop', 'description': 'lol'},
+                        ]
+                    }
+                ]}},
+        details=http_error.ExampleErrorDetails())
+    self.assertEquals(
+        self._GetFieldViolations(err),
+        {'blog.blug': 'hahaha', 'doop.doop': 'lol'})
+
+  def testGetNoFieldViolations(self):
+    err = http_error.MakeDetailedHttpError(
+        400,
+        url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
+        content={
+            'error': {
+                'code': 400,
+                'message': 'The request has errors.',
+                'status': 'INVALID_ARGUMENT',
+                'details': []}},
+        details=http_error.ExampleErrorDetails())
+    self.assertEquals(self._GetFieldViolations(err), {})
+
+  def testGetFieldViolationsBadJson(self):
+    err = http_error.MakeDetailedHttpError(
+        400,
+        url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
+        content={},
+        details=http_error.ExampleErrorDetails())
+    # Override content, since the factory doesn't let us make it invalid.
+    err.content = 'this is bad json yo . it is . like. so bad'
+    self.assertEquals(self._GetFieldViolations(err), {})
 
 
 if __name__ == '__main__':

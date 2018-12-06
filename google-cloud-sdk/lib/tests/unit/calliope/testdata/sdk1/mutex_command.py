@@ -17,10 +17,11 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class MutexArgCommand(base.Command):
+class MutexArgCommand(calliope_base.Command):
+  """Mutex Arg Command."""
 
   def Run(self, args):
     print(args.flag1a)

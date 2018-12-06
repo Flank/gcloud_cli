@@ -18,17 +18,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 from six.moves import map
 from six.moves import range
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class PerimetersListTest(accesscontextmanager.Base):
+class PerimetersListTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -42,13 +43,14 @@ class PerimetersListTest(accesscontextmanager.Base):
   def _ExpectList(self, perimeters, policy):
     policy_name = 'accessPolicies/{}'.format(policy)
     m = self.messages
-    request_type = m.AccesscontextmanagerAccessPoliciesAccessZonesListRequest
-    self.client.accessPolicies_accessZones.List.Expect(
+    request_type = (
+        m.AccesscontextmanagerAccessPoliciesServicePerimetersListRequest)
+    self.client.accessPolicies_servicePerimeters.List.Expect(
         request_type(parent=policy_name,),
-        self.messages.ListAccessZonesResponse(accessZones=perimeters))
+        m.ListServicePerimetersResponse(servicePerimeters=perimeters))
 
-  def testList(self, track):
-    self.SetUpForTrack(track)
+  def testList(self):
+    self.SetUpForTrack(self.track)
     perimeters = self._MakePerimeters()
     self._ExpectList(perimeters, 'my-policy')
 
@@ -57,8 +59,8 @@ class PerimetersListTest(accesscontextmanager.Base):
 
     self.assertEqual(results, perimeters)
 
-  def testList_PolicyFromProperty(self, track):
-    self.SetUpForTrack(track)
+  def testList_PolicyFromProperty(self):
+    self.SetUpForTrack(self.track)
     perimeters = self._MakePerimeters()
     policy = 'my-acm-policy'
     properties.VALUES.access_context_manager.policy.Set(policy)
@@ -68,8 +70,8 @@ class PerimetersListTest(accesscontextmanager.Base):
 
     self.assertEqual(results, perimeters)
 
-  def testList_Format(self, track):
-    self.SetUpForTrack(track)
+  def testList_Format(self):
+    self.SetUpForTrack(self.track)
     properties.VALUES.core.user_output_enabled.Set(True)
     perimeters = self._MakePerimeters()
     self._ExpectList(perimeters, 'my-policy')
@@ -84,6 +86,13 @@ class PerimetersListTest(accesscontextmanager.Base):
         MY_PERIMETER2  My Perimeter
         """,
         normalize_space=True)
+
+
+class PerimetersListTestAlpha(PerimetersListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

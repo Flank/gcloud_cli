@@ -21,6 +21,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import io
 import os
 import subprocess
 import textwrap
@@ -61,8 +62,8 @@ class LocalPredictTestBase(object):
         config.Paths, 'sdk_root', return_value='fake-sdk-root')
 
   def _MockPopen(self, returncode=0, stdout='[]\n', stderr=''):
-    popen_mock = mock.Mock(spec=subprocess.Popen)
-    popen_mock.stdin = test_case.FakeStd()
+    popen_mock = mock.MagicMock()
+    popen_mock.stdin = io.BytesIO()
     popen_mock.communicate.return_value = (stdout, stderr)
     popen_mock.returncode = returncode
     return self.StartObjectPatch(
@@ -80,8 +81,14 @@ class LocalPredictTestBase(object):
                         '--framework', framework]
     if additional_python_args:
       expected_command += additional_python_args
-    self.assertEqual(popen_mock.call_count, 1)
-    args, kwargs = popen_mock.call_args
+
+    # On py3, some core library uses popen to call uname which throws off the
+    # assertion.
+    calls = [args for args in popen_mock.call_args_list
+             if isinstance(args[0][0], list)
+             or not args[0][0].startswith('uname')]
+    self.assertEqual(len(calls), 1)
+    args, kwargs = calls[0]
     self.assertEqual(args[0], expected_command)
     self.assertEqual(set(kwargs.keys()), {'stdout', 'stderr', 'stdin', 'env'})
     self.assertEqual(kwargs['stdout'], subprocess.PIPE)

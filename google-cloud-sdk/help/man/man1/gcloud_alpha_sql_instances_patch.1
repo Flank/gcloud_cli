@@ -37,17 +37,17 @@ Cloud SQL instance ID.
 .RS 2m
 .TP 2m
 \fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR
-The activation policy for this instance. This specifies when the instance should
-be activated and is applicable only when the instance state is \f5RUNNABLE\fR.
-The default is \f5on\-demand\fR. More information on activation policies can be
+Activation policy for this instance. This specifies when the instance should be
+activated and is applicable only when the instance state is \f5RUNNABLE\fR. The
+default is \f5on\-demand\fR. More information on activation policies can be
 found here: https://cloud.google.com/sql/faq#activation_policy.
 \fIACTIVATION_POLICY\fR must be one of: \fBalways\fR, \fBnever\fR,
 \fBon\-demand\fR.
 
 .TP 2m
 \fB\-\-[no\-]assign\-ip\fR
-The instance must be assigned an IP address. Use \fB\-\-assign\-ip\fR to enable
-and \fB\-\-no\-assign\-ip\fR to disable.
+If provided, instance must be assigned an IP address. Use \fB\-\-assign\-ip\fR
+to enable and \fB\-\-no\-assign\-ip\fR to disable.
 
 .TP 2m
 \fB\-\-async\fR
@@ -66,12 +66,13 @@ automatically fails over to another zone within your selected region.
 .TP 2m
 \fBzonal\fR
 Provides no failover capability. This is the default.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-cpu\fR=\fICPU\fR
-A whole number value indicating how many cores are desired in the machine. Both
+Whole number value indicating how many cores are desired in the machine. Both
 \-\-cpu and \-\-memory must be specified if a custom machine type is desired,
 and the \-\-tier flag must be omitted.
 
@@ -117,9 +118,10 @@ compatibility with your application prior to the production release.
 .TP 2m
 \fBproduction\fR
 Production updates are stable and recommended for applications in production.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-maintenance\-window\-any\fR
 Removes the user\-specified maintenance window.
@@ -136,14 +138,14 @@ Hour of day for maintenance window, in UTC time zone.
 
 .TP 2m
 \fB\-\-memory\fR=\fIMEMORY\fR
-A whole number value indicating how much memory is desired in the machine. A
-size unit should be provided (eg. 3072MiB or 9GiB) \- if no units are specified,
-GiB is assumed. Both \-\-cpu and \-\-memory must be specified if a custom
-machine type is desired, and the \-\-tier flag must be omitted.
+Whole number value indicating how much memory is desired in the machine. A size
+unit should be provided (eg. 3072MiB or 9GiB) \- if no units are specified, GiB
+is assumed. Both \-\-cpu and \-\-memory must be specified if a custom machine
+type is desired, and the \-\-tier flag must be omitted.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
-The network in the current project that the instance will be part of.
+Network in the current project that the instance will be part of.
 
 .TP 2m
 \fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR, \fB\-p\fR \fIPRICING_PLAN\fR
@@ -152,7 +154,7 @@ First Generation instances only. The pricing plan for this instance.
 
 .TP 2m
 \fB\-\-replication\fR=\fIREPLICATION\fR
-The type of replication this instance uses. The default is synchronous.
+Type of replication this instance uses. The default is synchronous.
 \fIREPLICATION\fR must be one of: \fBsynchronous\fR, \fBasynchronous\fR.
 
 .TP 2m
@@ -247,7 +249,7 @@ restarted.
 
 .TP 2m
 \fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]
-A comma\-separated list of database flags to set on the instance. Use an equals
+Comma\-separated list of database flags to set on the instance. Use an equals
 sign to separate flag name and value. Flags without values, like
 skip_grant_tables, can be written out without a value after, e.g.,
 \f5skip_grant_tables=\fR. Use on/off for booleans. View the Instance Resource
@@ -297,8 +299,8 @@ Specified if daily backup should be disabled.
 
 .TP 2m
 \fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR
-The start time of daily backups, specified in the 24 hour format \- HH:MM, in
-the UTC timezone.
+Start time of daily backups, specified in the 24 hour format \- HH:MM, in the
+UTC timezone.
 
 
 .RE
@@ -308,9 +310,9 @@ the UTC timezone.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

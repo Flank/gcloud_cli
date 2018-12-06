@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import exceptions
 from tests.lib.apitools import http_error
@@ -33,8 +33,10 @@ def _MakeUnknownError():
   return UnknownError('Unknown error.')
 
 
-class Combinations(base.Command):
+class Combinations(calliope_base.Command):
   """A command to test generator / exception combinations."""
+
+  category = 'Category 1'
 
   @staticmethod
   def Args(parser):

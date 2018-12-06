@@ -1,0 +1,30 @@
+NAME
+    gcloud alpha compute machine-images delete - delete Google Compute Engine
+        machine images
+
+SYNOPSIS
+    gcloud alpha compute machine-images delete IMAGE [IMAGE ...]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute machine-images delete deletes one or more
+    Google Compute Engine machine images. Machine images can be deleted only if
+    they are not being used to restore any virtual machine instances.
+
+POSITIONAL ARGUMENTS
+     IMAGE [IMAGE ...]
+        Names of the machineImages to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

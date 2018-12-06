@@ -25,6 +25,7 @@ from tests.lib import parameterized
 from tests.lib.surface.bigtable import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class AppProfileDeleteTests(base.BigtableV2TestBase):

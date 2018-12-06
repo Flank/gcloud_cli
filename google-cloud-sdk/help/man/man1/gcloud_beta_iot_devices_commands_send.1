@@ -1,0 +1,111 @@
+
+.TH "GCLOUD_BETA_IOT_DEVICES_COMMANDS_SEND" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta iot devices commands send \- sends a command to a device
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta iot devices commands send\fR (\fB\-\-command\-data\fR=\fICOMMAND_DATA\fR\ |\ \fB\-\-command\-file\fR=\fICOMMAND_FILE\fR) (\fB\-\-device\fR=\fIDEVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR\ \fB\-\-registry\fR=\fIREGISTRY\fR) [\fB\-\-subfolder\fR=\fISUBFOLDER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Sends a command to a device.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-command\-data\fR=\fICOMMAND_DATA\fR
+The data for this command, as a string. For any values that contain special
+characters (in the context of your shell), use the \f5\-\-command\-file\fR flag
+instead.
+
+.TP 2m
+\fB\-\-command\-file\fR=\fICOMMAND_FILE\fR
+Path to a local file containing the data for this command.
+
+.RE
+.sp
+.TP 2m
+
+Device resource \- The device you want to send commands to. The arguments in
+this group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [\-\-device] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-device\fR=\fIDEVICE\fR
+ID of the device or fully qualified identifier for the device. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Cloud IoT region.
+
+.TP 2m
+\fB\-\-registry\fR=\fIREGISTRY\fR
+The name of the Cloud IoT registry.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-subfolder\fR=\fISUBFOLDER\fR
+The commands subfolder to append to the topic path.
+
+This field must not have more than 256 characters, and must not contain any MQTT
+wildcards ("+" or "#") or null characters.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudiot/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/iot
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud iot devices commands send
+$ gcloud alpha iot devices commands send
+.RE
+

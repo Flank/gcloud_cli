@@ -25,6 +25,7 @@ from tests.lib import test_case
 from tests.lib.surface.composer import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.BETA,
                           calliope_base.ReleaseTrack.GA)
 class ListOperationsIntegrationTest(base.ComposerE2ETestBase,

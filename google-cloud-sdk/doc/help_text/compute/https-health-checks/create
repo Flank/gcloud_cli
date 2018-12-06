@@ -1,6 +1,6 @@
 NAME
-    gcloud compute https-health-checks create - create an HTTPS health check to
-        monitor load balanced instances
+    gcloud compute https-health-checks create - create an HTTPS legacy health
+        check to monitor load balanced instances
 
 SYNOPSIS
     gcloud compute https-health-checks create NAME
@@ -13,11 +13,14 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute https-health-checks create is used to create an HTTPS health
-    check. HTTPS health checks monitor instances in a load balancer controlled
-    by a target pool. All arguments to the command are optional except for the
-    name of the health check. For more information on load balancing, see
-    https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/
+    gcloud compute https-health-checks create is used to create a legacy health
+    check with a health check type of HTTPS. HTTPS health checks monitor
+    instances in a load balancer controlled by a target pool. All arguments to
+    the command are optional except for the name of the health check. For more
+    information on load balancing, see
+    https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/.
+    Note, creating a legacy health check is recommended only for a network load
+    balancer.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -65,8 +68,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

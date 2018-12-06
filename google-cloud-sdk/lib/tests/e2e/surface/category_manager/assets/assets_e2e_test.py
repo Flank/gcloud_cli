@@ -23,6 +23,7 @@ from googlecloudsdk.api_lib.category_manager import utils
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.util import retry
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 from tests.lib.surface.category_manager import e2e_base as base
 
 
@@ -100,6 +101,7 @@ class AssetE2eTest(base.CategoryManagerE2eBase):
       if asset.subAsset is None and asset.name == self._asset:
         return asset
 
+  @test_case.Filters.skip('Failing', 'b/116202444')
   def testAssetCommandGroupUserJourney(self):
     description = 'arbitrary-test-description'
     with self.CreateTaxonomyResource(description) as taxonomy:

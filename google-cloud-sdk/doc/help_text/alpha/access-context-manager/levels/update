@@ -17,9 +17,9 @@ POSITIONAL ARGUMENTS
      specified.
 
        LEVEL
-          The ID of the level or a fully qualified identifier for the level.
-          This positional must be specified if any of the other arguments in
-          this group are specified.
+          ID of the level or fully qualified identifier for the level. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
 
        --policy=POLICY
           The ID of the access policy.
@@ -50,8 +50,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is an internal implementation detail and may change or
@@ -59,5 +60,8 @@ NOTES
     without notice. If this command fails with API permission errors despite
     specifying the right project, you will have to apply for early access and
     have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/.
+    contact Support at https://cloud.google.com/support/. This variant is also
+    available:
+
+        $ gcloud beta access-context-manager levels update
 

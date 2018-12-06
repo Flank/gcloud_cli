@@ -29,14 +29,14 @@ gcloud alpha spanner databases delete \- delete a Cloud Spanner database
 Database resource \- The Cloud Spanner database to delete. The arguments in this
 group can be used to specify the attributes of this resource. (NOTE) Some
 attributes are not given arguments in this group but can be set in other ways.
-To set the [project] attribute: provide the flag [database] on the command line
-with a fully specified name; provide the flag [\-\-project] on the command line;
-set the property [core/project]. This must be specified.
+To set the [project] attribute: provide the argument [database] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fIDATABASE\fR
-The ID of the database or a fully qualified identifier for the database. This
+ID of the database or fully qualified identifier for the database. This
 positional must be specified if any of the other arguments in this group are
 specified.
 
@@ -52,9 +52,9 @@ The Cloud Spanner instance for the database.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

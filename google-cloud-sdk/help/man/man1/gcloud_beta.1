@@ -11,7 +11,7 @@ gcloud beta \- beta versions of gcloud commands
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta\fR \fIGROUP\fR | \fICOMMAND\fR [\fB\-\-account\fR=\fIACCOUNT\fR] [\fB\-\-configuration\fR=\fICONFIGURATION\fR] [\fB\-\-flatten\fR=[\fIKEY\fR,...]] [\fB\-\-format\fR=\fIFORMAT\fR] [\fB\-\-help\fR] [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-quiet\fR,\ \fB\-q\fR] [\fB\-\-verbosity\fR=\fIVERBOSITY\fR;\ default="warning"] [\fB\-\-version\fR,\ \fB\-v\fR] [\fB\-h\fR] [\fB\-\-log\-http\fR] [\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR] [\fB\-\-no\-user\-output\-enabled\fR]
+\f5gcloud beta\fR \fIGROUP\fR | \fICOMMAND\fR [\fB\-\-account\fR=\fIACCOUNT\fR] [\fB\-\-configuration\fR=\fICONFIGURATION\fR] [\fB\-\-flags\-file\fR=\fIYAML_FILE\fR] [\fB\-\-flatten\fR=[\fIKEY\fR,...]] [\fB\-\-format\fR=\fIFORMAT\fR] [\fB\-\-help\fR] [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-quiet\fR,\ \fB\-q\fR] [\fB\-\-verbosity\fR=\fIVERBOSITY\fR;\ default="warning"] [\fB\-\-version\fR,\ \fB\-v\fR] [\fB\-h\fR] [\fB\-\-log\-http\fR] [\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR] [\fB\-\-no\-user\-output\-enabled\fR]
 
 
 
@@ -35,6 +35,14 @@ The configuration to use for this command invocation. For more information on
 how to use configurations, run: \f5gcloud topic configurations\fR. You can also
 use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment variable to set the equivalent
 of this flag for a terminal session.
+
+.TP 2m
+\fB\-\-flags\-file\fR=\fIYAML_FILE\fR
+A YAML or JSON file that specifies a \fB\-\-flag\fR:\fBvalue\fR dictionary.
+Useful for specifying complex flag values with special characters that work with
+any command interpreter. Additionally, each \fB\-\-flags\-file\fR arg is
+replaced by its constituent flags. See $ gcloud topic flags\-file for more
+information.
 
 .TP 2m
 \fB\-\-flatten\fR=[\fIKEY\fR,...]
@@ -126,6 +134,10 @@ Print user intended output to the console. Overrides the default
 
 .RS 2m
 .TP 2m
+\fBaccess\-context\-manager\fR
+\fB(BETA)\fR Manage Access Context Manager resources.
+
+.TP 2m
 \fBapp\fR
 \fB(BETA)\fR Manage your App Engine deployments.
 
@@ -210,6 +222,10 @@ Print user intended output to the console. Overrides the default
 \fB(BETA)\fR Work with Google Firebase.
 
 .TP 2m
+\fBfirestore\fR
+\fB(BETA)\fR Manage your Cloud Firestore imports and exports.
+
+.TP 2m
 \fBfunctions\fR
 \fB(BETA)\fR Manage Google Cloud Functions.
 
@@ -262,6 +278,10 @@ Print user intended output to the console. Overrides the default
 \fB(BETA)\fR Manage runtime configuration resources.
 
 .TP 2m
+\fBscheduler\fR
+\fB(BETA)\fR Manage Cloud Scheduler jobs and schedules.
+
+.TP 2m
 \fBservices\fR
 \fB(BETA)\fR List, enable and disable APIs and services.
 
@@ -291,8 +311,16 @@ Print user intended output to the console. Overrides the default
 
 .RS 2m
 .TP 2m
+\fBhelp\fR
+\fB(BETA)\fR Search gcloud help text.
+
+.TP 2m
 \fBinit\fR
 \fB(BETA)\fR Initialize or reinitialize gcloud.
+
+.TP 2m
+\fBinteractive\fR
+\fB(BETA)\fR Start the gcloud interactive shell.
 
 
 .RE

@@ -19,14 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import argparse
 from googlecloudsdk.api_lib.container import api_adapter
-from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.container import constants
-from googlecloudsdk.command_lib.container import container_command_util
-from googlecloudsdk.core import log
-from googlecloudsdk.core import properties
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -46,19 +40,7 @@ class Container(base.Group):
   can be found here: https://cloud.google.com/kubernetes-engine/docs/
   """
 
-  @staticmethod
-  def Args(parser):
-    """Add arguments to the parser.
-
-    Args:
-      parser: argparse.ArgumentParser, This is a standard argparser parser with
-        which you can register arguments.  See the public argparse documentation
-        for its capabilities.
-    """
-    parser.add_argument(
-        '--api-version', hidden=True, help='THIS ARGUMENT NEEDS HELP TEXT.',
-        action=actions.StoreProperty(
-            properties.VALUES.api_client_overrides.container))
+  category = 'Compute'
 
   def Filter(self, context, args):
     """Modify the context that will be given to this group's commands when run.
@@ -81,6 +63,8 @@ class Container(base.Group):
 class ContainerBeta(Container):
   """Deploy and manage clusters of machines for running containers."""
 
+  category = 'Compute'
+
   def Filter(self, context, args):
     """Modify the context that will be given to this group's commands when run.
 
@@ -101,6 +85,8 @@ class ContainerBeta(Container):
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class ContainerAlpha(Container):
   """Deploy and manage clusters of machines for running containers."""
+
+  category = 'Compute'
 
   def Filter(self, context, args):
     """Modify the context that will be given to this group's commands when run.

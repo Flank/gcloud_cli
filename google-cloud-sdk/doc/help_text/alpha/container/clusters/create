@@ -12,39 +12,52 @@ SYNOPSIS
         [--create-subnetwork=[KEY=VALUE,...]]
         [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
         [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
-        [--enable-autoupgrade] [--no-enable-cloud-logging]
+        [--enable-autoupgrade] [--enable-binauthz] [--no-enable-cloud-logging]
         [--no-enable-cloud-monitoring] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
         [--enable-network-policy] [--enable-pod-security-policy]
         [--enable-stackdriver-kubernetes] [--image-type=IMAGE_TYPE]
-        [--no-issue-client-certificate] [--istio-config=[auth=NONE,...]]
-        [--labels=[KEY=VALUE,...]]
+        [--issue-client-certificate]
+        [--istio-config=[auth=MTLS_PERMISSIVE,...]] [--labels=[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--maintenance-window=MAINTENANCE_WINDOW]
-        [--max-nodes-per-pool=MAX_NODES_PER_POOL] [--min-cpu-platform=PLATFORM]
-        [--network=NETWORK] [--node-labels=[NODE_LABEL,...]]
+        [--max-nodes-per-pool=MAX_NODES_PER_POOL]
+        [--metadata=KEY=VALUE,[KEY=VALUE,...]]
+        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
+        [--min-cpu-platform=PLATFORM] [--network=NETWORK]
+        [--node-labels=[NODE_LABEL,...]] [--node-pool-name=NODE_POOL_NAME]
         [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
         [--num-nodes=NUM_NODES; default=3] [--preemptible]
-        [--resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET]
         [--services-ipv4-cidr=CIDR] [--services-secondary-range-name=NAME]
         [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
         [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
         [--additional-zones=ZONE,[ZONE,...] | --node-locations=ZONE,[ZONE,...]]
-        [[--enable-autoprovisioning : --max-cpu=MAX_CPU --max-memory=MAX_MEMORY
-          --min-cpu=MIN_CPU --min-memory=MIN_MEMORY
+        [--database-encryption-key=DATABASE_ENCRYPTION_KEY
+          : --database-encryption-key-keyring=DATABASE_ENCRYPTION_KEY_KEYRING
+          --database-encryption-key-location=DATABASE_ENCRYPTION_KEY_LOCATION
+          --database-encryption-key-project=DATABASE_ENCRYPTION_KEY_PROJECT]
+        [[--enable-autoprovisioning
+          : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
+          | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY : --min-cpu=MIN_CPU
+          --min-memory=MIN_MEMORY
           [--max-accelerator=[type=TYPE,count=COUNT,...]
-          : --min-accelerator=[type=TYPE,count=COUNT,...]]]]
+          : --min-accelerator=[type=TYPE,count=COUNT,...]]]]]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--enable-master-authorized-networks
           --master-authorized-networks=NETWORK,[NETWORK,...]]
-        [--enable-tpu --tpu-ipv4-cidr=CIDR]
+        [--enable-network-egress-metering
+          --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET]
+        [--enable-private-endpoint --enable-private-nodes
+          --master-ipv4-cidr=MASTER_IPV4_CIDR --private-cluster]
+        [--enable-tpu --enable-tpu-service-networking | --tpu-ipv4-cidr=CIDR]
         [--local-ssd-count=LOCAL_SSD_COUNT
           | --local-ssd-volumes=[[count=COUNT],
           [type=TYPE],[format=FORMAT],...]]
-        [--master-ipv4-cidr=MASTER_IPV4_CIDR --private-cluster]
-        [--password=PASSWORD --no-enable-basic-auth
-          | --username=USERNAME, -u USERNAME; default="admin"]
+        [--password=PASSWORD --enable-basic-auth
+          | --username=USERNAME, -u USERNAME]
         [--region=REGION | --zone=ZONE, -z ZONE]
+        [--security-profile=SECURITY_PROFILE
+          --no-security-profile-runtime-rules]
         [--service-account=SERVICE_ACCOUNT | --no-enable-cloud-endpoints
           --scopes=[SCOPE,...]; default="gke-default"] [GCLOUD_WIDE_FLAG ...]
 
@@ -53,7 +66,11 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of this cluster.
+        The name of the cluster to create.
+
+        The name may contain only lowercase alphanumerics and '-', must start
+        with a letter and end with an alphanumeric, and must be no longer than
+        40 characters.
 
 FLAGS
      --accelerator=[type=TYPE,[count=COUNT],...]
@@ -76,7 +93,7 @@ FLAGS
         are additional Kubernetes cluster components. Addons specified by this
         flag will be enabled. The others will be disabled. ADDON must be one
         of: HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-        Istio, NetworkPolicy, Serverless.
+        Istio, NetworkPolicy, CloudRun.
 
      --allow-route-overlap
         Allows the provided cluster CIDRs to overlap with existing routes that
@@ -160,7 +177,7 @@ FLAGS
         Must be used in conjunction with '--enable-ip-alias'.
 
      --disk-size=DISK_SIZE
-        Size in GB for node VM boot disks. Defaults to 100GB.
+        Size for node VM boot disks. Defaults to 100GB.
 
      --disk-type=DISK_TYPE
         Type of the node VM boot disk. Defaults to pd-standard. DISK_TYPE must
@@ -173,7 +190,7 @@ FLAGS
                 --enable-autorepair
 
         Node autorepair is enabled by default for clusters using COS as a base
-        image.
+        image, use --no-enable-autorepair to disable.
 
         See
         https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
@@ -187,6 +204,9 @@ FLAGS
 
         See https://cloud.google.com/kubernetes-engine/docs/node-management for
         more info.
+
+     --enable-binauthz
+        Enable Binary Authorization for this cluster.
 
      --enable-cloud-logging
         Automatically send logs from the cluster to the Google Cloud Logging
@@ -255,18 +275,19 @@ FLAGS
         Issue a TLS client certificate with admin permissions.
 
         When enabled, the certificate and private key pair will be present in
-        MasterAuth field of the Cluster object.
+        MasterAuth field of the Cluster object. For cluster versions before
+        1.12, a client certificate will be issued by default. As of 1.12,
+        client certificates are disabled by default.
 
-        Enabled by default, use --no-issue-client-certificate to disable.
-
-     --istio-config=[auth=NONE,...]
-        Configurations for Istio addon, requires --addons contains Istio.
+     --istio-config=[auth=MTLS_PERMISSIVE,...]
+        Configurations for Istio addon, requires --addons contains Istio for
+        create, or --update-addons Istio=ENABLED for update.
 
          auth
-            Optional Type of auth NONE or MUTUAL_TLS Example:
+            Optional Type of auth MTLS_PERMISSIVE or MTLS_STRICT Example:
 
                 $ gcloud alpha container clusters create example-cluster \
-                    --addons=Istio --istio-config=auth=NONE
+                    --istio-config=auth=MTLS_PERMISSIVE
 
      --labels=[KEY=VALUE,...]
         Labels to apply to the Google Cloud resources in use by the Kubernetes
@@ -283,11 +304,11 @@ FLAGS
             $ gcloud compute machine-types list
 
         You can also specify custom machine types with the string
-        "custom-CPUS-RAM" where ``CPUS`` is the number of virtual CPUs and
-        ``RAM`` is the amount of RAM in MiB.
+        "custom-CPUS-RAM" where CPUS is the number of virtual CPUs and RAM is
+        the amount of RAM in MiB.
 
         For example, to create a node pool using custom machines with 2 vCPUs
-        and 12 GiB of RAM:
+        and 12 GB of RAM:
 
             $ gcloud alpha container clusters create high-mem-pool \
                 --machine-type=custom-2-12288
@@ -308,12 +329,49 @@ FLAGS
         Defaults to 1000 nodes, but can be set as low as 100 nodes per pool on
         initial create.
 
+     --metadata=KEY=VALUE,[KEY=VALUE,...]
+        Compute Engine metadata to be made available to the guest operating
+        system running on nodes within the node pool.
+
+        Each metadata entry is a key/value pair separated by an equals sign.
+        Metadata keys must be unique and less than 128 bytes in length. Values
+        must be less than or equal to 32,768 bytes in length. The total size of
+        all keys and values must be less than 512 KB. Multiple arguments can be
+        passed to this flag. For example:
+
+        --metadata key-1=value-1,key-2=value-2,key-3=value-3
+
+        Additionally, the following keys are reserved for use by Kubernetes
+        Engine:
+
+        * cluster-location
+        * cluster-name
+        * cluster-uid
+        * configure-sh
+        * enable-os-login
+        * gci-update-strategy
+        * gci-ensure-gke-docker
+        * instance-template
+        * kube-env
+        * startup-script
+        * user-data
+
+    See also Compute Engine's documentation
+    (https://cloud.google.com/compute/docs/storing-retrieving-metadata) on
+    storing and retrieving instance metadata.
+
+     --metadata-from-file=KEY=LOCAL_FILE_PATH,[...]
+        Same as --metadata except that the value for the entry will be read
+        from a local file.
+
      --min-cpu-platform=PLATFORM
         When specified, the nodes for the new cluster's default node pool will
         be scheduled on host with specified CPU architecture or a newer one.
 
-        Examples: $ gcloud alpha container clusters create example-cluster \
-        --min-cpu-platform=PLATFORM
+        Examples:
+
+            $ gcloud alpha container clusters create example-cluster \
+                --min-cpu-platform=PLATFORM
 
         To list available CPU platforms in given zone, run:
 
@@ -343,6 +401,20 @@ FLAGS
         and resources with one another and manage resource lifecycles, are
         different from Kubernetes Engine labels that are used for the purpose
         of tracking billing and usage information.
+
+     --node-pool-name=NODE_POOL_NAME
+        Name of the initial node pool that will be created for the cluster.
+
+        Specifies the name to use for the initial node pool that will be
+        created with the cluster. If the settings specified require multiple
+        node pools to be created, the name for each pool will be prefixed by
+        this name. For example running the following will result in three node
+        pools being created, example-node-pool-0, example-node-pool-1 and
+        example-node-pool-2:
+
+            $ gcloud alpha container clusters create example-cluster \
+                --num-nodes 9 --max-nodes-per-pool 3     \
+                --node-pool-name example-node-pool
 
      --node-taints=[NODE_TAINT,...]
         Applies the given kubernetes taints on all nodes in default
@@ -380,20 +452,6 @@ FLAGS
         preemptible VM instances. See
         https://cloud.google.com/kubernetes-engine/docs/preemptible-vm for more
         information on how to use Preemptible VMs with Kubernetes Engine.
-
-     Exports cluster's usage of cloud resources
-
-       --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
-          The name of the BigQuery dataset to which the cluster's usage of
-          cloud resources is exported. A table will be created in the specified
-          dataset to store cluster resource usage. The resulting table can be
-          joined with BigQuery Billing Export to produce a fine-grained cost
-          breakdown.
-
-          Example:
-
-              $ gcloud alpha container clusters create example-cluster \
-                  --resource-usage-bigquery-dataset=example_bigquery_dataset_name
 
      --services-ipv4-cidr=CIDR
         Set the IP range for the services IPs.
@@ -495,40 +553,82 @@ FLAGS
                   --zone us-central1-a \
                   --node-locations us-central1-a,us-central1-b
 
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the cluster. The 'Compute Engine Service Agent' service
+     account must hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'.
+     The arguments in this group can be used to specify the attributes of this
+     resource.
+
+       --database-encryption-key=DATABASE_ENCRYPTION_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --database-encryption-key-keyring=DATABASE_ENCRYPTION_KEY_KEYRING
+          The KMS keyring of the key.
+
+       --database-encryption-key-location=DATABASE_ENCRYPTION_KEY_LOCATION
+          The Cloud location for the key.
+
+       --database-encryption-key-project=DATABASE_ENCRYPTION_KEY_PROJECT
+          The Cloud project for the key.
+
      Node autoprovisioning
 
        --enable-autoprovisioning
           Enables node autoprovisioning for a cluster.
 
           Cluster Autoscaler will be able to create new node pools. Requires
-          --max-cpu and --max-memory to be specified. This flag must be
+          maximum CPU and memory limits to be specified. This flag must be
           specified if any of the other arguments in this group are specified.
 
-       --max-cpu=MAX_CPU
-          Maximum number of cores in the cluster.
+       At most one of these may be specified:
 
-          Maximum number of cores to which the cluster can scale.
+         --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
+            Path of the JSON/YAML file which contains information about the
+            cluster's autoscaling configuration. Currently it only contains a
+            list of resource limits of the cluster.
 
-       --max-memory=MAX_MEMORY
-          Maximum memory in the cluster.
+            Each resource limits definition contains three fields:
+            resourceType, maximum and minimum. Resource type can be "cpu",
+            "memory" or an accelerator (e.g. "nvidia-tesla-k80" for nVidia
+            Tesla K80). Use gcloud compute accelerator-types list to learn
+            about available accelerator types. Maximum is the maximum allowed
+            amount with the unit of the resource. Minimum is the minimum
+            allowed amount with the unit of the resource.
 
-          Maximum number of gigabytes of memory to which the cluster can scale.
+         Flags to configure resource limits:
 
-       --min-cpu=MIN_CPU
-          Minimum number of cores in the cluster.
+           --max-cpu=MAX_CPU
+              Maximum number of cores in the cluster.
 
-          Minimum number of cores to which the cluster can scale.
+              Maximum number of cores to which the cluster can scale. This flag
+              must be specified if any of the other arguments in this group are
+              specified.
 
-       --min-memory=MIN_MEMORY
-          Minimum memory in the cluster.
+           --max-memory=MAX_MEMORY
+              Maximum memory in the cluster.
 
-          Minimum number of gigabytes of memory to which the cluster can scale.
+              Maximum number of gigabytes of memory to which the cluster can
+              scale. This flag must be specified if any of the other arguments
+              in this group are specified.
 
-       Arguments to set limits on accelerators:
+           --min-cpu=MIN_CPU
+              Minimum number of cores in the cluster.
 
-         --max-accelerator=[type=TYPE,count=COUNT,...]
-            Sets maximum limit for a single type of accelerators (e.g. GPUs) in
-            cluster. Defaults to 0 for all accelerator types if it isn't set.
+              Minimum number of cores to which the cluster can scale.
+
+           --min-memory=MIN_MEMORY
+              Minimum memory in the cluster.
+
+              Minimum number of gigabytes of memory to which the cluster can
+              scale.
+
+           Arguments to set limits on accelerators:
+
+             --max-accelerator=[type=TYPE,count=COUNT,...]
+                Sets maximum limit for a single type of accelerators (e.g.
+                GPUs) in cluster.
 
        type
           (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla
@@ -541,10 +641,10 @@ FLAGS
           can be scaled. This flag must be specified if any of the other
           arguments in this group are specified.
 
-           --min-accelerator=[type=TYPE,count=COUNT,...]
-              Sets minimum limit for a single type of accelerators (e.g. GPUs)
-              in cluster. Defaults to 0 for all accelerator types if it isn't
-              set.
+                   --min-accelerator=[type=TYPE,count=COUNT,...]
+                      Sets minimum limit for a single type of accelerators
+                      (e.g. GPUs) in cluster. Defaults to 0 for all accelerator
+                      types if it isn't set.
 
        type
           (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla
@@ -587,8 +687,8 @@ FLAGS
           well:
 
               1) The private network the cluster connects to if
-              `--private-cluster` is specified.
-              2) Google Compute Engine Public IPs if `--private-cluster` is not
+              `--enable-private-nodes` is specified.
+              2) Google Compute Engine Public IPs if `--enable-private-nodes` is not
               specified.
 
           When disabled, public internet (0.0.0.0/0) is allowed to connect to
@@ -600,6 +700,52 @@ FLAGS
           1.2.3.4/30). Can not be specified unless
           --enable-master-authorized-networks is also specified.
 
+     Exports cluster's usage of cloud resources
+
+       --enable-network-egress-metering
+          Enable network egress metering on this cluster.
+
+          When enabled, a DaemonSet is deployed into the cluster. Each
+          DaemonSet pod meters network egress traffic by collecting data from
+          the conntrack table, and exports the metered metrics to the specified
+          destination.
+
+          Network egress metering is disabled if this flag is omitted, or when
+          --no-enable-network-egress-metering is set.
+
+       --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
+          The name of the BigQuery dataset to which the cluster's usage of
+          cloud resources is exported. A table will be created in the specified
+          dataset to store cluster resource usage. The resulting table can be
+          joined with BigQuery Billing Export to produce a fine-grained cost
+          breakdown.
+
+          Example:
+
+              $ gcloud alpha container clusters create example-cluster \
+                  --resource-usage-bigquery-dataset=example_bigquery_dataset_name
+
+     Private Clusters
+
+       --enable-private-endpoint
+          Cluster is managed using the private IP address of the master API
+          endpoint.
+
+       --enable-private-nodes
+          Cluster is created with no public IP addresses on the cluster nodes.
+
+       --master-ipv4-cidr=MASTER_IPV4_CIDR
+          IPv4 CIDR range to use for the master network. This should have a
+          netmask of size /28 and should be used in conjunction with the
+          --enable-private-nodes flag.
+
+       --private-cluster
+          (DEPRECATED) Cluster is created with no public IP addresses on the
+          cluster nodes.
+
+          The --private-cluster flag is deprecated and will be removed in a
+          future release. Use --enable-private-nodes instead.
+
      Flags relating to Cloud TPUs:
 
        --enable-tpu
@@ -608,17 +754,28 @@ FLAGS
           Can not be specified unless --enable-kubernetes-alpha and
           --enable-ip-alias are also specified.
 
-       --tpu-ipv4-cidr=CIDR
-          Set the IP range for the Cloud TPUs.
+       At most one of these may be specified:
 
-          Can be specified as a netmask size (e.g. '/20') or as in CIDR notion
-          (e.g. '10.100.0.0/20'). If given as a netmask size, the IP range will
-          be chosen automatically from the available space in the network.
+         --enable-tpu-service-networking
+            Enable Cloud TPU's Service Networking mode. In this mode, the CIDR
+            blocks used by the Cloud TPUs will be allocated and managed by
+            Service Networking, instead of Kubernetes Engine.
 
-          If unspecified, the TPU CIDR range will use automatic default '/20'.
+            This cannot be specified if tpu-ipv4-cidr is specified.
 
-          Can not be specified unless '--enable-tpu' and '--enable-ip-alias'
-          are also specified.
+         --tpu-ipv4-cidr=CIDR
+            Set the IP range for the Cloud TPUs.
+
+            Can be specified as a netmask size (e.g. '/20') or as in CIDR
+            notion (e.g. '10.100.0.0/20'). If given as a netmask size, the IP
+            range will be chosen automatically from the available space in the
+            network.
+
+            If unspecified, the TPU CIDR range will use automatic default
+            '/20'.
+
+            Can not be specified unless '--enable-tpu' and '--enable-ip-alias'
+            are also specified.
 
      At most one of these may be specified:
 
@@ -665,19 +822,6 @@ FLAGS
           zone. See https://cloud.google.com/compute/docs/disks/local-ssd for
           more information.
 
-     Private Clusters
-
-       --master-ipv4-cidr=MASTER_IPV4_CIDR
-          IPv4 CIDR range to use for the master network. This should be a /28
-          and should be used in conjunction with the --private-cluster flag.
-          This flag must be specified if any of the other arguments in this
-          group are specified.
-
-       --private-cluster
-          Cluster is created with no public IP addresses on the cluster nodes.
-          This flag must be specified if any of the other arguments in this
-          group are specified.
-
      Basic auth
 
        --password=PASSWORD
@@ -691,10 +835,12 @@ FLAGS
             --enable-basic-auth is an alias for --username=admin;
             --no-enable-basic-auth is an alias for --username="". Use
             --password to specify a password; if not, the server will randomly
-            generate one. Enabled by default, use --no-enable-basic-auth to
-            disable.
+            generate one. For cluster versions before 1.12, if neither
+            --enable-basic-auth nor --username is specified,
+            --enable-basic-auth will default to true. After 1.12,
+            --enable-basic-auth will default to false.
 
-         --username=USERNAME, -u USERNAME; default="admin"
+         --username=USERNAME, -u USERNAME
             The user name to use for basic auth for the cluster. Use --password
             to specify a password; if not, the server will randomly generate
             one.
@@ -707,6 +853,26 @@ FLAGS
        --zone=ZONE, -z ZONE
           Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
+
+     Flags for Security Profile:
+
+       --security-profile=SECURITY_PROFILE
+          Name and version of the security profile to be applied to the
+          cluster.
+
+          Example:
+
+              $ gcloud alpha container clusters create example-cluster \
+                  --security-profile=default-1.0-gke.0
+
+       --security-profile-runtime-rules
+          Apply runtime rules in the specified security profile to the cluster.
+          When enabled (by default), a security profile controller and webhook
+          are deployed on the cluster to enforce the runtime rules. If
+          --no-security-profile-runtime-rules is specified to disable this
+          feature, only bootstrapping rules are applied, and no security
+          profile controller or webhook are installed. Enabled by default, use
+          --no-security-profile-runtime-rules to disable.
 
      Options to specify the node identity. At most one of these may be
      specified:
@@ -738,11 +904,11 @@ FLAGS
          --scopes=[SCOPE,...]; default="gke-default"
             Specifies scopes for the node instances. Examples:
 
-            $ gcloud alpha container clusters create example-cluster \
-            --scopes=https://www.googleapis.com/auth/devstorage.read_only
+                $ gcloud alpha container clusters create example-cluster \
+                    --scopes=https://www.googleapis.com/auth/devstorage.read_only
 
-            $ gcloud alpha container clusters create example-cluster \
-            --scopes=bigquery,storage-rw,compute-ro
+                $ gcloud alpha container clusters create example-cluster \
+                    --scopes=bigquery,storage-rw,compute-ro
 
             Multiple SCOPEs can be specified, separated by commas.
             logging-write and/or monitoring are added unless Cloud Logging
@@ -759,55 +925,56 @@ FLAGS
             service-management are all included in the default scopes. In a
             future release, this will be the default behavior.
 
-            SCOPE can be either the full URI of the scope or an alias.
-            Available aliases are:
+            SCOPE can be either the full URI of the scope or an alias. default
+            scopes are assigned to all instances. Available aliases are:
 
-              Alias                 URI
-              bigquery              https://www.googleapis.com/auth/bigquery
-              cloud-platform        https://www.googleapis.com/auth/cloud-platform
-              cloud-source-repos    https://www.googleapis.com/auth/source.full_control
-              cloud-source-repos-ro https://www.googleapis.com/auth/source.read_only
-              compute-ro            https://www.googleapis.com/auth/compute.readonly
-              compute-rw            https://www.googleapis.com/auth/compute
-              datastore             https://www.googleapis.com/auth/datastore
-              default               https://www.googleapis.com/auth/devstorage.read_only
-                                    https://www.googleapis.com/auth/logging.write
-                                    https://www.googleapis.com/auth/monitoring.write
-                                    https://www.googleapis.com/auth/pubsub
-                                    https://www.googleapis.com/auth/service.management.readonly
-                                    https://www.googleapis.com/auth/servicecontrol
-                                    https://www.googleapis.com/auth/trace.append
-              gke-default           https://www.googleapis.com/auth/devstorage.read_only
-                                    https://www.googleapis.com/auth/logging.write
-                                    https://www.googleapis.com/auth/monitoring
-                                    https://www.googleapis.com/auth/service.management.readonly
-                                    https://www.googleapis.com/auth/servicecontrol
-                                    https://www.googleapis.com/auth/trace.append
-              logging-write         https://www.googleapis.com/auth/logging.write
-              monitoring            https://www.googleapis.com/auth/monitoring
-              monitoring-write      https://www.googleapis.com/auth/monitoring.write
-              pubsub                https://www.googleapis.com/auth/pubsub
-              service-control       https://www.googleapis.com/auth/servicecontrol
-              service-management    https://www.googleapis.com/auth/service.management.readonly
-              sql                   https://www.googleapis.com/auth/sqlservice
-              sql-admin             https://www.googleapis.com/auth/sqlservice.admin
-              storage-full          https://www.googleapis.com/auth/devstorage.full_control
-              storage-ro            https://www.googleapis.com/auth/devstorage.read_only
-              storage-rw            https://www.googleapis.com/auth/devstorage.read_write
-              taskqueue             https://www.googleapis.com/auth/taskqueue
-              trace                 https://www.googleapis.com/auth/trace.append
-              userinfo-email        https://www.googleapis.com/auth/userinfo.email
+              Alias                  URI
+              bigquery               https://www.googleapis.com/auth/bigquery
+              cloud-platform         https://www.googleapis.com/auth/cloud-platform
+              cloud-source-repos     https://www.googleapis.com/auth/source.full_control
+              cloud-source-repos-ro  https://www.googleapis.com/auth/source.read_only
+              compute-ro             https://www.googleapis.com/auth/compute.readonly
+              compute-rw             https://www.googleapis.com/auth/compute
+              datastore              https://www.googleapis.com/auth/datastore
+              default                https://www.googleapis.com/auth/devstorage.read_only
+                                     https://www.googleapis.com/auth/logging.write
+                                     https://www.googleapis.com/auth/monitoring.write
+                                     https://www.googleapis.com/auth/pubsub
+                                     https://www.googleapis.com/auth/service.management.readonly
+                                     https://www.googleapis.com/auth/servicecontrol
+                                     https://www.googleapis.com/auth/trace.append
+              gke-default            https://www.googleapis.com/auth/devstorage.read_only
+                                     https://www.googleapis.com/auth/logging.write
+                                     https://www.googleapis.com/auth/monitoring
+                                     https://www.googleapis.com/auth/service.management.readonly
+                                     https://www.googleapis.com/auth/servicecontrol
+                                     https://www.googleapis.com/auth/trace.append
+              logging-write          https://www.googleapis.com/auth/logging.write
+              monitoring             https://www.googleapis.com/auth/monitoring
+              monitoring-write       https://www.googleapis.com/auth/monitoring.write
+              pubsub                 https://www.googleapis.com/auth/pubsub
+              service-control        https://www.googleapis.com/auth/servicecontrol
+              service-management     https://www.googleapis.com/auth/service.management.readonly
+              sql (deprecated)       https://www.googleapis.com/auth/sqlservice
+              sql-admin              https://www.googleapis.com/auth/sqlservice.admin
+              storage-full           https://www.googleapis.com/auth/devstorage.full_control
+              storage-ro             https://www.googleapis.com/auth/devstorage.read_only
+              storage-rw             https://www.googleapis.com/auth/devstorage.read_write
+              taskqueue              https://www.googleapis.com/auth/taskqueue
+              trace                  https://www.googleapis.com/auth/trace.append
+              userinfo-email         https://www.googleapis.com/auth/userinfo.email
 
-            DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice'
+            DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice
             account scope and sql alias do not provide SQL instance management
             capabilities and have been deprecated. Please, use
-            'https://www.googleapis.com/auth/sqlservice.admin' or sql-admin to
+            https://www.googleapis.com/auth/sqlservice.admin or sql-admin to
             manage your Google SQL Service instances.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

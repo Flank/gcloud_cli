@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import contextlib
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib import parameterized
 from tests.lib.surface.compute import e2e_test_base
@@ -108,7 +108,7 @@ class DisksLabelsTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.disk_size = 10
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testDisks(self):
     with self._CreateDiskWithLabels() as disk_name:
@@ -222,7 +222,9 @@ class DisksTestRegional(e2e_test_base.BaseTest, parameterized.TestCase):
   def SetUp(self):
     self.disk_size = 10
 
-  @parameterized.parameters(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
+  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                            calliope_base.ReleaseTrack.BETA)
   def testDisks(self, track):
     self.track = track
     with self._CreateInstance() as instance_name, \

@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.meta import cache_util
 from googlecloudsdk.core.resource import resource_printer
 from tests.lib import calliope_test_base
@@ -36,7 +36,7 @@ class ListAttachedCompletersTest(calliope_test_base.CalliopeTestBase):
 
   def SetUp(self):
     self.WalkTestCli('sdk5')
-    self.cli = base.Command._cli_power_users_only
+    self.cli = calliope_base.Command._cli_power_users_only
 
   def testListAttachedCompleters(self):
     completers = cache_util.ListAttachedCompleters(self.cli)

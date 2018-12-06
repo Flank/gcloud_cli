@@ -26,6 +26,7 @@ from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.docker import docker
 from googlecloudsdk.core.util import times
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -45,8 +46,7 @@ _NEWER_TIME_CREATED = round(float(_NEWER_TIME_CREATED_MS) / 1000, 0)
 _UNDERFLOW_CREATED_MS = -62135596800000  # Observed in the wild.
 
 
-class ListTagsGAandBetaTest(
-    cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
+class ListTagsGATest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
   def SetUp(self):
     self._manifests = {}
@@ -68,7 +68,8 @@ class ListTagsGAandBetaTest(
     transform_manifests_mock = self.StartPatch(
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     response = httplib2.Response({'status': 403, 'body': 'some body'})
-    exception = docker_http.V2DiagnosticException(response, 'some content')
+    exception = docker_http.V2DiagnosticException(
+        response, 'some content'.encode('utf8'))
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags()
@@ -78,7 +79,8 @@ class ListTagsGAandBetaTest(
     transform_manifests_mock = self.StartPatch(
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     response = httplib2.Response({'status': 404, 'body': 'some body'})
-    exception = docker_http.V2DiagnosticException(response, 'some content')
+    exception = docker_http.V2DiagnosticException(
+        response, 'some content'.encode('utf8'))
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags()
@@ -168,8 +170,9 @@ sha1 tag1 2016-04-14T20:47:07
         self.GetOutput().index('sha1'), self.GetOutput().index('sha3'))
 
 
-class ListTagsALPHATest(
-    cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
+class ListTagsAlphaAndBetaTest(cli_test_base.CliTestBase,
+                               sdk_test_base.WithFakeAuth,
+                               parameterized.TestCase):
 
   def SetUp(self):
     self._manifests = {}
@@ -184,58 +187,69 @@ class ListTagsALPHATest(
     self.fetch_summary_mock = self.StartPatch(
         'googlecloudsdk.api_lib.container.images.util.FetchSummary')
 
-  def ListTags(
-      self, image=_IMAGE, show_occurrences=True, show_occurrences_from=None):
-    params = ['alpha', 'container', 'images', 'list-tags', image]
+  def ListTags(self,
+               track,
+               image=_IMAGE,
+               show_occurrences=True,
+               show_occurrences_from=None):
+    params = [track, 'container', 'images', 'list-tags', image]
     if not show_occurrences:
       params.append('--no-show-occurrences')
     if show_occurrences_from:
       params.append('--show-occurrences-from=%s' % show_occurrences_from)
     self.Run(params)
 
-  def testListEmpty(self):
-    self.ListTags()
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testListEmpty(self, track):
+    self.ListTags(track)
     self.AssertErrContains('Listed 0 items.')
 
-  def testV2DockerError_403(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testV2DockerError_403(self, track):
     transform_manifests_mock = self.StartPatch(
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     response = httplib2.Response({'status': 403, 'body': 'some body'})
-    exception = docker_http.V2DiagnosticException(response, 'some content')
+    exception = docker_http.V2DiagnosticException(
+        response, 'some content'.encode('utf8'))
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
-      self.ListTags()
+      self.ListTags(track)
     self.assertTrue('Access denied', six.text_type(cm.exception))
 
-  def testV2DockerError_404(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testV2DockerError_404(self, track):
     transform_manifests_mock = self.StartPatch(
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     response = httplib2.Response({'status': 404, 'body': 'some body'})
-    exception = docker_http.V2DiagnosticException(response, 'some content')
+    exception = docker_http.V2DiagnosticException(
+        response, 'some content'.encode('utf8'))
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
-      self.ListTags()
+      self.ListTags(track)
     self.assertTrue('Not found', six.text_type(cm.exception))
 
-  def testBadStateException_CredentialRefreshError(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testBadStateException_CredentialRefreshError(self, track):
     transform_manifests_mock = self.StartPatch(
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     expected_message = 'Bad status during token exchange: 403'
     exception = docker_http.TokenRefreshException(expected_message)
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.TokenRefreshError) as cm:
-      self.ListTags()
+      self.ListTags(track)
     self.assertIn(expected_message, six.text_type(cm.exception))
 
-  def testBadStateException_UnexpectedErrorsRaised(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testBadStateException_UnexpectedErrorsRaised(self, track):
     transform_manifests_mock = self.StartPatch(
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
     exception = docker_http.BadStateException('some unexpected error')
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(docker_http.BadStateException):
-      self.ListTags()
+      self.ListTags(track)
 
-  def testListTagsNoOccurrences(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testListTagsNoOccurrences(self, track):
     # Intercept FormatDateTime to use UTC for test portability.
     real_format_date_time = times.FormatDateTime
 
@@ -257,38 +271,42 @@ class ListTagsALPHATest(
             'timeCreatedMs': _TIME_CREATED_MS + 1000,  # +1s to ensure ordering.
         },
     }
-    self.ListTags()
+    self.ListTags(track)
     self.AssertOutputEquals("""\
 DIGEST TAGS TIMESTAMP
 sha2 tag2,tag3 2016-04-14T20:47:08
 sha1 tag1 2016-04-14T20:47:07
 """, normalize_space=True)
 
-  def testListTagsBadInput(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testListTagsBadInput(self, track):
     with self.assertRaises(util.InvalidImageNameError):
-      self.ListTags('gcr.io/foo/badi$mage')
+      self.ListTags(track, 'gcr.io/foo/badi$mage')
     self.AssertErrContains('Invalid repository: foo/badi$mage, acceptable '
                            'characters include')
 
-  def testListTagsUnsupportedInput(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testListTagsUnsupportedInput(self, track):
     with self.assertRaises(docker.UnsupportedRegistryError):
-      self.ListTags('myregistry.io/badimage')
+      self.ListTags(track, 'myregistry.io/badimage')
     self.AssertErrContains(
         'myregistry.io/badimage is not in a supported registry.  '
         'Supported registries are')
 
-  def testListTagsDoNotShowOccurrences(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testListTagsDoNotShowOccurrences(self, track):
     self._manifests = {_MakeSha('sha1'): {'tag': ['tag1'],
                                           'timeCreatedMs': _TIME_CREATED_MS},
                        _MakeSha('sha2'): {'tag': ['tag2', 'tag3'],
                                           'timeCreatedMs': _TIME_CREATED_MS}}
-    self.ListTags(show_occurrences=False)
+    self.ListTags(track, show_occurrences=False)
     for digest, data in six.iteritems(self._manifests):
       self.AssertOutputContains(_StripSha(digest))
       for tag in data['tag']:
         self.AssertOutputContains(tag)
 
-  def testListTagsRespectsVulnerabilityLimitCount(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testListTagsRespectsVulnerabilityLimitCount(self, track):
     resource_url1 = 'https://{repo}@{digest}'.format(
         repo=_IMAGE, digest=_MakeSha('sha1'))
     resource_url2 = 'https://{repo}@{digest}'.format(
@@ -302,33 +320,36 @@ sha1 tag1 2016-04-14T20:47:07
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
 
     # Limit to only the most recent occurrence.
-    self.ListTags(show_occurrences_from=1)
+    self.ListTags(track, show_occurrences_from=1)
     _, kwargs = transform_manifests_mock.call_args
     self.assertListEqual(kwargs['resource_urls'], [resource_url2])
 
     # Limit to the two most recent occurrences (both, in this test).
     transform_manifests_mock.reset_mock()
-    self.ListTags(show_occurrences_from=2)
+    self.ListTags(track, show_occurrences_from=2)
     _, kwargs = transform_manifests_mock.call_args
     self.assertListEqual(
         kwargs['resource_urls'], [resource_url2, resource_url1])
 
-  def testListTagsDoesNotFilterResourceUrlsWhenFlagIsUnlimited(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testListTagsDoesNotFilterResourceUrlsWhenFlagIsUnlimited(self, track):
     transform_manifests_mock = self.StartPatch(
         'googlecloudsdk.api_lib.container.images.util.TransformManifests')
 
     # Set unlimited limit of images for which to show occurrences.
-    self.ListTags(show_occurrences_from='unlimited')
+    self.ListTags(track, show_occurrences_from='unlimited')
     _, kwargs = transform_manifests_mock.call_args
     self.assertEqual(None, kwargs['resource_urls'])
 
-  def testListTagsRaisesErrorWhenShowOccurrenceFlagsConflict(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testListTagsRaisesErrorWhenShowOccurrenceFlagsConflict(self, track):
     # If --show-occurrences-from is explicitly provided when
     # --show-occurrences=False, an ArgumentError is raised.
     with self.assertRaises(exceptions.Error):
-      self.ListTags(show_occurrences=False, show_occurrences_from=10)
+      self.ListTags(track, show_occurrences=False, show_occurrences_from=10)
 
-  def testListTagsOutput(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testListTagsOutput(self, track):
     resource_url1 = 'https://{repo}@{digest}'.format(
         repo=_IMAGE, digest=_MakeSha('sha1'))
     resource_url2 = 'https://{repo}@{digest}'.format(
@@ -409,7 +430,7 @@ sha1 tag1 2016-04-14T20:47:07
         }
     }
 
-    self.ListTags()
+    self.ListTags(track)
 
     expected_time = times.FormatDateTime(
         times.GetDateTimeFromTimeStamp(_TIME_CREATED), '%Y-%m-%dT%H:%M:%S')

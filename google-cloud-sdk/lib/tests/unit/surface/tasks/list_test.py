@@ -49,8 +49,8 @@ class TasksListTest(test_base.CloudTasksTestBase):
           appEngineHttpRequest=self.messages.AppEngineHttpRequest(),
           createTime=self.task_create_time,
           scheduleTime=self.task_schedule_time,
-          status=self.messages.TaskStatus(attemptDispatchCount=i+1,
-                                          attemptResponseCount=i+1))
+          dispatchCount=i+1,
+          responseCount=i+1)
       tasks.append(t)
     return tasks
 

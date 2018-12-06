@@ -27,17 +27,16 @@ from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class DevicesListTest(base.CloudIotDeviceBase):
+class DevicesListTestGA(base.CloudIotDeviceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.devices_client = devices_api.DevicesClient(self.client, self.messages)
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def testList(self, track):
-    self.track = track
+  def testList(self):
     devices = self._MakeDevices()
     self._ExpectListDevices(devices)
 
@@ -47,8 +46,7 @@ class DevicesListTest(base.CloudIotDeviceBase):
 
     self.assertEqual(results, devices)
 
-  def testList_DeviceIds(self, track):
-    self.track = track
+  def testList_DeviceIds(self):
     devices = self._MakeDevices()
     self._ExpectListDevices(devices, device_ids=['d0', 'd1'],
                             device_num_ids=[3, 4])
@@ -61,8 +59,7 @@ class DevicesListTest(base.CloudIotDeviceBase):
 
     self.assertEqual(results, devices)
 
-  def testList_CheckFormat(self, track):
-    self.track = track
+  def testList_CheckFormat(self):
     devices = self._MakeDevices(n=3)
     self._ExpectListDevices(devices)
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -78,8 +75,7 @@ class DevicesListTest(base.CloudIotDeviceBase):
         d2  2       False
         """, normalize_space=True)
 
-  def testList_Uri(self, track):
-    self.track = track
+  def testList_Uri(self):
     devices = self._MakeDevices(n=3)
     self._ExpectListDevices(devices)
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -96,8 +92,7 @@ class DevicesListTest(base.CloudIotDeviceBase):
         https://cloudiot.googleapis.com/v1/projects/{project}/locations/us-central1/registries/my-registry/devices/d2
         """.format(project=self.Project()), normalize_space=True)
 
-  def testList_RelativeName(self, track):
-    self.track = track
+  def testList_RelativeName(self):
     devices = self._MakeDevices()
     self._ExpectListDevices(devices)
 
@@ -108,6 +103,69 @@ class DevicesListTest(base.CloudIotDeviceBase):
                        '    --registry {}'.format(registry_name))
 
     self.assertEqual(results, devices)
+
+
+class DevicesListTestBeta(DevicesListTestGA, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def SetUp(self):
+    self.auth_enum = (
+        self.messages.GatewayConfig.GatewayAuthMethodValueValuesEnum)
+    self.gateway_enum = self.messages.GatewayConfig.GatewayTypeValueValuesEnum
+    self.list_gateway_enum = (
+        self.messages.CloudiotProjectsLocationsRegistriesDevicesListRequest.
+        GatewayListOptionsGatewayTypeValueValuesEnum)
+    properties.VALUES.core.user_output_enabled.Set(False)
+
+  def testList_CheckFormat(self):
+    devices = self._MakeDevices(
+        n=3,
+        gateway_config=self.messages.GatewayConfig(
+            gatewayType=self.gateway_enum.GATEWAY,
+            gatewayAuthMethod=self.auth_enum.ASSOCIATION_AND_DEVICE_AUTH_TOKEN))
+    self._ExpectListDevices(devices)
+    properties.VALUES.core.user_output_enabled.Set(True)
+
+    self.Run('iot devices list '
+             '    --registry my-registry '
+             '    --region us-central1')
+
+    self.AssertOutputEquals(
+        """\
+        ID NUM_ID BLOCKED GATEWAY_TYPE GATEWAY_AUTH_METHOD
+        d0 0 False GATEWAY ASSOCIATION_AND_DEVICE_AUTH_TOKEN
+        d1 1 False GATEWAY ASSOCIATION_AND_DEVICE_AUTH_TOKEN
+        d2 2 False GATEWAY ASSOCIATION_AND_DEVICE_AUTH_TOKEN
+        """,
+        normalize_space=True)
+
+  @parameterized.parameters('non-gateway', 'gateway')
+  def testList_GatewayType(self, gateway_type):
+    # Filtering happens on backend so just checking for command workflow here.
+    devices = self._MakeDevices(
+        gateway_config=self.messages.GatewayConfig(
+            gatewayType=self.gateway_enum.GATEWAY,
+            gatewayAuthMethod=self.auth_enum.ASSOCIATION_AND_DEVICE_AUTH_TOKEN))
+    gateway_val = self.list_gateway_enum.lookup_by_name(
+        gateway_type.upper().replace('-', '_'))
+    self._ExpectListDevices(devices, gateway_type=gateway_val)
+
+    registry_name = ('projects/{}/'
+                     'locations/us-central1/'
+                     'registries/my-registry').format(self.Project())
+    results = self.Run('iot devices list '
+                       '    --registry {} --device-type {}'.format(
+                           registry_name, gateway_type))
+
+    self.assertEqual(results, devices)
+
+
+class DevicesListTestAlpha(DevicesListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

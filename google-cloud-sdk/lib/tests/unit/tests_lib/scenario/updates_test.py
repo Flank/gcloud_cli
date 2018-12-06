@@ -43,7 +43,7 @@ class ModeTests(test_case.TestCase, parameterized.TestCase):
   def testCurrentMode(self, value, expected):
     encoding.SetEncodedValue(os.environ, updates.UPDATE_MODES_ENV_VAR, value)
     actual = updates.Mode.FromEnv()
-    self.assertEqual(expected, actual)
+    self.assertEqual(set(expected), set(actual))
 
   @parameterized.parameters([
       ('BOGUS'),
@@ -107,6 +107,17 @@ a:
 
     c = context.ForKey('b.c')
     self.assertEqual(('3', '4'), c.Location())
+
+  def testLastKnownLocation(self):
+    data_string = """\
+a:
+  b:
+"""
+    data = yaml.load(data_string, round_trip=True)
+    data['a']['b'] = {'c': {'d': 'value'}}
+    context = updates.Context(data, 'a', updates.Mode.RESULT)
+    context = context.ForKey('b.c.d')
+    self.assertEqual(('2', '2'), context.Location())
 
   def testBlockText(self):
     data_string = """\

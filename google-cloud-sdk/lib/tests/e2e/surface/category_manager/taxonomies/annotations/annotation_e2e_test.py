@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.category_manager import utils
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 from tests.lib.surface.category_manager import e2e_base as base
 
 
@@ -36,6 +37,7 @@ class AnnotationE2eTest(base.CategoryManagerE2eBase):
     return self.Run('category-manager taxonomies annotations describe ' +
                     annotation.name)
 
+  @test_case.Filters.skip('Failing', 'b/115917883')
   def testUpdateAnnotation(self):
     description = 'old description'
     new_description = 'new description'
@@ -59,6 +61,7 @@ class AnnotationE2eTest(base.CategoryManagerE2eBase):
             taxonomy, annotation.displayName)
         self.assertEqual(listed_annotation.description, description)
 
+  @test_case.Filters.skip('Failing', 'b/115762046')
   def testAllAnnotationCommandsAsUserJourney(self):
     taxonomy_description = 'test taxonomy description'
     annotation_description = 'test annotation description'

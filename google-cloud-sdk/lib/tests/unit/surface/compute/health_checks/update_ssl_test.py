@@ -21,14 +21,16 @@ from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
 
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class HealthChecksUpdateSslTest(test_base.BaseTest,
-                                test_case.WithOutputCapture):
+class HealthChecksUpdateSslTest(test_base.BaseTest, test_case.WithOutputCapture,
+                                parameterized.TestCase):
 
   def testNoArgs(self):
     with self.AssertRaisesToolExceptionRegexp(
@@ -39,15 +41,17 @@ class HealthChecksUpdateSslTest(test_base.BaseTest,
 
   def testNoChange(self):
     self.make_requests.side_effect = [
-        [self.messages.HealthCheck(
-            name='my-health-check',
-            type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-            sslHealthCheck=self.messages.SSLHealthCheck(
-                port=80))],
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                description='fezzes are cool',
+                sslHealthCheck=self.messages.SSLHealthCheck(port=80))
+        ],
     ]
 
-    self.Run(
-        'compute health-checks update ssl my-health-check --port 80')
+    self.Run('compute health-checks update ssl my-health-check '
+             '--description "fezzes are cool"')
 
     self.CheckRequests(
         [(self.compute.healthChecks,
@@ -802,12 +806,266 @@ class HealthChecksUpdateSslTest(test_base.BaseTest,
           """)
 
 
-class HealthChecksUpdateSslAlphaTest(test_base.BaseTest,
-                                     test_case.WithOutputCapture):
+class HealthChecksUpdateSslBetaTest(HealthChecksUpdateSslTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
+  def testPortOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(port=80))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update ssl my-health-check --port 8888')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      portSpecification=(
+                          self.messages.SSLHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      port=8888)),
+              project='my-project'))],
+    )
+
+  def testPortNameOptionWithPreexistingPortName(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    portName='old-port'))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update ssl my-health-check '
+             '--port-name new-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      portSpecification=(
+                          self.messages.SSLHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
+                      portName='new-port')),
+              project='my-project'))],
+    )
+
+  def testPortNameOptionWithoutPreexistingPortName(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck())
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update ssl my-health-check '
+             '--port-name new-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      portSpecification=(
+                          self.messages.SSLHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
+                      portName='new-port')),
+              project='my-project'))],
+    )
+
+  def testUnsetPortNameOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    portName='happy-port'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update ssl my-health-check --port-name ''
+        """)
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      portSpecification=(
+                          self.messages.SSLHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),)),
+              project='my-project'))],
+    )
+
+  def testPortAndPortNameOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck())
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update ssl my-health-check '
+             '--port 8888 --port-name new-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      portSpecification=(
+                          self.messages.SSLHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      port=8888)),
+              project='my-project'))],
+    )
+
+  def testUseServingPortOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck())
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update ssl my-health-check '
+             '--use-serving-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      portSpecification=(
+                          self.messages.SSLHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_SERVING_PORT))),
+              project='my-project'))],
+    )
+
+  def testUseServingPortOptionWithPreexistingPortName(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    portName='old-port'))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update ssl my-health-check '
+             '--use-serving-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      portSpecification=(
+                          self.messages.SSLHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_SERVING_PORT))),
+              project='my-project'))],
+    )
+
+  @parameterized.parameters(('--port', 80), ('--port-name', 'my-port'))
+  def testUseServingPortOptionErrors(self, flag, flag_value):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck())
+        ],
+        [],
+    ])
+
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [--use-serving-port]: {0} cannot '
+        'be specified when using: --use-serving-port'.format(flag)):
+      self.Run("""
+          compute health-checks update ssl my-health-check
+          --use-serving-port {0} {1}
+      """.format(flag, flag_value))
+
+
+class HealthChecksUpdateSslAlphaTest(HealthChecksUpdateSslBetaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
+
+  def Run(self, cmd):
+    HealthChecksUpdateSslBetaTest.Run(self, cmd + ' --global')
 
   def testUriSupport(self):
     # This is the same as testRequestOption, but uses a full URI.
@@ -863,7 +1121,7 @@ class HealthChecksUpdateSslAlphaTest(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update ssl my-health-check
-          --request req2 --global
+          --request req2
         """)
 
     self.CheckRequests(

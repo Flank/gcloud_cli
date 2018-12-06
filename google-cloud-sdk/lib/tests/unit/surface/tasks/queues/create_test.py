@@ -27,7 +27,7 @@ from tests.lib import test_case
 from tests.lib.surface.tasks import test_base
 
 
-class CreateTestBase(test_base.CloudTasksTestBase):
+class CreatePullQueueTest(test_base.CloudTasksAlphaTestBase):
 
   def SetUp(self):
     self.location_ref = resources.REGISTRY.Create(
@@ -41,9 +41,6 @@ class CreateTestBase(test_base.CloudTasksTestBase):
     resolve_loc_mock = self.StartObjectPatch(app, 'ResolveAppLocation')
     resolve_loc_mock.return_value = (
         parsers.ParseLocation('us-central1').SelfLink())
-
-
-class CreatePullQueueTest(CreateTestBase):
 
   def testCreate_NoOptions(self):
     expected_queue = self.messages.Queue(
@@ -123,12 +120,25 @@ class CreatePullQueueTest(CreateTestBase):
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
 
 
-class CreateAppEngineQueueTest(CreateTestBase):
+class CreateAppEngineQueueTest(test_base.CloudTasksTestBase):
+
+  def SetUp(self):
+    self.location_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations', locationsId='us-central1',
+        projectsId=self.Project())
+    self.queue_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues', locationsId='us-central1',
+        projectsId=self.Project(), queuesId='my-queue')
+    self.queue_name = self.queue_ref.RelativeName()
+
+    resolve_loc_mock = self.StartObjectPatch(app, 'ResolveAppLocation')
+    resolve_loc_mock.return_value = (
+        parsers.ParseLocation('us-central1').SelfLink())
 
   def testCreate_NoOptions(self):
     expected_queue = self.messages.Queue(
         name=self.queue_name,
-        appEngineHttpTarget=self.messages.AppEngineHttpTarget())
+        appEngineHttpQueue=self.messages.AppEngineHttpQueue())
     self.queues_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
             parent=self.location_ref.RelativeName(), queue=expected_queue),
@@ -142,7 +152,7 @@ class CreateAppEngineQueueTest(CreateTestBase):
   def testCreate_AllOptions(self):
     expected_queue = self.messages.Queue(
         name=self.queue_name,
-        appEngineHttpTarget=self.messages.AppEngineHttpTarget(
+        appEngineHttpQueue=self.messages.AppEngineHttpQueue(
             appEngineRoutingOverride=self.messages.AppEngineRouting(
                 service='abc')),
         retryConfig=self.messages.RetryConfig(maxAttempts=10,
@@ -150,7 +160,7 @@ class CreateAppEngineQueueTest(CreateTestBase):
                                               maxDoublings=4, minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxTasksDispatchedPerSecond=100, maxConcurrentTasks=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
     self.queues_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
             parent=self.location_ref.RelativeName(), queue=expected_queue),
@@ -160,8 +170,8 @@ class CreateAppEngineQueueTest(CreateTestBase):
                             '--max-attempts=10 --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '
-                            '--max-tasks-dispatched-per-second=100 '
-                            '--max-concurrent-tasks=10 '
+                            '--max-dispatches-per-second=100 '
+                            '--max-concurrent-dispatches=10 '
                             '--routing-override=service:abc')
 
     self.assertEqual(actual_queue, expected_queue)
@@ -170,16 +180,16 @@ class CreateAppEngineQueueTest(CreateTestBase):
   def testCreate_AllOptions_MaxAttemptsUnlimited(self):
     expected_queue = self.messages.Queue(
         name=self.queue_name,
-        appEngineHttpTarget=self.messages.AppEngineHttpTarget(
+        appEngineHttpQueue=self.messages.AppEngineHttpQueue(
             appEngineRoutingOverride=self.messages.AppEngineRouting(
                 service='abc')),
-        retryConfig=self.messages.RetryConfig(unlimitedAttempts=True,
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
                                               maxRetryDuration='5s',
                                               maxDoublings=4,
                                               minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxTasksDispatchedPerSecond=100, maxConcurrentTasks=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
     self.queues_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
             parent=self.location_ref.RelativeName(), queue=expected_queue),
@@ -189,8 +199,8 @@ class CreateAppEngineQueueTest(CreateTestBase):
                             '--max-attempts=unlimited --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '
-                            '--max-tasks-dispatched-per-second=100 '
-                            '--max-concurrent-tasks=10 '
+                            '--max-dispatches-per-second=100 '
+                            '--max-concurrent-dispatches=10 '
                             '--routing-override=service:abc')
 
     self.assertEqual(actual_queue, expected_queue)

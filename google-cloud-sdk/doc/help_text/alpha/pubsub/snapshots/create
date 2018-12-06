@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha pubsub snapshots create - this feature is part of an
-        invite-only release of the Cloud Pub/Sub API
+    gcloud alpha pubsub snapshots create - creates one or more Cloud Pub/Sub
+        snapshots
 
 SYNOPSIS
     gcloud alpha pubsub snapshots create SNAPSHOT [SNAPSHOT ...]
@@ -8,11 +8,7 @@ SYNOPSIS
         [--subscription-project=SUBSCRIPTION_PROJECT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Creates one or more Cloud Pub/Sub snapshots. This feature is part
-    of an invitation-only release of the underlying Cloud Pub/Sub API. The
-    command will generate errors unless you have access to this API. This
-    restriction should be relaxed in the near future. Please contact
-    cloud-pubsub@google.com with any questions in the meantime.
+    (ALPHA) Creates one or more Cloud Pub/Sub snapshots.
 
 POSITIONAL ARGUMENTS
      SNAPSHOT [SNAPSHOT ...]
@@ -42,13 +38,16 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta pubsub snapshots create
 

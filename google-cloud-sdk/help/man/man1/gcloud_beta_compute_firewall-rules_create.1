@@ -122,15 +122,15 @@ be used to represent egress direction.
 
 .TP 2m
 \fB\-\-disabled\fR
-Use this flag to disable a firewall rule and stop it from being enforced in the
-network. In the case of disabled firewall rules, the associated network behaves
-as if the firewall rule did not exist. To enable a disabled rule instead, use:
+Disable a firewall rule and stop it from being enforced in the network. If a
+firewall rule is disabled, the associated network behaves as if the rule did not
+exist. To enable a disabled rule, use:
 
 .RS 2m
 $ gcloud beta compute firewall\-rules update MY\-RULE \-\-no\-disabled
 .RE
 
-If omitted firewall rule is considered enabled.
+Firewall rules are enabled by default.
 
 .TP 2m
 \fB\-\-enable\-logging\fR
@@ -244,9 +244,9 @@ can also be specified.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

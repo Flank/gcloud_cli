@@ -11,7 +11,7 @@ gcloud alpha compute routers nats update \- update a NAT on a Google Compute Eng
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute routers nats update\fR \fINAME\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-async\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-auto\-allocate\-nat\-external\-ips\fR\ |\ \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]] [\fB\-\-clear\-icmp\-idle\-timeout\fR\ |\ \fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR] [\fB\-\-clear\-min\-ports\-per\-vm\fR\ |\ \fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR] [\fB\-\-clear\-tcp\-established\-idle\-timeout\fR\ |\ \fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR] [\fB\-\-clear\-tcp\-transitory\-idle\-timeout\fR\ |\ \fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR] [\fB\-\-clear\-udp\-idle\-timeout\fR\ |\ \fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR] [\fB\-\-nat\-all\-subnet\-ip\-ranges\fR\ |\ \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]\ |\ \fB\-\-nat\-primary\-subnet\-ip\-ranges\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute routers nats update\fR \fINAME\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-async\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-auto\-allocate\-nat\-external\-ips\fR\ |\ \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]] [\fB\-\-clear\-icmp\-idle\-timeout\fR\ |\ \fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR] [\fB\-\-clear\-log\-filter\fR\ |\ \fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-clear\-min\-ports\-per\-vm\fR\ |\ \fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR] [\fB\-\-clear\-tcp\-established\-idle\-timeout\fR\ |\ \fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR] [\fB\-\-clear\-tcp\-transitory\-idle\-timeout\fR\ |\ \fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR] [\fB\-\-clear\-udp\-idle\-timeout\fR\ |\ \fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR] [\fB\-\-nat\-all\-subnet\-ip\-ranges\fR\ |\ \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]\ |\ \fB\-\-nat\-primary\-subnet\-ip\-ranges\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -51,6 +51,13 @@ The Router to use for NAT.
 \fB\-\-async\fR
 Display information about the operation in progress, without waiting for the
 operation to complete.
+
+.TP 2m
+\fB\-\-enable\-logging\fR
+Enable logging for the NAT. Logs will be exported to Stackdriver. NAT logging is
+disabled by default. To disable logging for the NAT, use $ gcloud alpha compute
+routers nats update MY\-NAT \e \-\-no\-enable\-logging \-\-router ROUTER
+\-\-region REGION
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -107,6 +114,45 @@ Clear timeout for ICMP connections
 \fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR
 Timeout for ICMP connections. See $ gcloud topic datetimes for information on
 duration formats.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-log\-filter\fR
+Clear the filter for logs exported to stackdriver. Without a filter, logs (if
+enabled) will be exported for all connections handled by this NAT.
+
+.TP 2m
+\fB\-\-log\-filter\fR=\fILOG_FILTER\fR
+Specify a filter for logs exported to stackdriver. This can be one of the
+following: ERRORS_ONLY \- export logs for connection failures only.
+TRANSLATIONS_ONLY \- export logs for successful connections only. Without a
+filter, logs (if enabled) will be exported for all connections handled by this
+NAT.
+
+If logging is not enabled, filter settings will be persisted but will have no
+effect. Use \-\-[no\-]enable\-logging to enable and disable logging.
+
+To clear the filter, use $ gcloud alpha compute routers nats update MY\-NAT \e
+\-\-clear\-log\-filter \-\-router ROUTER \-\-region REGION
+
+\fILOG_FILTER\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBERRORS_ONLY\fR
+Export logs for connection failures only.
+.TP 2m
+\fBTRANSLATIONS_ONLY\fR
+Export logs for successful connections only.
+.RE
+.sp
+
 
 .RE
 .sp
@@ -185,7 +231,7 @@ secondary ranges, to use NAT.
 
 .TP 2m
 \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]
-A list of subnetwork primary and secondary IP ranges to be allowed to use NAT.
+List of subnetwork primary and secondary IP ranges to be allowed to use NAT.
 [SUBNETWORK]: including a subnetwork name includes only the primary subnet range
 of the subnetwork. [SUBNETWORK]:[RANGE_NAME]: specifying a subnetwork and
 secondary range name includes only that secondary range.It does not include the
@@ -203,9 +249,47 @@ Allow only primary IP ranges of all subnetworks in the region to use NAT.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+Change subnetworks and IP address resources associated with NAT:
+
+.RS 2m
+$ gcloud alpha compute routers nats update nat1 \-\-router=my\-router
+  \-\-nat\-external\-ip\-pool=ip\-address2,ip\-address3
+  \-\-nat\-custom\-subnet\-ip\-ranges=subnet\-2,subnet\-3:secondary\-range\-2
+.RE
+
+Change minimum default ports allocated per VM associated with NAT:
+
+.RS 2m
+$ gcloud alpha compute routers nats update nat1 \-\-router=my\-router \e
+    \-\-min\-default\-ports\-per\-vm=128
+.RE
+
+Change connection timeouts associated with NAT:
+
+.RS 2m
+$ gcloud alpha compute routers nats update nat1 \-\-router=my\-router
+  \-\-udp\-mapping\-idle\-timeout=60s
+  \-\-icmp\-mapping\-idle\-timeout=60s
+  \-\-tcp\-established\-connection\-idle\-timeout=60s
+  \-\-tcp\-transitory\-connection\-idle\-timeout=60s
+.RE
+
+Reset connection timeouts associated NAT to default values:
+
+.RS 2m
+$ gcloud alpha compute routers nats update nat1 \-\-router=my\-router
+  \-\-clear\-udp\-mapping\-idle\-timeout \-\-clear\-icmp\-mapping\-idle\-timeout
+  \-\-clear\-tcp\-established\-connection\-idle\-timeout
+  \-\-clear\-tcp\-transitory\-connection\-idle\-timeout
+.RE
 
 
 
@@ -215,5 +299,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud compute routers nats update
+$ gcloud beta compute routers nats update
+.RE
 

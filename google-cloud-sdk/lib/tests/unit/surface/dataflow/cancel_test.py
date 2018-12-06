@@ -61,6 +61,7 @@ Cancelled job [{1}]
 """.format(JOB_1_ID, JOB_2_ID, normalize_space=True))
 
   def testCancelReturnsPermissionsError(self):
+    my_region = 'us-central1'
     self.mocked_client.projects_locations_jobs.Update.Expect(
         request=self._CancelReq(JOB_1_ID), response=self.SampleJob(JOB_1_ID))
     self.mocked_client.projects_locations_jobs.Update.Expect(
@@ -73,11 +74,14 @@ Cancelled job [{1}]
              (JOB_1_ID, JOB_2_ID, JOB_3_ID))
     self.AssertErrEquals("""\
 Cancelled job [{0}]
-Failed to cancel job [{1}]: Permission denied.
+Failed to cancel job [{1}]: Permission denied. Please ensure you have \
+permission to access the job and the `--region` flag, {3}, matches the job\'s \
+region.
 Cancelled job [{2}]
-""".format(JOB_1_ID, JOB_2_ID, JOB_3_ID, normalize_space=True))
+""".format(JOB_1_ID, JOB_2_ID, JOB_3_ID, my_region, normalize_space=True))
 
   def testCancelContinuesOnFailure(self):
+    my_region = 'us-central1'
     self.mocked_client.projects_locations_jobs.Update.Expect(
         request=self._CancelReq(JOB_1_ID), response=self.SampleJob(JOB_1_ID))
     self.mocked_client.projects_locations_jobs.Update.Expect(
@@ -90,9 +94,11 @@ Cancelled job [{2}]
              (JOB_1_ID, JOB_2_ID, JOB_3_ID))
     self.AssertErrEquals("""\
 Cancelled job [{0}]
-Failed to cancel job [{1}]: Resource not found.
+Failed to cancel job [{1}]: Resource not found. Please ensure you have \
+permission to access the job and the `--region` flag, {3}, matches the job\'s \
+region.
 Cancelled job [{2}]
-""".format(JOB_1_ID, JOB_2_ID, JOB_3_ID, normalize_space=True))
+""".format(JOB_1_ID, JOB_2_ID, JOB_3_ID, my_region, normalize_space=True))
 
   def _CancelReq(self, job_id, region=None):
     region = region or base.DEFAULT_REGION

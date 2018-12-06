@@ -67,9 +67,40 @@ OPTIONAL FLAGS
         (all fields are optional):
         https://cloud.google.com/ml/reference/rest/v1/projects.jobs
 
-        If an option is specified both in the configuration file **and** via
-        command line arguments, the command line arguments override the
-        configuration file.
+        EXAMPLES:
+
+        JSON:
+
+            {
+              "jobId": "my_job",
+              "labels": {
+                "type": "prod",
+                "owner": "alice"
+              },
+              "trainingInput": {
+                "scaleTier": "BASIC",
+                "packageUris": [
+                  "gs://my/package/path"
+                ],
+                "region": "us-east1"
+              }
+            }
+
+        YAML:
+
+            jobId: my_job
+            labels:
+              type: prod
+              owner: alice
+            trainingInput:
+              scaleTier: BASIC
+              packageUris:
+              - gs://my/package/path
+              region: us-east1
+
+    If an option is specified both in the configuration file **and** via
+    command line arguments, the command line arguments override the
+    configuration file.
 
      --job-dir=JOB_DIR
         Google Cloud Storage path in which to store training outputs and other
@@ -197,8 +228,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

@@ -1,0 +1,46 @@
+NAME
+    gcloud alpha compute allocations describe - show details about a Compute
+        Engine zonal allocation
+
+SYNOPSIS
+    gcloud alpha compute allocations describe (ALLOCATION : --zone=ZONE)
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Show details about a Compute Engine zonal allocation.
+
+POSITIONAL ARGUMENTS
+     Allocation resource - The name of the allocation to describe. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [allocation] on the command line with a fully specified name; set
+     the property [core/project]; provide the argument [--project] on the
+     command line. This must be specified.
+
+       ALLOCATION
+          ID of the allocation or fully qualified identifier for the
+          allocation. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --zone=ZONE
+          The name of the Google Compute Engine zone.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the compute/alpha API. The full documentation for this
+    API can be found at:
+    https://developers.google.com/compute/docs/reference/latest/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

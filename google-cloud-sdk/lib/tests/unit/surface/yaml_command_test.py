@@ -284,7 +284,17 @@ class Validator(object):
     # constructed.
     request_collection = self.builder.method.request_collection
     if (request_collection and request_collection.params and
-        not self.builder.spec.arguments.resource):
+        not (self.builder.spec.arguments.resource or
+             self.builder.spec.arguments.additional_arguments_hook)):
+      # Currently, an additional_arguments_hook is the only way to workaround
+      # declarative limitation of only one resource arg per command. However,
+      # using such a hook means that a resource argument will not be defined in
+      # the yaml spec itself so this check here is best is approximation for
+      # insuring that resource args are fully specified in the command. E.g:
+      # 'If request requires a resource AND that resource has params AND
+      # neither an explicit resource arg OR additional argument hook
+      # [which should provide resource params] is defined in yaml, then
+      # FAIL with an error.'
       self.E('arguments.resource',
              'API collection [{}] has resource parameters but no resource spec '
              'was provided.', self.builder.method.request_collection.name)

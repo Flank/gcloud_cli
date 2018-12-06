@@ -13,7 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for endpoints services deploy command."""
+"""Unit tests for endpoints services deploy command.
+
+Under certain conditions, various services will be enabled in the process of
+running deploy commands.
+
+If servicemanagement.googleapis is disabled, gcloud will detect this when
+requests are made and offer to enable it. This is built into gcloud's API
+client, rather than the deploy command proper, and as such is NOT tested in
+these tests.
+
+When a service is created for the first time, after a successful deployment, the
+deploy command will first enable endpoints.googleapis (which is a meta-service
+that enables several other services which may or may not already be enabled) as
+well as enabling the produced service. Failures to enable these services will be
+detected and the user notified.
+"""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -199,24 +214,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         request=rcr(rollout=rollout, serviceName=service_name),
         response=self.completed_operation)
 
-  def _WaitForEnabledCheck(self, status, service_name):
-    list_request = self.services_messages.ServicemanagementServicesListRequest
-    list_response = [self.services_messages.ManagedService(
-        serviceName='mocked_service_which_does_not_exist')]
-    if status == ENABLED:
-      list_response.append(self.services_messages.ManagedService(
-          serviceName=service_name))
-
-    self.mocked_client.services.List.Expect(
-        request=list_request(
-            consumerId='project:' + self.PROJECT_NAME,
-            pageSize=100,
-        ),
-        response=self.services_messages.ListServicesResponse(
-            services=list_response
-        )
-    )
-
   def _WaitForPushAdvisorReport(self, service_name, service_version, result):
     if self.beta or self.alpha:
       reporter = config_reporter.ConfigReporter(service_name)
@@ -270,22 +267,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
                                     self._config_file_path))
 
   def testDeployMultipleSwaggerFilesAtOnce(self):
-    self._WaitForEnabledCheck(DISABLED, ENDPOINTS_SERVICE)
-    # The Endpoints service is auto-enabled
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=ENDPOINTS_SERVICE,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
@@ -330,24 +311,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # Check to see if the service is already enabled
-    # (In this case, it is NOT already enabled)
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The service auto-enables
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
@@ -369,22 +332,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
                              contents=TEST_SERVICE_CONFIG_2_YAML)
     proto_file = self.Touch(
         self.temp_path, name='bookstore.descriptor', contents=proto_binary)
-    self._WaitForEnabledCheck(DISABLED, ENDPOINTS_SERVICE)
-
-    # The Endpoints service is auto-enabled
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=ENDPOINTS_SERVICE,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
 
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
@@ -434,24 +381,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # Check to see if the service is already enabled
-    # (In this case, it is NOT already enabled)
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The service auto-enables
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
@@ -470,22 +399,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
                                 contents=TEST_RAW_PROTO)
     yaml_file = self.Touch(self.temp_path, name='bookstore.yaml',
                            contents=TEST_SERVICE_CONFIG_YAML)
-    self._WaitForEnabledCheck(DISABLED, ENDPOINTS_SERVICE)
-
-    # The Endpoints service is auto-enabled
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=ENDPOINTS_SERVICE,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
 
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
@@ -530,24 +443,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # Check to see if the service is already enabled
-    # (In this case, it is NOT already enabled)
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The service auto-enables
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
@@ -571,9 +466,96 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         producerProjectId=self.PROJECT_NAME,
         title=TITLE)
 
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
+    # The service does not exist yet, so it is created first.
+    self.mocked_client.services.Get.Expect(
+        request=self.services_messages.ServicemanagementServicesGetRequest(
+            serviceName=SERVICE_NAME,
+        ),
+        exception=http_error.MakeHttpError(code=403)
+    )
+    managed_service = self.services_messages.ManagedService(
+        serviceName=SERVICE_NAME,
+        producerProjectId=self.PROJECT_NAME,
+    )
+    self.mocked_client.services.Create.Expect(
+        request=managed_service,
+        response=self.services_messages.Operation(name='operations/myop')
+    )
+
+    # The service configuration resource is created.
+    self.mocked_client.services_configs.Create.Expect(
+        request=CONFIG_CREATE_REQUEST(
+            serviceName=SERVICE_NAME,
+            service=config_to_deploy,
+        ),
+        response=self.services_messages.Service(
+            name=SERVICE_NAME,
+            producerProjectId=self.PROJECT_NAME,
+            title=TITLE,
+            id=SERVICE_VERSION,  # this id is set by the server
+        ),
+    )
+
+    # Wait for Push Advisor report (no warnings)
+    self._WaitForBlankPushAdvisorReport(SERVICE_NAME, SERVICE_VERSION)
+
+    # Mock the Service Rollout creation.
+    self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
+    self.MockOperationWait(self.operation_name)
+
+    # The Endpoints service and produced service are
+    # enabled here because the service was created.
+    self.mocked_client.services.Enable.Expect(
+        request=self.services_messages.ServicemanagementServicesEnableRequest(
+            serviceName=ENDPOINTS_SERVICE,
+            enableServiceRequest=self.services_messages.EnableServiceRequest(
+                consumerId='project:' + self.PROJECT_NAME
+            )
+        ),
+        response=self.services_messages.Operation(
+            name=self.operation_name,
+            done=False,
+        )
+    )
+    self.MockOperationWait(self.operation_name)
+
+    self.mocked_client.services.Enable.Expect(
+        request=self.services_messages.ServicemanagementServicesEnableRequest(
+            serviceName=SERVICE_NAME,
+            enableServiceRequest=self.services_messages.EnableServiceRequest(
+                consumerId='project:' + self.PROJECT_NAME
+            )
+        ),
+        response=self.services_messages.Operation(
+            name=self.operation_name,
+            done=False,
+        )
+    )
+    self.MockOperationWait(self.operation_name)
+
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
+
+    self.Run('{0} {1}'.format(self.base_cmd, self._config_file_path))
+
+    # Assert that we had to auto-enable the service, since it was not yet
+    # enabled.
+    self.AssertLogContains('Enabling service [{0}] on project [{1}]...'.format(
+        SERVICE_NAME, self.PROJECT_NAME))
+
+    self.AssertErrContains(
+        ('Service Configuration [{0}] uploaded for service [{1}]').format(
+            SERVICE_VERSION, SERVICE_NAME))
+
+    self._AssertManagementUrlDisplayed()
+
+  def testServicesDeployNewServiceConfigEnablementFailure(self):
+    # This test is basically the same as the previous one, except enabling
+    # the Endpoints meta-service and the produced service will fail.
+    config_to_deploy = self.services_messages.Service(
+        name=SERVICE_NAME,
+        producerProjectId=self.PROJECT_NAME,
+        title=TITLE)
 
     # The service does not exist yet, so it is created first.
     self.mocked_client.services.Get.Expect(
@@ -588,7 +570,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     )
     self.mocked_client.services.Create.Expect(
         request=managed_service,
-        response=managed_service
+        response=self.services_messages.Operation(name='operations/myop')
     )
 
     # The service configuration resource is created.
@@ -612,10 +594,18 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # Check to see if the service is already enabled
-    # (In this case, it is NOT already enabled)
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The produced service is thus enabled here.
+    # The Endpoints service and produced service are
+    # enabled here because the service was created.
+    self.mocked_client.services.Enable.Expect(
+        request=self.services_messages.ServicemanagementServicesEnableRequest(
+            serviceName=ENDPOINTS_SERVICE,
+            enableServiceRequest=self.services_messages.EnableServiceRequest(
+                consumerId='project:' + self.PROJECT_NAME
+            )
+        ),
+        exception=http_error.MakeHttpError(code=403)
+    )
+
     self.mocked_client.services.Enable.Expect(
         request=self.services_messages.ServicemanagementServicesEnableRequest(
             serviceName=SERVICE_NAME,
@@ -623,12 +613,8 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
                 consumerId='project:' + self.PROJECT_NAME
             )
         ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
+        exception=http_error.MakeHttpError(code=403)
     )
-    self.MockOperationWait(self.operation_name)
 
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
@@ -637,8 +623,15 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
 
     # Assert that we had to auto-enable the service, since it was not yet
     # enabled.
-    self.AssertLogContains('Enabling service {0} on project {1}...'.format(
+    self.AssertLogContains('Enabling service [{0}] on project [{1}]...'.format(
         SERVICE_NAME, self.PROJECT_NAME))
+
+    # This is an abbreviation of the full error message
+    # in AttemptToEnableService()
+    self.AssertErrContains(
+        'Attempted to enable service [{0}]'.format(ENDPOINTS_SERVICE))
+    self.AssertErrContains(
+        'Attempted to enable service [{0}]'.format(SERVICE_NAME))
 
     self.AssertErrContains(
         ('Service Configuration [{0}] uploaded for service [{1}]').format(
@@ -652,10 +645,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         producerProjectId=self.PROJECT_NAME,
         title=TITLE)
 
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
-
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
@@ -680,33 +669,10 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # Check to see if the service is already enabled
-    # (In this case, it is NOT already enabled)
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The produced service is thus enabled here.
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
     self.Run('{0} {1}'.format(self.base_cmd, self._config_file_path))
-
-    # Assert that we had to auto-enable the service, since it was not yet
-    # enabled.
-    self.AssertLogContains('Enabling service {0} on project {1}...'.format(
-        SERVICE_NAME, self.PROJECT_NAME))
 
     self.AssertErrContains(
         ('Service Configuration [{0}] uploaded for service [{1}]').format(
@@ -720,10 +686,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         producerProjectId=self.PROJECT_NAME,
         title=TITLE)
 
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
-
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
@@ -748,33 +710,10 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # Check to see if the service is already enabled
-    # (In this case, it is NOT already enabled)
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The produced service is thus enabled here.
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
     self.Run('{0} {1}'.format(self.base_cmd, self._config_yaml_file_path))
-
-    # Assert that we had to auto-enable the service, since it was not yet
-    # enabled.
-    self.AssertLogContains('Enabling service {0} on project {1}...'.format(
-        SERVICE_NAME, self.PROJECT_NAME))
 
     self.AssertErrContains(
         ('Service Configuration [{0}] uploaded for service [{1}]').format(
@@ -788,10 +727,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         producerProjectId=self.PROJECT_NAME,
         title=TITLE)
 
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
-
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
@@ -816,19 +751,10 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # Check to see if the service is already enabled
-    # (In this case, it IS already enabled)
-    self._WaitForEnabledCheck(ENABLED, SERVICE_NAME)
-
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
     self.Run('{0} {1}'.format(self.base_cmd, self._config_file_path))
-
-    # Assert that we had to auto-enable the service, since it was not yet
-    # enabled.
-    self.AssertLogNotContains('Enabling service {0} on project {1}...'.format(
-        SERVICE_NAME, self.PROJECT_NAME))
 
     self.AssertErrContains(
         ('Service Configuration [{0}] uploaded for service [{1}]').format(
@@ -841,10 +767,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         name=SERVICE_NAME,
         producerProjectId=self.PROJECT_NAME,
         title=TITLE)
-
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
 
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
@@ -869,33 +791,11 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     # Mock the Service Rollout creation.
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
 
-    # Check to see if the service is already enabled
-    # (In this case, it is NOT already enabled)
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The service auto-enables
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
     self.Run('{0} --async {1}'.format(self.base_cmd,
                                       self._config_file_path))
-
-    # Assert that we had to auto-enable the service, since it was not yet
-    # enabled.
-    self.AssertLogContains('Enabling service {0} on project {1}...'.format(
-        SERVICE_NAME, self.PROJECT_NAME))
 
     self.AssertErrNotContains('Waiting for async operation')
 
@@ -913,22 +813,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._AssertManagementUrlDisplayed()
 
   def testServicesDeployYamlSwaggerConfig(self):
-    self._WaitForEnabledCheck(DISABLED, ENDPOINTS_SERVICE)
-    # The Endpoints service is auto-enabled
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=ENDPOINTS_SERVICE,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
@@ -966,24 +850,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # Check to see if the service is already enabled
-    # (In this case, it is NOT already enabled)
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The service auto-enables
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
@@ -997,10 +863,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._AssertManagementUrlDisplayed()
 
   def testServicesDeployJSONSwaggerConfig(self):
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
-
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
@@ -1028,22 +890,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
 
     # Mock the Service Rollout creation.
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
-    self.MockOperationWait(self.operation_name)
-
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The service auto-enables
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
     self.MockOperationWait(self.operation_name)
 
     # A Get call is required to generate the management url
@@ -1075,10 +921,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
 
     project_name = 'one-' + self.PROJECT_NAME + '-another'
 
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
-
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
@@ -1108,22 +950,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-    # The service auto-enables
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, project_name)
 
@@ -1147,10 +973,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._AssertManagementUrlDisplayed(project=project_name)
 
   def testServicesDeployNoServiceVersion(self):
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
-
     config_to_deploy = self.services_messages.Service(
         name=SERVICE_NAME,
         producerProjectId=self.PROJECT_NAME,
@@ -1190,8 +1012,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
 
     # Assert that we did not auto-enable the service, since this is a
     # validate-only run
-    self.AssertLogNotContains('Enabling service {0} on project {1}...'.format(
-        SERVICE_NAME, self.PROJECT_NAME))
+    self.AssertLogNotContains(
+        'Enabling service [{0}] on project [{1}]...'.format(
+            SERVICE_NAME, self.PROJECT_NAME))
 
     # Assert that we did not print out the actual uploaded success message,
     # since this is a validate-only run
@@ -1204,10 +1027,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self.AssertErrNotContains('To manage your API, go to:')
 
   def testServicesDeployJSONSwaggerConfigValidateOnly(self):
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
-
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
@@ -1258,10 +1077,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         'the Operation details:\n {0}'.format(expected_cmd))
 
   def testServicesDeployValidateOnlyNewServiceNonInteractive(self):
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
-
     # The service does not exist yet, so it is created first.
     self.mocked_client.services.Get.Expect(
         request=self.services_messages.ServicemanagementServicesGetRequest(
@@ -1290,9 +1105,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
 
   def testServicesDeployValidateOnlyNewServiceInteractiveYes(self):
     self.StartObjectPatch(console_io, 'CanPrompt', return_value=True)
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
 
     # The service does not exist yet, so it is created first.
     self.mocked_client.services.Get.Expect(
@@ -1307,7 +1119,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     )
     self.mocked_client.services.Create.Expect(
         request=managed_service,
-        response=managed_service
+        response=self.services_messages.Operation(name='operations/myop')
     )
     # Mock the SubmitSourceConfig API call.
     self.mocked_client.services_configs.Submit.Expect(
@@ -1352,9 +1164,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
 
   def testServicesDeployValidateOnlyNewServiceInteractiveNo(self):
     self.StartObjectPatch(console_io, 'CanPrompt', return_value=True)
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
 
     # The service does not exist yet, so it is created first.
     self.mocked_client.services.Get.Expect(
@@ -1384,22 +1193,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self.AssertErrContains(self.PROJECT_NAME)
 
   def testServicesDeployYamlSwaggerConfigValidateOnly(self):
-    self._WaitForEnabledCheck(DISABLED, ENDPOINTS_SERVICE)
-    # The Endpoints service is auto-enabled
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=ENDPOINTS_SERVICE,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
     # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
@@ -1451,22 +1244,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
   def testServicesDeployRaisesExceptionOnDiagnosticErrors(self):
     # Test with one diagnostic ERROR as well as several
     for num_errors in range(1, 3):
-      self._WaitForEnabledCheck(DISABLED, ENDPOINTS_SERVICE)
-      # The Endpoints service is auto-enabled
-      self.mocked_client.services.Enable.Expect(
-          request=self.services_messages.ServicemanagementServicesEnableRequest(
-              serviceName=ENDPOINTS_SERVICE,
-              enableServiceRequest=self.services_messages.EnableServiceRequest(
-                  consumerId='project:' + self.PROJECT_NAME
-              )
-          ),
-          response=self.services_messages.Operation(
-              name=self.operation_name,
-              done=False,
-          )
-      )
-      self.MockOperationWait(self.operation_name)
-
       # The service already exists, so it is not created again.
       self._MockServiceGetCall(SERVICE_NAME)
 
@@ -1532,11 +1309,7 @@ class EndpointsBetaDeployTest(EndpointsDeployTest):
         producerProjectId=self.PROJECT_NAME,
         title=TITLE)
 
-    # The Endpoints service is already enabled, so no further action is taken
-    # to enable it.
-    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
-
-        # The service already exists, so it is not created again.
+    # The service already exists, so it is not created again.
     self._MockServiceGetCall(SERVICE_NAME)
 
     # The service configuration resource is created.
@@ -1561,24 +1334,6 @@ class EndpointsBetaDeployTest(EndpointsDeployTest):
     if force:
       # Mock the Service Rollout creation.
       self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
-      self.MockOperationWait(self.operation_name)
-
-      # Check to see if the service is already enabled
-      # (In this case, it is NOT already enabled)
-      self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
-      # The produced service is thus enabled here.
-      self.mocked_client.services.Enable.Expect(
-          request=self.services_messages.ServicemanagementServicesEnableRequest(
-              serviceName=SERVICE_NAME,
-              enableServiceRequest=self.services_messages.EnableServiceRequest(
-                  consumerId='project:' + self.PROJECT_NAME
-              )
-          ),
-          response=self.services_messages.Operation(
-              name=self.operation_name,
-              done=False,
-          )
-      )
       self.MockOperationWait(self.operation_name)
 
       # A Get call is required to generate the management url
@@ -1613,11 +1368,6 @@ class EndpointsBetaDeployTest(EndpointsDeployTest):
     self.AssertLogContains('Advice found for changes in the new service '
                            'config, but proceeding anyway because --force is '
                            'set...')
-
-    # Assert that we had to auto-enable the service, since it was not yet
-    # enabled.
-    self.AssertLogContains('Enabling service {0} on project {1}...'.format(
-        SERVICE_NAME, self.PROJECT_NAME))
 
     self.AssertErrContains(
         ('Service Configuration [{0}] uploaded for service [{1}]').format(

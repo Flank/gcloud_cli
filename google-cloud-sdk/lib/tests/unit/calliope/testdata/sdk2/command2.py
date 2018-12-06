@@ -18,12 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
-class BetaCommand2(base.Command):
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.ALPHA,
+                             calliope_base.ReleaseTrack.BETA)
+class BetaCommand2(calliope_base.Command):
   """Test empty DESCRIPTION followed by EXAMPLES.
 
   ## EXAMPLES
@@ -35,8 +36,8 @@ class BetaCommand2(base.Command):
     return None
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
-class Command2(base.Command):
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.GA)
+class Command2(calliope_base.Command):
   """A command with context and flags."""
 
   def Run(self, args):

@@ -39,6 +39,6 @@ apis:
       resources:
         liens:
           path: liens/{liensId}
-          enable_uri_parsing: False
+          enable_uri_parsing: false
     v2alpha1:
       discovery_doc: cloudresourcemanager_v2alpha1.json

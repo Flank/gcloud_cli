@@ -49,6 +49,7 @@ class TCPGitServerIPv6(server.TCPGitServer):
   address_family = socket.AF_INET6
 
 
+@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
 class LoaderTests(sdk_test_base.SdkBase):
 
   def SetUp(self):

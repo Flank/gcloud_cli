@@ -22,11 +22,13 @@ import json
 import logging
 
 from tests.lib import e2e_utils
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 WINDOWS_IMAGE_ALIAS = 'windows-2012-r2'
 
 
+@test_case.Filters.SkipOnPy3('They are broken', 'b/116339073')
 class WindowsInstancesTest(e2e_test_base.BaseTest):
 
   def SetUp(self):

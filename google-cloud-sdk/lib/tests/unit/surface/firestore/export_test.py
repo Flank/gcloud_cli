@@ -36,9 +36,9 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
     expected_request = admin_api.GetExportDocumentsRequest(
         self.DatabaseResourceName(), output_uri_prefix)
     operation_name = 'export operation name'
-    mock_response = operations.GetMessages().GoogleLongrunningOperation(
+    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
-
     self.mock_firestore_v1beta1.projects_databases.ExportDocuments.Expect(
         expected_request, response=mock_response)
 
@@ -51,7 +51,10 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
         self.DatabaseResourceName(), output_uri_prefix)
     operation_name = ('projects/{}/databases/(default)/'
                       'operations/exportoperationname').format(self.Project())
-    mock_response = operations.GetMessages().GoogleLongrunningOperation(
+    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    mock_export_response = messages.GoogleLongrunningOperation(
+        done=False, name=operation_name)
+    mock_get_response = operations.GetMessages().GoogleLongrunningOperation(
         done=False, name=operation_name)
     expected_operation_get = (
         operations.GetMessages()
@@ -61,11 +64,11 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
     # Expect several calls while done=False, then we get a response from the
     # command once the export is complete.
     self.mock_firestore_v1beta1.projects_databases.ExportDocuments.Expect(
-        expected_request, response=mock_response)
+        expected_request, response=mock_export_response)
     self.mock_firestore_v1.projects_databases_operations.Get.Expect(
-        expected_operation_get, response=mock_response)
+        expected_operation_get, response=mock_get_response)
     self.mock_firestore_v1.projects_databases_operations.Get.Expect(
-        expected_operation_get, response=mock_response)
+        expected_operation_get, response=mock_get_response)
 
     mock_response = operations.GetMessages().GoogleLongrunningOperation(
         done=True, name=operation_name)
@@ -88,11 +91,12 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
         collection_ids=collection_ids)
 
     operation_name = 'export operation name'
-    response = operations.GetMessages().GoogleLongrunningOperation(
+    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
     self.mock_firestore_v1beta1.projects_databases.ExportDocuments.Expect(
-        request, response=response)
+        request, response=mock_response)
 
     actual = self.RunExportTest(
         collection_ids=collection_ids, output_uri_prefix=output_uri_prefix)
@@ -138,7 +142,8 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
     expected_request = admin_api.GetExportDocumentsRequest(
         self.DatabaseResourceName(), expected)
     operation_name = 'export operation name'
-    mock_response = operations.GetMessages().GoogleLongrunningOperation(
+    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
     self.mock_firestore_v1beta1.projects_databases.ExportDocuments.Expect(

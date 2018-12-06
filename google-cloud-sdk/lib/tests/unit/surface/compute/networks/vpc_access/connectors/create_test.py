@@ -15,13 +15,13 @@
 """Tests of 'gcloud compute networks vpc-access connectors create' command."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope.concepts import handlers as concepts_handler
-from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
@@ -32,67 +32,111 @@ class ConnectorsCreateTest(base.VpcAccessUnitTestBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
     with self.assertRaises(concepts_handler.ParseError):
       self.Run('compute networks vpc-access connectors create {} '
-               '--network={} --range={}'
-               .format(self.connector_id,
-                       self.network_id,
-                       self.ip_cidr_range))
+               '--type={} --network={} --range={}'.format(
+                   self.connector_id, self.type_extended, self.network_id,
+                   self.ip_cidr_range))
 
-  def testConnectorsCreate_NoIpCidrRange(self):
+  def testConnectorCreate_DefaultType(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run('compute networks vpc-access connectors create {} --region={}'
-               .format(self.connector_id, self.region_id))
-
-  def testConnectorCreate(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    connector_to_create = self._MakeConnector()
+    connector_to_create = self._MakeConnectorExtended()
     expected_connector = self._ExpecteCreate(connector_to_create)
     actual_connector = self.Run(
         'compute networks vpc-access connectors create {} '
-        '--region={} --network={} --range={}'
-        .format(self.connector_id,
-                self.region_id,
-                self.network_id,
-                self.ip_cidr_range))
+        '--region={} --network={} --range={}'.format(
+            self.connector_id, self.region_id, self.network_id,
+            self.ip_cidr_range))
 
     self.assertEqual(actual_connector, expected_connector)
 
-  def testConnectorCreate_Async(self):
+  def testConnectorCreate_Extended(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    connector_to_create = self._MakeConnector()
-    self._ExpecteCreate(connector_to_create, is_async=True)
-    self.Run(
+    connector_to_create = self._MakeConnectorExtended()
+    expected_connector = self._ExpecteCreate(connector_to_create)
+    actual_connector = self.Run(
         'compute networks vpc-access connectors create {} '
-        '--region={} --network={} --range={} --async'
-        .format(self.connector_id,
-                self.region_id,
-                self.network_id,
-                self.ip_cidr_range))
+        '--region={} --type={} --network={} --range={}'.format(
+            self.connector_id, self.region_id, self.type_extended,
+            self.network_id, self.ip_cidr_range))
+
+    self.assertEqual(actual_connector, expected_connector)
+
+  def testConnectorCreate_Basic(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    connector_to_create = self._MakeConnectorBasic()
+    expected_connector = self._ExpecteCreate(connector_to_create)
+    actual_connector = self.Run(
+        'compute networks vpc-access connectors create {} '
+        '--region={} --type={} --network={}'.format(
+            self.connector_id, self.region_id, self.type_basic,
+            self.network_id))
+
+    self.assertEqual(actual_connector, expected_connector)
+
+  def testConnectorCreate_ExtendedAsync(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    connector_to_create = self._MakeConnectorExtended()
+    self._ExpecteCreate(connector_to_create, is_async=True)
+    self.Run('compute networks vpc-access connectors create {} '
+             '--region={} --type={} --network={} --range={} --async'.format(
+                 self.connector_id, self.region_id, self.type_extended,
+                 self.network_id, self.ip_cidr_range))
 
     self.AssertErrContains('Create request issued for: [{}]'.format(
         self.connector_id))
     self.AssertErrContains('Check operation [{}] for status.'.format(
         self.operation_id))
 
-  def testConnectorCreate_UsingRelativeConnectorName(self):
+  def testConnectorCreate_BasicAsync(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    connector_to_create = self._MakeConnector()
+    connector_to_create = self._MakeConnectorBasic()
+    self._ExpecteCreate(connector_to_create, is_async=True)
+    self.Run('compute networks vpc-access connectors create {} '
+             '--region={} --type={} --network={} --async'.format(
+                 self.connector_id, self.region_id, self.type_basic,
+                 self.network_id))
+
+    self.AssertErrContains('Create request issued for: [{}]'.format(
+        self.connector_id))
+    self.AssertErrContains('Check operation [{}] for status.'.format(
+        self.operation_id))
+
+  def testConnectorCreate_ExtendedUsingRelativeConnectorName(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    connector_to_create = self._MakeConnectorExtended()
     expected_connector = self._ExpecteCreate(connector_to_create)
     actual_connector = self.Run(
         'compute networks vpc-access connectors create {} '
-        '--network={} --range={}'
-        .format(self.connector_relative_name,
-                self.network_id,
-                self.ip_cidr_range))
+        '--type={} --network={} --range={}'.format(
+            self.connector_relative_name, self.type_extended, self.network_id,
+            self.ip_cidr_range))
 
     self.assertEqual(actual_connector, expected_connector)
 
-  def _MakeConnector(self):
+  def testConnectorCreate_BasicUsingRelativeConnectorName(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    connector_to_create = self._MakeConnectorBasic()
+    expected_connector = self._ExpecteCreate(connector_to_create)
+    actual_connector = self.Run(
+        'compute networks vpc-access connectors create {} '
+        '--type={} --network={}'.format(self.connector_relative_name,
+                                        self.type_basic, self.network_id))
+
+    self.assertEqual(actual_connector, expected_connector)
+
+  def _MakeConnectorExtended(self):
     return self.messages.Connector(
         # Note `name` should not be set as it's read-only.
         id=self.connector_id,
+        type=self.type_extended,
         network=self.network_id,
         ipCidrRange=self.ip_cidr_range)
+
+  def _MakeConnectorBasic(self):
+    return self.messages.Connector(
+        # Note `name` should not be set as it's read-only.
+        id=self.connector_id,
+        type=self.type_basic,
+        network=self.network_id)
 
   def _ExpecteCreate(self, connector_to_create, is_async=False):
     operation = self.messages.Operation(name=self.operation_relative_name)

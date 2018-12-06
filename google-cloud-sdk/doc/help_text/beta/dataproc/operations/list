@@ -66,13 +66,19 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To see the list of all operations, run:
 
         $ gcloud beta dataproc operations list
+
+    To see the list of all create cluster operations, run:
+
+        $ gcloud beta dataproc operations list \
+            --filter='operationType = CREATE'
 
     To see the list of all active operations in a cluster named mycluster, run:
 

@@ -15,7 +15,9 @@
 """Tests for the update subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.routers.nats import nats_utils
@@ -24,13 +26,13 @@ from tests.lib.surface.compute import router_test_utils
 from tests.lib.surface.compute import test_base
 
 
-class AlphaDescribeTest(test_base.BaseTest):
+class DescribeTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
     self.router = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, track='alpha')
+        self.messages, track='v1')
     self.router.nats = [
         self.messages.RouterNat(
             name='my-nat',
@@ -59,6 +61,24 @@ class AlphaDescribeTest(test_base.BaseTest):
           compute routers nats describe invalid-nat --router my-router
           --region us-central1
           """)
+
+
+class BetaDescribeTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.router = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='beta')
+
+
+class AlphaDescribeTest(BetaDescribeTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.router = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='alpha')
 
 
 if __name__ == '__main__':

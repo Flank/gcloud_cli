@@ -8,7 +8,7 @@ SYNOPSIS
           | --numerical-stat-field=NUMERICAL_STAT_FIELD
           | [--quasi-ids=[QUASI_IDS,...]
           : --sensitive-attribute=SENSITIVE_ATTRIBUTE])
-        (--output-tables=[OUTPUT_TABLES,...]
+        (--output-table=[OUTPUT_TABLE,...]
           | --output-topics=[OUTPUT_TOPICS,...]) [--job-id=JOB_ID]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -47,11 +47,11 @@ REQUIRED FLAGS
 
      Exactly one of these must be specified:
 
-       --output-tables=[OUTPUT_TABLES,...]
-          Publishes results of a Cloud DLP job to one or more BigQuery tables.
-          BigQuery tables are uniquely identified by their project_id,
-          dataset_id, and table_id in the format
-          <project_id>.<dataset_id>.<table_id>.
+       --output-table=[OUTPUT_TABLE,...]
+          Publishes results of a Cloud DLP job to a BigQuery table. BigQuery
+          tables are uniquely identified by their project_id, dataset_id, and
+          table_id in the format <project_id>.<dataset_id>.<table_id>. If no
+          table_id is specified, DLP will create a new table.
 
        --output-topics=[OUTPUT_TOPICS,...]
           Publishes the results of a Cloud DLP job to one or more Cloud Pub/Sub
@@ -71,8 +71,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
     This command uses the dlp/v2 API. The full documentation for this API can

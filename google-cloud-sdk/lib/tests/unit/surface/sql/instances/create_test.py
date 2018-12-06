@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 import argparse
 import getpass
 
@@ -40,10 +41,11 @@ class _BaseInstancesCreateTest(object):
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), diff)
     self.Run('sql instances create create-instance1')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME             DATABASE_VERSION LOCATION   TIER             ADDRESS STATUS
-create-instance1 MYSQL_5_6        us-central db-n1-standard-1 0.0.0.0 RUNNABLE
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-instance1 MYSQL_5_7        us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
 """,
         normalize_space=True)
 
@@ -60,10 +62,11 @@ create-instance1 MYSQL_5_6        us-central db-n1-standard-1 0.0.0.0 RUNNABLE
     self.ExpectInstanceGet(self.GetV1Instance(), diff)
     self.Run('sql instances create create-instance1 --activation-policy '
              'ON_DEMAND --tier=D1')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME              DATABASE_VERSION  LOCATION    TIER  ADDRESS  STATUS
-create-instance1  MYSQL_5_6         us-central  D1    -        RUNNABLE
+NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-instance1  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
 """,
         normalize_space=True)
 
@@ -121,10 +124,39 @@ user: test@sample.gserviceaccount.com
     self.ExpectInstanceGet(self.GetV1Instance(), diff)
     self.Run('sql instances create clone-instance-7 --enable-bin-log '
              '--backup-start-time=23:00 --tier=D1')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME              DATABASE_VERSION  LOCATION    TIER  ADDRESS  STATUS
-clone-instance-7  MYSQL_5_6         us-central  D1    -        RUNNABLE
+NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+clone-instance-7  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreateBinLogWithBackupFlagNoStartTime(self):
+    diff = {
+        'name': 'clone-instance-7',
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    binaryLogEnabled=True,
+                    enabled=True,
+                    kind='sql#backupConfiguration',
+                    startTime='00:00',
+                ),
+            'tier':
+                'D1'
+        }
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+    self.Run('sql instances create clone-instance-7 --enable-bin-log '
+             '--backup --tier=D1')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+clone-instance-7  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
 """,
         normalize_space=True)
 
@@ -148,10 +180,11 @@ clone-instance-7  MYSQL_5_6         us-central  D1    -        RUNNABLE
     self.ExpectInstanceGet(self.GetV1Instance(), diff)
 
     self.Run('sql instances create backupless-instance1 --no-backup --tier=D1')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME                  DATABASE_VERSION  LOCATION    TIER  ADDRESS  STATUS
-backupless-instance1  MYSQL_5_6         us-central  D1    -        RUNNABLE
+NAME                  DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+backupless-instance1  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
 """,
         normalize_space=True)
 
@@ -186,10 +219,11 @@ backupless-instance1  MYSQL_5_6         us-central  D1    -        RUNNABLE
 
     self.Run('sql instances create create-replica1 --master-instance-name '
              'create-instance1')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME             DATABASE_VERSION  LOCATION TIER              ADDRESS  STATUS
-create-replica1  MYSQL_5_7         us-west1 db-n1-standard-2  0.0.0.0  RUNNABLE
+NAME             DATABASE_VERSION  LOCATION TIER              PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-replica1  MYSQL_5_7         us-west1 db-n1-standard-2  0.0.0.0         -               RUNNABLE
 """,
         normalize_space=True)
 
@@ -223,10 +257,11 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-2  0.0.0.0  RUNNABLE
 
     self.Run('sql instances create create-replica1 --master-instance-name '
              'create-instance1 --tier=db-n1-standard-4')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME             DATABASE_VERSION  LOCATION TIER              ADDRESS  STATUS
-create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0  RUNNABLE
+NAME             DATABASE_VERSION  LOCATION TIER              PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0         -               RUNNABLE
 """,
         normalize_space=True)
 
@@ -295,10 +330,11 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0  RUNNABLE
 
     self.Run('sql instances create create-instance1 '
              '--authorized-networks=10.10.10.1/16 --tier=D1')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME              DATABASE_VERSION  LOCATION    TIER  ADDRESS  STATUS
-create-instance1  MYSQL_5_6         us-central  D1    -        RUNNABLE
+NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-instance1  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
 """,
         normalize_space=True)
 
@@ -318,8 +354,8 @@ create-instance1  MYSQL_5_6         us-central  D1    -        RUNNABLE
     # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME             DATABASE_VERSION LOCATION   TIER             ADDRESS STATUS
-custom-instance1 POSTGRES_9_6     us-central db-custom-1-1024 0.0.0.0 RUNNABLE
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+custom-instance1 POSTGRES_9_6     us-central db-custom-1-1024 0.0.0.0         -               RUNNABLE
 """,
         normalize_space=True)
 
@@ -330,7 +366,7 @@ custom-instance1 POSTGRES_9_6     us-central db-custom-1-1024 0.0.0.0 RUNNABLE
     self.mocked_client.instances.Insert.Expect(
         self.messages.DatabaseInstance(
             currentDiskSize=None,
-            databaseVersion='MYSQL_5_6',
+            databaseVersion=None,
             etag=None,
             name='create-instance1',
             ipAddresses=[],
@@ -392,8 +428,8 @@ custom-instance1 POSTGRES_9_6     us-central db-custom-1-1024 0.0.0.0 RUNNABLE
     # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME            DATABASE_VERSION LOCATION   TIER             ADDRESS STATUS
-tiered-instance MYSQL_5_6        us-central db-n1-standard-2 0.0.0.0 RUNNABLE
+NAME            DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -               RUNNABLE
 """,
         normalize_space=True)
 
@@ -785,15 +821,6 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
                '--master-username=root --master-instance-name=xm-instance '
                '--master-dump-file-path=gs://xm-bucket/dumpfile.sql ')
 
-
-class InstancesCreateBetaTest(_BaseInstancesCreateBetaTest,
-                              base.SqlMockTestBeta):
-  pass
-
-
-class InstancesCreateAlphaTest(_BaseInstancesCreateBetaTest,
-                               base.SqlMockTestAlpha):
-
   def testCreatePrivateNetwork(self):
     diff = {
         'name': 'create-instance1',
@@ -816,12 +843,24 @@ class InstancesCreateAlphaTest(_BaseInstancesCreateBetaTest,
 
     self.Run('sql instances create create-instance1 '
              '--network=somenetwork --tier=D1')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME              DATABASE_VERSION  LOCATION    TIER  ADDRESS  STATUS
-create-instance1  MYSQL_5_6         us-central  D1    -        RUNNABLE
+NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-instance1  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
 """,
         normalize_space=True)
+
+
+class InstancesCreateBetaTest(_BaseInstancesCreateBetaTest,
+                              base.SqlMockTestBeta):
+  pass
+
+
+class InstancesCreateAlphaTest(_BaseInstancesCreateBetaTest,
+                               base.SqlMockTestAlpha):
+
+  pass
 
 
 if __name__ == '__main__':

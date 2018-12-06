@@ -37,11 +37,17 @@ TOPICS
      filters
         Resource filters supplementary help.
 
+     flags-file
+        --flags-file=YAML_FILE supplementary help.
+
      formats
         Resource formats supplementary help.
 
      gcloudignore
         Reference for .gcloudignore files.
+
+     offline-help
+        Setting up gcloud command offline help.
 
      projections
         Resource projections supplementary help.

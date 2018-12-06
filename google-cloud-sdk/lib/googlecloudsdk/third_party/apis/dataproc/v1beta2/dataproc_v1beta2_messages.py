@@ -34,6 +34,38 @@ class AcceleratorConfig(_messages.Message):
   acceleratorTypeUri = _messages.StringField(2)
 
 
+class AllocationAffinity(_messages.Message):
+  r"""Allocation Affinity for consuming Zonal allocation.
+
+  Enums:
+    ConsumeAllocationTypeValueValuesEnum:
+
+  Fields:
+    consumeAllocationType: A ConsumeAllocationTypeValueValuesEnum attribute.
+    key: Corresponds to the label key of Allocation resource.
+    values: Corresponds to the label values of allocation resource.
+  """
+
+  class ConsumeAllocationTypeValueValuesEnum(_messages.Enum):
+    r"""ConsumeAllocationTypeValueValuesEnum enum type.
+
+    Values:
+      TYPE_UNSPECIFIED: <no description>
+      NO_ALLOCATION: Do not consume from any allocated capacity.
+      ANY_ALLOCATION: Consume any allocation available.
+      SPECIFIC_ALLOCATION: Must consume from a specific allocation. Must
+        specify key value fields for specifying the allocations.
+    """
+    TYPE_UNSPECIFIED = 0
+    NO_ALLOCATION = 1
+    ANY_ALLOCATION = 2
+    SPECIFIC_ALLOCATION = 3
+
+  consumeAllocationType = _messages.EnumField('ConsumeAllocationTypeValueValuesEnum', 1)
+  key = _messages.StringField(2)
+  values = _messages.StringField(3, repeated=True)
+
+
 class Binding(_messages.Message):
   r"""Associates members with a role.
 
@@ -521,23 +553,25 @@ class DataprocProjectsLocationsWorkflowTemplatesInstantiateInlineRequest(_messag
   object.
 
   Fields:
-    instanceId: Optional. A tag that prevents multiple concurrent workflow
+    instanceId: Deprecated. Please use request_id field instead.
+    parent: Required. The "resource name" of the workflow template region, as
+      described in https://cloud.google.com/apis/design/resource_names of the
+      form projects/{project_id}/regions/{region}
+    requestId: Optional. A tag that prevents multiple concurrent workflow
       instances with the same tag from running. This mitigates risk of
       concurrent instances started due to retries.It is recommended to always
       set this value to a UUID
       (https://en.wikipedia.org/wiki/Universally_unique_identifier).The tag
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
-    parent: Required. The "resource name" of the workflow template region, as
-      described in https://cloud.google.com/apis/design/resource_names of the
-      form projects/{project_id}/regions/{region}
     workflowTemplate: A WorkflowTemplate resource to be passed as the request
       body.
   """
 
   instanceId = _messages.StringField(1)
   parent = _messages.StringField(2, required=True)
-  workflowTemplate = _messages.MessageField('WorkflowTemplate', 3)
+  requestId = _messages.StringField(3)
+  workflowTemplate = _messages.MessageField('WorkflowTemplate', 4)
 
 
 class DataprocProjectsLocationsWorkflowTemplatesInstantiateRequest(_messages.Message):
@@ -1166,23 +1200,25 @@ class DataprocProjectsRegionsWorkflowTemplatesInstantiateInlineRequest(_messages
   object.
 
   Fields:
-    instanceId: Optional. A tag that prevents multiple concurrent workflow
+    instanceId: Deprecated. Please use request_id field instead.
+    parent: Required. The "resource name" of the workflow template region, as
+      described in https://cloud.google.com/apis/design/resource_names of the
+      form projects/{project_id}/regions/{region}
+    requestId: Optional. A tag that prevents multiple concurrent workflow
       instances with the same tag from running. This mitigates risk of
       concurrent instances started due to retries.It is recommended to always
       set this value to a UUID
       (https://en.wikipedia.org/wiki/Universally_unique_identifier).The tag
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
-    parent: Required. The "resource name" of the workflow template region, as
-      described in https://cloud.google.com/apis/design/resource_names of the
-      form projects/{project_id}/regions/{region}
     workflowTemplate: A WorkflowTemplate resource to be passed as the request
       body.
   """
 
   instanceId = _messages.StringField(1)
   parent = _messages.StringField(2, required=True)
-  workflowTemplate = _messages.MessageField('WorkflowTemplate', 3)
+  requestId = _messages.StringField(3)
+  workflowTemplate = _messages.MessageField('WorkflowTemplate', 4)
 
 
 class DataprocProjectsRegionsWorkflowTemplatesInstantiateRequest(_messages.Message):
@@ -1343,6 +1379,7 @@ class GceClusterConfig(_messages.Message):
       metadata#project_and_instance_metadata)).
 
   Fields:
+    allocationAffinity: Allocation Affinity for consuming Zonal allocation.
     internalIpOnly: Optional. If true, all instances in the cluster will only
       have internal IP addresses. By default, clusters are not restricted to
       internal IP addresses, and will have ephemeral external IP addresses
@@ -1422,14 +1459,15 @@ class GceClusterConfig(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  internalIpOnly = _messages.BooleanField(1)
-  metadata = _messages.MessageField('MetadataValue', 2)
-  networkUri = _messages.StringField(3)
-  serviceAccount = _messages.StringField(4)
-  serviceAccountScopes = _messages.StringField(5, repeated=True)
-  subnetworkUri = _messages.StringField(6)
-  tags = _messages.StringField(7, repeated=True)
-  zoneUri = _messages.StringField(8)
+  allocationAffinity = _messages.MessageField('AllocationAffinity', 1)
+  internalIpOnly = _messages.BooleanField(2)
+  metadata = _messages.MessageField('MetadataValue', 3)
+  networkUri = _messages.StringField(4)
+  serviceAccount = _messages.StringField(5)
+  serviceAccountScopes = _messages.StringField(6, repeated=True)
+  subnetworkUri = _messages.StringField(7)
+  tags = _messages.StringField(8, repeated=True)
+  zoneUri = _messages.StringField(9)
 
 
 class GetIamPolicyRequest(_messages.Message):
@@ -1656,12 +1694,12 @@ class InstantiateWorkflowTemplateRequest(_messages.Message):
 
   Messages:
     ParametersValue: Optional. Map from parameter names to values that should
-      be used for those parameters.
+      be used for those parameters. Values may not exceed 100 characters.
 
   Fields:
     instanceId: Deprecated. Please use request_id field instead.
     parameters: Optional. Map from parameter names to values that should be
-      used for those parameters.
+      used for those parameters. Values may not exceed 100 characters.
     requestId: Optional. A tag that prevents multiple concurrent workflow
       instances with the same tag from running. This mitigates risk of
       concurrent instances started due to retries.It is recommended to always
@@ -1678,7 +1716,7 @@ class InstantiateWorkflowTemplateRequest(_messages.Message):
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ParametersValue(_messages.Message):
     r"""Optional. Map from parameter names to values that should be used for
-    those parameters.
+    those parameters. Values may not exceed 100 characters.
 
     Messages:
       AdditionalProperty: An additional property for a ParametersValue object.
@@ -1726,6 +1764,9 @@ class Job(_messages.Message):
       the stdout of the job's driver program.
     hadoopJob: Job is a Hadoop job.
     hiveJob: Job is a Hive job.
+    jobUuid: Output only. A UUID that uniquely identifies a job within the
+      project over time. This is in contrast to a user-settable
+      reference.job_id that may be reused over time.
     labels: Optional. The labels to associate with this job. Label keys must
       contain 1 to 63 characters, and must conform to RFC 1035
       (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but,
@@ -1748,6 +1789,9 @@ class Job(_messages.Message):
       status information may be contained in the <code>type_job</code> and
       <code>yarn_applications</code> fields.
     statusHistory: Output only. The previous job status.
+    submittedBy: Output only. The email address of the user submitting the
+      job. For jobs submitted on the cluster, the address is
+      <code>username@hostname</code>.
     yarnApplications: Output only. The collection of YARN applications spun up
       by this job.Beta Feature: This report is available for testing purposes
       only. It may be changed before final release.
@@ -1786,18 +1830,20 @@ class Job(_messages.Message):
   driverOutputResourceUri = _messages.StringField(2)
   hadoopJob = _messages.MessageField('HadoopJob', 3)
   hiveJob = _messages.MessageField('HiveJob', 4)
-  labels = _messages.MessageField('LabelsValue', 5)
-  pigJob = _messages.MessageField('PigJob', 6)
-  placement = _messages.MessageField('JobPlacement', 7)
-  pysparkJob = _messages.MessageField('PySparkJob', 8)
-  reference = _messages.MessageField('JobReference', 9)
-  scheduling = _messages.MessageField('JobScheduling', 10)
-  sparkJob = _messages.MessageField('SparkJob', 11)
-  sparkRJob = _messages.MessageField('SparkRJob', 12)
-  sparkSqlJob = _messages.MessageField('SparkSqlJob', 13)
-  status = _messages.MessageField('JobStatus', 14)
-  statusHistory = _messages.MessageField('JobStatus', 15, repeated=True)
-  yarnApplications = _messages.MessageField('YarnApplication', 16, repeated=True)
+  jobUuid = _messages.StringField(5)
+  labels = _messages.MessageField('LabelsValue', 6)
+  pigJob = _messages.MessageField('PigJob', 7)
+  placement = _messages.MessageField('JobPlacement', 8)
+  pysparkJob = _messages.MessageField('PySparkJob', 9)
+  reference = _messages.MessageField('JobReference', 10)
+  scheduling = _messages.MessageField('JobScheduling', 11)
+  sparkJob = _messages.MessageField('SparkJob', 12)
+  sparkRJob = _messages.MessageField('SparkRJob', 13)
+  sparkSqlJob = _messages.MessageField('SparkSqlJob', 14)
+  status = _messages.MessageField('JobStatus', 15)
+  statusHistory = _messages.MessageField('JobStatus', 16, repeated=True)
+  submittedBy = _messages.StringField(17)
+  yarnApplications = _messages.MessageField('YarnApplication', 18, repeated=True)
 
 
 class JobPlacement(_messages.Message):
@@ -1920,20 +1966,25 @@ class JobStatus(_messages.Message):
 
 
 class LifecycleConfig(_messages.Message):
-  r"""Specifies the cluster auto delete related schedule configuration.
+  r"""Specifies the cluster auto-delete schedule configuration.
 
   Fields:
     autoDeleteTime: Optional. The time when cluster will be auto-deleted.
-    autoDeleteTtl: Optional. The life duration of cluster, the cluster will be
-      auto-deleted at the end of this duration.
-    idleDeleteTtl: Optional. The longest duration that cluster would keep
-      alive while staying  idle; passing this threshold will cause cluster to
-      be auto-deleted.
+    autoDeleteTtl: Optional. The lifetime duration of cluster. The cluster
+      will be auto-deleted at the end of this period. Valid range: 10m,
+      14d.Example: "1d", to delete the cluster 1 day after its creation..
+    idleDeleteTtl: Optional. The duration to keep the cluster alive while
+      idling. Passing this threshold will cause the cluster to be deleted.
+      Valid range: 10m, 14d.Example: "10m", the minimum value, to delete the
+      cluster when it has had no jobs running for 10 minutes.
+    idleStartTime: Output only. The time when cluster became idle (most recent
+      job finished) and became eligible for deletion due to idleness.
   """
 
   autoDeleteTime = _messages.StringField(1)
   autoDeleteTtl = _messages.StringField(2)
   idleDeleteTtl = _messages.StringField(3)
+  idleStartTime = _messages.StringField(4)
 
 
 class ListClustersResponse(_messages.Message):
@@ -2634,12 +2685,16 @@ class SoftwareConfig(_messages.Message):
       HIVE_WEBHCAT: <no description>
       ZEPPELIN: <no description>
       ANACONDA: <no description>
+      PRESTO: <no description>
+      KERBEROS: <no description>
     """
     COMPONENT_UNSPECIFIED = 0
     JUPYTER = 1
     HIVE_WEBHCAT = 2
     ZEPPELIN = 3
     ANACONDA = 4
+    PRESTO = 5
+    KERBEROS = 6
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class PropertiesValue(_messages.Message):
@@ -3066,26 +3121,25 @@ class TemplateParameter(_messages.Message):
       field path is similar in syntax to a google.protobuf.FieldMask. For
       example, a field path that references the zone field of a workflow
       template's cluster selector would be specified as
-      <code>placement.clusterSelector.zone</code>.Also, field paths can
-      reference fields using the following syntax: Values in maps can be
-      referenced by key. Examples<br> labels'key'
-      placement.clusterSelector.clusterLabels'key'
+      placement.clusterSelector.zone.Also, field paths can reference fields
+      using the following syntax: Values in maps can be referenced by key:
+      labels'key' placement.clusterSelector.clusterLabels'key'
       placement.managedCluster.labels'key'
-      placement.clusterSelector.clusterLabels'key' jobsstep-id.labels'key'
-      Jobs in the jobs list can be referenced by step-id. Examples:<br>
-      jobsstep-id.hadoopJob.mainJarFileUri jobsstep-id.hiveJob.queryFileUri
-      jobsstep-id.pySparkJob.mainPythonFileUri jobsstep-
-      id.hadoopJob.jarFileUris0 jobsstep-id.hadoopJob.archiveUris0 jobsstep-
-      id.hadoopJob.fileUris0 jobsstep-id.pySparkJob.pythonFileUris0 Items in
-      repeated fields can be referenced by a zero-based index. Example:<br>
-      jobsstep-id.sparkJob.args0 Other examples: jobsstep-
-      id.hadoopJob.properties'key' jobsstep-id.hadoopJob.args0 jobsstep-
-      id.hiveJob.scriptVariables'key' jobsstep-id.hadoopJob.mainJarFileUri
+      placement.clusterSelector.clusterLabels'key' jobs'step-id'.labels'key'
+      Jobs in the jobs list can be referenced by step-id: jobs'step-
+      id'.hadoopJob.mainJarFileUri jobs'step-id'.hiveJob.queryFileUri jobs
+      'step-id'.pySparkJob.mainPythonFileUri jobs'step-
+      id'.hadoopJob.jarFileUris0 jobs'step-id'.hadoopJob.archiveUris0 jobs
+      'step-id'.hadoopJob.fileUris0 jobs'step-id'.pySparkJob.pythonFileUris0
+      Items in repeated fields can be referenced by a zero-based index: jobs
+      'step-id'.sparkJob.args0 Other examples: jobs'step-
+      id'.hadoopJob.properties'key' jobs'step-id'.hadoopJob.args0 jobs'step-
+      id'.hiveJob.scriptVariables'key' jobs'step-id'.hadoopJob.mainJarFileUri
       placement.clusterSelector.zoneIt may not be possible to parameterize
       maps and repeated fields in their entirety since only individual map
       values and individual items in repeated fields can be referenced. For
       example, the following field paths are invalid:
-      placement.clusterSelector.clusterLabels jobsstep-id.sparkJob.args
+      placement.clusterSelector.clusterLabels jobs'step-id'.sparkJob.args
     name: Required. Parameter name. The parameter name is used as the key, and
       paired with the parameter value, which are passed to the template when
       the template is instantiated. The name must contain only capital letters
@@ -3156,12 +3210,15 @@ class WorkflowMetadata(_messages.Message):
       those parameters.
 
   Fields:
-    clusterName: Output only. The name of the managed cluster.
+    clusterName: Output only. The name of the target cluster.
+    clusterUuid: Output only. The UUID of target cluster.
     createCluster: Output only. The create cluster operation metadata.
     deleteCluster: Output only. The delete cluster operation metadata.
+    endTime: Output only. Workflow end time.
     graph: Output only. The workflow graph.
     parameters: Map from parameter names to values that were used for those
       parameters.
+    startTime: Output only. Workflow start time.
     state: Output only. The workflow state.
     template: Output only. The "resource name" of the template.
     version: Output only. The version of template at the time of workflow
@@ -3208,13 +3265,16 @@ class WorkflowMetadata(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   clusterName = _messages.StringField(1)
-  createCluster = _messages.MessageField('ClusterOperation', 2)
-  deleteCluster = _messages.MessageField('ClusterOperation', 3)
-  graph = _messages.MessageField('WorkflowGraph', 4)
-  parameters = _messages.MessageField('ParametersValue', 5)
-  state = _messages.EnumField('StateValueValuesEnum', 6)
-  template = _messages.StringField(7)
-  version = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  clusterUuid = _messages.StringField(2)
+  createCluster = _messages.MessageField('ClusterOperation', 3)
+  deleteCluster = _messages.MessageField('ClusterOperation', 4)
+  endTime = _messages.StringField(5)
+  graph = _messages.MessageField('WorkflowGraph', 6)
+  parameters = _messages.MessageField('ParametersValue', 7)
+  startTime = _messages.StringField(8)
+  state = _messages.EnumField('StateValueValuesEnum', 9)
+  template = _messages.StringField(10)
+  version = _messages.IntegerField(11, variant=_messages.Variant.INT32)
 
 
 class WorkflowNode(_messages.Message):

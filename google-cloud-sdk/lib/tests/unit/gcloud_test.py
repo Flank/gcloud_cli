@@ -38,6 +38,8 @@ import six
 
 class GcloudTest(sdk_test_base.WithOutputCapture):
 
+  maxDiff = None  # pylint: disable=invalid-name
+
   def SetUp(self):
     self.cli = self.StartObjectPatch(
         parser_extensions.ArgumentParser, 'parse_args')
@@ -66,7 +68,7 @@ class GcloudTest(sdk_test_base.WithOutputCapture):
     exception = Exception(msg)
     self.cli.side_effect = exception
     self.assertRaises(SystemExit, gcloud.main)
-    self.report_error_mock.assert_called_once_with(exception, is_crash=True)
+    self.report_error_mock.assert_called_once_with(is_crash=True)
 
   def testKnownError(self):
     # We want to suggest reinstall here
@@ -74,7 +76,7 @@ class GcloudTest(sdk_test_base.WithOutputCapture):
     exception = exceptions.Error(msg)
     self.cli.side_effect = exception
     self.assertRaises(SystemExit, gcloud.main)
-    self.report_error_mock.assert_called_once_with(exception, is_crash=False)
+    self.report_error_mock.assert_called_once_with(is_crash=False)
 
   def testIOErrorEPIPE(self):
     msg = 'Example exception message text'
@@ -89,7 +91,7 @@ class GcloudTest(sdk_test_base.WithOutputCapture):
     exception = Exception(msg)
     self.cli.side_effect = exception
     self.assertRaisesRegex(Exception, msg, gcloud.main)
-    self.report_error_mock.assert_called_once_with(exception, is_crash=True)
+    self.report_error_mock.assert_called_once_with(is_crash=True)
 
   def testExceptionImportErrorRunCommand(self):
     crash_handling_mock = self.StartObjectPatch(crash_handling,
@@ -131,27 +133,16 @@ class GcloudTest(sdk_test_base.WithOutputCapture):
         gcloud.main()
       self.assertEqual(1, cm.exception.code)
       self.report_error_mock.assert_not_called()
-    error = ('No module named gcloud_main' if six.PY2 else
-             "import of '{}.gcloud_main' halted; None in sys.modules".format(
-                 'googlecloudsdk'))
-    self.assertMultiLineEqual("""\
-ERROR: gcloud failed to load: {0}
-    gcloud_main = _import_gcloud_main()
-    import {1}
-
-This usually indicates corruption in your gcloud installation or problems with \
-your Python interpreter.
-
-Please verify that the following is the path to a working Python 2.7 executable:
-    {2}
-
-If it is not, please set the CLOUDSDK_PYTHON environment variable to point to \
-a working Python 2.7 executable.
-
-If you are still experiencing problems, please reinstall the Cloud SDK using \
-the instructions here:
-    https://cloud.google.com/sdk/
-""".format(error, module_path, sys.executable), self.GetErr())
+    error_msg = self.GetErr()
+    # We don't check the entire error message text as that is way too fragile
+    # and depends on specifics of the particular Python interpreter.
+    self.assertIn('gcloud_main' if six.PY3 else 'gcloud_main',
+                  error_msg)
+    self.assertIn('ERROR: gcloud failed to load:', error_msg)
+    self.assertIn('import {}'.format(module_path), error_msg)
+    self.assertIn('usually indicates corruption', error_msg)
+    self.assertIn('please reinstall the Cloud SDK', error_msg)
+    self.assertIn('https://cloud.google.com/sdk/', error_msg)
     self.assertMultiLineEqual('', self.GetOutput())
 
   def testExceptionOtherErrorImportingGcloudMain(self):
@@ -163,7 +154,6 @@ the instructions here:
       gcloud.main()
     self.assertEqual(1, cm.exception.code)
     self.report_error_mock.assert_not_called()
-    self.maxDiff = None
     self.assertMultiLineEqual("""\
 ERROR: gcloud failed to load: Exception message
     gcloud_main = _import_gcloud_main()

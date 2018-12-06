@@ -46,9 +46,9 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
   def _StoreDeletedTagsAndDigests(self, name, creds, transport):
     if isinstance(name, docker_name.Tag):
-      self._deleted_tags.add(str(name))
+      self._deleted_tags.add(six.text_type(name))
     if isinstance(name, docker_name.Digest):
-      self._deleted_digests.add(str(name))
+      self._deleted_digests.add(six.text_type(name))
 
   def _GetDigestForTag(self, tag_str):
     image = docker_name.Tag(tag_str)
@@ -81,6 +81,7 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         'container',
         'images',
         'delete',
+        '--quiet',
         '--format=disable',
         '--force-delete-tags',
     ] + image_names)
@@ -119,7 +120,7 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.digest_from_name_mock.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.UNAUTHORIZED
-        }), '')
+        }), ''.encode('utf8'))
 
     with self.assertRaises(util.UserRecoverableV2Error):
       self.Delete([_TAG_V1])
@@ -130,7 +131,7 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.digest_from_name_mock.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.NOT_FOUND
-        }), '')
+        }), ''.encode('utf8'))
 
     with self.assertRaises(util.UserRecoverableV2Error):
       self.Delete([_TAG_V1])

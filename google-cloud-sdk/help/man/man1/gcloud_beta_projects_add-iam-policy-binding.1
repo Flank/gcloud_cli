@@ -26,10 +26,17 @@ project ID and the binding.
 
 .RS 2m
 .TP 2m
+
+Project resource \- The project to add the IAM policy binding. This represents a
+Cloud resource. This must be specified.
+
+.RS 2m
+.TP 2m
 \fIPROJECT_ID\fR
-ID for the project you want to add IAM policy binding to.
+ID of the project or fully qualified identifier for the project.
 
 
+.RE
 .RE
 .sp
 
@@ -69,9 +76,16 @@ Define the role of the member.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudresourcemanager/v1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/resource\-manager
 
 
 
@@ -79,16 +93,16 @@ help\fR for details.
 
 The following command will add an IAM policy binding for the role of
 \'roles/editor' for the user 'test\-user@gmail.com' on a project with identifier
-\'example\-project\-id\-1'
+\'example\-project\-id\-1':
 
 .RS 2m
 $ gcloud beta projects add\-iam\-policy\-binding example\-project\-id\-1 \e
     \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
 .RE
 
-For a service account \f5test\-proj1@example.domain.com\fR, the following
-command will add an IAM policy binding for the role of 'roles/editor' to the
-given service account:
+For a service account test\-proj1@example.domain.com, the following command will
+add an IAM policy binding for the role of 'roles/editor' to the given service
+account:
 
 .RS 2m
 $ gcloud beta projects add\-iam\-policy\-binding \e

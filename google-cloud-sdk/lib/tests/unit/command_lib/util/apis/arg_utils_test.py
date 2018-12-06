@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,12 @@
 # limitations under the License.
 
 """Tests for the arg_marshalling module."""
+
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
+
 import re
 
 from apitools.base.protorpclite import messages as _messages
@@ -114,10 +117,26 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
       ('THING-TWO', fm.FakeMessage.FakeEnum.THING_TWO),
       ('thing_two', fm.FakeMessage.FakeEnum.THING_TWO),
       ('thing-two', fm.FakeMessage.FakeEnum.THING_TWO),
+      (None, None)
   )
   def testChoiceToEnum(self, choice, enum_type):
     self.assertEqual(enum_type,
                      arg_utils.ChoiceToEnum(choice, fm.FakeMessage.FakeEnum))
+
+  def testChoiceToEnumErrors(self):
+    # With valid choices specified, validate against those
+    with self.assertRaisesRegex(
+        arg_parsers.ArgumentTypeError,
+        r'Invalid choice: badchoice. Valid choices are: \[a, b\].'):
+      arg_utils.ChoiceToEnum('badchoice', fm.FakeMessage.FakeEnum,
+                             valid_choices=['a', 'b'])
+
+    # With no valid choices specified, validate against the enum
+    with self.assertRaisesRegex(
+        arg_parsers.ArgumentTypeError,
+        r'Invalid choice: badchoice. Valid choices are: \[thing-one, '
+        r'thing-two\].'):
+      arg_utils.ChoiceToEnum('badchoice', fm.FakeMessage.FakeEnum)
 
   def testConvertValueWithProcessor(self):
 
@@ -146,6 +165,11 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
         yaml_command_schema_util.Choice({'arg_value': 'a', 'enum_value': 'b'}),
         yaml_command_schema_util.Choice({'arg_value': 'c', 'enum_value': 'd'})]
     choices = yaml_command_schema_util.Choice.ToChoiceMap(choices)
+
+    # Value not provided.
+    self.assertEqual(
+        None,
+        arg_utils.ConvertValue(fm.FakeMessage.string1, None, choices=choices))
 
     # Non-repeated.
     self.assertEqual(
@@ -248,7 +272,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
         })
 
   def testGetRecursiveMessage(self):
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     message = arg_utils.GetRecursiveMessageSpec(fm.FakeMessage)
     self.assertEqual(
         message,
@@ -270,6 +294,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
                   'type': _messages.Variant.INT64},
          'message1': {'description': 'an InnerMessage message',
                       'repeated': False,
+                      'type': 'InnerMessage',
                       'fields': {
                           'string1': {
                               'description': 'the first string',
@@ -295,10 +320,12 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
                               'type': _messages.Variant.ENUM}}},
          'message2': {'description': 'an InnerMessage2 message',
                       'repeated': False,
+                      'type': 'InnerMessage2',
                       'fields': {
                           'deeper_message': {
                               'description': 'a DeeperMessage message',
                               'repeated': False,
+                              'type': 'DeeperMessage',
                               'fields': {
                                   'deep_string': {
                                       'description': 'a string',
@@ -319,6 +346,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
          'repeated_message': {
              'description': 'a repeated InnerMessage message.',
              'repeated': True,
+             'type': 'InnerMessage',
              'fields': {
                  'string1': {
                      'description': 'the first string',
@@ -456,7 +484,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     with self.assertRaisesRegex(
         arg_utils.ArgumentGenerationError,
         r'Failed to generate argument for field \[string2\]: The field is '
-        r'repeated but is but is using a custom action. You might want to set '
+        r'repeated but is using a custom action. You might want to set '
         r'repeated: False in your arg spec.'):
       arg_utils.GenerateFlag(fm.FakeMessage.string2, a)
 
@@ -524,7 +552,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
                      b"'\xd1\x82 \xd1\x95\xce\xb1\xd1\x83 \xce\xb7\xcf\x83")
 
   def testParseResourceIntoMessageGet(self):
-    self.MockGetListCreateMethods(('foo.projects.locations.instances', True))
+    self.MockCRUDMethods(('foo.projects.locations.instances', True))
     method = registry.GetMethod('foo.projects.locations.instances', 'get')
     message = method.GetRequestType()()
     ref = resources.REGISTRY.Parse(
@@ -537,8 +565,8 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual('projects/p/locations/l/instances/i', message.name)
 
   def testParseResourceIntoMessageWithParams(self):
-    self.MockGetListCreateMethods(('foo.projects.locations.instances', False),
-                                  ('baz.projects.quxs.quuxs', False))
+    self.MockCRUDMethods(('foo.projects.locations.instances', False),
+                         ('baz.projects.quxs.quuxs', False))
     method = registry.GetMethod('foo.projects.locations.instances', 'get')
     message = method.GetRequestType()()
     ref = resources.REGISTRY.Create(
@@ -557,7 +585,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual('quux', message.instancesId)
 
   def testParseResourceIntoMessageWithParamsNonMethodParams(self):
-    self.MockGetListCreateMethods(('foo.projects.locations.instances', False))
+    self.MockCRUDMethods(('foo.projects.locations.instances', False))
     method = registry.GetMethod('foo.projects.locations.instances', 'get')
     method.params = []
     message = fm.FakeMessage()
@@ -578,7 +606,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual('i', message.message1.string2)
 
   def testParseResourceIntoMessageWithParamsNonMethodParamsRelativeName(self):
-    self.MockGetListCreateMethods(('foo.projects.locations.instances', False))
+    self.MockCRUDMethods(('foo.projects.locations.instances', False))
     method = registry.GetMethod('foo.projects.locations.instances', 'get')
     method.params = []
     message = fm.FakeMessage()
@@ -595,7 +623,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual('projects/p/locations/l/instances/i', message.string1)
 
   def testParseResourceIntoMessageList(self):
-    self.MockGetListCreateMethods(('foo.projects.locations.instances', True))
+    self.MockCRUDMethods(('foo.projects.locations.instances', True))
     method = registry.GetMethod('foo.projects.locations.instances', 'list')
     message = method.GetRequestType()()
     ref = resources.REGISTRY.Parse(
@@ -608,7 +636,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual('projects/p/locations/l', message.parent)
 
   def testParseResourceIntoMessageCreate(self):
-    self.MockGetListCreateMethods(('foo.projects.locations.instances', True))
+    self.MockCRUDMethods(('foo.projects.locations.instances', True))
     method = registry.GetMethod('foo.projects.locations.instances', 'create')
     message = method.GetRequestType()()
     ref = resources.REGISTRY.Parse(
@@ -623,7 +651,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual('i', message.name)
 
   def testParseResourceIntoMessageCreateWithParentResource(self):
-    self.MockGetListCreateMethods(('foo.projects.locations.instances', True))
+    self.MockCRUDMethods(('foo.projects.locations.instances', True))
     method = registry.GetMethod('foo.projects.locations.instances', 'create')
     message = method.GetRequestType()()
     parent_ref = resources.REGISTRY.Parse(
@@ -633,7 +661,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual('projects/p/locations/l', message.parent)
 
   def testParseStaticFieldsIntoMessage(self):
-    self.MockGetListCreateMethods(('foo.projects.instances', True))
+    self.MockCRUDMethods(('foo.projects.instances', True))
     method = registry.GetMethod('foo.projects.instances', 'list')
     message_type = method.GetRequestType()
     message = message_type()

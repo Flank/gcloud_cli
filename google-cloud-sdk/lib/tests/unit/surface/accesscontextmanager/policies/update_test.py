@@ -18,16 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class PoliciesUpdateTest(accesscontextmanager.Base):
+class PoliciesUpdateTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -48,15 +49,15 @@ class PoliciesUpdateTest(accesscontextmanager.Base):
     self.client.accessPolicies.Get.Expect(get_req_type(name=policy_name),
                                           policy)
 
-  def testUpdate_MissingRequired(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_MissingRequired(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(handlers.ParseError,
                                            'Error parsing [policy]'):
       self.Run(
           'access-context-manager policies update')
 
-  def testUpdate(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate(self):
+    self.SetUpForTrack(self.track)
     policy = self.messages.AccessPolicy(title='My Policy #2')
     self._ExpectPatch('MY_POLICY', policy, 'title')
 
@@ -65,6 +66,12 @@ class PoliciesUpdateTest(accesscontextmanager.Base):
         '     --title "My Policy #2"')
 
     self.assertEqual(results, policy)
+
+
+class PoliciesUpdateTestAlpha(PoliciesUpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

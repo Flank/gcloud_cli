@@ -1,0 +1,69 @@
+NAME
+    gcloud meta apis messages generate-export-schemas - generate YAML export
+        schemas for a message in a given API
+
+SYNOPSIS
+    gcloud meta apis messages generate-export-schemas MESSAGE --api=API
+        [--api-version=API_VERSION] [--directory=DIRECTORY]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud commands that have "too many" create/update command flags may also
+    provide export/import commands. export lists the current state of a
+    resource in a YAML export format. import reads export format data and
+    either creates a new resource or updates an existing resource.
+
+    An export format is an abstract YAML representation of the mutable fields
+    of a populated protobuf message. Abstraction allows the export format to
+    hide implementation details of some protobuf constructs like enums and
+    additionalProperties.
+
+    One way of describing an export format is with JSON schemas. A schema
+    documents export format properties for a message in an API, and can also be
+    used to validate data on import. Validation is important because users can
+    modify export data before importing it again.
+
+    This command generates JSON schemas (in YAML format, go figure) for a
+    protobuf message in an API. A separate schema files is generated for each
+    nested message in the resource message.
+
+POSITIONAL ARGUMENTS
+     MESSAGE
+        The name of the message to generate the YAML export schemas for.
+
+REQUIRED FLAGS
+     --api=API
+        The name of the API to get the attributes for.
+
+OPTIONAL FLAGS
+     --api-version=API_VERSION
+        The version of the given API to use. If not provided, the default
+        version of the API will be used.
+
+     --directory=DIRECTORY
+        The path name of the directory to create the YAML export schema files
+        in. If not specified then the files are created in the current
+        directory.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+CAVEATS
+    The generated schemas depend on the quality of the protobuf discovery docs,
+    including proto file comment conventions that are not error checked. Always
+    manually inspect schemas before using them in a release.
+
+EXAMPLES
+    To generate the WorkflowTemplate schemas in the current directory from the
+    dataproc v1beta2 API:
+
+        $ gcloud meta apis messages generate-export-schemas \
+            WorkflowTemplate --api=dataproc --api-version=v1beta2
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

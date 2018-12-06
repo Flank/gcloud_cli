@@ -27,15 +27,9 @@ from tests.lib.surface.dataproc import jobs_unit_base
 class WorkflowTemplateRemoveJobUnitTest(jobs_unit_base.JobsUnitTestBase,
                                         compute_base.BaseComputeUnitTest):
   """Tests for dataproc workflow template remove job."""
-  pass
-
-
-class WorkflowTemplateRemoveJobUnitTestBeta(WorkflowTemplateRemoveJobUnitTest):
-
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
 
   def testRemoveJob(self):
+    """Tests removing a job from a template."""
     workflow_template = self.MakeWorkflowTemplate()
     labels = {'some_label_key': 'some_label_value'}
     ordered_job_1 = self.MakeOrderedJob(
@@ -72,3 +66,9 @@ class WorkflowTemplateRemoveJobUnitTestBeta(WorkflowTemplateRemoveJobUnitTest):
     err_msg = 'Step id [{0}] is not found in workflow template [{1}].'.format(
         12, workflow_template.id)
     self.AssertErrContains(err_msg)
+
+
+class WorkflowTemplateRemoveJobUnitTestBeta(WorkflowTemplateRemoveJobUnitTest):
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)

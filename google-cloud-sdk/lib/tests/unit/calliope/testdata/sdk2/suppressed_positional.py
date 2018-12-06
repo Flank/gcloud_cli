@@ -17,10 +17,10 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class SuppressedPositional(base.Command):
+class SuppressedPositional(calliope_base.Command):
   """A command to test remainder args."""
 
   @staticmethod
@@ -31,12 +31,12 @@ class SuppressedPositional(base.Command):
         help='THIS TEXT SHOULD BE HIDDEN.')
     parser.add_argument(
         '--hidden-no-detailed-help',
-        category=base.COMMONLY_USED_FLAGS,
+        category=calliope_base.COMMONLY_USED_FLAGS,
         hidden=True,
         help='Short help.')
     parser.add_argument(
         '--hidden',
-        category=base.COMMONLY_USED_FLAGS,
+        category=calliope_base.COMMONLY_USED_FLAGS,
         hidden=True,
         help='Detailed help.')
 

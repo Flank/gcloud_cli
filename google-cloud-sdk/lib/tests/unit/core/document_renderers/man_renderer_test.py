@@ -109,6 +109,28 @@ class ManMarkdownTests(test_base.Markdown):
         """)
     self.Run('man', markdown, expected, title='New Title')
 
+  def testManRoot(self):
+    markdown = self.ROOT_MARKDOWN
+    expected = textwrap.dedent(r"""
+      .TH "GCLOUD COMPONENT" 1
+
+
+      .SH "SYNOPSIS"
+      .HP
+      gcloud component [\ \fIflags\fR\ ] [\ \fIpositionals\fR\ ]
+
+
+      .SH "SECTION"
+
+      Section prose about the gcloud component command.
+
+
+      .SH "GCLOUD WIDE FLAGS"
+
+      These are available in all commands: \-\-foo, \-\-bar and \-\-verbosity.
+      """)
+    self.Run('man', markdown, expected)
+
   def testManSingleQuoteRune(self):
     markdown = textwrap.dedent("""\
         == DESCRIPTION ==
@@ -259,7 +281,7 @@ class ManMarkdownTests(test_base.Markdown):
         groups can \fBinclude:\fR other argument groups within the same YAML file, with
         unlimited nesting.
         """)
-    self.maxDiff = 1024 * 4
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('man', markdown, expected)
 
   def testManExampleBlock(self):
@@ -304,7 +326,7 @@ class ManMarkdownTests(test_base.Markdown):
 
         And that's it.
         """)
-    self.maxDiff = 1024 * 4
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('man', markdown, expected)
 
   def testManQuotedFontEmphasis(self):
@@ -326,8 +348,7 @@ class ManMarkdownTests(test_base.Markdown):
 
   def testManLink(self):
     markdown = self.LINK_MARKDOWN
-    expected = """\
-
+    expected = r"""
 .TH "New Title" ""
 
 .SH "Test Title"

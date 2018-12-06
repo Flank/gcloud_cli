@@ -51,11 +51,22 @@ def FakeIosCatalog():
       supportedVersionIds=['6.0', '7.2'],
       tags=['unstable'])
   ios_version_5 = testing_messages.IosVersion(
-      id='5.1', majorVersion=5, minorVersion=1, tags=['old'])
+      id='5.1',
+      majorVersion=5,
+      minorVersion=1,
+      supportedXcodeVersionIds=['9.2.0'],
+      tags=['old'])
   ios_version_6 = testing_messages.IosVersion(
-      id='6.0', majorVersion=6, minorVersion=0, tags=['default'])
+      id='6.0',
+      majorVersion=6,
+      minorVersion=0,
+      supportedXcodeVersionIds=['9.2.0', '10.0.1'],
+      tags=['default'])
   ios_version_7 = testing_messages.IosVersion(
-      id='7.2', majorVersion=7, minorVersion=2)
+      id='7.2',
+      majorVersion=7,
+      minorVersion=2,
+      supportedXcodeVersionIds=['9.2.0', '10.0.1'])
 
   locale_ro = TESTING_MESSAGES.Locale(
       id='ro', name='Romulan', region='Romulus', tags=['cunning', 'default'])
@@ -67,9 +78,15 @@ def FakeIosCatalog():
   orientation_diagonal = TESTING_MESSAGES.Orientation(
       id='diagonal', name='diag', tags=['popcorn'])
 
+  xcode_version_9 = TESTING_MESSAGES.XcodeVersion(
+      version='9.2.0', tags=['default'])
+  xcode_version_10 = TESTING_MESSAGES.XcodeVersion(
+      version='10.0.1', tags=['beta'])
+
   return testing_messages.IosDeviceCatalog(
       models=[ios_model_1, ios_model_2, ios_model_3],
       versions=[ios_version_5, ios_version_6, ios_version_7],
+      xcodeVersions=[xcode_version_9, xcode_version_10],
       runtimeConfiguration=TESTING_MESSAGES.IosRuntimeConfiguration(
           locales=[locale_ro, locale_kl],
           orientations=[orientation_askew, orientation_diagonal]))

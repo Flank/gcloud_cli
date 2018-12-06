@@ -27,16 +27,16 @@ from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class KeysCreateTest(base.KmsMockTest, parameterized.TestCase):
+class KeysCreateTestGA(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.key_name = self.project_name.Descendant('global/my_kr/my_key')
     self.version_name = self.project_name.Descendant('global/my_kr/my_key/1')
 
-  def testCreateSuccess(self, track):
-    self.track = track
+  def testCreateSuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Create.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysCreateRequest(
             parent=self.key_name.Parent().RelativeName(),
@@ -72,8 +72,7 @@ class KeysCreateTest(base.KmsMockTest, parameterized.TestCase):
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id))
 
-  def testCreateFullNameSuccess(self, track):
-    self.track = track
+  def testCreateFullNameSuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Create.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysCreateRequest(
             parent=self.key_name.Parent().RelativeName(),
@@ -106,12 +105,105 @@ class KeysCreateTest(base.KmsMockTest, parameterized.TestCase):
              '--labels=smile=happy'.format(self.key_name.RelativeName()))
 
 
-class KeysCreateAlphaTest(base.KmsMockTest, parameterized.TestCase):
+class KeysCreateTestBeta(KeysCreateTestGA):
 
-  def SetUp(self):
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class KeysCreateTestAlpha(KeysCreateTestBeta, parameterized.TestCase):
+
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.key_name = self.project_name.Descendant('global/my_kr/my_key')
-    self.version_name = self.project_name.Descendant('global/my_kr/my_key/1')
+
+  # This overrides the GA testCreateSuccess. It adds versionTemplate to the
+  # expected fields returned.
+  def testCreateSuccess(self):
+    ckvt = self.messages.CryptoKeyVersionTemplate(
+        algorithm=self.messages.CryptoKeyVersionTemplate
+        .AlgorithmValueValuesEnum.GOOGLE_SYMMETRIC_ENCRYPTION,
+        protectionLevel=self.messages.CryptoKeyVersionTemplate
+        .ProtectionLevelValueValuesEnum.SOFTWARE)
+
+    self.kms.projects_locations_keyRings_cryptoKeys.Create.Expect(
+        self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysCreateRequest(
+            parent=self.key_name.Parent().RelativeName(),
+            cryptoKeyId=self.key_name.crypto_key_id,
+            cryptoKey=self.messages.CryptoKey(
+                purpose=self.messages.CryptoKey.PurposeValueValuesEnum
+                .ENCRYPT_DECRYPT,
+                labels=self.messages.CryptoKey.LabelsValue(
+                    additionalProperties=[
+                        self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                            key='k-2', value='v-2'),
+                        self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                            key='k1', value='v1'),
+                        self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                            key='smile', value='happy')
+                    ]),
+                versionTemplate=ckvt)),
+        self.messages.CryptoKey(
+            name=self.key_name.RelativeName(),
+            purpose=self.messages.CryptoKey.PurposeValueValuesEnum
+            .ENCRYPT_DECRYPT,
+            labels=self.messages.CryptoKey.LabelsValue(additionalProperties=[
+                self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                    key='k1', value='v1'),
+                self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                    key='k-2', value='v-2'),
+                self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                    key='smile', value='happy')
+            ]),
+            versionTemplate=ckvt))
+
+    self.Run('kms keys create '
+             '--location={0} --keyring={1} {2} --purpose=encryption '
+             '--labels=k1=v1,k-2=v-2 --labels=smile=happy'.format(
+                 self.key_name.location_id, self.key_name.key_ring_id,
+                 self.key_name.crypto_key_id))
+
+  # This overrides the GA testCreateFullNameSuccess. It adds versionTemplate
+  # to the expected fields returned.
+  def testCreateFullNameSuccess(self):
+    ckvt = self.messages.CryptoKeyVersionTemplate(
+        algorithm=self.messages.CryptoKeyVersionTemplate
+        .AlgorithmValueValuesEnum.GOOGLE_SYMMETRIC_ENCRYPTION,
+        protectionLevel=self.messages.CryptoKeyVersionTemplate
+        .ProtectionLevelValueValuesEnum.SOFTWARE)
+
+    self.kms.projects_locations_keyRings_cryptoKeys.Create.Expect(
+        self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysCreateRequest(
+            parent=self.key_name.Parent().RelativeName(),
+            cryptoKeyId=self.key_name.crypto_key_id,
+            cryptoKey=self.messages.CryptoKey(
+                purpose=self.messages.CryptoKey.PurposeValueValuesEnum
+                .ENCRYPT_DECRYPT,
+                labels=self.messages.CryptoKey.LabelsValue(
+                    additionalProperties=[
+                        self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                            key='k-2', value='v-2'),
+                        self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                            key='k1', value='v1'),
+                        self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                            key='smile', value='happy')
+                    ]),
+                versionTemplate=ckvt)),
+        self.messages.CryptoKey(
+            name=self.key_name.RelativeName(),
+            purpose=self.messages.CryptoKey.PurposeValueValuesEnum
+            .ENCRYPT_DECRYPT,
+            labels=self.messages.CryptoKey.LabelsValue(additionalProperties=[
+                self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                    key='k1', value='v1'),
+                self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                    key='k-2', value='v-2'),
+                self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                    key='smile', value='happy')
+            ]),
+            versionTemplate=ckvt))
+
+    self.Run('kms keys create {} --purpose=encryption --labels=k1=v1,k-2=v-2 '
+             '--labels=smile=happy'.format(self.key_name.RelativeName()))
 
   @parameterized.parameters(
       ('asymmetric-signing', 'ec-sign-p256-sha256'),
@@ -119,11 +211,15 @@ class KeysCreateAlphaTest(base.KmsMockTest, parameterized.TestCase):
       ('asymmetric-signing', 'rsa-sign-pss-2048-sha256'),
       ('asymmetric-signing', 'rsa-sign-pss-3072-sha256'),
       ('asymmetric-signing', 'rsa-sign-pss-4096-sha256'),
+      ('asymmetric-signing', 'rsa-sign-pss-4096-sha512'),
       ('asymmetric-signing', 'rsa-sign-pkcs1-2048-sha256'),
       ('asymmetric-signing', 'rsa-sign-pkcs1-3072-sha256'),
       ('asymmetric-signing', 'rsa-sign-pkcs1-4096-sha256'),
+      ('asymmetric-signing', 'rsa-sign-pkcs1-4096-sha256'),
       ('asymmetric-encryption', 'rsa-decrypt-oaep-2048-sha256'),
-      ('asymmetric-encryption', 'rsa-decrypt-oaep-3072-sha256'))
+      ('asymmetric-encryption', 'rsa-decrypt-oaep-3072-sha256'),
+      ('asymmetric-encryption', 'rsa-decrypt-oaep-4096-sha256'),
+      ('asymmetric-encryption', 'rsa-decrypt-oaep-4096-sha512'))
   def testCreateAsymmetricKeySuccess(self, purpose, algorithm):
     ckvt = self.messages.CryptoKeyVersionTemplate(
         algorithm=maps.ALGORITHM_MAPPER.GetEnumForChoice(algorithm),

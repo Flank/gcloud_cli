@@ -88,7 +88,7 @@ settings:
     binaryLogEnabled: false
     enabled: true
     kind: sql#backupConfiguration
-    startTime: '11:54'
+    startTime: 11:54
   ipConfiguration:
     ipv4Enabled: false
   kind: sql#settings

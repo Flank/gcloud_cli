@@ -18,9 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
+from mock import patch
 
 
 class InstanceGroupsManagedInstancesConfigsListTestBase(test_base.BaseTest):
@@ -28,7 +30,7 @@ class InstanceGroupsManagedInstancesConfigsListTestBase(test_base.BaseTest):
   _API_VERSION = 'alpha'
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self._API_VERSION)
 
   def MakePerInstanceConfig(self, instance, override_disks, override_metadata,
@@ -240,6 +242,16 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
         origin: USER_PROVIDED
         """.format(compute_uri=self.compute_uri), normalize_space=True)
     self.AssertOutputNotContains('origin: AUTO_GENERATED', normalize_space=True)
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run("""
+        compute instance-groups managed instance-configs list group-a
+        --zone us-central1-a
+        """)
 
 
 class InstanceGroupsManagedInstancesConfigsListRegionalTest(

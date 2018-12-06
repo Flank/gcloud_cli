@@ -20,10 +20,10 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class OrderedChoices(base.Command):
+class OrderedChoices(calliope_base.Command):
   """A command with required flags."""
 
   @staticmethod

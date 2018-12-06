@@ -30,6 +30,7 @@ from googlecloudsdk.command_lib.resource_manager import completers
 import six.moves.http_client
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class AddIamPolicyBinding(base.Command):
   """Add IAM policy binding for a project.
 
@@ -44,9 +45,12 @@ class AddIamPolicyBinding(base.Command):
   def Args(parser):
     flags.GetProjectFlag('add IAM policy binding to').AddToParser(parser)
     iam_util.AddArgsForAddIamPolicyBinding(
-        parser, completer=completers.ProjectsIamRolesCompleter)
+        parser,
+        role_completer=completers.ProjectsIamRolesCompleter)
 
   @http_retry.RetryOnHttpStatus(six.moves.http_client.CONFLICT)
   def Run(self, args):
     project_ref = command_lib_util.ParseProject(args.id)
     return projects_api.AddIamPolicyBinding(project_ref, args.member, args.role)
+
+

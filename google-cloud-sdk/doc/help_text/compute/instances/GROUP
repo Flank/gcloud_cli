@@ -10,8 +10,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -39,6 +40,10 @@ COMMANDS
 
      create
         Create Google Compute Engine virtual machine instances.
+
+     create-with-container
+        Creates Google Compute engine virtual machine instances running
+        container images.
 
      delete
         Delete Google Compute Engine virtual machine instances.
@@ -86,6 +91,9 @@ COMMANDS
      set-service-account
         Set service account and scopes for a Google Compute Engine instance.
 
+     simulate-maintenance-event
+        Simulate maintenance of virtual machine instances.
+
      start
         Start a stopped virtual machine instance.
 
@@ -101,6 +109,10 @@ COMMANDS
 
      update-access-config
         Update a Google Compute Engine virtual machine access configuration.
+
+     update-container
+        Updates Google Compute engine virtual machine instances running
+        container images.
 
 NOTES
     These variants are also available:

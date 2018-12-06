@@ -20,15 +20,14 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsListTest(base.CloudIotBase):
+class CredentialsListTestGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.device_credentials = [
@@ -46,8 +45,7 @@ class CredentialsListTest(base.CloudIotBase):
             ))
     ]
 
-  def testList(self, track):
-    self.track = track
+  def testList(self):
     self._ExpectGet(self.device_credentials)
 
     results = self.Run(
@@ -78,8 +76,7 @@ class CredentialsListTest(base.CloudIotBase):
             },
         ])
 
-  def testList_Output(self, track):
-    self.track = track
+  def testList_Output(self):
     self._ExpectGet(self.device_credentials)
 
     self.Run(
@@ -93,8 +90,7 @@ class CredentialsListTest(base.CloudIotBase):
         1      ES256_PEM     2017-01-01T00:00Z
         """, normalize_space=True)
 
-  def testList_RelativeName(self, track):
-    self.track = track
+  def testList_RelativeName(self):
     self._ExpectGet(self.device_credentials)
 
     device_name = ('projects/{}/'
@@ -109,6 +105,18 @@ class CredentialsListTest(base.CloudIotBase):
         0      RSA_X509_PEM  2016-01-01T00:00Z
         1      ES256_PEM     2017-01-01T00:00Z
         """, normalize_space=True)
+
+
+class CredentialsListTestBeta(CredentialsListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsListTestAlpha(CredentialsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -13,12 +13,12 @@ REQUIRED FLAGS
      Region resource - The Cloud region to list registries for. This represents
      a Cloud resource. (NOTE) Some attributes are not given arguments in this
      group but can be set in other ways. To set the [project] attribute:
-     provide the flag [--region] on the command line with a fully specified
-     name; provide the flag [--project] on the command line; set the property
-     [core/project]. This must be specified.
+     provide the argument [--region] on the command line with a fully specified
+     name; provide the argument [--project] on the command line; set the
+     property [core/project]. This must be specified.
 
        --region=REGION
-          The ID of the region or a fully qualified identifier for the region.
+          ID of the region or fully qualified identifier for the region.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -51,8 +51,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

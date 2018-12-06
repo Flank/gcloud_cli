@@ -126,10 +126,13 @@ class TablePrinter(resource_printer_base.ResourcePrinter):
     format=_FORMAT-STRING_: Prints the key data indented by 4 spaces using
       _FORMAT-STRING_ which can reference any of the supported formats.
     no-heading: Disables the column headings.
+    margin=N: Right hand side padding when one or more columns are wrapped.
     pad=N: Sets the column horizontal pad to _N_ spaces. The default is 1 for
       box, 2 otherwise.
     title=_TITLE_: Prints a centered _TITLE_ at the top of the table, within
       the table box if *box* is enabled.
+    width=N: The table width. The default is the terminal width or 80 if the
+      output is not a terminal.
 
   Attributes:
     _optional: True if at least one column is optional. An optional
@@ -380,6 +383,11 @@ class TablePrinter(resource_printer_base.ResourcePrinter):
       # Check the heading widths too.
       for i, col in enumerate(heading[0]):
         col_widths[i] = max(col_widths[i], self._console_attr.DisplayWidth(col))
+    if self.column_attributes:
+      # Finally check the fixed column widths.
+      for i, col in enumerate(self.column_attributes.Columns()):
+        if col.attribute.width and col_widths[i] < col.attribute.width:
+          col_widths[i] = col.attribute.width
 
     # If table is wider than the console and columns can be wrapped,
     # change wrapped column widths to fit within the available space.
@@ -396,7 +404,10 @@ class TablePrinter(resource_printer_base.ResourcePrinter):
       if box:
         table_padding = (_BOX_CHAR_LENGTH * (visible_cols + 1)
                          + visible_cols * table_column_pad * 2)
-      total_col_width = self._console_attr.GetTermSize()[0] - table_padding
+      table_padding += self.attributes.get('margin', 0)
+      table_width = self.attributes.get(
+          'width', self._console_attr.GetTermSize()[0])
+      total_col_width = table_width - table_padding
       if total_col_width < sum(col_widths):
         non_wrappable_width = sum(
             [col_width for (i, col_width) in enumerate(col_widths)
@@ -479,11 +490,15 @@ class TablePrinter(resource_printer_base.ResourcePrinter):
     # We must flush directly to the output just in case there is a Windows-like
     # colorizer. This complicates the trailing space logic.
     first = True
+    # Used for boxed tables to determine whether any subformats are visible.
+    has_visible_subformats = box and self._subformats and any(
+        [(not subformat.hidden and subformat.printer)
+         for subformat in self._subformats])
     for row in heading + rows:
       if first:
         first = False
       elif box:
-        if self._subformats:
+        if has_visible_subformats:
           self._out.write(t_rule)
           self._out.write('\n')
         elif all_box:
@@ -518,14 +533,12 @@ class TablePrinter(resource_printer_base.ResourcePrinter):
           else:
             cell = s
             row[i] = ' '
-          if not box and i == len(row) - 1:
-            width = 0
           if is_colorizer:
             if pad:
               self._out.write(' ' * pad)
               pad = 0
-            # pylint: disable=cell-var-from-loop
-            cell.Render(self._out, justify=lambda s: justify(s, width))
+            # NOTICE: This may result in trailing space after the last column.
+            cell.Render(self._out, justify=lambda s: justify(s, width))  # pylint: disable=cell-var-from-loop
             if box:
               self._out.write(' ' * table_column_pad)
             else:
@@ -569,9 +582,12 @@ class TablePrinter(resource_printer_base.ResourcePrinter):
                 subformat.out.seek(0)
         else:
           self._out.write('\n')
-    if box and not self._subformats:
-      self._out.write(b_rule)
-      self._out.write('\n')
+    if box:
+      if not has_visible_subformats:
+        self._out.write(b_rule)
+        self._out.write('\n')
+
+    super(TablePrinter, self).Finish()
 
   def Page(self):
     """Flushes the current resource page output."""

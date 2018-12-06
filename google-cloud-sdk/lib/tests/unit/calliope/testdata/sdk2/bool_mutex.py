@@ -18,11 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class BoolMutex(base.Command):
+class BoolMutex(calliope_base.Command):
   """A command with a Boolean flag in a mutex group."""
+
+  category = 'Category 2'
 
   @staticmethod
   def Args(parser):

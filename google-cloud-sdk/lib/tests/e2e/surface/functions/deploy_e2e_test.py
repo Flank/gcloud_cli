@@ -105,6 +105,7 @@ exports.{func_name} = function (event, callback) {{
 """
 
 
+# TODO(b/120152563): fix the release tracks.
 class DeployE2ETestBase(e2e_base.WithServiceAuth,
                         cli_test_base.CliTestBase):
   """End to End tests for gcloud functions deploy command."""
@@ -236,6 +237,7 @@ class TriggerTest(DeployE2ETestBase):
       self.assertTrue(call_result)
       self.assertTrue(call_result.executionId)
 
+  @test_case.Filters.SkipOnPy3('It is broken.', 'b/114745758')
   def testStagingBucketDeploy(self):
     """Test with --staging-bucket flag."""
     with self._DeployFunction('--trigger-http',
@@ -309,6 +311,7 @@ class RedeployTest(DeployE2ETestBase):
       self.assertEqual(describe_result.timeout, timeout)
       self.assertIn(region, describe_result.name)
 
+  @test_case.Filters.SkipOnPy3('Not working.', 'b/115326867')
   def testRedeployStagingBucket(self):
     """Test redeploy with staging bucket."""
     with self._DeployFunction(
@@ -342,7 +345,7 @@ class EnvVarRedeployTest(DeployE2ETestBase):
   def testRedeployEnvVarUpdate(self):
     """Test redeploy with no source change, just environment variable changes.
     """
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
     with self._DeployFunction('--trigger-http', source=self.function_path,
                               set_env_vars='FOO=bar') as function_name:
       self.AssertOutputContains(function_name)

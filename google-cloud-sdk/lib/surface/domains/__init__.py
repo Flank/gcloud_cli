@@ -22,9 +22,10 @@ from googlecloudsdk.calliope import base
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
-@base.DisallowPython3  # TODO(b/77812608): Enable for py3.
 class Domains(base.Group):
   """Base class for gcloud domains command group."""
+
+  category = 'Networking'
 
   detailed_help = {
       'brief': 'Manage domains for your Google Cloud projects.',

@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud alpha compute ssl-certificates create NAME
         (--domains=DOMAIN,[DOMAIN,...]
           | --certificate=LOCAL_FILE_PATH --private-key=LOCAL_FILE_PATH)
-        [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--global | --region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute ssl-certificates create is used to create SSL
@@ -14,11 +15,11 @@ DESCRIPTION
     certificate consists of a certificate and private key. The private key is
     encrypted before it is stored.
 
-    You can create either a managed or a self-managed SslCertificate. Managed
+    You can create either a managed or a self-managed SslCertificate. A managed
     SslCertificate will be provisioned and renewed for you, when you specify
-    --domains flag. Self-managed certificate is created by passing certificate
-    obtained from Certificate Authority through --certificate and --private-key
-    flags.
+    the --domains flag. A self-managed certificate is created by passing the
+    certificate obtained from Certificate Authority through --certificate and
+    --private-key flags.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -34,15 +35,15 @@ REQUIRED FLAGS
        Flags for self-managed certificate
 
          --certificate=LOCAL_FILE_PATH
-            The path to a local certificate file to create a self-managed
+            Path to a local certificate file to create a self-managed
             certificate. The certificate must be in PEM format. The certificate
             chain must be no greater than 5 certs long. The chain must include
             at least one intermediate cert. This flag must be specified if any
             of the other arguments in this group are specified.
 
          --private-key=LOCAL_FILE_PATH
-            The path to a local private key file. The private key must be in
-            PEM format and must use RSA or ECDSA encryption. This flag must be
+            Path to a local private key file. The private key must be in PEM
+            format and must use RSA or ECDSA encryption. This flag must be
             specified if any of the other arguments in this group are
             specified.
 
@@ -50,10 +51,36 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the SSL certificate.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the SSL certificate is global.
+
+       --region=REGION
+          Region of the SSL certificate to create. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

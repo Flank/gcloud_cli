@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
@@ -31,9 +31,9 @@ class CloudFilestoreUnitTestBase(sdk_test_base.WithFakeAuth,
   """Base class for Cloud Filestore unit tests that use fake auth and mocks."""
 
   def SetUpTrack(self, track):
-    if track == base.ReleaseTrack.ALPHA:
+    if track == calliope_base.ReleaseTrack.ALPHA:
       self.api_version = 'v1alpha1'
-    elif track == base.ReleaseTrack.BETA:
+    elif track == calliope_base.ReleaseTrack.BETA:
       self.api_version = 'v1beta1'
     self.track = track
     self.messages = core_apis.GetMessagesModule('file', self.api_version)

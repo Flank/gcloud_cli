@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha compute images import IMAGE_NAME (--data-disk | --os=OS)
         (--source-file=SOURCE_FILE | --source-image=SOURCE_IMAGE) [--async]
-        [--log-location=LOG_LOCATION] [--timeout=TIMEOUT; default="2h"]
+        [--no-guest-environment] [--log-location=LOG_LOCATION]
+        [--network=NETWORK] [--subnet=SUBNET] [--timeout=TIMEOUT; default="2h"]
         [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -62,10 +63,26 @@ OPTIONAL FLAGS
         Display information about the operation in progress, without waiting
         for the operation to complete.
 
+     --no-guest-environment
+        Google Guest Environment will not be installed on the image.
+
      --log-location=LOG_LOCATION
         Directory in Google Cloud Storage to hold build logs. If not set,
         gs://<project num>.cloudbuild-logs.googleusercontent.com/ will be
         created and used.
+
+     --network=NETWORK
+        Name of the network in your project to use for the image import. The
+        network must have access to Google Cloud Storage. If not specified, the
+        network named default is used.
+
+     --subnet=SUBNET
+        Name of the subnetwork in your project to use for the image import. If
+        the network resource is in legacy mode, do not provide this property.
+        If the network is in auto subnet mode, providing the subnetwork is
+        optional. If the network is in custom subnet mode, then this field
+        should be specified. Region or zone should be specified if this field
+        is specified.
 
      --timeout=TIMEOUT; default="2h"
         Maximum time a build can last before it is failed as "TIMEOUT". For
@@ -79,8 +96,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -56,18 +56,10 @@ DETAILED_HELP = {
 @base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class Dataproc(base.Group):
   """Create and manage Google Cloud Dataproc clusters and jobs."""
-  detailed_help = DETAILED_HELP
 
-  @classmethod
-  def Args(cls, parser):
-    if cls.ReleaseTrack() == base.ReleaseTrack.BETA:
-      return
-    region_prop = properties.VALUES.dataproc.region
-    parser.add_argument(
-        '--region',
-        help=region_prop.help_text,
-        # Don't set default, because it would override users' property setting.
-        action=actions.StoreProperty(region_prop))
+  category = 'Data Analytics'
+
+  detailed_help = DETAILED_HELP
 
   def Filter(self, context, args):
     del context, args

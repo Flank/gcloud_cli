@@ -20,25 +20,23 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.composer import base
 import six
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class EnvironmentsStoragePluginsListTest(base.StorageApiCallingUnitTest,
-                                         parameterized.TestCase):
+class EnvironmentsStoragePluginsListGATest(base.StorageApiCallingUnitTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
 
   def SetUp(self):
     # Disable user output to not exhaust the generator returned by
     # RunEnvironments
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def testPluginsList(self, track):
+  def testPluginsList(self):
     """Tests successful plugin listing."""
-    self.SetTrack(track)
     file_names = [
         'plugins/', 'plugins/file1.py', 'plugins/file2.py', 'plugins/folder',
         'plugins/file3.py'
@@ -60,6 +58,20 @@ class EnvironmentsStoragePluginsListTest(base.StorageApiCallingUnitTest,
         '--location', self.TEST_LOCATION, '--environment',
         self.TEST_ENVIRONMENT_ID)
     six.assertCountEqual(self, response.items, actual_responses)
+
+
+class EnvironmentsStoragePluginsListBetaTest(
+    EnvironmentsStoragePluginsListGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+
+class EnvironmentsStoragePluginsListAlphaTest(
+    EnvironmentsStoragePluginsListBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

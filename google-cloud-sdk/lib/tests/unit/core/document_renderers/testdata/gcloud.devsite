@@ -47,7 +47,7 @@ gcloud - markdown top group docstring index
 <dt>SYNOPSIS</dt>
 <dd class="sectionbody">
 <dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
-<code>gcloud</code> <code><var>GROUP</var></code> <nobr>[<code>--format</code> <code><var>FORMAT</var></code>]</nobr> <nobr>[<code>--help</code>]</nobr> <nobr>[<code>--log-http</code> <code><var>LOG_HTTP</var></code>]</nobr> <nobr>[<code>--top-group-flag</code> <code><var>TOP_GROUP_FLAG</var></code>]</nobr> <nobr>[<code>--user-output-enabled</code> <code><var>USER_OUTPUT_ENABLED</var></code>]</nobr> <nobr>[<code>--verbosity</code> <code><var>VERBOSITY</var></code>]</nobr> <nobr>[<code>-h</code>]</nobr>
+<code><a href="#gcloud">gcloud</a></code> <code><var><a href="#GROUP">GROUP</a></var></code> <nobr>[<code><a href="#--format">--format</a></code> <code><var><a href="#FORMAT">FORMAT</a></var></code>]</nobr> <nobr>[<code><a href="#--help">--help</a></code>]</nobr> <nobr>[<code><a href="#--log-http">--log-http</a></code> <code><var><a href="#LOG_HTTP">LOG_HTTP</a></var></code>]</nobr> <nobr>[<code><a href="#--top-group-flag">--top-group-flag</a></code> <code><var><a href="#TOP_GROUP_FLAG">TOP_GROUP_FLAG</a></var></code>]</nobr> <nobr>[<code><a href="#--user-output-enabled">--user-output-enabled</a></code> <code><var><a href="#USER_OUTPUT_ENABLED">USER_OUTPUT_ENABLED</a></var></code>]</nobr> <nobr>[<code><a href="#--verbosity">--verbosity</a></code> <code><var><a href="#VERBOSITY">VERBOSITY</a></var></code>]</nobr> <nobr>[<code><a href="#-h">-h</a></code>]</nobr>
 </span></dt></dl>
 </dd>
 </section>

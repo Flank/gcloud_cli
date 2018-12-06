@@ -195,7 +195,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertOutputEquals("""\
         jobId: my_job
         startTime: '2015-12-31T16:00:00'
@@ -228,7 +229,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertOutputEquals("""\
         jobId: my_job
         startTime: '2015-12-31T16:00:00'
@@ -269,7 +271,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         Your job is still active. \
@@ -300,7 +303,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         Your job is still active. \
@@ -325,7 +329,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         Your job is still active. \
@@ -357,7 +362,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         Your job is still active. \
@@ -384,7 +390,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         Your job is still active. \
@@ -411,7 +418,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
 
   def testTrain_AsyncScaleTier(self):
     scale_tier = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum.CUSTOM
@@ -428,7 +436,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         Your job is still active. \
@@ -462,7 +471,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         INFO 2015-12-31 16:00:00 -0800 service 10 message
@@ -496,7 +506,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         INFO 2015-12-31 16:00:00 -0800 service 10 message
@@ -527,7 +538,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         Received keyboard interrupt.
@@ -562,7 +574,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         Polling logs failed:
@@ -596,7 +609,8 @@ class TrainTestBase(object):
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',
-        staging_location=self.staging_location)
+        staging_location=self.staging_location,
+        supports_container_training=False)
     self.AssertErrContains("""\
         Job [my_job] submitted successfully.
         Received keyboard interrupt.
@@ -690,15 +704,13 @@ if __name__ == '__main__':
         side_effect=self._FakeRunSetupTools)
     self.StartObjectPatch(sys, 'executable', 'fake/python')
 
-    def FakeCopyToGcs(bucket_ref, local_path, target_path):
+    def FakeCopyToGcs(local_path, target_obj_ref):
       del local_path  # Unused.
-      return storage_util.ObjectReference(bucket_ref, target_path)
+      return target_obj_ref
     self.copy_to_gcs = self.StartObjectPatch(
         storage_api.StorageClient, 'CopyFileToGCS', side_effect=FakeCopyToGcs)
-    self.bucket_ref = storage_util.BucketReference.FromBucketUrl(
-        'gs://train-bucket/')
-    self.job_bucket_ref = storage_util.BucketReference.FromBucketUrl(
-        'gs://job-bucket/')
+    self.bucket = 'train-bucket'
+    self.job_bucket = 'job-bucket'
 
   def _AssertExecMockCalled(self):
     """Assert that execution_utils.Exec was called with the proper arguments."""
@@ -744,8 +756,10 @@ if __name__ == '__main__':
 
     self._AssertExecMockCalled()
     self.copy_to_gcs.assert_called_once_with(
-        self.bucket_ref, mock.ANY,
-        'my-job/{}/trainer-0.0.0.tar.gz'.format(self._EMPTY_CHECKSUM))
+        mock.ANY,
+        storage_util.ObjectReference(
+            self.bucket,
+            'my-job/{}/trainer-0.0.0.tar.gz'.format(self._EMPTY_CHECKSUM)))
 
   def testSubmit_PackagesAndPackagePath(self):
     self._ExpectCreate(
@@ -769,12 +783,18 @@ if __name__ == '__main__':
     self.copy_to_gcs.assert_has_calls(
         [
             mock.call(
-                self.bucket_ref, mock.ANY,
-                'my-job/{}/trainer-0.0.0.tar.gz'.format(self._EMPTY_CHECKSUM)
+                mock.ANY,
+                storage_util.ObjectReference(
+                    self.bucket,
+                    'my-job/{}/trainer-0.0.0.tar.gz'.format(
+                        self._EMPTY_CHECKSUM))
             ),
             mock.call(
-                self.bucket_ref, mock.ANY,
-                'my-job/{}/other-0.0.0.tar.gz'.format(self._EMPTY_CHECKSUM)
+                mock.ANY,
+                storage_util.ObjectReference(
+                    self.bucket,
+                    'my-job/{}/other-0.0.0.tar.gz'.format(
+                        self._EMPTY_CHECKSUM))
             )
         ], any_order=True)
 
@@ -797,8 +817,10 @@ if __name__ == '__main__':
 
     self.exec_mock.assert_not_called()
     self.copy_to_gcs.assert_called_once_with(
-        self.bucket_ref, mock.ANY,
-        'my-job/{}/other-0.0.0.tar.gz'.format(self._EMPTY_CHECKSUM))
+        mock.ANY,
+        storage_util.ObjectReference(
+            self.bucket,
+            'my-job/{}/other-0.0.0.tar.gz'.format(self._EMPTY_CHECKSUM)))
 
   def testSubmit_PackagesNoStagingBucketNoJobDir(self):
     with self.AssertRaisesExceptionMatches(
@@ -836,9 +858,11 @@ if __name__ == '__main__':
 
     self.exec_mock.assert_not_called()
     self.copy_to_gcs.assert_called_once_with(
-        self.job_bucket_ref, mock.ANY,
-        'job-prefix/packages/{}/other-0.0.0.tar.gz'.format(
-            self._EMPTY_CHECKSUM))
+        mock.ANY,
+        storage_util.ObjectReference(
+            self.job_bucket,
+            'job-prefix/packages/{}/other-0.0.0.tar.gz'.format(
+                self._EMPTY_CHECKSUM)))
 
   def testSubmit_PackagesJobDirEmptyPrefixNoStagingBucket(self):
     self._ExpectCreate(
@@ -859,9 +883,10 @@ if __name__ == '__main__':
 
     self.exec_mock.assert_not_called()
     self.copy_to_gcs.assert_called_once_with(
-        self.job_bucket_ref, mock.ANY,
-        'packages/{}/other-0.0.0.tar.gz'.format(
-            self._EMPTY_CHECKSUM))
+        mock.ANY,
+        storage_util.ObjectReference(
+            self.job_bucket,
+            'packages/{}/other-0.0.0.tar.gz'.format(self._EMPTY_CHECKSUM)))
 
   def testSubmit_PackagesStagingBucketNoJobDir(self):
     self._ExpectCreate([self._StoragePath('other-0.0.0.tar.gz')])
@@ -880,8 +905,10 @@ if __name__ == '__main__':
 
     self.exec_mock.assert_not_called()
     self.copy_to_gcs.assert_called_once_with(
-        self.bucket_ref, mock.ANY,
-        'my-job/{}/other-0.0.0.tar.gz'.format(self._EMPTY_CHECKSUM))
+        mock.ANY,
+        storage_util.ObjectReference(
+            self.bucket,
+            'my-job/{}/other-0.0.0.tar.gz'.format(self._EMPTY_CHECKSUM)))
 
   def testSubmit_RemotePackages(self):
     self._ExpectCreate(
@@ -933,6 +960,43 @@ class TrainBetaTest(TrainTestBase, base.MlBetaPlatformTestBase):
 
   def SetUp(self):
     super(TrainBetaTest, self).SetUp()
+
+
+class TrainAlphaTest(base.MlAlphaPlatformTestBase):
+
+  def _MakeCreateRequest(self, job, parent):
+    return self.msgs.MlProjectsJobsCreateRequest(googleCloudMlV1Job=job,
+                                                 parent=parent)
+
+  def testTrain_Container(self):
+    config_file = self.Touch(
+        self.temp_path, 'config.yaml',
+        contents=json.dumps({
+            'trainingInput': {
+                'scaleTier': 'BASIC_GPU',
+                'masterConfig':
+                    {'imageUri': 'gcr.io/project/containerimage'}}}))
+    scale_tier_enum = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum
+    training_input = self.short_msgs.TrainingInput(
+        scaleTier=scale_tier_enum.BASIC_GPU,
+        region='us-central1',
+        args=['--model-dir=gs://my-bucket'],
+        masterConfig=self.short_msgs.ReplicaConfig(
+            imageUri='gcr.io/project/containerimage'))
+    self.client.projects_jobs.Create.Expect(
+        self._MakeCreateRequest(
+            self.short_msgs.Job(
+                jobId='my_job',
+                trainingInput=training_input),
+            parent='projects/{}'.format(self.Project())),
+        self.short_msgs.Job(jobId='my_job'))
+
+    self.Run(
+        ('ml-engine jobs submit training my_job '
+         '    --scale-tier BASIC_GPU  '
+         '    --region us-central1 '
+         '    --config {} '
+         '    -- --model-dir=gs://my-bucket ').format(config_file))
 
 
 class TrainIntegrationGaTest(TrainIntegrationTestBase,

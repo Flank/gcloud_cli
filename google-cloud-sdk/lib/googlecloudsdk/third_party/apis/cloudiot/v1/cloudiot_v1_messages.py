@@ -13,6 +13,25 @@ from apitools.base.py import extra_types
 package = 'cloudiot'
 
 
+class BindDeviceToGatewayRequest(_messages.Message):
+  r"""Request for `BindDeviceToGateway`.
+
+  Fields:
+    deviceId: The device to associate with the specified gateway. The value of
+      `device_id` can be either the device numeric ID or the user-defined
+      device identifier.
+    gatewayId: The value of `gateway_id` can be either the device numeric ID
+      or the user-defined device identifier.
+  """
+
+  deviceId = _messages.StringField(1)
+  gatewayId = _messages.StringField(2)
+
+
+class BindDeviceToGatewayResponse(_messages.Message):
+  r"""Response for `BindDeviceToGateway`."""
+
+
 class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
@@ -41,6 +60,20 @@ class Binding(_messages.Message):
   condition = _messages.MessageField('Expr', 1)
   members = _messages.StringField(2, repeated=True)
   role = _messages.StringField(3)
+
+
+class CloudiotProjectsLocationsRegistriesBindDeviceToGatewayRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesBindDeviceToGatewayRequest object.
+
+  Fields:
+    bindDeviceToGatewayRequest: A BindDeviceToGatewayRequest resource to be
+      passed as the request body.
+    parent: The name of the registry. For example, `projects/example-
+      project/locations/us-central1/registries/my-registry`.
+  """
+
+  bindDeviceToGatewayRequest = _messages.MessageField('BindDeviceToGatewayRequest', 1)
+  parent = _messages.StringField(2, required=True)
 
 
 class CloudiotProjectsLocationsRegistriesCreateRequest(_messages.Message):
@@ -130,32 +163,68 @@ class CloudiotProjectsLocationsRegistriesDevicesGetRequest(_messages.Message):
 class CloudiotProjectsLocationsRegistriesDevicesListRequest(_messages.Message):
   r"""A CloudiotProjectsLocationsRegistriesDevicesListRequest object.
 
+  Enums:
+    GatewayListOptionsGatewayTypeValueValuesEnum: If `GATEWAY` is specified,
+      only gateways are returned. If `NON_GATEWAY` is specified, only non-
+      gateway devices are returned. If `GATEWAY_TYPE_UNSPECIFIED` is
+      specified, all devices are returned.
+
   Fields:
-    deviceIds: A list of device string identifiers. If empty, it will ignore
-      this field. For example, `['device0', 'device12']`. This field cannot
-      hold more than 10,000 entries.
-    deviceNumIds: A list of device numerical ids. If empty, it will ignore
-      this field. This field cannot hold more than 10,000 entries.
+    deviceIds: A list of device string IDs. For example, `['device0',
+      'device12']`. If empty, this field is ignored. Maximum IDs: 10,000
+    deviceNumIds: A list of device numeric IDs. If empty, this field is
+      ignored. Maximum IDs: 10,000.
     fieldMask: The fields of the `Device` resource to be returned in the
-      response. The fields `id`, and `num_id` are always returned by default,
-      along with any other fields specified.
+      response. The fields `id` and `num_id` are always returned, along with
+      any other fields specified.
+    gatewayListOptions_associationsDeviceId: If set, returns only the gateways
+      with which the specified device is associated. The device ID can be
+      numeric (`num_id`) or the user-defined string (`id`). For example, if
+      `456` is specified, returns only the gateways to which the device with
+      `num_id` 456 is bound.
+    gatewayListOptions_associationsGatewayId: If set, only devices associated
+      with the specified gateway are returned. The gateway ID can be numeric
+      (`num_id`) or the user-defined string (`id`). For example, if `123` is
+      specified, only devices bound to the gateway with `num_id` 123 are
+      returned.
+    gatewayListOptions_gatewayType: If `GATEWAY` is specified, only gateways
+      are returned. If `NON_GATEWAY` is specified, only non-gateway devices
+      are returned. If `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices
+      are returned.
     pageSize: The maximum number of devices to return in the response. If this
       value is zero, the service will select a default size. A call may return
-      fewer objects than requested, but if there is a non-empty `page_token`,
-      it indicates that more entries are available.
+      fewer objects than requested. A non-empty `next_page_token` in the
+      response indicates that more data is available.
     pageToken: The value returned by the last `ListDevicesResponse`; indicates
-      that this is a continuation of a prior `ListDevices` call, and that the
-      system should return the next page of data.
+      that this is a continuation of a prior `ListDevices` call and the system
+      should return the next page of data.
     parent: The device registry path. Required. For example, `projects/my-
       project/locations/us-central1/registries/my-registry`.
   """
 
+  class GatewayListOptionsGatewayTypeValueValuesEnum(_messages.Enum):
+    r"""If `GATEWAY` is specified, only gateways are returned. If
+    `NON_GATEWAY` is specified, only non-gateway devices are returned. If
+    `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices are returned.
+
+    Values:
+      GATEWAY_TYPE_UNSPECIFIED: <no description>
+      GATEWAY: <no description>
+      NON_GATEWAY: <no description>
+    """
+    GATEWAY_TYPE_UNSPECIFIED = 0
+    GATEWAY = 1
+    NON_GATEWAY = 2
+
   deviceIds = _messages.StringField(1, repeated=True)
   deviceNumIds = _messages.IntegerField(2, repeated=True, variant=_messages.Variant.UINT64)
   fieldMask = _messages.StringField(3)
-  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(5)
-  parent = _messages.StringField(6, required=True)
+  gatewayListOptions_associationsDeviceId = _messages.StringField(4)
+  gatewayListOptions_associationsGatewayId = _messages.StringField(5)
+  gatewayListOptions_gatewayType = _messages.EnumField('GatewayListOptionsGatewayTypeValueValuesEnum', 6)
+  pageSize = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(8)
+  parent = _messages.StringField(9, required=True)
 
 
 class CloudiotProjectsLocationsRegistriesDevicesModifyCloudToDeviceConfigRequest(_messages.Message):
@@ -194,6 +263,22 @@ class CloudiotProjectsLocationsRegistriesDevicesPatchRequest(_messages.Message):
   device = _messages.MessageField('Device', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class CloudiotProjectsLocationsRegistriesDevicesSendCommandToDeviceRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesDevicesSendCommandToDeviceRequest
+  object.
+
+  Fields:
+    name: The name of the device. For example, `projects/p0/locations/us-
+      central1/registries/registry0/devices/device0` or `projects/p0/locations
+      /us-central1/registries/registry0/devices/{num_id}`.
+    sendCommandToDeviceRequest: A SendCommandToDeviceRequest resource to be
+      passed as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  sendCommandToDeviceRequest = _messages.MessageField('SendCommandToDeviceRequest', 2)
 
 
 class CloudiotProjectsLocationsRegistriesDevicesStatesListRequest(_messages.Message):
@@ -238,6 +323,21 @@ class CloudiotProjectsLocationsRegistriesGetRequest(_messages.Message):
   name = _messages.StringField(1, required=True)
 
 
+class CloudiotProjectsLocationsRegistriesGroupsBindDeviceToGatewayRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesGroupsBindDeviceToGatewayRequest
+  object.
+
+  Fields:
+    bindDeviceToGatewayRequest: A BindDeviceToGatewayRequest resource to be
+      passed as the request body.
+    parent: The name of the registry. For example, `projects/example-
+      project/locations/us-central1/registries/my-registry`.
+  """
+
+  bindDeviceToGatewayRequest = _messages.MessageField('BindDeviceToGatewayRequest', 1)
+  parent = _messages.StringField(2, required=True)
+
+
 class CloudiotProjectsLocationsRegistriesGroupsDevicesConfigVersionsListRequest(_messages.Message):
   r"""A
   CloudiotProjectsLocationsRegistriesGroupsDevicesConfigVersionsListRequest
@@ -275,32 +375,68 @@ class CloudiotProjectsLocationsRegistriesGroupsDevicesGetRequest(_messages.Messa
 class CloudiotProjectsLocationsRegistriesGroupsDevicesListRequest(_messages.Message):
   r"""A CloudiotProjectsLocationsRegistriesGroupsDevicesListRequest object.
 
+  Enums:
+    GatewayListOptionsGatewayTypeValueValuesEnum: If `GATEWAY` is specified,
+      only gateways are returned. If `NON_GATEWAY` is specified, only non-
+      gateway devices are returned. If `GATEWAY_TYPE_UNSPECIFIED` is
+      specified, all devices are returned.
+
   Fields:
-    deviceIds: A list of device string identifiers. If empty, it will ignore
-      this field. For example, `['device0', 'device12']`. This field cannot
-      hold more than 10,000 entries.
-    deviceNumIds: A list of device numerical ids. If empty, it will ignore
-      this field. This field cannot hold more than 10,000 entries.
+    deviceIds: A list of device string IDs. For example, `['device0',
+      'device12']`. If empty, this field is ignored. Maximum IDs: 10,000
+    deviceNumIds: A list of device numeric IDs. If empty, this field is
+      ignored. Maximum IDs: 10,000.
     fieldMask: The fields of the `Device` resource to be returned in the
-      response. The fields `id`, and `num_id` are always returned by default,
-      along with any other fields specified.
+      response. The fields `id` and `num_id` are always returned, along with
+      any other fields specified.
+    gatewayListOptions_associationsDeviceId: If set, returns only the gateways
+      with which the specified device is associated. The device ID can be
+      numeric (`num_id`) or the user-defined string (`id`). For example, if
+      `456` is specified, returns only the gateways to which the device with
+      `num_id` 456 is bound.
+    gatewayListOptions_associationsGatewayId: If set, only devices associated
+      with the specified gateway are returned. The gateway ID can be numeric
+      (`num_id`) or the user-defined string (`id`). For example, if `123` is
+      specified, only devices bound to the gateway with `num_id` 123 are
+      returned.
+    gatewayListOptions_gatewayType: If `GATEWAY` is specified, only gateways
+      are returned. If `NON_GATEWAY` is specified, only non-gateway devices
+      are returned. If `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices
+      are returned.
     pageSize: The maximum number of devices to return in the response. If this
       value is zero, the service will select a default size. A call may return
-      fewer objects than requested, but if there is a non-empty `page_token`,
-      it indicates that more entries are available.
+      fewer objects than requested. A non-empty `next_page_token` in the
+      response indicates that more data is available.
     pageToken: The value returned by the last `ListDevicesResponse`; indicates
-      that this is a continuation of a prior `ListDevices` call, and that the
-      system should return the next page of data.
+      that this is a continuation of a prior `ListDevices` call and the system
+      should return the next page of data.
     parent: The device registry path. Required. For example, `projects/my-
       project/locations/us-central1/registries/my-registry`.
   """
 
+  class GatewayListOptionsGatewayTypeValueValuesEnum(_messages.Enum):
+    r"""If `GATEWAY` is specified, only gateways are returned. If
+    `NON_GATEWAY` is specified, only non-gateway devices are returned. If
+    `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices are returned.
+
+    Values:
+      GATEWAY_TYPE_UNSPECIFIED: <no description>
+      GATEWAY: <no description>
+      NON_GATEWAY: <no description>
+    """
+    GATEWAY_TYPE_UNSPECIFIED = 0
+    GATEWAY = 1
+    NON_GATEWAY = 2
+
   deviceIds = _messages.StringField(1, repeated=True)
   deviceNumIds = _messages.IntegerField(2, repeated=True, variant=_messages.Variant.UINT64)
   fieldMask = _messages.StringField(3)
-  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(5)
-  parent = _messages.StringField(6, required=True)
+  gatewayListOptions_associationsDeviceId = _messages.StringField(4)
+  gatewayListOptions_associationsGatewayId = _messages.StringField(5)
+  gatewayListOptions_gatewayType = _messages.EnumField('GatewayListOptionsGatewayTypeValueValuesEnum', 6)
+  pageSize = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(8)
+  parent = _messages.StringField(9, required=True)
 
 
 class CloudiotProjectsLocationsRegistriesGroupsDevicesModifyCloudToDeviceConfigRequest(_messages.Message):
@@ -338,6 +474,23 @@ class CloudiotProjectsLocationsRegistriesGroupsDevicesPatchRequest(_messages.Mes
   device = _messages.MessageField('Device', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class CloudiotProjectsLocationsRegistriesGroupsDevicesSendCommandToDeviceRequest(_messages.Message):
+  r"""A
+  CloudiotProjectsLocationsRegistriesGroupsDevicesSendCommandToDeviceRequest
+  object.
+
+  Fields:
+    name: The name of the device. For example, `projects/p0/locations/us-
+      central1/registries/registry0/devices/device0` or `projects/p0/locations
+      /us-central1/registries/registry0/devices/{num_id}`.
+    sendCommandToDeviceRequest: A SendCommandToDeviceRequest resource to be
+      passed as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  sendCommandToDeviceRequest = _messages.MessageField('SendCommandToDeviceRequest', 2)
 
 
 class CloudiotProjectsLocationsRegistriesGroupsDevicesStatesListRequest(_messages.Message):
@@ -403,17 +556,33 @@ class CloudiotProjectsLocationsRegistriesGroupsTestIamPermissionsRequest(_messag
   testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
 
 
+class CloudiotProjectsLocationsRegistriesGroupsUnbindDeviceFromGatewayRequest(_messages.Message):
+  r"""A
+  CloudiotProjectsLocationsRegistriesGroupsUnbindDeviceFromGatewayRequest
+  object.
+
+  Fields:
+    parent: The name of the registry. For example, `projects/example-
+      project/locations/us-central1/registries/my-registry`.
+    unbindDeviceFromGatewayRequest: A UnbindDeviceFromGatewayRequest resource
+      to be passed as the request body.
+  """
+
+  parent = _messages.StringField(1, required=True)
+  unbindDeviceFromGatewayRequest = _messages.MessageField('UnbindDeviceFromGatewayRequest', 2)
+
+
 class CloudiotProjectsLocationsRegistriesListRequest(_messages.Message):
   r"""A CloudiotProjectsLocationsRegistriesListRequest object.
 
   Fields:
     pageSize: The maximum number of registries to return in the response. If
       this value is zero, the service will select a default size. A call may
-      return fewer objects than requested, but if there is a non-empty
-      `page_token`, it indicates that more entries are available.
+      return fewer objects than requested. A non-empty `next_page_token` in
+      the response indicates that more data is available.
     pageToken: The value returned by the last `ListDeviceRegistriesResponse`;
       indicates that this is a continuation of a prior `ListDeviceRegistries`
-      call, and that the system should return the next page of data.
+      call and the system should return the next page of data.
     parent: The project and cloud region path. For example, `projects/example-
       project/locations/us-central1`.
   """
@@ -473,8 +642,27 @@ class CloudiotProjectsLocationsRegistriesTestIamPermissionsRequest(_messages.Mes
   testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
 
 
+class CloudiotProjectsLocationsRegistriesUnbindDeviceFromGatewayRequest(_messages.Message):
+  r"""A CloudiotProjectsLocationsRegistriesUnbindDeviceFromGatewayRequest
+  object.
+
+  Fields:
+    parent: The name of the registry. For example, `projects/example-
+      project/locations/us-central1/registries/my-registry`.
+    unbindDeviceFromGatewayRequest: A UnbindDeviceFromGatewayRequest resource
+      to be passed as the request body.
+  """
+
+  parent = _messages.StringField(1, required=True)
+  unbindDeviceFromGatewayRequest = _messages.MessageField('UnbindDeviceFromGatewayRequest', 2)
+
+
 class Device(_messages.Message):
   r"""The device resource.
+
+  Enums:
+    LogLevelValueValuesEnum: **Beta Feature**  The logging verbosity for
+      device activity. If unspecified, DeviceRegistry.log_level will be used.
 
   Messages:
     MetadataValue: The metadata key-value pairs assigned to the device. This
@@ -501,6 +689,7 @@ class Device(_messages.Message):
       a single device at a time. When new credentials are added to a device,
       they are verified against the registry credentials. For details, see the
       description of the `DeviceRegistry.credentials` field.
+    gatewayConfig: Gateway-related configuration and state.
     id: The user-defined device identifier. The device ID must be unique
       within a device registry.
     lastConfigAckTime: [Output only] The last time a cloud-to-device config
@@ -527,6 +716,8 @@ class Device(_messages.Message):
     lastStateTime: [Output only] The last time a state event was received.
       Timestamps are periodically collected and written to storage; they may
       be stale by a few minutes.
+    logLevel: **Beta Feature**  The logging verbosity for device activity. If
+      unspecified, DeviceRegistry.log_level will be used.
     metadata: The metadata key-value pairs assigned to the device. This
       metadata is not interpreted or indexed by Cloud IoT Core. It can be used
       to add contextual information for the device.  Keys must conform to the
@@ -545,6 +736,25 @@ class Device(_messages.Message):
     state: [Output only] The state most recently received from the device. If
       no state has been reported, this field is not present.
   """
+
+  class LogLevelValueValuesEnum(_messages.Enum):
+    r"""**Beta Feature**  The logging verbosity for device activity. If
+    unspecified, DeviceRegistry.log_level will be used.
+
+    Values:
+      LOG_LEVEL_UNSPECIFIED: No logging specified. If not specified, logging
+        will be disabled.
+      NONE: Disables logging.
+      ERROR: Error events will be logged.
+      INFO: Informational events will be logged, such as connections and
+        disconnections.
+      DEBUG: All events will be logged.
+    """
+    LOG_LEVEL_UNSPECIFIED = 0
+    NONE = 1
+    ERROR = 2
+    INFO = 3
+    DEBUG = 4
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class MetadataValue(_messages.Message):
@@ -579,18 +789,20 @@ class Device(_messages.Message):
   blocked = _messages.BooleanField(1)
   config = _messages.MessageField('DeviceConfig', 2)
   credentials = _messages.MessageField('DeviceCredential', 3, repeated=True)
-  id = _messages.StringField(4)
-  lastConfigAckTime = _messages.StringField(5)
-  lastConfigSendTime = _messages.StringField(6)
-  lastErrorStatus = _messages.MessageField('Status', 7)
-  lastErrorTime = _messages.StringField(8)
-  lastEventTime = _messages.StringField(9)
-  lastHeartbeatTime = _messages.StringField(10)
-  lastStateTime = _messages.StringField(11)
-  metadata = _messages.MessageField('MetadataValue', 12)
-  name = _messages.StringField(13)
-  numId = _messages.IntegerField(14, variant=_messages.Variant.UINT64)
-  state = _messages.MessageField('DeviceState', 15)
+  gatewayConfig = _messages.MessageField('GatewayConfig', 4)
+  id = _messages.StringField(5)
+  lastConfigAckTime = _messages.StringField(6)
+  lastConfigSendTime = _messages.StringField(7)
+  lastErrorStatus = _messages.MessageField('Status', 8)
+  lastErrorTime = _messages.StringField(9)
+  lastEventTime = _messages.StringField(10)
+  lastHeartbeatTime = _messages.StringField(11)
+  lastStateTime = _messages.StringField(12)
+  logLevel = _messages.EnumField('LogLevelValueValuesEnum', 13)
+  metadata = _messages.MessageField('MetadataValue', 14)
+  name = _messages.StringField(15)
+  numId = _messages.IntegerField(16, variant=_messages.Variant.UINT64)
+  state = _messages.MessageField('DeviceState', 17)
 
 
 class DeviceConfig(_messages.Message):
@@ -651,6 +863,11 @@ class DeviceCredential(_messages.Message):
 class DeviceRegistry(_messages.Message):
   r"""A container for a group of devices.
 
+  Enums:
+    LogLevelValueValuesEnum: **Beta Feature**  The default logging verbosity
+      for activity from devices in this registry. The verbosity level can be
+      overridden by Device.log_level.
+
   Fields:
     credentials: The credentials used to verify the device credentials. No
       more than 10 credentials can be bound to a single registry at a time.
@@ -675,6 +892,9 @@ class DeviceRegistry(_messages.Message):
     httpConfig: The DeviceService (HTTP) configuration for this device
       registry.
     id: The identifier of this device registry. For example, `myRegistry`.
+    logLevel: **Beta Feature**  The default logging verbosity for activity
+      from devices in this registry. The verbosity level can be overridden by
+      Device.log_level.
     mqttConfig: The MQTT configuration for this device registry.
     name: The resource path name. For example, `projects/example-
       project/locations/us-central1/registries/my-registry`.
@@ -686,13 +906,34 @@ class DeviceRegistry(_messages.Message):
       state will still be stored in Cloud IoT Core.
   """
 
+  class LogLevelValueValuesEnum(_messages.Enum):
+    r"""**Beta Feature**  The default logging verbosity for activity from
+    devices in this registry. The verbosity level can be overridden by
+    Device.log_level.
+
+    Values:
+      LOG_LEVEL_UNSPECIFIED: No logging specified. If not specified, logging
+        will be disabled.
+      NONE: Disables logging.
+      ERROR: Error events will be logged.
+      INFO: Informational events will be logged, such as connections and
+        disconnections.
+      DEBUG: All events will be logged.
+    """
+    LOG_LEVEL_UNSPECIFIED = 0
+    NONE = 1
+    ERROR = 2
+    INFO = 3
+    DEBUG = 4
+
   credentials = _messages.MessageField('RegistryCredential', 1, repeated=True)
   eventNotificationConfigs = _messages.MessageField('EventNotificationConfig', 2, repeated=True)
   httpConfig = _messages.MessageField('HttpConfig', 3)
   id = _messages.StringField(4)
-  mqttConfig = _messages.MessageField('MqttConfig', 5)
-  name = _messages.StringField(6)
-  stateNotificationConfig = _messages.MessageField('StateNotificationConfig', 7)
+  logLevel = _messages.EnumField('LogLevelValueValuesEnum', 5)
+  mqttConfig = _messages.MessageField('MqttConfig', 6)
+  name = _messages.StringField(7)
+  stateNotificationConfig = _messages.MessageField('StateNotificationConfig', 8)
 
 
 class DeviceState(_messages.Message):
@@ -756,6 +997,63 @@ class Expr(_messages.Message):
   expression = _messages.StringField(2)
   location = _messages.StringField(3)
   title = _messages.StringField(4)
+
+
+class GatewayConfig(_messages.Message):
+  r"""Gateway-related configuration and state.
+
+  Enums:
+    GatewayAuthMethodValueValuesEnum: Indicates how to authorize and/or
+      authenticate devices to access the gateway.
+    GatewayTypeValueValuesEnum: Indicates whether the device is a gateway.
+
+  Fields:
+    gatewayAuthMethod: Indicates how to authorize and/or authenticate devices
+      to access the gateway.
+    gatewayType: Indicates whether the device is a gateway.
+    lastAccessedGatewayId: [Output only] The ID of the gateway the device
+      accessed most recently.
+    lastAccessedGatewayTime: [Output only] The most recent time at which the
+      device accessed the gateway specified in `last_accessed_gateway`.
+  """
+
+  class GatewayAuthMethodValueValuesEnum(_messages.Enum):
+    r"""Indicates how to authorize and/or authenticate devices to access the
+    gateway.
+
+    Values:
+      GATEWAY_AUTH_METHOD_UNSPECIFIED: No authentication/authorization method
+        specified. No devices are allowed to access the gateway.
+      ASSOCIATION_ONLY: The device is authenticated through the gateway
+        association only. Device credentials are ignored even if provided.
+      DEVICE_AUTH_TOKEN_ONLY: The device is authenticated through its own
+        credentials. Gateway association is not checked.
+      ASSOCIATION_AND_DEVICE_AUTH_TOKEN: The device is authenticated through
+        both device credentials and gateway association. The device must be
+        bound to the gateway and must provide its own credentials.
+    """
+    GATEWAY_AUTH_METHOD_UNSPECIFIED = 0
+    ASSOCIATION_ONLY = 1
+    DEVICE_AUTH_TOKEN_ONLY = 2
+    ASSOCIATION_AND_DEVICE_AUTH_TOKEN = 3
+
+  class GatewayTypeValueValuesEnum(_messages.Enum):
+    r"""Indicates whether the device is a gateway.
+
+    Values:
+      GATEWAY_TYPE_UNSPECIFIED: If unspecified, the device is considered a
+        non-gateway device.
+      GATEWAY: The device is a gateway.
+      NON_GATEWAY: The device is not a gateway.
+    """
+    GATEWAY_TYPE_UNSPECIFIED = 0
+    GATEWAY = 1
+    NON_GATEWAY = 2
+
+  gatewayAuthMethod = _messages.EnumField('GatewayAuthMethodValueValuesEnum', 1)
+  gatewayType = _messages.EnumField('GatewayTypeValueValuesEnum', 2)
+  lastAccessedGatewayId = _messages.StringField(3)
+  lastAccessedGatewayTime = _messages.StringField(4)
 
 
 class GetIamPolicyRequest(_messages.Message):
@@ -1019,6 +1317,27 @@ class RegistryCredential(_messages.Message):
   publicKeyCertificate = _messages.MessageField('PublicKeyCertificate', 1)
 
 
+class SendCommandToDeviceRequest(_messages.Message):
+  r"""Request for `SendCommandToDevice`.
+
+  Fields:
+    binaryData: The command data to send to the device.
+    subfolder: Optional subfolder for the command. If empty, the command will
+      be delivered to the /devices/{device-id}/commands topic, otherwise it
+      will be delivered to the /devices/{device-id}/commands/{subfolder}
+      topic. Multi-level subfolders are allowed. This field must not have more
+      than 256 characters, and must not contain any MQTT wildcards ("+" or
+      "#") or null characters.
+  """
+
+  binaryData = _messages.BytesField(1)
+  subfolder = _messages.StringField(2)
+
+
+class SendCommandToDeviceResponse(_messages.Message):
+  r"""Response for `SendCommandToDevice`."""
+
+
 class SetIamPolicyRequest(_messages.Message):
   r"""Request message for `SetIamPolicy` method.
 
@@ -1207,6 +1526,25 @@ class TestIamPermissionsResponse(_messages.Message):
   """
 
   permissions = _messages.StringField(1, repeated=True)
+
+
+class UnbindDeviceFromGatewayRequest(_messages.Message):
+  r"""Request for `UnbindDeviceFromGateway`.
+
+  Fields:
+    deviceId: The device to disassociate from the specified gateway. The value
+      of `device_id` can be either the device numeric ID or the user-defined
+      device identifier.
+    gatewayId: The value of `gateway_id` can be either the device numeric ID
+      or the user-defined device identifier.
+  """
+
+  deviceId = _messages.StringField(1)
+  gatewayId = _messages.StringField(2)
+
+
+class UnbindDeviceFromGatewayResponse(_messages.Message):
+  r"""Response for `UnbindDeviceFromGateway`."""
 
 
 class X509CertificateDetails(_messages.Message):

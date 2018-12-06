@@ -49,12 +49,12 @@ FLAGS
           https://cloud.google.com/compute/docs/disks/persistent-disks#updateautodelete.
           DISK_TYPE must be one of:
 
-       all
-          All disk types.
-       boot
-          The first partition is reserved for the root filesystem.
-       data
-          A non-boot disk.
+           all
+              All disk types.
+           boot
+              The first partition is reserved for the root filesystem.
+           data
+              A non-boot disk.
 
        --keep-disks=DISK_TYPE
           The types of disks to not delete with instance deletion regardless of
@@ -65,17 +65,18 @@ FLAGS
           https://cloud.google.com/compute/docs/disks/persistent-disks#updateautodelete.
           DISK_TYPE must be one of:
 
-       all
-          All disk types.
-       boot
-          The first partition is reserved for the root filesystem.
-       data
-          A non-boot disk.
+           all
+              All disk types.
+           boot
+              The first partition is reserved for the root filesystem.
+           data
+              A non-boot disk.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

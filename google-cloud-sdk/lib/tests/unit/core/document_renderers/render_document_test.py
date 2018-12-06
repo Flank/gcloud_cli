@@ -29,7 +29,7 @@ class BadStyleMarkdownTests(test_base.Markdown):
     markdown = self.NULL_MARKDOWN
     self.Run('bad', markdown=markdown, expected=markdown,
              exception='Unknown markdown document style [bad]'
-             ' -- must be one of: devsite, html, man, markdown, text.')
+             ' -- must be one of: devsite, html, linter, man, markdown, text.')
 
 
 class MarkdownCommandTests(test_base.Command):

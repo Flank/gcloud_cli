@@ -21,22 +21,24 @@ FLAGS
        --bgp-routing-mode=MODE
           The target BGP routing mode for this network. MODE must be one of:
 
-       global
-          Cloud Routers in this network advertise subnetworks from all regions
-          to their BGP peers, and program instances in all regions with the
-          router's best learned BGP routes.
-       regional
-          Cloud Routers in this network advertise subnetworks from their local
-          region only to their BGP peers, and program instances in their local
-          region only with the router's best learned BGP routes.
+           global
+              Cloud Routers in this network advertise subnetworks from all
+              regions to their BGP peers, and program instances in all regions
+              with the router's best learned BGP routes.
+           regional
+              Cloud Routers in this network advertise subnetworks from their
+              local region only to their BGP peers, and program instances in
+              their local region only with the router's best learned BGP
+              routes.
 
        --switch-to-custom-subnet-mode
           Switch to custom subnet mode. This action cannot be undone.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 import contextlib
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
@@ -39,7 +39,8 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
 
   ORG_ID = '1054311078602'
   LEVEL_SPEC = ('[{"ipSubnetworks": ["8.8.8.8/32"]}, '
-                '{"members": ["user:example@example.com"]}]')
+                '{"members": ["user:example@example.com"]}, '
+                '{"devicePolicy": {"requireScreenlock": true}}]')
   PROJECT_NUMBER = '175742511250'
   # Requires an already-set-up regular perimeter, in case it runs multiple times
   # simultaneously (a single project can only belong to one regular perimeter,
@@ -47,7 +48,7 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
   # needs to belong to one regular perimeter).
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   @contextlib.contextmanager
   def _SetPolicyProperty(self, policy):

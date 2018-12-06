@@ -23,6 +23,12 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib import info_holder
 from googlecloudsdk.core import log
 from googlecloudsdk.core.diagnostics import network_diagnostics
+from googlecloudsdk.core.diagnostics import property_diagnostics
+
+
+def _RunDiagnostics():
+  network_diagnostics.NetworkDiagnostic().RunChecks()
+  property_diagnostics.PropertyDiagnostic().RunChecks()
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -31,22 +37,25 @@ class Info(base.Command):
 
      {command} displays information about the current gcloud environment.
 
-     - {command} will print information about the current active configuration,
+     - {command} prints information about the current active configuration,
        including the Google Cloud Platform account, project and directory paths
        for logs.
 
-     - {command} --run-diagnostics will run a checks on network connectivity.
+     - {command} --run-diagnostics checks network connectivity.
 
      - {command} --show-log prints the contents of the most recent log file.
   """
 
+  category = 'SDK Tools'
+
   @staticmethod
   def Args(parser):
-    parser.add_argument(
+    mode = parser.add_group(mutex=True)
+    mode.add_argument(
         '--show-log',
         action='store_true',
         help='Print the contents of the last log file.')
-    parser.add_argument(
+    mode.add_argument(
         '--run-diagnostics',
         action='store_true',
         help='Run diagnostics on your installation of the Cloud SDK.')
@@ -58,20 +67,18 @@ class Info(base.Command):
 
   def Run(self, args):
     if args.run_diagnostics:
-      network_diagnostics.NetworkDiagnostic().RunChecks()
-      return
-    holder = info_holder.InfoHolder(
-        anonymizer=info_holder.Anonymizer()
-        if args.anonymize else info_holder.NoopAnonymizer())
-    return holder
+      _RunDiagnostics()
+      return None
+    return info_holder.InfoHolder(
+        anonymizer=info_holder.Anonymizer() if args.anonymize else None)
 
   def Display(self, args, info):
-    if not args.run_diagnostics:
+    if not info:
+      return
+    if not args.show_log:
       log.Print(info)
-
-    if args.show_log and info.logs.last_log:
+    elif info.logs.last_log:
       log.Print('\nContents of log file: [{0}]\n'
                 '==========================================================\n'
                 '{1}\n\n'
                 .format(info.logs.last_log, info.logs.LastLogContents()))
-

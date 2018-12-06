@@ -1,5 +1,5 @@
 {
-  "CLI_VERSION": "v1.9.7",
+  "CLI_VERSION": "v1.10.7",
   "VERSION": "1",
   "capsule": "",
   "commands": {
@@ -62,20 +62,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--include-uninitialized": {
           "attr": {},
@@ -202,20 +188,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--show-labels": {
           "attr": {},
@@ -501,20 +473,6 @@
               "type": "bool",
               "value": ""
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -763,20 +721,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--include-uninitialized": {
           "attr": {},
           "category": "",
@@ -916,20 +860,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--show-labels": {
           "attr": {},
@@ -1230,20 +1160,6 @@
               "type": "bool",
               "value": ""
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -1391,20 +1307,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--max": {
           "attr": {},
           "category": "",
@@ -1513,20 +1415,6 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--save-config",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -1808,22 +1696,7 @@
           }
         }
       },
-      "flags": {
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        }
-      },
+      "flags": {},
       "groups": {},
       "is_group": true,
       "is_hidden": false,
@@ -1852,7 +1725,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Output shell completion code for the specified shell (bash or zsh). The shell code must be evalutated to provide interactive completion of kubectl commands.  This can be done by sourcing it from the .bash _profile.\n\nDetailed instructions on how to do this are available here: https://kubernetes.io/docs/tasks/tools/install-kubectl/#enabling-shell-autocompletion\n\nNote for zsh users: [1] zsh completions are only supported in versions of zsh >= 5.2",
+        "DESCRIPTION": "Output shell completion code for the specified shell (bash or zsh). The shell code must be evaluated to provide interactive completion of kubectl commands.  This can be done by sourcing it from the .bash _profile.\n\nDetailed instructions on how to do this are available here: https://kubernetes.io/docs/tasks/tools/install-kubectl/#enabling-shell-autocompletion\n\nNote for zsh users: [1] zsh completions are only supported in versions of zsh >= 5.2",
         "EXAMPLES": "  # Installing bash completion on macOS using homebrew\n  ## If running Bash 3.2 included with macOS\n  brew install bash-completion\n  ## or, if running Bash 4.1+\n  brew install bash-completion@2\n  ## If kubectl is installed via homebrew, this should start working immediately.\n  ## If you've installed via other means, you may need add the completion to your completion directory\n  kubectl completion bash > $(brew --prefix)/etc/bash_completion.d/kubectl\n\n\n  # Installing bash completion on Linux\n  ## Load the kubectl completion code for bash into the current shell\n  source <(kubectl completion bash)\n  ## Write bash completion code to a file and source if from .bash_profile\n  kubectl completion bash > ~/.kube/completion.bash.inc\n  printf \"\n  # Kubectl shell completion\n  source '$HOME/.kube/completion.bash.inc'\n  \" >> $HOME/.bash_profile\n  source $HOME/.bash_profile\n\n  # Load the kubectl completion code for zsh[1] into the current shell\n  source <(kubectl completion zsh)\n  # Set the kubectl completion code for zsh[1] to autoload on startup\n  kubectl completion zsh > \"${fpath[1]}/_kubectl\""
       }
     },
@@ -2053,20 +1926,6 @@
           "capsule": "",
           "commands": {},
           "flags": {
-            "--certificate-authority": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "Path to certificate-authority file for the cluster entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--certificate-authority",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
             "--embed-certs": {
               "attr": {},
               "category": "",
@@ -2080,34 +1939,6 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
-            },
-            "--insecure-skip-tls-verify": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "insecure-skip-tls-verify for the cluster entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--insecure-skip-tls-verify",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
-            "--server": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "server for the cluster entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--server",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
             }
           },
           "groups": {},
@@ -2128,50 +1959,7 @@
         "set-context": {
           "capsule": "",
           "commands": {},
-          "flags": {
-            "--cluster": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "cluster for the context entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--cluster",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--namespace": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "namespace for the context entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--namespace",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--user": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "user for the context entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--user",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            }
-          },
+          "flags": {},
           "groups": {},
           "is_group": false,
           "is_hidden": false,
@@ -2219,34 +2007,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--client-certificate": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "Path to client-certificate file for the user entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--client-certificate",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--client-key": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "Path to client-key file for the user entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--client-key",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
             "--embed-certs": {
               "attr": {},
               "category": "",
@@ -2260,48 +2020,6 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
-            },
-            "--password": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "password for the user entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--password",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--token": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "token for the user entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--token",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--username": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "username for the user entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--username",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
             }
           },
           "groups": {},
@@ -2334,7 +2052,8 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Unsets an individual value in a kubeconfig file\n\nPROPERTY _NAME is a dot delimited name where each token represents either an attribute name or a map key.  Map keys may not contain dots."
+            "DESCRIPTION": "Unsets an individual value in a kubeconfig file\n\nPROPERTY _NAME is a dot delimited name where each token represents either an attribute name or a map key.  Map keys may not contain dots.",
+            "EXAMPLES": "  # Unset the current-context.\n  kubectl config unset current-context\n\n  # Unset namespace in foo context.\n  kubectl config unset contexts.foo.namespace"
           }
         },
         "use-context": {
@@ -2458,20 +2177,6 @@
               "type": "bool",
               "value": ""
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -2577,20 +2282,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--local": {
           "attr": {},
           "category": "",
@@ -2657,20 +2348,6 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--recursive",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -2945,20 +2622,6 @@
               "type": "bool",
               "value": ""
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -3175,20 +2838,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -3227,20 +2876,6 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--template",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--user": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "Usernames to bind to the role",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--user",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -3419,20 +3054,6 @@
               "type": "bool",
               "value": ""
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -3607,20 +3228,6 @@
               "type": "bool",
               "value": ""
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -3691,6 +3298,152 @@
           "sections": {
             "DESCRIPTION": "Create a deployment with the specified name.\n\nAliases:\ndeployment, deploy",
             "EXAMPLES": "  # Create a new deployment named my-dep that runs the busybox image.\n  kubectl create deployment my-dep --image=busybox"
+          }
+        },
+        "job": {
+          "capsule": "",
+          "commands": {},
+          "flags": {
+            "--allow-missing-template-keys": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--allow-missing-template-keys",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--from": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "The name of the resource to create a Job from (only cronjob is supported).",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--from",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--no-headers": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "When using the default or custom-column output format, don't print headers (default print headers).",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--no-headers",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--output": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Output format. One of: json|yaml|wide|name|custom-columns=...|custom-columns-file=...|go-template=...|go-template-file=...|jsonpath=...|jsonpath-file=... See custom columns [http://kubernetes.io/docs/user-guide/kubectl-overview/#custom-columns], golang template [http://golang.org/pkg/text/template/#pkg-overview] and jsonpath template [http://kubernetes.io/docs/user-guide/jsonpath].",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--output",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--save-config": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--save-config",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--show-labels": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "When printing, show all labels as the last column (default hide labels column)",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--show-labels",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--sort-by": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If non-empty, sort list types using this field specification. The field specification is expressed as a JSONPath expression (e.g. '{.metadata.name}'). The field in the API resource specified by this JSONPath expression must be an integer or a string.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--sort-by",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--template": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--template",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--validate": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, use a schema to validate the input before sending it",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--validate",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            }
+          },
+          "groups": {},
+          "is_group": false,
+          "is_hidden": false,
+          "path": [
+            "kubectl",
+            "create",
+            "job"
+          ],
+          "positionals": [],
+          "release": "GA",
+          "sections": {
+            "DESCRIPTION": "Create a job with the specified name.",
+            "EXAMPLES": "  # Create a job from a CronJob named \"a-cronjob\"\n  kubectl create job --from=cronjob/a-cronjob"
           }
         },
         "namespace": {
@@ -3777,20 +3530,6 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--save-config",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
               "nargs": "0",
               "type": "bool",
               "value": ""
@@ -3997,20 +3736,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -4195,20 +3920,6 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--save-config",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
               "nargs": "0",
               "type": "bool",
               "value": ""
@@ -4415,20 +4126,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -4599,20 +4296,6 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--save-config",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
               "nargs": "0",
               "type": "bool",
               "value": ""
@@ -4847,20 +4530,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -4899,20 +4568,6 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--template",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--user": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "Usernames to bind to the role",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--user",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -5066,20 +4721,6 @@
                   "type": "string",
                   "value": "VALUE"
                 },
-                "--include-extended-apis": {
-                  "attr": {},
-                  "category": "",
-                  "default": "",
-                  "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-                  "group": "",
-                  "is_global": false,
-                  "is_hidden": false,
-                  "is_required": false,
-                  "name": "--include-extended-apis",
-                  "nargs": "0",
-                  "type": "bool",
-                  "value": ""
-                },
                 "--no-headers": {
                   "attr": {},
                   "category": "",
@@ -5118,20 +4759,6 @@
                   "is_hidden": false,
                   "is_required": false,
                   "name": "--save-config",
-                  "nargs": "0",
-                  "type": "bool",
-                  "value": ""
-                },
-                "--show-all": {
-                  "attr": {},
-                  "category": "",
-                  "default": "",
-                  "description": "When printing, show all resources (default hide terminated pods.)",
-                  "group": "",
-                  "is_global": false,
-                  "is_hidden": false,
-                  "is_required": false,
-                  "name": "--show-all",
                   "nargs": "0",
                   "type": "bool",
                   "value": ""
@@ -5353,20 +4980,6 @@
                   "type": "bool",
                   "value": ""
                 },
-                "--show-all": {
-                  "attr": {},
-                  "category": "",
-                  "default": "",
-                  "description": "When printing, show all resources (default hide terminated pods.)",
-                  "group": "",
-                  "is_global": false,
-                  "is_hidden": false,
-                  "is_required": false,
-                  "name": "--show-all",
-                  "nargs": "0",
-                  "type": "bool",
-                  "value": ""
-                },
                 "--show-labels": {
                   "attr": {},
                   "category": "",
@@ -5584,20 +5197,6 @@
                   "type": "bool",
                   "value": ""
                 },
-                "--show-all": {
-                  "attr": {},
-                  "category": "",
-                  "default": "",
-                  "description": "When printing, show all resources (default hide terminated pods.)",
-                  "group": "",
-                  "is_global": false,
-                  "is_hidden": false,
-                  "is_required": false,
-                  "name": "--show-all",
-                  "nargs": "0",
-                  "type": "bool",
-                  "value": ""
-                },
                 "--show-labels": {
                   "attr": {},
                   "category": "",
@@ -5792,20 +5391,6 @@
                   "type": "bool",
                   "value": ""
                 },
-                "--show-all": {
-                  "attr": {},
-                  "category": "",
-                  "default": "",
-                  "description": "When printing, show all resources (default hide terminated pods.)",
-                  "group": "",
-                  "is_global": false,
-                  "is_hidden": false,
-                  "is_required": false,
-                  "name": "--show-all",
-                  "nargs": "0",
-                  "type": "bool",
-                  "value": ""
-                },
                 "--show-labels": {
                   "attr": {},
                   "category": "",
@@ -5995,20 +5580,6 @@
                   "type": "bool",
                   "value": ""
                 },
-                "--show-all": {
-                  "attr": {},
-                  "category": "",
-                  "default": "",
-                  "description": "When printing, show all resources (default hide terminated pods.)",
-                  "group": "",
-                  "is_global": false,
-                  "is_hidden": false,
-                  "is_required": false,
-                  "name": "--show-all",
-                  "nargs": "0",
-                  "type": "bool",
-                  "value": ""
-                },
                 "--show-labels": {
                   "attr": {},
                   "category": "",
@@ -6180,20 +5751,6 @@
                   "is_hidden": false,
                   "is_required": false,
                   "name": "--save-config",
-                  "nargs": "0",
-                  "type": "bool",
-                  "value": ""
-                },
-                "--show-all": {
-                  "attr": {},
-                  "category": "",
-                  "default": "",
-                  "description": "When printing, show all resources (default hide terminated pods.)",
-                  "group": "",
-                  "is_global": false,
-                  "is_hidden": false,
-                  "is_required": false,
-                  "name": "--show-all",
                   "nargs": "0",
                   "type": "bool",
                   "value": ""
@@ -6387,20 +5944,6 @@
                   "type": "bool",
                   "value": ""
                 },
-                "--show-all": {
-                  "attr": {},
-                  "category": "",
-                  "default": "",
-                  "description": "When printing, show all resources (default hide terminated pods.)",
-                  "group": "",
-                  "is_global": false,
-                  "is_hidden": false,
-                  "is_required": false,
-                  "name": "--show-all",
-                  "nargs": "0",
-                  "type": "bool",
-                  "value": ""
-                },
                 "--show-labels": {
                   "attr": {},
                   "category": "",
@@ -6550,20 +6093,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--include-extended-apis": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--include-extended-apis",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--no-headers": {
               "attr": {},
               "category": "",
@@ -6602,20 +6131,6 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--save-config",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
               "nargs": "0",
               "type": "bool",
               "value": ""
@@ -6750,20 +6265,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--no-headers": {
           "attr": {},
           "category": "",
@@ -6861,20 +6362,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--show-labels": {
           "attr": {},
@@ -7049,20 +6536,6 @@
           "type": "bool",
           "value": ""
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--include-uninitialized": {
           "attr": {},
           "category": "",
@@ -7193,20 +6666,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--include-uninitialized": {
           "attr": {},
@@ -7353,6 +6812,20 @@
           "type": "bool",
           "value": ""
         },
+        "--pod-selector": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Label selector to filter pods on the node",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--pod-selector",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
         "--selector": {
           "attr": {},
           "category": "",
@@ -7413,20 +6886,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--include-uninitialized": {
           "attr": {},
@@ -7648,20 +7107,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--recursive": {
           "attr": {},
           "category": "",
@@ -7719,20 +7164,6 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--cluster-ip",
-          "nargs": "1",
-          "type": "string",
-          "value": "VALUE"
-        },
-        "--container-port": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "Synonym for --target-port",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--container-port",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -7811,7 +7242,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "IP to assign to the Load Balancer. If empty, an ephemeral IP will be created and used (cloud-provider specific).",
+          "description": "IP to assign to the LoadBalancer. If empty, an ephemeral IP will be created and used (cloud-provider specific).",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -7975,20 +7406,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--show-labels": {
           "attr": {},
           "category": "",
@@ -8120,6 +7537,20 @@
           "type": "string",
           "value": "VALUE"
         },
+        "--experimental-server-print": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, have the server return the appropriate table output. Supports extension APIs and CRD. Experimental.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--experimental-server-print",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
         "--export": {
           "attr": {},
           "category": "",
@@ -8172,20 +7603,6 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--ignore-not-found",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -8287,20 +7704,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--show-kind": {
           "attr": {},
@@ -8411,7 +7814,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Display one or many resources\n\nPrints a table of the most important information about the specified resources. You can filter the list using a label selector and the --selector flag. If the desired resource type is namespaced you will only see results in your current namespace unless you pass --all-namespaces.\n\nThis command will hide resources that have completed, such as pods that are in the Succeeded or Failed phases. You can see the full results for any resource by providing the --show-all flag. Uninitialized objects are not shown unless --include-uninitialized is passed.\n\nBy specifying the output as 'template' and providing a Go template as the value of the --template flag, you can filter the attributes of the fetched resources.\n\nValid resource types include:\n\n  * all\n  * certificatesigningrequests (aka 'csr')\n  * clusterrolebindings\n  * clusterroles\n  * componentstatuses (aka 'cs')\n  * configmaps (aka 'cm')\n  * controllerrevisions\n  * cronjobs\n  * customresourcedefinition (aka 'crd')\n  * daemonsets (aka 'ds')\n  * deployments (aka 'deploy')\n  * endpoints (aka 'ep')\n  * events (aka 'ev')\n  * horizontalpodautoscalers (aka 'hpa')\n  * ingresses (aka 'ing')\n  * jobs\n  * limitranges (aka 'limits')\n  * namespaces (aka 'ns')\n  * networkpolicies (aka 'netpol')\n  * nodes (aka 'no')\n  * persistentvolumeclaims (aka 'pvc')\n  * persistentvolumes (aka 'pv')\n  * poddisruptionbudgets (aka 'pdb')\n  * podpreset\n  * pods (aka 'po')\n  * podsecuritypolicies (aka 'psp')\n  * podtemplates\n  * replicasets (aka 'rs')\n  * replicationcontrollers (aka 'rc')\n  * resourcequotas (aka 'quota')\n  * rolebindings\n  * roles\n  * secrets\n  * serviceaccounts (aka 'sa')\n  * services (aka 'svc')\n  * statefulsets (aka 'sts')\n  * storageclasses (aka 'sc')",
+        "DESCRIPTION": "Display one or many resources\n\nPrints a table of the most important information about the specified resources. You can filter the list using a label selector and the --selector flag. If the desired resource type is namespaced you will only see results in your current namespace unless you pass --all-namespaces.\n\nUninitialized objects are not shown unless --include-uninitialized is passed.\n\nBy specifying the output as 'template' and providing a Go template as the value of the --template flag, you can filter the attributes of the fetched resources.\n\nValid resource types include:\n\n  * all\n  * certificatesigningrequests (aka 'csr')\n  * clusterrolebindings\n  * clusterroles\n  * componentstatuses (aka 'cs')\n  * configmaps (aka 'cm')\n  * controllerrevisions\n  * cronjobs\n  * customresourcedefinition (aka 'crd')\n  * daemonsets (aka 'ds')\n  * deployments (aka 'deploy')\n  * endpoints (aka 'ep')\n  * events (aka 'ev')\n  * horizontalpodautoscalers (aka 'hpa')\n  * ingresses (aka 'ing')\n  * jobs\n  * limitranges (aka 'limits')\n  * namespaces (aka 'ns')\n  * networkpolicies (aka 'netpol')\n  * nodes (aka 'no')\n  * persistentvolumeclaims (aka 'pvc')\n  * persistentvolumes (aka 'pv')\n  * poddisruptionbudgets (aka 'pdb')\n  * podpreset\n  * pods (aka 'po')\n  * podsecuritypolicies (aka 'psp')\n  * podtemplates\n  * replicasets (aka 'rs')\n  * replicationcontrollers (aka 'rc')\n  * resourcequotas (aka 'quota')\n  * rolebindings\n  * roles\n  * secrets\n  * serviceaccounts (aka 'sa')\n  * services (aka 'svc')\n  * statefulsets (aka 'sts')\n  * storageclasses (aka 'sc')",
         "EXAMPLES": "  # List all pods in ps output format.\n  kubectl get pods\n\n  # List all pods in ps output format with more information (such as node name).\n  kubectl get pods -o wide\n\n  # List a single replication controller with specified NAME in ps output format.\n  kubectl get replicationcontroller web\n\n  # List a single pod in JSON output format.\n  kubectl get -o json pod web-pod-13je7\n\n  # List a pod identified by type and name specified in \"pod.yaml\" in JSON output format.\n  kubectl get -f pod.yaml -o json\n\n  # Return only the phase value of the specified pod.\n  kubectl get -o template pod/web-pod-13je7 --template={{.status.phase}}\n\n  # List all replication controllers and services together in ps output format.\n  kubectl get rc,services\n\n  # List one or more resources by their type and names.\n  kubectl get rc/web service/frontend pods/web-pod-13je7\n\n  # List all resources with different types.\n  kubectl get all"
       }
     },
@@ -8429,7 +7832,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Help provides help for any command in the application.\n    Simply type kubectl help [path to command] for full details."
+        "DESCRIPTION": "Help provides help for any command in the application.\nSimply type kubectl help [path to command] for full details."
       }
     },
     "label": {
@@ -8491,20 +7894,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--include-uninitialized": {
           "attr": {},
@@ -8646,20 +8035,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--show-labels": {
           "attr": {},
           "category": "",
@@ -8745,34 +8120,6 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--follow",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
-        "--interactive": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, prompt the user for input when required.",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--interactive",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -8936,20 +8283,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--local": {
           "attr": {},
           "category": "",
@@ -9030,20 +8363,6 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--recursive",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -9140,16 +8459,16 @@
       "capsule": "",
       "commands": {},
       "flags": {
-        "--pod": {
+        "--pod-running-timeout": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Pod name",
+          "description": "The length of time (like 5s, 2m, or 3h, higher than zero) to wait until at least one pod is running",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--pod",
+          "name": "--pod-running-timeout",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -9165,8 +8484,8 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Forward one or more local ports to a pod.",
-        "EXAMPLES": "  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in the pod\n  kubectl port-forward mypod 5000 6000\n\n  # Listen on port 8888 locally, forwarding to 5000 in the pod\n  kubectl port-forward mypod 8888:5000\n\n  # Listen on a random port locally, forwarding to 5000 in the pod\n  kubectl port-forward mypod :5000"
+        "DESCRIPTION": "Forward one or more local ports to a pod.\n\nUse resource type/name such as deployment/mydeployment to select a pod. Resource type defaults to 'pod' if omitted.\n\nIf there are multiple pods matching the criteria, a pod will be selected automatically. The forwarding session ends when the selected pod terminates, and rerun of the command is needed to resume forwarding.",
+        "EXAMPLES": "  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in the pod\n  kubectl port-forward pod/mypod 5000 6000\n\n  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in a pod selected by the deployment\n  kubectl port-forward deployment/mydeployment 5000 6000\n\n  # Listen on port 8888 locally, forwarding to 5000 in the pod\n  kubectl port-forward pod/mypod 8888:5000\n\n  # Listen on a random port locally, forwarding to 5000 in the pod\n  kubectl port-forward pod/mypod :5000"
       }
     },
     "proxy": {
@@ -9402,20 +8721,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--output": {
           "attr": {},
           "category": "",
@@ -9617,20 +8922,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--no-headers": {
           "attr": {},
           "category": "",
@@ -9683,20 +8974,6 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--rollback",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -10273,20 +9550,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--labels": {
           "attr": {},
           "category": "",
@@ -10552,20 +9815,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--show-labels": {
           "attr": {},
@@ -10796,20 +10045,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--labels": {
           "attr": {},
           "category": "",
@@ -11076,20 +10311,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--show-labels": {
           "attr": {},
           "category": "",
@@ -11221,20 +10442,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--output": {
           "attr": {},
           "category": "",
@@ -11344,8 +10551,8 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Set a new size for a Deployment, ReplicaSet, Replication Controller, or Job.\n\nScale also allows users to specify one or more preconditions for the scale action.\n\nIf --current-replicas or --resource-version is specified, it is validated before the scale is attempted, and it is guaranteed that the precondition holds true when the scale is sent to the server.",
-        "EXAMPLES": "  # Scale a replicaset named 'foo' to 3.\n  kubectl scale --replicas=3 rs/foo\n\n  # Scale a resource identified by type and name specified in \"foo.yaml\" to 3.\n  kubectl scale --replicas=3 -f foo.yaml\n\n  # If the deployment named mysql's current size is 2, scale mysql to 3.\n  kubectl scale --current-replicas=2 --replicas=3 deployment/mysql\n\n  # Scale multiple replication controllers.\n  kubectl scale --replicas=5 rc/foo rc/bar rc/baz\n\n  # Scale job named 'cron' to 3.\n  kubectl scale --replicas=3 job/cron"
+        "DESCRIPTION": "Set a new size for a Deployment, ReplicaSet, Replication Controller, or StatefulSet.\n\nScale also allows users to specify one or more preconditions for the scale action.\n\nIf --current-replicas or --resource-version is specified, it is validated before the scale is attempted, and it is guaranteed that the precondition holds true when the scale is sent to the server.",
+        "EXAMPLES": "  # Scale a replicaset named 'foo' to 3.\n  kubectl scale --replicas=3 rs/foo\n\n  # Scale a resource identified by type and name specified in \"foo.yaml\" to 3.\n  kubectl scale --replicas=3 -f foo.yaml\n\n  # If the deployment named mysql's current size is 2, scale mysql to 3.\n  kubectl scale --current-replicas=2 --replicas=3 deployment/mysql\n\n  # Scale multiple replication controllers.\n  kubectl scale --replicas=5 rc/foo rc/bar rc/baz\n\n  # Scale statefulset named 'web' to 3.\n  kubectl scale --replicas=3 statefulset/web"
       }
     },
     "set": {
@@ -11579,20 +10786,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -11808,20 +11001,6 @@
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
-            },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
             },
             "--show-labels": {
               "attr": {},
@@ -12081,20 +11260,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -12311,20 +11476,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -12523,20 +11674,6 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--recursive",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
               "nargs": "0",
               "type": "bool",
               "value": ""
@@ -12771,20 +11908,6 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--show-all": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "When printing, show all resources (default hide terminated pods.)",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--show-all",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            },
             "--show-labels": {
               "attr": {},
               "category": "",
@@ -12823,20 +11946,6 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--template",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--user": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "Usernames to bind to the role",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--user",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -12904,20 +12013,6 @@
           "type": "bool",
           "value": ""
         },
-        "--include-extended-apis": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, include definitions of new APIs via calls to the API server. [default true]",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--include-extended-apis",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--no-headers": {
           "attr": {},
           "category": "",
@@ -12973,20 +12068,6 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
-        },
-        "--show-all": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "When printing, show all resources (default hide terminated pods.)",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--show-all",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
         },
         "--show-labels": {
           "attr": {},
@@ -13783,6 +12864,6 @@
   "positionals": [],
   "release": "GA",
   "sections": {
-    "DESCRIPTION": "kubectl controls the Kubernetes cluster manager.\n\nFind more information at https://github.com/kubernetes/kubernetes."
+    "DESCRIPTION": "kubectl controls the Kubernetes cluster manager.\n\nFind more information at: https://kubernetes.io/docs/reference/kubectl/overview/"
   }
 }

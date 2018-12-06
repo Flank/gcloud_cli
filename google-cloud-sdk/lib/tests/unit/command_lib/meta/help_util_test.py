@@ -15,12 +15,13 @@
 """Tests for help_util."""
 
 from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import division
 from __future__ import unicode_literals
 
 import io
 import os
 import shutil
+import sys
 
 from googlecloudsdk.calliope import walker_util
 from googlecloudsdk.command_lib.meta import help_util
@@ -96,7 +97,7 @@ class HelpTextUtilTest(calliope_test_base.CalliopeTestBase,
 
     diff = Accumulator()
     self.DiffCliHelpText('sdk1', 'sdk2', diff)
-    print('\n'.join(sorted(diff.GetChanges())))
+    sys.stdout.write('\n'.join(sorted(diff.GetChanges())) + '\n')
     expected = """\
 add arg-groups
 add bool-mutex
@@ -148,7 +149,7 @@ delete newstylegroup/subcommand
 delete recommand
 delete simple-command
 delete unsetprop
-edit GROUP 91 136
+edit GROUP 105 143
 edit requiredargcommand 15 18
 """
     self.AssertOutputEquals(expected.replace('/', os.path.sep))
@@ -263,7 +264,7 @@ edit requiredargcommand 15 18
         'This does not contain an invalid brand_GCE_abbreviation.\n',
     ]
 
-    class Accumulator(help_util.HelpTextAccumulator):
+    class Accumulator(help_util.HelpAccumulator):
 
       def __init__(self):
         super(Accumulator, self).__init__()
@@ -296,8 +297,289 @@ edit requiredargcommand 15 18
       (os.path.join('d', 'e'), False),
   )
   def testIgnore(self, value, is_included):
-    diff = help_util.HelpTextAccumulator(restrict=['a.b', 'a.c.d'])
+    diff = help_util.HelpAccumulator(restrict=['a.b', 'a.c.d'])
     self.assertEqual(diff.Ignore(value), not is_included)
+
+
+class ManPageUpdaterTest(calliope_test_base.CalliopeTestBase):
+
+  def SetUp(self):
+
+    self.cli = self.LoadTestCli('sdk4')
+    self.help_dir = os.path.join(self.temp_path, 'help')
+    shutil.rmtree(self.help_dir, ignore_errors=True)
+    file_utils.MakeDir(self.help_dir)
+    with io.open(os.path.join(self.help_dir, 'second-level-command-1.1'),
+                 'wt') as f:
+      f.write('This is old content that should be edited.\n')
+    with io.open(os.path.join(self.help_dir, 'second-level-command-0.1'),
+                 'wt') as f:
+      f.write('This is old content that should be deleted.\n')
+
+  def testUpdateManPage(self):
+
+    changes = help_util.HelpUpdater(
+        self.cli, self.help_dir, walker_util.ManPageGenerator).Update()
+    expected = """\
+{"ux": "PROGRESS_BAR", "message": "Generating Help Document Files"}
+add man1/gcloud.1
+add man1/gcloud_alpha.1
+add man1/gcloud_alpha_internal.1
+add man1/gcloud_alpha_internal_internal-command.1
+add man1/gcloud_alpha_sdk.1
+add man1/gcloud_alpha_sdk_alphagroup.1
+add man1/gcloud_alpha_sdk_hidden-command.1
+add man1/gcloud_alpha_sdk_hiddengroup.1
+add man1/gcloud_alpha_sdk_hiddengroup_hidden-command-2.1
+add man1/gcloud_alpha_sdk_hiddengroup_hidden-command-a.1
+add man1/gcloud_alpha_sdk_ordered-choices.1
+add man1/gcloud_alpha_sdk_second-level-command-1.1
+add man1/gcloud_alpha_sdk_second-level-command-b.1
+add man1/gcloud_alpha_sdk_subgroup.1
+add man1/gcloud_alpha_sdk_subgroup_subgroup-command-2.1
+add man1/gcloud_alpha_sdk_subgroup_subgroup-command-a.1
+add man1/gcloud_alpha_sdk_xyzzy.1
+add man1/gcloud_alpha_version.1
+add man1/gcloud_beta.1
+add man1/gcloud_beta_internal.1
+add man1/gcloud_beta_internal_internal-command.1
+add man1/gcloud_beta_sdk.1
+add man1/gcloud_beta_sdk_betagroup.1
+add man1/gcloud_beta_sdk_betagroup_beta-command.1
+add man1/gcloud_beta_sdk_betagroup_sub-command-2.1
+add man1/gcloud_beta_sdk_betagroup_sub-command-a.1
+add man1/gcloud_beta_sdk_hidden-command.1
+add man1/gcloud_beta_sdk_hiddengroup.1
+add man1/gcloud_beta_sdk_hiddengroup_hidden-command-2.1
+add man1/gcloud_beta_sdk_hiddengroup_hidden-command-a.1
+add man1/gcloud_beta_sdk_ordered-choices.1
+add man1/gcloud_beta_sdk_second-level-command-1.1
+add man1/gcloud_beta_sdk_second-level-command-b.1
+add man1/gcloud_beta_sdk_subgroup.1
+add man1/gcloud_beta_sdk_subgroup_subgroup-command-2.1
+add man1/gcloud_beta_sdk_subgroup_subgroup-command-a.1
+add man1/gcloud_beta_sdk_xyzzy.1
+add man1/gcloud_beta_version.1
+add man1/gcloud_internal.1
+add man1/gcloud_internal_internal-command.1
+add man1/gcloud_sdk.1
+add man1/gcloud_sdk_hidden-command.1
+add man1/gcloud_sdk_hiddengroup.1
+add man1/gcloud_sdk_hiddengroup_hidden-command-2.1
+add man1/gcloud_sdk_hiddengroup_hidden-command-a.1
+add man1/gcloud_sdk_ordered-choices.1
+add man1/gcloud_sdk_second-level-command-1.1
+add man1/gcloud_sdk_second-level-command-b.1
+add man1/gcloud_sdk_subgroup.1
+add man1/gcloud_sdk_subgroup_subgroup-command-2.1
+add man1/gcloud_sdk_subgroup_subgroup-command-a.1
+add man1/gcloud_sdk_xyzzy.1
+add man1/gcloud_version.1
+delete second-level-command-0.1
+delete second-level-command-1.1
+"""
+    self.assertEqual(55, changes)
+    self.AssertErrEquals(expected.replace('/', os.path.sep))
+    self.ClearErr()
+
+    changes = help_util.HelpUpdater(
+        self.cli, self.help_dir, walker_util.ManPageGenerator).Update()
+    self.assertEqual(0, changes)
+    self.AssertErrEquals("""\
+{"ux": "PROGRESS_BAR", "message": "Generating Help Document Files"}
+""")
+
+
+class HtmlUpdaterTest(calliope_test_base.CalliopeTestBase):
+
+  def SetUp(self):
+
+    self.cli = self.LoadTestCli('sdk4')
+    self.help_dir = os.path.join(self.temp_path, 'help')
+    shutil.rmtree(self.help_dir, ignore_errors=True)
+    file_utils.MakeDir(self.help_dir)
+    with io.open(os.path.join(self.help_dir, 'second-level-command-1.html'),
+                 'wt') as f:
+      f.write('This is old content that should be edited.\n')
+    with io.open(os.path.join(self.help_dir, 'second-level-command-0.html'),
+                 'wt') as f:
+      f.write('This is old content that should be deleted.\n')
+
+  def testUpdateHtml(self):
+
+    changes = help_util.HelpUpdater(
+        self.cli, self.help_dir, walker_util.HtmlGenerator).Update()
+    expected = """\
+{"ux": "PROGRESS_BAR", "message": "Generating Help Document Files"}
+add _menu_.css
+add _menu_.html
+add _menu_.js
+add _title_.html
+add favicon.ico
+add gcloud.html
+add gcloud_alpha.html
+add gcloud_alpha_internal.html
+add gcloud_alpha_internal_internal-command.html
+add gcloud_alpha_sdk.html
+add gcloud_alpha_sdk_alphagroup.html
+add gcloud_alpha_sdk_hidden-command.html
+add gcloud_alpha_sdk_hiddengroup.html
+add gcloud_alpha_sdk_hiddengroup_hidden-command-2.html
+add gcloud_alpha_sdk_hiddengroup_hidden-command-a.html
+add gcloud_alpha_sdk_ordered-choices.html
+add gcloud_alpha_sdk_second-level-command-1.html
+add gcloud_alpha_sdk_second-level-command-b.html
+add gcloud_alpha_sdk_subgroup.html
+add gcloud_alpha_sdk_subgroup_subgroup-command-2.html
+add gcloud_alpha_sdk_subgroup_subgroup-command-a.html
+add gcloud_alpha_sdk_xyzzy.html
+add gcloud_alpha_version.html
+add gcloud_beta.html
+add gcloud_beta_internal.html
+add gcloud_beta_internal_internal-command.html
+add gcloud_beta_sdk.html
+add gcloud_beta_sdk_betagroup.html
+add gcloud_beta_sdk_betagroup_beta-command.html
+add gcloud_beta_sdk_betagroup_sub-command-2.html
+add gcloud_beta_sdk_betagroup_sub-command-a.html
+add gcloud_beta_sdk_hidden-command.html
+add gcloud_beta_sdk_hiddengroup.html
+add gcloud_beta_sdk_hiddengroup_hidden-command-2.html
+add gcloud_beta_sdk_hiddengroup_hidden-command-a.html
+add gcloud_beta_sdk_ordered-choices.html
+add gcloud_beta_sdk_second-level-command-1.html
+add gcloud_beta_sdk_second-level-command-b.html
+add gcloud_beta_sdk_subgroup.html
+add gcloud_beta_sdk_subgroup_subgroup-command-2.html
+add gcloud_beta_sdk_subgroup_subgroup-command-a.html
+add gcloud_beta_sdk_xyzzy.html
+add gcloud_beta_version.html
+add gcloud_internal.html
+add gcloud_internal_internal-command.html
+add gcloud_sdk.html
+add gcloud_sdk_hidden-command.html
+add gcloud_sdk_hiddengroup.html
+add gcloud_sdk_hiddengroup_hidden-command-2.html
+add gcloud_sdk_hiddengroup_hidden-command-a.html
+add gcloud_sdk_ordered-choices.html
+add gcloud_sdk_second-level-command-1.html
+add gcloud_sdk_second-level-command-b.html
+add gcloud_sdk_subgroup.html
+add gcloud_sdk_subgroup_subgroup-command-2.html
+add gcloud_sdk_subgroup_subgroup-command-a.html
+add gcloud_sdk_xyzzy.html
+add gcloud_version.html
+add index.html
+delete second-level-command-0.html
+delete second-level-command-1.html
+"""
+    self.assertEqual(61, changes)
+    self.AssertErrEquals(expected.replace('/', os.path.sep))
+    self.ClearErr()
+
+    changes = help_util.HelpUpdater(
+        self.cli, self.help_dir, walker_util.HtmlGenerator).Update()
+    self.assertEqual(0, changes)
+    self.AssertErrEquals("""\
+{"ux": "PROGRESS_BAR", "message": "Generating Help Document Files"}
+""")
+
+
+class DevSiteUpdaterTest(calliope_test_base.CalliopeTestBase):
+
+  def SetUp(self):
+
+    self.cli = self.LoadTestCli('sdk4')
+    self.help_dir = os.path.join(self.temp_path, 'help')
+    shutil.rmtree(self.help_dir, ignore_errors=True)
+    file_utils.MakeDir(self.help_dir)
+    subdir = os.path.join(self.help_dir, 'sdk')
+    file_utils.MakeDir(subdir)
+    with io.open(os.path.join(subdir, 'second-level-command-1.html'),
+                 'wt') as f:
+      f.write('This is old content that should be edited.\n')
+    subdir = os.path.join(subdir, 'subgroup')
+    file_utils.MakeDir(subdir)
+    with io.open(os.path.join(subdir, 'second-level-command-0.html'),
+                 'wt') as f:
+      f.write('This is old content that should be deleted.\n')
+
+  def testUpdateDevSite(self):
+
+    changes = help_util.HelpUpdater(
+        self.cli, self.help_dir, walker_util.DevSiteGenerator).Update()
+    expected = """\
+{"ux": "PROGRESS_BAR", "message": "Generating Help Document Files"}
+add _toc.yaml
+add alpha/_toc.yaml
+add alpha/index.html
+add alpha/internal/index.html
+add alpha/internal/internal-command.html
+add alpha/sdk/alphagroup/index.html
+add alpha/sdk/hidden-command.html
+add alpha/sdk/hiddengroup/hidden-command-2.html
+add alpha/sdk/hiddengroup/hidden-command-a.html
+add alpha/sdk/hiddengroup/index.html
+add alpha/sdk/index.html
+add alpha/sdk/ordered-choices.html
+add alpha/sdk/second-level-command-1.html
+add alpha/sdk/second-level-command-b.html
+add alpha/sdk/subgroup/index.html
+add alpha/sdk/subgroup/subgroup-command-2.html
+add alpha/sdk/subgroup/subgroup-command-a.html
+add alpha/sdk/xyzzy.html
+add alpha/version.html
+add beta/_toc.yaml
+add beta/index.html
+add beta/internal/index.html
+add beta/internal/internal-command.html
+add beta/sdk/betagroup/beta-command.html
+add beta/sdk/betagroup/index.html
+add beta/sdk/betagroup/sub-command-2.html
+add beta/sdk/betagroup/sub-command-a.html
+add beta/sdk/hidden-command.html
+add beta/sdk/hiddengroup/hidden-command-2.html
+add beta/sdk/hiddengroup/hidden-command-a.html
+add beta/sdk/hiddengroup/index.html
+add beta/sdk/index.html
+add beta/sdk/ordered-choices.html
+add beta/sdk/second-level-command-1.html
+add beta/sdk/second-level-command-b.html
+add beta/sdk/subgroup/index.html
+add beta/sdk/subgroup/subgroup-command-2.html
+add beta/sdk/subgroup/subgroup-command-a.html
+add beta/sdk/xyzzy.html
+add beta/version.html
+add index.html
+add internal/_toc.yaml
+add internal/index.html
+add internal/internal-command.html
+add sdk/_toc.yaml
+add sdk/hidden-command.html
+add sdk/hiddengroup/hidden-command-2.html
+add sdk/hiddengroup/hidden-command-a.html
+add sdk/hiddengroup/index.html
+add sdk/index.html
+add sdk/ordered-choices.html
+add sdk/second-level-command-b.html
+add sdk/subgroup/index.html
+add sdk/subgroup/subgroup-command-2.html
+add sdk/subgroup/subgroup-command-a.html
+add sdk/xyzzy.html
+add version.html
+delete sdk/subgroup/second-level-command-0.html
+edit sdk/second-level-command-1.html
+"""
+    self.assertEqual(59, changes)
+    self.AssertErrEquals(expected.replace('/', os.path.sep))
+    self.ClearErr()
+
+    changes = help_util.HelpUpdater(
+        self.cli, self.help_dir, walker_util.DevSiteGenerator).Update()
+    self.assertEqual(0, changes)
+    self.AssertErrEquals("""\
+{"ux": "PROGRESS_BAR", "message": "Generating Help Document Files"}
+""")
 
 
 class HelpTextUpdaterTest(calliope_test_base.CalliopeTestBase):
@@ -319,24 +601,26 @@ class HelpTextUpdaterTest(calliope_test_base.CalliopeTestBase):
 
   def testUpdateHelpTextNotAbsolute(self):
     with self.AssertRaisesExceptionMatches(
-        help_util.HelpTextUpdateError,
+        help_util.HelpUpdateError,
         'Destination directory [help_text] must be absolute.'):
-      help_util.HelpTextUpdater(self.cli, 'help_text').Update()
+      help_util.HelpUpdater(
+          self.cli, 'help_text', walker_util.HelpTextGenerator).Update()
 
   def testUpdateHelpTextDirectoryNotFound(self):
     with self.AssertRaisesExceptionMatches(
-        help_util.HelpTextUpdateError,
+        help_util.HelpUpdateError,
         'Destination directory [/NoT/uNdEr/BoZoS/bIgToP/help] '
         'must exist and be searchable.'):
-      help_util.HelpTextUpdater(self.cli,
-                                '/NoT/uNdEr/BoZoS/bIgToP/help').Update()
+      help_util.HelpUpdater(
+          self.cli, '/NoT/uNdEr/BoZoS/bIgToP/help',
+          walker_util.HelpTextGenerator).Update()
 
   def testUpdateHelpText(self):
 
-    changes = help_util.HelpTextUpdater(self.cli, self.help_dir).Update()
+    changes = help_util.HelpUpdater(
+        self.cli, self.help_dir, walker_util.HelpTextGenerator).Update()
     expected = """\
-{"ux": "PROGRESS_TRACKER", "message": "Loading CLI Tree", "status": "SUCCESS"}
-{"ux": "PROGRESS_BAR", "message": "Generating Help Docs"}
+{"ux": "PROGRESS_BAR", "message": "Generating Help Document Files"}
 add GROUP
 add alpha/GROUP
 add alpha/internal/GROUP
@@ -396,20 +680,20 @@ edit sdk/second-level-command-1
     self.AssertErrEquals(expected.replace('/', os.path.sep))
     self.ClearErr()
 
-    changes = help_util.HelpTextUpdater(self.cli, self.help_dir).Update()
+    changes = help_util.HelpUpdater(
+        self.cli, self.help_dir, walker_util.HelpTextGenerator).Update()
     self.assertEqual(0, changes)
     self.AssertErrEquals("""\
-{"ux": "PROGRESS_TRACKER", "message": "Loading CLI Tree", "status": "SUCCESS"}
-{"ux": "PROGRESS_BAR", "message": "Generating Help Docs"}
+{"ux": "PROGRESS_BAR", "message": "Generating Help Document Files"}
 """)
 
   def testUpdateHelpTextTest(self):
 
-    changes = help_util.HelpTextUpdater(
-        self.cli, self.help_dir, test=True).Update()
+    changes = help_util.HelpUpdater(
+        self.cli, self.help_dir, walker_util.HelpTextGenerator,
+        test=True).Update()
     expected = """\
-{"ux": "PROGRESS_TRACKER", "message": "Loading CLI Tree", "status": "SUCCESS"}
-{"ux": "PROGRESS_BAR", "message": "Generating Help Docs"}
+{"ux": "PROGRESS_BAR", "message": "Generating Help Document Files"}
 add GROUP
 add alpha/GROUP
 add alpha/internal/GROUP
@@ -454,13 +738,15 @@ add beta/sdk/ordered-choices
       invalid_brand_abbreviations = help_util.INVALID_BRAND_ABBREVIATIONS
       help_util.INVALID_BRAND_ABBREVIATIONS = ['error', 'image']
       with self.AssertRaisesExceptionMatches(
-          help_util.HelpTextUpdateError,
-          '6 help text files with invalid content must be fixed.'):
-        help_util.HelpTextUpdater(self.cli, self.help_dir, test=True).Update()
+          help_util.HelpUpdateError,
+          '6 help document files with invalid content must be fixed.'):
+        help_util.HelpUpdater(
+            self.cli, self.help_dir, walker_util.HelpTextGenerator,
+            test=True).Update()
     finally:
       help_util.INVALID_BRAND_ABBREVIATIONS = invalid_brand_abbreviations
     expected = """\
-ERROR: [sdk/subgroup/subgroup-command-a] Help text cannot contain any of these abbreviations: [error,image].
+ERROR: [sdk/subgroup/subgroup-command-a] Help document cannot contain these abbreviations: [error,image].
 """
     self.AssertErrContains(expected.replace('/', os.path.sep))
 
@@ -469,15 +755,17 @@ ERROR: [sdk/subgroup/subgroup-command-a] Help text cannot contain any of these a
 
     mock_copyfile.side_effect = IOError('File copy error.')
     with self.AssertRaisesExceptionMatches(
-        help_util.HelpTextUpdateError,
+        help_util.HelpUpdateError,
         'Update failed: File copy error.'):
-      help_util.HelpTextUpdater(self.cli, self.help_dir).Update()
+      help_util.HelpUpdater(
+          self.cli, self.help_dir, walker_util.HelpTextGenerator).Update()
 
     mock_copyfile.side_effect = OSError('Access denied.')
     with self.AssertRaisesExceptionMatches(
-        help_util.HelpTextUpdateError,
+        help_util.HelpUpdateError,
         'Update failed: Access denied.'):
-      help_util.HelpTextUpdater(self.cli, self.help_dir).Update()
+      help_util.HelpUpdater(
+          self.cli, self.help_dir, walker_util.HelpTextGenerator).Update()
 
 
 if __name__ == '__main__':

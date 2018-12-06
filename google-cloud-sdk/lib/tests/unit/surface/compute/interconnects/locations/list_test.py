@@ -22,7 +22,7 @@ import textwrap
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -33,7 +33,7 @@ class InterconnectLocationsListTest(sdk_test_base.WithFakeAuth,
                                     cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
     self.api_version = 'v1'
     self.client = mock.Client(
         core_apis.GetClientClass('compute', self.api_version))
@@ -110,7 +110,7 @@ class InterconnectLocationsListTest(sdk_test_base.WithFakeAuth,
 class InterconnectLocationsListBetaTest(InterconnectLocationsListTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'beta'
     self.client = mock.Client(
         core_apis.GetClientClass('compute', self.api_version))
@@ -136,7 +136,7 @@ class InterconnectLocationsListBetaTest(InterconnectLocationsListTest):
 class InterconnectLocationsListAlphaTest(InterconnectLocationsListTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'alpha'
     self.client = mock.Client(
         core_apis.GetClientClass('compute', self.api_version))

@@ -1,0 +1,261 @@
+title: surface e2e tests for asset get-history
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances create $$compute-instance-asset$$ --zone=us-central1-f
+      --quiet --format="disable"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
+- execute:
+  - command: asset get-history --project cloud-sdk-integration-testing --asset-names=//compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+      --content-type resource --start-time=2018-10-02T15:01:23.045Z --format=text(asset.name)
+  - stdout: |
+      ---
+      asset.name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+      ---
+      asset.name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+      ---
+      asset.name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+- execute:
+  - command: compute instances delete $$compute-instance-asset$$ --zone=us-central1-f
+      --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
+actions:
+- generate_resource_id:
+    reference: compute-instance-asset
+    prefix: compute-instance-asset
+- execute_command:
+    command: compute instances create $$compute-instance-asset$$ --zone=us-central1-f
+      --quiet --format="disable"
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset get-history --project cloud-sdk-integration-testing --asset-names=//compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+      --content-type resource --start-time=2018-10-02T15:01:23.045Z --format=text(asset.name)
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Fcloud-sdk-integration-testing%2Fzones%2Fus-central1-f%2Finstances%2F$$compute-instance-asset$$&contentType=RESOURCE&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '11657'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            assets:
+            - window:
+                startTime: '2018-11-20T17:05:27.060720Z'
+                endTime: '2262-04-11T23:47:16.854775807Z'
+              asset:
+                name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+                assetType: google.compute.Instance
+                resource:
+                  version: v1
+                  discoveryDocumentUri: https://www.googleapis.com/discovery/v1/apis/compute/v1/rest
+                  discoveryName: Instance
+                  parent: //cloudresourcemanager.googleapis.com/projects/462803083913
+                  data:
+                    disk:
+                    - license:
+                      - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+                      type: PERSISTENT
+                      interface: SCSI
+                      mode: READ_WRITE
+                      autoDelete: true
+                      index: 0
+                      deviceName: persistent-disk-0
+                      guestOsFeature:
+                      - type: VIRTIO_SCSI_MULTIQUEUE
+                      boot: true
+                      source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$compute-instance-asset$$
+                    cpuPlatform: Intel Ivy Bridge
+                    selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+                    machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+                    startRestricted: false
+                    deletionProtection: false
+                    status: RUNNING
+                    name: $$compute-instance-asset$$
+                    networkInterface:
+                    - ipAddress: 10.240.0.50
+                      fingerprint: LqFq5Bo51Vg=
+                      accessConfig:
+                      - networkTier: PREMIUM
+                        name: external-nat
+                        type: ONE_TO_ONE_NAT
+                        externalIp: 35.232.17.230
+                      network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                      name: nic0
+                    tags:
+                      fingerprint: 42WmSpB8rSM=
+                    id: '596747448447762519'
+                    serviceAccount:
+                    - scope:
+                      - https://www.googleapis.com/auth/devstorage.read_only
+                      - https://www.googleapis.com/auth/logging.write
+                      - https://www.googleapis.com/auth/monitoring.write
+                      - https://www.googleapis.com/auth/pubsub
+                      - https://www.googleapis.com/auth/service.management.readonly
+                      - https://www.googleapis.com/auth/servicecontrol
+                      - https://www.googleapis.com/auth/trace.append
+                      email: 462803083913-compute@developer.gserviceaccount.com
+                    canIpForward: false
+                    scheduling:
+                      onHostMaintenance: MIGRATE
+                      preemptible: false
+                      automaticRestart: true
+                    labelFingerprint: 42WmSpB8rSM=
+                    zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+                    creationTimestamp: '2018-11-20T09:04:59.723-08:00'
+            - window:
+                startTime: '2018-11-20T17:05:04.114203Z'
+                endTime: '2018-11-20T17:05:27.060720Z'
+              asset:
+                name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+                assetType: google.compute.Instance
+                resource:
+                  version: v1
+                  discoveryDocumentUri: https://www.googleapis.com/discovery/v1/apis/compute/v1/rest
+                  discoveryName: Instance
+                  parent: //cloudresourcemanager.googleapis.com/projects/462803083913
+                  data:
+                    networkInterface:
+                    - network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                      name: nic0
+                      ipAddress: 10.240.0.50
+                      fingerprint: LqFq5Bo51Vg=
+                      accessConfig:
+                      - networkTier: PREMIUM
+                        name: external-nat
+                        type: ONE_TO_ONE_NAT
+                        externalIp: 35.232.17.230
+                    tags:
+                      fingerprint: 42WmSpB8rSM=
+                    id: '596747448447762519'
+                    serviceAccount:
+                    - scope:
+                      - https://www.googleapis.com/auth/devstorage.read_only
+                      - https://www.googleapis.com/auth/logging.write
+                      - https://www.googleapis.com/auth/monitoring.write
+                      - https://www.googleapis.com/auth/pubsub
+                      - https://www.googleapis.com/auth/service.management.readonly
+                      - https://www.googleapis.com/auth/servicecontrol
+                      - https://www.googleapis.com/auth/trace.append
+                      email: 462803083913-compute@developer.gserviceaccount.com
+                    canIpForward: false
+                    scheduling:
+                      preemptible: false
+                      automaticRestart: true
+                      onHostMaintenance: MIGRATE
+                    labelFingerprint: 42WmSpB8rSM=
+                    zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+                    creationTimestamp: '2018-11-20T09:04:59.723-08:00'
+                    disk:
+                    - type: PERSISTENT
+                      interface: SCSI
+                      mode: READ_WRITE
+                      autoDelete: true
+                      index: 0
+                      deviceName: persistent-disk-0
+                      guestOsFeature:
+                      - type: VIRTIO_SCSI_MULTIQUEUE
+                      boot: true
+                      source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$compute-instance-asset$$
+                      license:
+                      - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+                    cpuPlatform: Unknown CPU Platform
+                    selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+                    machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+                    startRestricted: false
+                    deletionProtection: false
+                    status: STAGING
+                    name: $$compute-instance-asset$$
+            - window:
+                startTime: '2018-11-20T17:05:00.763498Z'
+                endTime: '2018-11-20T17:05:04.114203Z'
+              asset:
+                name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+                assetType: google.compute.Instance
+                resource:
+                  version: v1
+                  discoveryDocumentUri: https://www.googleapis.com/discovery/v1/apis/compute/v1/rest
+                  discoveryName: Instance
+                  parent: //cloudresourcemanager.googleapis.com/projects/462803083913
+                  data:
+                    canIpForward: false
+                    scheduling:
+                      onHostMaintenance: MIGRATE
+                      preemptible: false
+                      automaticRestart: true
+                    labelFingerprint: 42WmSpB8rSM=
+                    zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+                    creationTimestamp: '2018-11-20T09:04:59.723-08:00'
+                    disk:
+                    - boot: true
+                      source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$compute-instance-asset$$
+                      license:
+                      - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+                      type: PERSISTENT
+                      interface: SCSI
+                      mode: READ_WRITE
+                      autoDelete: true
+                      index: 0
+                      deviceName: persistent-disk-0
+                      guestOsFeature:
+                      - type: VIRTIO_SCSI_MULTIQUEUE
+                    cpuPlatform: Unknown CPU Platform
+                    selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+                    machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+                    startRestricted: false
+                    deletionProtection: false
+                    status: PROVISIONING
+                    name: $$compute-instance-asset$$
+                    networkInterface:
+                    - fingerprint: +bihpG1c6oU=
+                      accessConfig:
+                      - type: ONE_TO_ONE_NAT
+                        networkTier: PREMIUM
+                        name: external-nat
+                      network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                      name: nic0
+                    tags:
+                      fingerprint: 42WmSpB8rSM=
+                    id: '596747448447762519'
+                    serviceAccount:
+                    - scope:
+                      - https://www.googleapis.com/auth/devstorage.read_only
+                      - https://www.googleapis.com/auth/logging.write
+                      - https://www.googleapis.com/auth/monitoring.write
+                      - https://www.googleapis.com/auth/pubsub
+                      - https://www.googleapis.com/auth/service.management.readonly
+                      - https://www.googleapis.com/auth/servicecontrol
+                      - https://www.googleapis.com/auth/trace.append
+                      email: 462803083913-compute@developer.gserviceaccount.com
+    - expect_stdout: |
+        ---
+        asset.name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+        ---
+        asset.name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+        ---
+        asset.name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances delete $$compute-instance-asset$$ --zone=us-central1-f
+      --quiet
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
+    - expect_exit:
+        code: 0
+    cleanup_for: compute-instance-asset

@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 
 import os
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import command_loading
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -47,15 +47,15 @@ class BaseTest(sdk_test_base.SdkBase):
   FORMAT_BETA = 'beta'
   FORMAT = 'ga'
 
-  class NoTracks(base.Group):
+  class NoTracks(calliope_base.Group):
     pass
 
-  @base.ReleaseTracks(base.ReleaseTrack.GA)
-  class GA(base.Group):
+  @calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.GA)
+  class GA(calliope_base.Group):
     pass
 
-  @base.ReleaseTracks(base.ReleaseTrack.GA)
-  class GACommand(base.Command):
+  @calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.GA)
+  class GACommand(calliope_base.Command):
 
     def __init__(self):
       pass
@@ -63,12 +63,12 @@ class BaseTest(sdk_test_base.SdkBase):
     def Run(self):
       return self.GetTrackedAttribute(BaseTest, 'FORMAT')
 
-  @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-  class Alpha(base.Group):
+  @calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.ALPHA)
+  class Alpha(calliope_base.Group):
     pass
 
-  @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-  class AlphaCommand(base.Command):
+  @calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.ALPHA)
+  class AlphaCommand(calliope_base.Command):
 
     def __init__(self):
       pass
@@ -76,8 +76,8 @@ class BaseTest(sdk_test_base.SdkBase):
     def Run(self):
       return self.GetTrackedAttribute(BaseTest, 'FORMAT')
 
-  @base.ReleaseTracks(base.ReleaseTrack.BETA)
-  class Beta(base.Group):
+  @calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.BETA)
+  class Beta(calliope_base.Group):
 
     def __init__(self):
       pass
@@ -85,8 +85,9 @@ class BaseTest(sdk_test_base.SdkBase):
     def Run(self):
       return self.GetTrackedAttribute(BaseTest, 'FORMAT')
 
-  @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
-  class AlphaBeta(base.Group):
+  @calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.ALPHA,
+                               calliope_base.ReleaseTrack.BETA)
+  class AlphaBeta(calliope_base.Group):
 
     def __init__(self):
       pass
@@ -94,8 +95,8 @@ class BaseTest(sdk_test_base.SdkBase):
     def Run(self):
       return self.GetTrackedAttribute(BaseTest, 'FORMAT')
 
-  @base.ReleaseTracks(*base.ReleaseTrack.AllValues())
-  class All(base.Group):
+  @calliope_base.ReleaseTracks(*calliope_base.ReleaseTrack.AllValues())
+  class All(calliope_base.Group):
 
     def __init__(self):
       pass
@@ -107,11 +108,11 @@ class BaseTest(sdk_test_base.SdkBase):
     with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'No commands defined in file: \[file\]'):
-      _FromModule('file', [], base.ReleaseTrack.GA, is_command=True)
+      _FromModule('file', [], calliope_base.ReleaseTrack.GA, is_command=True)
     with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'No command groups defined in file: \[file\]'):
-      _FromModule('file', [], base.ReleaseTrack.GA, is_command=False)
+      _FromModule('file', [], calliope_base.ReleaseTrack.GA, is_command=False)
 
   def testMultipleDefs(self):
     with self.assertRaisesRegex(
@@ -120,98 +121,107 @@ class BaseTest(sdk_test_base.SdkBase):
         r'\[file\]'):
       _FromModule(
           'file', [BaseTest.Alpha, BaseTest.AlphaBeta],
-          base.ReleaseTrack.GA, is_command=False)
+          calliope_base.ReleaseTrack.GA, is_command=False)
     with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple definitions for release tracks \[.+, .+\] for element: '
         r'\[file\]'):
       _FromModule(
           'file', [BaseTest.Alpha, BaseTest.Beta, BaseTest.AlphaBeta],
-          base.ReleaseTrack.GA, is_command=False)
+          calliope_base.ReleaseTrack.GA, is_command=False)
     with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple implementations defined for element: \[file\]. Each must '
         r'explicitly declare valid release tracks.'):
       _FromModule(
           'file', [BaseTest.Alpha, BaseTest.NoTracks],
-          base.ReleaseTrack.GA, is_command=False)
+          calliope_base.ReleaseTrack.GA, is_command=False)
 
   def testGroup(self):
-    items = [base.Group]
+    items = [calliope_base.Group]
     # A single group can be found.
     self.assertEqual(
-        base.Group,
-        _FromModule('file', items, base.ReleaseTrack.GA, is_command=False))
+        calliope_base.Group,
+        _FromModule(
+            'file', items, calliope_base.ReleaseTrack.GA, is_command=False))
     # Allow a group to not define tracks and still work.
     self.assertEqual(
-        base.Group,
-        _FromModule('file', items, base.ReleaseTrack.ALPHA, is_command=False))
+        calliope_base.Group,
+        _FromModule(
+            'file', items, calliope_base.ReleaseTrack.ALPHA, is_command=False))
     # A group is registered but there should be a command.
     with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'You cannot define groups \[Group\] in a command file: \[file\]'):
       _FromModule(
-          'file', items, base.ReleaseTrack.GA, is_command=True)
+          'file', items, calliope_base.ReleaseTrack.GA, is_command=True)
     # No matches for the release track.
     with self.assertRaises(command_loading.ReleaseTrackNotImplementedException):
       _FromModule(
-          'file', [BaseTest.GA], base.ReleaseTrack.ALPHA, is_command=False)
+          'file', [BaseTest.GA],
+          calliope_base.ReleaseTrack.ALPHA,
+          is_command=False)
     # Explicitly tracked group can be found.
     self.assertEqual(
         BaseTest.GA,
         _FromModule(
-            'file', [BaseTest.GA], base.ReleaseTrack.GA, is_command=False))
+            'file', [BaseTest.GA],
+            calliope_base.ReleaseTrack.GA,
+            is_command=False))
     # Make sure we pick the right one.
     self.assertEqual(
         BaseTest.GA,
         _FromModule(
-            'file', [BaseTest.GA, BaseTest.Alpha], base.ReleaseTrack.GA,
+            'file', [BaseTest.GA, BaseTest.Alpha],
+            calliope_base.ReleaseTrack.GA,
             is_command=False))
     # No matches with multiple choices.
     with self.assertRaises(command_loading.ReleaseTrackNotImplementedException):
       _FromModule(
-          'file', [BaseTest.GA, BaseTest.Alpha], base.ReleaseTrack.BETA,
+          'file', [BaseTest.GA, BaseTest.Alpha],
+          calliope_base.ReleaseTrack.BETA,
           is_command=False)
 
   def testCommand(self):
-    items = [base.Command]
+    items = [calliope_base.Command]
     # A single command can be found.
     self.assertEqual(
-        base.Command,
-        _FromModule('file', items, base.ReleaseTrack.GA, is_command=True))
+        calliope_base.Command,
+        _FromModule(
+            'file', items, calliope_base.ReleaseTrack.GA, is_command=True))
     # Allow a command to not define tracks and still work.
     self.assertEqual(
-        base.Command,
+        calliope_base.Command,
         _FromModule(
-            'file', items, base.ReleaseTrack.ALPHA, is_command=True))
+            'file', items, calliope_base.ReleaseTrack.ALPHA, is_command=True))
     # A command is registered but there should be a group.
     with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'You cannot define commands \[Command\] in a command group file: '
         r'\[file\]'):
       _FromModule(
-          'file', items, base.ReleaseTrack.GA, is_command=False)
+          'file', items, calliope_base.ReleaseTrack.GA, is_command=False)
     # No matches for the release track.
     with self.assertRaises(command_loading.ReleaseTrackNotImplementedException):
       _FromModule(
-          'file', [BaseTest.GACommand], base.ReleaseTrack.ALPHA,
+          'file', [BaseTest.GACommand], calliope_base.ReleaseTrack.ALPHA,
           is_command=True)
     # Explicitly tracked command can be found.
     self.assertEqual(
         BaseTest.GACommand,
-        _FromModule('file', [BaseTest.GACommand], base.ReleaseTrack.GA,
+        _FromModule('file', [BaseTest.GACommand], calliope_base.ReleaseTrack.GA,
                     is_command=True))
     # Make sure we pick the right one.
     self.assertEqual(
         BaseTest.GACommand,
         _FromModule(
             'file', [BaseTest.GACommand, BaseTest.AlphaCommand],
-            base.ReleaseTrack.GA, is_command=True))
+            calliope_base.ReleaseTrack.GA, is_command=True))
     # No matches with multiple choices.
     with self.assertRaises(command_loading.ReleaseTrackNotImplementedException):
       _FromModule(
           'file', [BaseTest.GACommand, BaseTest.AlphaCommand],
-          base.ReleaseTrack.BETA, is_command=True)
+          calliope_base.ReleaseTrack.BETA, is_command=True)
 
   def testGetTrackedAttribute(self):
     self.assertEqual(BaseTest.FORMAT, BaseTest.GACommand().Run())
@@ -229,7 +239,7 @@ class YamlTests(sdk_test_base.SdkBase):
         r'Problem loading foo.bar: No yaml command translator has been '
         r'registered.'):
       _FromYaml(
-          'file', ['foo', 'bar'], [], base.ReleaseTrack.GA, None)
+          'file', ['foo', 'bar'], [], calliope_base.ReleaseTrack.GA, None)
 
   def testNoGroups(self):
     with self.assertRaisesRegex(
@@ -237,7 +247,7 @@ class YamlTests(sdk_test_base.SdkBase):
         r'Problem loading foo.bar: Command groups cannot be implemented in '
         r'yaml.'):
       command_loading.LoadCommonType(
-          ['dir/foo/bar.yaml'], ['foo', 'bar'], base.ReleaseTrack.GA,
+          ['dir/foo/bar.yaml'], ['foo', 'bar'], calliope_base.ReleaseTrack.GA,
           'id', is_command=False)
     with self.assertRaisesRegex(
         command_loading.CommandLoadFailure,
@@ -252,20 +262,20 @@ class YamlTests(sdk_test_base.SdkBase):
         command_loading.ReleaseTrackNotImplementedException,
         r'No implementation for release track \[GA\] for element: \[file\]'):
       _FromYaml(
-          'file', ['foo', 'bar'], [], base.ReleaseTrack.GA, object())
+          'file', ['foo', 'bar'], [], calliope_base.ReleaseTrack.GA, object())
     with self.assertRaisesRegex(
         command_loading.ReleaseTrackNotImplementedException,
         r'No implementation for release track \[GA\] for element: \[file\]'):
       _FromYaml(
           'file', ['foo', 'bar'], [{'release_tracks': ['ALPHA']}],
-          base.ReleaseTrack.GA, object())
+          calliope_base.ReleaseTrack.GA, object())
     with self.assertRaisesRegex(
         command_loading.ReleaseTrackNotImplementedException,
         r'No implementation for release track \[GA\] for element: \[file\]'):
       _FromYaml(
           'file', ['foo', 'bar'],
           [{'release_tracks': ['ALPHA']}, {'release_tracks': ['BETA']}],
-          base.ReleaseTrack.GA, object())
+          calliope_base.ReleaseTrack.GA, object())
 
   def testMultipleDefs(self):
     with self.assertRaisesRegex(
@@ -275,7 +285,7 @@ class YamlTests(sdk_test_base.SdkBase):
       _FromYaml(
           'file', ['foo', 'bar'],
           [{'release_tracks': ['ALPHA']}, {'release_tracks': ['ALPHA']}],
-          base.ReleaseTrack.ALPHA, object())
+          calliope_base.ReleaseTrack.ALPHA, object())
     with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple definitions for release tracks \[.+, .+\] for element: '
@@ -284,7 +294,7 @@ class YamlTests(sdk_test_base.SdkBase):
           'file', ['foo', 'bar'],
           [{'release_tracks': ['ALPHA']}, {'release_tracks': ['BETA']},
            {'release_tracks': ['ALPHA', 'BETA']}],
-          base.ReleaseTrack.ALPHA, object())
+          calliope_base.ReleaseTrack.ALPHA, object())
     with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple implementations defined for element: \[file\]. Each must '
@@ -292,7 +302,7 @@ class YamlTests(sdk_test_base.SdkBase):
       _FromYaml(
           'file', ['foo', 'bar'],
           [{'release_tracks': ['ALPHA']}, {},],
-          base.ReleaseTrack.ALPHA, object())
+          calliope_base.ReleaseTrack.ALPHA, object())
 
   def testCommand(self):
     # A stub translator.
@@ -309,25 +319,25 @@ class YamlTests(sdk_test_base.SdkBase):
     self.assertEqual(
         (sentinel, None),
         _FromYaml(
-            'file', ['foo', 'bar'], [{}], base.ReleaseTrack.GA, t))
+            'file', ['foo', 'bar'], [{}], calliope_base.ReleaseTrack.GA, t))
     # Explicitly tracked command can be found.
     self.assertEqual(
         (sentinel, ['GA']),
         _FromYaml(
             'file', ['foo', 'bar'], [{'release_tracks': ['GA']}],
-            base.ReleaseTrack.GA, t))
+            calliope_base.ReleaseTrack.GA, t))
     # Make sure we pick the right one.
     self.assertEqual(
         (sentinel, ['GA']),
         _FromYaml(
             'file', ['foo', 'bar'],
             [{'release_tracks': ['GA']}, {'release_tracks': ['ALPHA']}],
-            base.ReleaseTrack.GA, t))
+            calliope_base.ReleaseTrack.GA, t))
     # No matches with multiple choices.
     with self.assertRaises(command_loading.ReleaseTrackNotImplementedException):
       _FromModule(
           'file', [BaseTest.GACommand, BaseTest.AlphaCommand],
-          base.ReleaseTrack.BETA, is_command=True)
+          calliope_base.ReleaseTrack.BETA, is_command=True)
 
     # Check loading from file.
     self.Touch(self.temp_path, 'bar.yaml', """
@@ -337,7 +347,7 @@ class YamlTests(sdk_test_base.SdkBase):
         (sentinel, ['GA', 'BETA']),
         command_loading.LoadCommonType(
             [os.path.join(self.temp_path, 'bar.yaml')], ['bar'],
-            base.ReleaseTrack.GA, 'id', is_command=True,
+            calliope_base.ReleaseTrack.GA, 'id', is_command=True,
             yaml_command_translator=t))
 
 

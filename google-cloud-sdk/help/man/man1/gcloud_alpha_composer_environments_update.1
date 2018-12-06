@@ -1,0 +1,260 @@
+
+.TH "GCLOUD_ALPHA_COMPOSER_ENVIRONMENTS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha composer environments update \- update properties of a Cloud Composer environment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha composer environments update\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) (\fB\-\-node\-count\fR=\fINODE_COUNT\fR\ |\ \fB\-\-update\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-airflow\-configs\fR\ |\ \fB\-\-remove\-airflow\-configs\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-env\-variables\fR\ |\ \fB\-\-remove\-env\-variables\fR=[\fINAME\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-pypi\-packages\-from\-file\fR=\fIUPDATE_PYPI_PACKAGES_FROM_FILE\fR\ |\ \fB\-\-update\-pypi\-package\fR=\fIPACKAGE\fR[\fIEXTRAS_LIST\fR]\fIVERSION_SPECIFIER\fR\ \fB\-\-clear\-pypi\-packages\fR\ |\ \fB\-\-remove\-pypi\-packages\fR=[\fIPACKAGE\fR,...]) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update properties of a Cloud Composer environment.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Environment resource \- The environment to update. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [environment] on the command line with
+a fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIENVIRONMENT\fR
+ID of the environment or fully qualified identifier for the environment. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Compute Engine region in which to create the environment.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+The update type. Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-node\-count\fR=\fINODE_COUNT\fR
+The new number of nodes running the Environment. Must be >= 3.
+
+.TP 2m
+\fB\-\-update\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of Airflow config override KEY=VALUE pairs to set. If a config override
+already exists, its value is updated; otherwise a new config override is
+created.
+
+KEYs should specify the configuration section and property name, separated by a
+hyphen, for example \f5core\-print_stats_interval\fR. The section may not
+contain a closing square brace or period. The property name must be non\-empty
+and may not contain an equals sign, semicolon, or period. By convention,
+property names are spelled with \f5snake_case.\fR VALUEs may contain any
+character.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-airflow\-configs\fR
+Remove all Airflow config overrides from the environment.
+
+.TP 2m
+\fB\-\-remove\-airflow\-configs\fR=[\fIKEY\fR,...]
+A list of Airflow config override keys to remove.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-update\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]
+A list of environment variable NAME=VALUE pairs to set and provide to the Aiflow
+scheduler, worker, and webserver processes. If an environment variable already
+exists, its value is updated; otherwise a new environment variable is created.
+
+NAMEs are the environment variable names and may contain upper and lowercase
+letters, digits, and underscores; they must not begin with a digit.
+
+User\-specified environment variables should not be used to set Airflow
+configuration properties. Instead use the \f5\-\-update\-airflow\-configs\fR
+flag.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-env\-variables\fR
+Remove all environment variables from the environment.
+
+Environment variables that have system\-provided defaults cannot be unset with
+the \f5\-\-remove\-env\-variables\fR or \f5\-\-clear\-env\-variables\fR flags;
+only the user\-supplied overrides will be removed.
+
+.TP 2m
+\fB\-\-remove\-env\-variables\fR=[\fINAME\fR,...]
+A list of environment variables to remove.
+
+Environment variables that have system\-provided defaults cannot be unset with
+the \f5\-\-remove\-env\-variables\fR or \f5\-\-clear\-env\-variables\fR flags;
+only the user\-supplied overrides will be removed.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Removes all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha composer environments update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha composer environments update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+A list of label keys to remove. If a label does not exist it is silently
+ignored.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-update\-pypi\-packages\-from\-file\fR=\fIUPDATE_PYPI_PACKAGES_FROM_FILE\fR
+The path to a file containing a list of PyPI packages to install in the
+environment. Each line in the file should contain a package specification in the
+format of the update\-pypi\-package argument defined above. The path can be a
+local file path or a Google Cloud Storage file path (Cloud Storage file path
+starts with 'gs://').
+
+.TP 2m
+\fB\-\-update\-pypi\-package\fR=\fIPACKAGE\fR[\fIEXTRAS_LIST\fR]\fIVERSION_SPECIFIER\fR
+A PyPI package add to the environment. If a package already exists, its value is
+updated; otherwise a new package is installed.
+
+The value takes the form of: \f5PACKAGE[EXTRAS_LIST]VERSION_SPECIFIER\fR, as one
+would specify in a pip requirements file.
+
+PACKAGE is specified as a package name such as \f5numpy.\fR EXTRAS_LIST is a
+comma\-delimited list of PEP 508 distribution extras that may be empty, in which
+case the enclosing square brackets may be omitted. VERSION_SPECIFIER is an
+optional PEP 440 version specifier. If both EXTRAS_LIST and VERSION_SPECIFIER
+are omitted, the \f5=\fR and everything to the right may be left empty.
+
+This is a repeated argument that can be specified multiple times to update
+multiple packages. If PACKAGE appears more than once, the last value will be
+used.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-pypi\-packages\fR
+Remove all PyPI packages from the environment.
+
+PyPI packages that are required by the environment's core software cannot be
+uninstalled with the \f5\-\-remove\-pypi\-packages\fR or
+\f5\-\-clear\-pypi\-packages\fR flags.
+
+.TP 2m
+\fB\-\-remove\-pypi\-packages\fR=[\fIPACKAGE\fR,...]
+A list of PyPI package names to remove.
+
+PyPI packages that are required by the environment's core software cannot be
+uninstalled with the \f5\-\-remove\-pypi\-packages\fR or
+\f5\-\-clear\-pypi\-packages\fR flags.
+
+
+.RE
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud composer environments update
+$ gcloud beta composer environments update
+.RE
+

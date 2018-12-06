@@ -12,14 +12,13 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      Taxonomy resource - A taxonomy reference. This represents a Cloud
      resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: provide the flag
-     [taxonomy] on the command line with a fully specified name; provide the
-     flag [--project] on the command line; set the property [core/project].
-     This must be specified.
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [taxonomy] on the command line with a fully specified name;
+     provide the argument [--project] on the command line; set the property
+     [core/project]. This must be specified.
 
        TAXONOMY
-          The ID of the taxonomy or a fully qualified identifier for the
-          taxonomy.
+          ID of the taxonomy or fully qualified identifier for the taxonomy.
 
 REQUIRED FLAGS
      --description=DESCRIPTION
@@ -27,8 +26,9 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is an internal implementation detail and may change or

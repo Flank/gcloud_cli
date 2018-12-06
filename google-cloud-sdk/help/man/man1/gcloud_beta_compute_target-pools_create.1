@@ -115,8 +115,7 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR; default="NONE"
-The type of session affinity to use for this backend service.
-\fISESSION_AFFINITY\fR must be one of:
+The type of session affinity to use. \fISESSION_AFFINITY\fR must be one of:
 
 .RS 2m
 .TP 2m
@@ -124,28 +123,25 @@ The type of session affinity to use for this backend service.
 Route requests to instances based on the hash of the client's IP address.
 .TP 2m
 \fBCLIENT_IP_PROTO\fR
-Connections from the same client IP with the same IP protocol willgo to the same
-VM in the pool while that VM remains healthy. This option cannot be used for
-HTTP(s) load balancing.
-.TP 2m
-\fBGENERATED_COOKIE\fR
-Route requests to instances based on the contents of the "GCLB" cookie set by
-the load balancer.
+Connections from the same client IP with the same IP protocol will go to the
+same VM in the pool while that VM remains healthy.
 .TP 2m
 \fBNONE\fR
 Session affinity is disabled.
-
-
 .RE
+.sp
+
+
+
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

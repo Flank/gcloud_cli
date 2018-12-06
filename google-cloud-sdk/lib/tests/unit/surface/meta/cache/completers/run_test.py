@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import os
 
+from googlecloudsdk.command_lib.static_completion import lookup
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 from googlecloudsdk.core.util import files
@@ -63,7 +64,10 @@ class CompleteCommandFlagCompleterTest(test_base.BaseTest,
     self.Execute('meta cache completers run '
                  'googlecloudsdk.command_lib.compute.completers:'
                  'InstancesCompleter')
-    self.AssertErrEquals('COMPLETE> COMPLETE> COMPLETE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\n')
     self.AssertOutputEquals("""\
 instance-1 --zone=zone-1
 instance-2 --zone=zone-1
@@ -86,7 +90,10 @@ instance-1 --zone=zone-1
     self.Execute('meta cache completers run '
                  'googlecloudsdk.command_lib.compute.completers:'
                  'InstancesCompleter --zone=zone-1')
-    self.AssertErrEquals('COMPLETE> COMPLETE> COMPLETE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\n')
     self.AssertOutputEquals("""\
 instance-1
 instance-2
@@ -109,7 +116,10 @@ instance-1
     self.Execute('meta cache completers run --qualify=zone '
                  'googlecloudsdk.command_lib.compute.completers:'
                  'InstancesCompleter')
-    self.AssertErrEquals('COMPLETE> COMPLETE> COMPLETE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\n')
     self.AssertOutputEquals("""\
 instance-1 --zone=zone-1
 instance-2 --zone=zone-1
@@ -132,7 +142,10 @@ instance-1 --zone=zone-1
     self.Execute('meta cache completers run --qualify=zone '
                  'googlecloudsdk.command_lib.compute.completers:'
                  'InstancesCompleter --zone=zone-1')
-    self.AssertErrEquals('COMPLETE> COMPLETE> COMPLETE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\n')
     self.AssertOutputEquals("""\
 instance-1
 instance-2
@@ -184,7 +197,10 @@ class CompleteCommandGRICompleterTest(test_base.BaseTest,
     self.Execute('meta cache completers run '
                  'googlecloudsdk.command_lib.compute.completers:'
                  'InstancesCompleter')
-    self.AssertErrEquals('COMPLETE> COMPLETE> COMPLETE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\n')
     self.AssertOutputEquals("""\
 instance-1:zone-1
 instance-2:zone-1
@@ -208,7 +224,10 @@ instance-1:zone-1
                  'googlecloudsdk.command_lib.compute.completers:'
                  'InstancesCompleter '
                  '--zone=zone-1')
-    self.AssertErrEquals('COMPLETE> COMPLETE> COMPLETE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\n')
     self.AssertOutputEquals("""\
 instance-1
 instance-2
@@ -231,7 +250,10 @@ instance-1
     self.Execute('meta cache completers run --qualify=zone,collection '
                  'googlecloudsdk.command_lib.compute.completers:'
                  'InstancesCompleter')
-    self.AssertErrEquals('COMPLETE> COMPLETE> COMPLETE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\n')
     self.AssertOutputEquals("""\
 instance-1:zone-1::compute.instances
 instance-2:zone-1::compute.instances
@@ -254,7 +276,10 @@ instance-1:zone-1::compute.instances
     self.Execute('meta cache completers run --qualify=collection '
                  'googlecloudsdk.command_lib.compute.completers:'
                  'InstancesCompleter --zone=zone-1')
-    self.AssertErrEquals('COMPLETE> COMPLETE> COMPLETE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\n')
     self.AssertOutputEquals("""\
 instance-1::compute.instances
 instance-2::compute.instances
@@ -277,7 +302,10 @@ instance-1::compute.instances
     self.Execute('meta cache completers run --qualify=zone,collection '
                  'googlecloudsdk.command_lib.compute.completers:'
                  'InstancesCompleter --zone=zone-1')
-    self.AssertErrEquals('COMPLETE> COMPLETE> COMPLETE> \n')
+    self.AssertErrEquals(
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}'
+        '{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\n')
     self.AssertOutputEquals("""\
 instance-1:zone-1::compute.instances
 instance-2:zone-1::compute.instances
@@ -541,6 +569,8 @@ class CompleteCommandRunExceptionTest(test_base.BaseTest,
     self.StartDictPatch(os.environ)
 
   def testUpdateNoSuchListCommand(self):
+    self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
+                          return_value={})
     os.environ['_ARGCOMPLETE_TEST'] = (
         'collection=sql.instances,list_command=no-such-gcloud-command')
     self.WriteInput('x\nx')
@@ -553,19 +583,23 @@ class CompleteCommandRunExceptionTest(test_base.BaseTest,
     self.AssertOutputEquals('')
 
   def testUpdateNoSuchListCommandNoStackTrace(self):
+    self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
+                          return_value={})
     os.environ['_ARGCOMPLETE_TEST'] = (
         'collection=sql.instances,list_command=no-such-gcloud-command')
     self.WriteInput('x\nx')
     self.Run('meta cache completers run --no-stack-trace '
              'googlecloudsdk.command_lib.compute.completers:TestCompleter')
     self.AssertErrMatches("""\
-COMPLETE> ERROR: \\(gcloud\\) Invalid choice: 'no-such-gcloud-command'.
+{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\
+ERROR: \\(gcloud\\) Invalid choice: 'no-such-gcloud-command'.
 .*
 ERROR: Update command \\[no-such-gcloud-command --quiet]: Invalid choice: 'no-such-gcloud-command'.
-COMPLETE> ERROR: \\(gcloud\\) Invalid choice: 'no-such-gcloud-command'.
+{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\
+ERROR: \\(gcloud\\) Invalid choice: 'no-such-gcloud-command'.
 .*
 ERROR: Update command \\[no-such-gcloud-command --quiet]: Invalid choice: 'no-such-gcloud-command'.
-COMPLETE> """)
+{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}""")
     self.AssertOutputEquals('')
 
   def testUpdateListCommandCoreException(self):
@@ -586,12 +620,15 @@ COMPLETE> """)
     self.WriteInput('x\nx')
     self.Run('meta cache completers run --no-stack-trace '
              'googlecloudsdk.command_lib.compute.completers:TestCompleter')
-    self.AssertErrMatches("""\
-COMPLETE> ERROR: \\(gcloud.meta.test\\) Some core exception.
-ERROR: Update command \\[meta test --core-exception --quiet]: Some core exception.
-COMPLETE> ERROR: \\(gcloud.meta.test\\) Some core exception.
-ERROR: Update command \\[meta test --core-exception --quiet]: Some core exception.
-COMPLETE> """)
+    self.AssertErrEquals("""\
+{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\
+ERROR: (gcloud.meta.test) Some core exception.
+ERROR: Update command [meta test --core-exception --quiet]: Some core exception.
+{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}\
+ERROR: (gcloud.meta.test) Some core exception.
+ERROR: Update command [meta test --core-exception --quiet]: Some core exception.
+{"ux": "PROMPT_RESPONSE", "message": "COMPLETE> "}
+""")
     self.AssertOutputEquals('')
 
 

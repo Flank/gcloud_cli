@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.container.binauthz import containeranalysis
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.util import retry
@@ -76,7 +76,7 @@ class BinauthzTest(
   def SetUp(self):
     # We don't get our track from the base binauthz test because `CliTestBase`
     # clobbers it in its SetUp.
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     # CliTestBase sets this to True in its SetUp, but we only need to consume
     # the result of calling self.Run in their structured format.
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -125,9 +125,9 @@ class BinauthzTest(
         parent=self.project_ref.RelativeName(),
         noteId=note_id,
         note=self.Note(
-            kind=self.Note.KindValueValuesEnum.ATTESTATION_AUTHORITY,
+            kind=self.Note.KindValueValuesEnum.ATTESTATION,
             shortDescription='Attestation Authority Note',
-            attestationAuthority=self.AttestationAuthority(),
+            attestationAuthority=self.Authority(),
         ),
     )
     note = self.containeranalysis_client.projects_notes.Create(request)
@@ -188,10 +188,12 @@ class BinauthzTest(
 
     # Verify the generated Occurrence.
     occurrence = self.GetOccurrence(attestation.name)
-    self.assertEqual(occurrence.attestation.pgpSignedAttestation.pgpKeyId,
-                     'bogus_pk_id')
-    self.assertEqual(occurrence.attestation.pgpSignedAttestation.signature,
-                     'bogus_sig')
+    self.assertEqual(
+        occurrence.attestation.attestation.pgpSignedAttestation.pgpKeyId,
+        'bogus_pk_id')
+    self.assertEqual(
+        occurrence.attestation.attestation.pgpSignedAttestation.signature,
+        'bogus_sig')
 
     # Create an attestation with a different artifact URL.
     artifact_url2 = self.GenerateArtifactUrl()
@@ -217,7 +219,7 @@ class BinauthzTest(
         ],
         result_predicate=HasAtLeastTwoElements)
     self.assertEqual(
-        set(occ.resourceUrl for occ in occurrences),
+        set(occ.resource.uri for occ in occurrences),
         set([self.artifact_url, artifact_url2]),
     )
 
@@ -234,10 +236,12 @@ class BinauthzTest(
             self.artifact_url,
         ]))
     self.assertEqual(1, len(occurrences))
-    self.assertEqual(occurrences[0].attestation.pgpSignedAttestation.pgpKeyId,
-                     'bogus_pk_id')
-    self.assertEqual(occurrences[0].attestation.pgpSignedAttestation.signature,
-                     'bogus_sig')
+    self.assertEqual(
+        occurrences[0].attestation.attestation.pgpSignedAttestation.pgpKeyId,
+        'bogus_pk_id')
+    self.assertEqual(
+        occurrences[0].attestation.attestation.pgpSignedAttestation.signature,
+        'bogus_sig')
 
 
 if __name__ == '__main__':

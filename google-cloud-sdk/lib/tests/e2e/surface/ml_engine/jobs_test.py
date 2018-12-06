@@ -32,7 +32,7 @@ class MlJobsTests(e2e_base.WithServiceAuth):
 
   MODEL_ID = 'do_not_delete_model'
   VERSION_ID = 'do_not_delete_version'
-  BUCKET_REF = storage_util.BucketReference.FromBucketUrl(
+  BUCKET_REF = storage_util.BucketReference.FromUrl(
       'gs://cloud-sdk-integration-testing-ml')
 
   def RunTracked(self, command):
@@ -48,7 +48,8 @@ class MlJobsTests(e2e_base.WithServiceAuth):
       storage_client = storage_api.StorageClient()
       for obj in storage_client.ListBucket(self.BUCKET_REF):
         if obj.name.startswith(job_id + '/'):
-          storage_client.DeleteObject(self.BUCKET_REF, obj.name)
+          storage_client.DeleteObject(
+              storage_util.ObjectReference.FromMessage(obj))
 
   def testJobsSubmitTraining(self):
     job_id = next(e2e_utils.GetResourceNameGenerator(prefix='ml_job',
@@ -62,7 +63,7 @@ class MlJobsTests(e2e_base.WithServiceAuth):
          '    --region us-central1 '
          '    --module-name trainer.task '
          '    --packages {package} '
-         '    --async').format(bucket_url=self.BUCKET_REF.ToBucketUrl(),
+         '    --async').format(bucket_url=self.BUCKET_REF.ToUrl(),
                                package=package)):
       # Cancel immediately so we don't do any real work
       self.RunTracked('ml-engine jobs cancel ' + job_id)
@@ -96,7 +97,7 @@ class MlJobsTests(e2e_base.WithServiceAuth):
          '  --output-path {bucket_url}/{job_id} '
          '  --region us-central1').format(
              job_id=job_id,
-             bucket_url=self.BUCKET_REF.ToBucketUrl(),
+             bucket_url=self.BUCKET_REF.ToUrl(),
              model_id=self.MODEL_ID,
              version_id=self.VERSION_ID)):
       # Cancel immediately so we don't do any real work

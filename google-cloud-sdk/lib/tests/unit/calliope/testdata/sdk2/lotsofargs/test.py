@@ -18,12 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 import six
 
 
-class Test(base.Command):
+class Test(calliope_base.Command):
   """Test command for display_info and required/not-required arguments."""
 
   @staticmethod

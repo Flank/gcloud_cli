@@ -25,7 +25,7 @@ import uuid
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.container.binauthz import containeranalysis
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import e2e_utils
@@ -102,7 +102,7 @@ class BinauthzUnitTestBase(sdk_test_base.SdkBase):
     return self.Run(prefix + cmd)
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.containeranalysis_messages = apis.GetMessagesModule(
         containeranalysis.API_NAME,
         containeranalysis.DEFAULT_VERSION)
@@ -111,10 +111,7 @@ class BinauthzUnitTestBase(sdk_test_base.SdkBase):
     # Convenience aliases for commonly used messages.
     # pylint: disable=invalid-name
     self.Note = self.containeranalysis_messages.Note
-    self.AttestationAuthority = (
-        self.containeranalysis_messages.AttestationAuthority)
-    self.BuildType = self.containeranalysis_messages.BuildType
-    self.BuildSignature = self.containeranalysis_messages.BuildSignature
+    self.Authority = self.containeranalysis_messages.Authority
     self.Attestation = self.containeranalysis_messages.Attestation
     self.PgpSignedAttestation = (
         self.containeranalysis_messages.PgpSignedAttestation)
@@ -128,7 +125,6 @@ class BinauthzUnitTestBase(sdk_test_base.SdkBase):
         self.containeranalysis_messages.
         ContaineranalysisProjectsOccurrencesCreateRequest)
     self.Occurrence = self.containeranalysis_messages.Occurrence
-    self.BuildDetails = self.containeranalysis_messages.BuildDetails
     self.ProjectsOccurrencesListRequest = (
         self.containeranalysis_messages.
         ContaineranalysisProjectsOccurrencesListRequest)
@@ -168,7 +164,7 @@ class BinauthzMockedBetaPolicyClientUnitTest(sdk_test_base.WithFakeAuth,
   """Base class for BinAuthz unit tests with mocked beta policy service."""
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.client = mock.Client(
         apis.GetClientClass('binaryauthorization', 'v1beta1'),
         real_client=apis.GetClientInstance(
@@ -195,9 +191,9 @@ class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,
     # it gets its underlying client in the normal way using
     # apis.GetClientInstance.
     self.mocked_containeranalysis_client = mock.Client(
-        apis.GetClientClass('containeranalysis', 'v1alpha1'),
+        apis.GetClientClass('containeranalysis', 'v1beta1'),
         real_client=apis.GetClientInstance(
-            'containeranalysis', 'v1alpha1', no_http=True))
+            'containeranalysis', 'v1beta1', no_http=True))
     self.mocked_containeranalysis_client.Mock()
     self.addCleanup(self.mocked_containeranalysis_client.Unmock)
     self.artifact_url = self.GenerateArtifactUrl()
@@ -241,7 +237,7 @@ class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,
         # The rest is identical to the passed arguments.
         kind=kind,
         noteName=note_name,
-        resourceUrl=resource_url,
+        resource=self.containeranalysis_messages.Resource(uri=resource_url),
         **kwargs)
 
   def ExpectProjectsOccurrencesCreate(self, request_occurrence, project_ref):
@@ -264,7 +260,6 @@ class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,
     )
     self.mocked_containeranalysis_client.projects_occurrences.Create.Expect(
         request=self.ProjectsOccurrencesCreateRequest(
-            name=None,
             occurrence=request_occurrence,
             parent=parent,
         ),
@@ -342,21 +337,20 @@ class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
       Occurrence. This is linked to the appropriate Note, but does not
         have an ID set.
     """
-    content_type = (
-        self.PgpSignedAttestation.ContentTypeValueValuesEnum.SIMPLE_SIGNING_JSON
-    )
-    kind = self.Occurrence.KindValueValuesEnum.ATTESTATION_AUTHORITY
     attestation = self.Attestation(
         pgpSignedAttestation=self.PgpSignedAttestation(
-            contentType=content_type,
+            contentType=(
+                self.PgpSignedAttestation.ContentTypeValueValuesEnum.
+                SIMPLE_SIGNING_JSON),
             signature=signature,
             pgpKeyId=pgp_key_fingerprint,
         ))
     return self.Occurrence(
-        attestation=attestation,
-        kind=kind,
+        attestation=self.containeranalysis_messages.Details(
+            attestation=attestation),
+        kind=self.Occurrence.KindValueValuesEnum.ATTESTATION,
         noteName=note_ref.RelativeName(),
-        resourceUrl=artifact_url,
+        resource=self.containeranalysis_messages.Resource(uri=artifact_url),
     )
 
   def CreateResponseOccurrence(self, request_occurrence, project_ref):
@@ -378,7 +372,7 @@ class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
         project_ref=project_ref,
         kind=request_occurrence.kind,
         note_name=request_occurrence.noteName,
-        resource_url=request_occurrence.resourceUrl,
+        resource_url=request_occurrence.resource.uri,
         attestation=request_occurrence.attestation,
     )
 

@@ -1,0 +1,83 @@
+
+.TH "GCLOUD_ALPHA_ASSET_GET\-HISTORY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha asset get\-history \- get history of assets that overlaps a time window
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha asset get\-history\fR \fB\-\-asset\-names\fR=[\fIASSET_NAMES\fR,...] \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR \fB\-\-start\-time\fR=\fISTART_TIME\fR [\fB\-\-end\-time\fR=\fIEND_TIME\fR] [\fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Get history of assets that overlaps a time window.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-asset\-names\fR=[\fIASSET_NAMES\fR,...]
+A list of full names of the assets to get the history for. See
+https://cloud.google.com/apis/design/resource_names#full_resource_name for name
+format.
+
+.TP 2m
+\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR
+Asset content type. Choices are \f5resource\fR, \f5iam\-policy\fR. Specifying
+\f5resource\fR will export resource metadata, and specifying \f5iam\-policy\fR
+will export IAM policy set on assets. \fICONTENT_TYPE\fR must be one of:
+\fBresource\fR, \fBiam\-policy\fR.
+
+.TP 2m
+\fB\-\-start\-time\fR=\fISTART_TIME\fR
+Start time of the time window (inclusive) for the asset history. Must be later
+than 2018\-10\-02T00:00:00Z. See $ gcloud topic datetimes for information on
+time formats.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-end\-time\fR=\fIEND_TIME\fR
+End time of the time window (exclusive) for the asset history. Defaults to
+current time if not specified. See $ gcloud topic datetimes for information on
+time formats.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+The ID of the organization which is the root asset.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

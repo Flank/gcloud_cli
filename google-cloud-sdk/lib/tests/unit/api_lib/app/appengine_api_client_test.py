@@ -67,7 +67,6 @@ class AppEngineApiClientTestBase(sdk_test_base.WithFakeAuth):
 
     self.appyaml = appinfo.AppInfoExternal()
     self.appyaml.Set('runtime', 'python27')
-    self.appyaml.Set('entrypoint', 'ls')
 
 
 class AppEngineApiClientTests(AppEngineApiClientTestBase):
@@ -77,6 +76,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     """Test service deployment using an image name."""
     fake_image = 'fake-image'
     fake_version = 'fake-version'
+    self.appyaml.Set('entrypoint', 'ls')
 
     fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
     self.mocked_client.apps_services_versions.Create.Expect(
@@ -96,6 +96,37 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     self.client.DeployService('fake-service', fake_version, fake_service,
                               None, fake_build)
 
+  def testDeployServiceWithEnvVars(self):
+    """Test service deployment using an image name."""
+    fake_image = 'fake-image'
+    fake_version = 'fake-version'
+    self.appyaml.Set('entrypoint', 'ls')
+    variables = appinfo.EnvironmentVariables()
+    variables.update({'FOO': 'on', 'BAR': 'true', 'BAZ': '123'})
+    self.appyaml.Set('env_variables', variables)
+
+    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
+    env_var_message = self.messages.Version.EnvVariablesValue.AdditionalProperty
+    self.mocked_client.apps_services_versions.Create.Expect(
+        request=self.messages.AppengineAppsServicesVersionsCreateRequest(
+            parent='apps/fake-project/services/fake-service',
+            version=self.messages.Version(
+                entrypoint=self.messages.Entrypoint(shell='ls'),
+                runtime='python27',
+                deployment=self.messages.Deployment(
+                    container=self.messages.ContainerInfo(image=fake_image)),
+                id=fake_version,
+                envVariables=self.messages.Version.EnvVariablesValue(
+                    additionalProperties=[
+                        env_var_message(key='BAR', value='true'),
+                        env_var_message(key='BAZ', value='123'),
+                        env_var_message(key='FOO', value='on')]))),
+        response=self.messages.Operation(done=True))
+
+    fake_build = app_build.BuildArtifact.MakeImageArtifact('fake-image')
+    self.client.DeployService('fake-service', fake_version, fake_service,
+                              None, fake_build)
+
   def testDeployServiceFromBuildId(self):
     """Test service deployment using an in-progress build ID."""
     fake_build = 'fake-build'
@@ -106,7 +137,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
         request=self.beta_messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.beta_messages.Version(
-                entrypoint=self.beta_messages.Entrypoint(shell='ls'),
+                entrypoint=self.beta_messages.Entrypoint(shell=''),
                 runtime='python27',
                 deployment=self.beta_messages.Deployment(
                     build=self.beta_messages.BuildInfo(
@@ -173,7 +204,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
         request=self.beta_messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.beta_messages.Version(
-                entrypoint=self.beta_messages.Entrypoint(shell='ls'),
+                entrypoint=self.beta_messages.Entrypoint(shell=''),
                 runtime='python27',
                 deployment=deployment_message,
                 id=fake_version,
@@ -223,6 +254,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     fake_build = app_build.BuildArtifact.MakeBuildIdArtifact('fake-build')
     fake_image = app_build.BuildArtifact.MakeImageArtifact('fake-image')
     fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
+    self.appyaml.Set('entrypoint', 'ls')
 
     image_version_expected = self.messages.Version(
         entrypoint=self.messages.Entrypoint(shell='ls'),
@@ -251,6 +283,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
   def testDeployService_WithExtraConfigs(self):
     fake_image = 'fake-image'
     fake_version = 'fake-version'
+    self.appyaml.Set('entrypoint', 'ls')
 
     extra_config_settings = {
         'cloud_build_timeout': '50',
@@ -298,6 +331,28 @@ class AppEngineApiClientVersionTests(AppEngineApiClientTestBase):
             name=version_name),
         self.messages.Operation(done=True))
     self.client.DeleteVersion('my-service', 'my-version')
+
+
+class AppEngineApiClientPatchTests(AppEngineApiClientTestBase):
+  """Tests for patch-functionality such as dispatch rules update."""
+
+  def testUpdateDispatchRules(self):
+    rules = [
+        {'domain': 'abc.xyz', 'path': 'do', 'service': 's'},
+        {'domain': '*', 'path': 'dont', 'service': 's2'},
+    ]
+    rules_message = [
+        self.messages.UrlDispatchRule(domain='abc.xyz', path='do', service='s'),
+        self.messages.UrlDispatchRule(domain='*', path='dont', service='s2'),
+    ]
+    self.mocked_client.apps.Patch.Expect(
+        request=self.messages.AppengineAppsPatchRequest(
+            name='apps/fake-project',
+            application=self.messages.Application(
+                dispatchRules=rules_message),
+            updateMask='dispatchRules,'),
+        response=self.messages.Operation(done=True))
+    self.client.UpdateDispatchRules(rules)
 
 
 if __name__ == '__main__':

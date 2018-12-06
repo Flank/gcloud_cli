@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
@@ -27,11 +27,10 @@ from tests.lib import test_case
 from tests.lib.surface.container import base as testbase
 
 
-@test_case.Filters.skip('Failing', 'b/112466355')
 class NodePoolsTestGA(testbase.IntegrationTestBase):
 
   def SetUp(self):
-    self.releasetrack = base.ReleaseTrack.GA
+    self.releasetrack = calliope_base.ReleaseTrack.GA
 
   # We need to write a kubeconfig entry that has the executable path to gcloud,
   # so we run this test only in bundle.
@@ -39,7 +38,7 @@ class NodePoolsTestGA(testbase.IntegrationTestBase):
     self.cluster_name = next(
         e2e_utils.GetResourceNameGenerator(prefix=prefix))
 
-    # Cluster deleted in "TeadDown" method of base class.
+    # Cluster deleted in "TeadDown" method of calliope_base class.
     log.status.Print('Creating cluster %s', self.cluster_name)
     self.Run('container clusters create {0} {1} --num-nodes=1'
              .format(self.cluster_name, location_flag),
@@ -68,17 +67,17 @@ class NodePoolsTestGA(testbase.IntegrationTestBase):
 
   # This test will cleanup the leaked clusters.
   # Delete clusters that are older than 1h.
+  @test_case.Filters.skip('Failing', 'b/119035730')
   @sdk_test_base.Filters.RunOnlyInBundle
   def testCleanup(self):
     self.CleanupLeakedClusters(self.ZONE, self.releasetrack)
     self.CleanupLeakedClusters(self.REGION, self.releasetrack)
 
 
-@test_case.Filters.skip('Failing', 'b/112466355')
 class NodePoolsTestBeta(NodePoolsTestGA):
 
   def SetUp(self):
-    self.releasetrack = base.ReleaseTrack.BETA
+    self.releasetrack = calliope_base.ReleaseTrack.BETA
     self.ZONE = 'us-east1-d'  # pylint: disable=invalid-name
     self.REGION = 'us-east1'  # pylint: disable=invalid-name
 

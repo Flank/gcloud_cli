@@ -18,45 +18,31 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
+from mock import patch
 
-API_VERSION = 'v1'
 
-
-class InstanceGroupManagersSetTargetPoolsZonalTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.SelectApi(API_VERSION)
-    self.make_requests.side_effect = iter([
-        [
-            self.messages.Zone(name='central2-a'),
-        ],
-    ])
+class _InstanceGroupManagersSetTargetPoolsZonalTestBase(object):
 
   def testWithName(self):
     self.Run('compute instance-groups managed set-target-pools group-1 --zone '
              'central2-a --target-pools target-pool-1,target-pool-2')
 
-    request = (
-        self.messages.ComputeInstanceGroupManagersSetTargetPoolsRequest(
-            instanceGroupManager='group-1',
-            instanceGroupManagersSetTargetPoolsRequest=(
-                self.messages.InstanceGroupManagersSetTargetPoolsRequest(
-                    targetPools=[
-                        self.compute_uri + '/projects/my-project/regions'
-                        '/central2/targetPools/target-pool-1',
-                        self.compute_uri + '/projects/my-project/'
-                        'regions/central2/targetPools/target-pool-2'],
-                )
-            ),
-            project='my-project',
-            zone='central2-a'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers, 'SetTargetPools', request)],
-    )
+    request = self.GetRequest(
+        project='my-project',
+        zone='central2-a',
+        instance_group_manager='group-1',
+        target_pools=[
+            self.compute_uri + '/projects/my-project/regions'
+            '/central2/targetPools/target-pool-1',
+            self.compute_uri + '/projects/my-project/'
+            'regions/central2/targetPools/target-pool-2'
+        ])
+    self.CheckRequests([(self.compute.instanceGroupManagers,
+                         self.GetRequestName(), request)])
 
   def testWithUri(self):
     igm_uri = ('{0}/projects/my-project/zones/central2-a/instanceGroupManagers/'
@@ -67,23 +53,16 @@ class InstanceGroupManagersSetTargetPoolsZonalTest(test_base.BaseTest):
              'central2-a --target-pools {1}'.format(
                  igm_uri, target_pool_uri))
 
-    request = (
-        self.messages.ComputeInstanceGroupManagersSetTargetPoolsRequest(
-            instanceGroupManager='group-1',
-            instanceGroupManagersSetTargetPoolsRequest=(
-                self.messages.InstanceGroupManagersSetTargetPoolsRequest(
-                    targetPools=[
-                        self.compute_uri + '/projects/my-project/regions'
-                        '/central2/targetPools/target-pool-1']
-                )
-            ),
-            project='my-project',
-            zone='central2-a'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers, 'SetTargetPools', request)],
-    )
+    request = self.GetRequest(
+        project='my-project',
+        zone='central2-a',
+        instance_group_manager='group-1',
+        target_pools=[
+            self.compute_uri + '/projects/my-project/regions'
+            '/central2/targetPools/target-pool-1'
+        ])
+    self.CheckRequests([(self.compute.instanceGroupManagers,
+                         self.GetRequestName(), request)])
 
   def testZonePrompt(self):
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
@@ -104,56 +83,92 @@ class InstanceGroupManagersSetTargetPoolsZonalTest(test_base.BaseTest):
     self.Run('compute instance-groups managed set-target-pools group-1 '
              '--target-pools target-pool-1,target-pool-2')
 
-    request = (
-        self.messages.ComputeInstanceGroupManagersSetTargetPoolsRequest(
-            instanceGroupManager='group-1',
-            instanceGroupManagersSetTargetPoolsRequest=(
-                self.messages.InstanceGroupManagersSetTargetPoolsRequest(
-                    targetPools=[
-                        self.compute_uri + '/projects/my-project/regions'
-                        '/central2/targetPools/target-pool-1',
-                        self.compute_uri + '/projects/my-project/'
-                        'regions/central2/targetPools/target-pool-2'],
-                )
-            ),
-            project='my-project',
-            zone='central2-a'
-        )
-    )
+    request = self.GetRequest(
+        project='my-project',
+        zone='central2-a',
+        instance_group_manager='group-1',
+        target_pools=[
+            self.compute_uri + '/projects/my-project/regions'
+            '/central2/targetPools/target-pool-1',
+            self.compute_uri + '/projects/my-project/'
+            'regions/central2/targetPools/target-pool-2'
+        ])
     self.CheckRequests(
         self.regions_list_request,
         self.zones_list_request,
-        [(self.compute.instanceGroupManagers, 'SetTargetPools', request)],
+        [(self.compute.instanceGroupManagers, self.GetRequestName(), request)],
     )
 
   def testClearTargetPools(self):
     self.Run('compute instance-groups managed set-target-pools group-1 --zone '
              'central2-a --target-pools ""')
 
-    request = (
-        self.messages.ComputeInstanceGroupManagersSetTargetPoolsRequest(
-            instanceGroupManager='group-1',
-            instanceGroupManagersSetTargetPoolsRequest=(
-                self.messages.InstanceGroupManagersSetTargetPoolsRequest(
-                    targetPools=[],
-                )
-            ),
-            project='my-project',
-            zone='central2-a'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers, 'SetTargetPools', request)],
-    )
+    request = self.GetRequest(
+        project='my-project',
+        zone='central2-a',
+        instance_group_manager='group-1',
+        target_pools=[])
+    self.CheckRequests([(self.compute.instanceGroupManagers,
+                         self.GetRequestName(), request)])
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run('compute instance-groups managed set-target-pools group-1 '
+               '--zone central2-a --target-pools target-pool-1,target-pool-2')
 
 
-class InstanceGroupManagersSetTargetPoolsRegionalTest(test_base.BaseTest):
+class InstanceGroupManagersSetTargetPoolsZonalTestV1(
+    test_base.BaseTest, _InstanceGroupManagersSetTargetPoolsZonalTestBase):
 
   def SetUp(self):
-    self.SelectApi(API_VERSION)
+    self.SelectApi('v1')
     self.make_requests.side_effect = iter([
-        [],
+        [
+            self.messages.Zone(name='central2-a'),
+        ],
     ])
+
+  def GetRequest(self, project, zone, instance_group_manager, target_pools):
+    return (self.messages.ComputeInstanceGroupManagersSetTargetPoolsRequest(
+        project=project,
+        zone=zone,
+        instanceGroupManager=instance_group_manager,
+        instanceGroupManagersSetTargetPoolsRequest=(
+            self.messages.InstanceGroupManagersSetTargetPoolsRequest(
+                targetPools=target_pools,))))
+
+  def GetRequestName(self):
+    return 'SetTargetPools'
+
+
+class InstanceGroupManagersSetTargetPoolsZonalTestBeta(
+    test_base.BaseTest, _InstanceGroupManagersSetTargetPoolsZonalTestBase):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.Zone(name='central2-a'),
+        ],
+    ])
+
+  def GetRequest(self, project, zone, instance_group_manager, target_pools):
+    return (self.messages.ComputeInstanceGroupManagersPatchRequest(
+        project=project,
+        zone=zone,
+        instanceGroupManager=instance_group_manager,
+        instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+            targetPools=target_pools))))
+
+  def GetRequestName(self):
+    return 'Patch'
+
+
+class InstanceGroupManagersSetTargetPoolsRegionalTest(object):
 
   def testWithName(self):
     self.Run("""
@@ -162,25 +177,18 @@ class InstanceGroupManagersSetTargetPoolsRegionalTest(test_base.BaseTest):
             --target-pools target-pool-1,target-pool-2
         """)
 
-    request = (
-        self.messages.ComputeRegionInstanceGroupManagersSetTargetPoolsRequest(
-            instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetTargetPoolsRequest=(
-                self.messages.RegionInstanceGroupManagersSetTargetPoolsRequest(
-                    targetPools=[
-                        self.compute_uri + '/projects/my-project/regions'
-                        '/central2/targetPools/target-pool-1',
-                        self.compute_uri + '/projects/my-project/'
-                        'regions/central2/targetPools/target-pool-2'],
-                )
-            ),
-            project='my-project',
-            region='central2'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'SetTargetPools', request)],
-    )
+    request = self.GetRequest(
+        project='my-project',
+        region='central2',
+        instance_group_manager='group-1',
+        target_pools=[
+            self.compute_uri + '/projects/my-project/regions'
+            '/central2/targetPools/target-pool-1',
+            self.compute_uri + '/projects/my-project/'
+            'regions/central2/targetPools/target-pool-2'
+        ])
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers,
+                         self.GetRequestName(), request)],)
 
   def testWithUri(self):
     igm_uri = ('{0}/projects/my-project/regions/central2/instanceGroupManagers/'
@@ -193,23 +201,16 @@ class InstanceGroupManagersSetTargetPoolsRegionalTest(test_base.BaseTest):
             --target-pools {1}
         """.format(igm_uri, target_pool_uri))
 
-    request = (
-        self.messages.ComputeRegionInstanceGroupManagersSetTargetPoolsRequest(
-            instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetTargetPoolsRequest=(
-                self.messages.RegionInstanceGroupManagersSetTargetPoolsRequest(
-                    targetPools=[
-                        self.compute_uri + '/projects/my-project/regions'
-                        '/central2/targetPools/target-pool-1']
-                )
-            ),
-            project='my-project',
-            region='central2'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'SetTargetPools', request)],
-    )
+    request = self.GetRequest(
+        project='my-project',
+        region='central2',
+        instance_group_manager='group-1',
+        target_pools=[
+            self.compute_uri + '/projects/my-project/regions'
+            '/central2/targetPools/target-pool-1'
+        ])
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers,
+                         self.GetRequestName(), request)],)
 
   def testZonePrompt(self):
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
@@ -232,26 +233,21 @@ class InstanceGroupManagersSetTargetPoolsRegionalTest(test_base.BaseTest):
             --target-pools target-pool-1,target-pool-2
         """)
 
-    request = (
-        self.messages.ComputeRegionInstanceGroupManagersSetTargetPoolsRequest(
-            instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetTargetPoolsRequest=(
-                self.messages.RegionInstanceGroupManagersSetTargetPoolsRequest(
-                    targetPools=[
-                        self.compute_uri + '/projects/my-project/regions'
-                        '/central2/targetPools/target-pool-1',
-                        self.compute_uri + '/projects/my-project/'
-                        'regions/central2/targetPools/target-pool-2'],
-                )
-            ),
-            project='my-project',
-            region='central2'
-        )
-    )
+    request = self.GetRequest(
+        project='my-project',
+        region='central2',
+        instance_group_manager='group-1',
+        target_pools=[
+            self.compute_uri + '/projects/my-project/regions'
+            '/central2/targetPools/target-pool-1',
+            self.compute_uri + '/projects/my-project/'
+            'regions/central2/targetPools/target-pool-2'
+        ])
     self.CheckRequests(
         self.regions_list_request,
         self.zones_list_request,
-        [(self.compute.regionInstanceGroupManagers, 'SetTargetPools', request)],
+        [(self.compute.regionInstanceGroupManagers, self.GetRequestName(),
+          request)],
     )
 
   def testClearTargetPools(self):
@@ -261,21 +257,55 @@ class InstanceGroupManagersSetTargetPoolsRegionalTest(test_base.BaseTest):
             --target-pools ""
         """)
 
-    request = (
+    request = self.GetRequest(
+        project='my-project',
+        region='central2',
+        instance_group_manager='group-1',
+        target_pools=[])
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers,
+                         self.GetRequestName(), request)])
+
+
+class InstanceGroupManagersSetTargetPoolsRegionalTestV1(
+    test_base.BaseTest, InstanceGroupManagersSetTargetPoolsRegionalTest):
+
+  def SetUp(self):
+    self.SelectApi('v1')
+    self.make_requests.side_effect = iter([[]])
+
+  def GetRequest(self, project, region, instance_group_manager, target_pools):
+    return (
         self.messages.ComputeRegionInstanceGroupManagersSetTargetPoolsRequest(
-            instanceGroupManager='group-1',
+            project=project,
+            region=region,
+            instanceGroupManager=instance_group_manager,
             regionInstanceGroupManagersSetTargetPoolsRequest=(
                 self.messages.RegionInstanceGroupManagersSetTargetPoolsRequest(
-                    targetPools=[],
-                )
-            ),
-            project='my-project',
-            region='central2'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'SetTargetPools', request)],
-    )
+                    targetPools=target_pools,))))
+
+  def GetRequestName(self):
+    return 'SetTargetPools'
+
+
+class InstanceGroupManagersSetTargetPoolsRegionalTestBeta(
+    test_base.BaseTest, InstanceGroupManagersSetTargetPoolsRegionalTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.make_requests.side_effect = iter([[]])
+
+  def GetRequest(self, project, region, instance_group_manager, target_pools):
+    return (self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
+        project=project,
+        region=region,
+        instanceGroupManager=instance_group_manager,
+        instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+            targetPools=target_pools))))
+
+  def GetRequestName(self):
+    return 'Patch'
+
 
 if __name__ == '__main__':
   test_case.main()

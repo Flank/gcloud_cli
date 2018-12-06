@@ -66,7 +66,8 @@ class CreateTestBase(object):
                     python_version=None,
                     model_class=None,
                     package_uris=None,
-                    response=None):
+                    response=None,
+                    accelerator=None):
     if framework:
       framework = self.short_msgs.Version.FrameworkValueValuesEnum(framework)
     op = self.msgs.GoogleLongrunningOperation(name='opId')
@@ -75,6 +76,7 @@ class CreateTestBase(object):
             parent='projects/{}/models/modelId'.format(self.Project()),
             version=self.short_msgs.Version(
                 name='versionId',
+                acceleratorConfig=accelerator,
                 deploymentUri=deployment_uri,
                 runtimeVersion=runtime_version,
                 manualScaling=manual_scaling,
@@ -226,8 +228,9 @@ class CreateTestBase(object):
              '--origin ' + self.temp_path)
 
     copy_file_mock.assert_called_once_with(
-        storage_util.BucketReference.FromBucketUrl('gs://bucket/'),
-        os.path.join(self.temp_path, 'file'), self._SHA256_SUM + '/file')
+        os.path.join(self.temp_path, 'file'),
+        storage_util.ObjectReference.FromUrl(
+            'gs://bucket/' + self._SHA256_SUM + '/file'))
 
   def testCreateFrameworkFlag(self):
     self._ExpectCreate(framework='XGBOOST')
@@ -298,16 +301,13 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
 
   def testCreateInvalidMachineType(self):
 
-    class ErrorResponse(object):
-
-      class Error(object):
-        message = 'Invalid machine_type: mls1-c1-m4'
-
-      done = True
-      response = ''
-      error = Error
-
-    self._ExpectCreate(machine_type='mls1-c1-m4', response=ErrorResponse)
+    self._ExpectCreate(
+        machine_type='mls1-c1-m4',
+        response=self.msgs.GoogleLongrunningOperation(
+            done=True,
+            response=None,
+            error=self.msgs.GoogleRpcStatus(
+                message='Invalid machine_type: mls1-c1-m4')))
     error_msg = r'Invalid machine_type: mls1-c1-m4'
     with self.assertRaisesRegex(waiter.OperationError, error_msg):
       self.Run('ml-engine versions create versionId --model modelId '
@@ -370,16 +370,14 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
 
   def testCreateInvalidMachineType(self):
 
-    class ErrorResponse(object):
+    self._ExpectCreate(
+        machine_type='mls1-c1-m4',
+        response=self.msgs.GoogleLongrunningOperation(
+            done=True,
+            response=None,
+            error=self.msgs.GoogleRpcStatus(
+                message='Invalid machine_type: mls1-c1-m4')))
 
-      class Error(object):
-        message = 'Invalid machine_type: mls1-c1-m4'
-
-      done = True
-      response = ''
-      error = Error
-
-    self._ExpectCreate(machine_type='mls1-c1-m4', response=ErrorResponse)
     error_msg = r'Invalid machine_type: mls1-c1-m4'
     with self.assertRaisesRegex(waiter.OperationError, error_msg):
       self.Run('ml-engine versions create versionId --model modelId '
@@ -408,6 +406,19 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
     self.Run(('ml-engine versions create versionId --model modelId '
               '--origin gs://path/to/file '
               '--config {}').format(yaml_path))
+
+  def testCreateAcceleratorFlag(self):
+    accelerator_config = self.msgs.GoogleCloudMlV1AcceleratorConfig(
+        count=2,
+        type=(self.msgs.GoogleCloudMlV1AcceleratorConfig.
+              TypeValueValuesEnum.NVIDIA_TESLA_K80)
+        )
+    self._ExpectCreate(accelerator=accelerator_config)
+    self._ExpectOperationPolling()
+    self.Run('ml-engine versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--accelerator type=nvidia-tesla-k80,count=2')
+    self.AssertErrContains('Creating version (this might take a few minutes)')
 
 
 if __name__ == '__main__':

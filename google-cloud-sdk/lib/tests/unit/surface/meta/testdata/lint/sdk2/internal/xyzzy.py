@@ -19,10 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import arg_parsers
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class XyzZY(base.Command):
+class XyzZY(calliope_base.Command):
   """Internal tests command."""
 
   @staticmethod

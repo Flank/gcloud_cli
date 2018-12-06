@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -30,7 +30,7 @@ class MonitoringTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   """Base class for Monitoring unit tests."""
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.client = mock.Client(client_class=apis.GetClientClass('monitoring',
                                                                'v3'))
     self.client.Mock()

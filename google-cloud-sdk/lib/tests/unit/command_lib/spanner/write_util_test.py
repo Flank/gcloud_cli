@@ -256,6 +256,14 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
     with self.assertRaisesRegex(util.InvalidKeysError, error_message):
       table.GetJsonKeys(invalid_keys)
 
+  def testGetColumnTypes(self):
+    table = util.Table.FromDdl(_DATABASE_DDL, 'queryTest')
+    expected_types = OrderedDict([('id', util._ScalarColumnType('INT64')),
+                                  ('name', util._ScalarColumnType('STRING')),
+                                  ('others', util._ScalarColumnType('STRING')),
+                                  ('arr', util._ArrayColumnType('STRING'))])
+    self.assertEquals(table.GetColumnTypes(), expected_types)
+
 
 class JsonConversionTest(base.SpannerTestBase, parameterized.TestCase):
 
@@ -311,33 +319,25 @@ class JsonConversionTest(base.SpannerTestBase, parameterized.TestCase):
         util.ConvertJsonValueForScalarTypes('DATE', input_value))
 
 
-class RowDataParserTest(base.SpannerTestBase, parameterized.TestCase):
+class ValidateArrayInputTest(base.SpannerTestBase, parameterized.TestCase):
 
-  def testSimpleRow(self):
-    expected_dict = OrderedDict([('SingerId', '1'), ('SingerName', 'Apple')])
-    data_str = 'SingerId=1,SingerName=Apple'
-    self.assertEqual(expected_dict, util.RowDataParser(data_str))
+  def testValidInput(self):
+    data = OrderedDict([('id', '1'), ('name', 'Cooper Dogerson')])
+    table = util.Table.FromDdl(_DATABASE_DDL, 'queryTest')
+    self.assertEqual(data, util.ValidateArrayInput(table, data))
 
-  def testRowWithArrayColumn(self):
-    expected_dict = OrderedDict([('eventId', '2'), ('user', 'abc'),
-                                 ('test', ['2', '4', '5'])])
-    data_str = 'eventId=2, user=abc, test=[2,4,5]'
-    self.assertEqual(expected_dict, util.RowDataParser(data_str))
+  def testValidArrayInput(self):
+    data = OrderedDict([('id', '1'), ('name', 'Cooper Dogerson'),
+                        ('arr', ['hello, I am valid', 'also valid'])])
+    table = util.Table.FromDdl(_DATABASE_DDL, 'queryTest')
+    self.assertEqual(data, util.ValidateArrayInput(table, data))
 
-  def testRowWithEmptyArray(self):
-    expected_dict = OrderedDict([('eventId', '2'), ('user', 'abc'),
-                                 ('test', ['2', '4', '5']), ('date', [])])
-    data_str = 'eventId=2, user=abc, test=[2,4,5], date=[]'
-    self.assertEqual(expected_dict, util.RowDataParser(data_str))
-
-  def testRowWithEmptyString(self):
-    expected_dict = OrderedDict([('eventId', '2'), ('user', ''),
-                                 ('test', ['2', '4', '5']),
-                                 ('date', ['test date', 'test2'])])
-    data_str = 'eventId=2, user="", test=[2,4,5], date=["test date",test2]'
-    self.assertEqual(expected_dict, util.RowDataParser(data_str))
-
-  def testRowWithEmptyStringInLastColumn(self):
-    expected_dict = OrderedDict([('eventId', '2'), ('user', '')])
-    data_str = 'eventId=2, user=""'
-    self.assertEqual(expected_dict, util.RowDataParser(data_str))
+  def testInvalidArrayInput(self):
+    data = OrderedDict([('id', '1'), ('name', 'Cooper Dogerson'),
+                        ('arr', '[invalid]')])
+    table = util.Table.FromDdl(_DATABASE_DDL, 'queryTest')
+    error_message = re.escape(
+        'Column name [arr] has an invalid array input: [invalid]. '
+        '`--flags-file` should be used to specify array values.')
+    with self.assertRaisesRegex(util.InvalidArrayInputError, error_message):
+      util.ValidateArrayInput(table, data)

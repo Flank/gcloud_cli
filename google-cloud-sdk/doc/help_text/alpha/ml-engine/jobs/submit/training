@@ -3,13 +3,13 @@ NAME
         Learning training job
 
 SYNOPSIS
-    gcloud alpha ml-engine jobs submit training JOB --module-name=MODULE_NAME
-        [--config=CONFIG] [--job-dir=JOB_DIR] [--labels=[KEY=VALUE,...]]
-        [--package-path=PACKAGE_PATH] [--packages=[PACKAGE,...]]
-        [--python-version=PYTHON_VERSION] [--region=REGION]
-        [--runtime-version=RUNTIME_VERSION] [--scale-tier=SCALE_TIER]
-        [--staging-bucket=STAGING_BUCKET] [--async | --stream-logs]
-        [GCLOUD_WIDE_FLAG ...] [-- USER_ARGS ...]
+    gcloud alpha ml-engine jobs submit training JOB [--config=CONFIG]
+        [--job-dir=JOB_DIR] [--labels=[KEY=VALUE,...]]
+        [--module-name=MODULE_NAME] [--package-path=PACKAGE_PATH]
+        [--packages=[PACKAGE,...]] [--python-version=PYTHON_VERSION]
+        [--region=REGION] [--runtime-version=RUNTIME_VERSION]
+        [--scale-tier=SCALE_TIER] [--staging-bucket=STAGING_BUCKET]
+        [--async | --stream-logs] [GCLOUD_WIDE_FLAG ...] [-- USER_ARGS ...]
 
 DESCRIPTION
     (ALPHA) Submit a Cloud Machine Learning training job.
@@ -56,20 +56,47 @@ POSITIONAL ARGUMENTS
         The '--' argument must be specified between gcloud specific args on the
         left and USER_ARGS on the right.
 
-REQUIRED FLAGS
-     --module-name=MODULE_NAME
-        Name of the module to run.
-
-OPTIONAL FLAGS
+FLAGS
      --config=CONFIG
         Path to the job configuration file. This file should be a YAML document
         (JSON also accepted) containing a Job resource as defined in the API
         (all fields are optional):
         https://cloud.google.com/ml/reference/rest/v1/projects.jobs
 
-        If an option is specified both in the configuration file **and** via
-        command line arguments, the command line arguments override the
-        configuration file.
+        EXAMPLES:
+
+        JSON:
+
+            {
+              "jobId": "my_job",
+              "labels": {
+                "type": "prod",
+                "owner": "alice"
+              },
+              "trainingInput": {
+                "scaleTier": "BASIC",
+                "packageUris": [
+                  "gs://my/package/path"
+                ],
+                "region": "us-east1"
+              }
+            }
+
+        YAML:
+
+            jobId: my_job
+            labels:
+              type: prod
+              owner: alice
+            trainingInput:
+              scaleTier: BASIC
+              packageUris:
+              - gs://my/package/path
+              region: us-east1
+
+    If an option is specified both in the configuration file **and** via
+    command line arguments, the command line arguments override the
+    configuration file.
 
      --job-dir=JOB_DIR
         Google Cloud Storage path in which to store training outputs and other
@@ -89,6 +116,9 @@ OPTIONAL FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     --module-name=MODULE_NAME
+        Name of the module to run.
 
      --package-path=PACKAGE_PATH
         Path to a Python package to build. This should point to a directory
@@ -197,8 +227,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

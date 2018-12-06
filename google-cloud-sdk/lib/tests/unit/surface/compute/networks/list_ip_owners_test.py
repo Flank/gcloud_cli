@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -30,7 +30,7 @@ from tests.lib import test_case
 class NetworksListIpOwnersTest(sdk_test_base.WithFakeAuth,
                                cli_test_base.CliTestBase):
   api_version = 'alpha'
-  release_track = base.ReleaseTrack.ALPHA
+  release_track = calliope_base.ReleaseTrack.ALPHA
 
   def SetUp(self):
     self.track = self.release_track

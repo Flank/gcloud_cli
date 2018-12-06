@@ -5,7 +5,6 @@ platform/bq/MANIFEST.in
 platform/bq/README.txt
 platform/bq/VERSION
 platform/bq/bigquery_client.py
-platform/bq/bigquery_client_test.py
 platform/bq/bq.py
 platform/bq/bq_auth_flags.py
 platform/bq/bq_flags.py
@@ -138,6 +137,7 @@ platform/bq/third_party/pyasn1_modules/rfc2437.py
 platform/bq/third_party/pyasn1_modules/rfc2459.py
 platform/bq/third_party/pyasn1_modules/rfc2511.py
 platform/bq/third_party/pyasn1_modules/rfc2560.py
+platform/bq/third_party/pyasn1_modules/rfc2986.py
 platform/bq/third_party/pyasn1_modules/rfc3279.py
 platform/bq/third_party/pyasn1_modules/rfc3280.py
 platform/bq/third_party/pyasn1_modules/rfc3281.py

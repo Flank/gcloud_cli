@@ -1,0 +1,177 @@
+
+.TH "GCLOUD_DATAPROC_WORKFLOW\-TEMPLATES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud dataproc workflow\-templates \- create and manage Google Cloud Dataproc workflow templates
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud dataproc workflow\-templates\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create and manage Google Cloud Dataproc workflow templates.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBadd\-job\fR
+Add Google Cloud Dataproc jobs to workflow template.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+Create a workflow template.
+
+.TP 2m
+\fBdelete\fR
+Delete a workflow template.
+
+.TP 2m
+\fBdescribe\fR
+Describe a workflow template.
+
+.TP 2m
+\fBexport\fR
+Export a workflow template.
+
+.TP 2m
+\fBget\-iam\-policy\fR
+Get IAM policy for a workflow template.
+
+.TP 2m
+\fBimport\fR
+Import a workflow template.
+
+.TP 2m
+\fBinstantiate\fR
+Instantiate a workflow template.
+
+.TP 2m
+\fBinstantiate\-from\-file\fR
+Instantiate a workflow template from a file.
+
+.TP 2m
+\fBlist\fR
+List workflow templates.
+
+.TP 2m
+\fBremove\-job\fR
+Remove a job from workflow template.
+
+.TP 2m
+\fBset\-cluster\-selector\fR
+Set cluster selector for the workflow template.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+Set IAM policy for a template.
+
+.TP 2m
+\fBset\-managed\-cluster\fR
+Set a managed cluster for the workflow template.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To create a workflow template, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates create my_template
+.RE
+
+To instantiate a workflow template, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates instantiate my_template
+.RE
+
+To instantiate a workflow template from a file, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates instantiate\-from\-file \e
+    \-\-file template.yaml
+.RE
+
+To delete a workflow template, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates delete my_template
+.RE
+
+To view the details of a workflow template, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates describe my_template
+.RE
+
+To see the list of all workflow templates, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates list
+.RE
+
+To remove a job from a workflow template, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates remove\-job my_template \e
+    \-\-step\-id id
+.RE
+
+To update managed cluster in a workflow template, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates set\-managed\-cluster \e
+    my_template \-\-num\-masters 5
+.RE
+
+To update cluster selector in a workflow template, run:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates set\-cluster\-selector \e
+    my_template \e
+    \-\-cluster\-labels environment=prod
+.RE
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta dataproc workflow\-templates
+.RE
+

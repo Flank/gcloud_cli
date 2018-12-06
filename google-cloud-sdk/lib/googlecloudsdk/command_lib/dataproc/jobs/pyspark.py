@@ -43,7 +43,8 @@ class PySparkBase(job_base.JobBase):
         metavar='PY_FILE',
         default=[],
         help=('Comma separated list of Python files to be provided to the job. '
-              'Must be one of the following file formats" .py, ,.zip, or .egg'))
+              'Must be one of the following file formats '
+              '".py, .zip, or .egg".'))
     parser.add_argument(
         '--jars',
         type=arg_parsers.ArgList(),
@@ -112,7 +113,7 @@ class PySparkBase(job_base.JobBase):
         loggingConfig=logging_config)
 
     if args.properties:
-      pyspark_job.properties = encoding.DictToMessage(
+      pyspark_job.properties = encoding.DictToAdditionalPropertyMessage(
           args.properties, messages.PySparkJob.PropertiesValue)
 
     job.pysparkJob = pyspark_job

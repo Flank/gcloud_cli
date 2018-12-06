@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ from prompt_toolkit.token import Token
 class TokenMarkdownTests(test_base.Markdown):
 
   def SetUp(self):
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
 
   def Run(self, markdown, expected, width=60, height=50):
     actual = render_document.MarkdownRenderer(
@@ -71,6 +71,23 @@ class TokenMarkdownTests(test_base.Markdown):
          [(Token.Markdown.Section, 'SECTION'),
           (Token.Markdown.Normal, ' Section prose.')]])
 
+  def testTokenRoot(self):
+    markdown = self.ROOT_MARKDOWN
+    self.Run(
+        markdown,
+        [[(Token.Markdown.Section, 'SYNOPSIS'),
+          (Token.Markdown.Normal, ' gcloud component [ '),
+          (Token.Markdown.Italic, 'flags'),
+          (Token.Markdown.Normal, ' ] [ '),
+          (Token.Markdown.Italic, 'positionals'),
+          (Token.Markdown.Normal, ' ]')],
+         [(Token.Markdown.Section, 'SECTION'),
+          (Token.Markdown.Normal,
+           ' Section prose about the gcloud component command.')],
+         [(Token.Markdown.Section, 'GCLOUD WIDE FLAGS'),
+          (Token.Markdown.Normal, ' These are available in all commands:')],
+         [(Token.Markdown.Normal, '--foo, --bar and --verbosity.')]])
+
   def testTokenEmptyName(self):
     markdown = """\
 ## NAME
@@ -93,7 +110,19 @@ class TokenMarkdownTests(test_base.Markdown):
     markdown = """\
 ## TABLE
 
+--- | --- | ---
+"""
+    self.Run(
+        markdown,
+        [[(Token.Markdown.Section, 'TABLE')]])
+
+  def testOldTokenEmptyTable(self):
+    markdown = """\
+## TABLE
+
 [options="header",format="csv",grid="none",frame="none"]
+|====
+|====
 """
     self.Run(
         markdown,
@@ -103,19 +132,37 @@ class TokenMarkdownTests(test_base.Markdown):
     markdown = """\
 ## TABLE
 
-[options="header",format="csv",grid="none",frame="none"]
-abc,123,A B C
-pdq xyz,789012,X Y Z
+abc | 123 | A B C
+--- | --- | ---
+pdq xyz | 789012 | X Y Z
 
 And a sentence after the table.
 """
     self.Run(
         markdown,
         [[(Token.Markdown.Section, 'TABLE'),
-          (Token.Markdown.Normal, '  abc     123    A B C')],
-         [(Token.Markdown.Normal, '  pdq xyz 789012 X Y Z')],
-         [],
-         [(Token.Markdown.Normal, '  And a sentence after the table.')]])
+          (Token.Markdown.Normal, '  abc      123     A B C')],
+         [(Token.Markdown.Normal, '  pdq xyz  789012  X Y Z')],
+         [(Token.Markdown.Normal, 'And a sentence after the table.')]])
+
+  def testOldTokenTable(self):
+    markdown = """\
+## TABLE
+
+[options="header",format="csv",grid="none",frame="none"]
+|====
+abc,123,A B C
+pdq xyz,789012,X Y Z
+|====
+
+And a sentence after the table.
+"""
+    self.Run(
+        markdown,
+        [[(Token.Markdown.Section, 'TABLE'),
+          (Token.Markdown.Normal, '  abc      123     A B C')],
+         [(Token.Markdown.Normal, '  pdq xyz  789012  X Y Z')],
+         [(Token.Markdown.Normal, 'And a sentence after the table.')]])
 
   # The Synopsis tests verify that the NAME and SYNOPSYS justification stays
   # within the page width and does not split flag and positional groups in
@@ -203,7 +250,7 @@ And a sentence after the table.
           (Token.Markdown.Normal, ' '),
           (Token.Markdown.Italic, 'STATE')],
          [(Token.Markdown.Normal, '    ['),
-          (Token.Markdown.Italic, 'GLOBAL-FLAG ...'),
+          (Token.Markdown.Italic, 'GCLOUD_WIDE_FLAG ...'),
           (Token.Markdown.Normal, ']')],
          [(Token.Markdown.Section, 'DESCRIPTION'),
           (Token.Markdown.Normal, ' '),
@@ -434,8 +481,9 @@ And a sentence after the table.
           (Token.Markdown.Bold, '--zone'),
           (Token.Markdown.Normal, ' '),
           (Token.Markdown.Italic, 'ZONE'),
-          (Token.Markdown.Normal, '] ['),
-          (Token.Markdown.Italic, 'GLOBAL-FLAG ...'),
+          (Token.Markdown.Normal, ']')],
+         [(Token.Markdown.Normal, '    ['),
+          (Token.Markdown.Italic, 'GCLOUD_WIDE_FLAG ...'),
           (Token.Markdown.Normal, ']')],
          [(Token.Markdown.Section, 'DESCRIPTION'),
           (Token.Markdown.Normal, ' '),
@@ -447,7 +495,7 @@ And a sentence after the table.
   def testTokenLongSynopsisFlagValue(self):
     markdown = """## SYNOPSIS
 
-`gcloud alpha compute backend-services create` _NAME_ [*--https-health-checks*=_HTTPS_HEALTH_CHECK_,[_HTTPS_HEALTH_CHECK_,...]] [*--iap*=[_disabled_],[_enabled_],[_oauth2-client-id_=_OAUTH2-CLIENT-ID_],[_oauth2-client-secret_=_OAUTH2-CLIENT-SECRET_]] [*--load-balancing-scheme*=_LOAD_BALANCING_SCHEME_; default="EXTERNAL"] [*--port-name*=_PORT_NAME_] [*--protocol*=_PROTOCOL_] [*--cache-key-query-string-blacklist*=[_QUERY_STRING_,...] | *--cache-key-query-string-whitelist*=_QUERY_STRING_,[_QUERY_STRING_,...]] [*--server*=_SERVER_,[_SERVER_,...], *-s* _SERVER_,[_SERVER_,...]; default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,b.gcr.io,bucket.gcr.io,appengine.gcr.io,gcr.kubernetes.io"] [*--global* | *--region*=_REGION_] [_GLOBAL-FLAG ..._]
+`gcloud alpha compute backend-services create` _NAME_ [*--https-health-checks*=_HTTPS_HEALTH_CHECK_,[_HTTPS_HEALTH_CHECK_,...]] [*--iap*=[_disabled_],[_enabled_],[_oauth2-client-id_=_OAUTH2-CLIENT-ID_],[_oauth2-client-secret_=_OAUTH2-CLIENT-SECRET_]] [*--load-balancing-scheme*=_LOAD_BALANCING_SCHEME_; default="EXTERNAL"] [*--port-name*=_PORT_NAME_] [*--protocol*=_PROTOCOL_] [*--cache-key-query-string-blacklist*=[_QUERY_STRING_,...] | *--cache-key-query-string-whitelist*=_QUERY_STRING_,[_QUERY_STRING_,...]] [*--server*=_SERVER_,[_SERVER_,...], *-s* _SERVER_,[_SERVER_,...]; default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,b.gcr.io,bucket.gcr.io,appengine.gcr.io,gcr.kubernetes.io"] [*--global* | *--region*=_REGION_] [_GCLOUD_WIDE_FLAG ..._]
 """
     self.Run(
         markdown,
@@ -535,7 +583,7 @@ And a sentence after the table.
           (Token.Markdown.Normal, '='),
           (Token.Markdown.Italic, 'REGION'),
           (Token.Markdown.Normal, '] ['),
-          (Token.Markdown.Italic, 'GLOBAL-FLAG ...'),
+          (Token.Markdown.Italic, 'GCLOUD_WIDE_FLAG ...'),
           (Token.Markdown.Normal, ']')]])
 
   def testTokenCodeBlock(self):
@@ -810,7 +858,7 @@ gcloud compute - create and manipulate Google Compute Engine resources
 
 ## SYNOPSIS
 
-`gcloud compute` _GROUP_ | _COMMAND_ [_GLOBAL-FLAG ..._]
+`gcloud compute` _GROUP_ | _COMMAND_ [_GCLOUD_WIDE_FLAG ..._]
 
 
 ## DESCRIPTION
@@ -828,7 +876,7 @@ https://cloud.google.com/compute/ and detailed documentation can be
 found here: https://cloud.google.com/compute/docs/
 
 
-## GLOBAL FLAGS
+## GCLOUD WIDE FLAGS
 
 Run *$ link:gcloud[gcloud] help* for a description of flags available to
 all commands.
@@ -1000,7 +1048,7 @@ SSH into a virtual machine instance
          (Token.Markdown.Normal, ' | '),
          (Token.Markdown.Italic, 'COMMAND'),
          (Token.Markdown.Normal, ' ['),
-         (Token.Markdown.Italic, 'GLOBAL-FLAG ...'),
+         (Token.Markdown.Italic, 'GCLOUD_WIDE_FLAG ...'),
          (Token.Markdown.Normal, ']')],
         [(Token.Markdown.Section, 'DESCRIPTION'),
          (Token.Markdown.Normal,
@@ -1037,7 +1085,7 @@ gcloud compute ssh - SSH into a virtual machine instance
 
 ## SYNOPSIS
 
-`gcloud compute ssh` [_USER_@]_INSTANCE_ _SSH_ARGS_ [*--command*=_COMMAND_] [*--container*=_CONTAINER_] [*--dry-run*] [*--force-key-file-overwrite*] [*--plain*] [*--ssh-flag*=_SSH_FLAG_] [*--ssh-key-file*=_SSH_KEY_FILE_] [*--strict-host-key-checking*=_STRICT_HOST_KEY_CHECKING_] [*--zone*=_ZONE_] [_GLOBAL-FLAG ..._]
+`gcloud compute ssh` [_USER_@]_INSTANCE_ _SSH_ARGS_ [*--command*=_COMMAND_] [*--container*=_CONTAINER_] [*--dry-run*] [*--force-key-file-overwrite*] [*--plain*] [*--ssh-flag*=_SSH_FLAG_] [*--ssh-key-file*=_SSH_KEY_FILE_] [*--strict-host-key-checking*=_STRICT_HOST_KEY_CHECKING_] [*--zone*=_ZONE_] [_GCLOUD_WIDE_FLAG ..._]
 
 
 ## DESCRIPTION
@@ -1153,7 +1201,7 @@ Alternatively, the zone can be stored in the environment variable
 `_CLOUDSDK_COMPUTE_ZONE_`.
 
 
-## GLOBAL FLAGS
+## GCLOUD WIDE FLAGS
 
 Run *$ link:gcloud[gcloud] help* for a description of flags available to
 all commands.
@@ -1223,7 +1271,7 @@ can SSH into one of your containers with:
          (Token.Markdown.Italic, 'ZONE'),
          (Token.Markdown.Normal, ']')],
         [(Token.Markdown.Normal, '    ['),
-         (Token.Markdown.Italic, 'GLOBAL-FLAG ...'),
+         (Token.Markdown.Italic, 'GCLOUD_WIDE_FLAG ...'),
          (Token.Markdown.Normal, ']')],
         [(Token.Markdown.Section, 'DESCRIPTION'),
          (Token.Markdown.Normal, ' '),
@@ -1487,7 +1535,7 @@ can SSH into one of your containers with:
 class TokenUTF8MarkdownTests(test_base.UTF8):
 
   def SetUp(self):
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
 
   def Run(self, markdown, expected, width=60, height=50):
     actual = render_document.MarkdownRenderer(

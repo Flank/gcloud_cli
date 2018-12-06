@@ -28,7 +28,8 @@ from googlecloudsdk.calliope import cli_tree
 from googlecloudsdk.command_lib.interactive import bindings
 from googlecloudsdk.command_lib.interactive import bindings_vi
 from googlecloudsdk.command_lib.interactive import completer
-from googlecloudsdk.command_lib.interactive import coshell
+from googlecloudsdk.command_lib.interactive import coshell as interactive_coshell
+from googlecloudsdk.command_lib.interactive import debug as interactive_debug
 from googlecloudsdk.command_lib.interactive import layout
 from googlecloudsdk.command_lib.interactive import parser
 from googlecloudsdk.command_lib.interactive import style as interactive_style
@@ -56,18 +57,28 @@ class CLI(interface.CommandLineInterface):
   """Extends the prompt CLI object to include our state.
 
   Attributes:
+    command_count: Command line serial number, incremented on ctrl-c and Run.
+    completer: The interactive completer object.
+    config: The interactive shell config object.
+    coshell: The shell coprocess object.
+    debug: The debugging object.
+    parser: The interactive parser object.
     root: The root of the static CLI tree that contains all commands, flags,
       positionals and help doc snippets.
   """
 
-  def __init__(self, config=None, cosh=None, root=None, interactive_parser=None,
+  def __init__(self, config=None, coshell=None, debug=None, root=None,
+               interactive_parser=None, interactive_completer=None,
                application=None, eventloop=None, output=None):
     super(CLI, self).__init__(
         application=application,
         eventloop=eventloop,
         output=output)
+    self.command_count = 0
+    self.completer = interactive_completer
     self.config = config
-    self.coshell = cosh
+    self.coshell = coshell
+    self.debug = debug
     self.parser = interactive_parser
     self.root = root
 
@@ -90,6 +101,10 @@ class CLI(interface.CommandLineInterface):
     if alternate_screen:
       self.renderer.erase()
     self.coshell.Run(text)
+    if alternate_screen:
+      self.renderer.erase(leave_alternate_screen=False, erase_title=False)
+      self.renderer.request_absolute_cursor_position()
+      self._redraw()
 
   # Wraps the interface.CommandLineInterface method.
   def add_buffer(self, name, buf, focus=False):
@@ -171,6 +186,45 @@ def _GetJustifiedTokens(labels, width=80, justify=True):
   return tokens[:-1]
 
 
+def _AddCliTreeKeywordsAndBuiltins(root):
+  """Adds keywords and builtins to the CLI tree root."""
+
+  # Add the exit builtin to the CLI tree.
+
+  node = cli_tree.Node(
+      command='exit',
+      description='Exit the interactive shell.',
+      positionals=[
+          {
+              'default': '0',
+              'description': 'The exit status.',
+              'name': 'status',
+              'nargs': '?',
+              'required': False,
+              'value': 'STATUS',
+          },
+      ],
+  )
+  node[parser.LOOKUP_IS_GROUP] = False
+  root[parser.LOOKUP_COMMANDS]['exit'] = node
+
+  # Add special shell keywords that may be followed by commands.
+
+  for name in ['!', '{', 'do', 'elif', 'else', 'if', 'then', 'time',
+               'until', 'while']:
+    node = cli_tree.Node(name)
+    node[parser.LOOKUP_IS_GROUP] = False
+    node[parser.LOOKUP_IS_SPECIAL] = True
+    root[parser.LOOKUP_COMMANDS][name] = node
+
+  # Add misc shell keywords.
+
+  for name in ['break', 'case', 'continue', 'done', 'esac', 'fi']:
+    node = cli_tree.Node(name)
+    node[parser.LOOKUP_IS_GROUP] = False
+    root[parser.LOOKUP_COMMANDS][name] = node
+
+
 class Application(object):
   """The CLI application.
 
@@ -178,15 +232,17 @@ class Application(object):
     args: The parsed command line arguments.
     config: The interactive shell config object.
     coshell: The shell coprocess object.
+    debug: The debugging object.
     key_bindings: The key_bindings object holding the key binding list and
       toggle states.
     key_bindings_registry: The key bindings registry.
   """
 
-  def __init__(self, cosh=None, args=None, config=None):
+  def __init__(self, coshell=None, args=None, config=None, debug=None):
     self.args = args
-    self.coshell = cosh
+    self.coshell = coshell
     self.config = config
+    self.debug = debug
     self.key_bindings = bindings.KeyBindings()
     self.key_bindings_registry = self.key_bindings.MakeRegistry()
 
@@ -198,33 +254,9 @@ class Application(object):
     self.root = generate_cli_trees.LoadAll(
         ignore_out_of_date=True, warn_on_exceptions=True)
 
-    # Add the exit command completer node to the CLI tree.
-    self.root[parser.LOOKUP_COMMANDS]['exit'] = cli_tree.Node(
-        command='exit',
-        description='Exit the interactive shell.',
-        positionals=[
-            {
-                'default': '0',
-                'description': 'The exit status.',
-                'name': 'status',
-                'nargs': '?',
-                'required': False,
-                'value': 'STATUS',
-            },
-        ],
-    )
+    # Add the interactive default CLI tree nodes.
 
-    # Create the parser and completer.
-    interactive_parser = parser.Parser(
-        self.root,
-        context=config.context,
-        hidden=config.hidden)
-    interactive_completer = completer.InteractiveCliCompleter(
-        interactive_parser=interactive_parser,
-        args=args,
-        cosh=self.coshell,
-        hidden=config.hidden,
-        manpage_generator=config.manpage_generator)
+    _AddCliTreeKeywordsAndBuiltins(self.root)
 
     # Make sure that complete_while_typing is disabled when
     # enable_history_search is enabled. (First convert to SimpleFilter, to
@@ -236,8 +268,22 @@ class Application(object):
                                 'shell_history')
     multiline = shortcuts.to_simple_filter(False)
 
-    # Create the default buffer.
+    # Create the parser.
+    interactive_parser = parser.Parser(
+        self.root,
+        context=config.context,
+        hidden=config.hidden)
 
+    # Create the completer.
+    interactive_completer = completer.InteractiveCliCompleter(
+        coshell=coshell,
+        debug=debug,
+        interactive_parser=interactive_parser,
+        args=args,
+        hidden=config.hidden,
+        manpage_generator=config.manpage_generator)
+
+    # Create the default buffer.
     self.default_buffer = pt_buffer.Buffer(
         enable_history_search=enable_history_search,
         complete_while_typing=complete_while_typing,
@@ -253,14 +299,21 @@ class Application(object):
     # Create the CLI.
     self.cli = CLI(
         config=config,
-        cosh=cosh,
+        coshell=coshell,
+        debug=debug,
         root=self.root,
         interactive_parser=interactive_parser,
+        interactive_completer=interactive_completer,
         application=self._CreatePromptApplication(config=config,
                                                   multiline=multiline),
         eventloop=shortcuts.create_eventloop(),
         output=shortcuts.create_output(),
     )
+
+    # The interactive completer is friends with the CLI.
+    interactive_completer.cli = self.cli
+
+    # Initialize the bindings.
     self.key_bindings.Initialize(self.cli)
     bindings_vi.LoadViBindings(self.key_bindings_registry)
 
@@ -274,6 +327,7 @@ class Application(object):
             get_bottom_status_tokens=self._GetBottomStatusTokens,
             get_bottom_toolbar_tokens=self._GetBottomToolbarTokens,
             get_continuation_tokens=None,
+            get_debug_tokens=self._GetDebugTokens,
             get_prompt_tokens=None,
             is_password=False,
             lexer=None,
@@ -322,6 +376,10 @@ class Application(object):
         justify=cli.config.justify_bottom_lines,
         width=cli.output.get_size().columns)
 
+  def _GetDebugTokens(self, cli):
+    """Returns the debug frame tokens."""
+    return [(token.Token.Text, c + ' ') for c in cli.debug.contents()]
+
   def Prompt(self):
     """Prompts and returns one command line."""
     self.cli.context_was_set = not self.cli.config.context
@@ -337,6 +395,7 @@ class Application(object):
 
   def Run(self, text):
     """Runs the command(s) in text and waits for them to complete."""
+    self.cli.command_count += 1
     status = self.coshell.Run(text)
     if status > 128:
       # command interrupted - print an empty line to clear partial output
@@ -359,19 +418,20 @@ class Application(object):
       except KeyboardInterrupt:
         # ignore ctrl-c
         pass
-      except coshell.CoshellExitException:
+      except interactive_coshell.CoshellExitError:
         break
 
 
 def main(args=None, config=None):
   """The interactive application loop."""
-  cosh = coshell.Coshell()
+  coshell = interactive_coshell.Coshell()
   try:
     Application(
         args=args,
-        cosh=cosh,
+        coshell=coshell,
         config=config,
+        debug=interactive_debug.Debug(),
     ).Loop()
   finally:
-    status = cosh.Close()
+    status = coshell.Close()
   sys.exit(status)

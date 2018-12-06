@@ -66,13 +66,6 @@ class WorkflowTemplateSetClusterSelectorUnitTest(
     self.ExpectSetClusterSelector(
         workflow_template, response=response, exception=exception)
 
-
-class WorkflowTemplateSetClusterSelectorUnitTestBeta(
-    WorkflowTemplateSetClusterSelectorUnitTest):
-
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
-
   def testSetClusterSelector(self):
     workflow_template = self.MakeWorkflowTemplate()
     cluster_labels = {'k1': 'v1'}
@@ -101,3 +94,10 @@ class WorkflowTemplateSetClusterSelectorUnitTestBeta(
       self.RunDataproc('workflow-templates set-cluster-selector {0} '
                        '--zone us-central1-a --cluster-labels'.format(
                            self.WORKFLOW_TEMPLATE))
+
+
+class WorkflowTemplateSetClusterSelectorUnitTestBeta(
+    WorkflowTemplateSetClusterSelectorUnitTest):
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)

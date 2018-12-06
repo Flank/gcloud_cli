@@ -21,14 +21,17 @@ from __future__ import unicode_literals
 
 import os
 
-import urllib2
 from googlecloudsdk.core import log
+from googlecloudsdk.core import url_opener
 from googlecloudsdk.core.util import retry
 
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
 from tests.lib import exec_utils
 from tests.lib import sdk_test_base
+from tests.lib import test_case
+
+from six.moves import urllib
 
 
 @sdk_test_base.Filters.RunOnlyIfLongrunning
@@ -108,8 +111,9 @@ class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
     self.deployApp(test_app)
     url = ('https://{0}-dot-{1}.appspot.com/headers'.format(
         self.version, self.Project()))
-    r = retry.RetryOnException(f=urllib2.urlopen, max_retrials=3,
-                               sleep_ms=300)(url)
+    req = urllib.request.Request(url)
+    r = retry.RetryOnException(f=url_opener.urlopen, max_retrials=3,
+                               sleep_ms=300)(req)
     self.assertEqual(r.getcode(), 200)
 
   def testDeployNodejs(self):
@@ -130,6 +134,7 @@ class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
     test_app = self._Resource('app_engine_php_flex_data', 'app.yaml')
     self.deployApp(test_app)
 
+  @test_case.Filters.skip('Flaky', 'b/117423915')
   def testDeployOpenJDK8(self):
     test_app = self._Resource('app_engine_java_vm_openjdk8_data', 'app.yaml')
     self.deployApp(test_app)

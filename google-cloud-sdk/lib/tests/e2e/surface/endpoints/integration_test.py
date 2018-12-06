@@ -28,6 +28,7 @@ from googlecloudsdk.api_lib.endpoints import exceptions
 from googlecloudsdk.core import config
 from googlecloudsdk.core import log
 from googlecloudsdk.core import yaml
+from googlecloudsdk.core.util import files
 from tests.lib import e2e_base
 from tests.lib import test_case
 import six
@@ -51,8 +52,9 @@ class GcloudOperationError(Exception):
 
 def _get_docker_config(*unused_args, **kwargs):
   force_new = kwargs.get('force_new', False)
-  new_path = os.path.join(os.path.expanduser('~'), '.docker', 'config.json')
-  old_path = os.path.join(os.path.expanduser('~'), '.dockercfg')
+  home = files.GetHomeDir()
+  new_path = os.path.join(home, '.docker', 'config.json')
+  old_path = os.path.join(home, '.dockercfg')
   if os.path.exists(new_path) or force_new:
     return new_path, True
   return old_path, False
@@ -78,7 +80,7 @@ class EndpointsIntegrationTest(e2e_base.WithServiceAuth):
     os.environ['BOTO_CONFIG'] = (config.Paths()
                                  .LegacyCredentialsGSUtilPath(self.Account()))
 
-    # Mock GetDockerConfigPath to write configs to os.path.expanduser('~'),
+    # Mock GetDockerConfigPath to write configs to files.GetHomeDir(),
     # which is the Docker code will be looking for it.
     (self.StartPatch(
         'googlecloudsdk.core.docker.client_lib.GetDockerConfigPath')

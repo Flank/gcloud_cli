@@ -2,27 +2,25 @@ NAME
     gcloud alpha scheduler jobs - manage Cloud Scheduler jobs
 
 SYNOPSIS
-    gcloud alpha scheduler jobs COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha scheduler jobs GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Manage Cloud Scheduler jobs.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     create
+        (ALPHA) Create Cloud Scheduler jobs for various types of targets.
 
 COMMANDS
     COMMAND is one of the following:
-
-     create-app-engine-job
-        (ALPHA) Create a Cloud Scheduler job with an App Engine target.
-
-     create-http-job
-        (ALPHA) Create a Cloud Scheduler job that triggers an action via HTTP.
-
-     create-pubsub-job
-        (ALPHA) Create a Cloud Scheduler job with a Pub/Sub target.
 
      delete
         (ALPHA) Delete a job.
@@ -41,5 +39,7 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta scheduler jobs
 

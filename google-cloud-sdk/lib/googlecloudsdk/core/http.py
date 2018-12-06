@@ -14,6 +14,8 @@
 # limitations under the License.
 
 """A module to get an unauthenticated http object."""
+# TODO(b/71388306): Unskip pytype on this file.
+# pytype: skip-file
 
 from __future__ import absolute_import
 from __future__ import division
@@ -31,7 +33,6 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
-from googlecloudsdk.core.resource import session_capturer
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import platforms
 
@@ -39,6 +40,11 @@ import httplib2
 import six
 from six.moves import urllib
 from six.moves import zip  # pylint: disable=redefined-builtin
+
+
+# Alternative spellings of User-Agent header key that may appear in requests.
+_NORMALIZED_USER_AGENT = b'user-agent'
+_USER_AGENT_HEADER_KEYS = [_NORMALIZED_USER_AGENT, b'User-Agent', b'USER-AGENT']
 
 
 def Http(timeout='unset', response_encoding=None, ca_certs=None):
@@ -161,7 +167,7 @@ def _Wrap(
       Modifiers.ReportDuration()))
 
   handlers.append(Modifiers.Handler(
-      Modifiers.AppendToHeader('user-agent', gcloud_ua)))
+      Modifiers.AppendToHeader(_NORMALIZED_USER_AGENT, gcloud_ua)))
 
   trace_value = None
   if trace_token:
@@ -184,11 +190,6 @@ def _Wrap(
     handlers.append(Modifiers.Handler(
         Modifiers.LogRequest(log_http_redact_token),
         Modifiers.LogResponse()))
-
-  if session_capturer.SessionCapturer.capturer is not None:
-    handlers.append(Modifiers.Handler(
-        Modifiers.DumpRequest(session_capturer.SessionCapturer.capturer),
-        Modifiers.DumpResponse(session_capturer.SessionCapturer.capturer)))
 
   return Modifiers.WrapRequest(http_client, handlers,
                                response_encoding=response_encoding)
@@ -349,6 +350,14 @@ class Modifiers(object):
     return response, content
 
   @classmethod
+  def _GetUserAgentHeaderValue(cls, headers):
+    """Retrieve the correct user-agent header key from the requests."""
+    for hdr, value in six.iteritems(headers):
+      if hdr in _USER_AGENT_HEADER_KEYS:
+        return hdr, value
+    return None, None
+
+  @classmethod
   def AppendToHeader(cls, header, value):
     """Appends the given value to the existing value in the http request.
 
@@ -364,7 +373,13 @@ class Modifiers(object):
       """Replacement http.request() method."""
       modified_args = list(args)
       headers = RequestParam.HEADERS.Get(args, kwargs) or {}
-      current_value = headers.get(header, b'')
+      if header == _NORMALIZED_USER_AGENT:
+        found_header, current_value = cls._GetUserAgentHeaderValue(headers)
+        if found_header:
+          del headers[found_header]
+      else:
+        current_value = headers.get(header, b'')
+
       headers[header] = (
           (current_value + b' ' + value).strip() if current_value else value)
       RequestParam.HEADERS.Set(modified_args, kwargs, headers)

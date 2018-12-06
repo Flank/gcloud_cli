@@ -33,12 +33,12 @@ import os
 import zipfile
 
 from googlecloudsdk.api_lib.functions.exceptions import FunctionsError
-from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.util import gcloudignore
-from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import archive
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.functions import base
 from tests.lib.surface.functions import util as testutil
@@ -159,6 +159,27 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         labels=self._GetDefaultLabelsMessage(),
     )
 
+  def _GenerateFunctionWithVPCConnector(self, name, url, vpc_connector, bucket):
+    return self.messages.CloudFunction(
+        name=name, sourceArchiveUrl=url, vpcConnector=vpc_connector,
+        eventTrigger=self.messages.EventTrigger(
+            eventType='google.storage.object.finalize',
+            resource='projects/_/buckets/' + bucket,
+        ),
+        labels=self._GetDefaultLabelsMessage(),
+    )
+
+  def _GenerateFunctionWithServiceAccount(self, name, url, service_account,
+                                          bucket):
+    return self.messages.CloudFunction(
+        name=name, sourceArchiveUrl=url, serviceAccountEmail=service_account,
+        eventTrigger=self.messages.EventTrigger(
+            eventType='google.storage.object.finalize',
+            resource='projects/_/buckets/' + bucket,
+        ),
+        labels=self._GetDefaultLabelsMessage(),
+    )
+
   def _GenerateFunctionWithHttp(
       self, name, url, entry_point=None, timeout=None):
     https_trigger = self.messages.HttpsTrigger()
@@ -183,7 +204,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
             name=test_name),
         self._GenerateFunctionWithPubsub(test_name, 'url', 'old-topic'))
 
-  def _ExpectFunctionCreateWithPubsub(self, args, entry_point=None,
+  def _ExpectFunctionCreateWithPubsub(self, gcs_dest_url, entry_point=None,
                                       project=None):
     if project is None:
       project = self.Project()
@@ -194,7 +215,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithPubsub(
-                test_name, args[-1],
+                test_name, gcs_dest_url,
                 'projects/{0}/topics/topic'.format(project),
                 entry_point=entry_point,
                 project=project)),
@@ -218,7 +239,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
 
-  def _ExpectFunctionCreateWithGcs(self, args):
+  def _ExpectFunctionCreateWithGcs(self, gcs_dest_url):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
     test_location = 'projects/{}/locations/{}'.format(
@@ -227,12 +248,12 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithGcs(
-                test_name, args[-1], 'path')),
+                test_name, gcs_dest_url, 'path')),
         self._GenerateActiveOperation('operations/operation'))
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
 
-  def _ExpectFunctionCreateWithTimeout(self, args):
+  def _ExpectFunctionCreateWithTimeout(self, gcs_dest_url):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
     test_location = 'projects/{}/locations/{}'.format(
@@ -241,12 +262,13 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithTimeout(
-                test_name, args[-1], '30s', 'path')),
+                test_name, gcs_dest_url, '30s', 'path')),
         self._GenerateActiveOperation('operations/operation'))
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
 
-  def _ExpectFunctionCreateWithMaxInstances(self, args, max_instances=8):
+  def _ExpectFunctionCreateWithMaxInstances(self, gcs_dest_url,
+                                            max_instances=8):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
     test_location = 'projects/{}/locations/{}'.format(
@@ -255,15 +277,16 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithMaxInstances(
-                test_name, args[-1], max_instances, 'path')),
+                test_name, gcs_dest_url, max_instances, 'path')),
         self._GenerateActiveOperation('operations/operation'))
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
 
-  def _ExpectFunctionCreateWithClearMaxInstances(self, args):
-    return self._ExpectFunctionCreateWithMaxInstances(args, max_instances=0)
+  def _ExpectFunctionCreateWithClearMaxInstances(self, gcs_dest_url):
+    return self._ExpectFunctionCreateWithMaxInstances(gcs_dest_url,
+                                                      max_instances=0)
 
-  def _ExpectFunctionCreateWithConnectedVPC(self, args):
+  def _ExpectFunctionCreateWithConnectedVPC(self, gcs_dest_url):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
     test_location = 'projects/{}/locations/{}'.format(
@@ -272,12 +295,40 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithConnectedVPC(
-                test_name, args[-1], 'my-vpc', 'path')),
+                test_name, gcs_dest_url, 'my-vpc', 'path')),
         self._GenerateActiveOperation('operations/operation'))
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
 
-  def _ExpectFunctionCreateWithHttp(self, args, entry_point=None):
+  def _ExpectFunctionCreateWithVPCConnector(self, gcs_dest_url):
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(
+        self.Project(), self.GetRegion())
+    self.mock_client.projects_locations_functions.Create.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
+            location=test_location,
+            cloudFunction=self._GenerateFunctionWithVPCConnector(
+                test_name, gcs_dest_url, 'avpc', 'path')),
+        self._GenerateActiveOperation('operations/operation'))
+    self._ExpectGetOperationAndGetFunction(test_name)
+    return 0
+
+  def _ExpectFunctionCreateWithServiceAccount(self, gcs_dest_url):
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(
+        self.Project(), self.GetRegion())
+    self.mock_client.projects_locations_functions.Create.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
+            location=test_location,
+            cloudFunction=self._GenerateFunctionWithServiceAccount(
+                test_name, gcs_dest_url, 'service-account@google.com', 'path')),
+        self._GenerateActiveOperation('operations/operation'))
+    self._ExpectGetOperationAndGetFunction(test_name)
+    return 0
+
+  def _ExpectFunctionCreateWithHttp(self, gcs_dest_url, entry_point=None):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
     test_location = 'projects/{}/locations/{}'.format(
@@ -286,12 +337,12 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithHttp(
-                test_name, args[-1], entry_point=entry_point)),
+                test_name, gcs_dest_url, entry_point=entry_point)),
         self._GenerateActiveOperation('operations/operation'))
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
 
-  def _ExpectFailedFunctionCreate(self, args):
+  def _ExpectFailedFunctionCreate(self, gcs_dest_url):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
     test_location = 'projects/{}/locations/{}'.format(
@@ -300,7 +351,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithPubsub(
-                test_name, args[-1], 'projects/fake-project/topics/topic')),
+                test_name, gcs_dest_url, 'projects/fake-project/topics/topic')),
         self._GenerateActiveOperation('operations/operation'))
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(
@@ -322,22 +373,15 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         updated_function)
     return 0
 
-  def _ExpectSourceFiles(self, args):
-    self._CheckFiles(args[2], FILES_LIST)
-    return 1
-
-  def _ExpectGsutilCall(self, callback):
-
-    def FakeExec(args, no_exit, out_func, err_func):
-      """Mock implementation for execution_utils.Exec."""
-      del out_func, err_func
-
-      self.assertTrue(no_exit)
-      return self.callback(args)
+  def _ExpectCopyFileToGCS(self, callback):
+    def FakeCopyFileToGCS(client_obj, local_path, target_obj_ref):
+      del client_obj, local_path
+      return self.callback(target_obj_ref.ToUrl())
 
     self.callback = callback
-    self.StartObjectPatch(execution_utils, 'Exec', FakeExec)
-    self.StartObjectPatch(storage_util, '_GetGsutilPath', return_value='gsutil')
+    self.StartObjectPatch(storage_api.StorageClient,
+                          'CopyFileToGCS',
+                          FakeCopyFileToGCS)
 
   def _RunDeployFromRepoScenario(self, expected_repository, source_args):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
@@ -351,8 +395,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         'functions deploy my-test {0} --trigger-topic topic'.format(
             source_args))
 
-  def _GsutilCallback(
-      self, args, event_type, resource, test_name, test_location):
+  def _CopyFileToGCSCallback(
+      self, gcs_dest_url, event_type, resource, test_name, test_location):
     # We need to know what the arguments to gsutil were to know what
     # sourceArchiveUrl to expect in the Create() call
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -363,7 +407,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
                     resource=resource,
                 ),
                 name=test_name,
-                sourceArchiveUrl=args[-1],
+                sourceArchiveUrl=gcs_dest_url,
                 labels=self._GetDefaultLabelsMessage(),
             ),
             location=test_location,),
@@ -380,10 +424,10 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name,),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    def GscutilCb(args):
-      return self._GsutilCallback(
+    def CopyCallback(args):
+      return self._CopyFileToGCSCallback(
           args, event_type, resource, test_name, test_location)
-    self._ExpectGsutilCall(GscutilCb)
+    self._ExpectCopyFileToGCS(CopyCallback)
 
   def _ExpectCreateFunctionWithModules(self, event_type, resource):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
@@ -394,10 +438,10 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name,),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    def GscutilCb(args):
-      return self._GsutilCallback(
+    def CopyCallback(args):
+      return self._CopyFileToGCSCallback(
           args, event_type, resource, test_name, test_location)
-    self._ExpectGsutilCall(GscutilCb)
+    self._ExpectCopyFileToGCS(CopyCallback)
 
 
 class FunctionsDeployTest(FunctionsDeployTestBase):
@@ -408,7 +452,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectGsutilCall(functools.partial(
+    self._ExpectCopyFileToGCS(functools.partial(
         self._ExpectFunctionCreateWithPubsub, entry_point='foo_bar'))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
@@ -424,7 +468,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectGsutilCall(self._ExpectFunctionCreateWithGcs)
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithGcs)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -438,7 +482,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectGsutilCall(self._ExpectFunctionCreateWithTimeout)
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithTimeout)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -453,7 +497,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectGsutilCall(self._ExpectFunctionCreateWithHttp)
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithHttp)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -466,7 +510,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectGsutilCall(self._ExpectFailedFunctionCreate)
+    self._ExpectCopyFileToGCS(self._ExpectFailedFunctionCreate)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -505,7 +549,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/another/locations/{}/functions/my-test'.format(
         self.GetRegion())
-    self._ExpectGsutilCall(functools.partial(
+    self._ExpectCopyFileToGCS(functools.partial(
         self._ExpectFunctionCreateWithPubsub, project='another'))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
@@ -530,7 +574,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectGsutilCall(self._ExpectFunctionCreateWithPubsub)
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithPubsub)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -622,7 +666,28 @@ class FunctionsDeployWithoutProjectTest(base.FunctionsTestBase):
           'functions deploy my-test --trigger-topic topic --stage-bucket buck')
 
 
-class FunctionsAlphaTests(FunctionsDeployTestBase):
+class FunctionsBetaTests(FunctionsDeployTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testCreateWithServiceAccount(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithServiceAccount)
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    self.Run(
+        'functions deploy my-test --service-account service-account@google.com '
+        '--trigger-bucket path --stage-bucket buck')
+
+
+class FunctionsAlphaTests(FunctionsBetaTests):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -662,7 +727,7 @@ class FunctionsAlphaTests(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectGsutilCall(self._ExpectFunctionCreateWithMaxInstances)
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithMaxInstances)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -678,7 +743,7 @@ class FunctionsAlphaTests(FunctionsDeployTestBase):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
 
-    self._ExpectGsutilCall(self._ExpectFunctionCreateWithClearMaxInstances)
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithClearMaxInstances)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -693,7 +758,7 @@ class FunctionsAlphaTests(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectGsutilCall(self._ExpectFunctionCreateWithConnectedVPC)
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithConnectedVPC)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -702,6 +767,28 @@ class FunctionsAlphaTests(FunctionsDeployTestBase):
         'functions deploy my-test --connected-vpc my-vpc --trigger-bucket path '
         '--stage-bucket buck')
 
+  def testCreateWithVPCConnector(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithVPCConnector)
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    self.Run(
+        'functions deploy my-test --vpc-connector avpc --trigger-bucket path '
+        '--stage-bucket buck')
+
+  def testCreateVpcMutexGroupFailure(self):
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        'argument --connected-vpc: At most one of --connected-vpc |'
+        ' --vpc-connector may be specified.'):
+      self.Run(
+          'functions deploy my-test --vpc-connector a --connected-vpc b')
 
 if __name__ == '__main__':
   test_case.main()

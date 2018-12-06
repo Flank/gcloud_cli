@@ -59,22 +59,22 @@ class QuotaHeaderTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
     properties.VALUES.core.project.Set('foo')
     self.request_mock = self.StartObjectPatch(
         httplib2.Http, 'request',
-        return_value=(httplib2.Response({'status': 200}), ''))
+        return_value=(httplib2.Response({'status': 200}), b''))
 
   @parameterized.parameters(
       (None, 'beta', None),
       (None, '', None),
       (properties.VALUES.billing.LEGACY, 'beta', None),
       (properties.VALUES.billing.LEGACY, '', None),
-      (properties.VALUES.billing.CURRENT_PROJECT, 'beta', 'foo'),
-      (properties.VALUES.billing.CURRENT_PROJECT, '', 'foo'),
-      ('bar', 'beta', 'bar'),
-      ('bar', '', 'bar'),
+      (properties.VALUES.billing.CURRENT_PROJECT, 'beta', b'foo'),
+      (properties.VALUES.billing.CURRENT_PROJECT, '', b'foo'),
+      ('bar', 'beta', b'bar'),
+      ('bar', '', b'bar'),
   )
   def testQuotaHeader(self, prop_value, track, header_value):
     properties.VALUES.billing.quota_project.Set(prop_value)
     self.Run(track + ' app regions list')
-    header = self.request_mock.call_args[0][3].get('X-Goog-User-Project', None)
+    header = self.request_mock.call_args[0][3].get(b'X-Goog-User-Project', None)
     self.assertEqual(header, header_value)
 
 

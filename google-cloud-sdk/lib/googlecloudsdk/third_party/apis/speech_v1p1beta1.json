@@ -109,6 +109,24 @@
     }
   },
   "schemas": {
+    "ListOperationsResponse": {
+      "id": "ListOperationsResponse",
+      "description": "The response message for Operations.ListOperations.",
+      "type": "object",
+      "properties": {
+        "operations": {
+          "description": "A list of operations that matches the specified filter in the request.",
+          "type": "array",
+          "items": {
+            "$ref": "Operation"
+          }
+        },
+        "nextPageToken": {
+          "description": "The standard List next-page token.",
+          "type": "string"
+        }
+      }
+    },
     "Operation": {
       "id": "Operation",
       "description": "This resource represents a long-running operation that is the result of a\nnetwork API call.",
@@ -221,20 +239,20 @@
           "format": "int32"
         },
         "audioChannelCount": {
-          "description": "*Optional* The number of channels in the input audio data.\nONLY set this for MULTI-CHANNEL recognition.\nValid values for LINEAR16 and FLAC are `1`-`8`.\nValid values for OGG_OPUS are '1'-'254'.\nValid value for MULAW, AMR, AMR_WB and SPEEX_WITH_HEADER_BYTE is only `1`.\nIf `0` or omitted, defaults to one channel (mono).\nNOTE: We only recognize the first channel by default.\nTo perform independent recognition on each channel set\nenable_separate_recognition_per_channel to 'true'.",
+          "description": "*Optional* The number of channels in the input audio data.\nONLY set this for MULTI-CHANNEL recognition.\nValid values for LINEAR16 and FLAC are `1`-`8`.\nValid values for OGG_OPUS are '1'-'254'.\nValid value for MULAW, AMR, AMR_WB and SPEEX_WITH_HEADER_BYTE is only `1`.\nIf `0` or omitted, defaults to one channel (mono).\nNote: We only recognize the first channel by default.\nTo perform independent recognition on each channel set\n`enable_separate_recognition_per_channel` to 'true'.",
           "type": "integer",
           "format": "int32"
         },
         "enableSeparateRecognitionPerChannel": {
-          "description": "This needs to be set to \u2018true\u2019 explicitly and audio_channel_count > 1\nto get each channel recognized separately. The recognition result will\ncontain a channel_tag field to state which channel that result belongs to.\nIf this is not \u2018true\u2019, we will only recognize the first channel.\nNOTE: The request is also billed cumulatively for all channels recognized:\n    (audio_channel_count times the audio length)",
+          "description": "This needs to be set to \u2018true\u2019 explicitly and `audio_channel_count` > 1\nto get each channel recognized separately. The recognition result will\ncontain a `channel_tag` field to state which channel that result belongs\nto. If this is not true, we will only recognize the first channel. The\nrequest is billed cumulatively for all channels recognized:\n`audio_channel_count` multiplied by the length of the audio.",
           "type": "boolean"
         },
         "languageCode": {
-          "description": "*Required* The language of the supplied audio as a\n[BCP-47](https:\/\/www.rfc-editor.org\/rfc\/bcp\/bcp47.txt) language tag.\nExample: \"en-US\".\nSee [Language Support](https:\/\/cloud.google.com\/speech\/docs\/languages)\nfor a list of the currently supported language codes.",
+          "description": "*Required* The language of the supplied audio as a\n[BCP-47](https:\/\/www.rfc-editor.org\/rfc\/bcp\/bcp47.txt) language tag.\nExample: \"en-US\".\nSee [Language Support](\/speech-to-text\/docs\/languages)\nfor a list of the currently supported language codes.",
           "type": "string"
         },
         "alternativeLanguageCodes": {
-          "description": "*Optional* A list of up to 3 additional\n[BCP-47](https:\/\/www.rfc-editor.org\/rfc\/bcp\/bcp47.txt) language tags,\nlisting possible alternative languages of the supplied audio.\nSee [Language Support](https:\/\/cloud.google.com\/speech\/docs\/languages)\nfor a list of the currently supported language codes.\nIf alternative languages are listed, recognition result will contain\nrecognition in the most likely language detected including the main\nlanguage_code. The recognition result will include the language tag\nof the language detected in the audio.\nNOTE: This feature is only supported for Voice Command and Voice Search\nuse cases and performance may vary for other use cases (e.g., phone call\ntranscription).",
+          "description": "*Optional* A list of up to 3 additional\n[BCP-47](https:\/\/www.rfc-editor.org\/rfc\/bcp\/bcp47.txt) language tags,\nlisting possible alternative languages of the supplied audio.\nSee [Language Support](\/speech-to-text\/docs\/languages)\nfor a list of the currently supported language codes.\nIf alternative languages are listed, recognition result will contain\nrecognition in the most likely language detected including the main\nlanguage_code. The recognition result will include the language tag\nof the language detected in the audio.\nNote: This feature is only supported for Voice Command and Voice Search\nuse cases and performance may vary for other use cases (e.g., phone call\ntranscription).",
           "type": "array",
           "items": {
             "type": "string"
@@ -250,7 +268,7 @@
           "type": "boolean"
         },
         "speechContexts": {
-          "description": "*Optional* A means to provide context to assist the speech recognition.",
+          "description": "*Optional* array of SpeechContext.\nA means to provide context to assist the speech recognition. For more\ninformation, see [Phrase Hints](\/speech-to-text\/docs\/basics#phrase-hints).",
           "type": "array",
           "items": {
             "$ref": "SpeechContext"
@@ -265,17 +283,21 @@
           "type": "boolean"
         },
         "enableAutomaticPunctuation": {
-          "description": "*Optional* If 'true', adds punctuation to recognition result hypotheses.\nThis feature is only available in select languages. Setting this for\nrequests in other languages has no effect at all.\nThe default 'false' value does not add punctuation to result hypotheses.\nNOTE: \"This is currently offered as an experimental service, complimentary\nto all users. In the future this may be exclusively available as a\npremium feature.\"",
+          "description": "*Optional* If 'true', adds punctuation to recognition result hypotheses.\nThis feature is only available in select languages. Setting this for\nrequests in other languages has no effect at all.\nThe default 'false' value does not add punctuation to result hypotheses.\nNote: This is currently offered as an experimental service, complimentary\nto all users. In the future this may be exclusively available as a\npremium feature.",
           "type": "boolean"
         },
         "enableSpeakerDiarization": {
-          "description": "*Optional* If 'true', enables speaker detection for each recognized word in\nthe top alternative of the recognition result using a speaker_tag provided\nin the WordInfo.\nNote: When this is true, we send all the words from the beginning of the\naudio for the top alternative in every consecutive responses.\nThis is done in order to improve our speaker tags as our models learn to\nidentify the speakers in the conversation over time.",
+          "description": "*Optional* If 'true', enables speaker detection for each recognized word in\nthe top alternative of the recognition result using a speaker_tag provided\nin the WordInfo.\nNote: Use diarization_config instead. This field will be DEPRECATED soon.",
           "type": "boolean"
         },
         "diarizationSpeakerCount": {
-          "description": "*Optional*\nIf set, specifies the estimated number of speakers in the conversation.\nIf not set, defaults to '2'.\nIgnored unless enable_speaker_diarization is set to true.\"",
+          "description": "*Optional*\nIf set, specifies the estimated number of speakers in the conversation.\nIf not set, defaults to '2'.\nIgnored unless enable_speaker_diarization is set to true.\"\nNote: Use diarization_config instead. This field will be DEPRECATED soon.",
           "type": "integer",
           "format": "int32"
+        },
+        "diarizationConfig": {
+          "description": "*Optional* Config to enable speaker diarization and set additional\nparameters to make diarization better suited for your application.\nNote: When this is enabled, we send all the words from the beginning of the\naudio for the top alternative in every consecutive STREAMING responses.\nThis is done in order to improve our speaker tags as our models learn to\nidentify the speakers in the conversation over time.\nFor non-streaming requests, the diarization results will be provided only\nin the top alternative of the FINAL SpeechRecognitionResult.",
+          "$ref": "SpeakerDiarizationConfig"
         },
         "metadata": {
           "description": "*Optional* Metadata regarding this request.",
@@ -286,7 +308,7 @@
           "type": "string"
         },
         "useEnhanced": {
-          "description": "*Optional* Set to true to use an enhanced model for speech recognition.\nYou must also set the `model` field to a valid, enhanced model. If\n`use_enhanced` is set to true and the `model` field is not set, then\n`use_enhanced` is ignored. If `use_enhanced` is true and an enhanced\nversion of the specified model does not exist, then the speech is\nrecognized using the standard version of the specified model.\n\nEnhanced speech models require that you opt-in to the audio logging using\ninstructions in the [alpha documentation](\/speech\/data-sharing). If you set\n`use_enhanced` to true and you have not enabled audio logging, then you\nwill receive an error.",
+          "description": "*Optional* Set to true to use an enhanced model for speech recognition.\nIf `use_enhanced` is set to true and the `model` field is not set, then\nan appropriate enhanced model is chosen if:\n1. project is eligible for requesting enhanced models\n2. an enhanced model exists for the audio\n\nIf `use_enhanced` is true and an enhanced version of the specified model\ndoes not exist, then the speech is recognized using the standard version\nof the specified model.\n\nEnhanced speech models require that you opt-in to data logging using\ninstructions in the\n[documentation](\/speech-to-text\/docs\/enable-data-logging). If you set\n`use_enhanced` to true and you have not enabled audio logging, then you\nwill receive an error.",
           "type": "boolean"
         }
       }
@@ -297,27 +319,31 @@
       "type": "object",
       "properties": {
         "phrases": {
-          "description": "*Optional* A list of strings containing words and phrases \"hints\" so that\nthe speech recognition is more likely to recognize them. This can be used\nto improve the accuracy for specific words and phrases, for example, if\nspecific commands are typically spoken by the user. This can also be used\nto add additional words to the vocabulary of the recognizer. See\n[usage limits](https:\/\/cloud.google.com\/speech\/limits#content).",
+          "description": "*Optional* A list of strings containing words and phrases \"hints\" so that\nthe speech recognition is more likely to recognize them. This can be used\nto improve the accuracy for specific words and phrases, for example, if\nspecific commands are typically spoken by the user. This can also be used\nto add additional words to the vocabulary of the recognizer. See\n[usage limits](\/speech-to-text\/quotas#content).",
           "type": "array",
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "SpeakerDiarizationConfig": {
+      "id": "SpeakerDiarizationConfig",
+      "type": "object",
+      "properties": {
+        "enableSpeakerDiarization": {
+          "description": "*Optional* If 'true', enables speaker detection for each recognized word in\nthe top alternative of the recognition result using a speaker_tag provided\nin the WordInfo.",
+          "type": "boolean"
         },
-        "strength": {
-          "description": "Hint strength to use (high, medium or low). If you use a high strength then\nyou are more likely to see those phrases in the results. If strength is not\nspecified then by default medium strength will be used. If you'd like\ndifferent phrases to have different strengths, you can specify multiple\nspeech_contexts.",
-          "enumDescriptions": [
-            "",
-            "Low strength",
-            "Medium strength",
-            "High strength"
-          ],
-          "type": "string",
-          "enum": [
-            "STRENGTH_UNSPECIFIED",
-            "LOW",
-            "MEDIUM",
-            "HIGH"
-          ]
+        "minSpeakerCount": {
+          "description": "*Optional* Only used if diarization_speaker_count is not set.\nMinimum number of speakers in the conversation. This range gives you more\nflexibility by allowing the system to automatically determine the correct\nnumber of speakers. If not set, the default value is 2.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "maxSpeakerCount": {
+          "description": "*Optional* Only used if diarization_speaker_count is not set.\nMaximum number of speakers in the conversation. This range gives you more\nflexibility by allowing the system to automatically determine the correct\nnumber of speakers. If not set, the default value is 6.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -437,7 +463,7 @@
     },
     "RecognitionAudio": {
       "id": "RecognitionAudio",
-      "description": "Contains audio data in the encoding specified in the `RecognitionConfig`.\nEither `content` or `uri` must be supplied. Supplying both or neither\nreturns google.rpc.Code.INVALID_ARGUMENT. See\n[audio limits](https:\/\/cloud.google.com\/speech\/limits#content).",
+      "description": "Contains audio data in the encoding specified in the `RecognitionConfig`.\nEither `content` or `uri` must be supplied. Supplying both or neither\nreturns google.rpc.Code.INVALID_ARGUMENT. See\n[content limits](\/speech-to-text\/quotas#content).",
       "type": "object",
       "properties": {
         "content": {
@@ -446,7 +472,7 @@
           "format": "byte"
         },
         "uri": {
-          "description": "URI that points to a file that contains audio data bytes as specified in\n`RecognitionConfig`. Currently, only Google Cloud Storage URIs are\nsupported, which must be specified in the following format:\n`gs:\/\/bucket_name\/object_name` (other URI formats return\ngoogle.rpc.Code.INVALID_ARGUMENT). For more information, see\n[Request URIs](https:\/\/cloud.google.com\/storage\/docs\/reference-uris).",
+          "description": "URI that points to a file that contains audio data bytes as specified in\n`RecognitionConfig`. The file must not be compressed (for example, gzip).\nCurrently, only Google Cloud Storage URIs are\nsupported, which must be specified in the following format:\n`gs:\/\/bucket_name\/object_name` (other URI formats return\ngoogle.rpc.Code.INVALID_ARGUMENT). For more information, see\n[Request URIs](https:\/\/cloud.google.com\/storage\/docs\/reference-uris).",
           "type": "string"
         }
       }
@@ -503,7 +529,7 @@
           "format": "float"
         },
         "words": {
-          "description": "Output only. A list of word-specific information for each recognized word.\nNote: When enable_speaker_diarization is true, you will see all the words\nfrom the beginning of the audio.",
+          "description": "Output only. A list of word-specific information for each recognized word.\nNote: When `enable_speaker_diarization` is true, you will see all the words\nfrom the beginning of the audio.",
           "type": "array",
           "items": {
             "$ref": "WordInfo"
@@ -606,15 +632,15 @@
           "type": "string"
         },
         "useLoggedData": {
-          "description": "If this is true, then use the previously logged data (for the project)\nThe logs data for this project will be preprocessed and prepared for\ndownstream pipelines (like training)",
+          "description": "If this is true, then use the previously logged data (for the project)\nThe logs data for this project will be preprocessed and prepared for\ndownstream pipelines (like training). All logs are logged to the consumer\nproject.",
           "type": "boolean"
         },
         "uri": {
-          "description": "URI that points to a file in csv file where each row has following format.\n<gs_path_to_audio>,<gs_path_to_transcript>,<label>\nlabel can be HUMAN_TRANSCRIBED or MACHINE_TRANSCRIBED. Few rules for a row\nto be considered valid are :-\n1. Each row must have at least a label and <gs_path_to_transcript>\n2. If a row is marked HUMAN_TRANSCRIBED, then both <gs_path_to_audio>\nand <gs_path_to_transcript> needs to be specified.\n3. There has to be minimum 500 number of rows labelled HUMAN_TRANSCRIBED if\nevaluation stats are required.\n4. If use_logged_data is set to true, then we ignore the rows labelled as\nMACHINE_TRANSCRIBED.\n5. There has to be minimum 100,000 words in the transcripts in order to\nprovide sufficient textual training data for the language model.\nCurrently, only Google Cloud Storage URIs are\nsupported, which must be specified in the following format:\n`gs:\/\/bucket_name\/object_name` (other URI formats will be ignored).\nFor more information, see\n[Request URIs](https:\/\/cloud.google.com\/storage\/docs\/reference-uris).",
+          "description": "URI that points to a file in csv file where each row has following format.\n<gs_path_to_audio>,<gs_path_to_transcript>,<label>\nlabel can be HUMAN_TRANSCRIBED or MACHINE_TRANSCRIBED. Rows must comply to\nthe following to be valid:\n1. Each row must have at least a label and <gs_path_to_transcript>\n2. If a row is marked HUMAN_TRANSCRIBED, then you must specify both\n<gs_path_to_audio> and <gs_path_to_transcript>. Only WAV file formats\nwhich encode linear 16-bit pulse-code modulation (PCM) audio format are\nsupported. The maximum audio file size is 500 MB. Also note that the audio\nhas to be single channel audio.\n3. There has to be at least 500 rows labelled HUMAN_TRANSCRIBED covering\nat least ~10K words in order to get reliable word error rate results.\n4. To create a language model, you should provide at least 100,000 words\nin your transcriptions as training data if you have conversational and\ncaptions type of data. You should provide at least 10,000 words if you\nhave short utterances like voice commands and search type of use cases.\nCurrently, only Google Cloud Storage URIs are\nsupported, which must be specified in the following format:\n`gs:\/\/bucket_name\/object_name` (other URI formats will be ignored).\nFor more information, see\n[Request URIs](\/storage\/docs\/reference-uris).",
           "type": "string"
         },
         "languageCode": {
-          "description": "Required. The language of the supplied audio as a\n[BCP-47](https:\/\/www.rfc-editor.org\/rfc\/bcp\/bcp47.txt) language tag.\nExample: \"en-US\".\nSee [Language Support](https:\/\/cloud.google.com\/speech\/docs\/languages)\nfor a list of the currently supported language codes.",
+          "description": "Required. The language of the supplied audio as a\n[BCP-47](https:\/\/www.rfc-editor.org\/rfc\/bcp\/bcp47.txt) language tag.\nExample: \"en-US\".\nSee [Language Support](\/speech-to-text\/docs\/languages)\nfor a list of the currently supported language codes.",
           "type": "string"
         },
         "dataProcessingRegion": {
@@ -622,7 +648,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Output only. Resource name of the dataset. Form :-\n'\/projects\/{project_number}\/locations\/{location_id}\/datasets\/{dataset_id}'",
+          "description": "Output only. Resource name of the dataset. Form :-\n'projects\/{project_number}\/locations\/{location_id}\/datasets\/{dataset_id}'",
           "type": "string"
         },
         "dataStats": {
@@ -656,6 +682,14 @@
           "description": "Output only. The timestamp this dataset is last updated.",
           "type": "string",
           "format": "google-datetime"
+        },
+        "lastError": {
+          "description": "Output only. The error status, if any, of the last operation performed on\nthis dataset. Empty if there is still pending operation, or if the last\noperation completed with success.",
+          "$ref": "Status"
+        },
+        "bucketName": {
+          "description": "If set, the log data to be used in this dataset is restricted to the\nbucket specified. This field is only applicable if use_logged_data is true.\nIf use_logged_data is true, but this field is not set, then all logs will\nbe used for training the models. See: RecognitionMetadata for information\non setting up data logs.",
+          "type": "string"
         }
       }
     },
@@ -680,6 +714,11 @@
           "items": {
             "$ref": "DataErrors"
           }
+        },
+        "trainingWordCount": {
+          "description": "The number of words used for training.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -694,7 +733,7 @@
             "Not specified.",
             "Audio format not in the formats supported by the cloud speech API",
             "File format different from what is specified in the file name extension",
-            "File too large. Maximum allowed size is 50 MB."
+            "File too large. Maximum allowed size is 500 MB."
           ],
           "type": "string",
           "enum": [
@@ -783,6 +822,22 @@
         "isEnhancedModel": {
           "description": "If true then it means we are referring to the results of an enhanced\nversion of the model_type. Currently only PHONE_CALL model_type has an\nenhanced version.",
           "type": "boolean"
+        },
+        "wordCount": {
+          "description": "Number of words used in the word_error_rate computation.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "RefreshDataRequest": {
+      "id": "RefreshDataRequest",
+      "description": "Message sent by the client to refresh data in a existing dataset.",
+      "type": "object",
+      "properties": {
+        "uri": {
+          "description": "URI that points to a file in csv file where each row has following format.\n<gs_path_to_audio>,<gs_path_to_transcript>,<label>\nlabel can be HUMAN_TRANSCRIBED or MACHINE_TRANSCRIBED. Rows must comply to\nthe following to be valid:\n1. Each row must have at least a label and <gs_path_to_transcript>\n2. If a row is marked HUMAN_TRANSCRIBED, then you must specify both\n<gs_path_to_audio> and <gs_path_to_transcript>. Only WAV file formats\nwhich encode linear 16-bit pulse-code modulation (PCM) audio format are\nsupported. The maximum audio file size is 500 MB. Also note that the audio\nhas to be single channel audio.\n3. There has to be at least 500 rows labelled HUMAN_TRANSCRIBED covering\nat least ~10K words in order to get reliable word error rate results.\n4. To create a language model, you should provide at least 100,000 words\nin your transcriptions as training data if you have conversational and\ncaptions type of data. You should provide at least 10,000 words if you\nhave short utterances like voice commands and search type of use cases.\nCurrently, only Google Cloud Storage URIs are\nsupported, which must be specified in the following format:\n`gs:\/\/bucket_name\/object_name` (other URI formats will be ignored).\nFor more information, see\n[Request URIs](\/storage\/docs\/reference-uris).",
+          "type": "string"
         }
       }
     },
@@ -833,11 +888,163 @@
       "type": "object",
       "properties": {
       }
+    },
+    "LongRunningRecognizeMetadata": {
+      "id": "LongRunningRecognizeMetadata",
+      "description": "Describes the progress of a long-running `LongRunningRecognize` call. It is\nincluded in the `metadata` field of the `Operation` returned by the\n`GetOperation` call of the `google::longrunning::Operations` service.",
+      "type": "object",
+      "properties": {
+        "progressPercent": {
+          "description": "Approximate percentage of audio processed thus far. Guaranteed to be 100\nwhen the audio is fully processed and the results are available.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "startTime": {
+          "description": "Time when the request was received.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "lastUpdateTime": {
+          "description": "Time of the most recent processing update.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "SpeechOperationMetadata": {
+      "id": "SpeechOperationMetadata",
+      "description": "Describes the progress of a long-running call. It is\nincluded in the `metadata` field of the `Operation` returned by the\n`GetOperation` call of the `google::longrunning::Operations` service.",
+      "type": "object",
+      "properties": {
+        "progressPercent": {
+          "description": "Approximate percentage of progress, from AutoML Operation Metadata.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "startTime": {
+          "description": "Time when the request was received.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "lastUpdateTime": {
+          "description": "Time of the most recent processing update.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "worksOn": {
+          "description": "The resource being worked on.",
+          "type": "string"
+        }
+      }
+    },
+    "LongRunningRecognizeResponse": {
+      "id": "LongRunningRecognizeResponse",
+      "description": "The only message returned to the client by the `LongRunningRecognize` method.\nIt contains the result as zero or more sequential `SpeechRecognitionResult`\nmessages. It is included in the `result.response` field of the `Operation`\nreturned by the `GetOperation` call of the `google::longrunning::Operations`\nservice.",
+      "type": "object",
+      "properties": {
+        "results": {
+          "description": "Output only. Sequential list of transcription results corresponding to\nsequential portions of audio.",
+          "type": "array",
+          "items": {
+            "$ref": "SpeechRecognitionResult"
+          }
+        }
+      }
+    },
+    "CreateDatasetMetadata": {
+      "id": "CreateDatasetMetadata",
+      "description": "Describes the progress of a long-running `CreateDataset` call. It is\nincluded in the `metadata` field of the `Operation` returned by the\n`GetOperation` call of the `google::longrunning::Operations` service.",
+      "type": "object",
+      "properties": {
+        "progressPercent": {
+          "description": "Approximate percentage of data processed thus far. Guaranteed to be 100\nwhen the data is fully ingested, pre-processed and stats about the data\nare available.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "startTime": {
+          "description": "Time when the request was received.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "lastUpdateTime": {
+          "description": "Time of the most recent processing update.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "name": {
+          "description": "Resource name of the dataset. Form :-\n'projects\/{project_number}\/locations\/{location_id}\/datasets\/{dataset_id}'",
+          "type": "string"
+        }
+      }
+    },
+    "CreateModelMetadata": {
+      "id": "CreateModelMetadata",
+      "description": "Describes the progress of a long-running `CreateModel` call. It is\nincluded in the `metadata` field of the `Operation` returned by the\n`GetOperation` call of the `google::longrunning::Operations` service.",
+      "type": "object",
+      "properties": {
+        "progressPercent": {
+          "description": "Approximate percentage of data processed thus far. Guaranteed to be 100\nwhen the data is fully ingested, pre-processed and stats about the data\nare available.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "startTime": {
+          "description": "Time when the request was received.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "lastUpdateTime": {
+          "description": "Time of the most recent processing update.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "name": {
+          "description": "Resource name of the model.\nFormat: \"projects\/{project_id}\/locations\/{location_id}\/models\/{model_id}\"",
+          "type": "string"
+        }
+      }
     }
   },
   "resources": {
     "operations": {
       "methods": {
+        "list": {
+          "id": "speech.operations.list",
+          "path": "v1p1beta1/operations",
+          "flatPath": "v1p1beta1/operations",
+          "httpMethod": "GET",
+          "parameters": {
+            "name": {
+              "description": "The name of the operation's parent resource.",
+              "location": "query",
+              "type": "string"
+            },
+            "filter": {
+              "description": "The standard list filter.",
+              "location": "query",
+              "type": "string"
+            },
+            "pageSize": {
+              "description": "The standard list page size.",
+              "location": "query",
+              "type": "integer",
+              "format": "int32"
+            },
+            "pageToken": {
+              "description": "The standard list page token.",
+              "location": "query",
+              "type": "string"
+            }
+          },
+          "parameterOrder": [
+          ],
+          "response": {
+            "$ref": "ListOperationsResponse"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "description": "Lists operations that match the specified filter in the request. If the\nserver doesn't support this method, it returns `UNIMPLEMENTED`.\n\nNOTE: the `name` binding allows API services to override the binding\nto use different resource name schemes, such as `users\/*\/operations`. To\noverride the binding, API services can add a binding such as\n`\"\/v1\/{name=users\/*}\/operations\"` to their service configuration.\nFor backwards compatibility, the default name includes the operations\ncollection id, however overriding users must ensure the name binding\nis the parent resource, without the operations collection id."
+        },
         "get": {
           "id": "speech.operations.get",
           "path": "v1p1beta1/operations/{+name}",
@@ -848,7 +1055,7 @@
               "description": "The name of the operation resource.",
               "location": "path",
               "required": true,
-              "pattern": "^[^\/]+$",
+              "pattern": "^.+$",
               "type": "string"
             }
           },
@@ -938,7 +1145,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "List all log data stats associated with this project."
+                  "description": "List all log data stats associated with this consumer project."
                 }
               }
             },
@@ -970,7 +1177,35 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Performs asynchronous data upload for AutoML: receive results via the\ngoogle.longrunning.Operations interface. Returns either an\n`Operation.error` or an `Operation.response` which contains\na `Dataset` message."
+                  "description": "Performs asynchronous data upload for AutoML: receive results via the\ngoogle.longrunning.Operations interface. Returns either an\n`Operation.error` with CreateDatasetMetadata showing a Dataset\nname or an `Operation.response` which contains an Empty response."
+                },
+                "refreshData": {
+                  "id": "speech.projects.locations.datasets.refreshData",
+                  "path": "v1p1beta1/{+name}:refreshData",
+                  "flatPath": "v1p1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}:refreshData",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "description": "The resource name of the destination dataset.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "RefreshDataRequest"
+                  },
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Refresh data for a dataset. Returns an Empty response."
                 },
                 "list": {
                   "id": "speech.projects.locations.datasets.list",
@@ -1025,7 +1260,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "The resource name of the dataset to retrieve. Form :-\n'\/projects\/{project_number}\/locations\/{location_id}\/datasets\/{dataset_id}'",
+                      "description": "The resource name of the dataset to retrieve. Form :-\n'projects\/{project_number}\/locations\/{location_id}\/datasets\/{dataset_id}'",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+$",
@@ -1066,7 +1301,7 @@
                       "type": "string"
                     },
                     "name": {
-                      "description": "Required. Resource name of the dataset being used to create the model.\n'\/projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}'",
+                      "description": "Required. Resource name of the dataset being used to create the model.\n'projects\/{project_id}\/locations\/{location_id}\/datasets\/{dataset_id}'",
                       "location": "query",
                       "type": "string"
                     }

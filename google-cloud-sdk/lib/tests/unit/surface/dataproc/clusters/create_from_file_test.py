@@ -23,7 +23,7 @@ import copy
 import os
 
 from googlecloudsdk import calliope
-from googlecloudsdk.api_lib.dataproc import util
+from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
@@ -86,7 +86,7 @@ class ClustersCreateFromFileUnitTestBeta(ClustersCreateFromFileUnitTest,
 
     file_name = os.path.join(self.temp_path, 'cluster.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=expected_request_cluster, stream=stream)
+      export_util.Export(message=expected_request_cluster, stream=stream)
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
         response_cluster=expected_response_cluster)
@@ -103,7 +103,7 @@ class ClustersCreateFromFileUnitTestBeta(ClustersCreateFromFileUnitTest,
 
     file_name = os.path.join(self.temp_path, 'cluster.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=expected_request_cluster, stream=stream)
+      export_util.Export(message=expected_request_cluster, stream=stream)
     self.ExpectCreateCluster(cluster=expected_request_cluster)
 
     self.RunDataproc(
@@ -122,7 +122,7 @@ class ClustersCreateFromFileUnitTestBeta(ClustersCreateFromFileUnitTest,
 
     file_name = os.path.join(self.temp_path, 'cluster.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=expected_request_cluster, stream=stream)
+      export_util.Export(message=expected_request_cluster, stream=stream)
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
         response_cluster=expected_response_cluster,

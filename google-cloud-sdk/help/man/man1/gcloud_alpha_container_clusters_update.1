@@ -11,7 +11,7 @@ gcloud alpha container clusters update \- update cluster settings for an existin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-security\-profile\fR=\fISECURITY_PROFILE\fR\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ [\fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ :\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -72,6 +72,10 @@ Enables autoscaling in the node pool specified by \-\-node\-pool or the default
 node pool if \-\-node\-pool is not provided.
 
 .TP 2m
+\fB\-\-enable\-binauthz\fR
+Enable Binary Authorization for this cluster.
+
+.TP 2m
 \fB\-\-enable\-legacy\-authorization\fR
 Enables the legacy ABAC authentication for the cluster. User rights are granted
 through the use of policies which combine attributes together. For a detailed
@@ -88,8 +92,8 @@ through HTTPS. Besides these blocks, the following have access as well:
 
 .RS 2m
 1) The private network the cluster connects to if
-`\-\-private\-cluster` is specified.
-2) Google Compute Engine Public IPs if `\-\-private\-cluster` is not
+`\-\-enable\-private\-nodes` is specified.
+2) Google Compute Engine Public IPs if `\-\-enable\-private\-nodes` is not
 specified.
 .RE
 
@@ -140,6 +144,18 @@ $ gcloud alpha container clusters update example\-cluster \e
 .RE
 
 .TP 2m
+\fB\-\-security\-profile\fR=\fISECURITY_PROFILE\fR
+Name and version of the security profile to be applied to the cluster. If not
+specified, the current setting of security profile will be preserved.
+
+Example:
+
+.RS 2m
+$ gcloud alpha container clusters update example\-cluster \e
+    \-\-security\-profile=default\-1.0\-gke.1
+.RE
+
+.TP 2m
 \fB\-\-set\-password\fR
 Set the basic auth password to the specified value, keeping the existing
 username.
@@ -172,7 +188,8 @@ point to the new IP.
 \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]
 Cluster addons to enable or disable. Options are
 HorizontalPodAutoscaling=ENABLED|DISABLED HttpLoadBalancing=ENABLED|DISABLED
-KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
+KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
+NetworkPolicy=ENABLED|DISABLED
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -253,6 +270,17 @@ specified:
 Disables exporting cluster resource usage to BigQuery.
 
 .TP 2m
+\fB\-\-enable\-network\-egress\-metering\fR
+\f5 Enable network egress metering on this cluster.
+
+When enabled, a DaemonSet is deployed into the cluster. Each DaemonSet pod
+meters network egress traffic by collecting data from the conntrack table, and
+exports the metered metrics to the specified destination.
+
+Network egress metering is disabled if this flag is omitted, or when
+\fR\-\-no\-enable\-network\-egress\-metering\f5 is set.
+
+.TP 2m
 \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR
 The name of the BigQuery dataset to which the cluster's usage of cloud resources
 is exported. A table will be created in the specified dataset to store cluster
@@ -277,21 +305,46 @@ Node autoprovisioning
 \fB\-\-enable\-autoprovisioning\fR
 Enables node autoprovisioning for a cluster.
 
-Cluster Autoscaler will be able to create new node pools. Requires \-\-max\-cpu
-and \-\-max\-memory to be specified. This flag must be specified if any of the
+Cluster Autoscaler will be able to create new node pools. Requires maximum CPU
+and memory limits to be specified. This flag must be specified if any of the
 other arguments in this group are specified.
 
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR
+Path of the JSON/YAML file which contains information about the cluster's
+autoscaling configuration. Currently it only contains a list of resource limits
+of the cluster.
+
+Each resource limits definition contains three fields: resourceType, maximum and
+minimum. Resource type can be "cpu", "memory" or an accelerator (e.g.
+"nvidia\-tesla\-k80" for nVidia Tesla K80). Use gcloud compute
+accelerator\-types list to learn about available accelerator types. Maximum is
+the maximum allowed amount with the unit of the resource. Minimum is the minimum
+allowed amount with the unit of the resource.
+
+.TP 2m
+
+Flags to configure resource limits:
+
+.RS 2m
 .TP 2m
 \fB\-\-max\-cpu\fR=\fIMAX_CPU\fR
 Maximum number of cores in the cluster.
 
-Maximum number of cores to which the cluster can scale.
+Maximum number of cores to which the cluster can scale. This flag must be
+specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR
 Maximum memory in the cluster.
 
-Maximum number of gigabytes of memory to which the cluster can scale.
+Maximum number of gigabytes of memory to which the cluster can scale. This flag
+must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR
@@ -313,16 +366,17 @@ Arguments to set limits on accelerators:
 .TP 2m
 \fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]
 Sets maximum limit for a single type of accelerators (e.g. GPUs) in cluster.
-Defaults to 0 for all accelerator types if it isn't set.
 
+.RE
+.RE
 .RE
 .RE
 .sp
 .TP 2m
 \fBtype\fR
 (Required) The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of
-accelerator for which the limit is set. Use \f5gcloud compute accelerator\-types
-list\fR to learn about all available accelerator types.
+accelerator for which the limit is set. Use \fRgcloud compute accelerator\-types
+list\f5 to learn about all available accelerator types.
 
 .TP 2m
 \fBcount\fR
@@ -341,8 +395,8 @@ Defaults to 0 for all accelerator types if it isn't set.
 .TP 2m
 \fBtype\fR
 (Required) The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of
-accelerator for which the limit is set. Use \f5gcloud compute accelerator\-types
-list\fR to learn about all available accelerator types.
+accelerator for which the limit is set. Use \fRgcloud compute accelerator\-types
+list\f5 to learn about all available accelerator types.
 
 .TP 2m
 \fBcount\fR
@@ -382,17 +436,21 @@ Options to specify the username. At most one of these may be specified:
 .TP 2m
 \fB\-\-enable\-basic\-auth\fR
 Enable basic (username/password) auth for the cluster.
-\f5\-\-enable\-basic\-auth\fR is an alias for \f5\-\-username=admin\fR;
-\f5\-\-no\-enable\-basic\-auth\fR is an alias for \f5\-\-username=""\fR. Use
-\f5\-\-password\fR to specify a password; if not, the server will randomly
-generate one.
+\fR\-\-enable\-basic\-auth\f5 is an alias for \fR\-\-username=admin\f5;
+\fR\-\-no\-enable\-basic\-auth\f5 is an alias for \fR\-\-username=""\f5. Use
+\fR\-\-password\f5 to specify a password; if not, the server will randomly
+generate one. For cluster versions before 1.12, if neither
+\fR\-\-enable\-basic\-auth\f5 nor \fR\-\-username\f5 is specified,
+\fR\-\-enable\-basic\-auth\f5 will default to \fRtrue\f5. After 1.12,
+\fR\-\-enable\-basic\-auth\f5 will default to \fRfalse\f5.
 
 .TP 2m
 \fB\-\-username\fR=\fIUSERNAME\fR, \fB\-u\fR \fIUSERNAME\fR
-The user name to use for basic auth for the cluster. Use \f5\-\-password\fR to
+The user name to use for basic auth for the cluster. Use \fR\-\-password\f5 to
 specify a password; if not, the server will randomly generate one.
 
 
+\fR
 .RE
 .RE
 .RE
@@ -406,6 +464,23 @@ specify a password; if not, the server will randomly generate one.
 \fB\-\-async\fR
 Don't wait for the operation to complete.
 
+.TP 2m
+\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]
+Configurations for Istio addon, requires \-\-addons contains Istio for create,
+or \-\-update\-addons Istio=ENABLED for update.
+
+.RS 2m
+.TP 2m
+\fBauth\fR
+Optional Type of auth MTLS_PERMISSIVE or MTLS_STRICT Example:
+
+.RS 2m
+$ gcloud alpha container clusters update example\-cluster \e
+    \-\-istio\-config=auth=MTLS_PERMISSIVE
+.RE
+
+.RE
+.sp
 .TP 2m
 \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]
 The list of CIDR blocks (up to 20) that are allowed to connect to Kubernetes
@@ -462,9 +537,9 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

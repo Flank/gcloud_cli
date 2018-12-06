@@ -21,6 +21,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import argparse
+import collections
 import datetime
 import os
 import re
@@ -232,6 +233,7 @@ class DurationTest(subtests.Base):
     self.Run(0, '0d')
     self.Run(1, '1s')
     self.Run(2, '2s')
+    self.Run(6, '6000ms')
     self.Run(22, '22s')
     self.Run(60, '1m')
     self.Run(120, '2m')
@@ -240,24 +242,27 @@ class DurationTest(subtests.Base):
     self.Run(86400, '1d')
     self.Run(172800, '2d')
 
+    self.Run(61, '1m1s')
+    self.Run(61, '1s1m')
+    self.Run(3601, '1h1s')
+    self.Run(3601, '1s1h')
+
+    self.Run(1, '1s', upper_bound='1s1h')
+    self.Run(60, '1m', upper_bound='1h1s')
+    self.Run(60, '1m', lower_bound='59s', upper_bound='1m1s')
+
   def testMalformedInput(self):
     self.Run(None, '1x', exception=arg_parsers.ArgumentTypeError(
-        'unit must be one of s, m, h, d; received: x'))
+        "Failed to parse duration: Unknown character 'X' in duration"))
     self.Run(None, '1s', lower_bound='1x',
              exception=arg_parsers.ArgumentTypeError(
-                 'unit must be one of s, m, h, d; received: x'))
+                 "Failed to parse duration: Unknown character 'X' in duration"))
     self.Run(None, '1s', upper_bound='1x',
              exception=arg_parsers.ArgumentTypeError(
-                 'unit must be one of s, m, h, d; received: x'))
-    self.Run(None, '1s1h', exception=arg_parsers.ArgumentTypeError)
+                 "Failed to parse duration: Unknown character 'X' in duration"))
     self.Run(None, '1s', lower_bound='1s1h',
              exception=arg_parsers.ArgumentTypeError)
-    self.Run(None, '1s', upper_bound='1s1h',
-             exception=arg_parsers.ArgumentTypeError)
-    self.Run(None, '1h1s', exception=arg_parsers.ArgumentTypeError)
     self.Run(None, '1s', lower_bound='1h1s',
-             exception=arg_parsers.ArgumentTypeError)
-    self.Run(None, '1s', upper_bound='1h1s',
              exception=arg_parsers.ArgumentTypeError)
     self.Run(None, '1sec', exception=arg_parsers.ArgumentTypeError)
     self.Run(None, '1s', lower_bound='1sec',
@@ -741,6 +746,11 @@ class ArgDictTest(subtests.Base):
     # No operator
     self.Run(None, 'x,y', exception=arg_parsers.ArgumentTypeError)
 
+  def testArgDictOrdering(self):
+    self.Run(collections.OrderedDict([('x', 'y')]), 'x=y')
+    self.Run(collections.OrderedDict([('x', 'y'), ('a', 'b')]), 'x=y,a=b')
+    self.Run(collections.OrderedDict([('a', 'b'), ('x', 'y')]), 'a=b,x=y')
+
   def testArgDictAltDelim(self):
     self.Run({'x': 'y', 'z': 'w'}, 'x=y,z=w')
     self.Run({'v': 'w,x', 'y': 'z'}, '^:^v=w,x:y=z')
@@ -1015,6 +1025,21 @@ class ArgCommandsTest(util.WithTestTool,
                       '--repeated-dict-update', 'key2=value2'])
     self.AssertOutputContains(
         "repeated-dict-update: {'key1': 'value1', 'key2': 'value2'}")
+
+  def testArgDictUpdateActionOrdering(self):
+    self.cli.Execute(['dict-list',
+                      '--repeated-dict-update', 'key=value'])
+    self.AssertOutputContains("repeated-dict-update: {'key': 'value'}")
+    self.cli.Execute(['dict-list',
+                      '--repeated-dict-update', 'key1=value1',
+                      '--repeated-dict-update', 'key2=value2'])
+    self.AssertOutputContains(
+        "repeated-dict-update: {'key1': 'value1', 'key2': 'value2'}")
+    self.cli.Execute(['dict-list',
+                      '--repeated-dict-update', 'key2=value2',
+                      '--repeated-dict-update', 'key1=value1'])
+    self.AssertOutputContains(
+        "repeated-dict-update: {'key2': 'value2', 'key1': 'value1'}")
 
   def testArgDictUpdateActionDuplicateException(self):
     with self.AssertRaisesArgumentErrorMatches(

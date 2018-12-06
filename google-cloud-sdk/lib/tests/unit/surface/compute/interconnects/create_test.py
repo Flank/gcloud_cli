@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import test_case
@@ -28,7 +28,7 @@ from tests.lib.surface.compute import test_base
 class InterconnectsCreateGATest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
     self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'v1')
@@ -142,7 +142,7 @@ class InterconnectsCreateGATest(test_base.BaseTest):
 class InterconnectsCreateBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'beta')
@@ -280,7 +280,7 @@ class InterconnectsCreateBetaTest(test_base.BaseTest):
 class InterconnectsCreateAlphaTest(InterconnectsCreateBetaTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'alpha')

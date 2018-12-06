@@ -18,17 +18,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class LevelsUpdateTest(accesscontextmanager.Base):
+class LevelsUpdateTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -52,8 +53,8 @@ class LevelsUpdateTest(accesscontextmanager.Base):
         ),
         level)
 
-  def testUpdate_InvalidSpec(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_InvalidSpec(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(
         yaml.FileLoadError,
         r'Failed to load YAML from [not-found]'):
@@ -61,15 +62,15 @@ class LevelsUpdateTest(accesscontextmanager.Base):
           'access-context-manager levels update my_level --policy my_policy '
           '    --basic-level-spec not-found')
 
-  def testUpdate_MissingRequired(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_MissingRequired(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run(
           'access-context-manager levels update --policy my_policy')
 
-  def testUpdate(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate(self):
+    self.SetUpForTrack(self.track)
     level = self.messages.AccessLevel(title='My Level')
     self._ExpectPatch('my_level', level, 'my_policy', 'title')
 
@@ -79,8 +80,8 @@ class LevelsUpdateTest(accesscontextmanager.Base):
 
     self.assertEqual(results, level)
 
-  def testUpdate_AllParams(self, track):
-    self.SetUpForTrack(track)
+  def testUpdate_AllParams(self):
+    self.SetUpForTrack(self.track)
     level = self._MakeBasicLevel(
         None, title='My Level',
         combining_function='OR',
@@ -99,8 +100,8 @@ class LevelsUpdateTest(accesscontextmanager.Base):
 
     self.assertEqual(results, level)
 
-  def testCreate_PolicyFromProperty(self, track):
-    self.SetUpForTrack(track)
+  def testCreate_PolicyFromProperty(self):
+    self.SetUpForTrack(self.track)
     policy = 'my_acm_policy'
     properties.VALUES.access_context_manager.policy.Set(policy)
     level = self.messages.AccessLevel(title='My Level')
@@ -111,6 +112,11 @@ class LevelsUpdateTest(accesscontextmanager.Base):
 
     self.assertEqual(results, level)
 
+
+class LevelsUpdateTestAlpha(LevelsUpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

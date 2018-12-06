@@ -1,11 +1,13 @@
-- help_text:
+- release_tracks: [ALPHA, BETA]
+
+  help_text:
     brief: List access policies.
     DESCRIPTION: List access policies.
 
   request:
     collection: accesscontextmanager.accessPolicies
     resource_method_params:
-        parent: ''
+      parent: ''
 
   arguments:
     resource:
@@ -13,9 +15,9 @@
       spec: !REF googlecloudsdk.command_lib.organizations.resources:organization
 
   output:
-      format: |
-          table(
-              name.basename(),
-              parent.basename():label=ORGANIZATION,
-              title
-          )
+    format: |
+      table(
+          name.basename(),
+          parent.basename():label=ORGANIZATION,
+          title
+      )

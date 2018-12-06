@@ -13,15 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.sql.instances."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
+import io
+import json
+import sys
+
+from googlecloudsdk.api_lib.sql import api_util as common_api_util
+from googlecloudsdk.api_lib.sql import exceptions as sql_exceptions
+from googlecloudsdk.api_lib.sql import instance_prop_reducers as reducers_util
 from googlecloudsdk.api_lib.sql import instances as instances_util
+from googlecloudsdk.calliope import exceptions
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 from tests.lib.surface.sql import data
+import mock
 
 
 class DatabaseInstancesTest(base.SqlMockTestBeta):
@@ -149,6 +159,176 @@ class GetRegionFromZoneTest(base.SqlMockTestBeta, parameterized.TestCase):
       ('europe-west2-a-etc', 'europe-west2'))
   def testGetRegionFromZone(self, zone, derived_region):
     self.assertEqual(instances_util.GetRegionFromZone(zone), derived_region)
+
+
+class PrintAndConfirmAuthorizedNetworksOverwriteTest(base.SqlMockTestBeta):
+
+  def testPrintAndConfirmAuthorizedNetworksOverwrite(self):
+    captured_prompt = io.StringIO()
+    sys.stderr = captured_prompt
+    instances_util.InstancesV1Beta4.PrintAndConfirmAuthorizedNetworksOverwrite()
+    sys.stderr = sys.__stdout__
+
+    self.assertEqual(json.loads(captured_prompt.getvalue())['message'],
+                     'When adding a new IP address to authorized networks, '
+                     'make sure to also include any IP addresses that have '
+                     'already been authorized. Otherwise, they will be '
+                     'overwritten and de-authorized.')
+
+
+class InstanceV1Beta4Test(base.SqlMockTestBeta):
+
+  def testSetProjectAndInstanceFromRef(self):
+    instance_resource = self.messages.DatabaseInstance()
+    instance_ref = common_api_util.SqlClient('v1beta4').resource_parser.Parse(
+        'test_instance_id',
+        params={'project': 'test_project_name'},
+        collection='sql.instances')
+    instances_util.InstancesV1Beta4.\
+      SetProjectAndInstanceFromRef(instance_resource, instance_ref)
+    self.assertEqual((instance_resource.project, instance_resource.name),
+                     (instance_ref.project, instance_ref.instance))
+
+  def testAddBackupConfigToSettings(self):
+    settings = self.messages.Settings(
+        activationPolicy=None,
+        authorizedGaeApplications=[],
+        backupConfiguration=None,
+        databaseFlags=[],
+        ipConfiguration=None,
+        kind='sql#settings',
+        locationPreference=None,
+        pricingPlan='PER_USE',
+        replicationType='SYNCHRONOUS',
+        settingsVersion=None,
+        tier='D1',
+    )
+
+    backup_configuration = (reducers_util.BackupConfiguration(
+        self.messages, enable_bin_log=True))
+    instances_util.InstancesV1Beta4.AddBackupConfigToSettings(
+        settings, backup_configuration)
+
+    self.assertEqual(settings.backupConfiguration, backup_configuration)
+
+
+class StartCloudSqlProxyTest(base.SqlMockTestBeta):
+  """Tests instances_util.StartCloudSqlProxy."""
+  paths_mock = mock.Mock()
+  proxy_process = mock.Mock()
+
+  def SetUp(self):
+    self.instance = self.messages.DatabaseInstance(
+        name='some-instance', connectionName='storage:some-instance')
+    self.proxy_process.stderr = mock.Mock()
+
+    # Mock out calls to get the SDK path.
+    self.paths_mock.sdk_bin_path = '/some/sdk/path'
+    self.StartPatch(
+        'googlecloudsdk.core.config.Paths', return_value=self.paths_mock)
+
+    # Mock out calls to get the credentials.
+    self.StartPatch(
+        'googlecloudsdk.core.properties.VALUES.core.account.Get',
+        return_value='test@google.com')
+    self.paths_mock.LegacyCredentialsAdcPath = mock.Mock(
+        return_value='wherever/adc.json')
+
+    # Mock out calls to get the proxy command line args.
+    self.StartPatch(
+        'googlecloudsdk.core.execution_utils',
+        return_value=['cloud_sql_proxy', 'wtv'])
+    self.proxy_process.poll = mock.Mock(return_value=None)
+    self.StartPatch('subprocess.Popen', return_value=self.proxy_process)
+
+  def testStartProxyFromBinPath(self):
+    find_exec_mock = self.StartPatch(
+        'googlecloudsdk.core.util.files.FindExecutableOnPath')
+    self.proxy_process.stderr.readline = mock.Mock(
+        return_value=b'Ready for new connections')
+    process = instances_util.StartCloudSqlProxy(self.instance, 9470)
+
+    # Ensure that FindExecutableOnPath was not called.
+    self.assertEqual(find_exec_mock.call_count, 0)
+    self.assertEqual(process, self.proxy_process)
+
+  def testStartProxyFromPath(self):
+    find_exec_mock = self.StartPatch(
+        'googlecloudsdk.core.util.files.FindExecutableOnPath',
+        return_value='/other/sdk/path')
+    self.paths_mock.sdk_bin_path = None
+    self.proxy_process.stderr.readline = mock.Mock(
+        return_value=b'Ready for new connections')
+    process = instances_util.StartCloudSqlProxy(self.instance, 9470)
+
+    # Ensure that FindExecutableOnPath was called.
+    self.assertEqual(find_exec_mock.call_count, 1)
+    self.assertEqual(process, self.proxy_process)
+
+  def testFailToFindProxyPath(self):
+    find_exec_mock = self.StartPatch(
+        'googlecloudsdk.core.util.files.FindExecutableOnPath',
+        return_value=None)
+    self.paths_mock.sdk_bin_path = None
+    with self.assertRaises(exceptions.ToolException):
+      instances_util.StartCloudSqlProxy(self.instance, 9470)
+
+    # Ensure that FindExecutableOnPath was called.
+    self.assertEqual(find_exec_mock.call_count, 1)
+
+  def testProxyTimeout(self):
+    sleep_mock = self.StartPatch('time.sleep')
+    self.proxy_process.stderr.readline = mock.Mock(return_value=b'')
+    seconds_to_timeout = 10
+
+    with self.assertRaises(sql_exceptions.CloudSqlProxyError):
+      instances_util.StartCloudSqlProxy(self.instance, 9470, seconds_to_timeout)
+
+    # Polling happens every 0.2 seconds, so timeout should happen after
+    # the seconds to timeout have elapsed.
+    iterations_to_timeout = (seconds_to_timeout / 0.2) + 1
+    self.assertEqual(sleep_mock.call_count, iterations_to_timeout)
+
+  def testProxyAddressInUse(self):
+    sleep_mock = self.StartPatch('time.sleep')
+    self.proxy_process.stderr.readline = mock.Mock(
+        return_value=b'bind: address already in use')
+
+    with self.assertRaises(sql_exceptions.CloudSqlProxyError):
+      instances_util.StartCloudSqlProxy(self.instance, 9470)
+
+    # The error was thrown on the first iteration, so no sleep calls were made.
+    self.assertEqual(sleep_mock.call_count, 0)
+
+  def testProxyUnknownError(self):
+    # Polling will stop if the proxy process poll method does not return None.
+    self.proxy_process.poll = mock.Mock(return_value=1)
+
+    with self.AssertRaisesExceptionRegexp(
+        sql_exceptions.CloudSqlProxyError,
+        'Failed to start the Cloud SQL Proxy.'):
+      instances_util.StartCloudSqlProxy(self.instance, 9470)
+
+
+class IsInstanceV2Test(base.SqlMockTestBeta):
+  """Tests instances_util.IsInstanceV2."""
+  project = 'some-project'
+  instance = 'some-instance'
+
+  def testV2MySqlInstance(self):
+    self.assertTrue(
+        instances_util.IsInstanceV2(
+            data.GetV2Instance(self.project, self.instance)))
+
+  def testPostgresInstance(self):
+    self.assertTrue(
+        instances_util.IsInstanceV2(
+            data.GetPostgresInstance(self.project, self.instance)))
+
+  def testV1MySqlInstance(self):
+    self.assertFalse(
+        instances_util.IsInstanceV2(
+            data.GetV1Instance(self.project, self.instance)))
 
 
 if __name__ == '__main__':

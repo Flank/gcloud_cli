@@ -19,11 +19,49 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.dns import util as dns_util
 from tests.lib.surface.dns import util
 
 
 def GetMessages():
   return util.GetMessages("v1beta2")
+
+
+def GetDnsVisibilityDict(version, visibility="public", network_urls=None):
+  """Build visibility messages."""
+  messages = GetMessages()
+  result = {"visibility":
+            messages.ManagedZone.VisibilityValueValuesEnum(visibility)}
+
+  if visibility == "private":
+    if network_urls:
+      network_configs = [
+          messages.ManagedZonePrivateVisibilityConfigNetwork(
+              networkUrl=dns_util.GetRegistry(version).Parse(
+                  nurl,
+                  collection="compute.networks",
+                  params={"project": "fake-project"}).SelfLink())
+          for nurl in network_urls]
+    else:
+      network_configs = []
+
+    pvcfg = messages.ManagedZonePrivateVisibilityConfig
+    result["privateVisibilityConfig"] = pvcfg(networks=network_configs)
+  return result
+
+
+def ParseManagedZoneForwardingConfig(target_servers=None):
+  """Parses list of forwarding nameservers into ManagedZoneForwardingConfig."""
+  if not target_servers:
+    return None
+
+  messages = GetMessages()
+  target_servers = [
+      messages.ManagedZoneForwardingConfigNameServerTarget(ipv4Address=name)
+      for name in target_servers
+  ]
+
+  return messages.ManagedZoneForwardingConfig(targetNameServers=target_servers)
 
 
 def GetManagedZones():
@@ -56,26 +94,37 @@ def GetManagedZones():
   ]
 
 
-def GetManagedZoneBeforeCreation(api_version="v1beta2"):
-  m = util.GetMessages(api_version)
-  nonexistence = m.ManagedZoneDnsSecConfig.NonExistenceValueValuesEnum.nsec3
-  return m.ManagedZone(
+def GetManagedZoneBeforeCreation(messages,
+                                 dns_sec_config=False,
+                                 visibility_dict=None,
+                                 forwarding_config=None):
+  """Generate a create message for a managed zone."""
+  m = messages
+  mzone = m.ManagedZone(
       creationTime=None,
       description="Zone!",
       dnsName="zone.com.",
-      dnssecConfig=m.ManagedZoneDnsSecConfig(
-          defaultKeySpecs=[
-          ],
-          kind="dns#managedZoneDnsSecConfig",
-          nonExistence=nonexistence,
-          state=m.ManagedZoneDnsSecConfig.StateValueValuesEnum.on,
-      ),
-      kind="dns#managedZone",
+      kind=u"dns#managedZone",
       name="mz",
-      nameServerSet=None,
-      nameServers=[
-      ],
-  )
+      forwardingConfig=forwarding_config)
+
+  if dns_sec_config:
+    nonexistence = m.ManagedZoneDnsSecConfig.NonExistenceValueValuesEnum.nsec3
+    mzone.dnssecConfig = m.ManagedZoneDnsSecConfig(
+        defaultKeySpecs=[],
+        kind=u"dns#managedZoneDnsSecConfig",
+        nonExistence=nonexistence,
+        state=m.ManagedZoneDnsSecConfig.StateValueValuesEnum.on,
+    )
+
+  if visibility_dict:
+    mzone.visibility = visibility_dict["visibility"]
+    if mzone.visibility == m.ManagedZone.VisibilityValueValuesEnum("private"):
+      mzone.privateVisibilityConfig = visibility_dict["privateVisibilityConfig"]
+  elif hasattr(messages.ManagedZone, "VisibilityValueValuesEnum"):
+    mzone.visibility = messages.ManagedZone.VisibilityValueValuesEnum.public
+
+  return mzone
 
 
 def GetBaseARecord():

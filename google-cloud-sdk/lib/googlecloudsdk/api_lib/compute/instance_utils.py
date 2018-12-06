@@ -30,17 +30,22 @@ from googlecloudsdk.api_lib.compute import kms_utils
 from googlecloudsdk.api_lib.compute import metadata_utils
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.api_lib.compute import zone_utils
-from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute import scope as compute_scopes
 from googlecloudsdk.command_lib.compute.instances import flags
 from googlecloudsdk.command_lib.compute.sole_tenancy import util as sole_tenancy_util
 from googlecloudsdk.command_lib.util.ssh import ssh
+from googlecloudsdk.core import log
 import ipaddress
 import six
 
 
 EMAIL_REGEX = re.compile(r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)')
+
+_DEFAULT_DEVICE_NAME_CONTAINER_WARNING = (
+    'Default device-name for disk name [{0}] will be [{0}] because it is being '
+    'mounted to a container with [`--container-mount-disk`]')
 
 
 def GetCpuRamFromCustomName(name):
@@ -97,9 +102,9 @@ def InterpretMachineType(machine_type, custom_cpu, custom_memory, ext=True):
     A string representing the URL naming a machine-type.
 
   Raises:
-    exceptions.RequiredArgumentException when only one of the two custom
-      machine type flags are used.
-    exceptions.InvalidArgumentException when both the machine type and
+    calliope_exceptions.RequiredArgumentException when only one of the two
+      custom machine type flags are used.
+    calliope_exceptions.InvalidArgumentException when both the machine type and
       custom machine type flags are used to generate a new instance.
   """
   # Setting the machine type
@@ -110,15 +115,15 @@ def InterpretMachineType(machine_type, custom_cpu, custom_memory, ext=True):
   # Setting the specs for the custom machine.
   if custom_cpu or custom_memory or ext:
     if not custom_cpu:
-      raise exceptions.RequiredArgumentException(
+      raise calliope_exceptions.RequiredArgumentException(
           '--custom-cpu', 'Both [--custom-cpu] and [--custom-memory] must be '
           'set to create a custom machine type instance.')
     if not custom_memory:
-      raise exceptions.RequiredArgumentException(
+      raise calliope_exceptions.RequiredArgumentException(
           '--custom-memory', 'Both [--custom-cpu] and [--custom-memory] must '
           'be set to create a custom machine type instance.')
     if machine_type:
-      raise exceptions.InvalidArgumentException(
+      raise calliope_exceptions.InvalidArgumentException(
           '--machine-type', 'Cannot set both [--machine-type] and '
           '[--custom-cpu]/[--custom-memory] for the same instance.')
     custom_type_string = GetNameForCustom(
@@ -184,18 +189,18 @@ def CreateServiceAccountMessages(messages, scopes, service_account):
       scope_uri = scope
     elif len(parts) == 2:
       # TODO(b/33688878) Remove exception for this deprecated format
-      raise exceptions.InvalidArgumentException(
+      raise calliope_exceptions.InvalidArgumentException(
           '--scopes',
           'Flag format --scopes [ACCOUNT=]SCOPE,[[ACCOUNT=]SCOPE, ...] is '
           'removed. Use --scopes [SCOPE,...] --service-account ACCOUNT '
           'instead.')
     else:
-      raise exceptions.ToolException(
+      raise calliope_exceptions.ToolException(
           '[{0}] is an illegal value for [--scopes]. Values must be of the '
           'form [SCOPE].'.format(scope))
 
     if service_account != 'default' and not ssh.Remote.FromArg(service_account):
-      raise exceptions.InvalidArgumentException(
+      raise calliope_exceptions.InvalidArgumentException(
           '--service-account',
           'Invalid format: expected default or user@domain.com, received ' +
           service_account)
@@ -430,6 +435,7 @@ def CreateNetworkInterfaceMessages(resources, compute_client,
 
 
 def ParseDiskResource(resources, name, project, zone, type_):
+  """Parses the regional disk resources."""
   if type_ == compute_scopes.ScopeEnum.REGION:
     return resources.Parse(
         name,
@@ -448,8 +454,29 @@ def ParseDiskResource(resources, name, project, zone, type_):
         })
 
 
+def GetDiskDeviceName(disk, name, container_mount_disk):
+  """Helper method to get device-name for a disk message."""
+  if (container_mount_disk and
+      filter(bool,
+             [d.get('name', name) == name for d in container_mount_disk])):
+    # device-name must be the same as name if it is being mounted to a
+    # container.
+    if not disk.get('device-name'):
+      log.warning(_DEFAULT_DEVICE_NAME_CONTAINER_WARNING.format(name))
+      return name
+    # This is defensive only; should be validated before this method is called.
+    elif disk.get('device-name') != name:
+      raise calliope_exceptions.InvalidArgumentException(
+          '--container-mount-disk',
+          'Attempting to mount disk named [{}] with device-name [{}]. If '
+          'being mounted to container, disk name must match device-name.'
+          .format(name, disk.get('device-name')))
+  return disk.get('device-name')
+
+
 def CreatePersistentAttachedDiskMessages(
-    resources, compute_client, csek_keys, disks, instance_ref):
+    resources, compute_client, csek_keys, disks, instance_ref,
+    container_mount_disk=None):
   """Returns a list of AttachedDisk messages and the boot disk's reference."""
   disks_messages = []
   boot_disk_ref = None
@@ -487,10 +514,12 @@ def CreatePersistentAttachedDiskMessages(
     else:
       kwargs = {}
 
+    device_name = GetDiskDeviceName(disk, name, container_mount_disk)
+
     attached_disk = messages.AttachedDisk(
         autoDelete=auto_delete,
         boot=boot,
-        deviceName=disk.get('device-name'),
+        deviceName=device_name,
         mode=mode,
         source=disk_ref.SelfLink(),
         type=messages.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
@@ -508,7 +537,8 @@ def CreatePersistentAttachedDiskMessages(
 def CreatePersistentCreateDiskMessages(compute_client,
                                        resources, csek_keys, create_disks,
                                        instance_ref, enable_kms=False,
-                                       enable_snapshots=False):
+                                       enable_snapshots=False,
+                                       container_mount_disk=None):
   """Returns a list of AttachedDisk messages for newly creating disks.
 
   Args:
@@ -517,6 +547,7 @@ def CreatePersistentCreateDiskMessages(compute_client,
     csek_keys: customer suplied encryption keys,
     create_disks: disk objects - contains following properties
              * name - the name of disk,
+             * description - an optional description for the disk,
              * mode - 'rw' (R/W), 'ro' (R/O) access mode,
              * disk-size - the size of the disk,
              * disk-type - the type of the disk (HDD or SSD),
@@ -529,6 +560,8 @@ def CreatePersistentCreateDiskMessages(compute_client,
     instance_ref: reference to the instance that will own the new disks.
     enable_kms: True if KMS keys are supported for the disk.
     enable_snapshots: True if snapshot initialization is supported for the disk.
+    container_mount_disk: list of disks to be mounted to container, if any.
+
   Returns:
     list of API messages for attached disks
   """
@@ -596,6 +629,7 @@ def CreatePersistentCreateDiskMessages(compute_client,
 
     initialize_params = messages.AttachedDiskInitializeParams(
         diskName=name,
+        description=disk.get('description'),
         sourceImage=image_uri,
         diskSizeGb=disk_size_gb,
         diskType=disk_type_uri,
@@ -610,10 +644,11 @@ def CreatePersistentCreateDiskMessages(compute_client,
         initialize_params.sourceImage = None
         initialize_params.sourceSnapshot = attached_snapshot_uri
 
+    device_name = GetDiskDeviceName(disk, name, container_mount_disk)
     create_disk = messages.AttachedDisk(
         autoDelete=auto_delete,
         boot=False,
-        deviceName=disk.get('device-name'),
+        deviceName=device_name,
         initializeParams=initialize_params,
         mode=mode,
         type=messages.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
@@ -737,8 +772,77 @@ def UseExistingBootDisk(disks):
   return any(disk.get('boot') == 'yes' for disk in disks)
 
 
-def CreateLocalSsdMessage(resources, messages, device_name, interface,
-                          size_bytes=None, zone=None, project=None):
+# TODO(b/116515070) Replace `aep-nvdimm` with `local-nvdimm`
+NVDIMM_DISK_TYPE = 'aep-nvdimm'
+
+
+def CreateLocalNvdimmMessages(args, resources, messages, zone=None,
+                              project=None):
+  """Create messages representing local NVDIMMs."""
+  local_nvdimms = []
+  for local_nvdimm_disk in getattr(args, 'local_nvdimm', []) or []:
+    local_nvdimm = _CreateLocalNvdimmMessage(
+        resources,
+        messages,
+        local_nvdimm_disk.get('size'),
+        zone,
+        project
+    )
+    local_nvdimms.append(local_nvdimm)
+  return local_nvdimms
+
+
+def _CreateLocalNvdimmMessage(resources, messages, size_bytes=None, zone=None,
+                              project=None):
+  """Create a message representing a local NVDIMM."""
+
+  if zone:
+    disk_type_ref = resources.Parse(
+        NVDIMM_DISK_TYPE,
+        collection='compute.diskTypes',
+        params={
+            'project': project,
+            'zone': zone
+        })
+    disk_type = disk_type_ref.SelfLink()
+  else:
+    disk_type = NVDIMM_DISK_TYPE
+
+  local_nvdimm = messages.AttachedDisk(
+      type=messages.AttachedDisk.TypeValueValuesEnum.SCRATCH,
+      autoDelete=True,
+      interface=messages.AttachedDisk.InterfaceValueValuesEnum.NVDIMM,
+      mode=messages.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+      initializeParams=messages.AttachedDiskInitializeParams(
+          diskType=disk_type),
+      )
+
+  if size_bytes is not None:
+    local_nvdimm.diskSizeGb = utils.BytesToGb(size_bytes)
+
+  return local_nvdimm
+
+
+def CreateLocalSsdMessages(args, resources, messages, zone=None,
+                           project=None):
+  """Create messages representing local ssds."""
+  local_ssds = []
+  for local_ssd_disk in getattr(args, 'local_ssd', []) or []:
+    local_ssd = _CreateLocalSsdMessage(
+        resources,
+        messages,
+        local_ssd_disk.get('device-name'),
+        local_ssd_disk.get('interface'),
+        local_ssd_disk.get('size'),
+        zone,
+        project
+    )
+    local_ssds.append(local_ssd)
+  return local_ssds
+
+
+def _CreateLocalSsdMessage(resources, messages, device_name, interface,
+                           size_bytes=None, zone=None, project=None):
   """Create a message representing a local ssd."""
 
   if zone:
@@ -766,7 +870,7 @@ def CreateLocalSsdMessage(resources, messages, device_name, interface,
       mode=messages.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
       initializeParams=messages.AttachedDiskInitializeParams(
           diskType=disk_type),
-      )
+  )
 
   if size_bytes is not None:
     local_ssd.diskSizeGb = utils.BytesToGb(size_bytes)
@@ -951,33 +1055,43 @@ def GetCanIpForward(args, skip_defaults):
 
 
 def CreateDiskMessages(
-    holder, args, boot_disk_size_gb, image_uri, instance_ref, skip_defaults):
+    holder, args, boot_disk_size_gb, image_uri, instance_ref, skip_defaults,
+    match_container_mount_disks=False):
   """Creates API messages with disks attached to VM instance."""
+  flags_to_check = ['create_disk', 'local_ssd',
+                    'boot_disk_type', 'boot_disk_device_name',
+                    'boot_disk_auto_delete']
+  if hasattr(args, 'local_nvdimm'):
+    flags_to_check.append('local_nvdimm')
   if (skip_defaults and not args.IsSpecified('disk') and not
-      IsAnySpecified(
-          args, 'create_disk', 'local_ssd', 'boot_disk_type',
-          'boot_disk_device_name', 'boot_disk_auto_delete')):
+      IsAnySpecified(args, *flags_to_check)):
     return []
   else:
+    if match_container_mount_disks:
+      container_mount_disk = args.container_mount_disk
+    else:
+      container_mount_disk = []
     persistent_disks, _ = (
         CreatePersistentAttachedDiskMessages(
             holder.resources, holder.client, None, args.disk or [],
-            instance_ref))
+            instance_ref, container_mount_disk=container_mount_disk))
     persistent_create_disks = (
         CreatePersistentCreateDiskMessages(
             holder.client, holder.resources, None,
-            getattr(args, 'create_disk', []), instance_ref))
-    local_ssds = []
-    for x in args.local_ssd or []:
-      local_ssd = CreateLocalSsdMessage(
-          holder.resources,
-          holder.client.messages,
-          x.get('device-name'),
-          x.get('interface'),
-          x.get('size'),
-          instance_ref.zone,
-          instance_ref.project)
-      local_ssds.append(local_ssd)
+            getattr(args, 'create_disk', []), instance_ref,
+            container_mount_disk=container_mount_disk))
+    local_nvdimms = CreateLocalNvdimmMessages(
+        args,
+        holder.resources,
+        holder.client.messages,
+        instance_ref.zone,
+        instance_ref.project)
+    local_ssds = CreateLocalSsdMessages(
+        args,
+        holder.resources,
+        holder.client.messages,
+        instance_ref.zone,
+        instance_ref.project)
     boot_disk = CreateDefaultBootAttachedDiskMessage(
         holder.client, holder.resources,
         disk_type=args.boot_disk_type,
@@ -989,7 +1103,8 @@ def CreateDiskMessages(
         instance_ref=instance_ref,
         csek_keys=None)
     return (
-        [boot_disk] + persistent_disks + persistent_create_disks + local_ssds)
+        [boot_disk] + persistent_disks + persistent_create_disks + local_nvdimms
+        + local_ssds)
 
 
 def GetTags(args, client):
@@ -1030,4 +1145,35 @@ def ResolveSnapshotURI(user_project, snapshot, resource_parser):
                                          collection='compute.snapshots',
                                          params={'project': user_project})
     return snapshot_ref.SelfLink()
+  return None
+
+
+def GetAllocationAffinity(args, client):
+  """Returns the message of allocation affinity for the instance."""
+  if args.IsSpecified('allocation_affinity'):
+    type_msgs = (client.messages.
+                 AllocationAffinity.ConsumeAllocationTypeValueValuesEnum)
+
+    if args.allocation_affinity == 'none':
+      allocation_type = type_msgs.NO_ALLOCATION
+      allocation_key = None
+      allocation_values = []
+    elif args.allocation_affinity == 'specific':
+      allocation_type = type_msgs.SPECIFIC_ALLOCATION
+      # Currently, the key is fixed and the value is the name of the allocation.
+      # The value being a repeated field is reserved for future use when user
+      # can specify more than one allocation names from which the Vm can take
+      # capacity from.
+      allocation_key = args.allocation_label.get('key', None)
+      allocation_values = [args.allocation_label.get('value', None)]
+    else:
+      allocation_type = type_msgs.ANY_ALLOCATION
+      allocation_key = None
+      allocation_values = []
+
+    return client.messages.AllocationAffinity(
+        consumeAllocationType=allocation_type,
+        key=allocation_key,
+        values=allocation_values)
+
   return None

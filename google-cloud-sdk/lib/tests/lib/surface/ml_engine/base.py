@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -79,7 +79,7 @@ class MlAlphaPlatformTestBase(_MlPlatformTestBase):
   API_VERSION = 'v1'
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 class MlBetaPlatformTestBase(_MlPlatformTestBase):
@@ -87,7 +87,7 @@ class MlBetaPlatformTestBase(_MlPlatformTestBase):
   API_VERSION = 'v1'
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def GetBetaModel(self, name):
     return self.msgs.GoogleCloudMlV1beta1Model(name=name)
@@ -98,7 +98,7 @@ class MlGaPlatformTestBase(_MlPlatformTestBase):
   API_VERSION = 'v1'
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def GetGaModel(self, name):
     return self.msgs.GoogleCloudMlV1Model(name=name)

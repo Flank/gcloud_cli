@@ -22,7 +22,7 @@ from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -43,7 +43,7 @@ class VpnTunnelsLabelsTestBase(sdk_test_base.WithFakeAuth,
 
     self.resources = resources.Registry()
     self.resources.RegisterApiByName('compute', api_name)
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.mock_region_operations = self.mock_apitools_client.regionOperations
     # Patch time.sleep for faster test execution.
     self.StartPatch('time.sleep')

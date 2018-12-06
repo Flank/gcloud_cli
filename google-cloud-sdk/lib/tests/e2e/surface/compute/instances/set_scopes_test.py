@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
+from tests.lib import test_case
 
 
 class SetScopesTest(e2e_instances_test_base.InstancesTestBase):
@@ -28,6 +29,7 @@ class SetScopesTest(e2e_instances_test_base.InstancesTestBase):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
+  @test_case.Filters.skip('Failing', 'b/116225672')
   def testInstanceSetScopes(self):
     self.GetInstanceName()
     self.Run('compute instances create {0} --zone {1} '.format(

@@ -36,8 +36,8 @@ CHANGE_NUMBER = os.environ.get('KOKORO_PIPER_CHANGELIST')
 DATETIME = datetime.datetime.now().strftime('%Y-%m-%d %H:00:00')
 MAX_TAB_COMPLETION_TIME = 0.05  # 50 milliseconds
 MAX_STARTUP_TIME = 0.6  # 600 milliseconds
-TAB_COMPLETION_OUTPUT_FILE = '/tmpfs/src/tab_completion_times.csv'
-STARTUP_OUTPUT_FILE = '/tmpfs/src/startup_times.csv'
+TAB_COMPLETION_OUTPUT_FILE = os.environ.get('TAB_COMPLETION_TIMES_FILE')
+STARTUP_OUTPUT_FILE = os.environ.get('STARTUP_TIMES_FILE')
 TIMING_RUNS = 10
 
 TAB_COMPLETION_SCRIPT = """\
@@ -84,7 +84,7 @@ class PerformanceTest(sdk_test_base.BundledBase, parameterized.TestCase):
       ('ContainerImagesList', 'gcloud container images list'),
       ('DataflowJobsRun', 'gcloud dataflow jobs run'),
       ('DataprocClustersList', 'gcloud dataproc clusters list'),
-      ('DatastoreCreateIndexes', 'gcloud datastore create-indexes'),
+      ('DatastoreCreateIndexes', 'gcloud datastore indexes create'),
       ('DebugSnapshotsCreate', 'gcloud debug snapshots create'),
       ('DeploymentManagerTypesList', 'gcloud deployment-manager types list'),
       ('DnsOperationsDescribe', 'gcloud dns operations describe'),

@@ -9,17 +9,24 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
+
+     commands
+        (BETA) Manage commands for Cloud IoT devices.
 
      configs
         (BETA) Manage configurations for Cloud IoT devices.
 
      credentials
         (BETA) Manage credentials for Cloud IoT devices.
+
+     gateways
+        (BETA) Manage Cloud IoT Core Gateway Associations.
 
      states
         (BETA) Manage states for Cloud IoT devices.

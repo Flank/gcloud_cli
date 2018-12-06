@@ -88,8 +88,19 @@ class TypesTest(_HooksTestBase):
     result = hooks.BigQueryTableAction(table_name)
     self.assertEqual(expected_action, result)
 
+  def testBigQueryTableActionWithNoTableId(self):
+    expected_action = self.msg.GooglePrivacyDlpV2Action(
+        saveFindings=self.msg.GooglePrivacyDlpV2SaveFindings(
+            outputConfig=self.msg.GooglePrivacyDlpV2OutputStorageConfig(
+                table=self.msg.GooglePrivacyDlpV2BigQueryTable(
+                    datasetId='mydataset', projectId=self.test_project,
+                    tableId=''))))
+    table_name = '{}.mydataset'.format(self.test_project)
+    result = hooks.BigQueryTableAction(table_name)
+    self.assertEqual(expected_action, result)
+
   @parameterized.named_parameters(
-      ('TooFewParts', 'foo.bar'),
+      ('TooFewParts', 'foo'),
       ('Empty', ''),
       ('TooManyParts', 'foo.bar.fiz.buzz'),
   )

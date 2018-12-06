@@ -9,8 +9,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -22,7 +23,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) add an IAM policy binding to a device registry.
+        (ALPHA) Add IAM policy binding to a device registry.
 
      create
         (ALPHA) Create a new device registry.
@@ -40,7 +41,7 @@ COMMANDS
         (ALPHA) List device registries.
 
      remove-iam-policy-binding
-        (ALPHA) Remove an IAM policy binding from a device registry.
+        (ALPHA) Remove IAM policy binding of a device registry.
 
      set-iam-policy
         (ALPHA) Set the IAM policy for a device registry.

@@ -30,6 +30,7 @@ from googlecloudsdk.command_lib.iot import util
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import times
 from tests.lib import parameterized
+from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 from six.moves import range  # pylint: disable=redefined-builtin
@@ -404,6 +405,20 @@ class ParseMetadataTest(test_case.Base, parameterized.TestCase):
             self._CreateAdditionalProperty('key1', 'value'),
             self._CreateAdditionalProperty('key2', 'file_value')])
     self.assertEqual(result, expected)
+
+
+class IotHooksTest(sdk_test_base.SdkBase):
+  """Test for declarative python hooks."""
+
+  def testGetCommandFromFileProcessor(self):
+    file_path = self.Touch(self.root_path, contents=b'command_data')
+    self.assertTrue(util.GetCommandFromFileProcessor(file_path))
+
+  def testGetCommandFromFileProcessorBadFileFails(self):
+    fake_path = 'fake/path/to_file'
+    with self.assertRaisesRegex(
+        ValueError, r'Command File \[{}\] can not be opened'.format(fake_path)):
+      util.GetCommandFromFileProcessor(fake_path)
 
 
 if __name__ == '__main__':

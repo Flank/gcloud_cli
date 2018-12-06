@@ -178,12 +178,17 @@ DESCRIPTION
             can reference any of the supported formats.
          no-heading
             Disables the column headings.
+         margin=N
+            Right hand side padding when one or more columns are wrapped.
          pad=N
             Sets the column horizontal pad to N spaces. The default is 1 for
             box, 2 otherwise.
          title=TITLE
             Prints a centered TITLE at the top of the table, within the table
             box if box is enabled.
+         width=N
+            The table width. The default is the terminal width or 80 if the
+            output is not a terminal.
 
      text
         An alias for the flattened format.
@@ -222,6 +227,8 @@ DESCRIPTION
      json-decode
         Decodes string values that are JSON compact encodings of list and
         dictionary objects. This may become the default.
+     pager
+        If True, sends output to a pager.
      private
         Disables log file output. Use this for sensitive resource data that
         should not be displayed in log files. Explicit command line IO

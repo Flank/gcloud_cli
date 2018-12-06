@@ -95,10 +95,10 @@ class TasksTest(test_base.CloudTasksTestBase):
     self.assertEqual(actual_task_list, expected_task_list[:limit])
 
   def _TestTaskCreation(self, task_ref=None, schedule_time=None,
-                        pull_message=None, app_engine_http_request=None):
+                        app_engine_http_request=None):
     expected_task = self.messages.Task(
         name=task_ref.RelativeName() if task_ref else None,
-        scheduleTime=schedule_time, pullMessage=pull_message,
+        scheduleTime=schedule_time,
         appEngineHttpRequest=app_engine_http_request)
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
@@ -108,19 +108,12 @@ class TasksTest(test_base.CloudTasksTestBase):
         expected_task)
     actual_task = self.tasks_client.Create(
         parent_ref=self.queue_ref, task_ref=task_ref,
-        schedule_time=schedule_time, pull_message=pull_message,
+        schedule_time=schedule_time,
         app_engine_http_request=app_engine_http_request)
     self.assertEqual(actual_task, expected_task)
 
   def testCreate_NoOptions(self):
     self._TestTaskCreation()
-
-  def testCreate_AllOptions_PullTask(self):
-    task_ref = self.task_ref
-    schedule_time = self._MakeScheduleTime()
-    pull_message = self.messages.PullMessage(tag='tag', payload=b'payload')
-    self._TestTaskCreation(task_ref=task_ref, schedule_time=schedule_time,
-                           pull_message=pull_message)
 
   def testCreate_AllOptions_AppEngineTask(self):
     task_ref = self.task_ref
@@ -132,27 +125,9 @@ class TasksTest(test_base.CloudTasksTestBase):
             self.messages.AppEngineHttpRequest.HeadersValue),
         httpMethod=self.messages.AppEngineHttpRequest.HttpMethodValueValuesEnum(
             'POST'),
-        payload=b'payload', relativeUrl='/paths/a/')
+        body=b'body', relativeUri='/paths/a/')
     self._TestTaskCreation(task_ref=task_ref, schedule_time=schedule_time,
                            app_engine_http_request=app_engine_http_request)
-
-  def testCreate_AttemptPullandAppEngineTask(self):
-    task_ref = self.task_ref
-    schedule_time = self._MakeScheduleTime()
-    pull_message = self.messages.PullMessage(tag='tag', payload=b'payload')
-    app_engine_http_request = self.messages.AppEngineHttpRequest(
-        appEngineRouting=self.messages.AppEngineRouting(service='abc'),
-        headers=encoding.DictToAdditionalPropertyMessage(
-            {'header': 'value'},
-            self.messages.AppEngineHttpRequest.HeadersValue),
-        httpMethod=self.messages.AppEngineHttpRequest.HttpMethodValueValuesEnum(
-            'POST'),
-        payload=b'payload', relativeUrl='/paths/a/')
-    with self.assertRaises(tasks_api.ModifyingPullAndAppEngineTaskError):
-      self.tasks_client.Create(parent_ref=self.queue_ref, task_ref=task_ref,
-                               schedule_time=schedule_time,
-                               pull_message=pull_message,
-                               app_engine_http_request=app_engine_http_request)
 
   def testGet(self):
     expected_task = self.messages.Task(name=self.task_name)
@@ -183,6 +158,73 @@ class TasksTest(test_base.CloudTasksTestBase):
     actual_task = self.tasks_client.Run(self.task_ref)
 
     self.assertEqual(actual_task, expected_task)
+
+
+class PullTasksTest(test_base.CloudTasksAlphaTestBase):
+
+  def SetUp(self):
+    self.location_ref = resources.REGISTRY.Parse(
+        'us-central1', params={'projectsId': self.Project()},
+        collection='cloudtasks.projects.locations')
+    self.queue_ref = resources.REGISTRY.Parse(
+        'my-queue', params={'projectsId': self.Project(),
+                            'locationsId': 'us-central1'},
+        collection='cloudtasks.projects.locations.queues')
+    self.task_ref = resources.REGISTRY.Parse(
+        'my-task', params={'projectsId': self.Project(),
+                           'locationsId': 'us-central1',
+                           'queuesId': 'my-queue'},
+        collection='cloudtasks.projects.locations.queues.tasks')
+    # Define separately from task_ref because we know that this is what the API
+    # expects
+    self.task_name = ('projects/{}/locations/us-central1/queues/my-queue/tasks/'
+                      'my-task'.format(self.Project()))
+
+  def _MakeScheduleTime(self):
+    return datetime.datetime.utcnow().isoformat() + 'Z'
+
+  def _TestTaskCreation(self, task_ref=None, schedule_time=None,
+                        pull_message=None, app_engine_http_request=None):
+    expected_task = self.messages.Task(
+        name=task_ref.RelativeName() if task_ref else None,
+        scheduleTime=schedule_time, pullMessage=pull_message,
+        appEngineHttpRequest=app_engine_http_request)
+    self.tasks_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
+            parent=self.queue_ref.RelativeName(),
+            createTaskRequest=self.messages.CreateTaskRequest(
+                task=expected_task)),
+        expected_task)
+    actual_task = self.tasks_client.Create(
+        parent_ref=self.queue_ref, task_ref=task_ref,
+        schedule_time=schedule_time, pull_message=pull_message,
+        app_engine_http_request=app_engine_http_request)
+    self.assertEqual(actual_task, expected_task)
+
+  def testCreate_AllOptions_PullTask(self):
+    task_ref = self.task_ref
+    schedule_time = self._MakeScheduleTime()
+    pull_message = self.messages.PullMessage(tag='tag', payload=b'payload')
+    self._TestTaskCreation(task_ref=task_ref, schedule_time=schedule_time,
+                           pull_message=pull_message)
+
+  def testCreate_AttemptPullandAppEngineTask(self):
+    task_ref = self.task_ref
+    schedule_time = self._MakeScheduleTime()
+    pull_message = self.messages.PullMessage(tag='tag', payload=b'payload')
+    app_engine_http_request = self.messages.AppEngineHttpRequest(
+        appEngineRouting=self.messages.AppEngineRouting(service='abc'),
+        headers=encoding.DictToAdditionalPropertyMessage(
+            {'header': 'value'},
+            self.messages.AppEngineHttpRequest.HeadersValue),
+        httpMethod=self.messages.AppEngineHttpRequest.HttpMethodValueValuesEnum(
+            'POST'),
+        payload=b'payload', relativeUrl='/paths/a/')
+    with self.assertRaises(tasks_api.ModifyingPullAndAppEngineTaskError):
+      self.tasks_client.Create(parent_ref=self.queue_ref, task_ref=task_ref,
+                               schedule_time=schedule_time,
+                               pull_message=pull_message,
+                               app_engine_http_request=app_engine_http_request)
 
   def testLease(self):
     expected_lease_tasks_request = self.messages.LeaseTasksRequest(

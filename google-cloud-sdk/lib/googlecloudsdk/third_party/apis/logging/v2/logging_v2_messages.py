@@ -415,6 +415,13 @@ class LogEntry(_messages.Message):
       if any. If it contains a relative resource name, the name is assumed to
       be relative to //tracing.googleapis.com. Example: projects/my-
       projectid/traces/06796866738c859f2f19b7cfb3214824
+    traceSampled: Optional. The sampling decision of the trace associated with
+      the log entry. True means that the trace resource name in the trace
+      field was sampled for storage in a trace backend. False means that the
+      trace was not sampled for storage when this log entry was written, or
+      the sampling decision was unknown at the time. A non-sampled trace value
+      is still useful as a request correlation identifier. The default is
+      False.
   """
 
   class SeverityValueValuesEnum(_messages.Enum):
@@ -537,6 +544,7 @@ class LogEntry(_messages.Message):
   textPayload = _messages.StringField(14)
   timestamp = _messages.StringField(15)
   trace = _messages.StringField(16)
+  traceSampled = _messages.BooleanField(17)
 
 
 class LogEntryOperation(_messages.Message):
@@ -688,7 +696,7 @@ class LogMetric(_messages.Message):
       based metric is using a DISTRIBUTION value type and it describes the
       bucket boundaries used to create a histogram of the extracted values.
     description: Optional. A description of this metric, which is used in
-      documentation.
+      documentation. The maximum length of the description is 8000 characters.
     filter: Required. An advanced logs filter which is used to match log
       entries. Example: "resource.type=gae_app AND severity>=ERROR" The
       maximum length of the filter is 20000 characters.
@@ -824,8 +832,6 @@ class LogSink(_messages.Message):
       sink's writer_identity, set when the sink is created, must have
       permission to write to the destination or else the log entries are not
       exported. For more information, see Exporting Logs With Sinks.
-    endTime: Deprecated. This field is ignored when creating or updating
-      sinks.
     filter: Optional. An advanced logs filter. The only exported log entries
       are those that are in the resource owning the sink and that match the
       filter. For example: logName="projects/[PROJECT_ID]/logs/[LOG_ID]" AND
@@ -850,8 +856,6 @@ class LogSink(_messages.Message):
     outputVersionFormat: Deprecated. The log entry format to use for this
       sink's exported log entries. The v2 format is used by default and cannot
       be changed.
-    startTime: Deprecated. This field is ignored when creating or updating
-      sinks.
     writerIdentity: Output only. An IAM identity&mdash;a service account or
       group&mdash;under which Logging writes the exported log entries to the
       sink's destination. This field is set by sinks.create and sinks.update,
@@ -877,13 +881,11 @@ class LogSink(_messages.Message):
     V1 = 2
 
   destination = _messages.StringField(1)
-  endTime = _messages.StringField(2)
-  filter = _messages.StringField(3)
-  includeChildren = _messages.BooleanField(4)
-  name = _messages.StringField(5)
-  outputVersionFormat = _messages.EnumField('OutputVersionFormatValueValuesEnum', 6)
-  startTime = _messages.StringField(7)
-  writerIdentity = _messages.StringField(8)
+  filter = _messages.StringField(2)
+  includeChildren = _messages.BooleanField(3)
+  name = _messages.StringField(4)
+  outputVersionFormat = _messages.EnumField('OutputVersionFormatValueValuesEnum', 5)
+  writerIdentity = _messages.StringField(6)
 
 
 class LoggingBillingAccountsExclusionsCreateRequest(_messages.Message):
@@ -1121,7 +1123,7 @@ class LoggingBillingAccountsSinksPatchRequest(_messages.Message):
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmaskExample:
+      buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
 
@@ -1160,7 +1162,7 @@ class LoggingBillingAccountsSinksUpdateRequest(_messages.Message):
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmaskExample:
+      buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
 
@@ -1495,7 +1497,7 @@ class LoggingFoldersSinksPatchRequest(_messages.Message):
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmaskExample:
+      buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
 
@@ -1534,7 +1536,7 @@ class LoggingFoldersSinksUpdateRequest(_messages.Message):
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmaskExample:
+      buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
 
@@ -1834,7 +1836,7 @@ class LoggingOrganizationsSinksPatchRequest(_messages.Message):
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmaskExample:
+      buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
 
@@ -1873,7 +1875,7 @@ class LoggingOrganizationsSinksUpdateRequest(_messages.Message):
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmaskExample:
+      buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
 
@@ -2189,7 +2191,7 @@ class LoggingProjectsSinksPatchRequest(_messages.Message):
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmaskExample:
+      buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
 
@@ -2228,7 +2230,7 @@ class LoggingProjectsSinksUpdateRequest(_messages.Message):
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmaskExample:
+      buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
 
@@ -2345,7 +2347,7 @@ class LoggingSinksUpdateRequest(_messages.Message):
       some point in the future, behavior will be removed and specifying an
       empty updateMask will be an error.For a detailed FieldMask definition,
       see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmaskExample:
+      buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample:
       updateMask=filter.
   """
 
@@ -2946,9 +2948,12 @@ class WriteLogEntriesRequest(_messages.Message):
       "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
       "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
       "folders/[FOLDER_ID]/logs/[LOG_ID]" [LOG_ID] must be URL-encoded. For
-      example, "projects/my-project-id/logs/syslog" or "organizations/12345678
-      90/logs/cloudresourcemanager.googleapis.com%2Factivity". For more
-      information about log names, see LogEntry.
+      example: "projects/my-project-id/logs/syslog" "organizations/1234567890/
+      logs/cloudresourcemanager.googleapis.com%2Factivity" The permission
+      <code>logging.logEntries.create</code> is needed on each project,
+      organization, billing account, or folder that is receiving new log
+      entries, whether the resource is specified in <code>logName</code> or in
+      an individual log entry.
     partialSuccess: Optional. Whether valid entries should be written even if
       some other entries fail due to INVALID_ARGUMENT or PERMISSION_DENIED
       errors. If any entry is not written, then the response status is the

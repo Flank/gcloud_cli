@@ -21,18 +21,17 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import util as command_util
 from googlecloudsdk.core.console import console_io
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class OperationsDeleteTest(base.OperationsUnitTest, parameterized.TestCase):
+class OperationsDeleteGATest(base.OperationsUnitTest):
 
-  def testSuccessfulDeleteSingle(self, track):
-    self.SetTrack(track)
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
+
+  def testSuccessfulDeleteSingle(self):
     self.WriteInput('y\n')
     self.ExpectOperationDelete(self.TEST_PROJECT, self.TEST_LOCATION,
                                self.TEST_OPERATION_UUID)
@@ -40,8 +39,7 @@ class OperationsDeleteTest(base.OperationsUnitTest, parameterized.TestCase):
     self.RunOperations('delete', '--project', self.TEST_PROJECT, '--location',
                        self.TEST_LOCATION, self.TEST_OPERATION_UUID)
 
-  def testSuccessfulDeleteMultiple(self, track):
-    self.SetTrack(track)
+  def testSuccessfulDeleteMultiple(self):
     self.WriteInput('y\n')
     self.ExpectOperationDelete(self.TEST_PROJECT, self.TEST_LOCATION,
                                self.TEST_OPERATION_UUID)
@@ -52,9 +50,8 @@ class OperationsDeleteTest(base.OperationsUnitTest, parameterized.TestCase):
                        self.TEST_LOCATION, self.TEST_OPERATION_UUID,
                        self.TEST_OPERATION_UUID2)
 
-  def testSuccessfulDeleteMultipleWithSingleFailure(self, track):
+  def testSuccessfulDeleteMultipleWithSingleFailure(self):
     """Test that if some deletions fail, all deletions are attempted."""
-    self.SetTrack(track)
     self.WriteInput('y\n')
     self.ExpectOperationDelete(
         self.TEST_PROJECT,
@@ -74,8 +71,7 @@ class OperationsDeleteTest(base.OperationsUnitTest, parameterized.TestCase):
     self.AssertErrMatches(r'^Deleted operation \S*{}]\.$'.format(
         self.TEST_OPERATION_UUID2))
 
-  def testDeleteOperationNotFound(self, track):
-    self.SetTrack(track)
+  def testDeleteOperationNotFound(self):
     self.WriteInput('y\n')
     self.ExpectOperationDelete(
         self.TEST_PROJECT,
@@ -88,16 +84,14 @@ class OperationsDeleteTest(base.OperationsUnitTest, parameterized.TestCase):
                          self.TEST_LOCATION, self.TEST_OPERATION_UUID)
     self.AssertErrContains('NOT_FOUND')
 
-  def testDeleteOperationDecline(self, track):
-    self.SetTrack(track)
+  def testDeleteOperationDecline(self):
     self.WriteInput('n\n')
     with self.AssertRaisesExceptionMatches(console_io.OperationCancelledError,
                                            'Deletion aborted by user'):
       self.RunOperations('delete', '--project', self.TEST_PROJECT, '--location',
                          self.TEST_LOCATION, self.TEST_OPERATION_UUID)
 
-  def testDeleteInsufficentPermissions(self, track):
-    self.SetTrack(track)
+  def testDeleteInsufficentPermissions(self):
     self.WriteInput('y\n')
     self.ExpectOperationDelete(
         self.TEST_PROJECT,
@@ -109,6 +103,18 @@ class OperationsDeleteTest(base.OperationsUnitTest, parameterized.TestCase):
                                            'Some deletions did not succeed.'):
       self.RunOperations('delete', '--project', self.TEST_PROJECT, '--location',
                          self.TEST_LOCATION, self.TEST_OPERATION_UUID)
+
+
+class OperationsDeleteBetaTest(OperationsDeleteGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+
+class OperationsDeleteAlphaTest(OperationsDeleteBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

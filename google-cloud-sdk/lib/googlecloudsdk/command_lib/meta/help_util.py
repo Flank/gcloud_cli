@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utilities for gcloud help text differences."""
+"""Utilities for gcloud help document differences."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -23,7 +23,6 @@ import os
 import re
 import shutil
 
-from googlecloudsdk.calliope import walker_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
@@ -38,7 +37,11 @@ INVALID_BRAND_ABBREVIATIONS = ['GAE', 'GCE', 'GCP', 'GCS', 'GKE']
 TEST_CHANGES_DISPLAY_MAX = 32
 
 
-class HelpTextUpdateError(exceptions.Error):
+class Error(exceptions.Error):
+  """Errors for this module."""
+
+
+class HelpUpdateError(Error):
   """Update errors."""
 
 
@@ -144,19 +147,30 @@ def DirDiff(old_dir, new_dir, diff):
     The return value of the first diff.AddChange() call that returns non-zero
     or None if all diff.AddChange() calls returned zero.
   """
+
+  def GetFileContents(compared_file):
+    try:
+      contents = file_utils.ReadFileContents(compared_file)
+      is_binary = False
+    except UnicodeError:
+      contents = file_utils.ReadBinaryFileContents(compared_file)
+      is_binary = True
+    return (contents, is_binary)
+
   new_files = GetDirFilesRecursive(new_dir)
   old_files = GetDirFilesRecursive(old_dir)
   for new_file in new_files:
     relative_file = os.path.relpath(new_file, new_dir)
     if diff.Ignore(relative_file):
       continue
-    new_contents = file_utils.ReadFileContents(new_file)
-    diff.Validate(relative_file, new_contents)
+    new_contents, new_binary = GetFileContents(new_file)
+    if not new_binary:
+      diff.Validate(relative_file, new_contents)
     old_contents = None
     old_file = os.path.normpath(os.path.join(old_dir, relative_file))
     if old_file in old_files:
-      old_contents = file_utils.ReadFileContents(old_file)
-      if old_contents == new_contents:
+      old_contents, old_binary = GetFileContents(old_file)
+      if old_binary == new_binary and old_contents == new_contents:
         continue
       op = 'edit'
     else:
@@ -176,8 +190,8 @@ def DirDiff(old_dir, new_dir, diff):
   return None
 
 
-class HelpTextAccumulator(DiffAccumulator):
-  """Accumulates help text directory differences.
+class HelpAccumulator(DiffAccumulator):
+  """Accumulates help document directory differences.
 
   Attributes:
     _changes: The list of DirDiff() (op, path) difference tuples.
@@ -187,7 +201,7 @@ class HelpTextAccumulator(DiffAccumulator):
   """
 
   def __init__(self, restrict=None):
-    super(HelpTextAccumulator, self).__init__()
+    super(HelpAccumulator, self).__init__()
     self._changes = []
     self._invalid_abbreviations = re.compile(
         r'\b({0})\b'.format('|'.join(INVALID_BRAND_ABBREVIATIONS)))
@@ -219,7 +233,7 @@ class HelpTextAccumulator(DiffAccumulator):
 
   def Validate(self, relative_file, contents):
     if self._invalid_abbreviations.search(contents):
-      log.error('[{0}] Help text cannot contain any of these abbreviations: '
+      log.error('[{0}] Help document cannot contain these abbreviations: '
                 '[{1}].'.format(relative_file,
                                 ','.join(INVALID_BRAND_ABBREVIATIONS)))
       self._invalid_file_count += 1
@@ -240,49 +254,55 @@ class HelpTextAccumulator(DiffAccumulator):
     return None
 
 
-class HelpTextUpdater(object):
-  """Updates the help text directory to match the current CLI.
+class HelpUpdater(object):
+  """Updates the document directory to match the current CLI.
 
   Attributes:
     _cli: The Current CLI.
-    _help_dir: The help text directory.
+    _directory: The help document directory.
+    _generator: The document generator.
+    _hidden: Boolean indicating whether to update hidden commands.
     _test: Show but do not apply operations if True.
   """
 
-  def __init__(self, cli, directory, test=False):
+  def __init__(self, cli, directory, generator, test=False, hidden=False):
     """Constructor.
 
     Args:
       cli: The Current CLI.
-      directory: The help text directory.
+      directory: The help document directory.
+      generator: An uninstantiated walker_util document generator.
       test: Show but do not apply operations if True.
+      hidden: Boolean indicating whether the hidden commands should be used.
 
     Raises:
-      HelpTextUpdateError: If the destination directory does not exist.
+      HelpUpdateError: If the destination directory does not exist.
     """
     if not os.path.isabs(directory):
-      raise HelpTextUpdateError(
+      raise HelpUpdateError(
           'Destination directory [%s] must be absolute.' % directory)
     self._cli = cli
-    self._help_dir = directory
+    self._directory = directory
+    self._generator = generator
+    self._hidden = hidden
     self._test = test
 
   def _Update(self, restrict):
-    """Update() helper method. Returns the number of changed help text files."""
+    """Update() helper method. Returns the number of changed help doc files."""
     with file_utils.TemporaryDirectory() as temp_dir:
-      pb = console_io.ProgressBar(label='Generating Help Docs')
-      walker = walker_util.HelpTextGenerator(
+      pb = console_io.ProgressBar(label='Generating Help Document Files')
+      walker = self._generator(
           self._cli, temp_dir, pb.SetProgress, restrict=restrict)
       pb.Start()
       walker.Walk(hidden=True)
       pb.Finish()
-      diff = HelpTextAccumulator(restrict=restrict)
-      DirDiff(self._help_dir, temp_dir, diff)
+      diff = HelpAccumulator(restrict=restrict)
+      DirDiff(self._directory, temp_dir, diff)
       if diff.invalid_file_count:
         # Bail out early on invalid content errors. These must be corrected
         # before proceeding.
-        raise HelpTextUpdateError(
-            '{0} help text {1} with invalid content must be fixed.'.format(
+        raise HelpUpdateError(
+            '{0} help document {1} with invalid content must be fixed.'.format(
                 diff.invalid_file_count,
                 text.Pluralize(diff.invalid_file_count, 'file')))
 
@@ -308,7 +328,7 @@ class HelpTextUpdater(object):
       op = 'add'
       if ops[op]:
         for path in ops[op]:
-          dest_path = os.path.join(self._help_dir, path)
+          dest_path = os.path.join(self._directory, path)
           subdir = os.path.dirname(dest_path)
           if subdir:
             file_utils.MakeDir(subdir)
@@ -318,14 +338,14 @@ class HelpTextUpdater(object):
       op = 'edit'
       if ops[op]:
         for path in ops[op]:
-          dest_path = os.path.join(self._help_dir, path)
+          dest_path = os.path.join(self._directory, path)
           temp_path = os.path.join(temp_dir, path)
           shutil.copyfile(temp_path, dest_path)
 
       op = 'delete'
       if ops[op]:
         for path in ops[op]:
-          dest_path = os.path.join(self._help_dir, path)
+          dest_path = os.path.join(self._directory, path)
           try:
             os.remove(dest_path)
           except OSError:
@@ -334,7 +354,7 @@ class HelpTextUpdater(object):
       return changes
 
   def Update(self, restrict=None):
-    """Updates the help text directory to match the current CLI.
+    """Updates the help document directory to match the current CLI.
 
     Args:
       restrict: Restricts the walk to the command/group dotted paths in this
@@ -343,16 +363,16 @@ class HelpTextUpdater(object):
         commands/groups.
 
     Raises:
-      HelpTextUpdateError: If the destination directory does not exist.
+      HelpUpdateError: If the destination directory does not exist.
 
     Returns:
-      The number of changed help text files.
+      The number of changed help document files.
     """
-    if not os.path.isdir(self._help_dir):
-      raise HelpTextUpdateError(
+    if not os.path.isdir(self._directory):
+      raise HelpUpdateError(
           'Destination directory [%s] must exist and be searchable.' %
-          self._help_dir)
+          self._directory)
     try:
       return self._Update(restrict)
     except (IOError, OSError, SystemError) as e:
-      raise HelpTextUpdateError('Update failed: %s' % six.text_type(e))
+      raise HelpUpdateError('Update failed: %s' % six.text_type(e))

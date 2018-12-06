@@ -30,7 +30,6 @@ long_desc = ('gcloud-cli is a Python application that lets you access '
 
 tests_require = [
     'modulegraph>=0.15',
-    'portpicker>=1.1.1',
     'pytest',
     'pytest-pythonpath',
     'pytest-xdist',
@@ -94,6 +93,7 @@ setup(
         'monotonic==1.2',
         'oauth2==1.5.170',
         'packaging>=16.8',
+        'portpicker>=1.1.1',
         'prompt_toolkit==1.0.3',
         'pyparsing>=2.1.0',
         'protobuf==3.2.0',

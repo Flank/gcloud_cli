@@ -30,7 +30,7 @@ from tests.lib import test_case
 from tests.lib.surface.tasks import test_base
 
 
-class CreateTestBase(test_base.CloudTasksTestBase):
+class CreatePullTaskTest(test_base.CloudTasksAlphaTestBase):
 
   def SetUp(self):
     self.queue_ref = resources.REGISTRY.Create(
@@ -47,9 +47,6 @@ class CreateTestBase(test_base.CloudTasksTestBase):
         parsers.ParseLocation('us-central1').SelfLink())
 
     self.schedule_time = time_util.CalculateExpiration(20)
-
-
-class CreatePullTaskTest(CreateTestBase):
 
   def testCreate_NoOptions(self):
     expected_task = self.messages.Task(pullMessage=self.messages.PullMessage())
@@ -131,7 +128,23 @@ class CreatePullTaskTest(CreateTestBase):
       self.assertEqual(actual_task, expected_task)
 
 
-class CreateAppEngineTaskTest(CreateTestBase):
+class CreateAppEngineTaskTest(test_base.CloudTasksTestBase):
+
+  def SetUp(self):
+    self.queue_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues', locationsId='us-central1',
+        projectsId=self.Project(), queuesId='my-queue')
+    self.queue_name = self.queue_ref.RelativeName()
+    self.task_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues.tasks', locationsId='us-central1',
+        projectsId=self.Project(), queuesId='my-queue', tasksId='my-task')
+    self.task_name = self.task_ref.RelativeName()
+
+    resolve_loc_mock = self.StartObjectPatch(app, 'ResolveAppLocation')
+    resolve_loc_mock.return_value = (
+        parsers.ParseLocation('us-central1').SelfLink())
+
+    self.schedule_time = time_util.CalculateExpiration(20)
 
   def testCreate_NoOptions(self):
     expected_task = self.messages.Task(
@@ -157,8 +170,8 @@ class CreateAppEngineTaskTest(CreateTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header1': 'value1', 'header2': 'value2'},
                 self.messages.AppEngineHttpRequest.HeadersValue),
-            httpMethod=http_method, payload=b'payload',
-            relativeUrl='/paths/a/'))
+            httpMethod=http_method, body=b'body',
+            relativeUri='/paths/a/'))
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
             parent=self.queue_name,
@@ -168,8 +181,8 @@ class CreateAppEngineTaskTest(CreateTestBase):
 
     actual_task = self.Run('tasks create-app-engine-task --queue my-queue '
                            'my-task --schedule-time={} '
-                           '--payload-content=payload --method=POST '
-                           '--url=/paths/a/ --header=header1:value1 '
+                           '--body-content=body --method=POST '
+                           '--relative-uri=/paths/a/ --header=header1:value1 '
                            '--header=header2:value2 --routing=service:abc'
                            .format(self.schedule_time))
 
@@ -185,8 +198,8 @@ class CreateAppEngineTaskTest(CreateTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header1': 'value1', 'header2': 'value2'},
                 self.messages.AppEngineHttpRequest.HeadersValue),
-            httpMethod=http_method, payload=b'payload',
-            relativeUrl='/paths/a/'))
+            httpMethod=http_method, body=b'body',
+            relativeUri='/paths/a/'))
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
             parent=self.queue_name,
@@ -196,8 +209,8 @@ class CreateAppEngineTaskTest(CreateTestBase):
 
     actual_task = self.Run('tasks create-app-engine-task --queue my-queue '
                            'my-task --schedule-time={} '
-                           '--payload-content=payload --method=POST '
-                           '--url=/paths/a/ --header=header1:value1 '
+                           '--body-content=body --method=POST '
+                           '--relative-uri=/paths/a/ --header=header1:value1 '
                            '--header=header2:value2 --routing=service:abc'
                            .format(self.schedule_time))
 
@@ -213,8 +226,8 @@ class CreateAppEngineTaskTest(CreateTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header1': 'value1', 'header2': 'value2'},
                 self.messages.AppEngineHttpRequest.HeadersValue),
-            httpMethod=http_method, payload=b'payload',
-            relativeUrl='/paths/a/'))
+            httpMethod=http_method, body=b'body',
+            relativeUri='/paths/a/'))
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
             parent=self.queue_name,
@@ -223,14 +236,14 @@ class CreateAppEngineTaskTest(CreateTestBase):
         response=expected_task)
 
     with files.TemporaryDirectory() as tmp_dir:
-      self.Touch(tmp_dir, 'payload.txt', contents='payload')
-      payload_file = os.path.join(tmp_dir, 'payload.txt')
+      self.Touch(tmp_dir, 'body.txt', contents='body')
+      body = os.path.join(tmp_dir, 'body.txt')
       actual_task = self.Run('tasks create-app-engine-task --queue my-queue '
                              'my-task --schedule-time={} '
-                             '--payload-file={} --method=POST --url=/paths/a/ '
-                             '--header=header1:value1 --header=header2:value2 '
-                             '--routing=service:abc'.format(
-                                 self.schedule_time, payload_file))
+                             '--body-file={} --method=POST '
+                             '--relative-uri=/paths/a/ --header=header1:value1 '
+                             '--header=header2:value2 --routing=service:abc'
+                             .format(self.schedule_time, body))
 
       self.assertEqual(actual_task, expected_task)
 

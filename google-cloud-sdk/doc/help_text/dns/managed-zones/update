@@ -16,12 +16,12 @@ POSITIONAL ARGUMENTS
      Zone resource - The name of the managed-zone to be updated. This
      represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
-     attribute: provide the flag [zone] on the command line with a fully
-     specified name; provide the flag [--project] on the command line; set the
-     property [core/project]. This must be specified.
+     attribute: provide the argument [zone] on the command line with a fully
+     specified name; provide the argument [--project] on the command line; set
+     the property [core/project]. This must be specified.
 
        ZONE
-          The ID of the zone or a fully qualified identifier for the zone.
+          ID of the zone or fully qualified identifier for the zone.
 
 FLAGS
      --denial-of-existence=DENIAL_OF_EXISTENCE
@@ -43,8 +43,8 @@ FLAGS
 
      --ksk-algorithm=KSK_ALGORITHM
         String mnemonic specifying the DNSSEC algorithm of the key-signing key.
-        Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256,
-        RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384
+        Requires DNSSEC enabled. KSK_ALGORITHM must be one of: ecdsap256sha256,
+        ecdsap384sha384, rsasha1, rsasha256, rsasha512.
 
      --ksk-key-length=KSK_KEY_LENGTH
         Length of the key-signing key in bits. Requires DNSSEC enabled.
@@ -59,9 +59,9 @@ FLAGS
         numbers.
 
      --zsk-algorithm=ZSK_ALGORITHM
-        String mnemonic specifying the DNSSEC algorithm of the zone-signing
-        key. Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256,
-        RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384
+        String mnemonic specifying the DNSSEC algorithm of the key-signing key.
+        Requires DNSSEC enabled. ZSK_ALGORITHM must be one of: ecdsap256sha256,
+        ecdsap384sha384, rsasha1, rsasha256, rsasha512.
 
      --zsk-key-length=ZSK_KEY_LENGTH
         Length of the zone-signing key in bits. Requires DNSSEC enabled.
@@ -87,8 +87,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To change the description of a managed-zone, run:

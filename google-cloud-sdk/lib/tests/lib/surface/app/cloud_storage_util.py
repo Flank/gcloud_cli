@@ -137,6 +137,5 @@ class WithGCSCalls(sdk_test_base.SdkBase):
     """
     self.apitools_client.objects.List.Expect(
         storage_v1.StorageObjectsListRequest(bucket=self._BUCKET_NAME),
-        response=None,
         exception=exception
     )

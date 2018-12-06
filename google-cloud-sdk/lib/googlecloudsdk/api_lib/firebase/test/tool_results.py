@@ -121,7 +121,7 @@ def _ErrorFromInvalidMatrix(matrix):
       enum_values.NO_PACKAGE_NAME:
           'The APK manifest file is missing the package name',
       enum_values.TEST_SAME_AS_APP:
-          'The test APK is the same as the app APK',
+          'The test APK has the same package name as the app APK',
       enum_values.NO_INSTRUMENTATION:
           'The test APK declares no instrumentation tags in the manifest',
       enum_values.NO_SIGNATURE:
@@ -170,7 +170,12 @@ def _ErrorFromInvalidMatrix(matrix):
           '"hasCode" is false in the Manifest. Tested APKs must contain code',
       enum_values.INVALID_INPUT_APK:
           'Either the provided input APK path was malformed, the APK file does '
-          'not exist, or the user does not have permission to access the file'
+          'not exist, or the user does not have permission to access the file',
+      enum_values.INVALID_APK_PREVIEW_SDK:
+          "Your app targets a preview version of the Android SDK that's "
+          'incompatible with the selected devices.',
+      enum_values.PLIST_CANNOT_BE_PARSED:
+          'One or more of the Info.plist files in the zip could not be parsed',
   }
   details_enum = matrix.invalidMatrixDetails
   if details_enum in error_dict:

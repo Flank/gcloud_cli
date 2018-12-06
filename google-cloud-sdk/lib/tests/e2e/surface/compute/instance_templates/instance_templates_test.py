@@ -191,18 +191,6 @@ class InstanceTemplatesBetaTest(InstanceTemplatesTestBase):
     self.AssertOutputContains('abc: xyz')
     self.AssertOutputContains('x: y')
 
-  def testCreateWithContainer(self):
-    name = next(self._name_generator)
-    self.Run('compute instance-templates create-with-container {} '
-             '--container-image=gcr.io/google-containers/busybox'.format(name))
-    try:
-      self.ClearOutput()
-      self.Run('compute instance-templates describe {}'.format(name))
-      self.AssertOutputContains('containers')
-      self.AssertOutputContains('image: gcr.io/google-containers/busybox')
-    finally:
-      self.Run('compute instance-templates delete ' + name)
-
 
 class InstanceTemplatesGATest(InstanceTemplatesTestBase):
   """Test create instance template command in GA track."""
@@ -237,6 +225,18 @@ class InstanceTemplatesGATest(InstanceTemplatesTestBase):
     self.Run('compute instance-templates delete {0} --quiet'.format(name))
     self.AssertErrContains(
         'Deleted [{0}].'.format(self._InstanceTemplateUrl(name)))
+
+  def testCreateWithContainer(self):
+    name = next(self._name_generator)
+    self.Run('compute instance-templates create-with-container {} '
+             '--container-image=gcr.io/google-containers/busybox'.format(name))
+    try:
+      self.ClearOutput()
+      self.Run('compute instance-templates describe {}'.format(name))
+      self.AssertOutputContains('containers')
+      self.AssertOutputContains('image: gcr.io/google-containers/busybox')
+    finally:
+      self.Run('compute instance-templates delete ' + name)
 
 
 if __name__ == '__main__':

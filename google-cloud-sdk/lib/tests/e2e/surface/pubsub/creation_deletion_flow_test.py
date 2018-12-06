@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from tests.lib import e2e_utils
 from tests.lib import test_case
@@ -30,7 +30,7 @@ class PubsubIntegrationTest(e2e_base.CloudPubsubTestBase):
   """Integration tests for Cloud Pub/Sub."""
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testCreationUpdateDeletionFlow(self):
     id_gen = e2e_utils.GetResourceNameGenerator(prefix='cpstest')

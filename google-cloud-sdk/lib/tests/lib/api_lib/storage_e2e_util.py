@@ -35,11 +35,10 @@ _WAIT_MS = 1000
 def _CleanUpBucket(storage_client, bucket_ref):
   """Removes a bucket and its contents."""
   # The bucket must be empty before we can delete it
-  bucket_url = bucket_ref.ToBucketUrl()
   delete_tasks = []
   for obj in storage_client.ListBucket(bucket_ref):
-    delete_tasks.append(storage_parallel.ObjectDeleteTask(bucket_url,
-                                                          obj.name))
+    delete_tasks.append(storage_parallel.ObjectDeleteTask(
+        storage_util.ObjectReference.FromMessage(obj)))
   storage_parallel.DeleteObjects(delete_tasks)
   storage_client.DeleteBucket(bucket_ref)
 
@@ -57,7 +56,7 @@ def CloudStorageBucket(storage_client, name, project):
     storage_util.BucketReference for the created bucket.
   """
   storage_client.CreateBucketIfNotExists(name, project=project)
-  bucket_ref = storage_util.BucketReference.FromBucketUrl(name)
+  bucket_ref = storage_util.BucketReference.FromUrl(name)
   try:
     yield bucket_ref
   finally:
@@ -65,7 +64,7 @@ def CloudStorageBucket(storage_client, name, project):
 
 
 @contextlib.contextmanager
-def GcsFile(storage_client, bucket_ref, local_path, object_path):
+def GcsFile(storage_client, local_path, target_obj_ref):
   """Copies a file to Cloud Storage and deletes it on exit.
 
   This isn't as reliable as it could be, since there's no retry on the object
@@ -74,17 +73,14 @@ def GcsFile(storage_client, bucket_ref, local_path, object_path):
 
   Args:
     storage_client: googlecloudsdk.api_lib.storage_api.StorageClient
-    bucket_ref: googlecloudsdk.api_lib.storage_util.BucketReference for the
-      bucket to copy to
     local_path: str, the path to the file on disk to be uploaded
-    object_path: str, the name of the object within the bucket.
+    target_obj_ref: storage_util.ObjectReference, the path of the file on GCS.
 
   Yields:
     storage_util.ObjectReference for the created object.
   """
-  storage_client.CopyFileToGCS(bucket_ref, local_path, object_path)
-  object_ref = storage_util.ObjectReference(bucket_ref, object_path)
+  storage_client.CopyFileToGCS(local_path, target_obj_ref)
   try:
-    yield object_ref
+    yield target_obj_ref
   finally:
-    storage_client.DeleteObject(bucket_ref, object_path)
+    storage_client.DeleteObject(target_obj_ref)

@@ -25,43 +25,6 @@ from tests.lib.surface.services import unit_test_base
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-class CompletionLegacyTest(unit_test_base.SV1UnitTestBase,
-                           completer_test_base.CompleterBase):
-
-  def SetUp(self):
-    self.num_services = 10
-    self.services = [self.CreateService('service-name%d' % i)
-                     for i in range(self.num_services)]
-
-  def testConsumerServiceCompletion(self):
-    mocked_response = self.services_messages.ListServicesResponse(
-        services=self.services)
-
-    self.mocked_client.services.List.Expect(
-        request=self.services_messages.ServicemanagementServicesListRequest(
-            consumerId='project:fake-project'
-        ),
-        response=mocked_response
-    )
-
-    self.RunCompleter(
-        common_flags.ConsumerServiceLegacyCompleter,
-        expected_command=[
-            'services',
-            'list',
-            '--format=disable',
-            '--flatten=serviceName',
-            '--quiet',
-            '--enabled',
-        ],
-        args={
-            '--enabled': True,
-        },
-        expected_completions=[service.serviceName for service in self.services],
-        cli=self.cli,
-    )
-
-
 class CompletionTest(unit_test_base.SUUnitTestBase,
                      completer_test_base.CompleterBase):
 

@@ -23,7 +23,7 @@ import textwrap
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -36,10 +36,10 @@ class SecurityPoliciesListTest(sdk_test_base.WithFakeAuth,
                                cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
+    self.track = calliope_base.ReleaseTrack.GA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'v1'))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', 'v1')
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE

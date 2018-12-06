@@ -20,8 +20,8 @@ from __future__ import unicode_literals
 
 import argparse
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class AnotherGroup(base.Group):
+class AnotherGroup(calliope_base.Group):
   pass

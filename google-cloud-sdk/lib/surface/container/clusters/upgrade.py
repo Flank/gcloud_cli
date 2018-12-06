@@ -62,7 +62,6 @@ class VersionVerifier(object):
 
   def Compare(self, current_master_version, current_cluster_version):
     """Compares the cluster and master versions and returns an enum."""
-    # TODO(b/36051978):update the if condition when we roll the master version
     if current_master_version == current_cluster_version:
       return self.UP_TO_DATE
     master_version = SemVer(current_master_version)
@@ -74,6 +73,19 @@ class VersionVerifier(object):
       return self.SUPPORT_ENDING
     else:
       return self.UPGRADE_AVAILABLE
+
+
+def ParseUpgradeOptionsBase(args):
+  """Parses the flags provided with the cluster upgrade command."""
+  return api_adapter.UpdateClusterOptions(
+      version=args.cluster_version,
+      update_master=args.master,
+      update_nodes=(not args.master),
+      node_pool=args.node_pool,
+      image_type=args.image_type,
+      image=args.image,
+      image_project=args.image_project,
+      concurrent_node_count=getattr(args, 'concurrent_node_count', None))
 
 
 def _Args(parser):
@@ -109,6 +121,13 @@ You can find the list of allowed versions for upgrades by running:
       ' supported on Kubernetes Engine. Nodes cannot be upgraded at the same'
       ' time as the master.',
       action='store_true')
+  # Timeout in seconds for the operation, default 2700 seconds (45 minutes)
+  parser.add_argument(
+      '--timeout',
+      type=int,
+      default=2700,
+      hidden=True,
+      help='Timeout (seconds) for waiting on the operation to complete.')
   flags.AddAsyncFlag(parser)
   flags.AddImageTypeFlag(parser, 'cluster/node pool')
   flags.AddImageFlag(parser, hidden=True)
@@ -122,6 +141,9 @@ class Upgrade(base.Command):
   @staticmethod
   def Args(parser):
     _Args(parser)
+
+  def ParseUpgradeOptions(self, args):
+    return ParseUpgradeOptionsBase(args)
 
   def Run(self, args):
     """This is what gets called when the user runs this command.
@@ -174,15 +196,7 @@ class Upgrade(base.Command):
         throw_if_unattended=True,
         cancel_on_no=True)
 
-    options = api_adapter.UpdateClusterOptions(
-        version=args.cluster_version,
-        update_master=args.master,
-        update_nodes=(not args.master),
-        node_pool=args.node_pool,
-        image_type=args.image_type,
-        image=args.image,
-        image_project=args.image_project,
-        concurrent_node_count=concurrent_node_count)
+    options = self.ParseUpgradeOptions(args)
 
     try:
       op_ref = adapter.UpdateCluster(cluster_ref, options)
@@ -191,7 +205,8 @@ class Upgrade(base.Command):
 
     if not args.async:
       adapter.WaitForOperation(
-          op_ref, 'Upgrading {0}'.format(cluster_ref.clusterId))
+          op_ref, 'Upgrading {0}'.format(cluster_ref.clusterId),
+          timeout_s=args.timeout)
 
       log.UpdatedResource(cluster_ref)
 
@@ -252,3 +267,10 @@ class UpgradeAlpha(Upgrade):
   def Args(parser):
     _Args(parser)
     flags.AddConcurrentNodeCountFlag(parser)
+    flags.AddSecurityProfileForUpgradeFlags(parser)
+
+  def ParseUpgradeOptions(self, args):
+    ops = ParseUpgradeOptionsBase(args)
+    ops.security_profile = args.security_profile
+    ops.security_profile_runtime_rules = args.security_profile_runtime_rules
+    return ops

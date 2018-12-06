@@ -20,8 +20,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -31,6 +32,9 @@ GROUPS
 
      addresses
         (ALPHA) Read and manipulate Google Compute Engine addresses.
+
+     allocations
+        (ALPHA) Manage Compute Engine zonal allocations.
 
      backend-buckets
         (ALPHA) Read and manipulate backend buckets.
@@ -81,6 +85,9 @@ GROUPS
 
      interconnects
         (ALPHA) Read and manipulate Google Compute Engine interconnects.
+
+     machine-images
+        (ALPHA) Read and manage Google Compute Engine machine image resources.
 
      machine-types
         (ALPHA) Read Google Compute Engine virtual machine types.
@@ -170,9 +177,6 @@ GROUPS
      vpn-tunnels
         (ALPHA) Read and manipulate Google Compute Engine VPN Tunnels.
 
-     xpn
-        (ALPHA) Configure shared VPC.
-
      zones
         (ALPHA) List Google Compute Engine zones.
 
@@ -201,6 +205,11 @@ COMMANDS
 
      ssh
         (ALPHA) SSH into a virtual machine instance.
+
+     start-iap-tunnel
+        (ALPHA) Starts a tunnel to the Cloud Identity-Aware Proxy through which
+        another process can create a connection (eg. SSH, RDP) to a Google
+        Compute Engine instance.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

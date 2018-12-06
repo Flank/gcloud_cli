@@ -14,11 +14,12 @@
 # limitations under the License.
 
 """This is a command for testing deprecation utils."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib import deprecation_utils
 from googlecloudsdk.core import log
 
@@ -27,7 +28,7 @@ from googlecloudsdk.core import log
     remove_version='1.3.0',
     remove=False,
     alt_command='alt-command')
-class DepCommandWithAlt(base.Command):
+class DepCommandWithAlt(calliope_base.Command):
   """A simple command to test deprecation."""
 
   def Run(self, args):

@@ -35,8 +35,8 @@ from tests.lib import test_case
 
 class FakeStorageClient(object):
 
-  def CopyFileToGCS(self, bucket_ref, local_path, target_path):
-    del self, bucket_ref, target_path  # Unused in CopyFileToGCS
+  def CopyFileToGCS(self, local_path, target_obj_ref):
+    del self, target_obj_ref  # Unused in CopyFileToGCS
     with open(local_path, 'rb') as f:
       return f.read()
 

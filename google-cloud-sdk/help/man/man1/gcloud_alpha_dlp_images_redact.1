@@ -11,7 +11,7 @@ gcloud alpha dlp images redact \- redact potentially sensitive data from image c
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dlp images redact\fR \fIIMAGE\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] [\fB\-\-include\-quote\fR] [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR] [\fB\-\-redact\-all\-text\fR] [\fB\-\-redact\-color\fR=\fIREDACT_COLOR\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dlp images redact\fR \fIIMAGE\fR [\fB\-\-include\-quote\fR] [\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]] [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR] [\fB\-\-redact\-all\-text\fR] [\fB\-\-redact\-color\fR=\fIREDACT_COLOR\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -33,26 +33,19 @@ SVG, or BMP.
 .RE
 .sp
 
-.SH "REQUIRED FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]
-Which infoTypes to scan input for. The values must correspond to infoType values
-found in documentation. For more information about valid infoTypes, see
-infoTypes Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
-
-
-.RE
-.sp
-
-.SH "OPTIONAL FLAGS"
+.SH "FLAGS"
 
 .RS 2m
 .TP 2m
 \fB\-\-include\-quote\fR
 If True, the server will attempt to filter out profanities, replacing all but
 the initial character in each filtered word with asterisks, e.g. "f**\fB".
+
+.TP 2m
+\fR\-\-info\-types\fB=[\fIINFOTYPE\fR,...]
+Which infoTypes to scan input for. The values must correspond to infoType values
+found in documentation. For more information about valid infoTypes, see
+infoTypes Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
 
 .TP 2m
 \fR\-\-min\-likelihood\fB=\fIMIN_LIKELIHOOD\fR; default="possible"
@@ -85,9 +78,9 @@ blue in the color, respectively. For example, \f5black = 0,0,0\fR, \f5red =
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

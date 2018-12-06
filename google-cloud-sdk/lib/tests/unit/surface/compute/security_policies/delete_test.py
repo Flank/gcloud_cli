@@ -18,17 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class SecurityPoliciesDeleteTestAlpha(test_base.BaseTest):
+class SecurityPoliciesDeleteTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
 
   def testWithSingleSecurityPolicy(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -115,11 +115,18 @@ class SecurityPoliciesDeleteTestAlpha(test_base.BaseTest):
     self.CheckRequests()
 
 
-class SecurityPoliciesDeleteTestBeta(SecurityPoliciesDeleteTestAlpha):
+class SecurityPoliciesDeleteTestBeta(SecurityPoliciesDeleteTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+
+
+class SecurityPoliciesDeleteTestAlpha(SecurityPoliciesDeleteTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
 
 
 if __name__ == '__main__':

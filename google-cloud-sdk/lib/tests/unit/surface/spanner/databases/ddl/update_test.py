@@ -34,18 +34,8 @@ class DatabasesDdlUpdateTest(base.SpannerTestBase):
         },
         collection='spanner.projects.instances.databases')
 
-  def testUpdateAsync(self):
-    self.client.projects_instances_databases.UpdateDdl.Expect(
-        request=self.msgs.SpannerProjectsInstancesDatabasesUpdateDdlRequest(
-            database=self.db_ref.RelativeName(),
-            updateDatabaseDdlRequest=self.msgs.UpdateDatabaseDdlRequest(
-                statements=['A', 'B', 'C'])),
-        response=self.msgs.Operation())
-    self.Run('beta spanner databases ddl update mydb --instance myins --async '
-             '--ddl A --ddl "B;C"')
-
-  def testUpdateSync(self):
-    op_ref = resources.REGISTRY.Parse(
+  def _GivenOperation(self):
+    return resources.REGISTRY.Parse(
         'opId',
         params={
             'projectsId': self.Project(),
@@ -53,6 +43,22 @@ class DatabasesDdlUpdateTest(base.SpannerTestBase):
             'databasesId': 'dbId',
         },
         collection='spanner.projects.instances.databases.operations')
+
+  def testUpdateAsync(self):
+    op_ref = self._GivenOperation()
+    self.client.projects_instances_databases.UpdateDdl.Expect(
+        request=self.msgs.SpannerProjectsInstancesDatabasesUpdateDdlRequest(
+            database=self.db_ref.RelativeName(),
+            updateDatabaseDdlRequest=self.msgs.UpdateDatabaseDdlRequest(
+                statements=['A', 'B', 'C'])),
+        response=self.msgs.Operation(name=op_ref.RelativeName()))
+    self.Run('beta spanner databases ddl update mydb --instance myins --async '
+             '--ddl A --ddl "B;C"')
+    self.AssertErrContains('Schema update in progress. Operation name=' +
+                           op_ref.RelativeName() + '\n')
+
+  def testUpdateSync(self):
+    op_ref = self._GivenOperation()
     self.client.projects_instances_databases.UpdateDdl.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesUpdateDdlRequest(
             database=self.db_ref.RelativeName(),

@@ -11,7 +11,7 @@ gcloud compute routers \- list, create, and delete Google Compute Engine routers
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute routers\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute routers\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -24,11 +24,24 @@ List, create, and delete Google Compute Engine routers.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBnats\fR
+List, create, describe and delete Google Compute Engine NATs.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 
@@ -54,6 +67,10 @@ Delete Google Compute Engine routers.
 .TP 2m
 \fBdescribe\fR
 Describe a Google Compute Engine router.
+
+.TP 2m
+\fBget\-nat\-mapping\-info\fR
+Display NAT Mapping information in a router.
 
 .TP 2m
 \fBget\-status\fR

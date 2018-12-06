@@ -24,6 +24,13 @@ DOCS_URL = 'https://cloud.google.com/iam/'
 class Collections(enum.Enum):
   """Collections for all supported apis."""
 
+  IAMPOLICIES = (
+      'iamPolicies',
+      'iamPolicies',
+      {},
+      [],
+      True
+  )
   ORGANIZATIONS = (
       'organizations',
       'organizations/{organizationsId}',
@@ -64,6 +71,17 @@ class Collections(enum.Enum):
       {
           '':
               'projects/{projectsId}/serviceAccounts/{serviceAccountsId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_SERVICEACCOUNTS_IDENTITYBINDINGS = (
+      'projects.serviceAccounts.identityBindings',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/serviceAccounts/{serviceAccountsId}/'
+              'identityBindings/{identityBindingsId}',
       },
       [u'name'],
       True

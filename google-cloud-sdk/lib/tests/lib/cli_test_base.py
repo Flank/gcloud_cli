@@ -184,8 +184,6 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
     # Ensure everything gets loaded correctly.
     self.AssertErrNotContains('ERROR')
 
-    self.track = calliope_base.ReleaseTrack.GA
-
   def TearDown(self):
     # Wait for all threads to finish.
     # Classes like ProgressTracker leave threads behind so as not to block the
@@ -366,7 +364,7 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
       self, expected_message, callable_obj=None, *args, **kwargs):
     """A convenience method for asserting that an HttpError prints correctly.
 
-    Checks that the expected message (not a regular expresssion) matches the
+    Checks that the expected message (not a regular expression) matches the
     error created by converting the given HttpError to an HttpException.
 
     Args:
@@ -476,6 +474,11 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
     else:
       prefixed_command = [track.prefix]
     prefixed_command.extend(cmd)
+    if 'FILE_WRITE' in os.environ:
+      with open(
+          (os.environ[str('FILE_FOLDER')] + '/' + str(os.getpid()) + '.out'),
+          'a+') as f:
+        f.write((' '.join(prefixed_command) + '%%').encode('utf-8'))
     return self.cli.Execute(prefixed_command)
 
   def _RunUntil(self, retry_function, retry_if_function, cmd, max_retrials,
@@ -603,7 +606,20 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
         retry.Retryer.RetryOnException, ShouldRetryIf, cmd, max_retrials,
         sleep_ms, max_wait_ms, exponential_sleep_multiplier, jitter_ms)
 
-  def RunCompletion(self, cmd, choices):
+  def RunCompletion(self, cmd, choices, track=None):
+    """Run completion and compare the completions with choices.
+
+    Args:
+      cmd: string, The command to type on CLI before running the completion.
+      choices: list, The expected completion choices.
+      track: The track of command to run. If not specified, self.track will be
+      used.
+    """
+
+    if track is None:
+      track = self.track
+    if track.prefix is not None:
+      cmd = track.prefix + ' ' + cmd
     # pylint:disable=protected-access, Invalidate cache between commands.
     named_configs.ActivePropertiesFile.Invalidate()
     # argcomplete messes with the parser object so we need to make a new one

@@ -282,6 +282,76 @@ class DevSiteMarkdownTests(test_base.Markdown):
         """)
     self.Run('devsite', markdown, expected, title='New Title')
 
+  def testDevSiteRoot(self):
+    markdown = self.ROOT_MARKDOWN
+    expected = textwrap.dedent("""\
+        <html devsite="">
+        <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="book_path" value="/sdk/_book.yaml">
+        <!-- Cloud SDK reference documentation consumer survey snippet. -->
+        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
+        <!--
+                THIS DOC IS GENERATED.  DO NOT EDIT.
+          -->
+        <style>
+          dd {
+            margin-bottom: 1ex;
+          }
+          li {
+            margin-top: 1ex; margin-bottom: 1ex;
+          }
+          .hangingindent {
+            padding-left: 1.5em;
+            text-indent: -1.5em;
+          }
+          .normalfont {
+            font-weight: normal;
+          }
+          .notopmargin {
+            margin-top: 0em;
+          }
+          .sectionbody {
+            margin-top: .2em;
+          }
+        </style>
+        </head>
+        <body>
+        <dl>
+
+        <section id="SYNOPSIS">
+        <dt>SYNOPSIS</dt>
+        <dd class="sectionbody">
+        <dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
+        gcloud component <nobr>[ <code><var>flags</var></code> ]</nobr> <nobr>[ <code><var>positionals</var></code> ]</nobr>
+        </span></dt></dl>
+        </dd>
+        </section>
+
+        <section id="SECTION">
+        <dt>SECTION</dt>
+        <dd class="sectionbody">
+        Section prose about the gcloud component command.
+        </dd>
+        </section>
+
+        <section id="GCLOUD-WIDE-FLAGS">
+        <dt>GCLOUD WIDE FLAGS</dt>
+        <dd class="sectionbody">
+        These are available in all commands: <a href="/sdk/gcloud
+        component/reference/#--foo">--foo</a>, <a href="/sdk/gcloud
+        component/reference/#--bar">--bar</a> and <a href="/sdk/gcloud
+        component/reference/#--verbosity">--verbosity</a>.
+        </dd>
+        </section>
+
+        </dl>
+        </body>
+        </html>
+        """)
+    self.Run('devsite', markdown, expected)
+
   def testDevSiteLinkOnly(self):
     markdown = self.LINK_ONLY_MARKDOWN
     expected = textwrap.dedent("""\
@@ -599,7 +669,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         </body>
         </html>
        """)
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('devsite', markdown, expected, title='New Title')
 
   def testDevSiteExampleBlock(self):
@@ -685,7 +755,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         </body>
         </html>
        """)
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('devsite', markdown, expected, title='New Title')
 
   def testDevSiteDefinitionList(self):
@@ -784,7 +854,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         </body>
         </html>
        """)
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('devsite', markdown, expected, title='New Title')
 
   def testDevSiteDefinitionListEmptyItem(self):
@@ -929,7 +999,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         </body>
         </html>
        """)
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.Run('devsite', markdown, expected, title='New Title')
 
 

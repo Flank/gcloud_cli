@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.core import resources
+from tests.lib.apitools import http_error
 from tests.lib.surface.spanner import base
 
 
@@ -35,6 +36,10 @@ class DatabasesDeleteTest(base.SpannerTestBase):
         collection='spanner.projects.instances.databases')
 
   def testDelete(self):
+    self.client.projects_instances_databases.Get.Expect(
+        request=self.msgs.SpannerProjectsInstancesDatabasesGetRequest(
+            name=self.db_ref.RelativeName()),
+        response=self.msgs.Database(name=self.db_ref.RelativeName()))
     self.client.projects_instances_databases.DropDatabase.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesDropDatabaseRequest(
             database=self.db_ref.RelativeName()),
@@ -43,6 +48,10 @@ class DatabasesDeleteTest(base.SpannerTestBase):
     self.Run('spanner databases delete mydb --instance myins')
 
   def testDeleteWithDefaultInstance(self):
+    self.client.projects_instances_databases.Get.Expect(
+        request=self.msgs.SpannerProjectsInstancesDatabasesGetRequest(
+            name=self.db_ref.RelativeName()),
+        response=self.msgs.Database(name=self.db_ref.RelativeName()))
     self.client.projects_instances_databases.DropDatabase.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesDropDatabaseRequest(
             database=self.db_ref.RelativeName()),
@@ -50,3 +59,13 @@ class DatabasesDeleteTest(base.SpannerTestBase):
     self.WriteInput('y\n')
     self.Run('config set spanner/instance myins')
     self.Run('spanner databases delete mydb')
+
+  def testDeleteForNonExistentDatabase(self):
+    self.client.projects_instances_databases.Get.Expect(
+        request=self.msgs.SpannerProjectsInstancesDatabasesGetRequest(
+            name=self.db_ref.RelativeName()),
+        exception=http_error.MakeHttpError(code=404,
+                                           message='Database not found'))
+    with self.AssertRaisesHttpExceptionMatches('Database not found'):
+      self.WriteInput('y\n')
+      self.Run('spanner databases delete mydb --instance myins')

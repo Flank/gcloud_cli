@@ -1,0 +1,212 @@
+title: surface unit tests for asset export
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --content-type resource --output-path=gs://bucket-name/object-name --asset-types=google.compute.Disk,google.compute.Firewall
+  - stderr: |
+      Export in progress for root asset [projects/test-project].
+      Use [gcloud alpha asset operations describe projects/19809800890/operations/ExportAssets/10801893675377458834] to check the status of the operation(s).
+- execute:
+  - command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --output-path=gs://bucket-name/object-name
+  - stderr: |
+      Export in progress for root asset [projects/test-project].
+      Use [gcloud alpha asset operations describe projects/19809800890/operations/ExportAssets/10801893675377458834] to check the status of the operation(s).
+- execute:
+  - command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
+      --content-type iam-policy --output-path=gs://bucket-name/object-name --asset-types=google.compute.Disk,google.compute.Firewall
+  - stderr: |
+      Export in progress for root asset [organizations/test-organization].
+      Use [gcloud alpha asset operations describe organizations/19809800890/operations/ExportAssets/10801893675377458834] to check the status of the operation(s).
+- execute:
+  - command: asset export --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy
+      --output-path=gs://bucket-name/object-name --asset-types=google.compute.Disk,google.compute.Firewall
+  - error: '1: Missing required argument [--organization or --project]: Should specify
+      the project or organization name for root cloud asset.'
+- execute:
+  - command: asset export --organization test-organization --project test-project
+      --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy --output-path=gs://bucket-name/object-name
+      --asset-types=google.compute.Disk,google.compute.Firewall
+  - error: '1: arguments not allowed simultaneously: organization, project'
+- execute:
+  - command: asset export --organization test-organization --project test-project
+      --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy --output-path=wrong-gs-path
+      --asset-types=google.compute.Disk,google.compute.Firewall
+  - stderr: |
+      ERROR: (gcloud.alpha.asset.export) argument --output-path: Bad value [wrong-gs-path]: --output-path must be a Google Cloud Storage URI starting with "gs://". For example, "gs://bucket_name/object_name"
+      Usage: gcloud alpha asset export --output-path=OUTPUT_PATH [optional flags]
+        optional flags may be  --asset-types | --content-type | --help |
+                               --organization | --snapshot-time
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha asset export --help
+  - error: '1: argument --output-path: Bad value [wrong-gs-path]: --output-path must
+      be a Google Cloud Storage URI starting with "gs://". For example, "gs://bucket_name/object_name"'
+actions:
+- execute_command:
+    command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --content-type resource --output-path=gs://bucket-name/object-name --asset-types=google.compute.Disk,google.compute.Firewall
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1beta1/projects/test-project:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              assetTypes:
+              - google.compute.Disk
+              - google.compute.Firewall
+              contentType: RESOURCE
+              outputConfig:
+                gcsDestination:
+                  uri: gs://bucket-name/object-name
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/19809800890/operations/ExportAssets/10801893675377458834",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1beta1.ExportAssetsRequest",
+                "parent": "projects/19809800890",
+                "readTime": "2018-10-05T00:00:00Z",
+                "assetTypes": [
+                  "google.compute.Disk",
+                  "google.compute.Firewall"
+                ],
+                "contentType": "RESOURCE",
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uri": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [projects/test-project].
+        Use [gcloud alpha asset operations describe projects/19809800890/operations/ExportAssets/10801893675377458834] to check the status of the operation(s).
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --output-path=gs://bucket-name/object-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1beta1/projects/test-project:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              contentType: CONTENT_TYPE_UNSPECIFIED
+              outputConfig:
+                gcsDestination:
+                  uri: gs://bucket-name/object-name
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/19809800890/operations/ExportAssets/10801893675377458834",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1beta1.ExportAssetsRequest",
+                "parent": "projects/19809800890",
+                "readTime": "2018-10-05T00:00:00Z",
+                "contentType": "CONTENT_TYPE_UNSPECIFIED",
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uri": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [projects/test-project].
+        Use [gcloud alpha asset operations describe projects/19809800890/operations/ExportAssets/10801893675377458834] to check the status of the operation(s).
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
+      --content-type iam-policy --output-path=gs://bucket-name/object-name --asset-types=google.compute.Disk,google.compute.Firewall
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1beta1/organizations/test-organization:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              assetTypes:
+              - google.compute.Disk
+              - google.compute.Firewall
+              contentType: IAM_POLICY
+              outputConfig:
+                gcsDestination:
+                  uri: gs://bucket-name/object-name
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/19809800890/operations/ExportAssets/10801893675377458834",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1beta1.ExportAssetsRequest",
+                "parent": "organizations/19809800890",
+                "readTime": "2018-10-05T00:00:00Z",
+                "assetTypes": [
+                  "google.compute.Disk",
+                  "google.compute.Firewall"
+                ],
+                "contentType": "IAM_POLICY",
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uri": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [organizations/test-organization].
+        Use [gcloud alpha asset operations describe organizations/19809800890/operations/ExportAssets/10801893675377458834] to check the status of the operation(s).
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset export --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy
+      --output-path=gs://bucket-name/object-name --asset-types=google.compute.Disk,google.compute.Firewall
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Missing required argument [--organization or --project]: Should
+          specify the project or organization name for root cloud asset.'
+- execute_command:
+    command: asset export --organization test-organization --project test-project
+      --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy --output-path=gs://bucket-name/object-name
+      --asset-types=google.compute.Disk,google.compute.Firewall
+    events:
+    - expect_exit:
+        code: 1
+        message: 'arguments not allowed simultaneously: organization, project'
+- execute_command:
+    command: asset export --organization test-organization --project test-project
+      --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy --output-path=wrong-gs-path
+      --asset-types=google.compute.Disk,google.compute.Firewall
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.asset.export) argument --output-path: Bad value [wrong-gs-path]: --output-path must be a Google Cloud Storage URI starting with "gs://". For example, "gs://bucket_name/object_name"
+        Usage: gcloud alpha asset export --output-path=OUTPUT_PATH [optional flags]
+          optional flags may be  --asset-types | --content-type | --help |
+                                 --organization | --snapshot-time
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha asset export --help
+    - expect_exit:
+        code: 1
+        message: 'argument --output-path: Bad value [wrong-gs-path]: --output-path
+          must be a Google Cloud Storage URI starting with "gs://". For example, "gs://bucket_name/object_name"'

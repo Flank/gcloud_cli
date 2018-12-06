@@ -52,7 +52,7 @@ class InstanceOperationsClientTest(base.SpannerTestBase):
             name=ref.RelativeName()),
         response=done)
     self.client.projects_instances.Get.Expect(
-        request=self.msgs.SpannerProjectsInstancesOperationsGetRequest(
+        request=self.msgs.SpannerProjectsInstancesGetRequest(
             name='resultname'),
         response=instance)
     self.assertEqual(

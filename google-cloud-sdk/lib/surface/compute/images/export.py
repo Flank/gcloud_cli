@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.api_lib.compute import image_utils
+from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.images import flags
 from googlecloudsdk.core import properties
@@ -30,53 +31,63 @@ _EXTERNAL_WORKFLOW = '../workflows/export/image_export_ext.wf.json'
 _OUTPUT_FILTER = ['[Daisy', '[image-export', '  image', 'ERROR']
 
 
+def _CommonArgs(parser):
+  """Adds common arguments for image export to parser.
+
+  Args:
+    parser: Parser to have common args added
+  """
+  image_group = parser.add_mutually_exclusive_group(required=True)
+
+  image_group.add_argument(
+      '--image',
+      help=('The name of the disk image to export.'),
+  )
+  image_group.add_argument(
+      '--image-family',
+      help=('The family of the disk image to be exported. When a family '
+            'is used instead of an image, the latest non-deprecated image '
+            'associated with that family is used.'),
+  )
+  image_utils.AddImageProjectFlag(parser)
+
+  flags.compute_flags.AddZoneFlag(
+      parser, 'image', 'export',
+      explanation='The zone to use when exporting the image.')
+
+  parser.add_argument(
+      '--destination-uri',
+      required=True,
+      help=('The Google Cloud Storage URI destination for '
+            'the exported virtual disk file.'),
+  )
+
+  # Export format can take more values than what we list here in the help.
+  # However, we don't want to suggest formats that will likely never be used,
+  # so we list common ones here, but don't prevent others from being used.
+  parser.add_argument(
+      '--export-format',
+      help=('Specify the format to export to, such as '
+            '`vmdk`, `vhdx`, `vpc`, or `qcow2`.'),
+  )
+
+  parser.add_argument(
+      '--network',
+      help=('The name of the network in your project to use for the image '
+            'export. The network must have access to Google Cloud Storage. '
+            'If not specified, the network named `default` is used.'),
+  )
+  daisy_utils.AddCommonDaisyArgs(parser)
+  parser.display_info.AddCacheUpdater(flags.ImagesCompleter)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class Export(base.CreateCommand):
   """Export a Google Compute Engine image."""
 
   @staticmethod
   def Args(parser):
-    image_group = parser.add_mutually_exclusive_group(required=True)
-
-    image_group.add_argument(
-        '--image',
-        help=('The name of the disk image to export.'),
-    )
-    image_group.add_argument(
-        '--image-family',
-        help=('The family of the disk image to be exported. When a family '
-              'is used instead of an image, the latest non-deprecated image '
-              'associated with that family is used.'),
-    )
-    image_utils.AddImageProjectFlag(parser)
-
-    flags.compute_flags.AddZoneFlag(
-        parser, 'image', 'export',
-        explanation='The zone to use when exporting the image.')
-
-    parser.add_argument(
-        '--destination-uri',
-        required=True,
-        help=('The Google Cloud Storage URI destination for '
-              'the exported virtual disk file.'),
-    )
-
-    # Export format can take more values than what we list here in the help.
-    # However, we don't want to suggest formats that will likely never be used,
-    # so we list common ones here, but don't prevent others from being used.
-    parser.add_argument(
-        '--export-format',
-        help=('Specify the format to export to, such as '
-              '`vmdk`, `vhdx`, `vpc`, or `qcow2`.'),
-    )
-
-    parser.add_argument(
-        '--network',
-        help=('The name of the network in your project to use for the image '
-              'export. The network must have access to Google Cloud Storage. '
-              'If not specified, the network named `default` is used.'),
-    )
-    daisy_utils.AddCommonDaisyArgs(parser)
-    parser.display_info.AddCacheUpdater(flags.ImagesCompleter)
+    _CommonArgs(parser)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -102,14 +113,54 @@ class Export(base.CreateCommand):
     else:
       workflow = _DEFAULT_WORKFLOW
 
+    variables = self._ProcessNetworkArgs(args, variables)
+
+    tags = ['gce-daisy-image-export']
+    return daisy_utils.RunDaisyBuild(
+        args, workflow, variables, tags=tags,
+        user_zone=properties.VALUES.compute.zone.Get(),
+        output_filter=_OUTPUT_FILTER, daisy_bucket=self._GetDaisyBucket(args))
+
+  def _GetDaisyBucket(self, args):
+    return None
+
+  def _ProcessNetworkArgs(self, args, variables):
     if args.network:
       variables += """,export_network=global/networks/{0}""".format(
           args.network.lower())
+    return variables
 
-    tags = ['gce-daisy-image-export']
-    return daisy_utils.RunDaisyBuild(args, workflow, variables,
-                                     tags=tags, user_zone=args.zone,
-                                     output_filter=_OUTPUT_FILTER)
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ExportAlpha(Export):
+  """Export a Google Compute Engine image for Alpha release track."""
+
+  @staticmethod
+  def Args(parser):
+    _CommonArgs(parser)
+    parser.add_argument(
+        '--subnet',
+        help=('Name of the subnetwork in your project to use for the image '
+              'export. If the network resource is in legacy mode, do not '
+              'provide this property. If the network is in auto subnet mode, '
+              'providing the subnetwork is optional. If the network is in '
+              'custom subnet mode, then this field should be specified.'),
+    )
+
+  def _GetDaisyBucket(self, args):
+    storage_client = storage_api.StorageClient()
+    return daisy_utils.GetAndCreateDaisyBucket(
+        storage_client=storage_client,
+        bucket_location=storage_client.GetBucketLocationForFile(
+            args.destination_uri))
+
+  def _ProcessNetworkArgs(self, args, variables):
+    network_vars = daisy_utils.ExtractNetworkAndSubnetDaisyVariables(
+        args, daisy_utils.ImageOperation.EXPORT)
+    if network_vars:
+      variables += ',' + ','.join(network_vars)
+    return variables
+
 
 Export.detailed_help = {
     'brief': 'Export a Google Compute Engine image',

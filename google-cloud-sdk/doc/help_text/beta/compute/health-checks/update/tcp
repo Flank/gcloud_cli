@@ -7,7 +7,8 @@ SYNOPSIS
         [--healthy-threshold=HEALTHY_THRESHOLD] [--proxy-header=PROXY_HEADER]
         [--request=REQUEST] [--response=RESPONSE] [--timeout=TIMEOUT]
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD]
-        [--port=PORT --port-name=PORT_NAME] [GCLOUD_WIDE_FLAG ...]
+        [--port=PORT --port-name=PORT_NAME --use-serving-port]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute health-checks update tcp is used to update an
@@ -85,10 +86,19 @@ FLAGS
           empty. Setting this to an empty string will clear any existing
           port-name value.
 
+       --use-serving-port
+          If given, use the "serving port" for health checks:
+
+          + When health checking network endpoints in a Network Endpoint
+            Group, use the port specified with each endpoint.
+          + When health checking other backends, use the port or named port
+            of the backend service.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

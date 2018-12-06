@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.compute import containers_utils
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -79,7 +79,10 @@ class InstanceTemplatesCreateWithContainerTestBase(test_base.BaseTest):
     self.default_metadata = m.Metadata(items=[
         m.Metadata.ItemsValueListEntry(
             key='gce-container-declaration',
-            value=containers_utils.DumpYaml(self.default_container_manifest))])
+            value=containers_utils.DumpYaml(self.default_container_manifest)),
+        m.Metadata.ItemsValueListEntry(
+            key='google-logging-enabled',
+            value='true')])
     self.default_tags = None
     self.default_labels = m.InstanceProperties.LabelsValue(
         additionalProperties=[
@@ -108,8 +111,7 @@ class InstanceTemplatesCreateFromContainerTest(
     InstanceTemplatesCreateWithContainerTestBase):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self._SetUp()
 
   def testSimple(self):
@@ -184,7 +186,9 @@ class InstanceTemplatesCreateFromContainerTest(
                           m.Metadata.ItemsValueListEntry(
                               key='gce-container-declaration',
                               value=containers_utils.DumpYaml(
-                                  expected_manifest))
+                                  expected_manifest)),
+                          m.Metadata.ItemsValueListEntry(
+                              key='google-logging-enabled', value='true')
                       ]),
                       networkInterfaces=[self.default_network_interface],
                       scheduling=m.Scheduling(automaticRestart=True),
@@ -260,6 +264,8 @@ class InstanceTemplatesCreateFromContainerTest(
                               key='gce-container-declaration',
                               value=containers_utils.DumpYaml(
                                   self.default_container_manifest)),
+                          m.Metadata.ItemsValueListEntry(
+                              key='google-logging-enabled', value='true'),
                           m.Metadata.ItemsValueListEntry(key='x', value='abc'),
                           m.Metadata.ItemsValueListEntry(key='y', value='foo'),
                       ]),
@@ -268,66 +274,6 @@ class InstanceTemplatesCreateFromContainerTest(
                       serviceAccounts=[self.default_service_account],
                       tags=self.default_tags)),
               project='my-project',))],)
-
-  def testAdditionalAttachedDisks(self):
-    m = self.messages
-    self.Run("""
-        compute instance-templates create-with-container it-1
-          --local-ssd device-name=foo
-          --local-ssd device-name=bar,interface=NVME
-          --disk name=disk-1,mode=rw,device-name=x,boot=no
-          --container-image=gcr.io/my-docker/test-image
-        """)
-    self.CheckRequests(
-        self.cos_images_list_request,
-        [(self.compute.instanceTemplates,
-          'Insert',
-          m.ComputeInstanceTemplatesInsertRequest(
-              instanceTemplate=m.InstanceTemplate(
-                  name='it-1',
-                  properties=m.InstanceProperties(
-                      canIpForward=False,
-                      disks=[
-                          self.default_attached_disk,
-                          m.AttachedDisk(
-                              autoDelete=False,
-                              boot=False,
-                              deviceName='x',
-                              licenses=[],
-                              mode=(m.AttachedDisk.ModeValueValuesEnum
-                                    .READ_WRITE),
-                              source='disk-1',
-                              type=(m.AttachedDisk
-                                    .TypeValueValuesEnum.PERSISTENT)),
-                          m.AttachedDisk(
-                              autoDelete=True,
-                              deviceName='foo',
-                              initializeParams=m.AttachedDiskInitializeParams(
-                                  diskType='local-ssd'),
-                              licenses=[],
-                              mode=(m.AttachedDisk.ModeValueValuesEnum
-                                    .READ_WRITE),
-                              type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
-                          m.AttachedDisk(
-                              autoDelete=True,
-                              deviceName='bar',
-                              initializeParams=m.AttachedDiskInitializeParams(
-                                  diskType='local-ssd'),
-                              interface=(m.AttachedDisk
-                                         .InterfaceValueValuesEnum.NVME),
-                              licenses=[],
-                              mode=(m.AttachedDisk.ModeValueValuesEnum
-                                    .READ_WRITE),
-                              type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH)],
-                      labels=self.default_labels,
-                      machineType=self.default_machine_type,
-                      metadata=self.default_metadata,
-                      networkInterfaces=[self.default_network_interface],
-                      scheduling=m.Scheduling(automaticRestart=True),
-                      serviceAccounts=[self.default_service_account],
-                      tags=self.default_tags)),
-              project='my-project',
-          ))],)
 
   def testTagsOptions(self):
     m = self.messages
@@ -582,7 +528,8 @@ class InstanceTemplatesCreateFromContainerTest(
           """)
 
   def testCreateMetadataKeyConflict(self):
-    with self.AssertRaisesToolExceptionRegexp(
+    with self.AssertRaisesExceptionMatches(
+        containers_utils.InvalidMetadataKeyException,
         'Metadata key "user-data" is not allowed when '
         'running containerized VM'):
       self.Run("""
@@ -792,7 +739,7 @@ class InstanceTemplatesCreateWithContainerTestAlpha(
 
   def SetUp(self):
     self.SelectApi('alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self._SetUp()
 
   def createWithOnHostMaintenanceTest(self, flag):
@@ -826,6 +773,68 @@ class InstanceTemplatesCreateWithContainerTestAlpha(
               project='my-project',
           ))],)
 
+  def testAdditionalAttachedDisks(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create-with-container it-1
+          --local-nvdimm ''
+          --local-nvdimm size=3TB
+          --disk name=disk-1,mode=rw,device-name=x,boot=no
+          --container-image=gcr.io/my-docker/test-image
+        """)
+    self.CheckRequests(
+        self.cos_images_list_request,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=m.InstanceTemplate(
+                  name='it-1',
+                  properties=m.InstanceProperties(
+                      canIpForward=False,
+                      disks=[
+                          self.default_attached_disk,
+                          m.AttachedDisk(
+                              autoDelete=False,
+                              boot=False,
+                              deviceName='x',
+                              licenses=[],
+                              mode=(m.AttachedDisk.ModeValueValuesEnum
+                                    .READ_WRITE),
+                              source='disk-1',
+                              type=(m.AttachedDisk.TypeValueValuesEnum
+                                    .PERSISTENT)),
+                          m.AttachedDisk(
+                              autoDelete=True,
+                              initializeParams=m.AttachedDiskInitializeParams(
+                                  diskType='aep-nvdimm'),
+                              interface=(m.AttachedDisk.InterfaceValueValuesEnum
+                                         .NVDIMM),
+                              licenses=[],
+                              mode=(m.AttachedDisk.ModeValueValuesEnum
+                                    .READ_WRITE),
+                              type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
+                          m.AttachedDisk(
+                              autoDelete=True,
+                              diskSizeGb=3072,
+                              initializeParams=m.AttachedDiskInitializeParams(
+                                  diskType='aep-nvdimm'),
+                              interface=(m.AttachedDisk.InterfaceValueValuesEnum
+                                         .NVDIMM),
+                              licenses=[],
+                              mode=(m.AttachedDisk.ModeValueValuesEnum
+                                    .READ_WRITE),
+                              type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
+                      ],
+                      labels=self.default_labels,
+                      machineType=self.default_machine_type,
+                      metadata=self.default_metadata,
+                      networkInterfaces=[self.default_network_interface],
+                      scheduling=m.Scheduling(automaticRestart=True),
+                      serviceAccounts=[self.default_service_account],
+                      tags=self.default_tags)),
+              project='my-project',
+          ))],
+    )
+
   def testWithOnHostMaintenance(self):
     self.createWithOnHostMaintenanceTest('--on-host-maintenance')
 
@@ -836,12 +845,11 @@ class InstanceTemplatesCreateWithContainerTestAlpha(
         'Please use `--on-host-maintenance` instead')
 
 
-class InstanceTemplatesCreateFromContainerWithNetworkTierBetaTest(
+class InstanceTemplatesCreateFromContainerWithNetworkTierTest(
     InstanceTemplatesCreateWithContainerTestBase):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self._SetUp()
 
   def CreateRequestWithNetworkTier(self, network_tier):
@@ -969,7 +977,7 @@ class InstanceTemplatesCreateFromContainerWithNetworkTierAlphaTest(
 
   def SetUp(self):
     self.SelectApi('alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self._SetUp()
 
   def CreateRequestWithNetworkTier(self, network_tier):
@@ -1079,6 +1087,75 @@ class InstanceTemplatesCreateFromContainerWithNetworkTierAlphaTest(
         [(self.compute.instanceTemplates, 'Insert', expected_request)],
     )
 
+
+class InstanceTemplatesCreateFromContainerWithLocalSsdBetaTest(
+    InstanceTemplatesCreateWithContainerTestBase):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self._SetUp()
+
+  def testAdditionalAttachedDisks(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create-with-container it-1
+          --local-ssd device-name=foo
+          --local-ssd device-name=bar,interface=NVME
+          --disk name=disk-1,mode=rw,device-name=x,boot=no
+          --container-image=gcr.io/my-docker/test-image
+        """)
+    self.CheckRequests(
+        self.cos_images_list_request,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=m.InstanceTemplate(
+                  name='it-1',
+                  properties=m.InstanceProperties(
+                      canIpForward=False,
+                      disks=[
+                          self.default_attached_disk,
+                          m.AttachedDisk(
+                              autoDelete=False,
+                              boot=False,
+                              deviceName='x',
+                              licenses=[],
+                              mode=(m.AttachedDisk.ModeValueValuesEnum
+                                    .READ_WRITE),
+                              source='disk-1',
+                              type=(m.AttachedDisk.TypeValueValuesEnum
+                                    .PERSISTENT)),
+                          m.AttachedDisk(
+                              autoDelete=True,
+                              deviceName='foo',
+                              initializeParams=m.AttachedDiskInitializeParams(
+                                  diskType='local-ssd'),
+                              licenses=[],
+                              mode=(m.AttachedDisk.ModeValueValuesEnum
+                                    .READ_WRITE),
+                              type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
+                          m.AttachedDisk(
+                              autoDelete=True,
+                              deviceName='bar',
+                              initializeParams=m.AttachedDiskInitializeParams(
+                                  diskType='local-ssd'),
+                              interface=(
+                                  m.AttachedDisk.InterfaceValueValuesEnum.NVME),
+                              licenses=[],
+                              mode=(m.AttachedDisk.ModeValueValuesEnum
+                                    .READ_WRITE),
+                              type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH)
+                      ],
+                      labels=self.default_labels,
+                      machineType=self.default_machine_type,
+                      metadata=self.default_metadata,
+                      networkInterfaces=[self.default_network_interface],
+                      scheduling=m.Scheduling(automaticRestart=True),
+                      serviceAccounts=[self.default_service_account],
+                      tags=self.default_tags)),
+              project='my-project',
+          ))],
+    )
 
 if __name__ == '__main__':
   test_case.main()

@@ -94,7 +94,7 @@ class ClientLibTest(sdk_test_base.WithFakeAuth):
       self.assertFalse(self.mock_get_home_path.called)
       self.mock_expandvars.assert_called_with('%USERPROFILE%')
     else:
-      # Every platform aside from Windows should use platforms.GetHomePath
+      # Every platform aside from Windows should use files.GetHomeDir
       # to locate the user's home directory.
       self.assertTrue(self.mock_get_home_path.called)
       self.assertFalse(self.mock_expandvars.called)

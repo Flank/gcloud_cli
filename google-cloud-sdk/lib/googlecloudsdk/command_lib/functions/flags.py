@@ -25,7 +25,6 @@ from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
-from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
 from googlecloudsdk.command_lib.util import completers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.core import properties
@@ -105,9 +104,9 @@ def AddSourceFlag(parser):
 
       Location of the source can be one of the following three options:
 
-        1. Source code in Google Cloud Storage (must be a `.zip` archive),
-        2. Reference to source repository or,
-        3. Local filesystem path (root directory of function source).
+      * Source code in Google Cloud Storage (must be a `.zip` archive),
+      * Reference to source repository or,
+      * Local filesystem path (root directory of function source).
 
       The value of the flag will be interpreted as a Cloud Storage location, if
       it starts with `gs://`.
@@ -130,9 +129,9 @@ def AddSourceFlag(parser):
       If you want to deploy from a revision different from `master`, append one
       of the following three sources to the URL:
 
-        1. `/revisions/${REVISION}`,
-        2. `/moveable-aliases/${MOVEABLE_ALIAS}`,
-        3. `/fixed-aliases/${FIXED_ALIAS}`.
+      * `/revisions/${REVISION}`,
+      * `/moveable-aliases/${MOVEABLE_ALIAS}`,
+      * `/fixed-aliases/${FIXED_ALIAS}`.
 
       If you'd like to deploy sources from a directory different from the root,
       you must specify a revision, a moveable alias, or a fixed alias, as above,
@@ -185,11 +184,19 @@ def AddRuntimeFlag(parser):
           """)
 
 
-def AddConnectedVPCFlag(parser):
-  parser.add_argument(
+def AddConnectedVPCMutexGroup(parser):
+  """Add mutex group for --connected-vpc and --vpc-connector."""
+  mutex_group = parser.add_group(mutex=True)
+  mutex_group.add_argument(
       '--connected-vpc',
       help='Specifies the VPC network to connect the function to.',
-      hidden=True)
+      hidden=True
+  )
+  mutex_group.add_argument(
+      '--vpc-connector',
+      help='The VPC Network Connector that this cloud function can connect to.',
+      hidden=True
+  )
 
 
 def AddEntryPointFlag(parser):
@@ -327,7 +334,7 @@ def GetFunctionResourceSpec():
       'cloudfunctions.projects.locations.functions',
       resource_name='function',
       disable_auto_completers=False,
-      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG,
+      projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
       locationsId=RegionAttributeConfig(),
       functionsId=FunctionAttributeConfig(),
   )
@@ -350,3 +357,25 @@ def AddFunctionResourceArg(parser, verb, positional=True):
       GetFunctionResourceSpec(),
       'The Cloud function name {}.'.format(verb),
       required=True).AddToParser(parser)
+
+
+def AddServiceAccountFlag(parser):
+  parser.add_argument(
+      '--service-account',
+      help="""\
+      The email address of the IAM service account associated with the
+      function at runtime. The service account represents the identity of the
+      running function, and determines what permissions the function has.
+
+      If not provided, the function will use the project's default service
+      account.
+      """
+  )
+
+
+def AddIAMPolicyFileArg(parser):
+  parser.add_argument(
+      'policy_file',
+      metavar='POLICY_FILE',
+      help='Path to a local JSON or YAML formatted file '
+      'containing a valid policy.')

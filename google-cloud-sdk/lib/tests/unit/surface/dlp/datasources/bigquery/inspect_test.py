@@ -28,6 +28,7 @@ from tests.lib.surface.dlp import base
 class InspectTest(base.DlpUnitTestBase):
   """dlp datasources bigquery inspect tests."""
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testInspectDefaults(self, track):
     self.track = track
@@ -54,13 +55,12 @@ class InspectTest(base.DlpUnitTestBase):
        False, 500, 10, 'LIKELY',
        '2018-05-01T12:00:00.000Z', '2018-05-31T12:00:00.000Z', None),
       ('TableOutput', calliope_base.ReleaseTrack.ALPHA, 'myds', 'mytable',
-       ['PHONE_NUMBER', 'LAST_NAME'], None, [
-           'fakeproject.myds.mytable1', 'fakeproject.myds.mytable2'], False,
+       ['PHONE_NUMBER', 'LAST_NAME'], None, 'fakeproject.myds.mytable1', False,
        True, 100, 5, 'VERY-LIKELY', '2018-05-01T12:00:00.000Z', None,
        ['col1', 'col2']))
   def testInspectWithOptionalParams(
       self, track, input_bq_dataset, input_bq_table, info_types, output_topics,
-      output_tables, exclude_info_types, include_quote, max_findings,
+      output_table, exclude_info_types, include_quote, max_findings,
       max_findings_per_item, min_likelihood, mintime, maxtime, identify_fields):
     self.track = track
     job_ref = resources.REGISTRY.Parse(
@@ -74,7 +74,7 @@ class InspectTest(base.DlpUnitTestBase):
         input_bq_dataset=input_bq_dataset,
         input_bq_table=input_bq_table,
         output_topics=output_topics,
-        output_tables=output_tables,
+        output_table=output_table,
         exclude_info_types=exclude_info_types,
         include_quote=include_quote,
         max_findings=max_findings,
@@ -100,9 +100,9 @@ class InspectTest(base.DlpUnitTestBase):
         max_findings_per_item)
     min_time_flag = '--min-time '+ mintime if mintime else ''
     max_time_flag = '--max-time ' + maxtime if maxtime else ''
-    if output_tables:
-      output_flag = '--output-tables {}'.format(','.join(output_tables))
-    else:  # topics
+    if output_table:
+      output_flag = '--output-table ' + output_table
+    else:  # topics, but incorrectly assumes only one or the other is allowed
       output_flag = '--output-topics {}'.format(','.join(output_topics))
     likelihood_flag = (
         '--min-likelihood ' + min_likelihood.replace('_', '-').lower())

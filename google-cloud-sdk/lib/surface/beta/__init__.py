@@ -26,3 +26,5 @@ from googlecloudsdk.calliope import base
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class Beta(base.Group):
   """Beta versions of gcloud commands."""
+
+  category = 'SDK Tools'

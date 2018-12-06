@@ -20,17 +20,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class ConfigsListTest(base.CloudIotBase):
+class ConfigsListTestGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _MakeConfigs(self, num=10):
     configs = []
@@ -71,8 +70,7 @@ class ConfigsListTest(base.CloudIotBase):
         self.messages.ListDeviceConfigVersionsResponse(deviceConfigs=configs)
     )
 
-  def testList(self, track):
-    self.track = track
+  def testList(self):
     configs = self._MakeConfigs()
     self._ExpectListConfigVersions(configs)
 
@@ -85,8 +83,7 @@ class ConfigsListTest(base.CloudIotBase):
 
     self.assertEqual(list(results), configs)
 
-  def testList_Flags(self, track):
-    self.track = track
+  def testList_Flags(self):
     configs = self._MakeConfigs()
     self._ExpectListConfigVersions(
         configs,
@@ -103,8 +100,7 @@ class ConfigsListTest(base.CloudIotBase):
 
     self.assertEqual(list(results), configs)
 
-  def testList_Limit(self, track):
-    self.track = track
+  def testList_Limit(self):
     configs = self._MakeConfigs()
     self._ExpectListConfigVersions(configs[-3:], num_versions=3)
 
@@ -121,8 +117,7 @@ class ConfigsListTest(base.CloudIotBase):
         10       2017-01-01T00:00Z  2017-01-01T00:00Z
         """, normalize_space=True)
 
-  def testList_RelativeName(self, track):
-    self.track = track
+  def testList_RelativeName(self):
     configs = self._MakeConfigs()
     device_name = ('projects/{}/'
                    'locations/us-central1/'
@@ -136,6 +131,18 @@ class ConfigsListTest(base.CloudIotBase):
         '    --device {}'.format(device_name))
 
     self.assertEqual(list(results), configs)
+
+
+class ConfigsListTestBeta(ConfigsListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ConfigsListTestAlpha(ConfigsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

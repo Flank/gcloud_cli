@@ -20,14 +20,11 @@ from __future__ import unicode_literals
 
 import textwrap
 from apitools.base.py import extra_types
-from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.spanner import write_util
 from googlecloudsdk.core import resources
-from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
-@parameterized.named_parameters(('Beta', calliope_base.ReleaseTrack.BETA),
-                                ('Alpha', calliope_base.ReleaseTrack.ALPHA))
 class RowsUpdateTest(base.SpannerTestBase):
   """Cloud Spanner rows update tests."""
 
@@ -80,7 +77,7 @@ class RowsUpdateTest(base.SpannerTestBase):
                 mutations=mutations,
                 singleUseTransaction=self.msgs.TransactionOptions(
                     readWrite=self.msgs.ReadWrite()))),
-        response=self.msgs.Empty())
+        response=self.msgs.CommitResponse())
 
   def _GivenDdlResponse(self):
     table1_ddl = textwrap.dedent("""
@@ -104,44 +101,32 @@ class RowsUpdateTest(base.SpannerTestBase):
         response=self.msgs.GetDatabaseDdlResponse(
             statements=[table1_ddl, table2_ddl]))
 
-  def testUpdateWithSimpleTable(self, track):
-    self.track = track
+  def testUpdateWithSimpleTable(self):
     self._GivenDdlResponse()
 
     session = self.msgs.Session(name=self.session_ref.RelativeName())
     self._ExpectSessionCreate(session)
 
-    self._ExpectSessionCommit(
-        self.session_ref.RelativeName(),
-        'Singers', ['SingerId', 'FirstName', 'LastName'], [
-            extra_types.JsonValue(string_value='2'),
-            extra_types.JsonValue(string_value='abc'),
-            extra_types.JsonValue(string_value='cab')
-        ])
+    self._ExpectSessionCommit(self.session_ref.RelativeName(), 'Singers',
+                              ['SingerId', 'FirstName', 'LastName'], [
+                                  extra_types.JsonValue(string_value='2'),
+                                  extra_types.JsonValue(string_value='abc 123'),
+                                  extra_types.JsonValue(string_value='cab')
+                              ])
     self._ExpectSessionDelete(session)
 
     self.Run('spanner rows update --table=Singers --database=mydb '
-             '--instance=myins --data=SingerId=2,FirstName=abc,LastName=cab')
+             '--instance=myins --data=SingerId=2,FirstName="abc 123",'
+             'LastName=cab')
 
-  def testUpdateWithComplicatedTable(self, track):
-    self.track = track
+  def testUpdateWithComplicatedTable(self):
     self._GivenDdlResponse()
 
-    session = self.msgs.Session(name=self.session_ref.RelativeName())
-    self._ExpectSessionCreate(session)
-    self._ExpectSessionCommit(
-        self.session_ref.RelativeName(),
-        'Songs', ['SingerId', 'AlbumName', 'Genre', 'Modification'], [
-            extra_types.JsonValue(string_value='2'),
-            extra_types.JsonValue(string_value='my-album'),
-            extra_types.JsonValue(is_null=True),
-            extra_types.JsonValue(
-                array_value=extra_types.JsonArray(entries=[
-                    extra_types.JsonValue(boolean_value=True),
-                ]))
-        ])
-    self._ExpectSessionDelete(session)
-
-    self.Run(
-        'spanner rows update  --table=Songs --database=mydb --instance=myins '
-        '--data=SingerId=2,AlbumName=my-album,Genre=NULL,Modification=[True]')
+    with self.AssertRaisesExceptionMatches(
+        write_util.InvalidArrayInputError,
+        'Column name [Modification] has an invalid array input: [True]. '
+        '`--flags-file` should be used to specify array values.'):
+      self.Run(
+          'spanner rows update  --table=Songs --database=mydb --instance=myins '
+          '--data=SingerId=2,AlbumName=my-album,Genre=NULL,'
+          'Modification=["True"]')

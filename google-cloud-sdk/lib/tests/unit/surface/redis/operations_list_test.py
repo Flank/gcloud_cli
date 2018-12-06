@@ -28,8 +28,10 @@ from tests.lib.surface import redis_test_base
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA])
+                           calliope_base.ReleaseTrack.BETA,
+                           calliope_base.ReleaseTrack.GA])
 class ListTest(redis_test_base.OperationsUnitTestBase, parameterized.TestCase):
 
   def testList(self, track):

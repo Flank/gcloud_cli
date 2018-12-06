@@ -96,9 +96,49 @@ Path to the job configuration file. This file should be a YAML document (JSON
 also accepted) containing a Job resource as defined in the API (all fields are
 optional): https://cloud.google.com/ml/reference/rest/v1/projects.jobs
 
+EXAMPLES:
+
+JSON:
+
+.RS 2m
+{
+  "jobId": "my_job",
+  "labels": {
+    "type": "prod",
+    "owner": "alice"
+  },
+  "trainingInput": {
+    "scaleTier": "BASIC",
+    "packageUris": [
+      "gs://my/package/path"
+    ],
+    "region": "us\-east1"
+  }
+}
+.RE
+
+YAML:
+
+.RS 2m
+jobId: my_job
+labels:
+  type: prod
+  owner: alice
+trainingInput:
+  scaleTier: BASIC
+  packageUris:
+  \- gs://my/package/path
+  region: us\-east1
+.RE
+
+
+
+.RE
+.sp
 If an option is specified both in the configuration file **and** via command
 line arguments, the command line arguments override the configuration file.
 
+.RS 2m
 .TP 2m
 \fB\-\-job\-dir\fR=\fIJOB_DIR\fR
 Google Cloud Storage path in which to store training outputs and other data
@@ -222,9 +262,13 @@ Large number of workers with many parameter servers.
 .TP 2m
 \fBstandard\-1\fR
 Many workers and a few parameter servers.
+.RE
+.sp
 
 .RE
 .sp
+
+.RS 2m
 .TP 2m
 \fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR
 Bucket in which to stage training archives.
@@ -262,9 +306,9 @@ $ gcloud ml\-engine jobs cancel JOB_ID
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

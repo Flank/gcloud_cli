@@ -19,9 +19,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.Deprecate(is_removed=False, warning='group warning')
-class Sdk(base.Group):
+@calliope_base.Deprecate(is_removed=False, warning='group warning')
+class Sdk(calliope_base.Group):
   """Test commands for running calliope tests."""

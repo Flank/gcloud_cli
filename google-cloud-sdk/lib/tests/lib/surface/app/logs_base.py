@@ -42,7 +42,9 @@ class LogsTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         'OR '
         '"projects/{project}/logs/appengine.googleapis.com%2Frequest_log" OR '
         '"projects/{project}/logs/appengine.googleapis.com%2Fstderr" OR '
-        '"projects/{project}/logs/appengine.googleapis.com%2Fstdout")'
+        '"projects/{project}/logs/stderr" OR '
+        '"projects/{project}/logs/appengine.googleapis.com%2Fstdout" OR '
+        '"projects/{project}/logs/stdout")'
         .format(project=PROJECT))
     self.resource_filter = 'resource.type="gae_app"'
     self.default_filter = self.resource_filter + ' AND ' + self.log_name_filter

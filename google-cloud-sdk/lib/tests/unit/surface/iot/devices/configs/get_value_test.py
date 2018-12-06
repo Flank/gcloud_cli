@@ -21,20 +21,18 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class ConfigsGetValueTest(base.CloudIotBase):
+class ConfigsGetValueTestGA(base.CloudIotBase):
 
-  def testGetValue(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testGetValue(self):
     data = bytes(range(256))
     device_config = self.messages.DeviceConfig(binaryData=data)
     self._ExpectGet(config=device_config)
@@ -48,8 +46,7 @@ class ConfigsGetValueTest(base.CloudIotBase):
 
     self.assertEqual(results, data)
 
-  def testGetValue_Output(self, track):
-    self.track = track
+  def testGetValue_Output(self):
     # Before output values get written to stdout, they are converted to unicode
     # and encoded using utf-8. This means that while the output will appear the
     # same when printed, the underlying byte representation will differ.
@@ -77,8 +74,7 @@ class ConfigsGetValueTest(base.CloudIotBase):
 
     self.AssertOutputEquals(unicode_data)
 
-  def testGetValue_NoData(self, track):
-    self.track = track
+  def testGetValue_NoData(self):
     device_config = self.messages.DeviceConfig()
     self._ExpectGet(config=device_config)
 
@@ -90,8 +86,7 @@ class ConfigsGetValueTest(base.CloudIotBase):
 
     self.AssertOutputEquals('')
 
-  def testGetValue_NoneConfig(self, track):
-    self.track = track
+  def testGetValue_NoneConfig(self):
     self._ExpectGet()
 
     with self.AssertRaisesExceptionMatches(
@@ -104,8 +99,7 @@ class ConfigsGetValueTest(base.CloudIotBase):
           '    --region us-central1')
     self.AssertOutputEquals('')
 
-  def testGetValue_RelativeName(self, track):
-    self.track = track
+  def testGetValue_RelativeName(self):
     data = bytes(range(256))
     device_config = self.messages.DeviceConfig(binaryData=data)
     self._ExpectGet(config=device_config)
@@ -116,6 +110,18 @@ class ConfigsGetValueTest(base.CloudIotBase):
                        '--device ' + device_name)
 
     self.assertEqual(results, data)
+
+
+class ConfigsGetValueTestBeta(ConfigsGetValueTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ConfigsGetValueTestAlpha(ConfigsGetValueTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

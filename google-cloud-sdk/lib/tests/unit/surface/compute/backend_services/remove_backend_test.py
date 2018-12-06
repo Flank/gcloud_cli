@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -408,7 +408,7 @@ class RemoveBackendBetaTest(RemoveBackendTest):
 
   def SetUp(self):
     self.SelectApi('beta')
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testWithExistingBackendNetworkEndpointGroup(self):
     messages = self.messages
@@ -467,7 +467,7 @@ class RemoveBackendAlphaTest(RemoveBackendBetaTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

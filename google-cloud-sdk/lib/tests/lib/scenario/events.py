@@ -24,18 +24,29 @@ from __future__ import unicode_literals
 import abc
 from collections import OrderedDict
 import json
+import os
+
 import enum
 
-
+from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_transform
 from googlecloudsdk.core.util import http_encoding
 from tests.lib.scenario import assertions
 from tests.lib.scenario import updates
-
 import httplib2
 import six
 from six.moves import urllib
+
+
+class Error(Exception):
+  """General exception for the module."""
+  pass
+
+
+class UnknownFieldError(Error):
+  """Exception for when a referenced field does not exist in the data."""
+  pass
 
 
 class Event(six.with_metaclass(abc.ABCMeta, object)):
@@ -55,6 +66,12 @@ class Event(six.with_metaclass(abc.ABCMeta, object)):
   def Handle(self, *args, **kwargs):
     return []
 
+  def Summary(self):
+    return []
+
+  def __str__(self):
+    return '{}: [{}]'.format(self.EventType(), self._update_context.Location())
+
 
 class _SingleValueEvent(six.with_metaclass(abc.ABCMeta, Event)):
   """Base class for all event types that just check a single value."""
@@ -68,7 +85,7 @@ class _SingleValueEvent(six.with_metaclass(abc.ABCMeta, Event)):
     update_context = updates.Context(
         backing_data, field, cls.EventType().UpdateMode(),
         was_missing=was_missing, location=location)
-    return cls(update_context, assertions.EqualsAssertion(value))
+    return cls(update_context, assertions.Assertion.ForComplex(value))
 
   def __init__(self, update_context, assertion):
     super(_SingleValueEvent, self).__init__(update_context)
@@ -76,6 +93,9 @@ class _SingleValueEvent(six.with_metaclass(abc.ABCMeta, Event)):
 
   def Handle(self, value):
     return self._assertion.Check(self._update_context, value)
+
+  def Summary(self):
+    return [{str(self.EventType()): self._assertion.ValueRepr()}]
 
 
 class StdoutEvent(_SingleValueEvent):
@@ -128,8 +148,9 @@ class ExitEvent(Event):
     return cls(
         updates.Context(
             backing_data, 'expect_exit', cls.EventType().UpdateMode()),
+        code,
         assertions.EqualsAssertion(code),
-        assertions.EqualsAssertion(message) if has_message else None
+        assertions.Assertion.ForComplex(message) if has_message else None
     )
 
   @classmethod
@@ -138,11 +159,13 @@ class ExitEvent(Event):
         {'expect_exit': OrderedDict()}, 'expect_exit',
         cls.EventType().UpdateMode(), was_missing=True, location=location)
     return cls(update_context,
+               0,
                assertions.EqualsAssertion(None),
                assertions.EqualsAssertion(None))
 
-  def __init__(self, update_context, code_assertion, message_assertion):
+  def __init__(self, update_context, code, code_assertion, message_assertion):
     super(ExitEvent, self).__init__(update_context)
+    self._code = code
     self._code_assertion = code_assertion
     self._message_assertion = message_assertion
 
@@ -152,11 +175,19 @@ class ExitEvent(Event):
     failures = []
     failures.extend(
         self._code_assertion.Check(self._update_context.ForKey('code'), code))
-    if self._message_assertion:
+    if self._message_assertion or failures:
+      msg_assertion = self._message_assertion or assertions.EqualsAssertion('')
       failures.extend(
-          self._message_assertion.Check(
-              self._update_context.ForKey('message'), message))
+          msg_assertion.Check(self._update_context.ForKey('message'), message))
     return failures
+
+  def Summary(self):
+    if self._code == 0:
+      return []
+    return [{'error': '{}: {}'.format(
+        self._code,
+        self._message_assertion.ValueRepr() if self._message_assertion
+        else None)}]
 
 
 class UserInputEvent(Event):
@@ -203,6 +234,9 @@ class UserInputEvent(Event):
     return [assertions.Failure.ForGeneric(
         self._update_context, title='Missing user input event')]
 
+  def Summary(self):
+    return [{'input': self._lines}]
+
 
 class FileWrittenEvent(Event):
   """Checks that a given file was written with the given contents."""
@@ -218,12 +252,13 @@ class FileWrittenEvent(Event):
         backing_data, 'expect_file_written', cls.EventType().UpdateMode())
 
     path_assertion = assertions.EqualsAssertion(file_data.get('path'))
-    contents_assertion = _CreateAssertion(file_data.get('contents'))
+    contents_assertion = assertions.Assertion.ForComplex(
+        file_data.get('contents'))
     binary_contents = file_data.get('binary_contents')
     if (binary_contents is not None and
         isinstance(binary_contents, six.text_type)):
       binary_contents = binary_contents.encode('utf8')
-    binary_contents_assertion = _CreateAssertion(binary_contents)
+    binary_contents_assertion = assertions.Assertion.ForComplex(binary_contents)
     is_private_assertion = assertions.EqualsAssertion(
         file_data.get('is_private') or False)
 
@@ -273,21 +308,8 @@ class FileWrittenEvent(Event):
             self._update_context.ForKey('is_private'), private))
     return failures
 
-
-def _CreateAssertion(value):
-  """Adds an additional assertion to a DictAssertion for a given key."""
-  if not isinstance(value, dict):
-    return assertions.EqualsAssertion(value)
-  elif 'equals' in value:
-    return assertions.EqualsAssertion(value['equals'])
-  elif 'matches' in value:
-    return assertions.MatchesAssertion(value['matches'])
-  elif 'is_none' in value:
-    return assertions.IsNoneAssertion(value['is_none'])
-  elif 'in' in value:
-    return assertions.InAssertion(value['in'])
-  # This should never happen for things that pass schema validation.
-  raise ValueError('Assertion type is invalid.')
+  def Summary(self):
+    return [{'write_file': self._path_assertion.ValueRepr()}]
 
 
 class ApiCallEvent(Event):
@@ -304,8 +326,9 @@ class ApiCallEvent(Event):
     update_context = updates.Context(
         backing_data, 'api_call', cls.EventType().UpdateMode())
 
-    is_repeatable_assertion = assertions.EqualsAssertion(
-        call_data.get('repeatable', False))
+    poll_operation = call_data.get('poll_operation', None)
+    is_repeatable = call_data.get('repeatable', None)
+    is_optional = call_data.get('optional', False)
     request_assertion = HTTPAssertion.ForRequest(call_data['expect_request'])
     response_assertion = HTTPAssertion.ForResponse(
         call_data.get('expect_response'))
@@ -313,10 +336,12 @@ class ApiCallEvent(Event):
     response_payload_data = call_data.get('return_response') or OrderedDict()
     response_payload = HTTPResponsePayload(
         headers=response_payload_data.get('headers', {'status': '200'}),
-        payload=response_payload_data.get('body', ''))
+        payload=response_payload_data.get('body', ''),
+        omit_fields=response_payload_data.get('omit_fields'))
 
-    return cls(update_context, is_repeatable_assertion, request_assertion,
-               response_assertion, response_payload)
+    return cls(update_context, poll_operation, is_repeatable,
+               is_optional, request_assertion, response_assertion,
+               response_payload)
 
   @classmethod
   def ForMissing(cls, location):
@@ -339,7 +364,9 @@ class ApiCallEvent(Event):
 
     return cls(
         update_context,
-        assertions.EqualsAssertion(False),
+        None,
+        None,
+        False,
         HTTPAssertion(
             'expect_request',
             assertions.EqualsAssertion(assertions.MISSING_VALUE),
@@ -351,40 +378,129 @@ class ApiCallEvent(Event):
             {}),
         None,
         HTTPResponsePayload(headers=response['headers'],
-                            payload=response['body']))
+                            payload=response['body'],
+                            omit_fields=None))
 
-  def __init__(self, update_context, is_repeatable_assertion, request_assertion,
-               response_assertion, response_payload):
+  def __init__(self, update_context, poll_operation, is_repeatable,
+               is_optional, request_assertion, response_assertion,
+               response_payload):
     super(ApiCallEvent, self).__init__(update_context)
-    self._is_repeatable_assertion = is_repeatable_assertion
+    self._poll_operation = poll_operation
+    self._is_repeatable = is_repeatable
+    self._is_optional = is_optional
+    self._was_repeated = False
     self._request_assertion = request_assertion
     self._response_assertion = response_assertion
     self._response_payload = response_payload
+    self._call_data = None
+    self._generated_op = None
 
-  def CheckRepeatable(self, was_repeated):
-    return self._is_repeatable_assertion.Check(
-        self._update_context.ForKey('repeatable'), was_repeated)
+  def IsOptional(self):
+    return self._is_optional
 
-  def Handle(self, uri, method, headers, body):
+  def CanBeRepeated(self):
+    # pylint: disable=g-explicit-bool-comparison, We will try to repeat events
+    # if necessary unless this is explicitly set to False.
+    return self._is_repeatable != False
+
+  def MarkRepeated(self):
+    self._was_repeated = True
+
+  def MarkCalledWith(self, uri, method, body, response):
+    response_body = self._ParseResponse(response[1]) if response else None
+    self._call_data = (uri, method, body, response_body)
+
+  def MatchesPreviousCall(self, uri, method, body, response):
+    response_body = self._ParseResponse(response[1]) if response else None
+    new_call = (uri, method, body, response_body)
+    return self._call_data == new_call
+
+  def _ParseResponse(self, response):
+    try:
+      return json.loads(response)
+    except (ValueError, TypeError):
+      # Not a json object.
+      return response
+
+  def GetMatchingOperationForRequest(self, uri, method):
+    if (self._generated_op and
+        self._generated_op.MatchesPollingRequest(uri, method)):
+      return self._generated_op
+    return None
+
+  def CheckRepeatable(self):
+    return assertions.EqualsAssertion(self._is_repeatable).Check(
+        self._update_context.ForKey('repeatable'), self._was_repeated)
+
+  def Handle(self, uri, method, headers, body, dry_run=False):
     return self._request_assertion.Check(
-        self._update_context, uri, method, headers, body)
+        self._update_context, uri, method, headers, body, dry_run=dry_run)
 
-  def HandleResponse(self, headers, body, resource_ref_resolver):
+  def HandleResponse(self, headers, body, resource_ref_resolver, dry_run=False,
+                     generate_extras=False):
+    if not isinstance(body, six.text_type):
+      # For regular requests, this gets called before the wrapped request
+      # decodes the response so this call is necessary. However, when this
+      # function gets called during a batch request process, the response
+      # has already gone through the entire wrapped request and the body
+      # is already decoded.
+      body = body.decode('utf8')
+
+    failures = []
+    if generate_extras:
+      failures.extend(
+          self._GenerateOperationPolling(resource_ref_resolver, headers, body))
+    elif self._poll_operation and not dry_run:
+      op = Operation.FromResponse(headers, body)
+      self._ExtractOperationPollingName(resource_ref_resolver, op)
+
     if self._response_assertion:
-      self._response_assertion.ExtractReferences(resource_ref_resolver, body)
-      return self._response_assertion.Check(
-          self._update_context, None, None, headers, body.decode('utf8'))
-    else:
-      return self._GenerateOperationsRefExtraction(resource_ref_resolver, body)
+      if not dry_run:
+        self._response_assertion.ExtractReferences(resource_ref_resolver, body)
+      failures.extend(self._response_assertion.Check(
+          self._update_context, None, None, headers, body, dry_run=dry_run))
+    elif generate_extras and self._poll_operation is False:
+      # Legacy operation detection.
+      failures.extend(
+          self._GenerateOperationsExtras(resource_ref_resolver, body))
+    return failures
 
-  def _GenerateOperationsRefExtraction(self, resource_ref_resolver,
-                                       response_body):
-    """Generates an extract_references block if it looks like an operation.
+  def _GenerateOperationPolling(self, resource_ref_resolver, headers,
+                                response_body):
+    if self._poll_operation is False:
+      # If explicitly disabled, don't treat this as an operation no matter what.
+      return []
+
+    op = Operation.FromResponse(headers, response_body)
+    if not op or resource_ref_resolver.IsExtractedIdCurrent('operation',
+                                                            op.name):
+      # Not an operation response at all.
+      if self._poll_operation is None:
+        return []
+      return assertions.EqualsAssertion(self._poll_operation).Check(
+          self._update_context.ForKey('poll_operation'), False)
+
+    # We've identified the response as an operation, make sure polling is turned
+    # on.
+    self._ExtractOperationPollingName(resource_ref_resolver, op)
+    failures = assertions.EqualsAssertion(self._poll_operation).Check(
+        self._update_context.ForKey('poll_operation'), True)
+    return failures
+
+  def _ExtractOperationPollingName(self, resource_ref_resolver, op):
+    self._generated_op = op
+    resource_ref_resolver.SetExtractedId('operation', op.name)
+    resource_ref_resolver.SetExtractedId('operation-basename',
+                                         os.path.basename(op.name))
+
+  def _GenerateOperationsExtras(self, resource_ref_resolver, response_body):
+    """Generates extra data if this response looks like an operation.
 
     If the body has a kind attribute that indicates an operation, this will
     update the scenario spec to include a default extract_references block
     to pull out the operation id. This should only be called if an
-    expect_response block is not already present.
+    expect_response block is not already present. If this is a polling operation
+    it will be marked as optional.
 
     Args:
       resource_ref_resolver: ResourceReferenceResolver, The resolver to track
@@ -394,44 +510,134 @@ class ApiCallEvent(Event):
     Returns:
       [Failure], The failures to update the spec and inject the new block or [].
     """
-    def _UpdateHook(context, actual):
-      """Custom update hook since this is not a real assertion failure."""
-      del actual
-      data = context.BackingData()
-      data['expect_response'] = OrderedDict([
-          ('extract_references',
-           [OrderedDict([('field', 'name'), ('reference', 'operation')])]),
-          ('body', {'json': {}})])
-      return True
+    op = Operation.FromResponse(None, response_body)
+    if not op:
+      # Not an operation response at all.
+      return []
+    if resource_ref_resolver.IsExtractedIdCurrent('operation', op.name):
+      # This is an op, but the id has already been extracted in a previous
+      # event. This means that this is not the call that generated the op, but
+      # rather the polling of the op. No need to generate the ref extraction,
+      # but we do want to mark polling steps as optional and repeated calls.
+      self.MarkRepeated()
+      failures = self.CheckRepeatable()
+      if op.status:
+        # In order for optional to work, we need to also generate an assertion
+        # against the status in the response.
+        failures = assertions.EqualsAssertion(self._is_optional).Check(
+            self._update_context.ForKey('optional'), True)
+        failures.append(
+            assertions.Failure.ForGeneric(
+                self._update_context.ForKey('expect_response'),
+                'Adding operation response assertion for optional polling',
+                OrderedDict([('body', {'json': {'status': op.status}})]))
+        )
+      return failures
 
-    try:
-      json_data = json.loads(response_body)
-    except (ValueError, TypeError):
-      # Not a json object.
-      return []
-    if not json_data.get('kind', '').endswith('#operation'):
-      # not an operation response.
-      return []
-    op_id = json_data.get('name', None)
-    if (not op_id or
-        resource_ref_resolver.IsExtractedIdCurrent('operation', op_id)):
-      # Couldn't find the operation id in the normal place or the id has
-      # already been extracted in a prevent event.
-      return []
-
-    resource_ref_resolver.SetExtractedId('operation', op_id)
-    update_context = self._update_context.ForKey(
-        'expect_response',
-        update_mode=assertions.updates.Mode.API_REQUESTS,
-        custom_update_hook=_UpdateHook)
+    # This is a call that resulted in an operation being created. Extract its
+    # id for future polling calls.
+    resource_ref_resolver.SetExtractedId('operation', op.name)
     return [assertions.Failure.ForGeneric(
-        update_context, 'Adding reference extraction for Operations response')]
+        self._update_context.ForKey('expect_response'),
+        'Adding reference extraction for Operations response',
+        OrderedDict([
+            ('extract_references',
+             [OrderedDict([('field', 'name'), ('reference', 'operation')])]),
+            ('body', {'json': {}})])
+    )]
 
   def GetResponsePayload(self):
     return self._response_payload.Respond()
 
   def UpdateResponsePayload(self, headers, body):
     return self._response_payload.Update(self._update_context, headers, body)
+
+  def __str__(self):
+    # pylint: disable=protected-access
+    return super(ApiCallEvent, self).__str__() + ' [{}]'.format(
+        self._request_assertion._uri_assertion)
+
+
+class Operation(object):
+  """Holds information about an operation that got returned an can be polled."""
+
+  _NEXT_STATE = {
+      'PENDING': 'RUNNING',
+      'RUNNING': 'DONE',
+      'DONE': 'DONE',
+      None: 'DONE',
+  }
+
+  @classmethod
+  def FromResponse(cls, headers, body):
+    """Construct an Operation from an API response."""
+    try:
+      json_data = json.loads(body)
+    except (ValueError, TypeError):
+      # Not a json object.
+      return None
+
+    name = json_data.get('name')
+    if not name:
+      return None
+
+    if (json_data.get('kind', '').endswith('#operation') or
+        'operationType' in json_data):
+      return _OldOperation(name, headers, json_data)
+
+    t = (json_data.get('metadata') or {}).get('@type') or ''
+    if 'done' in json_data or 'operation' in t.lower():
+      return _NewOperation(name, headers, json_data)
+
+    return None
+
+  def __init__(self, name, headers, parsed_response_body):
+    self._name = name
+    self._headers = headers
+    self._parsed_response_body = parsed_response_body
+
+  @property
+  def name(self):
+    return self._name
+
+  def MatchesPollingRequest(self, uri, method):
+    return method == 'GET' and ('/' + self.name) in uri
+
+  def Respond(self):
+    self.status = Operation._NEXT_STATE[self.status]
+    response = HTTPResponsePayload(
+        self._headers, self._parsed_response_body, None)
+    return response.Respond()
+
+
+class _NewOperation(Operation):
+  """Represents a new style LRO.
+
+  New Operations have a name and done=true/false. Other than that they have
+  service specific metadata that can take any form. Because of this, we don't
+  do the normal advancement of the status because we don't know where it is.
+  """
+
+  @property
+  def status(self):
+    return None
+
+  @status.setter
+  def status(self, value):
+    if value == 'DONE':
+      self._parsed_response_body['done'] = True
+      self._parsed_response_body['response'] = {}
+
+
+class _OldOperation(Operation):
+
+  @property
+  def status(self):
+    return self._parsed_response_body['status']
+
+  @status.setter
+  def status(self, value):
+    self._parsed_response_body['status'] = value
 
 
 class HTTPResponsePayload(object):
@@ -443,16 +649,17 @@ class HTTPResponsePayload(object):
       'x-content-type-options', 'x-frame-options', 'x-xss-protection',
   }
 
-  def __init__(self, headers, payload):
+  def __init__(self, headers, payload, omit_fields):
     self._headers = headers
-    if isinstance(payload, dict):
+    if yaml.dict_like(payload):
       payload = json.dumps(payload)
     payload = payload or ''
     self._payload = http_encoding.Encode(payload)
+    self._omit_fields = omit_fields
 
   def _SaveHeader(self, header):
     for prefix in HTTPResponsePayload.HEADER_BLACKLIST_PREFIX:
-      if header.startswith(prefix):
+      if header.lower().startswith(prefix):
         return False
     return True
 
@@ -468,15 +675,24 @@ class HTTPResponsePayload(object):
       h, b = actual
 
       try:
-        b = json.loads(b, object_pairs_hook=OrderedDict)
+        json_b = json.loads(b, object_pairs_hook=OrderedDict)
       except (ValueError, TypeError):
         # Not a json object.
-        pass
+        json_b = None
+
+      if json_b and self._omit_fields:
+        for omit in self._omit_fields:
+          try:
+            del json_b[omit]
+          except KeyError:
+            raise UnknownFieldError(
+                'Field [{}] in omit_fields was not found in the API '
+                'response data'.format(omit))
 
       data['return_response']['headers'] = OrderedDict(
           (key, value) for key, value in sorted(six.iteritems(h))
           if self._SaveHeader(key))
-      data['return_response']['body'] = b
+      data['return_response']['body'] = json_b or b
       return True
 
     update_context = context.ForKey(
@@ -487,13 +703,38 @@ class HTTPResponsePayload(object):
         update_context, 'API Response Payload', (headers, body.decode('utf8')))]
 
 
+class ReferenceExtraction(object):
+  """Encapsulates an extract_reference directive."""
+
+  @classmethod
+  def FromData(cls, extraction_data):
+    return cls(extraction_data['field'], extraction_data['reference'],
+               extraction_data.get('modifiers', {}).get('basename'))
+
+  def __init__(self, field, reference, basename):
+    self._field = field
+    self._reference = reference
+    self._basename = basename
+
+  def Extract(self, json_data, resource_ref_resolver):
+    resource_id = resource_transform.GetKeyValue(json_data, self._field)
+    if resource_id is None:
+      raise Error(
+          'Unable to extract resource reference for field: [{}] from data: [{}]'
+          .format(self._field, json_data))
+
+    if self._basename:
+      resource_id = os.path.basename(resource_id)
+    resource_ref_resolver.SetExtractedId(self._reference, resource_id)
+
+
 class HTTPAssertion(object):
   """Holds all the component assertions of an API request or response assertion.
   """
 
   @classmethod
   def ForRequest(cls, http_data):
-    uri_assertion = assertions.EqualsAssertion(http_data.get('uri', ''))
+    uri_assertion = assertions.Assertion.ForComplex(http_data.get('uri', ''))
     method_assertion = assertions.EqualsAssertion(
         http_data.get('method', 'GET'))
     return cls._ForCommon('expect_request', http_data, uri_assertion,
@@ -503,8 +744,8 @@ class HTTPAssertion(object):
   def ForResponse(cls, http_data):
     if not http_data:
       return None
-    extract_references = {x['field']: x['reference']
-                          for x in http_data.get('extract_references', [])}
+    extract_references = [ReferenceExtraction.FromData(d) for d in
+                          http_data.get('extract_references', [])]
     return cls._ForCommon(
         'expect_response', http_data, None, None, extract_references)
 
@@ -514,7 +755,8 @@ class HTTPAssertion(object):
     """Builder for the attributes applicable to both requests and responses."""
     header_assertion = assertions.DictAssertion()
     for header, value in six.iteritems(http_data.get('headers', {})):
-      header_assertion.AddAssertion(header, _CreateAssertion(value))
+      header_assertion.AddAssertion(header,
+                                    assertions.Assertion.ForComplex(value))
 
     payload_json_assertion = None
     payload_text_assertion = None
@@ -539,7 +781,8 @@ class HTTPAssertion(object):
     else:
       # The body is present, load the assertions that were provided.
       if 'text' in body_data:
-        payload_text_assertion = _CreateAssertion(body_data['text'])
+        payload_text_assertion = assertions.Assertion.ForComplex(
+            body_data['text'])
       if 'json' in body_data:
         payload_json_assertion = assertions.JsonAssertion()
         json_data = body_data['json']
@@ -591,15 +834,17 @@ class HTTPAssertion(object):
       resource_ref_resolver: ResourceReferenceResolver, the resolver that is
         tracking resource references.
       body: str, The body payload of the response.
+
+    Raises:
+      Error: If a given reference cannot be extracted.
     """
     if not self._extract_references:
       return
     json_data = json.loads(body)
-    for field, reference in six.iteritems(self._extract_references):
-      resource_id = resource_transform.GetKeyValue(json_data, field)
-      resource_ref_resolver.SetExtractedId(reference, resource_id)
+    for extraction in self._extract_references:
+      extraction.Extract(json_data, resource_ref_resolver)
 
-  def Check(self, context, uri, method, headers, body):
+  def Check(self, context, uri, method, headers, body, dry_run=False):
     """Validates that the assertion matches the real data."""
     failures = []
 
@@ -639,7 +884,7 @@ class HTTPAssertion(object):
 
     body_context = context.ForKey(self._Key('body'))
     backing_data = body_context.BackingData()
-    if backing_data.get('body') is None and (body or json_data):
+    if not dry_run and backing_data.get('body') is None and (body or json_data):
       # Body was explicitly set to None, but there is a body. The assertion
       # updates are going to trigger so we need to make sure there is a
       # dictionary for the values to get put into.
@@ -667,40 +912,6 @@ class HTTPAssertion(object):
               body))
 
     return failures
-
-
-class RepeatableAPICall(object):
-  """A class to encapsulate an api_call event and how it was previously used.
-
-  For events that are declared as repeatable, we allow them to be reused
-  (instead) of you manually having to repeat the event for each call. This holds
-  how the call was used last time, and can only be reused if the new call is
-  exactly the same as the previous one.
-  """
-
-  def __init__(self, uri, method, body, event, response):
-    self._uri = uri
-    self._method = method
-    self._body = body
-    self._event = event
-    self._response_body = response[1]
-    self._was_repeated = False
-
-  def Matches(self, uri, method, body, response):
-    _, response_body = response
-    return (self._uri == uri and
-            self._method == method and
-            self._body == body and
-            self._response_body == response_body)
-
-  def Event(self):
-    return self._event
-
-  def MarkRepeated(self):
-    self._was_repeated = True
-
-  def Check(self):
-    return self._event.CheckRepeatable(self._was_repeated)
 
 
 class _UXEvent(six.with_metaclass(abc.ABCMeta, Event)):
@@ -735,6 +946,11 @@ class _UXEvent(six.with_metaclass(abc.ABCMeta, Event)):
           attribute_assertion.Check(self._update_context.ForKey(attribute),
                                     ux_event_data.get(attribute)))
     return failures
+
+  def Summary(self):
+    attrs = [{attr: assertion.ValueRepr()}
+             for attr, assertion in self._attr_assertions.items()]
+    return [{str(self.EventType()): attrs}]
 
 
 class ProgressBarEvent(_UXEvent):
@@ -771,6 +987,24 @@ class ProgressTrackerEvent(_UXEvent):
                       was_missing=True, location=location)
 
 
+class StagedProgressTrackerEvent(_UXEvent):
+  """Checks that the staged tracker event (from stderr) matches a given value.
+  """
+
+  @classmethod
+  def EventType(cls):
+    return EventType.STAGED_PROGRESS_TRACKER
+
+  @classmethod
+  def FromData(cls, backing_data):
+    return cls._Build(backing_data, 'expect_staged_progress_tracker')
+
+  @classmethod
+  def ForMissing(cls, location):
+    return cls._Build(OrderedDict(), 'expect_staged_progress_tracker',
+                      was_missing=True, location=location)
+
+
 class _PromptEvent(six.with_metaclass(abc.ABCMeta, _UXEvent)):
   """Base class for UX events that involve a prompt with user input."""
 
@@ -794,6 +1028,12 @@ class _PromptEvent(six.with_metaclass(abc.ABCMeta, _UXEvent)):
           assertions.EqualsAssertion(None).Check(
               self._update_context.ForKey('user_input'), self.DefaultValue()))
     return failures
+
+  def Summary(self):
+    attrs = [{attr: assertion.ValueRepr()}
+             for attr, assertion in self._attr_assertions.items()]
+    attrs.append({'input': self.UserInput()})
+    return [{'prompt': attrs}]
 
 
 class PromptContinueEvent(_PromptEvent):
@@ -834,6 +1074,24 @@ class PromptChoiceEvent(_PromptEvent):
                       location=location)
 
 
+class PromptResponseEvent(_PromptEvent):
+  """Checks that the prompt response event (from stderr) matches a given value.
+  """
+
+  @classmethod
+  def EventType(cls):
+    return EventType.PROMPT_RESPONSE
+
+  @classmethod
+  def FromData(cls, backing_data):
+    return cls._Build(backing_data, 'expect_prompt_response')
+
+  @classmethod
+  def ForMissing(cls, location):
+    return cls._Build(OrderedDict(), 'expect_prompt_response', was_missing=True,
+                      location=location)
+
+
 class EventType(enum.Enum):
   """Describes the set of events we can handle as part of a scenario."""
   STDOUT = (StdoutEvent, assertions.updates.Mode.RESULT, None, False)
@@ -846,10 +1104,16 @@ class EventType(enum.Enum):
                   console_io.UXElementType.PROGRESS_BAR, False)
   PROGRESS_TRACKER = (ProgressTrackerEvent, assertions.updates.Mode.UX,
                       console_io.UXElementType.PROGRESS_TRACKER, False)
+  STAGED_PROGRESS_TRACKER = (StagedProgressTrackerEvent,
+                             assertions.updates.Mode.UX,
+                             console_io.UXElementType.STAGED_PROGRESS_TRACKER,
+                             False)
   PROMPT_CONTINUE = (PromptContinueEvent, assertions.updates.Mode.UX,
                      console_io.UXElementType.PROMPT_CONTINUE, True)
   PROMPT_CHOICE = (PromptChoiceEvent, assertions.updates.Mode.UX,
                    console_io.UXElementType.PROMPT_CHOICE, True)
+  PROMPT_RESPONSE = (PromptResponseEvent, assertions.updates.Mode.UX,
+                     console_io.UXElementType.PROMPT_RESPONSE, True)
 
   def __init__(self, impl, update_mode, ux_element_type, has_user_input):
     self._impl = impl
@@ -869,3 +1133,5 @@ class EventType(enum.Enum):
   def HasUserInput(self):
     return self._has_user_input
 
+  def __str__(self):
+    return self.name.lower()

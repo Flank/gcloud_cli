@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import util as command_util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
@@ -28,9 +27,10 @@ from tests.lib.surface.composer import base
 ERROR_DESCRIPTION = 'ERROR_DESCRIPTION'
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class OperationsWaitTest(base.OperationsUnitTest, parameterized.TestCase):
+class OperationsWaitGATest(base.OperationsUnitTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
 
   # Must be called after self.SetTrack() for self.messages to be present
   def _SetTestMessages(self):
@@ -51,8 +51,7 @@ class OperationsWaitTest(base.OperationsUnitTest, parameterized.TestCase):
         done=True,
         error=self.messages.Status(message=ERROR_DESCRIPTION))
 
-  def testSuccessfulOperation(self, track):
-    self.SetTrack(track)
+  def testSuccessfulOperation(self):
     self._SetTestMessages()
     for response in [self.running_op, self.successful_op]:
       self.ExpectOperationGet(
@@ -63,8 +62,7 @@ class OperationsWaitTest(base.OperationsUnitTest, parameterized.TestCase):
     self.RunOperations('wait', '--project', self.TEST_PROJECT, '--location',
                        self.TEST_LOCATION, self.TEST_OPERATION_UUID)
 
-  def testErroredOperation(self, track):
-    self.SetTrack(track)
+  def testErroredOperation(self):
     self._SetTestMessages()
     for response in [self.running_op, self.errored_op]:
       self.ExpectOperationGet(
@@ -78,15 +76,13 @@ class OperationsWaitTest(base.OperationsUnitTest, parameterized.TestCase):
       self.RunOperations('wait', '--project', self.TEST_PROJECT, '--location',
                          self.TEST_LOCATION, self.TEST_OPERATION_UUID)
 
-  def testOperationNotFound(self, track):
-    self.SetTrack(track)
+  def testOperationNotFound(self):
     self._SetTestMessages()
     self._testHttpError(
         http_error.MakeHttpError(code=404, message='NOT_FOUND'),
         'Resource not found API reason: NOT_FOUND')
 
-  def testOperationInsufficientPermissions(self, track):
-    self.SetTrack(track)
+  def testOperationInsufficientPermissions(self):
     self._SetTestMessages()
     self._testHttpError(
         http_error.MakeHttpError(code=403, message='PERMISSION_DENIED'),
@@ -101,6 +97,18 @@ class OperationsWaitTest(base.OperationsUnitTest, parameterized.TestCase):
     with self.AssertRaisesHttpExceptionMatches(expected_message):
       self.RunOperations('wait', '--project', self.TEST_PROJECT, '--location',
                          self.TEST_LOCATION, self.TEST_OPERATION_UUID)
+
+
+class OperationsWaitBetaTest(OperationsWaitGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+
+class OperationsWaitAlphaTest(OperationsWaitBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

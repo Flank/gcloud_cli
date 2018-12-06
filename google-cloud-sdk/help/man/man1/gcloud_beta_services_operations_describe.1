@@ -20,13 +20,6 @@ gcloud beta services operations describe \- describes an operation resource for 
 \fB(BETA)\fR This command will return information about an operation given the
 name of that operation.
 
-The amount of information inside an operation can be very large, so by default,
-only a summary is returned. If you want the entire operation resource, you can
-include the \f5\-\-full\fR flag.
-
-Note that the \f5operations/\fR prefix of the operation name is optional and may
-be omitted.
-
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -45,8 +38,7 @@ The name of the operation to describe.
 .RS 2m
 .TP 2m
 \fB\-\-full\fR=\fIFULL\fR
-(DEPRECATED) Print the entire operation resource, which could be large. By
-default, a summary will be printed instead.
+(DEPRECATED) This flag is deprecated.
 
 This flag is deprecated.
 
@@ -57,27 +49,18 @@ This flag is deprecated.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To describe an operation resource named
-\f5operations/serviceConfigs.my\-service.1\fR, run:
+To describe an operation resource named \f5operations/abc\fR, run:
 
 .RS 2m
-$ gcloud beta services operations describe \e
-    serviceConfigs.my\-service.1
-.RE
-
-To get the full operation resource, run:
-
-.RS 2m
-$ gcloud beta services operations describe \e
-    serviceConfigs.my\-service.1 \-\-full
+$ gcloud beta services operations describe operations/abc
 .RE
 
 

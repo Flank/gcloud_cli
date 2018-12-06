@@ -2,9 +2,10 @@ NAME
     gcloud compute routers create - create a Google Compute Engine router
 
 SYNOPSIS
-    gcloud compute routers create NAME --asn=ASN --network=NETWORK
-        [--advertisement-mode=MODE] [--async] [--description=DESCRIPTION]
-        [--region=REGION] [--set-advertisement-groups=[GROUP,...]]
+    gcloud compute routers create NAME --network=NETWORK
+        [--advertisement-mode=MODE] [--asn=ASN] [--async]
+        [--description=DESCRIPTION] [--region=REGION]
+        [--set-advertisement-groups=[GROUP,...]]
         [--set-advertisement-ranges=[CIDR_RANGE=DESC,...]]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -17,10 +18,6 @@ POSITIONAL ARGUMENTS
         Name of the router to create.
 
 REQUIRED FLAGS
-     --asn=ASN
-        The BGP autonomous system number (ASN) for this router. For more
-        information see: https://tools.ietf.org/html/rfc6996.
-
      --network=NETWORK
         The network for this router
 
@@ -32,6 +29,11 @@ OPTIONAL FLAGS
             Custom (user-configured) BGP advertisements.
          DEFAULT
             Default (Google-managed) BGP advertisements.
+
+     --asn=ASN
+        The optional BGP autonomous system number (ASN) for this router. Must
+        be a 16-bit or 32-bit private ASN as defined in
+        https://tools.ietf.org/html/rfc6996, for example --asn=64512.
 
      --async
         Display information about the operation in progress, without waiting
@@ -80,8 +82,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

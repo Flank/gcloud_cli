@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud beta compute networks create NAME
         [--bgp-routing-mode=MODE; default="regional"]
-        [--description=DESCRIPTION] [--range=RANGE]
-        [--mode=NETWORK_TYPE | --subnet-mode=MODE] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--range=RANGE] [--subnet-mode=MODE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute networks create is used to create virtual
@@ -51,39 +51,25 @@ FLAGS
         Please be advised that legacy networks may not be supported in the
         future.
 
-     At most one of these may be specified:
+     --subnet-mode=MODE
+        The subnet mode of the network. If not specified, defaults to AUTO.
 
-       --mode=NETWORK_TYPE
-          (REMOVED) The network type.
+        MODE must be one of:
 
-          mode has been removed. Please use subnet-mode instead. NETWORK_TYPE
-          must be one of:
-
-       auto
-          Subnets are created automatically. This is the recommended selection.
-       custom
-          Create subnets manually.
-       legacy
-          Create an old style network that has a range and cannot have subnets.
-          This is not recommended for new networks.
-
-       --subnet-mode=MODE
-          The subnet mode of the network. If not specified, defaults to AUTO.
-
-          MODE must be one of:
-
-       auto
-          Subnets are created automatically. This is the recommended selection.
-       custom
-          Create subnets manually.
-       legacy
-          Create an old style network that has a range and cannot have subnets.
-          This is not recommended for new networks.
+         auto
+            Subnets are created automatically. This is the recommended
+            selection.
+         custom
+            Create subnets manually.
+         legacy
+            Create an old style network that has a range and cannot have
+            subnets. This is not recommended for new networks.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

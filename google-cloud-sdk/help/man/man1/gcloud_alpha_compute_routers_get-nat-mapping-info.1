@@ -17,9 +17,10 @@ gcloud alpha compute routers get\-nat\-mapping\-info \- display NAT Mapping info
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR $ gcloud alpha compute routers get\-nat\-mapping\-info shows a
-mapping of IP:port\-ranges allocated to each VM's interface that is configured
-to use NAT via the specified router.
+\fB(ALPHA)\fR $ gcloud alpha compute routers get\-nat\-mapping\-info
+
+shows a mapping of IP:port\-ranges allocated to each VM's interface that is
+configured to use NAT via the specified router.
 
 
 
@@ -107,9 +108,9 @@ flag interacts with other flags that are applied in this order:
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -119,5 +120,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud compute routers get\-nat\-mapping\-info
+$ gcloud beta compute routers get\-nat\-mapping\-info
+.RE
 

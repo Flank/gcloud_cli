@@ -53,15 +53,14 @@ class SinksUpdateTest(base.LoggingTestBase):
   def testUpdateSuccessOtherFieldsPreserved(self):
     test_sink = self.msgs.LogSink(
         name='my-sink', destination='base', filter='foo',
-        writerIdentity='foo@bar.com', includeChildren=True,
-        startTime='start_time')
+        writerIdentity='foo@bar.com', includeChildren=True)
     self.mock_client_v2.projects_sinks.Get.Expect(
         self.msgs.LoggingProjectsSinksGetRequest(
             sinkName='projects/my-project/sinks/my-sink'),
         test_sink)
     updated_sink = self.msgs.LogSink(
         name=test_sink.name, destination='dest', filter='foo',
-        includeChildren=True, startTime='start_time')
+        includeChildren=True)
     self.mock_client_v2.projects_sinks.Update.Expect(
         self.msgs.LoggingProjectsSinksUpdateRequest(
             sinkName='projects/my-project/sinks/my-sink',
@@ -72,7 +71,6 @@ class SinksUpdateTest(base.LoggingTestBase):
     self.AssertOutputContains('destination: dest')
     self.AssertOutputContains('filter: foo')
     self.AssertOutputContains('includeChildren: true')
-    self.AssertOutputContains('startTime: start_time')
     self.AssertOutputNotContains(test_sink.destination)
 
   def testUpdateSuccessToEmptyFilter(self):

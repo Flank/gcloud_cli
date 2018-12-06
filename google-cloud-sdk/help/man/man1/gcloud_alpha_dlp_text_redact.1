@@ -11,7 +11,7 @@ gcloud alpha dlp text redact \- redact potentially sensitive data from text cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dlp text redact\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] (\fB\-\-content\fR=\fICONTENT\fR\ |\ \fB\-\-content\-file\fR=\fICONTENT_FILE\fR) (\fB\-\-remove\-findings\fR\ |\ \fB\-\-replace\-with\-info\-type\fR\ |\ \fB\-\-replacement\-text\fR=\fIREPLACEMENT_TEXT\fR) [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dlp text redact\fR (\fB\-\-content\fR=\fICONTENT\fR\ |\ \fB\-\-content\-file\fR=\fICONTENT_FILE\fR) (\fB\-\-remove\-findings\fR\ |\ \fB\-\-replace\-with\-info\-type\fR\ |\ \fB\-\-replacement\-text\fR=\fIREPLACEMENT_TEXT\fR) [\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]] [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -24,12 +24,6 @@ gcloud alpha dlp text redact \- redact potentially sensitive data from text cont
 .SH "REQUIRED FLAGS"
 
 .RS 2m
-.TP 2m
-\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]
-Which infoTypes to scan input for. The values must correspond to infoType values
-found in documentation. For more information about valid infoTypes, see
-infoTypes Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
-
 .TP 2m
 
 Exactly one of these must be specified:
@@ -74,6 +68,12 @@ Text to replace each sensitive data finding with.
 
 .RS 2m
 .TP 2m
+\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]
+Which infoTypes to scan input for. The values must correspond to infoType values
+found in documentation. For more information about valid infoTypes, see
+infoTypes Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
+
+.TP 2m
 \fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR; default="possible"
 Only return findings equal to or above this threshold. \fIMIN_LIKELIHOOD\fR must
 be one of: \fBlikely\fR, \fBpossible\fR, \fBunlikely\fR, \fBvery\-likely\fR,
@@ -90,9 +90,9 @@ Path to the file to write redacted contents to.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

@@ -69,29 +69,21 @@ DETAILED_HELP = {
 
 
 def _CommonArgs(parser,
-                # TODO(b/80138906): Release track should not be passed around.
-                release_track,
-                support_public_dns,
                 enable_regional=False,
-                support_local_ssd_size=False,
                 enable_kms=False,
-                supports_resource_policies=False,
-                enable_snapshots=False):
+                enable_snapshots=False,
+                deprecate_maintenance_policy=False):
   """Register parser args common to all tracks."""
   metadata_utils.AddMetadataArgs(parser)
   instances_flags.AddDiskArgs(parser, enable_regional, enable_kms=enable_kms)
   instances_flags.AddCreateDiskArgs(parser, enable_kms=enable_kms,
                                     enable_snapshots=enable_snapshots)
-  if support_local_ssd_size:
-    instances_flags.AddLocalSsdArgsWithSize(parser)
-  else:
-    instances_flags.AddLocalSsdArgs(parser)
   instances_flags.AddCanIpForwardArgs(parser)
   instances_flags.AddAddressArgs(parser, instances=True)
   instances_flags.AddAcceleratorArgs(parser)
   instances_flags.AddMachineTypeArgs(parser)
-  deprecate_maintenance_policy = release_track in [base.ReleaseTrack.ALPHA]
-  instances_flags.AddMaintenancePolicyArgs(parser, deprecate_maintenance_policy)
+  instances_flags.AddMaintenancePolicyArgs(
+      parser, deprecate=deprecate_maintenance_policy)
   instances_flags.AddNoRestartOnFailureArgs(parser)
   instances_flags.AddPreemptibleVmArgs(parser)
   instances_flags.AddServiceAccountAndScopeArgs(
@@ -107,17 +99,11 @@ def _CommonArgs(parser,
   instances_flags.AddImageArgs(parser, enable_snapshots=enable_snapshots)
   instances_flags.AddDeletionProtectionFlag(parser)
   instances_flags.AddPublicPtrArgs(parser, instance=True)
-  if support_public_dns:
-    instances_flags.AddPublicDnsArgs(parser, instance=True)
   instances_flags.AddNetworkTierArgs(parser, instance=True)
 
   sole_tenancy_flags.AddNodeAffinityFlagToParser(parser)
 
-  if supports_resource_policies:
-    maintenance_flags.AddResourcePoliciesArgs(parser, 'added to', 'instance')
-
   labels_util.AddCreateLabelsFlags(parser)
-  instances_flags.AddMinCpuPlatformArgs(parser, release_track)
 
   parser.add_argument(
       '--description',
@@ -138,22 +124,19 @@ def _CommonArgs(parser,
 class Create(base.CreateCommand):
   """Create Google Compute Engine virtual machine instances."""
 
-  _support_kms = False
+  _support_kms = True
+  _support_nvdimm = False
   _support_public_dns = False
   _support_snapshots = False
 
   @classmethod
   def Args(cls, parser):
-    _CommonArgs(
-        parser,
-        release_track=base.ReleaseTrack.GA,
-        support_public_dns=cls._support_public_dns,
-        enable_kms=cls._support_kms,
-        enable_snapshots=cls._support_snapshots
-    )
+    _CommonArgs(parser, enable_kms=cls._support_kms)
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
+    instances_flags.AddLocalSsdArgs(parser)
+    instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.GA)
 
   def Collection(self):
     return 'compute.instances'
@@ -164,6 +147,10 @@ class Create(base.CreateCommand):
       return None
     ref = self.SOURCE_INSTANCE_TEMPLATE.ResolveAsResource(args, resources)
     return ref.SelfLink()
+
+  def GetSourceMachineImage(self, args, resources):
+    """Get sourceMachineImage value as required by API."""
+    return None
 
   def _BuildShieldedVMConfigMessage(self, messages, args):
     if (args.IsSpecified('shielded_vm_secure_boot') or
@@ -182,19 +169,22 @@ class Create(base.CreateCommand):
     return instance_utils.GetNetworkInterfaces(
         args, client, holder, instance_refs, skip_defaults)
 
-  def _GetDiskMessagess(
+  def _GetDiskMessages(
       self, args, skip_defaults, instance_refs, compute_client,
       resource_parser, create_boot_disk, boot_disk_size_gb, image_uri,
       csek_keys):
     flags_to_check = [
-        'disk', 'local_ssd', 'boot_disk_type', 'boot_disk_device_name',
-        'boot_disk_auto_delete', 'require_csek_key_create',
+        'disk', 'local_ssd', 'boot_disk_type',
+        'boot_disk_device_name', 'boot_disk_auto_delete',
+        'require_csek_key_create',
     ]
     if self._support_kms:
       flags_to_check.extend([
           'create_disk', 'boot_disk_kms_key', 'boot_disk_kms_project',
           'boot_disk_kms_location', 'boot_disk_kms_keyring',
       ])
+    if self._support_nvdimm:
+      flags_to_check.extend(['local_nvdimm'])
 
     if (skip_defaults and
         not instance_utils.IsAnySpecified(args, *flags_to_check)):
@@ -222,18 +212,22 @@ class Create(base.CreateCommand):
               instance_ref,
               enable_kms=self._support_kms,
               enable_snapshots=self._support_snapshots))
-      local_ssds = []
-      for x in args.local_ssd or []:
-        local_ssds.append(
-            instance_utils.CreateLocalSsdMessage(
-                resource_parser,
-                compute_client.messages,
-                x.get('device-name'),
-                x.get('interface'),
-                x.get('size'),
-                instance_ref.zone,
-                instance_ref.project)
+      local_nvdimms = []
+      if self._support_nvdimm:
+        local_nvdimms = instance_utils.CreateLocalNvdimmMessages(
+            args,
+            resource_parser,
+            compute_client.messages,
+            instance_ref.zone,
+            instance_ref.project
         )
+      local_ssds = instance_utils.CreateLocalSsdMessages(
+          args,
+          resource_parser,
+          compute_client.messages,
+          instance_ref.zone,
+          instance_ref.project
+      )
 
       if create_boot_disk:
         if self._support_snapshots:
@@ -262,7 +256,7 @@ class Create(base.CreateCommand):
       else:
         existing_boot_disks[boot_disk_ref.zone] = boot_disk_ref
       disks_messages.append(persistent_disks + persistent_create_disks +
-                            local_ssds)
+                            local_nvdimms + local_ssds)
     return disks_messages
 
   def _GetProjectToServiceAccountMap(
@@ -347,6 +341,10 @@ class Create(base.CreateCommand):
         args, resource_parser)
     skip_defaults = source_instance_template is not None
 
+    source_machine_image = self.GetSourceMachineImage(
+        args, resource_parser)
+    skip_defaults = skip_defaults or source_machine_image is not None
+
     scheduling = instance_utils.GetScheduling(
         args, compute_client, skip_defaults, support_node_affinity=True)
     tags = instance_utils.GetTags(args, compute_client)
@@ -375,7 +373,7 @@ class Create(base.CreateCommand):
           messages=compute_client.messages, args=args)
 
     csek_keys = csek_utils.CsekKeyStore.FromArgs(args, allow_rsa_encrypted)
-    disks_messages = self._GetDiskMessagess(
+    disks_messages = self._GetDiskMessages(
         args, skip_defaults, instance_refs, compute_client, resource_parser,
         create_boot_disk, boot_disk_size_gb, image_uri, csek_keys)
 
@@ -406,6 +404,14 @@ class Create(base.CreateCommand):
           scheduling=scheduling,
           tags=tags)
 
+      if hasattr(args, 'hostname'):
+        instance.hostname = args.hostname
+
+      # TODO(b/80138906): These features are only exposed in alpha.
+      if self.ReleaseTrack() == base.ReleaseTrack.ALPHA:
+        instance.allocationAffinity = instance_utils.GetAllocationAffinity(
+            args, compute_client)
+
       resource_policies = getattr(
           args, 'resource_policies', None)
       if resource_policies:
@@ -430,6 +436,9 @@ class Create(base.CreateCommand):
       if source_instance_template:
         request.sourceInstanceTemplate = source_instance_template
 
+      if source_machine_image:
+        request.instance.sourceMachineImage = source_machine_image
+
       requests.append(
           (compute_client.apitools_client.instances, 'Insert', request))
     return requests
@@ -442,6 +451,7 @@ class Create(base.CreateCommand):
     instances_flags.ValidateServiceAccountAndScopeArgs(args)
     instances_flags.ValidateAcceleratorArgs(args)
     instances_flags.ValidateNetworkTierArgs(args)
+    instances_flags.ValidateAllocationAffinityGroup(args)
 
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     compute_client = holder.client
@@ -498,6 +508,7 @@ class CreateBeta(Create):
   """Create Google Compute Engine virtual machine instances."""
 
   _support_kms = True
+  _support_nvdimm = False
   _support_public_dns = False
   _support_snapshots = False
 
@@ -510,16 +521,16 @@ class CreateBeta(Create):
   def Args(cls, parser):
     _CommonArgs(
         parser,
-        release_track=base.ReleaseTrack.BETA,
-        support_public_dns=cls._support_public_dns,
         enable_regional=True,
-        enable_kms=cls._support_kms,
-        enable_snapshots=cls._support_snapshots,
+        enable_kms=True,
     )
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
     instances_flags.AddShieldedVMConfigArgs(parser)
+    instances_flags.AddHostnameArg(parser)
+    instances_flags.AddLocalSsdArgs(parser)
+    instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.BETA)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -527,6 +538,7 @@ class CreateAlpha(CreateBeta):
   """Create Google Compute Engine virtual machine instances."""
 
   _support_kms = True
+  _support_nvdimm = True
   _support_public_dns = True
   _support_snapshots = True
 
@@ -535,22 +547,33 @@ class CreateAlpha(CreateBeta):
     return instance_utils.GetNetworkInterfacesAlpha(
         args, client, holder, instance_refs, skip_defaults)
 
+  def GetSourceMachineImage(self, args, resources):
+    if not args.IsSpecified('source_machine_image'):
+      return None
+    ref = self.SOURCE_MACHINE_IMAGE.ResolveAsResource(args, resources)
+    return ref.SelfLink()
+
   @classmethod
   def Args(cls, parser):
-
     _CommonArgs(
         parser,
-        release_track=base.ReleaseTrack.ALPHA,
-        support_public_dns=cls._support_public_dns,
         enable_regional=True,
-        support_local_ssd_size=True,
-        enable_kms=cls._support_kms,
-        enable_snapshots=cls._support_snapshots,
-        supports_resource_policies=True)
+        enable_kms=True,
+        enable_snapshots=True,
+        deprecate_maintenance_policy=True)
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
+    CreateAlpha.SOURCE_MACHINE_IMAGE = (
+        instances_flags.AddMachineImageArg())
+    CreateAlpha.SOURCE_MACHINE_IMAGE.AddArgument(parser)
+    instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.ALPHA)
     instances_flags.AddShieldedVMConfigArgs(parser)
-
+    instances_flags.AddHostnameArg(parser)
+    instances_flags.AddAllocationAffinityGroup(parser)
+    instances_flags.AddPublicDnsArgs(parser, instance=True)
+    instances_flags.AddLocalSsdArgsWithSize(parser)
+    instances_flags.AddLocalNvdimmArgs(parser)
+    maintenance_flags.AddResourcePoliciesArgs(parser, 'added to', 'instance')
 
 Create.detailed_help = DETAILED_HELP

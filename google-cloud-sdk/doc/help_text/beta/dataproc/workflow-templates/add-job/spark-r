@@ -1,0 +1,83 @@
+NAME
+    gcloud beta dataproc workflow-templates add-job spark-r - add a SparkR job
+        to the workflow template
+
+SYNOPSIS
+    gcloud beta dataproc workflow-templates add-job spark-r R_FILE
+        --step-id=STEP_ID --workflow-template=WORKFLOW_TEMPLATE
+        [--archives=[ARCHIVE,...]] [--driver-log-levels=[PACKAGE=LEVEL,...]]
+        [--files=[FILE,...]] [--labels=[KEY=VALUE,...]]
+        [--properties=[PROPERTY=VALUE,...]] [--region=REGION]
+        [--start-after=STEP_ID,[STEP_ID,...]] [GCLOUD_WIDE_FLAG ...]
+        [-- JOB_ARGS ...]
+
+DESCRIPTION
+    (BETA) Add a SparkR job to the workflow template.
+
+POSITIONAL ARGUMENTS
+     R_FILE
+        Main .R file to run as the driver.
+
+     [-- JOB_ARGS ...]
+        Arguments to pass to the driver.
+
+        The '--' argument must be specified between gcloud specific args on the
+        left and JOB_ARGS on the right.
+
+REQUIRED FLAGS
+     --step-id=STEP_ID
+        The step ID of the job in the workflow template.
+
+     --workflow-template=WORKFLOW_TEMPLATE
+        The dataproc workflow template ID.
+
+OPTIONAL FLAGS
+     --archives=[ARCHIVE,...]
+        Comma separated list of archives to be provided to the job. must be one
+        of the following file formats: .zip, .tar, .tar.gz, or .tgz.
+
+     --driver-log-levels=[PACKAGE=LEVEL,...]
+        List of key value pairs to configure driver logging, where key is a
+        package and value is the log4j log level. For example:
+        root=FATAL,com.example=INFO
+
+     --files=[FILE,...]
+        Comma separated list of files to be provided to the job.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --properties=[PROPERTY=VALUE,...]
+        List of key value pairs to configure SparkR. For a list of available
+        properties, see:
+        https://spark.apache.org/docs/latest/configuration.html#available-properties.
+        Alternatively, to see examples of how to use the --properties flag,
+        see:
+        https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties#how_the_properties_flag_works
+
+     --region=REGION
+        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+        independent resource namespace constrained to deploying instances into
+        Compute Engine zones inside the region. The default value of global is
+        a special multi-region namespace which is capable of deploying
+        instances into all Compute Engine zones globally, and is disjoint from
+        other Cloud Dataproc regions. Overrides the default dataproc/region
+        property value for this command invocation.
+
+     --start-after=STEP_ID,[STEP_ID,...]
+        (Optional) List of step IDs to start this job after.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

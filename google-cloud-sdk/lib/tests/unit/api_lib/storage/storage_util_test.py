@@ -23,6 +23,7 @@ import io
 import string
 import subprocess
 from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.core import config
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.util import files as files_util
 from tests.lib import subtests
@@ -33,16 +34,16 @@ import mock
 class RunGsutilCommandTest(subtests.Base):
 
   def _MockPopen(self):
-    popen_mock = mock.Mock(spec=subprocess.Popen)
+    popen_mock = mock.MagicMock()
     popen_mock.stdin = io.StringIO()
     popen_mock.communicate.return_value = ('[]\n', '')
     popen_mock.returncode = 0
     return self.StartObjectPatch(subprocess, 'Popen',
                                  return_value=popen_mock, autospec=True)
 
-  def _MockFindExecutableOnPath(self):
-    return self.StartObjectPatch(files_util, 'FindExecutableOnPath',
-                                 return_value='/usr/bin/gsutil')
+  def _MockFindExecutableOnPath(self, return_value='/usr/bin/gsutil'):
+    self.StartObjectPatch(files_util, 'FindExecutableOnPath',
+                          return_value=return_value)
 
   def testUploadFileWithSpacesInFilename(self):
     popen_mock = self._MockPopen()
@@ -64,6 +65,17 @@ class RunGsutilCommandTest(subtests.Base):
     self.assertEqual(
         args[0][-3:],
         ['cp', 'C:\\Users\\foo\\file.txt', 'gs://bucket/my-file.txt'])
+
+  def testRaisesErrorIfGsutilNotFound(self):
+    mock_paths = mock.MagicMock()
+    mock_paths.sdk_bin_path = None
+    self.StartObjectPatch(config, 'Paths', return_value=mock_paths)
+    self._MockFindExecutableOnPath(return_value=None)
+    with self.assertRaisesRegex(
+        storage_util.GsutilError,
+        'A path to the storage client `gsutil` could not be found. Please '
+        'check your SDK installation.'):
+      storage_util.RunGsutilCommand('cp', [])
 
 
 class BucketReferenceFromArgumentTest(subtests.Base):
@@ -150,7 +162,7 @@ class BucketReferenceFromArgumentTest(subtests.Base):
     bucket_ref = storage_util.BucketReference.FromArgument('foo',
                                                            require_prefix=False)
 
-    self.assertEqual(bucket_ref.ToBucketUrl(), 'gs://foo')
+    self.assertEqual(bucket_ref.ToUrl(), 'gs://foo')
 
     with self.assertRaises(argparse.ArgumentTypeError):
       storage_util.BucketReference.FromArgument('foo')
@@ -185,15 +197,15 @@ class BucketReferenceTest(subtests.Base):
 
   def testUrlConversion(self):
     """Test converting from/to gs:// URL and public reference URL."""
-    bucket_ref = storage_util.BucketReference.FromBucketUrl('gs://bucket-name/')
+    bucket_ref = storage_util.BucketReference.FromUrl('gs://bucket-name/')
     self.assertEqual(bucket_ref.bucket, 'bucket-name')
-    self.assertEqual(bucket_ref.ToBucketUrl(), 'gs://bucket-name')
+    self.assertEqual(bucket_ref.ToUrl(), 'gs://bucket-name')
     self.assertEqual(bucket_ref.GetPublicUrl(),
                      'https://storage.googleapis.com/bucket-name')
     # Make sure that 'gs://' is optional
     self.assertEqual(
         bucket_ref,
-        storage_util.BucketReference.FromBucketUrl('bucket-name'))
+        storage_util.BucketReference.FromUrl('bucket-name'))
 
   def RunSubTest(self, url, message=None):
     """Run a subtest for FromBucketUrl.
@@ -217,7 +229,7 @@ class BucketReferenceTest(subtests.Base):
     # To prevent scope problems
     bucket_ref = None
     try:
-      bucket_ref = storage_util.BucketReference.FromBucketUrl(url)
+      bucket_ref = storage_util.BucketReference.FromUrl(url)
     except storage_util.InvalidBucketNameError as err:
       if message:
         # Check that the expected InvalidBucketNameError contains the right
@@ -325,7 +337,7 @@ class ObjectReferenceTests(subtests.Base):
     object_ref = storage_util.ObjectReference.FromUrl('gs://bucket/object')
     self.assertEqual(object_ref.name, 'object')
     self.assertEqual(object_ref.bucket, 'bucket')
-    self.assertEqual(object_ref.bucket_ref.ToBucketUrl(), 'gs://bucket')
+    self.assertEqual(object_ref.bucket_ref.ToUrl(), 'gs://bucket')
     self.assertEqual(object_ref.ToUrl(), 'gs://bucket/object')
 
   def testObjectReference_NoObject(self):
@@ -334,7 +346,7 @@ class ObjectReferenceTests(subtests.Base):
                                                         allow_empty_object=True)
       self.assertEqual(object_ref.name, '')
       self.assertEqual(object_ref.bucket, 'bucket')
-      self.assertEqual(object_ref.bucket_ref.ToBucketUrl(), 'gs://bucket')
+      self.assertEqual(object_ref.bucket_ref.ToUrl(), 'gs://bucket')
       self.assertEqual(object_ref.ToUrl(), 'gs://bucket/')
 
   def testIsStorageUrl(self):
@@ -399,7 +411,6 @@ class ObjectReferenceTests(subtests.Base):
     with self.assertRaisesRegex(argparse.ArgumentTypeError,
                                 'Empty object name is not allowed'):
       storage_util.ObjectReference.FromArgument('gs://bucket')
-
 
 if __name__ == '__main__':
   test_case.main()

@@ -11,7 +11,7 @@ gcloud compute backend\-services update \- update a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -90,13 +90,23 @@ service.
 
 .TP 2m
 \fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]
-Specifies a list of HTTP health check objects for checking the health of the
-backend service.
+Specifies a list of legacy HTTP health check objects for checking the health of
+the backend service.
+
+Legacy health checks are not recommended for backend services. It is possible to
+use a legacy health check on a backend service for a HTTP(S) load balancer if
+that backend service uses instance groups. For more information, see this guide:
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
 
 .TP 2m
 \fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]
-Specifies a list of HTTPS health check objects for checking the health of the
-backend service.
+Specifies a list of legacy HTTPS health check objects for checking the health of
+the backend service.
+
+Legacy health checks are not recommended for backend services. It is possible to
+use a legacy health check on a backend service for a HTTP(S) load balancer if
+that backend service uses instance groups. For more information, see this guide:
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
 
 .TP 2m
 \fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]
@@ -131,9 +141,12 @@ If the load\-balancing\-scheme is \f5EXTERNAL\fR, the protocol must be one of:
 \f5HTTP\fR, \f5HTTPS\fR, \f5HTTP2\fR, \f5SSL\fR, \f5TCP\fR, \f5UDP\fR.
 
 .TP 2m
+\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
+The security policy that will be set for this backend service.
+
+.TP 2m
 \fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR
-The type of session affinity to use for this backend service.
-\fISESSION_AFFINITY\fR must be one of:
+The type of session affinity to use. \fISESSION_AFFINITY\fR must be one of:
 
 .RS 2m
 .TP 2m
@@ -141,24 +154,25 @@ The type of session affinity to use for this backend service.
 Route requests to instances based on the hash of the client's IP address.
 .TP 2m
 \fBCLIENT_IP_PORT_PROTO\fR
-Connections from the same client IP with the same IP protocol and port will go
-to the same VM in the backend while that VM remains healthy. This option cannot
-be used for HTTP(S) load balancing.
+(Applicable if load\-balancing scheme is internal) Connections from the same
+client IP with the same IP protocol and port will go to the same VM in the
+backend while that VM remains healthy.
 .TP 2m
 \fBCLIENT_IP_PROTO\fR
-Connections from the same client IP with the same IP protocol willgo to the same
-VM in the pool while that VM remains healthy. This option cannot be used for
-HTTP(s) load balancing.
+(Applicable if load\-balancing scheme is internal) Connections from the same
+client IP with the same IP protocol will go to the same VM in the pool while
+that VM remains healthy.
 .TP 2m
 \fBGENERATED_COOKIE\fR
-Route requests to instances based on the contents of the "GCLB" cookie set by
-the load balancer.
+(Applicable if load\-balancing scheme is external) Route requests to instances
+based on the contents of the "GCLB" cookie set by the load balancer.
 .TP 2m
 \fBNONE\fR
 Session affinity is disabled.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR
 The amount of time up to which the response to a signed URL request will be
@@ -176,17 +190,19 @@ This flag only affects signed URL requests.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR
-The amount of time to wait for a backend to return a full response for the
-request and for the load balancer to proxy the response to the client before
-considering the request failed.
+Only applicable to HTTP(S), SSL Proxy, and TCP Proxy load balancers: The amount
+of time to wait for a backend to return a full response for the request and for
+the load balancer to proxy the response to the client before considering the
+request failed.
 
-For example, specifying \f510s\fR gives instances 10 seconds to respond to
-requests. The load balancer will retry GET requests once if the backend closes
-the connection or times out before sending response headers to the proxy. If the
+For example, specifying 10s gives instances 10 seconds to respond to requests.
+The load balancer will retry GET requests once if the backend closes the
+connection or times out before sending response headers to the proxy. If the
 backend produces any response headers, the load balancer does not retry. If the
-backend does not reply at all, the load balancer returns a \f5502 Bad Gateway\fR
-error to the client. See $ gcloud topic datetimes for information on duration
-formats.
+backend does not reply at all, the load balancer returns a 502 Bad Gateway error
+to the client. See $ gcloud topic datetimes for information on duration formats.
+
+This parameter has no effect if the load\-balancing\-scheme is INTERNAL.
 
 .TP 2m
 
@@ -233,9 +249,9 @@ Region of the backend service to update. Overrides the default
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

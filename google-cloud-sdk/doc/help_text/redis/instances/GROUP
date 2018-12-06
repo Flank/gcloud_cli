@@ -1,0 +1,59 @@
+NAME
+    gcloud redis instances - manage Cloud Memorystore Redis instances
+
+SYNOPSIS
+    gcloud redis instances COMMAND [GCLOUD_WIDE_FLAG ...]
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a Memorystore Redis instance.
+
+     delete
+        Delete a Redis instance.
+
+     describe
+        Show metadata for a Memorystore Redis instance.
+
+     list
+        List Memorystore Redis instances.
+
+     update
+        Update Memorystore Redis instances.
+
+EXAMPLES
+    To create an instance with the name my-redis-instance, run:
+
+        $ gcloud redis instances create my-redis-instance
+
+    To delete an instance with the name my-redis-instance, run:
+
+        $ gcloud redis instances delete my-redis-instance
+
+    To display the details for an instance with the name my-redis-instance,
+    run:
+
+        $ gcloud redis instances describe my-redis-instance
+
+    To list all the instances, run:
+
+        $ gcloud redis instances list
+
+    To set the label env to prod for an instance with the name
+    my-redis-instance, run:
+
+        $ gcloud redis instances my-redis-instance --update-labels=env=prod
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha redis instances
+        $ gcloud beta redis instances
+

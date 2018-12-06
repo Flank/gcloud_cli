@@ -11,8 +11,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -31,7 +32,8 @@ COMMANDS
         List the DAG files for a Cloud Composer environment.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha composer environments storage dags
         $ gcloud beta composer environments storage dags
 

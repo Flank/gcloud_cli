@@ -59,16 +59,13 @@ class SetIamPolicyTest(test_base.BaseTest,
     policy = test_resources.IamPolicyWithOneBindingAndDifferentEtag(
         self.messages)
     self.CheckRequests(
-        [(self.compute.instances,
-          'SetIamPolicy',
+        [(self.compute.instances, 'SetIamPolicy',
           self.messages.ComputeInstancesSetIamPolicyRequest(
               resource='resource',
               project='my-project',
               zone='zone-1',
               zoneSetPolicyRequest=self.messages.ZoneSetPolicyRequest(
-                  bindings=policy.bindings,
-                  etag=policy.etag)))],
-    )
+                  policy=policy)))],)
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
@@ -78,6 +75,8 @@ class SetIamPolicyTest(test_base.BaseTest,
               role: owner
             etag: ZXRhZ1R3bw==
             """))
+    self.AssertErrContains(
+        'instance [projects/my-project/zones/zone-1/instances/resource]')
 
   def testBadJsonOrYamlSetIamPolicyProject(self, track, api_version):
     self._SetUp(track, api_version)

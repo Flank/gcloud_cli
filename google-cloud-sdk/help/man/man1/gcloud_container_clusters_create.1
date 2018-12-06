@@ -11,7 +11,7 @@ gcloud container clusters create \- create a cluster for running containers
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-addons\fR=[\fIADDON\fR,...]] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-no\-enable\-cloud\-logging\fR] [\fB\-\-no\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-no\-issue\-client\-certificate\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-no\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR;\ default="admin"] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-addons\fR=[\fIADDON\fR,...]] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-no\-enable\-cloud\-logging\fR] [\fB\-\-no\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-issue\-client\-certificate\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-nodes\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,7 +26,10 @@ Create a cluster for running containers.
 .RS 2m
 .TP 2m
 \fINAME\fR
-The name of this cluster.
+The name of the cluster to create.
+
+The name may contain only lowercase alphanumerics and '\-', must start with a
+letter and end with an alphanumeric, and must be no longer than 40 characters.
 
 
 .RE
@@ -161,7 +164,7 @@ be used in conjunction with the '\-\-subnetwork' option.
 
 .TP 2m
 \fB\-\-disk\-size\fR=\fIDISK_SIZE\fR
-Size in GB for node VM boot disks. Defaults to 100GB.
+Size for node VM boot disks. Defaults to 100GB.
 
 .TP 2m
 \fB\-\-disk\-type\fR=\fIDISK_TYPE\fR
@@ -177,7 +180,8 @@ $ gcloud container clusters create example\-cluster \e
     \-\-enable\-autorepair
 .RE
 
-Node autorepair is enabled by default for clusters using COS as a base image.
+Node autorepair is enabled by default for clusters using COS as a base image,
+use \-\-no\-enable\-autorepair to disable.
 
 See https://cloud.google.com/kubernetes\-engine/docs/how\-to/node\-auto\-repair
 for more info.
@@ -258,9 +262,9 @@ $ gcloud container get\-server\-config
 Issue a TLS client certificate with admin permissions.
 
 When enabled, the certificate and private key pair will be present in MasterAuth
-field of the Cluster object.
-
-Enabled by default, use \fB\-\-no\-issue\-client\-certificate\fR to disable.
+field of the Cluster object. For cluster versions before 1.12, a client
+certificate will be issued by default. As of 1.12, client certificates are
+disabled by default.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -291,10 +295,10 @@ $ gcloud compute machine\-types list
 .RE
 
 You can also specify custom machine types with the string "custom\-CPUS\-RAM"
-where ``CPUS`` is the number of virtual CPUs and ``RAM`` is the amount of RAM in
-MiB.
+where \f5CPUS\fR is the number of virtual CPUs and \f5RAM\fR is the amount of
+RAM in MiB.
 
-For example, to create a node pool using custom machines with 2 vCPUs and 12 GiB
+For example, to create a node pool using custom machines with 2 vCPUs and 12 GB
 of RAM:
 
 .RS 2m
@@ -322,12 +326,67 @@ node pool contains less than \-\-max\-nodes\-per\-pool nodes. Defaults to 1000
 nodes, but can be set as low as 100 nodes per pool on initial create.
 
 .TP 2m
+\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
+Compute Engine metadata to be made available to the guest operating system
+running on nodes within the node pool.
+
+Each metadata entry is a key/value pair separated by an equals sign. Metadata
+keys must be unique and less than 128 bytes in length. Values must be less than
+or equal to 32,768 bytes in length. The total size of all keys and values must
+be less than 512 KB. Multiple arguments can be passed to this flag. For example:
+
+\f5\fI\-\-metadata key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR
+
+Additionally, the following keys are reserved for use by Kubernetes Engine:
+
+.RS 2m
+.IP "\(em" 2m
+\f5\fIcluster\-location\fR\fR
+.IP "\(em" 2m
+\f5\fIcluster\-name\fR\fR
+.IP "\(em" 2m
+\f5\fIcluster\-uid\fR\fR
+.IP "\(em" 2m
+\f5\fIconfigure\-sh\fR\fR
+.IP "\(em" 2m
+\f5\fIenable\-os\-login\fR\fR
+.IP "\(em" 2m
+\f5\fIgci\-update\-strategy\fR\fR
+.IP "\(em" 2m
+\f5\fIgci\-ensure\-gke\-docker\fR\fR
+.IP "\(em" 2m
+\f5\fIinstance\-template\fR\fR
+.IP "\(em" 2m
+\f5\fIkube\-env\fR\fR
+.IP "\(em" 2m
+\f5\fIstartup\-script\fR\fR
+.IP "\(em" 2m
+\f5\fIuser\-data\fR\fR
+
+.RE
+.RE
+.sp
+See also Compute Engine's documentation
+(https://cloud.google.com/compute/docs/storing\-retrieving\-metadata) on storing
+and retrieving instance metadata.
+
+.RS 2m
+.TP 2m
+\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]
+Same as \f5\fI\-\-metadata\fR\fR except that the value for the entry will be
+read from a local file.
+
+.TP 2m
 \fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR
 When specified, the nodes for the new cluster's default node pool will be
 scheduled on host with specified CPU architecture or a newer one.
 
-Examples: $ gcloud container clusters create example\-cluster \e
-\-\-min\-cpu\-platform=PLATFORM
+Examples:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-min\-cpu\-platform=PLATFORM
+.RE
 
 To list available CPU platforms in given zone, run:
 
@@ -511,8 +570,8 @@ through HTTPS. Besides these blocks, the following have access as well:
 
 .RS 2m
 1) The private network the cluster connects to if
-`\-\-private\-cluster` is specified.
-2) Google Compute Engine Public IPs if `\-\-private\-cluster` is not
+`\-\-enable\-private\-nodes` is specified.
+2) Google Compute Engine Public IPs if `\-\-enable\-private\-nodes` is not
 specified.
 .RE
 
@@ -525,6 +584,27 @@ The list of CIDR blocks (up to 20) that are allowed to connect to Kubernetes
 master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30). Can not be
 specified unless \f5\-\-enable\-master\-authorized\-networks\fR is also
 specified.
+
+.RE
+.sp
+.TP 2m
+
+Private Clusters
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-private\-endpoint\fR
+Cluster is managed using the private IP address of the master API endpoint.
+
+.TP 2m
+\fB\-\-enable\-private\-nodes\fR
+Cluster is created with no public IP addresses on the cluster nodes.
+
+.TP 2m
+\fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR
+IPv4 CIDR range to use for the master network. This should have a netmask of
+size /28 and should be used in conjunction with the \-\-enable\-private\-nodes
+flag.
 
 .RE
 .sp
@@ -549,11 +629,13 @@ Enable basic (username/password) auth for the cluster.
 \f5\-\-enable\-basic\-auth\fR is an alias for \f5\-\-username=admin\fR;
 \f5\-\-no\-enable\-basic\-auth\fR is an alias for \f5\-\-username=""\fR. Use
 \f5\-\-password\fR to specify a password; if not, the server will randomly
-generate one. Enabled by default, use \fB\-\-no\-enable\-basic\-auth\fR to
-disable.
+generate one. For cluster versions before 1.12, if neither
+\f5\-\-enable\-basic\-auth\fR nor \f5\-\-username\fR is specified,
+\f5\-\-enable\-basic\-auth\fR will default to \f5true\fR. After 1.12,
+\f5\-\-enable\-basic\-auth\fR will default to \f5false\fR.
 
 .TP 2m
-\fB\-\-username\fR=\fIUSERNAME\fR, \fB\-u\fR \fIUSERNAME\fR; default="admin"
+\fB\-\-username\fR=\fIUSERNAME\fR, \fB\-u\fR \fIUSERNAME\fR
 The user name to use for basic auth for the cluster. Use \f5\-\-password\fR to
 specify a password; if not, the server will randomly generate one.
 
@@ -616,67 +698,70 @@ Enabled by default, use \fB\-\-no\-enable\-cloud\-endpoints\fR to disable.
 \fB\-\-scopes\fR=[\fISCOPE\fR,...]; default="gke\-default"
 Specifies scopes for the node instances. Examples:
 
+.RS 2m
 $ gcloud container clusters create example\-cluster \e
-\-\-scopes=https://www.googleapis.com/auth/devstorage.read_only
+    \-\-scopes=https://www.googleapis.com/auth/devstorage.read_only
+.RE
 
+.RS 2m
 $ gcloud container clusters create example\-cluster \e
-\-\-scopes=bigquery,storage\-rw,compute\-ro
+    \-\-scopes=bigquery,storage\-rw,compute\-ro
+.RE
 
 Multiple SCOPEs can be specified, separated by commas. \f5logging\-write\fR
 and/or \f5monitoring\fR are added unless Cloud Logging and/or Cloud Monitoring
 are disabled (see \f5\-\-enable\-cloud\-logging\fR and
 \f5\-\-enable\-cloud\-monitoring\fR for more information).
 
-SCOPE can be either the full URI of the scope or an alias. Available aliases
-are:
+SCOPE can be either the full URI of the scope or an alias. \fBdefault\fR scopes
+are assigned to all instances. Available aliases are:
 
 
 .TS
-tab(,);
+tab(	);
 lB lB
 l l.
-Alias,URI
-bigquery,https://www.googleapis.com/auth/bigquery
-cloud\-platform,https://www.googleapis.com/auth/cloud\-platform
-cloud\-source\-repos,https://www.googleapis.com/auth/source.full_control
-cloud\-source\-repos\-ro,https://www.googleapis.com/auth/source.read_only
-compute\-ro,https://www.googleapis.com/auth/compute.readonly
-compute\-rw,https://www.googleapis.com/auth/compute
-datastore,https://www.googleapis.com/auth/datastore
-default,https://www.googleapis.com/auth/devstorage.read_only
-,https://www.googleapis.com/auth/logging.write
-,https://www.googleapis.com/auth/monitoring.write
-,https://www.googleapis.com/auth/pubsub
-,https://www.googleapis.com/auth/service.management.readonly
-,https://www.googleapis.com/auth/servicecontrol
-,https://www.googleapis.com/auth/trace.append
-gke\-default,https://www.googleapis.com/auth/devstorage.read_only
-,https://www.googleapis.com/auth/logging.write
-,https://www.googleapis.com/auth/monitoring
-,https://www.googleapis.com/auth/service.management.readonly
-,https://www.googleapis.com/auth/servicecontrol
-,https://www.googleapis.com/auth/trace.append
-logging\-write,https://www.googleapis.com/auth/logging.write
-monitoring,https://www.googleapis.com/auth/monitoring
-monitoring\-write,https://www.googleapis.com/auth/monitoring.write
-pubsub,https://www.googleapis.com/auth/pubsub
-service\-control,https://www.googleapis.com/auth/servicecontrol
-service\-management,https://www.googleapis.com/auth/service.management.readonly
-sql,https://www.googleapis.com/auth/sqlservice
-sql\-admin,https://www.googleapis.com/auth/sqlservice.admin
-storage\-full,https://www.googleapis.com/auth/devstorage.full_control
-storage\-ro,https://www.googleapis.com/auth/devstorage.read_only
-storage\-rw,https://www.googleapis.com/auth/devstorage.read_write
-taskqueue,https://www.googleapis.com/auth/taskqueue
-trace,https://www.googleapis.com/auth/trace.append
-userinfo\-email,https://www.googleapis.com/auth/userinfo.email
+Alias	URI
+bigquery	https://www.googleapis.com/auth/bigquery
+cloud-platform	https://www.googleapis.com/auth/cloud-platform
+cloud-source-repos	https://www.googleapis.com/auth/source.full_control
+cloud-source-repos-ro	https://www.googleapis.com/auth/source.read_only
+compute-ro	https://www.googleapis.com/auth/compute.readonly
+compute-rw	https://www.googleapis.com/auth/compute
+datastore	https://www.googleapis.com/auth/datastore
+default	https://www.googleapis.com/auth/devstorage.read_only
+	https://www.googleapis.com/auth/logging.write
+	https://www.googleapis.com/auth/monitoring.write
+	https://www.googleapis.com/auth/pubsub
+	https://www.googleapis.com/auth/service.management.readonly
+	https://www.googleapis.com/auth/servicecontrol
+	https://www.googleapis.com/auth/trace.append
+gke-default	https://www.googleapis.com/auth/devstorage.read_only
+	https://www.googleapis.com/auth/logging.write
+	https://www.googleapis.com/auth/monitoring
+	https://www.googleapis.com/auth/service.management.readonly
+	https://www.googleapis.com/auth/servicecontrol
+	https://www.googleapis.com/auth/trace.append
+logging-write	https://www.googleapis.com/auth/logging.write
+monitoring	https://www.googleapis.com/auth/monitoring
+monitoring-write	https://www.googleapis.com/auth/monitoring.write
+pubsub	https://www.googleapis.com/auth/pubsub
+service-control	https://www.googleapis.com/auth/servicecontrol
+service-management	https://www.googleapis.com/auth/service.management.readonly
+sql (deprecated)	https://www.googleapis.com/auth/sqlservice
+sql-admin	https://www.googleapis.com/auth/sqlservice.admin
+storage-full	https://www.googleapis.com/auth/devstorage.full_control
+storage-ro	https://www.googleapis.com/auth/devstorage.read_only
+storage-rw	https://www.googleapis.com/auth/devstorage.read_write
+taskqueue	https://www.googleapis.com/auth/taskqueue
+trace	https://www.googleapis.com/auth/trace.append
+userinfo-email	https://www.googleapis.com/auth/userinfo.email
 .TE
 
-
-DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice' account scope
+DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice account scope
 and \f5sql\fR alias do not provide SQL instance management capabilities and have
-been deprecated. Please, use 'https://www.googleapis.com/auth/sqlservice.admin'
-or \f5sql\-admin\fR to manage your Google SQL Service instances.
+been deprecated. Please, use https://www.googleapis.com/auth/sqlservice.admin or
+\f5sql\-admin\fR to manage your Google SQL Service instances.
 
 
 
@@ -688,9 +773,9 @@ or \f5sql\-admin\fR to manage your Google SQL Service instances.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

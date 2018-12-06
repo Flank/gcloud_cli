@@ -35,9 +35,9 @@ invocation.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -60,11 +60,15 @@ help\fR for details.
 
 .TP 2m
 \fBpyspark\fR
-\fB(BETA)\fR Add a PySPark job to the workflow template.
+\fB(BETA)\fR Add a PySpark job to the workflow template.
 
 .TP 2m
 \fBspark\fR
 \fB(BETA)\fR Add a Spark job to the workflow template.
+
+.TP 2m
+\fBspark\-r\fR
+\fB(BETA)\fR Add a SparkR job to the workflow template.
 
 .TP 2m
 \fBspark\-sql\fR
@@ -125,5 +129,10 @@ $ gcloud beta dataproc workflow\-templates add\-job hive \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates add\-job
+.RE
 

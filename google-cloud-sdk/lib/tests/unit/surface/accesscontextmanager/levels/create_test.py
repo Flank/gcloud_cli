@@ -13,21 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud access-context-manager levels create`."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class LevelsCreateTest(accesscontextmanager.Base):
+class LevelsCreateTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -47,8 +49,8 @@ class LevelsCreateTest(accesscontextmanager.Base):
     self.client.accessPolicies_accessLevels.Get.Expect(
         get_req_type(name=level.name), level)
 
-  def testCreate_InvalidSpec(self, track):
-    self.SetUpForTrack(track)
+  def testCreate_InvalidSpec(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(
         yaml.FileLoadError,
         r'Failed to load YAML from [not-found]'):
@@ -56,16 +58,16 @@ class LevelsCreateTest(accesscontextmanager.Base):
           'access-context-manager levels create my_level --policy my_policy '
           '     --title "My Level" --basic-level-spec not-found')
 
-  def testCreate_MissingRequired(self, track):
-    self.SetUpForTrack(track)
+  def testCreate_MissingRequired(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must be specified'):
       self.Run(
           'access-context-manager levels create my_level --policy my_policy '
           '     --title "My Level"')
 
-  def testCreate(self, track):
-    self.SetUpForTrack(track)
+  def testCreate(self):
+    self.SetUpForTrack(self.track)
     level_name = 'accessPolicies/my_policy/accessLevels/my_level'
     level = self._MakeBasicLevel(level_name, title='My Level',
                                  combining_function='AND')
@@ -79,8 +81,8 @@ class LevelsCreateTest(accesscontextmanager.Base):
 
     self.assertEqual(results, level)
 
-  def testCreate_AllParams(self, track):
-    self.SetUpForTrack(track)
+  def testCreate_AllParams(self):
+    self.SetUpForTrack(self.track)
     level_name = 'accessPolicies/my_policy/accessLevels/my_level'
     level = self._MakeBasicLevel(
         level_name, title='My Level',
@@ -98,8 +100,8 @@ class LevelsCreateTest(accesscontextmanager.Base):
 
     self.assertEqual(results, level)
 
-  def testCreate_PolicyFromProperty(self, track):
-    self.SetUpForTrack(track)
+  def testCreate_PolicyFromProperty(self):
+    self.SetUpForTrack(self.track)
     policy = 'my_acm_policy'
     level_name = 'accessPolicies/my_acm_policy/accessLevels/my_level'
     properties.VALUES.access_context_manager.policy.Set(policy)
@@ -114,6 +116,12 @@ class LevelsCreateTest(accesscontextmanager.Base):
         '     --basic-level-spec {}'.format(level_spec_path))
 
     self.assertEqual(results, level)
+
+
+class LevelsCreateTestAlpha(LevelsCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

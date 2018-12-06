@@ -19,13 +19,13 @@ POSITIONAL ARGUMENTS
      Key resource - The key for which to display the IAM policy. The arguments
      in this group can be used to specify the attributes of this resource.
      (NOTE) Some attributes are not given arguments in this group but can be
-     set in other ways. To set the [project] attribute: provide the flag [key]
-     on the command line with a fully specified name; provide the flag
-     [--project] on the command line; set the property [core/project]. This
-     must be specified.
+     set in other ways. To set the [project] attribute: provide the argument
+     [key] on the command line with a fully specified name; provide the
+     argument [--project] on the command line; set the property [core/project].
+     This must be specified.
 
        KEY
-          The ID of the key or a fully qualified identifier for the key. This
+          ID of the key or fully qualified identifier for the key. This
           positional must be specified if any of the other arguments in this
           group are specified.
 
@@ -63,8 +63,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
     This command uses the cloudkms/v1 API. The full documentation for this API

@@ -116,9 +116,9 @@ Print a list of resource URIs instead of the default output.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -155,12 +155,29 @@ To list all regional operations in a project, run:
 $ gcloud alpha compute operations list \-\-regions ""
 .RE
 
+To list all operations with names prefixed with \f5operation\fR, run:
+
+.RS 2m
+$ gcloud alpha compute operations list \-\-filter="name:operation"
+.RE
+
 To list all operations in the us\-central1 and europe\-west1 regions and all
 operations in the us\-central1\-a zone, run:
 
 .RS 2m
 $ gcloud alpha compute operations list \-\-zones us\-central1\-a \e
    \-\-regions us\-central1,europe\-west1
+.RE
+
+To list all operations with a specified target, filter on the targetLink field
+(run \f5gcloud alpha compute operations list \-\-format=json\fR to see a full,
+well\-structured list of available fields). Additionally, use \f5scope()\fR
+which extracts the last part of the URL to get the required target information,
+and run:
+
+.RS 2m
+$ gcloud alpha compute operations list \e
+   \-\-filter="targetLink.scope():default\-12345abc"
 .RE
 
 

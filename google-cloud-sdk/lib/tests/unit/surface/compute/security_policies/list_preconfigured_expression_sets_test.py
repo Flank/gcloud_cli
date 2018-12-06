@@ -23,7 +23,7 @@ import textwrap
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -34,7 +34,7 @@ class SecurityPoliciesListPreconfiguredExpressionSetsTest(
     sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'alpha')

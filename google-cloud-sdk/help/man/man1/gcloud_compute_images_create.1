@@ -11,7 +11,7 @@ gcloud compute images create \- create Google Compute Engine images
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute images create\fR \fIIMAGE_NAME\fR (\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR\ |\ \fB\-\-source\-image\-family\fR=\fISOURCE_IMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR\ |\ \fB\-\-source\-uri\fR=\fISOURCE_URI\fR) [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-family\fR=\fIFAMILY\fR] [\fB\-\-force\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSES\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR] [\fB\-\-source\-image\-project\fR=\fISOURCE_IMAGE_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute images create\fR \fIIMAGE_NAME\fR (\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR\ |\ \fB\-\-source\-image\-family\fR=\fISOURCE_IMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR\ |\ \fB\-\-source\-uri\fR=\fISOURCE_URI\fR) [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-family\fR=\fIFAMILY\fR] [\fB\-\-force\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSES\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR] [\fB\-\-source\-image\-project\fR=\fISOURCE_IMAGE_PROJECT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -212,16 +212,41 @@ The project name of the source image. Must also specify either
 \f5\fI\-\-source\-image\fR\fR or \f5\fI\-\-source\-image\-family\fR\fR when
 using this flag.
 
+.TP 2m
 
+Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
+used to protect the image. The arguments in this group can be used to specify
+the attributes of this resource.
+
+.RS 2m
+.TP 2m
+\fB\-\-kms\-key\fR=\fIKMS_KEY\fR
+ID of the key or fully qualified identifier for the key. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR
+The KMS keyring of the key.
+
+.TP 2m
+\fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR
+The Cloud location for the key.
+
+.TP 2m
+\fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR
+The Cloud project for the key.
+
+
+.RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

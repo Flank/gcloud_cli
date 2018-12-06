@@ -25,7 +25,7 @@ from tests.lib.surface.tasks import test_base
 from six.moves import range
 
 
-class TasksLeaseTest(test_base.CloudTasksTestBase):
+class TasksLeaseTest(test_base.CloudTasksAlphaTestBase):
 
   def SetUp(self):
     self.queue_name = (

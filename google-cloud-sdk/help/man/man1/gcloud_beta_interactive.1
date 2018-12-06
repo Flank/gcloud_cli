@@ -1,0 +1,343 @@
+
+.TH "GCLOUD_BETA_INTERACTIVE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta interactive \- start the gcloud interactive shell
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta interactive\fR [\fB\-\-context\fR=\fICONTEXT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta interactive\fR provides an enhanced \fBbash\fR(1)
+command line with features that include:
+
+.RS 2m
+.IP "\(bu" 2m
+auto\-completion and active help for all commands
+.IP "\(bu" 2m
+state preservation across commands: \fBcd\fR, local/environment variables
+.RE
+.sp
+
+
+
+.SH "Display"
+
+The \fBgcloud beta interactive\fR display window is divided into sections,
+described here from top to bottom.
+
+.RS 2m
+.TP 2m
+\fBPrevious Output\fR
+Command output scrolls above the command input section as commands are executed.
+
+.TP 2m
+\fBCommand Input\fR
+Commands are typed, completed, and edited in this section. The default prompt is
+"$ ". If a context has been set, then its tokens are prepopulated before the
+cursor.
+
+.TP 2m
+\fBActive Help\fR
+As you type, this section displays in\-line help summaries for commands, flags,
+and arguments. You can toggle active help on and off via the \fBF2\fR key. Hit
+\fBF8\fR to display the help text in your browser.
+
+.TP 2m
+\fBStatus Display\fR
+Current \fBgcloud\fR project and account information, and function key
+descriptions and settings are displayed in this section. Function keys toggle
+mode/state settings or run specific actions.
+
+.RS 2m
+.TP 2m
+\fBF2:help:\fR\fISTATE\fR
+Toggles the active help section, \fBON\fR when enabled, \fBOFF\fR when disabled.
+
+.TP 2m
+\fBF7:context\fR
+Sets the context for command input, so you won't have to re\-type common command
+prefixes at every prompt. The context is the command line from just after the
+prompt up to the cursor.
+
+For example, if you are about to work with \f5gcloud compute\fR for a while,
+type \fBgcloud compute\fR and hit \fBF7\fR. This will display \fBgcloud
+compute\fR at subsequent prompts until the context is changed.
+
+Hit ctrl\-c and \fBF7\fR to clear the context, or edit a command line and/or
+move the cursor and hit \fBF7\fR to set a different context.
+
+.TP 2m
+\fBF8:web\-help\fR
+Opens a web browser tab/window to display the complete man page help for the
+current command. If there is no active web browser (running in \fBssh\fR(1) for
+example), then command specific help or \fBman\fR(1) help is attempted.
+
+.TP 2m
+\fBF9:quit\fR
+Exit.
+
+.RE
+.RE
+.sp
+
+.SH "Auto and Tab Completion"
+
+Command completions are displayed in a scrolling pop\-up menu. Use \f5tab\fR and
+up/down keys to navigate the completions, and \f5space\fR or \f5/\fR to select
+the highlighted completion.
+
+Completions for \fIknown\fR commands, flags, and static flag values are
+displayed automatically. Positional and dynamic flag value completions for known
+commands are displayed after \f5tab\fR is entered. Known commands include
+\f5gcloud\fR, \f5bq\fR, \f5gsutil\fR, \f5kubectl\fR, and any command with a man
+page that has been executed at least once in any \fBinteractive\fR session.
+
+\f5tab\fR completion for unknown commands defers to \fBbash\fR(1), while still
+using the \fBinteractive\fR user interface. Absent specific command information,
+a file/path completer is used when \f5tab\fR is entered for unknown positionals
+(arguments that do not start with '\-'). The default completer handles '~' path
+notation and embedded \fI$var\fR references, but does not expand their values in
+completions.
+
+Configure bash completions as you normally would. \fBgcloud beta interactive\fR
+starts up bash in a mode that sources \fB~/.bashrc\fR with the environment
+variable \fBCOSHELL_VERSION\fR set to a non\-empty version value.
+
+Command completion resets with each simple command in the command line. Simple
+commands are separated by '|', ';', '&' and may appear after '$(', '(', '{',
+\'!', \fBif\fR, \fBthen\fR, \fBelif\fR, \fBwhile\fR, and \fIname\fR=\fIvalue\fR
+per command exports. Use \f5tab\fR on an empty line to enable command executable
+search on PATH for the first token in each simple command.
+
+Currently simple and compound commands must be entered in a single line.
+
+Refer to Using gcloud interactive
+(https://cloud.google.com/sdk/docs/interactive\-gcloud) for more information and
+animated GIFs.
+
+
+.SH "Control Characters"
+
+Control characters affect the currently running command or the current command
+line being entered at the prompt.
+
+.RS 2m
+.TP 2m
+\fBctrl\-c\fR
+If a command is currently running, then that command is interrupted. This
+terminates the command. Otherwise, if no command is running, ctrl\-c clears the
+current command line.
+
+.TP 2m
+\fBctrl\-d\fR
+Exits when entered as the first character at the command prompt. You can also
+run the \fBexit\fR command at the prompt.
+
+.TP 2m
+\fBctrl\-w\fR
+If a command is not currently running, then the last word on the command line is
+deleted. This is handy for "walking back" partial completions.
+
+.RE
+.sp
+
+.SH "Command history"
+
+\fBgcloud beta interactive\fR maintains persistent command history across
+sessions.
+
+
+.SH "emacs mode"
+
+.RS 2m
+.TP 2m
+\fB^N\fR
+Move ahead one line in the history.
+.TP 2m
+\fB^P\fR
+Move back one line in the history.
+.TP 2m
+\fB^R\fR
+Search backwards in the history.
+.RE
+.sp
+
+.SH "vi mode"
+
+.RS 2m
+.TP 2m
+/
+Search backwards in the history.
+.TP 2m
+\fBj\fR
+Move ahead one line in the history.
+.TP 2m
+\fBk\fR
+Move back one line in the history.
+.TP 2m
+\fBn\fR
+Search backwards for the next match.
+.TP 2m
+\fBN\fR
+Search forwards for the next match.
+.RE
+.sp
+
+.SH "history search mode"
+
+.RS 2m
+.TP 2m
+\fBENTER/RETURN\fR
+Retrieve the matched command line from the history.
+.TP 2m
+\fB^R\fR
+Search backwards for the next match.
+.TP 2m
+\fB^S\fR
+Search forwards for the next match.
+.RE
+.sp
+
+.SH "Layout Configuration"
+
+Parts of the layout are configurable via \fB$ gcloud config set\fR
+interactive/\fIproperty\fR. These properties are only checked at startup. You
+must exit and restart to see the effects of new settings.
+
+.RS 2m
+.TP 2m
+\fBbottom_bindings_line\fR
+If True, display the bottom key bindings line. The default value is \fBtrue\fR.
+
+.TP 2m
+\fBbottom_status_line\fR
+If True, display the bottom status line. The default value is \fBfalse\fR.
+
+.TP 2m
+\fBcompletion_menu_lines\fR
+Number of lines in the completion menu. The default value is \fB4\fR.
+
+.TP 2m
+\fBcontext\fR
+Command context string. The default value is "".
+
+.TP 2m
+\fBdebug\fR
+If True, enable the debugging display. The default value is \fBfalse\fR.
+
+.TP 2m
+\fBfixed_prompt_position\fR
+If True, display the prompt at the same position. The default value is
+\fBfalse\fR.
+
+.TP 2m
+\fBhelp_lines\fR
+Maximum number of help snippet lines. The default value is \fB10\fR.
+
+.TP 2m
+\fBhidden\fR
+If True, expose hidden commands/flags. The default value is \fBfalse\fR.
+
+.TP 2m
+\fBjustify_bottom_lines\fR
+If True, left\- and right\-justify bottom toolbar lines. The default value is
+\fBfalse\fR.
+
+.TP 2m
+\fBmanpage_generator\fR
+If True, use the manpage CLI tree generator for unsupported commands. The
+default value is \fBtrue\fR.
+
+.TP 2m
+\fBmulti_column_completion_menu\fR
+If True, display the completions as a multi\-column menu. The default value is
+\fBfalse\fR.
+
+.TP 2m
+\fBobfuscate\fR
+If True, obfuscate status PII. The default value is \fBfalse\fR.
+
+.TP 2m
+\fBprompt\fR
+Command prompt string. The default value is "$ ".
+
+.TP 2m
+\fBshow_help\fR
+If True, show help as command args are being entered. The default value is
+\fBtrue\fR.
+
+.TP 2m
+\fBsuggest\fR
+If True, add command line suggestions based on history. The default value is
+\fBfalse\fR.
+
+.RE
+.sp
+
+.SH "CLI Trees"
+
+\fBgcloud beta interactive\fR uses CLI tree data files for typeahead, command
+line completion, and help snippet generation. A few CLI trees are installed with
+their respective Cloud SDK components: \fBgcloud\fR (core component), \fBbq\fR,
+\fBgsutil\fR, and \fBkubectl\fR. Trees for commands that have man(1) pages are
+generated on the fly. See \f5$ gcloud topic cli\-trees\fR for details.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-context\fR=\fICONTEXT\fR
+Default command context. This is a string containing a command name, flags, and
+arguments. The context is prepopulated in each command line. You can inline edit
+any part of the context, or ctrl\-c to eliminate it.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To set the command context of \fBgcloud beta interactive\fR to "gcloud ", run:
+
+.RS 2m
+gcloud beta interactive \-\-context="gcloud "
+.RE
+
+
+
+.SH "NOTES"
+
+On Windows, install \fBgit\fR(1) for a \fBbash\fR(1) experience. \fBgcloud beta
+interactive\fR will then use the \fBgit\fR (MinGW) \fBbash\fR instead of
+\fBcmd.exe\fR.
+
+Please run \fB$ gcloud feedback\fR to report bugs or request new features.
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha interactive
+.RE
+

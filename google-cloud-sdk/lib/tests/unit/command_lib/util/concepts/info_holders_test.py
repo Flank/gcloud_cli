@@ -253,7 +253,7 @@ class InfoHoldersTests(concepts_test_base.ConceptsTestBase,
         for arg in info.GetAttributeArgs()]
     self.assertEqual(['The Cloud Project of the book.',
                       'The shelf of the book. Shelves hold books.',
-                      'The ID of the book or a fully qualified identifier for '
+                      'ID of the book or fully qualified identifier for '
                       'the book.'],
                      help_text)
 
@@ -336,9 +336,9 @@ class InfoHoldersTests(concepts_test_base.ConceptsTestBase,
                 'group can be used to specify the attributes of this resource. '
                 '(NOTE) Some attributes are not given arguments in this group '
                 'but can be set in other ways. To set the [project] attribute: '
-                'provide the flag [--book] on the command line with a fully '
-                'specified name; provide the flag [--project] on the command '
-                'line; set the property [core/project].')
+                'provide the argument [--book] on the command line with a '
+                'fully specified name; provide the argument [--project] on the '
+                'command line; set the property [core/project].')
     self.assertEqual(expected, info.GetGroupHelp())
 
   def testGroupHelpSkippedFlagsOtherFlagFallthrough(self):
@@ -356,9 +356,9 @@ class InfoHoldersTests(concepts_test_base.ConceptsTestBase,
                 'group can be used to specify the attributes of this resource. '
                 '(NOTE) Some attributes are not given arguments in this group '
                 'but can be set in other ways. To set the [project] attribute: '
-                'provide the flag [--book] on the command line with a fully '
-                'specified name; provide the flag [--other-project] on the '
-                'command line; provide the flag [--project] on the '
+                'provide the argument [--book] on the command line with a '
+                'fully specified name; provide the argument [--other-project] '
+                'on the command line; provide the argument [--project] on the '
                 'command line; set the property [core/project].')
     self.assertEqual(expected, info.GetGroupHelp())
 
@@ -374,11 +374,11 @@ class InfoHoldersTests(concepts_test_base.ConceptsTestBase,
     expected = ('Book resource - The book to act upon. This represents a Cloud '
                 'resource. (NOTE) Some attributes are not given arguments in '
                 'this group but can be set in other ways. To set the [project] '
-                'attribute: provide the flag [--book] on the command line with '
-                'a fully specified name; provide the flag [--project] on the '
-                'command line; set the property [core/project]. To set the '
-                '[shelf] attribute: provide the flag [--book] on the command '
-                'line with a fully specified name.')
+                'attribute: provide the argument [--book] on the command line '
+                'with a fully specified name; provide the argument [--project] '
+                'on the command line; set the property [core/project]. To set '
+                'the [shelf] attribute: provide the argument [--book] on the '
+                'command line with a fully specified name.')
     self.assertEqual(expected, info.GetGroupHelp())
 
   def testGetExampleArgListFlag(self):
@@ -523,8 +523,8 @@ class MultitypeTest(concepts_test_base.MultitypeTestBase,
       ('Hidden', '',
        '(NOTE) Some attributes are not given arguments in this group '
        'but can be set in other ways. To set the [project] attribute: '
-       'provide the flag [--book] on the command line with a fully '
-       'specified name; provide the flag [--project] on the command '
+       'provide the argument [--book] on the command line with a fully '
+       'specified name; provide the argument [--project] on the command '
        'line; set the property [core/project]. '))
   def testGroupHelp(self, project_flag, additional_message):
     info = info_holders.MultitypeResourceInfo(
@@ -558,10 +558,10 @@ class MultitypeTest(concepts_test_base.MultitypeTestBase,
                 'group can be used to specify the attributes of this resource. '
                 '(NOTE) Some attributes are not given arguments in this group '
                 'but can be set in other ways. To set the [project] attribute: '
-                'provide the flag [--book] on the command line with a fully '
-                'specified name; provide the flag [--project] on the command '
-                'line; set the property [core/project]. This resource can be '
-                'one of the following types: [projectbook, casebook].')
+                'provide the argument [--book] on the command line with a '
+                'fully specified name; provide the argument [--project] on the '
+                'command line; set the property [core/project]. This resource '
+                'can be one of the following types: [projectbook, casebook].')
     self.assertEqual(expected, info.GetGroupHelp())
 
   @parameterized.named_parameters(
@@ -611,25 +611,30 @@ class MultitypeTest(concepts_test_base.MultitypeTestBase,
   def testAttributeHelpAddsTypes(self):
     info = info_holders.MultitypeResourceInfo(
         '--book',
-        self.proj_org_resource,
+        self.four_way_resource,
         'The book to act upon.',
         {'book': '--book', 'shelf': '--shelf', 'project': '--book-project',
-         'organization': '--organization'},
+         'case': '--case', 'organization': '--organization'},
         {})
     help_text = sorted([
         arg.kwargs.get('help', None)
         for arg in info.GetAttributeArgs()])
-    self.assertEqual(
-        ['The Cloud Organization of the book. This argument is used for the '
-         'following types: [orgbook].',
-         'The Cloud Project of the book. This argument is used for the '
-         'following types: [projectbook].',
-         'The ID of the book or a fully qualified identifier for the book. '
-         'This argument is used for the following types: [projectbook,'
-         ' orgbook].',
-         'The shelf of the book. Shelves hold books. This argument is used for '
-         'the following types: [projectbook, orgbook].'],
-        help_text)
+    expected_help_text = [
+        # Used in all resources.
+        'ID of the book or fully qualified identifier for the book.',
+        # Used in two resources.
+        'The Cloud Organization of the book. Must be specified for resource '
+        'of type [orgcasebook] or [orgshelfbook].',
+        # Used in two resources.
+        'The Cloud Project of the book. Must be specified for resource of '
+        'type [projcasebook] or [projectbook].',
+        # Used in two resources.
+        'The bookcase of the book. Must be specified for resource of type '
+        '[orgcasebook] or [projcasebook].',
+        # Used in two resources.
+        'The shelf of the book. Shelves hold books. Must be specified for '
+        'resource of type [orgshelfbook] or [projectbook].']
+    self.assertEqual(expected_help_text, help_text)
 
   @parameterized.named_parameters(
       ('True', [], True, True, True),
@@ -707,8 +712,7 @@ class MultitypeTest(concepts_test_base.MultitypeTestBase,
     self.assertIsInstance(actual_type, arg_parsers.ArgList)
     expected = {
         'help': ('IDs of the books or fully qualified identifiers for the '
-                 'books. This argument is used for the following types: '
-                 '[projectbook, orgbook].'),
+                 'books.'),
         'completer': None,
         'metavar': 'BOOKS',
         # Anchor argument is always required within the group.
@@ -735,8 +739,7 @@ class MultitypeTest(concepts_test_base.MultitypeTestBase,
 
     expected = {
         'help': ('IDs of the books or fully qualified identifiers for the '
-                 'books. This argument is used for the following types: '
-                 '[projectbook, orgbook].'),
+                 'books.'),
         'completer': None,
         # Anchor argument is always required within the group.
         'nargs': '+',

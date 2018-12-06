@@ -27,7 +27,7 @@ class WaitInfoTest(test_case.TestCase):
 
   def _CreateInstanceGroupManager(
       self, api_version, current_operations=0, pending_operations=0):
-    return test_resources.MakeInstanceGroupManagersWithCurrentActions(
+    return test_resources.MakeInstanceGroupManagersWithActions(
         api_version, current_operations)
 
   def testV1IsGroupStableTrue(self):

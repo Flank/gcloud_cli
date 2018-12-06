@@ -216,13 +216,12 @@ DESCRIPTION
             as the error message.
 
      extract(keys)
-        Extract an ordered list of values from the resource for the specified
-        keys.
+        Extract a list of non-empty values for the specified resource keys.
 
         The arguments are:
 
          keys
-            The list of keys in the resource whose associated values will be
+            The list of keys in the resource whose non-empty values will be
             included in the result.
 
      fatal(message)
@@ -233,6 +232,19 @@ DESCRIPTION
          message
             An error message. If not specified then the resource is formatted
             as the error message.
+
+     filter(expression)
+        Selects elements of r that match the filter expression.
+
+        The arguments are:
+
+         expression
+            The filter expression to apply to r.
+
+        For example:
+
+        x.filter("key:val") selects elements of r that have 'key' fields
+        containing 'val'.
 
      firstof(keys)
         Returns the first non-empty attribute value for key in keys.
@@ -247,6 +259,26 @@ DESCRIPTION
          x.firstof(bar_foo, barFoo, BarFoo, BAR_FOO)
             Checks x.bar_foo, x.barFoo, x.BarFoo, and x.BAR_FOO in order for
             the first non-empty value.
+
+     flatten(show="", undefined="", separator=",")
+        Formats nested dicts and/or lists into a compact comma separated list.
+
+        The arguments are:
+
+         show
+            If show=keys then list dict keys; if show=values then list dict
+            values; otherwise list dict key=value pairs.
+         undefined
+            Return this if the resource is empty.
+         separator
+            The list item separator string.
+
+        For example:
+
+         --format="table(field.map(2).list().map().list().list()"
+            Expression with explicit flattening.
+         --format="table(field.flatten()"
+            Equivalent expression using .flatten().
 
      float(precision=6, spec, undefined="")
         Returns the string representation of a floating point number.
@@ -368,11 +400,15 @@ DESCRIPTION
          list_field.map().foo().list()
             Applies foo() to each item in list_field and then list() to the
             resulting value to return a compact comma-separated list.
+         list_field.*foo().list()
+            * is shorthand for map().
          list_field.map().foo().map().bar()
             Applies foo() to each item in list_field and then bar() to each
             item in the resulting list.
          abc.xyz.map(2).foo()
             Applies foo() to each item in xyz[] for all items in abc[].
+         abc.xyz.**foo()
+            ** is shorthand for map(2).
 
      notnull()
         Remove null values from the resource list.

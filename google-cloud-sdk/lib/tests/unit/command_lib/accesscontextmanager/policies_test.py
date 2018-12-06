@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py import exceptions
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.accesscontextmanager import policies
 from googlecloudsdk.command_lib.meta import cache_util
 from googlecloudsdk.core import properties
@@ -33,7 +33,7 @@ from tests.lib.surface import accesscontextmanager
 class GetDefaultPolicyTest(parameterized.TestCase, accesscontextmanager.Base):
 
   def SetUp(self):
-    self.SetUpForTrack(base.ReleaseTrack.ALPHA)
+    self.SetUpForTrack(calliope_base.ReleaseTrack.ALPHA)
 
     self.organizations = [
         self.resource_manager_messages.Organization(

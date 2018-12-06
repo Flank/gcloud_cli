@@ -6,12 +6,12 @@ SYNOPSIS
     gcloud beta tasks queues update-app-engine-queue QUEUE
         [--clear-max-attempts | --max-attempts=MAX_ATTEMPTS]
         [--clear-max-backoff | --max-backoff=MAX_BACKOFF]
-        [--clear-max-concurrent-tasks
-          | --max-concurrent-tasks=MAX_CONCURRENT_TASKS]
+        [--clear-max-concurrent-dispatches
+          | --max-concurrent-dispatches=MAX_CONCURRENT_DISPATCHES]
+        [--clear-max-dispatches-per-second
+          | --max-dispatches-per-second=MAX_DISPATCHES_PER_SECOND]
         [--clear-max-doublings | --max-doublings=MAX_DOUBLINGS]
         [--clear-max-retry-duration | --max-retry-duration=MAX_RETRY_DURATION]
-        [--clear-max-tasks-dispatched-per-second
-          | --max-tasks-dispatched-per-second=MAX_TASKS_DISPATCHED_PER_SECOND]
         [--clear-min-backoff | --min-backoff=MIN_BACKOFF]
         [--clear-routing-override | --routing-override=KEY:VALUE,[...]]
         [GCLOUD_WIDE_FLAG ...]
@@ -50,14 +50,22 @@ FLAGS
 
      At most one of these may be specified:
 
-       --clear-max-concurrent-tasks
-          Clear the field corresponding to --max-concurrent-tasks.
+       --clear-max-concurrent-dispatches
+          Clear the field corresponding to --max-concurrent-dispatches.
 
-       --max-concurrent-tasks=MAX_CONCURRENT_TASKS
+       --max-concurrent-dispatches=MAX_CONCURRENT_DISPATCHES
           The maximum number of concurrent tasks that Cloud Tasks allows to be
           dispatched for this queue. After this threshold has been reached,
           Cloud Tasks stops dispatching tasks until the number of outstanding
           requests decreases.
+
+     At most one of these may be specified:
+
+       --clear-max-dispatches-per-second
+          Clear the field corresponding to --max-dispatches-per-second.
+
+       --max-dispatches-per-second=MAX_DISPATCHES_PER_SECOND
+          The maximum rate at which tasks are dispatched from this queue.
 
      At most one of these may be specified:
 
@@ -93,14 +101,6 @@ FLAGS
 
      At most one of these may be specified:
 
-       --clear-max-tasks-dispatched-per-second
-          Clear the field corresponding to --max-tasks-dispatched-per-second.
-
-       --max-tasks-dispatched-per-second=MAX_TASKS_DISPATCHED_PER_SECOND
-          The maximum rate at which tasks are dispatched from this queue.
-
-     At most one of these may be specified:
-
        --clear-min-backoff
           Clear the field corresponding to --min-backoff.
 
@@ -122,8 +122,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. This

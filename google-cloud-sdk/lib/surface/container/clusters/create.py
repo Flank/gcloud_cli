@@ -21,6 +21,8 @@ from __future__ import unicode_literals
 
 from apitools.base.py import exceptions as apitools_exceptions
 
+from googlecloudsdk.api_lib.compute import metadata_utils
+from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import kubeconfig as kconfig
 from googlecloudsdk.api_lib.container import util
@@ -31,6 +33,7 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.container import constants
 from googlecloudsdk.command_lib.container import flags
 from googlecloudsdk.command_lib.container import messages
+from googlecloudsdk.command_lib.kms import resource_args as kms_resource_args
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -70,7 +73,15 @@ def _Args(parser):
     parser: An argparse.ArgumentParser-like object. It is mocked out in order
         to capture some information, but behaves like an ArgumentParser.
   """
-  parser.add_argument('name', help='The name of this cluster.')
+  parser.add_argument(
+      'name',
+      help="""\
+The name of the cluster to create.
+
+The name may contain only lowercase alphanumerics and '-', must start with a
+letter and end with an alphanumeric, and must be no longer than 40
+characters.
+""")
   # Timeout in seconds for operation
   parser.add_argument(
       '--timeout',
@@ -122,8 +133,8 @@ Cannot be used with the "--create-subnetwork" option.
   parser.set_defaults(enable_cloud_monitoring=True)
   parser.add_argument(
       '--disk-size',
-      type=int,
-      help='Size in GB for node VM boot disks. Defaults to 100GB.')
+      type=arg_parsers.BinarySize(lower_bound='10GB'),
+      help='Size for node VM boot disks. Defaults to 100GB.')
   flags.AddBasicAuthFlags(parser)
   parser.add_argument(
       '--max-nodes-per-pool',
@@ -157,6 +168,7 @@ for examples.
   flags.AddIssueClientCertificateFlag(parser)
   flags.AddAcceleratorArgs(parser)
   flags.AddDiskTypeFlag(parser)
+  flags.AddMetadataFlags(parser)
 
 
 def ValidateBasicAuthFlags(args):
@@ -175,8 +187,9 @@ def ValidateBasicAuthFlags(args):
   if args.IsSpecified('enable_basic_auth'):
     if not args.enable_basic_auth:
       args.username = ''
-    # Right now, enable_basic_auth is a no-op because username defaults to
-    # admin.
+    # `enable_basic_auth == true` is a no-op defaults are resoved server-side
+    # based on the version of the cluster. For versions before 1.12, this is
+    # 'admin', otherwise '' (disabled).
   if not args.username and args.IsSpecified('password'):
     raise util.Error(constants.USERNAME_PASSWORD_ERROR_MSG)
 
@@ -196,6 +209,13 @@ def ParseCreateOptionsBase(args):
                 '`--[no-]issue-client-certificate` flag.')
 
   flags.MungeBasicAuthFlags(args)
+
+  if args.IsSpecified('issue_client_certificate') and not (
+      args.IsSpecified('enable_basic_auth') or args.IsSpecified('username')):
+    log.warning('If `--issue-client-certificate` is specified but '
+                '`--enable-basic-auth` or `--username` is not, our API will '
+                'treat that as `--no-enable-basic-auth`.')
+
   if (args.IsSpecified('enable_cloud_endpoints') and
       properties.VALUES.container.new_scopes_behavior.GetBool()):
     raise util.Error('Flag --[no-]enable-cloud-endpoints is not allowed if '
@@ -209,13 +229,13 @@ def ParseCreateOptionsBase(args):
     # failing so don't do it.
     enable_autorepair = ((args.image_type or '').lower() in ['', 'cos'])
   flags.WarnForUnspecifiedIpAllocationPolicy(args)
-  cluster_ipv4_cidr = args.cluster_ipv4_cidr
-  enable_master_authorized_networks = args.enable_master_authorized_networks
+  metadata = metadata_utils.ConstructMetadataDict(args.metadata,
+                                                  args.metadata_from_file)
   return api_adapter.CreateClusterOptions(
       accelerators=args.accelerator,
       additional_zones=args.additional_zones,
       addons=args.addons,
-      cluster_ipv4_cidr=cluster_ipv4_cidr,
+      cluster_ipv4_cidr=args.cluster_ipv4_cidr,
       cluster_secondary_range_name=args.cluster_secondary_range_name,
       cluster_version=args.cluster_version,
       node_version=args.node_version,
@@ -230,8 +250,10 @@ def ParseCreateOptionsBase(args):
       enable_ip_alias=args.enable_ip_alias,
       enable_kubernetes_alpha=args.enable_kubernetes_alpha,
       enable_legacy_authorization=args.enable_legacy_authorization,
-      enable_master_authorized_networks=enable_master_authorized_networks,
+      enable_master_authorized_networks=args.enable_master_authorized_networks,
       enable_network_policy=args.enable_network_policy,
+      enable_private_nodes=args.enable_private_nodes,
+      enable_private_endpoint=args.enable_private_endpoint,
       image_type=args.image_type,
       image=args.image,
       image_project=args.image_project,
@@ -241,12 +263,13 @@ def ParseCreateOptionsBase(args):
       local_ssd_count=args.local_ssd_count,
       maintenance_window=args.maintenance_window,
       master_authorized_networks=args.master_authorized_networks,
+      master_ipv4_cidr=args.master_ipv4_cidr,
       max_nodes=args.max_nodes,
       max_nodes_per_pool=args.max_nodes_per_pool,
       min_cpu_platform=args.min_cpu_platform,
       min_nodes=args.min_nodes,
       network=args.network,
-      node_disk_size_gb=args.disk_size,
+      node_disk_size_gb=utils.BytesToGb(args.disk_size),
       node_labels=args.node_labels,
       node_locations=args.node_locations,
       node_machine_type=args.machine_type,
@@ -260,7 +283,8 @@ def ParseCreateOptionsBase(args):
       services_secondary_range_name=args.services_secondary_range_name,
       subnetwork=args.subnetwork,
       tags=args.tags,
-      user=args.username)
+      user=args.username,
+      metadata=metadata)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -287,6 +311,7 @@ class Create(base.CreateCommand):
     flags.AddNodeTaintsFlag(parser)
     flags.AddPreemptibleFlag(parser)
     flags.AddDeprecatedClusterNodeIdentityFlags(parser)
+    flags.AddPrivateClusterFlags(parser, with_deprecated=False)
 
   def ParseCreateOptions(self, args):
     return ParseCreateOptionsBase(args)
@@ -316,19 +341,31 @@ class Create(base.CreateCommand):
     cluster_ref = adapter.ParseCluster(args.name, location)
     options = self.ParseCreateOptions(args)
 
+    if options.private_cluster and not (
+        options.enable_master_authorized_networks or
+        options.master_authorized_networks):
+      log.warning(
+          '`--private-cluster` makes the master inaccessible from '
+          'cluster-external IP addresses, by design. To allow limited '
+          'access to the master, see the `--master-authorized-networks` flags '
+          'and our documentation on setting up private clusters: '
+          'https://cloud.google.com'
+          '/kubernetes-engine/docs/how-to/private-clusters'
+      )
+
+    if not (options.metadata and
+            'disable-legacy-endpoints' in options.metadata):
+      log.warning('Starting in 1.12, default node pools in new clusters '
+                  'will have their legacy Compute Engine instance metadata '
+                  'endpoints disabled by default. To create a cluster with '
+                  'legacy instance metadata endpoints disabled in the default '
+                  'node pool, run `clusters create` with the flag '
+                  '`--metadata disable-legacy-endpoints=true`.')
+
     if options.enable_kubernetes_alpha:
       console_io.PromptContinue(message=constants.KUBERNETES_ALPHA_PROMPT,
                                 throw_if_unattended=True,
                                 cancel_on_no=True)
-
-    if getattr(args, 'region', None):
-      # TODO(b/68496825): Remove this completely after regional clusters beta
-      # launch.
-      if self._release_track == base.ReleaseTrack.ALPHA:
-        console_io.PromptContinue(
-            message=constants.KUBERNETES_REGIONAL_CHARGES_PROMPT,
-            throw_if_unattended=True,
-            cancel_on_no=True)
 
     if options.enable_autorepair is not None:
       log.status.Print(messages.AutoUpdateUpgradeRepairMessage(
@@ -349,7 +386,8 @@ class Create(base.CreateCommand):
 
       operation = adapter.WaitForOperation(
           operation_ref,
-          'Creating cluster {0}'.format(cluster_ref.clusterId),
+          'Creating cluster {0} in {1}'.format(cluster_ref.clusterId,
+                                               cluster_ref.zone),
           timeout_s=args.timeout)
       cluster = adapter.GetCluster(cluster_ref)
     except apitools_exceptions.HttpError as error:
@@ -382,13 +420,15 @@ class CreateBeta(Create):
     group = parser.add_mutually_exclusive_group()
     _AddAdditionalZonesFlag(group, deprecated=True)
     flags.AddNodeLocationsFlag(group)
-    flags.AddAddonsFlags(parser)
+    flags.AddBetaAddonsFlags(parser)
     flags.AddClusterAutoscalingFlags(parser)
+    flags.AddMaxPodsPerNodeFlag(parser)
     flags.AddEnableAutoRepairFlag(parser, for_create=True)
-    flags.AddEnableBinAuthzFlag(parser, hidden=True)
+    flags.AddEnableBinAuthzFlag(parser)
     flags.AddEnableKubernetesAlphaFlag(parser)
     flags.AddEnableLegacyAuthorizationFlag(parser)
     flags.AddIPAliasFlags(parser)
+    flags.AddIstioConfigFlag(parser)
     flags.AddLabelsFlag(parser)
     flags.AddLocalSSDFlag(parser)
     flags.AddMaintenanceWindowFlag(parser)
@@ -401,15 +441,17 @@ class CreateBeta(Create):
     flags.AddPodSecurityPolicyFlag(parser)
     flags.AddAllowRouteOverlapFlag(parser)
     flags.AddClusterNodeIdentityFlags(parser)
-    flags.AddPrivateClusterFlags(parser, hidden=False)
+    flags.AddPrivateClusterFlags(parser, with_deprecated=True)
     flags.AddEnableStackdriverKubernetesFlag(parser)
     flags.AddTpuFlags(parser, hidden=False)
-    flags.AddAutoprovisioningFlags(parser, hidden=True)
+    flags.AddAutoprovisioningFlags(parser)
     flags.AddVerticalPodAutoscalingFlag(parser, hidden=True)
+    flags.AddResourceUsageExportFlags(parser)
 
   def ParseCreateOptions(self, args):
     ops = ParseCreateOptionsBase(args)
     ops.enable_autoprovisioning = args.enable_autoprovisioning
+    ops.autoprovisioning_config_file = args.autoprovisioning_config_file
     ops.min_cpu = args.min_cpu
     ops.max_cpu = args.max_cpu
     ops.min_memory = args.min_memory
@@ -422,12 +464,16 @@ class CreateBeta(Create):
     ops.allow_route_overlap = args.allow_route_overlap
     ops.new_scopes_behavior = True
     ops.private_cluster = args.private_cluster
-    ops.master_ipv4_cidr = args.master_ipv4_cidr
     ops.enable_stackdriver_kubernetes = args.enable_stackdriver_kubernetes
     ops.enable_binauthz = args.enable_binauthz
     ops.enable_tpu = args.enable_tpu
     ops.tpu_ipv4_cidr = args.tpu_ipv4_cidr
+    ops.istio_config = args.istio_config
     ops.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
+    ops.default_max_pods_per_node = args.default_max_pods_per_node
+    ops.resource_usage_bigquery_dataset = args.resource_usage_bigquery_dataset
+    ops.enable_network_egress_metering = args.enable_network_egress_metering
+    flags.ValidateIstioConfigCreateArgs(args.istio_config, args.addons)
     return ops
 
 
@@ -445,7 +491,7 @@ class CreateAlpha(Create):
     flags.AddClusterAutoscalingFlags(parser)
     flags.AddMaxPodsPerNodeFlag(parser)
     flags.AddEnableAutoRepairFlag(parser, for_create=True)
-    flags.AddEnableBinAuthzFlag(parser, hidden=True)
+    flags.AddEnableBinAuthzFlag(parser)
     flags.AddEnableKubernetesAlphaFlag(parser)
     flags.AddEnableLegacyAuthorizationFlag(parser)
     flags.AddIPAliasFlags(parser)
@@ -462,18 +508,29 @@ class CreateAlpha(Create):
     flags.AddPreemptibleFlag(parser)
     flags.AddPodSecurityPolicyFlag(parser)
     flags.AddAllowRouteOverlapFlag(parser)
-    flags.AddPrivateClusterFlags(parser, hidden=False)
+    flags.AddPrivateClusterFlags(parser, with_deprecated=True)
     flags.AddClusterNodeIdentityFlags(parser)
-    flags.AddTpuFlags(parser, hidden=False)
+    flags.AddTpuFlags(parser, hidden=False, enable_tpu_service_networking=True)
     flags.AddEnableStackdriverKubernetesFlag(parser)
-    flags.AddManagedPodIdentityFlag(parser)
-    flags.AddResourceUsageBigqueryDatasetFlag(parser)
+    flags.AddManagedPodIdentityFlags(parser)
+    flags.AddResourceUsageExportFlags(parser)
     flags.AddAuthenticatorSecurityGroupFlags(parser)
     flags.AddVerticalPodAutoscalingFlag(parser, hidden=True)
+    flags.AddSecurityProfileForCreateFlags(parser)
+    flags.AddInitialNodePoolNameArg(parser, hidden=False)
+    kms_flag_overrides = {
+        'kms-key': '--database-encryption-key',
+        'kms-keyring': '--database-encryption-key-keyring',
+        'kms-location': '--database-encryption-key-location',
+        'kms-project': '--database-encryption-key-project'
+    }
+    kms_resource_args.AddKmsKeyResourceArg(
+        parser, 'cluster', flag_overrides=kms_flag_overrides)
 
   def ParseCreateOptions(self, args):
     ops = ParseCreateOptionsBase(args)
     ops.enable_autoprovisioning = args.enable_autoprovisioning
+    ops.autoprovisioning_config_file = args.autoprovisioning_config_file
     ops.min_cpu = args.min_cpu
     ops.max_cpu = args.max_cpu
     ops.min_memory = args.min_memory
@@ -486,16 +543,36 @@ class CreateAlpha(Create):
     ops.enable_pod_security_policy = args.enable_pod_security_policy
     ops.allow_route_overlap = args.allow_route_overlap
     ops.private_cluster = args.private_cluster
+    ops.enable_private_nodes = args.enable_private_nodes
+    ops.enable_private_endpoint = args.enable_private_endpoint
     ops.master_ipv4_cidr = args.master_ipv4_cidr
     ops.new_scopes_behavior = True
     ops.enable_tpu = args.enable_tpu
     ops.tpu_ipv4_cidr = args.tpu_ipv4_cidr
+    ops.enable_tpu_service_networking = args.enable_tpu_service_networking
     ops.istio_config = args.istio_config
     ops.enable_stackdriver_kubernetes = args.enable_stackdriver_kubernetes
     ops.default_max_pods_per_node = args.default_max_pods_per_node
     ops.enable_managed_pod_identity = args.enable_managed_pod_identity
+    ops.federating_service_account = args.federating_service_account
     ops.resource_usage_bigquery_dataset = args.resource_usage_bigquery_dataset
     ops.security_group = args.security_group
-    flags.ValidateIstioConfigArgs(args.istio_config, args.addons)
+    flags.ValidateIstioConfigCreateArgs(args.istio_config, args.addons)
     ops.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
+    ops.security_profile = args.security_profile
+    ops.security_profile_runtime_rules = args.security_profile_runtime_rules
+    ops.node_pool_name = args.node_pool_name
+    ops.enable_network_egress_metering = args.enable_network_egress_metering
+    kms_ref = args.CONCEPTS.kms_key.Parse()
+    if kms_ref:
+      ops.database_encryption = kms_ref.RelativeName()
+    else:
+      # Check for partially specified database-encryption-key.
+      for keyword in [
+          'database-encryption-key', 'database-encryption-key-keyring',
+          'database-encryption-key-location', 'database-encryption-key-project'
+      ]:
+        if getattr(args, keyword.replace('-', '_'), None):
+          raise exceptions.InvalidArgumentException('--database-encryption-key',
+                                                    'not fully specified.')
     return ops

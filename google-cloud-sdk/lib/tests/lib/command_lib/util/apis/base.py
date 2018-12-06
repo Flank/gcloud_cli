@@ -34,6 +34,11 @@ import mock
 class Base(sdk_test_base.SdkBase):
   """Base class for tests of gcloud meta apis."""
 
+  def SetUp(self):
+    # Determines whether a projects collection will be rendered with the path
+    # projects/{projectId} instead of {projectsId}
+    self.cloudresourcemanager_format = False
+
   def MockAPIs(self, *mock_apis):
     """Mocks out the API list."""
     api_list = []
@@ -54,19 +59,24 @@ class Base(sdk_test_base.SdkBase):
     if parent:
       parts = parts[:-1]
     flat_params = [p + 'Id' for p in parts]
+    # If cloudresourcemanager format is on and this isn't a parent resource,
+    # modify the flat path to match the "real" cloudresourcemanager resource.
+    if self.cloudresourcemanager_format and not parent:
+      if flat_params == ['projectsId']:
+        flat_params = ['projectId']
     flat_path = '/'.join(['{p}/{{{p}Id}}'.format(p=p) for p in parts])
     return flat_params, flat_path
 
   def MockCollections(self, *collections):
-    """Mocks out the foo v1 API to have mock collections."""
+    """Mocks out the foo API to have mock collections."""
     mock_collections = {}
     all_collections = []
     for c in collections:
-      full_collection_name, is_relative = c
+      full_collection_name, is_relative, api_version = (
+          self._ReadCollectionTuple(c))
       # pylint:disable=protected-access
       api_name, collection_name = registry._SplitFullCollectionName(
           full_collection_name)
-      api_version = 'v1'
       base_url = 'https://{0}.googleapis.com/{1}/'.format(api_name, api_version)
       flat_params, flat_path = self._FlatPath(collection_name)
 
@@ -98,118 +108,167 @@ class Base(sdk_test_base.SdkBase):
     collection_mock = self.StartObjectPatch(apis_internal, '_GetApiCollections')
     collection_mock.side_effect = lambda n, v: mock_collections[n][v]
 
-  def MockGetListCreateMethods(self, *collections):
-    """Mocks out the foo.projects.clusters to have get and list methods."""
+  def _ReadCollectionTuple(self, collection_tuple):
+    if len(collection_tuple) == 2:
+      full_collection_name, is_relative = collection_tuple
+      api_version = 'v1'
+    else:
+      full_collection_name, is_relative, api_version = collection_tuple
+    return full_collection_name, is_relative, api_version
+
+  def _GetCRUDMethodsForCollection(self, full_collection_name, is_relative,
+                                   api_version=None):
+    api_version = 'v1' if api_version is None else api_version
+    # pylint:disable=protected-access
+    _, collection_name = registry._SplitFullCollectionName(
+        full_collection_name)
+    if is_relative:
+      flat_params, flat_path = self._FlatPath(collection_name)
+      get_method = base_api.ApiMethodInfo(
+          flat_path='{}/{}'.format(api_version, flat_path),
+          http_method='GET',
+          method_id=full_collection_name + '.get',
+          ordered_params=['name'],
+          path_params=['name'],
+          query_params=[],
+          relative_path='{}/{}'.format(api_version, '{+name}'),
+          request_field='',
+          request_type_name='GetRequest',
+          response_type_name='GetResponse',
+          supports_download=False,
+      )
+      patch_method = base_api.ApiMethodInfo(
+          flat_path='{}/{}'.format(api_version, flat_path),
+          http_method='PATCH',
+          method_id=full_collection_name + '.patch',
+          ordered_params=['name'],
+          path_params=['name'],
+          query_params=['description'],
+          relative_path='{}/{}'.format(api_version, '{+name}'),
+          request_field='',
+          request_type_name='UpdateRequest',
+          response_type_name='UpdateResponse',
+          supports_download=False,
+      )
+      _, parent_flat_path = self._FlatPath(
+          collection_name, parent=True)
+      last_part = full_collection_name.split('.')[-1]
+      create_method = base_api.ApiMethodInfo(
+          flat_path='{}/{}/{}'.format(api_version, parent_flat_path, last_part),
+          http_method='POST',
+          method_id=full_collection_name + '.create',
+          ordered_params=['parent'],
+          path_params=['parent'],
+          query_params=[],
+          relative_path=api_version + '/{+parent}/' + last_part,
+          request_field=last_part[:-1],
+          request_type_name='CreateRequest',
+          response_type_name='CreateResponse',
+          supports_download=False,
+      )
+      list_method = base_api.ApiMethodInfo(
+          flat_path='{}/{}/{}'.format(api_version, parent_flat_path, last_part),
+          http_method='GET',
+          method_id=full_collection_name + '.list',
+          ordered_params=['parent'],
+          path_params=['parent'],
+          query_params=['pageSize', 'pageToken'],
+          relative_path=api_version + '/{+parent}/' + last_part,
+          request_field='',
+          request_type_name='ListRequest',
+          response_type_name='ListResponse',
+          supports_download=False,
+      )
+
+    else:
+      flat_params, flat_path = self._FlatPath(collection_name)
+      get_method = base_api.ApiMethodInfo(
+          http_method='GET',
+          method_id=full_collection_name + '.get',
+          ordered_params=flat_params,
+          path_params=flat_params,
+          query_params=[],
+          relative_path=flat_path,
+          request_field='',
+          request_type_name='GetRequest',
+          response_type_name='GetResponse',
+          supports_download=False,
+      )
+      patch_method = base_api.ApiMethodInfo(
+          http_method='PATCH',
+          method_id=full_collection_name + '.patch',
+          ordered_params=flat_params,
+          path_params=flat_params,
+          query_params=['description'],
+          relative_path=flat_path,
+          request_field='',
+          request_type_name='UpdateRequest',
+          response_type_name='UpdateResponse',
+          supports_download=False,
+      )
+      parent_flat_params, parent_flat_path = self._FlatPath(collection_name,
+                                                            parent=True)
+      last_part = full_collection_name.split('.')[-1]
+      create_method = base_api.ApiMethodInfo(
+          http_method='POST',
+          method_id=full_collection_name + '.create',
+          ordered_params=parent_flat_params,
+          path_params=parent_flat_params,
+          query_params=[],
+          relative_path=parent_flat_path + '/' + last_part,
+          request_field=last_part[:-1],
+          request_type_name='CreateRequest',
+          response_type_name='CreateResponse',
+          supports_download=False,
+      )
+      list_method = base_api.ApiMethodInfo(
+          http_method='GET',
+          method_id=full_collection_name + '.list',
+          ordered_params=parent_flat_params,
+          path_params=parent_flat_params,
+          query_params=['pageSize', 'pageToken'],
+          relative_path=parent_flat_path + '/' + last_part,
+          request_field='',
+          request_type_name='GetRequest',
+          response_type_name='GetResponse',
+          supports_download=False,
+      )
+    return get_method, list_method, create_method, patch_method
+
+  def MockCRUDMethods(self, *collections, **kwargs):
+    """Mocks out the foo.projects.clusters to have CRUD methods."""
     parent_collections = list(collections)
-    for c in collections:
-      full_collection_name, is_relative = c
-      while full_collection_name.count('.') > 1:
-        full_collection_name = full_collection_name.rsplit('.', 1)[0]
-        parent_collections.append((full_collection_name, is_relative))
+    if kwargs.get('mock_parents', True):
+      for c in collections:
+        full_collection_name, is_relative, api_version = (
+            self._ReadCollectionTuple(c))
+        while full_collection_name.count('.') > 1:
+          full_collection_name = full_collection_name.rsplit('.', 1)[0]
+          parent_collections.append(
+              (full_collection_name, is_relative, api_version))
     self.MockCollections(*parent_collections)
     methods = {}
     for c in collections:
-      full_collection_name, is_relative = c
-      # pylint:disable=protected-access
-      _, collection_name = registry._SplitFullCollectionName(
-          full_collection_name)
-
-      if is_relative:
-        flat_params, flat_path = self._FlatPath(collection_name)
-        get_method = base_api.ApiMethodInfo(
-            flat_path='v1/' + flat_path,
-            http_method='GET',
-            method_id=full_collection_name + '.get',
-            ordered_params=['name'],
-            path_params=['name'],
-            query_params=[],
-            relative_path='v1/{+name}',
-            request_field='',
-            request_type_name='GetRequest',
-            response_type_name='GetResponse',
-            supports_download=False,
-        )
-        flat_params, flat_path = self._FlatPath(collection_name, parent=True)
-        last_part = full_collection_name.split('.')[-1]
-        create_method = base_api.ApiMethodInfo(
-            flat_path='v1/' + flat_path + '/' + last_part,
-            http_method='POST',
-            method_id=full_collection_name + '.create',
-            ordered_params=['parent'],
-            path_params=['parent'],
-            query_params=[],
-            relative_path='v1/{+parent}/' + last_part,
-            request_field=last_part[:-1],
-            request_type_name='CreateRequest',
-            response_type_name='CreateResponse',
-            supports_download=False,
-        )
-        list_method = base_api.ApiMethodInfo(
-            flat_path='v1/' + flat_path + '/' + last_part,
-            http_method='GET',
-            method_id=full_collection_name + '.list',
-            ordered_params=['parent'],
-            path_params=['parent'],
-            query_params=['pageSize', 'pageToken'],
-            relative_path='v1/{+parent}/' + last_part,
-            request_field='',
-            request_type_name='ListRequest',
-            response_type_name='ListResponse',
-            supports_download=False,
-        )
-
-      else:
-        flat_params, flat_path = self._FlatPath(collection_name)
-        get_method = base_api.ApiMethodInfo(
-            http_method='GET',
-            method_id=full_collection_name + '.get',
-            ordered_params=flat_params,
-            path_params=flat_params,
-            query_params=[],
-            relative_path=flat_path,
-            request_field='',
-            request_type_name='GetRequest',
-            response_type_name='GetResponse',
-            supports_download=False,
-        )
-        flat_params, flat_path = self._FlatPath(collection_name,
-                                                parent=True)
-        last_part = full_collection_name.split('.')[-1]
-        create_method = base_api.ApiMethodInfo(
-            http_method='POST',
-            method_id=full_collection_name + '.create',
-            ordered_params=flat_params,
-            path_params=flat_params,
-            query_params=[],
-            relative_path=flat_path + '/' + last_part,
-            request_field=last_part[:-1],
-            request_type_name='CreateRequest',
-            response_type_name='CreateResponse',
-            supports_download=False,
-        )
-        list_method = base_api.ApiMethodInfo(
-            http_method='GET',
-            method_id=full_collection_name + '.list',
-            ordered_params=flat_params,
-            path_params=flat_params,
-            query_params=['pageSize', 'pageToken'],
-            relative_path=flat_path + '/' + last_part,
-            request_field='',
-            request_type_name='GetRequest',
-            response_type_name='GetResponse',
-            supports_download=False,
-        )
-
-      collection = registry.GetAPICollection(full_collection_name, 'v1')
-      methods[full_collection_name] = [
-          registry.APIMethod(self._CreateMockService(get_method), 'Get',
-                             collection, get_method),
-          registry.APIMethod(self._CreateMockService(get_method), 'Create',
-                             collection, create_method),
-          registry.APIMethod(self._CreateMockService(list_method), 'List',
-                             collection, list_method),
+      full_collection_name, is_relative, api_version = (
+          self._ReadCollectionTuple(c))
+      crud_methods = self._GetCRUDMethodsForCollection(
+          full_collection_name, is_relative, api_version=api_version)
+      get_method, list_method, create_method, patch_method = crud_methods
+      collection = registry.GetAPICollection(full_collection_name, api_version)
+      methods[full_collection_name] = methods.get(full_collection_name, []) + [
+          registry.APIMethod(
+              self._CreateMockService(get_method), 'Get', collection,
+              get_method),
+          registry.APIMethod(
+              self._CreateMockService(patch_method), 'Patch', collection,
+              patch_method),
+          registry.APIMethod(
+              self._CreateMockService(create_method), 'Create', collection,
+              create_method),
+          registry.APIMethod(
+              self._CreateMockService(list_method), 'List', collection,
+              list_method)
       ]
-
     methods_mock = self.StartObjectPatch(registry, 'GetMethods')
     methods_mock.side_effect = lambda n, **kwargs: methods.get(n, [])
 

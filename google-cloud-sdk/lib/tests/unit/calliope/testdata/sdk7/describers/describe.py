@@ -18,15 +18,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class Describe(base.DescribeCommand):
+class Describe(calliope_base.DescribeCommand):
   """Test display command for display_info."""
 
   @staticmethod
   def Args(parser):
-    base.URI_FLAG.AddToParser(parser)
+    calliope_base.URI_FLAG.AddToParser(parser)
     parser.display_info.AddTransforms({'size': len})
 
   def Run(self, args):

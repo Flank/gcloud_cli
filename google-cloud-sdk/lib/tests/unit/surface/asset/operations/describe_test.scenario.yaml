@@ -1,0 +1,107 @@
+title: surface unit tests for asset operations describe
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: asset operations describe projects/19306908007/operations/ExportAssets/78689643348272423423
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.asset.v1beta1.ExportAssetsRequest
+        contentType: RESOURCE
+        outputConfig:
+          gcsDestination:
+            uri: gs://my-bucket/cloud-asset-output
+        parent: projects/19306908007
+        readTime: '2018-10-05T00:00:00Z'
+      name: projects/19306908007/operations/ExportAssets/78689643348272423423
+      response:
+        '@type': type.googleapis.com/google.cloud.asset.v1beta1.ExportAssetsResponse
+        outputConfig:
+          gcsDestination:
+            uri: gs://my-bucket/cloud-asset-output
+        readTime: '2018-10-05T00:00:00Z'
+- execute:
+  - command: asset operations describe 78689643348272423423
+  - stderr: |
+      ERROR: (gcloud.alpha.asset.operations.describe) argument OPERATION_NAME: Bad value [78689643348272423423]: Operation name must be "projects/<project_id>/operations/ExportAssets/<operation_id>" or "organizations/<organization_id>/operations/ExportAssets/<operation_id>"
+      Usage: gcloud alpha asset operations describe OPERATION_NAME [optional flags]
+        optional flags may be  --help
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha asset operations describe --help
+  - error: '1: argument OPERATION_NAME: Bad value [78689643348272423423]: Operation
+      name must be "projects/<project_id>/operations/ExportAssets/<operation_id>"
+      or "organizations/<organization_id>/operations/ExportAssets/<operation_id>"'
+actions:
+- execute_command:
+    command: asset operations describe projects/19306908007/operations/ExportAssets/78689643348272423423
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1beta1/projects/19306908007/operations/ExportAssets/78689643348272423423?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+             "name": "projects/19306908007/operations/ExportAssets/78689643348272423423",
+             "metadata": {
+              "@type": "type.googleapis.com/google.cloud.asset.v1beta1.ExportAssetsRequest",
+              "parent": "projects/19306908007",
+              "readTime": "2018-10-05T00:00:00Z",
+              "contentType": "RESOURCE",
+              "outputConfig": {
+               "gcsDestination": {
+                "uri": "gs://my-bucket/cloud-asset-output"
+               }
+              }
+             },
+             "done": true,
+             "response": {
+              "@type": "type.googleapis.com/google.cloud.asset.v1beta1.ExportAssetsResponse",
+              "readTime": "2018-10-05T00:00:00Z",
+              "outputConfig": {
+               "gcsDestination": {
+                "uri": "gs://my-bucket/cloud-asset-output"
+               }
+              }
+             }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.asset.v1beta1.ExportAssetsRequest
+          contentType: RESOURCE
+          outputConfig:
+            gcsDestination:
+              uri: gs://my-bucket/cloud-asset-output
+          parent: projects/19306908007
+          readTime: '2018-10-05T00:00:00Z'
+        name: projects/19306908007/operations/ExportAssets/78689643348272423423
+        response:
+          '@type': type.googleapis.com/google.cloud.asset.v1beta1.ExportAssetsResponse
+          outputConfig:
+            gcsDestination:
+              uri: gs://my-bucket/cloud-asset-output
+          readTime: '2018-10-05T00:00:00Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset operations describe 78689643348272423423
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.asset.operations.describe) argument OPERATION_NAME: Bad value [78689643348272423423]: Operation name must be "projects/<project_id>/operations/ExportAssets/<operation_id>" or "organizations/<organization_id>/operations/ExportAssets/<operation_id>"
+        Usage: gcloud alpha asset operations describe OPERATION_NAME [optional flags]
+          optional flags may be  --help
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha asset operations describe --help
+    - expect_exit:
+        code: 1
+        message: 'argument OPERATION_NAME: Bad value [78689643348272423423]: Operation
+          name must be "projects/<project_id>/operations/ExportAssets/<operation_id>"
+          or "organizations/<organization_id>/operations/ExportAssets/<operation_id>"'

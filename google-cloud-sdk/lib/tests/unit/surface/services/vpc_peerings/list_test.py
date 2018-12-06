@@ -26,6 +26,7 @@ from tests.lib.surface.services import unit_test_base
 import mock
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class ListTest(unit_test_base.SNUnitTestBase):

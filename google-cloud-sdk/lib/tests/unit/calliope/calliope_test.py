@@ -30,6 +30,8 @@ from googlecloudsdk.calliope import display
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.calliope import parser_errors
 from googlecloudsdk.calliope import parser_extensions
+from googlecloudsdk.command_lib.static_completion import generate
+from googlecloudsdk.command_lib.static_completion import lookup
 from googlecloudsdk.core import config
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import metrics
@@ -172,6 +174,7 @@ class CalliopeTest(util.WithTestTool,
     commands_args, commands_kwargs = commands_mock.call_args_list[0]
     self.assertIn('UnrecognizedArgumentsError', str(commands_kwargs['error']))
     self.assertEqual('test.command1', str(commands_args[0]))
+    self.AssertErrContains('To search the help text of gcloud commands')
 
   def testUnexpectedArgs2(self):
     """Test that providing extra arguments is an error."""
@@ -192,7 +195,8 @@ class CalliopeTest(util.WithTestTool,
       self.cli.Execute('sdk2 lotsofargs --group-required-test=0 '
                        'test --command-required-test=0 '
                        'positional unexpected'. split())
-    self.AssertErrContains('Usage: test sdk2 lotsofargs test')
+    self.AssertErrContains('To search the help text of gcloud commands, run:\n'
+                           '  gcloud help')
 
   def testMetricsResetBetweenCommands(self):
     """Test that metrics flag arg collection resets between commands."""
@@ -265,6 +269,7 @@ class CalliopeTest(util.WithTestTool,
                        '--command-required-test=3 '
                        '6'
                        .split())
+    self.AssertErrContains('To search the help text of gcloud commands')
 
   def testGoofyArgs5(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -298,9 +303,9 @@ class CalliopeTest(util.WithTestTool,
       self.cli.Execute(
           'sdk2 --verbo=info lotsofargs --group-required=1 test '
           '--command-required-test=3 --command-not=4 6'.split())
-    self.AssertErrContains("""\
-(test.sdk2.lotsofargs.test) unrecognized arguments: --command-not=4 (did you mean '--command-not-required-test'?)
-""")
+    self.AssertErrContains(
+        "(test.sdk2.lotsofargs.test) unrecognized arguments: --command-not=4 "
+        "(did you mean '--command-not-required-test'?)")
 
   def testGoofyArgsNoAbbreviatedRequiredPrecedence(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -316,9 +321,9 @@ class CalliopeTest(util.WithTestTool,
       self.cli.Execute(
           'sdk2 --verbo=info lotsofargs --group-required-test=1 test '
           '--command-required-test=3 --command-not-required-test=4 6'.split())
-    self.AssertErrContains("""\
-(test.sdk2) unrecognized arguments: --verbo=info (did you mean '--verbosity'?)
-""")
+    self.AssertErrContains(
+        "(test.sdk2) unrecognized arguments: --verbo=info (did you mean "
+        "'--verbosity'?)")
 
   def testGoofyArgsRequiredPrecedenceNoPositional(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -604,8 +609,8 @@ OPTIONAL FLAGS
           STU sib help text.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --top-flag, --user-output-enabled,
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
     --verbosity. Run $ test help for details.
 
 NOTES
@@ -768,32 +773,15 @@ NOTES
 
     self.StartObjectPatch(calliope_exceptions, '_Exit')
 
-    # `help` and `--help` now hit the same code which bypasses cli.Execute().
+    # `--help` bypasses cli.Execute().
     with self.assertRaisesRegex(SystemExit, '0'):
       cli.Execute(['--help'])
     message = six.text_type(exceptions.NetworkIssueError(''))
     self.AssertErrNotContains(message)
-    with self.assertRaisesRegex(SystemExit, '0'):
-      cli.Execute(['help'])
-    self.AssertErrNotContains(message)
 
-  def testUsage(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        "Invalid choice: 'sdk1'. Did you mean 'sdk11'?"):
-      self.cli.Execute('sdk1 cfg'.split())
-    self.AssertErrContains("""\
-ERROR: (test) Invalid choice: 'sdk1'. Did you mean 'sdk11'?
-Usage: test [optional flags] <group | command>
-  group may be           beta | broken-sdk | cfg | compound-group |
-                         newstylegroup | sdk11 | sdk2 | sdk3 | sdk7
-  command may be         command1 | dict-list | exceptioncommand | exit2 |
-                         help | implementation-args | loggingcommand |
-                         mutex-command | newstylecommand | recommand |
-                         requiredargcommand | simple-command | unsetprop
-
-For detailed information on this command and its flags, run:
-  test --help
-""")
+    # `help` does not bypass cli.Execute().
+    cli.Execute(['help'])
+    self.AssertErrContains(message)
 
   def testNestingCommands(self):
     loader = calliope.CLILoader(
@@ -862,48 +850,6 @@ None
 ['--flag1', '1', '2', '3']
 """)
 
-  def testSuggest(self):
-    commands_mock = self.StartObjectPatch(metrics, 'Commands')
-    errors_mock = self.StartObjectPatch(metrics, 'Error')
-
-    with self.AssertRaisesArgumentErrorMatches(
-        "Invalid choice: 'mutex-commanda'. Did you mean 'mutex-command'?"):
-      self.cli.Execute(['mutex-commanda'])
-
-    self.assertEqual(2, commands_mock.call_count)
-    self.assertEqual(2, errors_mock.call_count)
-    _, commands_kwargs = commands_mock.call_args_list[0]
-    self.assertIn('UnknownCommandError', str(commands_kwargs['error']))
-    expected = ({'suggestions': ['mutex-command'], 'total_suggestions': 1,
-                 'total_unrecognized': 1})
-    self.assertEqual(expected, commands_kwargs['error_extra_info'])
-    self.assertEqual(0, self.known_error_handler.call_count)
-
-  def testSuggestSynonym(self):
-    commands_mock = self.StartObjectPatch(metrics, 'Commands')
-    errors_mock = self.StartObjectPatch(metrics, 'Error')
-
-    with self.AssertRaisesArgumentErrorMatches(
-        "Invalid choice: 'describe'. Did you mean 'get'?"):
-      self.cli.Execute(['cfg', 'describe'])
-
-    self.assertEqual(2, commands_mock.call_count)
-    self.assertEqual(2, errors_mock.call_count)
-    _, commands_kwargs = commands_mock.call_args_list[0]
-    self.assertIn('UnknownCommandError', str(commands_kwargs['error']))
-    expected = ({'suggestions': ['get'], 'total_suggestions': 1,
-                 'total_unrecognized': 1})
-    self.assertEqual(expected, commands_kwargs['error_extra_info'])
-    self.assertEqual(0, self.known_error_handler.call_count)
-
-  def testSuggestCommandAlias(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        "Invalid choice: 'foo'. Did you mean 'test sdk2 somethingelse'?"):
-      self.cli.Execute(['sdk7', 'foo'])
-    with self.AssertRaisesArgumentErrorMatches(
-        "Invalid choice: 'bar'. Did you mean 'test sdk7 somethingelse'?"):
-      self.cli.Execute(['sdk7', 'bar'])
-
   def testSuggestAlternateTrack(self):
     commands_mock = self.StartObjectPatch(metrics, 'Commands')
     errors_mock = self.StartObjectPatch(metrics, 'Error')
@@ -935,6 +881,8 @@ This command is available in one or more alternate release tracks.  Try:
         calliope_base.ReleaseTrack.ALPHA,
         os.path.join(self.calliope_test_home, 'alpha'))
     self.cli = self._loader.Generate()
+    self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
+                          return_value={})
     with self.AssertRaisesArgumentErrorMatches("Invalid choice: 'hidden'"):
       self.cli.Execute(['alpha', 'sdk2', 'hidden'])
 
@@ -949,6 +897,8 @@ This command is available in one or more alternate release tracks.  Try:
   def testMissingComponent(self):
     update_mock = self.StartObjectPatch(update_manager.UpdateManager,
                                         'EnsureInstalledAndRestart')
+    self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
+                          return_value={})
     with self.AssertRaisesArgumentErrorMatches(
         "Invalid choice: 'does-not-exist'."):
       self.cli.Execute(['does-not-exist'])
@@ -968,6 +918,7 @@ unrecognized arguments:
         "unrecognized arguments: "
         "--ky (did you mean '--key'?)"):
       self.cli.Execute(['cfg', 'set', '--ky'])
+    self.AssertErrContains('To search the help text of gcloud commands')
 
   def testSuggestFlagWIthLongValue(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -1191,6 +1142,16 @@ class UnicodeSupportedTest(util.WithTestTool,
     self.assertEqual(expected, actual)
 
   def testUnicodeSupportedGroupUnknownUnicodeCommand(self):
+    try:
+      # py2 argparse invalid use of str() workaround
+      argparse.str = unicode  # pytype: disable=name-error
+    except NameError:
+      # probably py3
+      pass
+    self.root = generate.GenerateCompletionTree(self.cli,
+                                                ignore_load_errors=True)
+    self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
+                          return_value=self.root)
     self.SetEncoding('utf8')
     with self.assertRaisesRegex(SystemExit, '2'):
       self.cli.Execute(['sdk7', 'Ṳᾔḯ¢◎ⅾℯ'])
@@ -1273,7 +1234,7 @@ class HelpCommandAndFlagTests(cli_test_base.CliTestBase):
     interactive_mock.return_value = False
     with self.assertRaisesRegex(SystemExit, '0'):
       self.Run(['help', '--help'])
-    self.AssertOutputContains('gcloud help - prints detailed help messages')
+    self.AssertOutputContains('gcloud help - search gcloud help text')
     self.assertFalse(more_mock.called)
 
     # Interactive mode goes through the console_io pager, make sure that works.
@@ -1281,7 +1242,7 @@ class HelpCommandAndFlagTests(cli_test_base.CliTestBase):
     with self.assertRaisesRegex(SystemExit, '0'):
       self.Run(['help', '--help'])
     self.assertEqual(len(more_mock.call_args_list), 1)
-    self.assertIn('gcloud help - prints detailed help messages',
+    self.assertIn('gcloud help - search gcloud help text',
                   more_mock.call_args_list[0][0][0])
 
 
@@ -1405,7 +1366,7 @@ trace_email. Overrides the default *core/trace_email* property value for this co
 
 ## GCLOUD WIDE FLAGS
 
-These flags are available to all commands: --configuration, --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled, --verbosity.
+These flags are available to all commands: --configuration, --flags-file, --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled, --verbosity.
 Run *$ link:gcloud/help[gcloud help]* for details.
 
 
@@ -1527,9 +1488,9 @@ DESCRIPTION
     group warning
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1555,9 +1516,9 @@ DESCRIPTION
     group warning
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -1599,9 +1560,9 @@ DESCRIPTION
     My Custom Warning
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1638,9 +1599,9 @@ DESCRIPTION
     much longer docstring to ensure the final output is preserved.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1672,9 +1633,9 @@ DESCRIPTION
     This command has been removed.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This command is an internal implementation detail and may change or
@@ -1704,9 +1665,9 @@ DESCRIPTION
     My Custom Warning
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1738,9 +1699,9 @@ DESCRIPTION
     My Custom Error
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This command is an internal implementation detail and may change or
@@ -1770,9 +1731,9 @@ DESCRIPTION
     passed in via the 'detailed_help' and not via the __doc__ string directly.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1812,9 +1773,9 @@ DESCRIPTION
     preserved.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
@@ -1848,9 +1809,9 @@ DESCRIPTION
     multiple --help commands in the same session accumulate.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
@@ -1885,9 +1846,9 @@ DESCRIPTION
     --help commands in the same session accumulate.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -2008,9 +1969,9 @@ FLAGS
         testflag is DEPRECATED.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -2043,9 +2004,9 @@ FLAGS
         testflag is REMOVED.
 
 TEST WIDE FLAGS
-    These flags are available to all commands: --configuration, --flatten,
-    --format, --help, --log-http, --user-output-enabled, --verbosity. Run $
-    test help for details.
+    These flags are available to all commands: --configuration, --flags-file,
+    --flatten, --format, --help, --log-http, --user-output-enabled,
+    --verbosity. Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -2092,10 +2053,10 @@ flags=
 name=abc
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 """)
 
   def testDynamicArgsNoAdditionalRunTwice(self):
@@ -2106,10 +2067,10 @@ flags=
 name=abc
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 """)
 
     self.ClearOutput()
@@ -2121,10 +2082,10 @@ flags=
 name=abc
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 """)
 
   def testDynamicArgsRunOnce(self):
@@ -2135,10 +2096,10 @@ flags=
 name=abc
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 """)
 
   def testDynamicArgsRunTwice(self):
@@ -2149,10 +2110,10 @@ flags=
 name=abc
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 """)
 
     self.ClearOutput()
@@ -2164,10 +2125,10 @@ flags=
 name=abc
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 """)
 
   def testDynamicArgsAddZoneFlagOnce(self):
@@ -2179,10 +2140,10 @@ flags=zone
 name=abc
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,extra,flags,h,help,name,verbosity,zone
+additional,extra,flag_file_line_,flags,flags_file,h,help,name,verbosity,zone
 """)
 
   def testDynamicArgsUseZoneFlagOnce(self):
@@ -2195,10 +2156,10 @@ name=abc
 zone=ZONE
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,extra,flags,h,help,name,verbosity,zone
+additional,extra,flag_file_line_,flags,flags_file,h,help,name,verbosity,zone
 """)
 
   def testDynamicArgsAddZoneFlagTwice(self):
@@ -2211,10 +2172,10 @@ name=abc
 zone=ZONE
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,extra,flags,h,help,name,verbosity,zone
+additional,extra,flag_file_line_,flags,flags_file,h,help,name,verbosity,zone
 """)
 
     self.ClearOutput()
@@ -2228,10 +2189,10 @@ name=abc
 zone=ZONE
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,extra,flags,h,help,name,verbosity,zone
+additional,extra,flag_file_line_,flags,flags_file,h,help,name,verbosity,zone
 """)
 
   def testDynamicArgsUseZoneFlagTwice(self):
@@ -2244,10 +2205,10 @@ name=abc
 zone=ZONE
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,extra,flags,h,help,name,verbosity,zone
+additional,extra,flag_file_line_,flags,flags_file,h,help,name,verbosity,zone
 """)
 
     self.ClearOutput()
@@ -2261,10 +2222,10 @@ name=abc
 zone=ZONE
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,extra,flags,h,help,name,verbosity,zone
+additional,extra,flag_file_line_,flags,flags_file,h,help,name,verbosity,zone
 """)
 
   def testDynamicArgsRunTwiceDifferentFlags(self):
@@ -2277,10 +2238,10 @@ name=abc
 zone=ZONE
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,extra,flags,h,help,name,verbosity,zone
+additional,extra,flag_file_line_,flags,flags_file,h,help,name,verbosity,zone
 """)
 
     self.ClearOutput()
@@ -2294,10 +2255,10 @@ name=abc
 foo=BAR
 """)
     self.AssertErrContains("""\
-additional,flags,h,help,name,verbosity
+additional,flag_file_line_,flags,flags_file,h,help,name,verbosity
 Filter Sdk1
 Filter Sdk2
-additional,extra,flags,foo,h,help,name,verbosity,zone
+additional,extra,flag_file_line_,flags,flags_file,foo,h,help,name,verbosity,zone
 """)
 
 
@@ -2501,6 +2462,90 @@ class ChoiceArgumentTest(sdk_test_base.WithOutputCapture):
     choice_arg.AddToParser(self.parser)
     parse_result = self.parser.parse_args(['--my-arg', 'tWO_ThE-seConD'])
     self.assertEqual('two-the-second', parse_result.my_arg)
+
+
+class SuggestTest(util.WithTestTool,
+                  cli_test_base.CliTestBase,
+                  sdk_test_base.WithOutputCapture):
+
+  def SetUp(self):
+    try:
+      # py2 argparse invalid use of str() workaround
+      argparse.str = unicode  # pytype: disable=name-error
+    except NameError:
+      # probably py3
+      pass
+    self.root = generate.GenerateCompletionTree(self.cli,
+                                                ignore_load_errors=True)
+    self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
+                          return_value=self.root)
+
+  def testSuggest(self):
+    commands_mock = self.StartObjectPatch(metrics, 'Commands')
+    errors_mock = self.StartObjectPatch(metrics, 'Error')
+
+    with self.AssertRaisesArgumentErrorMatches(
+        "Invalid choice: 'mutex-commanda'."):
+      self.cli.Execute(['mutex-commanda'])
+
+    self.AssertErrContains('Maybe you meant:\n  gcloud mutex-command')
+    self.assertEqual(2, commands_mock.call_count)
+    self.assertEqual(2, errors_mock.call_count)
+    _, commands_kwargs = commands_mock.call_args_list[0]
+    self.assertIn('UnknownCommandError',
+                  six.text_type(commands_kwargs['error']))
+    expected = ({'suggestions': ['mutex-command'], 'total_suggestions': 1,
+                 'total_unrecognized': 1})
+    expected = {
+        'suggestions': [
+            'gcloud mutex-command',
+        ],
+        'total_suggestions': 1,
+        'total_unrecognized': 1,
+    }
+    self.assertEqual(expected, commands_kwargs['error_extra_info'])
+    self.assertEqual(0, self.known_error_handler.call_count)
+
+  def testSuggestSynonym(self):
+    commands_mock = self.StartObjectPatch(metrics, 'Commands')
+    errors_mock = self.StartObjectPatch(metrics, 'Error')
+
+    with self.AssertRaisesArgumentErrorMatches(
+        "Invalid choice: 'foo'."):
+      self.cli.Execute(['foo', 'get'])
+
+    self.AssertErrContains("""\
+Maybe you meant:
+  gcloud sdk7 describers describe
+  gcloud sdk7 describers legacy-describe
+  gcloud cfg get
+
+To search the help text of gcloud commands, run:
+  gcloud help -- SEARCH_TERMS
+""")
+    self.assertEqual(2, commands_mock.call_count)
+    self.assertEqual(2, errors_mock.call_count)
+    _, commands_kwargs = commands_mock.call_args_list[0]
+    self.assertIn('UnknownCommandError',
+                  six.text_type(commands_kwargs['error']))
+    expected = {
+        'suggestions': [
+            'gcloud sdk7 describers describe',
+            'gcloud sdk7 describers legacy-describe',
+            'gcloud cfg get',
+        ],
+        'total_suggestions': 3,
+        'total_unrecognized': 1,
+    }
+    self.assertEqual(expected, commands_kwargs['error_extra_info'])
+    self.assertEqual(0, self.known_error_handler.call_count)
+
+  def testUsage(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        "Invalid choice: 'sdk1'."):
+      self.cli.Execute('sdk1 cfg'.split())
+    self.AssertErrContains(
+        'Maybe you meant:\n  gcloud sdk11 sdk')
 
 
 if __name__ == '__main__':

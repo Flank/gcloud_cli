@@ -187,8 +187,8 @@ def BackendServiceArgumentForTargetTcpProxy(required=True):
 def AddLoadBalancingScheme(parser, include_alpha=False):
   parser.add_argument(
       '--load-balancing-scheme',
-      choices=['INTERNAL', 'EXTERNAL'] + (['INTERNAL_SELF_MANAGED']
-                                          if include_alpha else []),
+      choices=['INTERNAL', 'EXTERNAL'] +
+      (['INTERNAL_MANAGED', 'INTERNAL_SELF_MANAGED'] if include_alpha else []),
       type=lambda x: x.replace('-', '_').upper(),
       default='EXTERNAL',
       help='Specifies if this is internal or external load balancer.')
@@ -356,8 +356,14 @@ def HttpHealthCheckArgument(required=False):
       required=required,
       global_collection='compute.httpHealthChecks',
       short_help="""\
-      Specifies a list of HTTP health check objects for checking the health
-      of the backend service.
+      Specifies a list of legacy HTTP health check objects for checking the
+      health of the backend service.
+
+      Legacy health checks are not recommended for backend services. It is
+      possible to use a legacy health check on a backend service for a HTTP(S)
+      load balancer if that backend service uses instance groups. For more
+      information, see this guide:
+      https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide
       """)
 
 
@@ -370,8 +376,14 @@ def HttpsHealthCheckArgument(required=False):
       required=required,
       global_collection='compute.httpsHealthChecks',
       short_help="""\
-      Specifies a list of HTTPS health check objects for checking the health
-      of the backend service.
+      Specifies a list of legacy HTTPS health check objects for checking the
+      health of the backend service.
+
+      Legacy health checks are not recommended for backend services. It is
+      possible to use a legacy health check on a backend service for a HTTP(S)
+      load balancer if that backend service uses instance groups. For more
+      information, see this guide:
+      https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide
       """)
 
 
@@ -414,33 +426,37 @@ def AddIap(parser, help=None):  # pylint: disable=redefined-builtin
       help=help or 'Specifies a list of settings for IAP service.')
 
 
-def AddSessionAffinity(parser, internal_lb=False, target_pools=False,
-                       hidden=False):
+def AddSessionAffinity(parser, target_pools=False, hidden=False):
   """Adds session affinity flag to the argparse."""
   choices = {
       'CLIENT_IP': (
           "Route requests to instances based on the hash of the client's IP "
           'address.'),
-      'GENERATED_COOKIE': (
-          'Route requests to instances based on the contents of the "GCLB" '
-          'cookie set by the load balancer.'),
       'NONE': 'Session affinity is disabled.',
+      'CLIENT_IP_PROTO': (
+          'Connections from the same client IP with the same IP '
+          'protocol will go to the same VM in the pool while that VM remains'
+          ' healthy.'),
   }
-  if internal_lb or target_pools:
+
+  if not target_pools:
     choices.update({
+        'GENERATED_COOKIE': (
+            '(Applicable if load-balancing scheme is external) Route requests '
+            'to instances based on the contents of the "GCLB" '
+            'cookie set by the load balancer.'),
         'CLIENT_IP_PROTO': (
-            'Connections from the same client IP with the same IP protocol will'
-            'go to the same VM in the pool while that VM remains healthy. This '
-            'option cannot be used for HTTP(s) load balancing.'),
-    })
-  if internal_lb:
-    choices.update({
+            '(Applicable if load-balancing scheme is internal) '
+            'Connections from the same client IP with the same IP '
+            'protocol will go to the same VM in the pool while that VM remains'
+            ' healthy.'),
         'CLIENT_IP_PORT_PROTO': (
-            'Connections from the same client IP with the same IP protocol and '
+            '(Applicable if load-balancing scheme is internal) Connections from'
+            ' the same client IP with the same IP protocol and '
             'port will go to the same VM in the backend while that VM remains '
-            'healthy. This option cannot be used for HTTP(S) load balancing.'),
+            'healthy.'),
     })
-  help_str = 'The type of session affinity to use for this backend service.'
+  help_str = 'The type of session affinity to use.'
   parser.add_argument(
       '--session-affinity',
       choices=choices,
@@ -480,17 +496,20 @@ def AddTimeout(parser, default='30s'):
       default=default,
       type=arg_parsers.Duration(),
       help="""\
-      The amount of time to wait for a backend to return a full response for the
-      request and for the load balancer to proxy the response to the client
-      before considering the request failed.
+      Only applicable to HTTP(S), SSL Proxy, and TCP Proxy load balancers:
+      The amount of time to wait for a backend to return a full response for
+      the request and for the load balancer to proxy the response to the
+      client before considering the request failed.
 
-      For example, specifying `10s` gives instances 10 seconds to respond to
+      For example, specifying 10s gives instances 10 seconds to respond to
       requests. The load balancer will retry GET requests once if the backend
-      closes the connection or times out before sending response headers to the
-      proxy. If the backend produces any response headers, the load balancer
-      does not retry. If the backend does not reply at all, the load balancer
-      returns a `502 Bad Gateway` error to the client.
-      See $ gcloud topic datetimes for information on duration formats.
+      closes the connection or times out before sending response headers to
+      the proxy. If the backend produces any response headers, the load
+      balancer does not retry. If the backend does not reply at all, the load
+      balancer returns a 502 Bad Gateway error to the client. See $ gcloud
+      topic datetimes for information on duration formats.
+
+      This parameter has no effect if the load-balancing-scheme is INTERNAL.
       """)
 
 

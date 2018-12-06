@@ -29,7 +29,6 @@ from googlecloudsdk.api_lib.cloudbuild import logs as cb_logs
 from googlecloudsdk.api_lib.cloudbuild import snapshot
 from googlecloudsdk.api_lib.compute import utils as compute_utils
 from googlecloudsdk.api_lib.storage import storage_api
-from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
@@ -69,14 +68,9 @@ class Submit(base.CreateCommand):
 
   _machine_type_flag_map = arg_utils.ChoiceEnumMapper(
       '--machine-type',
-      (cloudbuild_util.GetMessagesModule())
-      .BuildOptions.MachineTypeValueValuesEnum,
-      # TODO(b/69962368): remove this custom mapping when we can exclude
-      # UNSPECIFIED from the proto.
-      custom_mappings={
-          'N1_HIGHCPU_32': 'n1-highcpu-32',
-          'N1_HIGHCPU_8': 'n1-highcpu-8'
-      },
+      (cloudbuild_util.GetMessagesModule()
+      ).BuildOptions.MachineTypeValueValuesEnum,
+      include_filter=lambda s: str(s) != 'UNSPECIFIED',
       help_str='Machine type used to run the build.')
 
   @staticmethod
@@ -85,7 +79,7 @@ class Submit(base.CreateCommand):
 
     Args:
       parser: An argparse.ArgumentParser-like object. It is mocked out in order
-          to capture some information, but behaves like an ArgumentParser.
+        to capture some information, but behaves like an ArgumentParser.
     """
     source = parser.add_mutually_exclusive_group()
     source.add_argument(
@@ -99,7 +93,7 @@ class Submit(base.CreateCommand):
         '`.gitignore` file is present in the local source directory, gcloud '
         'will use a Git-compatible `.gcloudignore` file that respects your '
         '.gitignored files. The global `.gitignore` is not respected. For more '
-        'information on `.gcloudignore`, see `$gcloud topic gcloudignore`.',
+        'information on `.gcloudignore`, see `gcloud topic gcloudignore`.',
     )
     source.add_argument(
         '--no-source',
@@ -161,7 +155,7 @@ For more details, see:
 https://cloud.google.com/cloud-build/docs/api/build-requests#substitutions
 """)
 
-    build_config = parser.add_mutually_exclusive_group(required=True)
+    build_config = parser.add_mutually_exclusive_group()
     build_config.add_argument(
         '--tag',
         '-t',
@@ -177,7 +171,8 @@ https://cloud.google.com/cloud-build/docs/api/build-requests#substitutions
     )
     build_config.add_argument(
         '--config',
-        help='The .yaml or .json file to use for build configuration.',
+        default='cloudbuild.yaml',  # By default, find this in the current dir
+        help='The YAML or JSON file to use as the build configuration file.',
     )
     base.ASYNC_FLAG.AddToParser(parser)
     parser.display_info.AddFormat("""
@@ -239,26 +234,45 @@ https://cloud.google.com/cloud-build/docs/api/build-requests#substitutions
     else:
       timeout_str = None
 
-    if args.tag:
+    if args.tag is not None:
       if (properties.VALUES.builds.check_tag.GetBool() and
           'gcr.io/' not in args.tag):
         raise c_exceptions.InvalidArgumentException(
             '--tag',
             'Tag value must be in the gcr.io/* or *.gcr.io/* namespace.')
-      build_config = messages.Build(
-          images=[args.tag],
-          steps=[
-              messages.BuildStep(
-                  name='gcr.io/cloud-builders/docker',
-                  args=['build', '--no-cache', '-t', args.tag, '.'],
-              ),
-          ],
-          timeout=timeout_str,
-          substitutions=cloudbuild_util.EncodeSubstitutions(
-              args.substitutions, messages))
-    elif args.config:
+      if properties.VALUES.builds.use_kaniko.GetBool():
+        build_config = messages.Build(
+            steps=[
+                messages.BuildStep(
+                    name='gcr.io/kaniko-project/executor:latest',
+                    args=['--destination', args.tag],
+                ),
+            ],
+            timeout=timeout_str,
+            substitutions=cloudbuild_util.EncodeSubstitutions(
+                args.substitutions, messages))
+      else:
+        build_config = messages.Build(
+            images=[args.tag],
+            steps=[
+                messages.BuildStep(
+                    name='gcr.io/cloud-builders/docker',
+                    args=['build', '--no-cache', '-t', args.tag, '.'],
+                ),
+            ],
+            timeout=timeout_str,
+            substitutions=cloudbuild_util.EncodeSubstitutions(
+                args.substitutions, messages))
+    elif args.config is not None:
+      if not args.config:
+        raise c_exceptions.InvalidArgumentException(
+            '--config', 'Config file path must not be empty.')
       build_config = config.LoadCloudbuildConfigFromPath(
           args.config, messages, params=args.substitutions)
+    else:
+      raise c_exceptions.OneOfArgumentsRequiredException(
+          ['--tag', '--config'],
+          'Requires either a docker tag or a config file.')
 
     # If timeout was set by flag, overwrite the config file.
     if timeout_str:
@@ -359,9 +373,7 @@ https://cloud.google.com/cloud-build/docs/api/build-requests#substitutions
                                object=gcs_source_staging.object,
                            ))
           staged_source_obj = gcs_client.CopyFileToGCS(
-              storage_util.BucketReference.FromBucketUrl(
-                  gcs_source_staging.bucket), args.source,
-              gcs_source_staging.object)
+              args.source, gcs_source_staging)
           build_config.source = messages.Source(
               storageSource=messages.StorageSource(
                   bucket=staged_source_obj.bucket,

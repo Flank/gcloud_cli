@@ -26,6 +26,7 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class ConnectTest(unit_test_base.SNUnitTestBase):

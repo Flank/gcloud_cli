@@ -17,12 +17,12 @@
 
 A coshell is an interactive non-login /bin/bash running as a coprocess. It has
 the same stdin, stdout and stderr as the caller and reads command lines from a
-pipe. Only one command runs at a time. ^C interrupts and kills the currently
+pipe. Only one command runs at a time. ctrl-c interrupts and kills the currently
 running command but does not kill the coshell. The coshell process exits when
 the shell 'exit' command is executed. State is maintained by the coshell across
 commands, including the current working directory and local and environment
-variables. ~/.bashrc or the $ENV file, if it exists, is sourced into the coshell
-at startup. This gives the caller the opportunity to set up aliases and default
+variables. ~/.bashrc, if it exists, is sourced into the coshell at startup.
+This gives the caller the opportunity to set up aliases and default
 'set -o ...' shell modes.
 
 Usage:
@@ -31,7 +31,7 @@ Usage:
     command = <the next command line to run>
     try:
       command_exit_status = cosh.Run(command)
-    except coshell.CoshellExitException:
+    except coshell.CoshellExitError:
       break
   coshell_exit_status = cosh.Close()
 
@@ -60,11 +60,15 @@ COSHELL_VERSION = '1.1'
 
 
 _GET_COMPLETIONS_INIT = r"""
-# defines functions to support completion requests to the coshell
+# Defines functions to support completion requests to the coshell.
+#
+# The only coshell specific shell globals are functions prefixed by __coshell_.
+# All other globals are part of the bash completion api.
 
-__get_completions__() {
-  # prints the completions for the (partial) command line "$@" followed by
-  # a blank line
+__coshell_get_completions__() {
+  # Prints the completions for the (partial) command line "$@" terminated by
+  # a blank line sentinel. The first arg is either 'prefix' for command
+  # executable completeions or 'default' for default completions.
 
   local command completion_function last_word next_to_last_word
   local COMP_CWORD COMP_LINE COMP_POINT COMP_WORDS COMPREPLY=()
@@ -75,62 +79,154 @@ __get_completions__() {
   }
 
   command=$1
-  COMP_WORDS=("$@")
+  COMP_WORDS=( "$@" )
 
-  # get the command specific completion function
+  # Get the command specific completion function.
   set -- $(complete -p "$command" 2>/dev/null)
+  if (( ! $# )); then
+    # Load the completion function for the command.
+    _completion_loader "$command"
+    set -- $(complete -p "$command" 2>/dev/null)
+  fi
+  # Check if it was loaded.
   if (( $# )); then
+    # There is an explicit completer.
     shift $(( $# - 2 ))
     completion_function=$1
   else
-    # load the completion function for the command
-    _completion_loader "$command"
-
-    # check if it was loaded
-    set -- $(complete -p "$command" 2>/dev/null)
-    if (( $# )); then
-      shift $(( $# - 2 ))
-      completion_function=$1
-    else
-      # default to file completions
-      __get_file_completions__ "${COMP_WORDS[${#COMP_WORDS[*]}-1]}"
-      return
-    fi
+    # Use the coshell default completer.
+    __coshell_get_file_completions__ "${COMP_WORDS[${#COMP_WORDS[*]}-1]}"
+    return
   fi
 
-  # set up the completion call stack -- really, this is the api?
-  COMP_LINE=${COMP_WORDS[*]}
+  # Set up the completion call stack -- really, this is the api?
+  COMP_LINE=${COMP_WORDS[@]}
   COMP_POINT=${#COMP_LINE}
 
-  # add '' to COMP_WORDS if the last character of the command line is a space
-  [[ ${COMP_LINE[@]: -1} = ' ' ]] && COMP_WORDS+=('')
-
-  # index and value of the last word
+  # Index and value of the last word.
   COMP_CWORD=$(( ${#COMP_WORDS[@]} - 1 ))
   last_word=${COMP_WORDS[$COMP_CWORD]}
 
-  # value of the next to last word
+  # Value of the next to last word.
   if (( COMP_CWORD >= 2 )); then
     next_to_last_word=${COMP_WORDS[$((${COMP_CWORD}-1))]}
   else
     next_to_last_word=''
   fi
 
-  # execute the completion function
-  $completion_function "${command}" "${last_word}" "${next_to_last_word}" 2>/dev/null
-
-  # print the completions to stdout
-  printf '%s\n' "${COMPREPLY[@]}" ''
+  # Execute the completion function. Some completers, like _python_argcomplete,
+  # require $1, $2 and $3.
+  if $completion_function "${command}" "${last_word}" "${next_to_last_word}" 2>/dev/null; then
+    # Print the completions to stdout.
+    printf '%s\n' "${COMPREPLY[@]}" ''
+  else
+    # Fall back to the coshell default completer on error.
+    __coshell_get_file_completions__ "${COMP_WORDS[${#COMP_WORDS[@]}-1]}"
+  fi
 }
 
-__get_file_completions__() {
-  # prints the file completions for the first arg, followed by a blank line
-  compgen -o filenames -A file "$1"
+__coshell_get_executable_completions__() {
+  # Prints the executable completions for $1 one per line, terminated by a
+  # blank line sentinel.
+  compgen -A command -- "$1"
   printf '\n'
 }
 
-__init_completions__(){
-  # loads bash-completion if necessary
+__coshell_get_file_completions__() {
+  # Prints the file completions for $1, with trailing / for dirs, one per line,
+  # terminated by a blank line sentinel. We could almost use_filedir_xspec, but
+  #   * it's not installed/sourced by default on some systems (like macos)
+  #   * it's part of a ~2K line rc file with no clear way of slicing it out
+  #   * ~ and $... are expanded in the completions
+  if __coshell_var_brace_expand "$1"; then
+    # ...$AB
+    compgen -A variable -P "${1%\$*}\${" -S "}" -- "${1##*\$\{}"
+  elif __coshell_var_plain_expand "$1"; then
+    # ...${AB
+    compgen -A variable -P "${1%\$*}\$" -- "${1##*\$}"
+  else
+    local word_raw word_exp word words=() x IFS=$'\n'
+    word_raw=$1
+    eval word_exp=\"$word_raw\"
+    if [[ $word_exp == "$word_raw" ]]; then
+      # No $... expansions, just add trailing / for dirs.
+      words=( $(compgen -A file -- "$word_exp") )
+      for word in ${words[@]}; do
+        if [[ $word != */ ]]; then
+          if [[ $word == \~* ]]; then
+            eval x="$word"
+          else
+            x=$word
+          fi
+          [[ -d $x ]] && word+=/
+        fi
+        printf '%s\n' "$word"
+      done
+    else
+      # $... expansions: expand for -d tests, return unexpanded completions with
+      # trailing / for dirs. compgen -A file handles ~ but does not expand it,
+      # too bad it doesn't do the same for $... expansions.
+      local prefix_exp suffix_raw
+      __coshell_suffix_raw "$word_raw"  # Sets suffix_raw.
+      prefix_raw=${word_raw%"$suffix_raw"}
+      prefix_exp=${word_exp%"$suffix_raw"}
+      words=( $(compgen -A file "$word_exp") )
+      for word in ${words[@]}; do
+        [[ $word != */ && -d $word ]] && word+=/
+        printf '%s\n' "${prefix_raw}${word#"$prefix_exp"}"
+      done
+    fi
+  fi
+  printf '\n'
+}
+
+__coshell_get_directory_completions__() {
+  # Prints the directory completions for $1, with trailing /, one per line,
+  # terminated by a blank line sentinel.
+  if __coshell_var_brace_expand "$1"; then
+    # ...$AB
+    compgen -A variable -P "${1%\$*}\${" -S "}" -- "${1##*\$\{}"
+  elif __coshell_var_plain_expand "$1"; then
+    # ...${AB
+    compgen -A variable -P "${1%\$*}\$" -- "${1##*\$}"
+  else
+    local word_raw word_exp word words=() x IFS=$'\n'
+    word_raw=$1
+    eval word_exp=\"$word_raw\"
+    if [[ $word_exp == "$word_raw" ]]; then
+      # No $... expansions, just add trailing / for dirs.
+      words=( $(compgen -A directory -S/ -- "$word_exp") )
+      printf '%s\n' "${words[@]}"
+    else
+      # $... expansions: return unexpanded completions with trailing /.
+      local prefix_exp suffix_raw
+      __coshell_suffix_raw "$word_raw"  # Sets suffix_raw.
+      prefix_raw=${word_raw%"$suffix_raw"}
+      prefix_exp=${word_exp%"$suffix_raw"}
+      words=( $(compgen -A file -S/ -- "$word_exp") )
+      for word in ${words[@]}; do
+        printf '%s\n' "${prefix_raw}${word#"$prefix_exp"}"
+      done
+    fi
+  fi
+  printf '\n'
+}
+
+__coshell_default_completer__() {
+  # The default interactive completer. Handles ~ and embedded $... expansion.
+  local IFS=$'\n' completer=__coshell_get_file_completions__
+  for o in "$@"; do
+    case $o in
+    -c) completer=__coshell_get_executable_completions__ ;;
+    -d) completer=__coshell_get_directory_completions__ ;;
+    esac
+  done
+  COMPREPLY=( $($completer "$cur") )
+}
+
+__coshell_init_completions__() {
+  # Loads bash-completion if necessary.
+
   declare -F _completion_loader &>/dev/null || {
     source /usr/share/bash-completion/bash_completion 2>/dev/null || {
       _completion_loader() {
@@ -138,16 +234,79 @@ __init_completions__(){
       }
     }
   }
+
+  # Defines bash version dependent functions.
+
+  local x y
+
+  x='${HOME}/tmp'
+  y=${x##*\$?(\{)+([a-zA-Z0-90-9_])?(\})}
+  if [[ $x != $y ]]; then
+    # Modern bash.
+    eval '
+      __coshell_suffix_raw() {
+        coshell_suffix_raw=${1##*\$?(\{)+([a-zA-Z0-90-9_])?(\})}
+      }
+    '
+  else
+    __coshell_suffix_raw() {
+      suffix_raw=$(sed 's/.*\${*[a-zA-Z0-9_]*}*//' <<<"$1")
+    }
+  fi
+
+  if eval '[[ x == *\$\{*([a-zA-Z0-90-9_]) ]]' 2>/dev/null; then
+    # Modern bash.
+    eval '
+      __coshell_var_brace_expand() {
+        [[ $1 == *\$\{*([a-zA-Z0-90-9_]) ]]
+      }
+      __coshell_var_plain_expand() {
+        [[ $1 == *\$+([a-zA-Z0-90-9_]) ]]
+      }
+    '
+  else
+    __coshell_var_brace_expand() {
+      __coshell_partial_expand=$(sed 's/.*\$\({*\)[a-zA-Z0-9_]*$/\1/' <<<"$1")
+      [[ $1 && $__coshell_partial_expand == "{" ]]
+    }
+    __coshell_var_plain_expand() {
+      __coshell_partial_expand=$(sed 's/.*\$\({*\)[a-zA-Z0-9_]*$/\1/' <<<"$1")
+      [[ $1 && $__coshell_partial_expand == "" ]]
+    }
+  fi
+
+  _filedir() {
+    # Overrides the bash_completion function that completes internal $cur.
+    __coshell_default_completer__ "$@"
+  }
+
+  _minimal() {
+    # Overrides the bash_completion function that completes external COMP_WORDS.
+    cur=${COMP_WORDS[$COMP_CWORD]}
+    __coshell_default_completer__ "$@"
+  }
+
+  compopt() {
+    # $completion_function is called by __coshell_get_file_completions__
+    # outside a completion context. Any of those functions calling compopt will
+    # get an annoying error and completely break completions. This override
+    # ignores the errors -- the other coshell completer overrides should wash
+    # them out.
+    command compopt "$@" 2>/dev/null
+    return 0
+  }
+
 }
-__init_completions__
+
+__coshell_init_completions__
 """
 
 
-class CoshellExitException(Exception):
+class CoshellExitError(Exception):
   """The coshell exited."""
 
   def __init__(self, message, status=None):
-    super(CoshellExitException, self).__init__(message)
+    super(CoshellExitError, self).__init__(message)
     self.status = status
 
 
@@ -192,6 +351,20 @@ class _CoshellBase(six.with_metaclass(abc.ABCMeta, object)):
       status = 256 - status
     return status
 
+  def _Decode(self, data):
+    """Decodes external data if needed and returns internal string."""
+    try:
+      return data.decode(self._encoding)
+    except (AttributeError, UnicodeError):
+      return data
+
+  def _Encode(self, string):
+    """Encodes internal string if needed and returns external data."""
+    try:
+      return string.encode(self._encoding)
+    except UnicodeError:
+      return string
+
   def Close(self):
     """Closes the coshell connection and release any resources."""
     pass
@@ -226,11 +399,12 @@ class _CoshellBase(six.with_metaclass(abc.ABCMeta, object)):
     """Sends the interrupt signal to the coshell."""
     pass
 
-  def GetCompletions(self, args):
+  def GetCompletions(self, args, prefix=False):
     """Returns the list of completion choices for args.
 
     Args:
       args: The list of command line argument strings to complete.
+      prefix: Complete the last arg as a command prefix.
     """
     del args
     return None
@@ -274,19 +448,31 @@ class _UnixCoshellBase(six.with_metaclass(abc.ABCMeta, _CoshellBase)):
   def _Exited(self):
     """Raises the coshell exit exception."""
     try:
-      self._shell.communicate(b':')
+      self._WriteLine(':')
     except (IOError, OSError, ValueError):
       # Yeah, ValueError for IO on a closed file.
       pass
     status = self._ShellStatus(self._shell.returncode)
-    raise CoshellExitException(
+    raise CoshellExitError(
         'The coshell exited [status={}].'.format(status),
         status=status)
+
+  def _ReadLine(self):
+    """Reads and returns a decoded stripped line from the coshell."""
+    return self._Decode(self._shell.stdout.readline()).strip()
+
+  def _ReadStatusChar(self):
+    """Reads and returns one encoded character from the coshell status fd."""
+    return os.read(self._status_fd, 1)
+
+  def _WriteLine(self, line):
+    """Writes an encoded line to the coshell."""
+    self._shell.communicate(self._Encode(line + '\n'))
 
   def _SendCommand(self, command):
     """Sends command to the coshell for execution."""
     try:
-      self._shell.stdin.write((command + '\n').encode(self._encoding))
+      self._shell.stdin.write(self._Encode(command + '\n'))
       self._shell.stdin.flush()
     except (IOError, OSError, ValueError):
       # Yeah, ValueError for IO on a closed file.
@@ -295,13 +481,14 @@ class _UnixCoshellBase(six.with_metaclass(abc.ABCMeta, _CoshellBase)):
   def _GetStatus(self):
     """Gets the status of the last command sent to the coshell."""
     line = []
+    shell_status_exit = self.SHELL_STATUS_EXIT.encode('ascii')
     while True:
-      c = os.read(self._status_fd, 1)
-      if c in (None, b'\n', self.SHELL_STATUS_EXIT.encode('ascii')):
+      c = self._ReadStatusChar()
+      if c in (None, b'\n', shell_status_exit):
         break
       line.append(c)
-    status_string = b''.join(line).decode(self._encoding)
-    if not status_string.isdigit() or c == self.SHELL_STATUS_EXIT:
+    status_string = self._Decode(b''.join(line))
+    if not status_string.isdigit() or c == shell_status_exit:
       self._Exited()
     return int(status_string)
 
@@ -313,7 +500,7 @@ class _UnixCoshellBase(six.with_metaclass(abc.ABCMeta, _CoshellBase)):
 
     changed = False
 
-    # Get the caller $ENV emacs/vi mode.
+    # Get the caller emacs/vi mode.
     if self.Run('set -o | grep -q "^vi.*on"', check_modes=False) == 0:
       if self._edit_mode != 'vi':
         changed = True
@@ -323,7 +510,7 @@ class _UnixCoshellBase(six.with_metaclass(abc.ABCMeta, _CoshellBase)):
         changed = True
         self._edit_mode = 'emacs'
 
-    # Get the caller $ENV ignoreeof setting.
+    # Get the caller ignoreeof setting.
     ignore_eof = self._ignore_eof
     self._ignore_eof = self.Run(
         'set -o | grep -q "^ignoreeof.*on"', check_modes=False) == 0
@@ -352,13 +539,9 @@ class _UnixCoshellBase(six.with_metaclass(abc.ABCMeta, _CoshellBase)):
         'COSHELL_VERSION={coshell_version};'
         # Set $? to $1.
         '_status() {{ return $1; }};'
-        # The env rc files configures aliases and set -o modes.
-        'for rc in "$HOME/.bashrc" "$ENV"; do'
-        '  if [[ $rc && -f $rc ]]; then'
-        '    source "$rc";'
-        '    break;'
-        '  fi;'
-        'done;'
+        # .bashrc configures aliases and set -o modes. Must be done explicitly
+        # because the input pipe makes bash think it's not interactive.
+        '[[ -f $HOME/.bashrc ]] && source $HOME/.bashrc;'
         # The exit command hits this trap, reaped by _GetStatus() in Run().
         "trap 'echo $?{exit} >&{fdstatus}' 0;"
         # This catches interrupts so commands die while the coshell stays alive.
@@ -397,17 +580,23 @@ class _UnixCoshellBase(six.with_metaclass(abc.ABCMeta, _CoshellBase)):
       signal.signal(signal.SIGINT, sigint)
     return status
 
-  def GetCompletions(self, args):
+  def GetCompletions(self, args, prefix=False):
     """Returns the list of completion choices for args.
 
     Args:
       args: The list of command line argument strings to complete.
+      prefix: Complete the last arg as a command prefix.
 
     Returns:
       The list of completions for args.
     """
+    if prefix:
+      completions = self.Communicate(['__coshell_get_executable_completions__',
+                                      args[-1]])
+    else:
+      completions = self.Communicate(['__coshell_get_completions__'] + args)
     # Some shell completers return unsorted with dups -- that stops here.
-    return sorted(set(self.Communicate(['__get_completions__'] + args)))
+    return sorted(set(completions))
 
   def Interrupt(self):
     """Sends the interrupt signal to the coshell."""
@@ -450,6 +639,7 @@ class _UnixCoshell(_UnixCoshellBase):
 
     self._shell = subprocess.Popen(
         [self.SHELL_PATH],
+        env=os.environ,  # NOTE: Needed to pass mocked environ to children.
         stdin=subprocess.PIPE,
         stdout=stdout,
         stderr=stderr,
@@ -475,7 +665,7 @@ class _UnixCoshell(_UnixCoshellBase):
       os.close(self._status_fd)
       self._status_fd = -1
     try:
-      self._shell.communicate(b'exit')  # This closes internal fds.
+      self._WriteLine('exit')  # This closes internal fds.
     except (IOError, ValueError):
       # Yeah, ValueError for IO on a closed file.
       pass
@@ -520,14 +710,14 @@ class _UnixCoshell(_UnixCoshellBase):
     line = []
     while True:
       try:
-        c = os.read(self._status_fd, 1)
+        c = self._ReadStatusChar()
       except (IOError, OSError, ValueError):
         # Yeah, ValueError for IO on a closed file.
         self._Exited()
       if c in (None, b'\n'):
         if not line:
           break
-        lines.append(b''.join(line).decode(self._encoding).rstrip())
+        lines.append(self._Decode(b''.join(line).rstrip()))
         line = []
       else:
         line.append(c)
@@ -569,7 +759,7 @@ class _MinGWCoshell(_UnixCoshellBase):
   def Close(self):
     """Closes the coshell connection and release any resources."""
     try:
-      self._shell.communicate(b'exit')  # This closes internal fds.
+      self._WriteLine('exit')  # This closes internal fds.
     except (IOError, ValueError):
       # Yeah, ValueError for IO on a closed file.
       pass
@@ -577,7 +767,7 @@ class _MinGWCoshell(_UnixCoshellBase):
 
   def _GetStatus(self):
     """Gets the status of the last command sent to the coshell."""
-    status_string = self._shell.stdout.readline().strip()
+    status_string = self._ReadLine()
     if status_string.endswith(self.SHELL_STATUS_EXIT):
       c = self.SHELL_STATUS_EXIT
       status_string = status_string[:-1]
@@ -625,13 +815,13 @@ class _MinGWCoshell(_UnixCoshellBase):
     lines = []
     while True:
       try:
-        line = self._shell.stdout.readline().rstrip('\n')
+        line = self._ReadLine()
       except (IOError, OSError, ValueError):
         # Yeah, ValueError for IO on a closed file.
         self._Exited()
       if not line:
         break
-      lines.append(line.decode(self._encoding))
+      lines.append(line)
     return lines
 
   def Interrupt(self):

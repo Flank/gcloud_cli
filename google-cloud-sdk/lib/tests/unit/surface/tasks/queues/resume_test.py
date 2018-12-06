@@ -39,7 +39,7 @@ class QueuesResumeTest(test_base.CloudTasksTestBase):
         self.messages.CloudtasksProjectsLocationsQueuesResumeRequest(
             name='projects/{}/locations/us-central1/queues/{}'.format(
                 self.Project(), 'my-queue')),
-        response=self.messages.Empty())
+        response=self.messages.Queue())
 
     output = self.Run('tasks queues resume my-queue')
 
@@ -52,7 +52,7 @@ class QueuesResumeTest(test_base.CloudTasksTestBase):
     self.queues_service.Resume.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesResumeRequest(
             name=queue_name),
-        response=self.messages.Empty())
+        response=self.messages.Queue())
 
     self.Run('tasks queues resume {}'.format(queue_name))
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
@@ -62,7 +62,7 @@ class QueuesResumeTest(test_base.CloudTasksTestBase):
         self.messages.CloudtasksProjectsLocationsQueuesResumeRequest(
             name='projects/{}/locations/us-central2/queues/{}'.format(
                 self.Project(), 'my-queue')),
-        response=self.messages.Empty())
+        response=self.messages.Queue())
 
     output = self.Run('tasks queues resume my-queue --location=us-central2')
 

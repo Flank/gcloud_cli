@@ -47,7 +47,7 @@ gcloud hidden-group hidden-command - <code><nobr>(ALPHA)</nobr></code> hidden co
 <dt>SYNOPSIS</dt>
 <dd class="sectionbody">
 <dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
-<code>gcloud hidden-group hidden-command</code> <nobr>[<code><var>GLOBAL-FLAG &hellip;</var></code>]</nobr>
+<code>gcloud hidden-group hidden-command</code> <nobr>[<code><var>GCLOUD-WIDE-FLAG &hellip;</var></code>]</nobr>
 </span></dt></dl>
 </dd>
 </section>
@@ -59,8 +59,8 @@ gcloud hidden-group hidden-command - <code><nobr>(ALPHA)</nobr></code> hidden co
 </dd>
 </section>
 
-<section id="GLOBAL-FLAGS">
-<dt>GLOBAL FLAGS</dt>
+<section id="GCLOUD-WIDE-FLAGS">
+<dt>GCLOUD WIDE FLAGS</dt>
 <dd class="sectionbody">
 Run <code>$ <a href="/sdk/../reference/">gcloud</a> help</code> for a
 description of flags available to all commands.

@@ -34,13 +34,11 @@ Markdown lists are supported:
 
 Did the end of list work? Also, format="csv" tables are recognized:
 
-[options="header",format="csv",grid="none",frame="none"]
-|========
-Alias,Project,Image Name
-a1a1a,p1p1p,i1ii1
-a222,p2,i22222i2222
-a3aaaa3a3a3,p3p3pp3p,iii3i3i
-|========
+Alias | Project | Image Name
+--- | --- | ---
+a1a1a | p1p1p | i1ii1
+a222 | p2 | i22222i2222
+a3aaaa3a3a3 | p3p3pp3p | iii3i3i
 
 Did the end of table work?
 
@@ -113,7 +111,7 @@ Optional flag.
 
 ## GCLOUD WIDE FLAGS
 
-These flags are available to all commands: --configuration, --flatten, --format, --help, --log-http, --top-group-flag, --user-output-enabled, --verbosity.
+These flags are available to all commands: --configuration, --flags-file, --flatten, --format, --help, --log-http, --top-group-flag, --user-output-enabled, --verbosity.
 Run *$ link:gcloud[gcloud] help* for details.
 
 

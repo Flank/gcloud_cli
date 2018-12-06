@@ -11,7 +11,7 @@ gcloud beta composer environments create \- create and initialize a Cloud Compos
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -34,16 +34,16 @@ gcloud composer operations describe
 Environment resource \- The environment to create. The arguments in this group
 can be used to specify the attributes of this resource. (NOTE) Some attributes
 are not given arguments in this group but can be set in other ways. To set the
-[project] attribute: provide the flag [environment] on the command line with a
-fully specified name; provide the flag [\-\-project] on the command line; set
-the property [core/project]. This must be specified.
+[project] attribute: provide the argument [environment] on the command line with
+a fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fIENVIRONMENT\fR
-The ID of the environment or a fully qualified identifier for the environment.
-This positional must be specified if any of the other arguments in this group
-are specified.
+ID of the environment or fully qualified identifier for the environment. This
+positional must be specified if any of the other arguments in this group are
+specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
@@ -109,6 +109,23 @@ Defaults to ['https://www.googleapis.com/auth/cloud\-platform']. Cannot be
 updated.
 
 .TP 2m
+\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
+The Python version to be used within the created environment. Supplied value
+should represent the desired major Python version. Cannot be updated.
+\fIPYTHON_VERSION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fB2\fR
+Created environment will use Python 2
+.TP 2m
+\fB3\fR
+Created environment will use Python 3
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
 The Google Cloud Platform service account to be used by the node VMs. If a
 service account is not specified, the "default" Compute Engine service account
@@ -125,6 +142,48 @@ comply with RFC 1035. Cannot be updated.
 The Compute Engine zone in which the environment will be created. For example
 \f5\-\-zone=us\-central1\-a\fR.
 
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR
+Version of Airflow to run in the environment.
+
+.RS 2m
+Must be of the form `X.Y[.Z]`.
+.RE
+
+.RS 2m
+Cannot be updated.
+.RE
+
+.TP 2m
+\fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR
+Version of the image to run in the environment.
+
+.RS 2m
+This encapsulates the versions of both Cloud Composer and Apache
+Airflow. Must be of the form `composer\-A.B.C\-airflow\-X.Y[.Z]`.
+.RE
+
+.RS 2m
+The Cloud Composer and Airflow versions are semantic versions.
+`latest` can be provided instead of an explicit Cloud Composer
+version number indicating that the server will replace `latest`
+with the current Cloud Composer version. For the Apache Airflow
+portion, the patch version can be omitted and the current
+version will be selected. The version numbers that are used will
+be stored.
+.RE
+
+.RS 2m
+Cannot be updated.
+.RE
+
+.RE
+.sp
 .TP 2m
 
 Virtual Private Cloud networking
@@ -151,18 +210,19 @@ will be connected.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud composer environments create
+$ gcloud alpha composer environments create
 .RE
 

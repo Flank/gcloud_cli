@@ -31,18 +31,22 @@ class InstancesCreateDiskTest(e2e_instances_test_base.InstancesTestBase):
 
   def testInstanceCreationWithCreateDisk(self):
     self.GetInstanceName()
-    self.Run('compute instances create {0} '
-             '--create-disk size=10GB,name={0}-3,mode=rw,'
-             'device-name=data,auto-delete=yes,image-family={1},'
-             'image-project=debian-cloud '
-             '--create-disk size=10GB,name={0}-4,mode=rw,'
-             'device-name=data-2,auto-delete=no '
-             '--zone {2}'.format(
-                 self.instance_name, utils.DEBIAN_IMAGE_FAMILY, self.zone))
+    self.Run(
+        'compute instances create {0} '
+        '--create-disk size=10GB,name={0}-3,mode=rw,'
+        'device-name=data,auto-delete=yes,image-family={1},'
+        'image-project=debian-cloud '
+        '--create-disk size=10GB,name={0}-4,mode=rw,'
+        'description=testDescription,device-name=data-2,auto-delete=no '
+        '--zone {2}'.format(self.instance_name, utils.DEBIAN_IMAGE_FAMILY,
+                            self.zone))
     self.Run('compute instances describe {0} --zone {1}'.format(
         self.instance_name, self.zone))
     self.AssertNewOutputContainsAll(
         ['deviceName: data', 'mode: READ_WRITE', 'deviceName: data-2'])
+    self.Run('compute disks describe {0}-4 --zone {1}'.format(
+        self.instance_name, self.zone))
+    self.AssertNewOutputContains('description: testDescription')
 
 
 if __name__ == '__main__':

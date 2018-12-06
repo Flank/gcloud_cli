@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta services operations wait \- waits for an operation to complete
+gcloud beta services operations wait \- waits for an operation to complete for a given operation name
 
 
 
@@ -19,9 +19,6 @@ gcloud beta services operations wait \- waits for an operation to complete
 
 \fB(BETA)\fR This command will block until an operation has been marked as
 complete.
-
-Note that the \f5operations/\fR prefix of the operation name is optional and may
-be omitted.
 
 
 
@@ -39,19 +36,18 @@ The name of the operation on which to wait.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To wait on an operation named \f5operations/serviceConfigs.my\-service.1\fR to
-complete, run:
+To wait on an operation named \f5operations/abc\fR to complete, run:
 
 .RS 2m
-$ gcloud beta services operations wait serviceConfigs.my\-service.1
+$ gcloud beta services operations wait operations/abc
 .RE
 
 

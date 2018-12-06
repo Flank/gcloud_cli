@@ -58,12 +58,11 @@ class FoldersMoveTest(testbase.FoldersUnitTestBase):
         is_async=True)
     self.assertEqual(
         self.DoCommand(is_async=True),
-        operations.OperationsMessages().Operation(
-            done=False, name=TEST_OPERATION_NAME))
+        self.messages.Operation(done=False, name=TEST_OPERATION_NAME))
 
   def SetUpFolderMove(self, original, moved, is_async=False):
     response_value = operations.ToOperationResponse(moved)
-    test_move_operation = operations.OperationsMessages().Operation(
+    test_move_operation = self.messages.Operation(
         done=False, name=TEST_OPERATION_NAME)
     expected_move_request = folders.FoldersMessages(
     ).CloudresourcemanagerFoldersMoveRequest(

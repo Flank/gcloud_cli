@@ -47,12 +47,6 @@ class WorkflowTemplateCreateUnitTest(unit_base.DataprocUnitTestBase,
         response=response,
         exception=exception)
 
-
-class WorkflowTemplateCreateUnitTestBeta(WorkflowTemplateCreateUnitTest):
-
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
-
   def testCreateWorkflowTemplates(self):
     workflow_template = self.MakeWorkflowTemplate()
     self.ExpectCreateWorkflowTemplate(workflow_template, workflow_template)
@@ -81,3 +75,9 @@ class WorkflowTemplateCreateUnitTestBeta(WorkflowTemplateCreateUnitTest):
     self.assertTrue(result.labels is not None)
     self.assertEqual(workflow_template.labels, result.labels)
     self.AssertMessagesEqual(workflow_template, result)
+
+
+class WorkflowTemplateCreateUnitTestBeta(WorkflowTemplateCreateUnitTest):
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)

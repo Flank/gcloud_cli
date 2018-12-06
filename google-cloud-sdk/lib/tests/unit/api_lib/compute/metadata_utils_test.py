@@ -19,9 +19,14 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import os.path
+
 from googlecloudsdk.api_lib.compute import metadata_utils
+from googlecloudsdk.calliope import exceptions
 from tests.lib import cli_test_base
 from tests.lib import parameterized
+
+import six
 
 
 class MetadataUtilsTest(cli_test_base.CliTestBase, parameterized.TestCase):
@@ -105,6 +110,56 @@ class MetadataUtilsTest(cli_test_base.CliTestBase, parameterized.TestCase):
   def testSshKeyStartsWithKeyType(self, key, starts_with_key_type):
     self.assertEqual(
         metadata_utils._SshKeyStartsWithKeyType(key), starts_with_key_type)
+
+  @parameterized.parameters(
+      # Empty dicts
+      ({}, {}, {}, {}),
+      # non-empty metadata
+      ({
+          'key1': 'value1'
+      }, {}, {}, {
+          'key1': 'value1'
+      }),
+      # non-empty metadata_from_file
+      ({}, {
+          'file_key1': 'file_path1'
+      }, {
+          'file_path1': 'file_value1'
+      }, {
+          'file_key1': 'file_value1'
+      }),
+      # non-empty metadata & metadata_from_file
+      ({
+          'key1': 'value1'
+      }, {
+          'file_key1': 'file_path1'
+      }, {
+          'file_path1': 'file_value1'
+      }, {
+          'key1': 'value1',
+          'file_key1': 'file_value1'
+      }),
+  )
+  def testConstructMetadataDict(self, test_metadata, test_metadata_from_file,
+                                value_for_file, expected_metadata):
+    for filename, contents in six.iteritems(value_for_file):
+      self.Touch(self.temp_path, filename, contents=contents)
+
+    test_metadata_from_tmp_file = {}
+    for key, filename in six.iteritems(test_metadata_from_file):
+      test_metadata_from_tmp_file[key] = os.path.join(self.temp_path, filename)
+
+    self.assertDictEqual(
+        metadata_utils.ConstructMetadataDict(
+            test_metadata, test_metadata_from_tmp_file), expected_metadata)
+
+  def testConstructMetadataDict_KeysOverlap(self):
+    test_metadata = {'key': 'dict_value'}
+    test_metadata_from_file = {'key': 'file'}
+
+    with self.assertRaises(exceptions.ToolException):
+      metadata_utils.ConstructMetadataDict(test_metadata,
+                                           test_metadata_from_file)
 
 
 if __name__ == '__main__':

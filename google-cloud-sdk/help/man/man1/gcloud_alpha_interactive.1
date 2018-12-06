@@ -42,14 +42,15 @@ Command output scrolls above the command input section as commands are executed.
 
 .TP 2m
 \fBCommand Input\fR
-Commands are typed, completed and edited in this section. The default prompt is
+Commands are typed, completed, and edited in this section. The default prompt is
 "$ ". If a context has been set, then its tokens are prepopulated before the
 cursor.
 
 .TP 2m
 \fBActive Help\fR
-As you type, this section displays in\-line help summaries for commands, flags
-and arguments. You can toggle active help on and off via the \fBF2\fR key.
+As you type, this section displays in\-line help summaries for commands, flags,
+and arguments. You can toggle active help on and off via the \fBF2\fR key. Hit
+\fBF8\fR to display the help text in your browser.
 
 .TP 2m
 \fBStatus Display\fR
@@ -72,8 +73,8 @@ For example, if you are about to work with \f5gcloud compute\fR for a while,
 type \fBgcloud compute\fR and hit \fBF7\fR. This will display \fBgcloud
 compute\fR at subsequent prompts until the context is changed.
 
-Hit ^C and \fBF7\fR to clear the context, or edit a command line and/or move the
-cursor and hit \fBF7\fR to set a different context.
+Hit ctrl\-c and \fBF7\fR to clear the context, or edit a command line and/or
+move the cursor and hit \fBF7\fR to set a different context.
 
 .TP 2m
 \fBF8:web\-help\fR
@@ -93,14 +94,36 @@ Exit.
 
 Command completions are displayed in a scrolling pop\-up menu. Use \f5tab\fR and
 up/down keys to navigate the completions, and \f5space\fR or \f5/\fR to select
-the highlighted completion. Completions for \fIknown\fR commands (\f5gcloud\fR,
-\f5bq\fR, \f5gsutil\fR, \f5kubectl\fR, or any command with a man page), flags
-and static flag values are displayed automatically. Positional and dynamic flag
-value completions for \fIknown\fR commands are displayed after \f5tab\fR is
-entered. \f5tab\fR completion for unknown commands defers to \fBbash\fR(1),
-while still using the \fBinteractive\fR user interface. Absent specific command
-information, a file/path completer is used when \f5tab\fR is entered for unknown
-positionals (arguments that do not start with '\-').
+the highlighted completion.
+
+Completions for \fIknown\fR commands, flags, and static flag values are
+displayed automatically. Positional and dynamic flag value completions for known
+commands are displayed after \f5tab\fR is entered. Known commands include
+\f5gcloud\fR, \f5bq\fR, \f5gsutil\fR, \f5kubectl\fR, and any command with a man
+page that has been executed at least once in any \fBinteractive\fR session.
+
+\f5tab\fR completion for unknown commands defers to \fBbash\fR(1), while still
+using the \fBinteractive\fR user interface. Absent specific command information,
+a file/path completer is used when \f5tab\fR is entered for unknown positionals
+(arguments that do not start with '\-'). The default completer handles '~' path
+notation and embedded \fI$var\fR references, but does not expand their values in
+completions.
+
+Configure bash completions as you normally would. \fBgcloud alpha interactive\fR
+starts up bash in a mode that sources \fB~/.bashrc\fR with the environment
+variable \fBCOSHELL_VERSION\fR set to a non\-empty version value.
+
+Command completion resets with each simple command in the command line. Simple
+commands are separated by '|', ';', '&' and may appear after '$(', '(', '{',
+\'!', \fBif\fR, \fBthen\fR, \fBelif\fR, \fBwhile\fR, and \fIname\fR=\fIvalue\fR
+per command exports. Use \f5tab\fR on an empty line to enable command executable
+search on PATH for the first token in each simple command.
+
+Currently simple and compound commands must be entered in a single line.
+
+Refer to Using gcloud interactive
+(https://cloud.google.com/sdk/docs/interactive\-gcloud) for more information and
+animated GIFs.
 
 
 .SH "Control Characters"
@@ -110,18 +133,18 @@ line being entered at the prompt.
 
 .RS 2m
 .TP 2m
-\fB^C\fR
+\fBctrl\-c\fR
 If a command is currently running, then that command is interrupted. This
-terminates the command. Otherwise, if no command is running, ^C clears the
+terminates the command. Otherwise, if no command is running, ctrl\-c clears the
 current command line.
 
 .TP 2m
-\fB^D\fR
+\fBctrl\-d\fR
 Exits when entered as the first character at the command prompt. You can also
 run the \fBexit\fR command at the prompt.
 
 .TP 2m
-\fB^W\fR
+\fBctrl\-w\fR
 If a command is not currently running, then the last word on the command line is
 deleted. This is handy for "walking back" partial completions.
 
@@ -264,7 +287,7 @@ If True, add command line suggestions based on history. The default value is
 .SH "CLI Trees"
 
 \fBgcloud alpha interactive\fR uses CLI tree data files for typeahead, command
-line completion and help snippet generation. A few CLI trees are installed with
+line completion, and help snippet generation. A few CLI trees are installed with
 their respective Cloud SDK components: \fBgcloud\fR (core component), \fBbq\fR,
 \fBgsutil\fR, and \fBkubectl\fR. Trees for commands that have man(1) pages are
 generated on the fly. See \f5$ gcloud topic cli\-trees\fR for details.
@@ -276,9 +299,9 @@ generated on the fly. See \f5$ gcloud topic cli\-trees\fR for details.
 .RS 2m
 .TP 2m
 \fB\-\-context\fR=\fICONTEXT\fR
-The default command context. This is a string containing a command name, flags
-and arguments. The context is prepopulated in each command line. You can inline
-edit any part of the context, or ^C to eliminate it.
+Default command context. This is a string containing a command name, flags, and
+arguments. The context is prepopulated in each command line. You can inline edit
+any part of the context, or ctrl\-c to eliminate it.
 
 
 .RE
@@ -287,15 +310,15 @@ edit any part of the context, or ^C to eliminate it.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-Run \fBgcloud alpha interactive\fR with the command context set to "gcloud ":
+To set the command context of \fBgcloud alpha interactive\fR to "gcloud ", run:
 
 .RS 2m
 gcloud alpha interactive \-\-context="gcloud "
@@ -305,7 +328,7 @@ gcloud alpha interactive \-\-context="gcloud "
 
 .SH "NOTES"
 
-On Windows install \fBgit\fR(1) for a \fBbash\fR(1) experience. \fBgcloud alpha
+On Windows, install \fBgit\fR(1) for a \fBbash\fR(1) experience. \fBgcloud alpha
 interactive\fR will then use the \fBgit\fR (MinGW) \fBbash\fR instead of
 \fBcmd.exe\fR.
 
@@ -315,5 +338,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta interactive
+.RE
 

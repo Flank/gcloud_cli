@@ -11,17 +11,17 @@ gcloud compute health\-checks create https \- create a HTTPS health check to mon
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute health\-checks create https\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR;\ default="/"] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-port\fR=\fIPORT\fR;\ default=80\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute health\-checks create https\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR;\ default="/"] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-port\fR=\fIPORT\fR;\ default=80\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fBgcloud compute health\-checks create https\fR is used to create a HTTPS
-health check. HTTPS health checks monitor instances in a load balancer
-controlled by a target pool. All arguments to the command are optional except
-for the name of the health check. Note, by default, this health check monitors
-TCP port 80. For more information on load balancing, see
+\fBgcloud compute health\-checks create https\fR is used to create an HTTPS
+non\-legacy health check. HTTPS health checks monitor instances in a load
+balancer controlled by a target pool. All arguments to the command are optional
+except for the name of the health check. Note, by default, this health check
+monitors TCP port 80. For more information on load balancing, see
 https://cloud.google.com/compute/docs/load\-balancing\-and\-autoscaling/
 
 
@@ -75,13 +75,20 @@ No proxy header is added.
 .TP 2m
 \fBPROXY_V1\fR
 Adds the header "PROXY UNKNOWN\er\en".
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-request\-path\fR=\fIREQUEST_PATH\fR; default="/"
 The request path that this health check monitors. For example,
 \f5\fI/healthcheck\fR\fR. The default value is ``/''.
+
+.TP 2m
+\fB\-\-response\fR=\fIRESPONSE\fR
+When empty, status code of the response determines health. When not empty,
+presence of specified string in first 1024 characters of response body
+determines health. Only ASCII characters allowed.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="5s"
@@ -120,9 +127,9 @@ The port name that this health check monitors. By default, this is empty.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

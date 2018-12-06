@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from apitools.base.py import base_api
 
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 import mock
 
@@ -42,7 +42,7 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
   SUBNET = 'test-subnetwork'
 
   def GetComputeApiVersion(self):
-    if self.track == base.ReleaseTrack.GA:
+    if self.track == calliope_base.ReleaseTrack.GA:
       return 'v1'
     return 'beta'
 

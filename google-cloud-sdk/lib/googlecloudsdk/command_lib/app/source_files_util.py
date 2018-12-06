@@ -47,7 +47,23 @@ _PHP_GCLOUDIGNORE = '\n'.join([
 _PYTHON_GCLOUDIGNORE = '\n'.join([
     gcloudignore.DEFAULT_IGNORE_FILE,
     '# Python pycache:',
-    '__pycache__/'
+    '__pycache__/',
+    '# Ignored by the build system',
+    '/setup.cfg'
+])
+
+_GO_GCLOUDIGNORE = '\n'.join([
+    gcloudignore.DEFAULT_IGNORE_FILE,
+    '# Binaries for programs and plugins',
+    '*.exe',
+    '*.exe~',
+    '*.dll',
+    '*.so',
+    '*.dylib',
+    '# Test binary, build with `go test -c`',
+    '*.test',
+    '# Output of the go coverage tool, specifically when used with LiteIDE',
+    '*.out'
 ])
 
 
@@ -58,21 +74,21 @@ _GCLOUDIGNORE_REGISTRY = {
         env.PHP_TI_RUNTIME_EXPR, {env.STANDARD}): _PHP_GCLOUDIGNORE,
     runtime_registry.RegistryEntry(
         env.PYTHON_TI_RUNTIME_EXPR, {env.STANDARD}): _PYTHON_GCLOUDIGNORE,
+    runtime_registry.RegistryEntry(
+        env.GO_TI_RUNTIME_EXPR, {env.STANDARD}): _GO_GCLOUDIGNORE,
 }
 
 
 class SkipFilesError(core_exceptions.Error):
-
-  def __init__(self, error_message):
-    super(SkipFilesError, self).__init__(error_message)
+  pass
 
 
 def _GetGcloudignoreRegistry():
   return runtime_registry.Registry(_GCLOUDIGNORE_REGISTRY, default=False)
 
 
-def GetSourceFileIterator(source_dir, skip_files_regex, has_explicit_skip_files,
-                          runtime, environment):
+def GetSourceFiles(upload_dir, skip_files_regex, has_explicit_skip_files,
+                   runtime, environment, source_dir):
   """Returns an iterator for accessing all source files to be uploaded.
 
   This method uses several implementations based on the provided runtime and
@@ -87,7 +103,7 @@ def GetSourceFileIterator(source_dir, skip_files_regex, has_explicit_skip_files,
     2b) If there is no .gcloudignore, we use the provided skip_files.
 
   Args:
-    source_dir: str, path to source directory
+    upload_dir: str, path to upload directory, the files to be uploaded.
     skip_files_regex: str, skip_files to use if necessary - see above rules for
       when this could happen. This can be either the user's explicit skip_files
       as defined in their app.yaml or the default skip_files we implicitly
@@ -96,6 +112,8 @@ def GetSourceFileIterator(source_dir, skip_files_regex, has_explicit_skip_files,
       explicitly defined by the user
     runtime: str, runtime as defined in app.yaml
     environment: env.Environment enum
+    source_dir: str, path to original source directory, for writing generated
+      files. May be the same as upload_dir.
 
   Raises:
     SkipFilesError: if you are using a runtime that no longer supports
@@ -104,8 +122,7 @@ def GetSourceFileIterator(source_dir, skip_files_regex, has_explicit_skip_files,
       a. gcloudignore file are present.
 
   Returns:
-    An iterable object. The returned values are path names of source files that
-    should be uploaded for deployment.
+    A list of path names of source files to be uploaded.
   """
   gcloudignore_registry = _GetGcloudignoreRegistry()
   registry_entry = gcloudignore_registry.Get(runtime, environment)
@@ -113,19 +130,21 @@ def GetSourceFileIterator(source_dir, skip_files_regex, has_explicit_skip_files,
   if registry_entry:
     if has_explicit_skip_files:
       raise SkipFilesError(
-          'You cannot use skip_files and have a .gcloudignore file in the same '
-          'application. You should convert your skip_files patterns and put '
-          'them in your .gcloudignore file. For information on the format and '
+          'skip_files cannot be used with the [{}] runtime. '
+          'Ignore patterns are instead expressed in '
+          'a .gcloudignore file. For information on the format and '
           'syntax of .gcloudignore files, see '
-          'https://cloud.google.com/sdk/gcloud/reference/topic/gcloudignore.')
+          'https://cloud.google.com/sdk/gcloud/reference/topic/gcloudignore.'
+          .format(runtime))
     file_chooser = gcloudignore.GetFileChooserForDir(
         source_dir,
         default_ignore_file=registry_entry,
         write_on_disk=True,
         gcloud_ignore_creation_predicate=lambda unused_dir: True,
         include_gitignore=False)
-    return file_chooser.GetIncludedFiles(source_dir, include_dirs=False)
-  elif os.path.exists(os.path.join(source_dir, gcloudignore.IGNORE_FILE_NAME)):
+    it = file_chooser.GetIncludedFiles(upload_dir, include_dirs=False)
+  elif os.path.exists(os.path.join(source_dir,
+                                   gcloudignore.IGNORE_FILE_NAME)):
     if has_explicit_skip_files:
       raise SkipFilesError(
           'Cannot have both a .gcloudignore file and skip_files defined in '
@@ -133,7 +152,8 @@ def GetSourceFileIterator(source_dir, skip_files_regex, has_explicit_skip_files,
           'ignore patterns to your .gcloudignore file. See '
           'https://cloud.google.com/sdk/gcloud/reference/topic/gcloudignore '
           'for more information about gcloudignore.')
-    return gcloudignore.GetFileChooserForDir(source_dir).GetIncludedFiles(
-        source_dir, include_dirs=False)
+    it = gcloudignore.GetFileChooserForDir(source_dir).GetIncludedFiles(
+        upload_dir, include_dirs=False)
   else:
-    return util.FileIterator(source_dir, skip_files_regex)
+    it = util.FileIterator(upload_dir, skip_files_regex)
+  return list(it)

@@ -50,11 +50,11 @@ from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import text as text_utils
+from googlecloudsdk.core.util import typing  # pylint: disable=unused-import
 
 import httplib2
 import six
 from six.moves import range
-from typing import Any, Dict  # pylint: disable=unused-import
 
 
 class Error(exceptions.Error):
@@ -122,7 +122,7 @@ def _Positional(name, description='', default=None, nargs='0'):
 
 
 def _Command(path):
-  # type: (str) -> Dict[str, Any]
+  # type: (str) -> typing.Dict[str, typing.Any]
   """Initializes and returns a command/group dict node."""
   return {
       cli_tree.LOOKUP_CAPSULE: '',
@@ -879,7 +879,8 @@ class _ManCommandCollector(_ManPageCollector):
     """Returns the raw man page text."""
     try:
       with files.FileWriter(os.devnull) as f:
-        return subprocess.check_output(['man', self.command], stderr=f)
+        return encoding.Decode(subprocess.check_output(['man', self.command],
+                                                       stderr=f))
     except (OSError, subprocess.CalledProcessError):
       raise NoManPageTextForCommand(
           'Cannot get man(1) command man page text for [{}].'.format(
@@ -890,7 +891,7 @@ class _ManCommandCollector(_ManPageCollector):
     text = self._GetRawManPageText()
     return re.sub(
         '.\b', '', re.sub(
-            '(\u2010|\\u2010)\n *', '', encoding.Decode(text)))
+            '(\u2010|\\u2010)\n *', '', text))
 
 
 class _ManUrlCollector(_ManPageCollector):
@@ -1136,7 +1137,7 @@ GENERATORS = {
 
 def LoadOrGenerate(command, directories=None, tarball=None, force=False,
                    generate=True, ignore_out_of_date=False, verbose=False,
-                   warn_on_exceptions=False):
+                   warn_on_exceptions=False, allow_extensions=False):
   """Returns the CLI tree for command, generating it if it does not exist.
 
   Args:
@@ -1153,6 +1154,7 @@ def LoadOrGenerate(command, directories=None, tarball=None, force=False,
     verbose: Display a status line for up to date CLI trees if True.
     warn_on_exceptions: Emits warning messages in lieu of generator exceptions.
       Used during installation.
+    allow_extensions: Whether or not to allow extensions in executable names.
 
   Returns:
     The CLI tree for command or None if command not found or there is no
@@ -1175,7 +1177,9 @@ def LoadOrGenerate(command, directories=None, tarball=None, force=False,
 
     # The command must exist.
     if (command_dir and not os.path.exists(command) or
-        not command_dir and not files.FindExecutableOnPath(command_name)):
+        not command_dir
+        and not files.FindExecutableOnPath(command_name,
+                                           allow_extensions=allow_extensions)):
       if verbose:
         log.status.Print('Command [{}] not found.'.format(command))
       return None

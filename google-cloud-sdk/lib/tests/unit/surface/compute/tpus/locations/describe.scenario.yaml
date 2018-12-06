@@ -1,0 +1,30 @@
+title: Describe a TPU Location
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute tpus locations describe asia-east1-c
+  - stdout: |
+      locationId: asia-east1-c
+      name: projects/fake-project/locations/asia-east1-c
+actions:
+- execute_command:
+    command: compute tpus locations describe asia-east1-c
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/asia-east1-c?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/asia-east1-c
+            locationId: asia-east1-c
+    - expect_stdout: |
+        locationId: asia-east1-c
+        name: projects/fake-project/locations/asia-east1-c
+    - expect_exit:
+        code: 0

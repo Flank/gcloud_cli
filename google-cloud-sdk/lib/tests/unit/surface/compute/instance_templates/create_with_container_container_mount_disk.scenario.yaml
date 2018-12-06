@@ -1,0 +1,951 @@
+title: instance-template create-with-container --container-mount-disk tests
+description: |
+  Tests --container-mount-disk flag.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,mode=rw,device-name=disk-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+  - stdout: |
+      NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
+      instance-template-1  n1-standard-1               2018-11-22T14:58:24.163-08:00
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk name=disk-1,mode=rw
+      --container-mount-disk name=disk-1,mount-path="/mounted"
+  - stderr: |
+      WARNING: Default device-name for disk name [disk-1] will be [disk-1] because it is being mounted to a container with [`--container-mount-disk`]
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+  - stdout: |
+      NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
+      instance-template-1  n1-standard-1               2018-11-22T14:58:24.163-08:00
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk
+      name=disk-1,mode=rw,device-name=disk-1 --container-mount-disk
+      name=disk-1,mode=ro,mount-path="/mounted",partition=1 --container-mount-disk
+      name=disk-1,mode=ro,mount-path="/mounted-1",partition=2
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+  - stdout: |
+      NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
+      instance-template-1  n1-standard-1               2018-11-23T22:11:17.910-08:00
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk
+      name=disk-1,mode=rw,device-name=pd-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+  - error: '1: Invalid value for [--container-mount-disk]: Container mount disk cannot
+      be used with a device whose device-name is different from its name. The disk
+      with name [disk-1] has the device-name [pd-1].'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,mode=rw,device-name=pd-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+  - error: '1: Invalid value for [--container-mount-disk]: Container mount disk cannot
+      be used with a device whose device-name is different from its name. The disk
+      with name [disk-1] has the device-name [pd-1].'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+  - error: '1: Invalid value for [--container-mount-disk]: Must be used with `--disk`
+      or `--create-disk`'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image"  --disk name=disk-2,mode=rw,device-name=disk-2
+      --container-mount-disk name=disk-1,mount-path="/mounted"
+  - error: '1: Invalid value for [--container-mount-disk]: Attempting to mount a disk
+      that is not attached to the instance: must attach a disk named [disk-1] using
+      `--disk` or `--create-disk`.'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image"  --create-disk
+      name=disk-2,mode=rw,device-name=disk-2 --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+  - error: '1: Invalid value for [--container-mount-disk]: Attempting to mount a disk
+      that is not attached to the instance: must attach a disk named [disk-1] using
+      `--disk` or `--create-disk`.'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk name=disk-1,mode=rw,device-name=disk-1
+      --disk name=disk-2,mode=rw,device-name=disk-2 --container-mount-disk mount-path="/mounted"
+  - error: '1: Invalid value for [--container-mount-disk]: Must specify the name of
+      the disk to be mounted unless exactly one disk is attached to the instance using
+      `--disk` or `--create-disk`..'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk mode=rw --container-mount-disk
+      mount-path="/mounted"
+  - error: '1: Invalid value for [--container-mount-disk]: When attaching or creating
+      a disk that is also being mounted to a container, must specify the disk name.'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk name=disk-1,mode=ro,device-name=disk-1
+      --container-mount-disk name=disk-1,mount-path="/mounted",mode=rw
+  - error: '1: Invalid value for [--container-mount-disk]: Value for [mode] in [--container-mount-disk]
+      cannot be [rw] if the disk is attached in [ro] mode: disk name [disk-1], partition
+      [None]'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,mode=ro,device-name=disk-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted",mode=rw
+  - error: '1: Invalid value for [--container-mount-disk]: Value for [mode] in [--container-mount-disk]
+      cannot be [rw] if the disk is attached in [ro] mode: disk name [disk-1], partition
+      [None]'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,mode=ro,device-name=disk-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted",mode=ro
+  - error: '1: Invalid value for [--container-mount-disk]: Cannot mount disk named
+      [disk-1] to container: disk is created in [ro] mode and thus cannot be formatted.'
+- execute:
+  - command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,device-name=disk-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted",partition=1
+  - error: '1: Invalid value for [--container-mount-disk]: Container mount disk cannot
+      specify a partition when the disk is created with --create-disk: disk name [disk-1],
+      partition [1]'
+actions:
+# Create with container functionality is already tested fairly extensively in
+# instances/create_with_container_test.py. We include a corresponding subset of those tests here
+# just to ensure it works with instance_templates as well.
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: alpha
+      BETA: beta
+- execute_command:
+    # Create disk, device name given
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,mode=rw,device-name=disk-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: projects/cos-cloud/global/images
+            items:
+            - archiveSizeBytes: '4309204608'
+              creationTimestamp: '2018-11-06T18:10:12.809-08:00'
+              description: 'Google, Container-Optimized OS, 70-11021.67.0 stable,
+                Kernel: ChromiumOS-4.14.67 Kubernetes: 1.11.3 Docker: 18.06.1 Family:
+                cos-stable'
+              diskSizeGb: '10'
+              family: cos-stable
+              id: '7128057228532119403'
+              kind: compute#image
+              labelFingerprint: 42WmSpB8rSM=
+              licenseCodes:
+              - '1001010'
+              - '6880041984096540132'
+              licenses:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos-pcid
+              name: cos-stable-70-11021-67-0
+              rawDisk:
+                containerType: TAR
+                source: ''
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+              sourceType: RAW
+              status: READY
+            kind: compute#imageList
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: instance-template-1
+              properties:
+                canIpForward: false
+                disks:
+                - autoDelete: true
+                  boot: true
+                  initializeParams:
+                    sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                  mode: READ_WRITE
+                  type: PERSISTENT
+                - autoDelete: false
+                  boot: false
+                  deviceName: disk-1
+                  initializeParams:
+                    diskName: disk-1
+                  mode: READ_WRITE
+                  type: PERSISTENT
+                labels:
+                  container-vm: cos-stable-70-11021-67-0
+                machineType: n1-standard-1
+                metadata:
+                  items:
+                  - key: gce-container-declaration
+                    value: |
+                      # DISCLAIMER:
+                      # This container declaration format is not a public API and may change without
+                      # notice. Please use gcloud command-line tool or Google Cloud Console to run
+                      # Containers on Google Compute Engine.
+
+                      spec:
+                        containers:
+                        - image: gcr.io/my-docker/test-image
+                          name: instance-template-1
+                          securityContext:
+                            privileged: false
+                          stdin: false
+                          tty: false
+                          volumeMounts:
+                          - mountPath: /mounted
+                            name: pd-0
+                            readOnly: false
+                        restartPolicy: Always
+                        volumes:
+                        - gcePersistentDisk:
+                            fsType: ext4
+                            pdName: disk-1
+                          name: pd-0
+                  - key: google-logging-enabled
+                    value: 'true'
+                networkInterfaces:
+                - accessConfigs:
+                  - name: external-nat
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
+                scheduling:
+                  automaticRestart: true
+                serviceAccounts:
+                - email: default
+                  scopes:
+                  - https://www.googleapis.com/auth/devstorage.read_only
+                  - https://www.googleapis.com/auth/logging.write
+                  - https://www.googleapis.com/auth/monitoring.write
+                  - https://www.googleapis.com/auth/pubsub
+                  - https://www.googleapis.com/auth/service.management.readonly
+                  - https://www.googleapis.com/auth/servicecontrol
+                  - https://www.googleapis.com/auth/trace.append
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: '1528195962254297727'
+            insertTime: '2018-11-22T14:58:24.178-08:00'
+            kind: compute#operation
+            name: operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
+            operationType: compute.instanceTemplates.insert
+            progress: 0
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/operations/operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
+            status: PENDING
+            targetId: '3451132337698015871'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+            user: example@google.com
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/instance-template-1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            creationTimestamp: '2018-11-22T14:58:24.163-08:00'
+            description: ''
+            id: '3451132337698015871'
+            kind: compute#instanceTemplate
+            name: instance-template-1
+            properties:
+              canIpForward: false
+              disks:
+              - autoDelete: true
+                boot: true
+                deviceName: persistent-disk-0
+                index: 0
+                initializeParams:
+                  sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                kind: compute#attachedDisk
+                mode: READ_WRITE
+                type: PERSISTENT
+              - autoDelete: false
+                boot: false
+                deviceName: disk-1
+                index: 1
+                initializeParams:
+                  diskName: disk-1
+                kind: compute#attachedDisk
+                mode: READ_WRITE
+                type: PERSISTENT
+              labels:
+                container-vm: cos-stable-70-11021-67-0
+              machineType: n1-standard-1
+              metadata:
+                fingerprint: vnYlnupnIsA=
+                items:
+                - key: gce-container-declaration
+                  value: "# DISCLAIMER:\n# This container declaration format is not\
+                    \ a public API and may change without\n# notice. Please use gcloud\
+                    \ command-line tool or Google Cloud Console to run\n# Containers\
+                    \ on Google Compute Engine.\n\nspec:\n  containers:\n  - image:\
+                    \ gcr.io/my-docker/test-image\n    name: instance-template-1\n\
+                    \    securityContext:\n      privileged: false\n    stdin: false\n\
+                    \    tty: false\n    volumeMounts:\n    - mountPath: /mounted\n\
+                    \      name: pd-0\n      readOnly: false\n  restartPolicy: Always\n\
+                    \  volumes:\n  - gcePersistentDisk:\n      fsType: ext4\n    \
+                    \  pdName: disk-1\n    name: pd-0\n"
+                - key: google-logging-enabled
+                  value: 'true'
+                kind: compute#metadata
+              networkInterfaces:
+              - accessConfigs:
+                - kind: compute#accessConfig
+                  name: external-nat
+                  networkTier: PREMIUM
+                  type: ONE_TO_ONE_NAT
+                kind: compute#networkInterface
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/networks/default
+              scheduling:
+                automaticRestart: true
+                onHostMaintenance: MIGRATE
+                preemptible: false
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+
+    - expect_stdout: |
+        NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
+        instance-template-1  n1-standard-1               2018-11-22T14:58:24.163-08:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Attach disk, device name not given
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk name=disk-1,mode=rw
+      --container-mount-disk name=disk-1,mount-path="/mounted"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: projects/cos-cloud/global/images
+            items:
+            - archiveSizeBytes: '4309204608'
+              creationTimestamp: '2018-11-06T18:10:12.809-08:00'
+              description: 'Google, Container-Optimized OS, 70-11021.67.0 stable,
+                Kernel: ChromiumOS-4.14.67 Kubernetes: 1.11.3 Docker: 18.06.1 Family:
+                cos-stable'
+              diskSizeGb: '10'
+              family: cos-stable
+              id: '7128057228532119403'
+              kind: compute#image
+              labelFingerprint: 42WmSpB8rSM=
+              licenseCodes:
+              - '1001010'
+              - '6880041984096540132'
+              licenses:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos-pcid
+              name: cos-stable-70-11021-67-0
+              rawDisk:
+                containerType: TAR
+                source: ''
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+              sourceType: RAW
+              status: READY
+            kind: compute#imageList
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images
+
+    - expect_stderr: |
+        WARNING: Default device-name for disk name [disk-1] will be [disk-1] because it is being mounted to a container with [`--container-mount-disk`]
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: instance-template-1
+              properties:
+                canIpForward: false
+                disks:
+                - autoDelete: true
+                  boot: true
+                  initializeParams:
+                    sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                  mode: READ_WRITE
+                  type: PERSISTENT
+                - autoDelete: false
+                  boot: false
+                  deviceName: disk-1
+                  mode: READ_WRITE
+                  source: disk-1
+                  type: PERSISTENT
+                labels:
+                  container-vm: cos-stable-70-11021-67-0
+                machineType: n1-standard-1
+                metadata:
+                  items:
+                  - key: gce-container-declaration
+                    value: |
+                      # DISCLAIMER:
+                      # This container declaration format is not a public API and may change without
+                      # notice. Please use gcloud command-line tool or Google Cloud Console to run
+                      # Containers on Google Compute Engine.
+
+                      spec:
+                        containers:
+                        - image: gcr.io/my-docker/test-image
+                          name: instance-template-1
+                          securityContext:
+                            privileged: false
+                          stdin: false
+                          tty: false
+                          volumeMounts:
+                          - mountPath: /mounted
+                            name: pd-0
+                            readOnly: false
+                        restartPolicy: Always
+                        volumes:
+                        - gcePersistentDisk:
+                            fsType: ext4
+                            pdName: disk-1
+                          name: pd-0
+                  - key: google-logging-enabled
+                    value: 'true'
+                networkInterfaces:
+                - accessConfigs:
+                  - name: external-nat
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
+                scheduling:
+                  automaticRestart: true
+                serviceAccounts:
+                - email: default
+                  scopes:
+                  - https://www.googleapis.com/auth/devstorage.read_only
+                  - https://www.googleapis.com/auth/logging.write
+                  - https://www.googleapis.com/auth/monitoring.write
+                  - https://www.googleapis.com/auth/pubsub
+                  - https://www.googleapis.com/auth/service.management.readonly
+                  - https://www.googleapis.com/auth/servicecontrol
+                  - https://www.googleapis.com/auth/trace.append
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: '1528195962254297727'
+            insertTime: '2018-11-22T14:58:24.178-08:00'
+            kind: compute#operation
+            name: operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
+            operationType: compute.instanceTemplates.insert
+            progress: 0
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/operations/operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
+            status: PENDING
+            targetId: '3451132337698015871'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+            user: example@google.com
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/instance-template-1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            creationTimestamp: '2018-11-22T14:58:24.163-08:00'
+            description: ''
+            id: '3451132337698015871'
+            kind: compute#instanceTemplate
+            name: instance-template-1
+            properties:
+              canIpForward: false
+              disks:
+              - autoDelete: true
+                boot: true
+                deviceName: persistent-disk-0
+                index: 0
+                initializeParams:
+                  sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                kind: compute#attachedDisk
+                mode: READ_WRITE
+                type: PERSISTENT
+              - autoDelete: false
+                boot: false
+                deviceName: disk-1
+                index: 1
+                source: disk-1
+                kind: compute#attachedDisk
+                mode: READ_WRITE
+                type: PERSISTENT
+              labels:
+                container-vm: cos-stable-70-11021-67-0
+              machineType: n1-standard-1
+              metadata:
+                fingerprint: vnYlnupnIsA=
+                items:
+                - key: gce-container-declaration
+                  value: "# DISCLAIMER:\n# This container declaration format is not\
+                    \ a public API and may change without\n# notice. Please use gcloud\
+                    \ command-line tool or Google Cloud Console to run\n# Containers\
+                    \ on Google Compute Engine.\n\nspec:\n  containers:\n  - image:\
+                    \ gcr.io/my-docker/test-image\n    name: instance-template-1\n\
+                    \    securityContext:\n      privileged: false\n    stdin: false\n\
+                    \    tty: false\n    volumeMounts:\n    - mountPath: /mounted\n\
+                    \      name: pd-0\n      readOnly: false\n  restartPolicy: Always\n\
+                    \  volumes:\n  - gcePersistentDisk:\n      fsType: ext4\n    \
+                    \  pdName: disk-1\n    name: pd-0\n"
+                - key: google-logging-enabled
+                  value: 'true'
+                kind: compute#metadata
+              networkInterfaces:
+              - accessConfigs:
+                - kind: compute#accessConfig
+                  name: external-nat
+                  networkTier: PREMIUM
+                  type: ONE_TO_ONE_NAT
+                kind: compute#networkInterface
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/networks/default
+              scheduling:
+                automaticRestart: true
+                onHostMaintenance: MIGRATE
+                preemptible: false
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+    - expect_stdout: |
+        NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
+        instance-template-1  n1-standard-1               2018-11-22T14:58:24.163-08:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Repeated with partition
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk
+      name=disk-1,mode=rw,device-name=disk-1 --container-mount-disk
+      name=disk-1,mode=ro,mount-path="/mounted",partition=1 --container-mount-disk
+      name=disk-1,mode=ro,mount-path="/mounted-1",partition=2
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: projects/cos-cloud/global/images
+            items:
+            - archiveSizeBytes: '4309204608'
+              creationTimestamp: '2018-11-06T18:10:12.809-08:00'
+              description: 'Google, Container-Optimized OS, 70-11021.67.0 stable,
+                Kernel: ChromiumOS-4.14.67 Kubernetes: 1.11.3 Docker: 18.06.1 Family:
+                cos-stable'
+              diskSizeGb: '10'
+              family: cos-stable
+              id: '7128057228532119403'
+              kind: compute#image
+              labelFingerprint: 42WmSpB8rSM=
+              licenseCodes:
+              - '1001010'
+              - '6880041984096540132'
+              licenses:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos-pcid
+              name: cos-stable-70-11021-67-0
+              rawDisk:
+                containerType: TAR
+                source: ''
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+              sourceType: RAW
+              status: READY
+            kind: compute#imageList
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: instance-template-1
+              properties:
+                canIpForward: false
+                disks:
+                - autoDelete: true
+                  boot: true
+                  initializeParams:
+                    sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                  mode: READ_WRITE
+                  type: PERSISTENT
+                - autoDelete: false
+                  boot: false
+                  deviceName: disk-1
+                  mode: READ_WRITE
+                  source: disk-1
+                  type: PERSISTENT
+                labels:
+                  container-vm: cos-stable-70-11021-67-0
+                machineType: n1-standard-1
+                metadata:
+                  items:
+                  - key: gce-container-declaration
+                    value: |
+                      # DISCLAIMER:
+                      # This container declaration format is not a public API and may change without
+                      # notice. Please use gcloud command-line tool or Google Cloud Console to run
+                      # Containers on Google Compute Engine.
+
+                      spec:
+                        containers:
+                        - image: gcr.io/my-docker/test-image
+                          name: instance-template-1
+                          securityContext:
+                            privileged: false
+                          stdin: false
+                          tty: false
+                          volumeMounts:
+                          - mountPath: /mounted
+                            name: pd-0
+                            readOnly: true
+                          - mountPath: /mounted-1
+                            name: pd-1
+                            readOnly: true
+                        restartPolicy: Always
+                        volumes:
+                        - gcePersistentDisk:
+                            fsType: ext4
+                            partition: 1
+                            pdName: disk-1
+                          name: pd-0
+                        - gcePersistentDisk:
+                            fsType: ext4
+                            partition: 2
+                            pdName: disk-1
+                          name: pd-1
+                  - key: google-logging-enabled
+                    value: 'true'
+                networkInterfaces:
+                - accessConfigs:
+                  - name: external-nat
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
+                scheduling:
+                  automaticRestart: true
+                serviceAccounts:
+                - email: default
+                  scopes:
+                  - https://www.googleapis.com/auth/devstorage.read_only
+                  - https://www.googleapis.com/auth/logging.write
+                  - https://www.googleapis.com/auth/monitoring.write
+                  - https://www.googleapis.com/auth/pubsub
+                  - https://www.googleapis.com/auth/service.management.readonly
+                  - https://www.googleapis.com/auth/servicecontrol
+                  - https://www.googleapis.com/auth/trace.append
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: '1528195962254297727'
+            insertTime: '2018-11-22T14:58:24.178-08:00'
+            kind: compute#operation
+            name: operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
+            operationType: compute.instanceTemplates.insert
+            progress: 0
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/operations/operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
+            status: PENDING
+            targetId: '3451132337698015871'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+            user: example@google.com
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/instance-template-1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            creationTimestamp: '2018-11-23T22:11:17.910-08:00'
+            description: ''
+            id: '3139191667602838890'
+            kind: compute#instanceTemplate
+            name: instance-template-1
+            properties:
+              canIpForward: false
+              disks:
+              - autoDelete: true
+                boot: true
+                deviceName: persistent-disk-0
+                index: 0
+                initializeParams:
+                  sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                kind: compute#attachedDisk
+                mode: READ_WRITE
+                type: PERSISTENT
+              - autoDelete: false
+                boot: false
+                deviceName: disk-1
+                index: 1
+                kind: compute#attachedDisk
+                mode: READ_WRITE
+                source: disk-1
+                type: PERSISTENT
+              labels:
+                container-vm: cos-stable-70-11021-67-0
+              machineType: n1-standard-1
+              metadata:
+                fingerprint: Gl6Xvwod6Uo=
+                items:
+                - key: gce-container-declaration
+                  value: "# DISCLAIMER:\n# This container declaration format is not\
+                    \ a public API and may change without\n# notice. Please use gcloud\
+                    \ command-line tool or Google Cloud Console to run\n# Containers\
+                    \ on Google Compute Engine.\n\nspec:\n  containers:\n  - image:\
+                    \ gcr.io/my-docker/test-image\n    name: instance-template-1\n\
+                    \    securityContext:\n      privileged: false\n    stdin: false\n\
+                    \    tty: false\n    volumeMounts:\n    - mountPath: /mounted\n\
+                    \      name: pd-0\n      readOnly: true\n    - mountPath: /mounted-1\n\
+                    \      name: pd-1\n      readOnly: true\n  restartPolicy: Always\n\
+                    \  volumes:\n  - gcePersistentDisk:\n      fsType: ext4\n    \
+                    \  partition: 1\n      pdName: disk-1\n    name: pd-0\n  - gcePersistentDisk:\n\
+                    \      fsType: ext4\n      partition: 2\n      pdName: disk-1\n\
+                    \    name: pd-1\n"
+                - key: google-logging-enabled
+                  value: 'true'
+                kind: compute#metadata
+              networkInterfaces:
+              - accessConfigs:
+                - kind: compute#accessConfig
+                  name: external-nat
+                  networkTier: PREMIUM
+                  type: ONE_TO_ONE_NAT
+                kind: compute#networkInterface
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/networks/default
+              scheduling:
+                automaticRestart: true
+                onHostMaintenance: MIGRATE
+                preemptible: false
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+
+    - expect_stdout: |
+        NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
+        instance-template-1  n1-standard-1               2018-11-23T22:11:17.910-08:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Attach mismatched (device name, if given, must match name)
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk
+      name=disk-1,mode=rw,device-name=pd-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Container mount disk
+          cannot be used with a device whose device-name is different from its name.
+          The disk with name [disk-1] has the device-name [pd-1].'
+- execute_command:
+    # Create mismatched (device name, if given, must match name)
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,mode=rw,device-name=pd-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Container mount disk
+          cannot be used with a device whose device-name is different from its name.
+          The disk with name [disk-1] has the device-name [pd-1].'
+- execute_command:
+    # Must be used with disk or create-disk flags
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Must be used with `--disk`
+          or `--create-disk`'
+- execute_command:
+    # Disk must have matching name
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image"  --disk name=disk-2,mode=rw,device-name=disk-2
+      --container-mount-disk name=disk-1,mount-path="/mounted"
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Attempting to mount
+          a disk that is not attached to the instance: must attach a disk named [disk-1]
+          using `--disk` or `--create-disk`.'
+- execute_command:
+    # Create disk must have matching name
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image"  --create-disk
+      name=disk-2,mode=rw,device-name=disk-2 --container-mount-disk
+      name=disk-1,mount-path="/mounted"
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Attempting to mount
+          a disk that is not attached to the instance: must attach a disk named [disk-1]
+          using `--disk` or `--create-disk`.'
+- execute_command:
+    # If no name is given for --container-mount-disk, there can be only one
+    # disk specified with --disk or --create-disk.
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk name=disk-1,mode=rw,device-name=disk-1
+      --disk name=disk-2,mode=rw,device-name=disk-2 --container-mount-disk mount-path="/mounted"
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Must specify the name
+          of the disk to be mounted unless exactly one disk is attached to the instance
+          using `--disk` or `--create-disk`..'
+- execute_command:
+    # If no name is given for --create-disk, should fail.
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk mode=rw --container-mount-disk
+      mount-path="/mounted"
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: When attaching or creating
+          a disk that is also being mounted to a container, must specify the disk
+          name.'
+- execute_command:
+    # Attached disk mode must be rw if --container-mount-disk mode is rw.
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --disk name=disk-1,mode=ro,device-name=disk-1
+      --container-mount-disk name=disk-1,mount-path="/mounted",mode=rw
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Value for [mode] in
+          [--container-mount-disk] cannot be [rw] if the disk is attached in [ro]
+          mode: disk name [disk-1], partition [None]'
+- execute_command:
+    # Create disk mode must be rw if --container-mount-disk mode is rw.
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,mode=ro,device-name=disk-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted",mode=rw
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Value for [mode] in
+          [--container-mount-disk] cannot be [rw] if the disk is attached in [ro]
+          mode: disk name [disk-1], partition [None]'
+- execute_command:
+    # Disk can't be created in ro mode
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,mode=ro,device-name=disk-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted",mode=ro
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Cannot mount disk named
+          [disk-1] to container: disk is created in [ro] mode and thus cannot be formatted.'
+- execute_command:
+    # Can't specify a partition when disk created with --create-disk
+    command: |
+      compute instance-templates create-with-container instance-template-1
+      --container-image="gcr.io/my-docker/test-image" --create-disk
+      name=disk-1,device-name=disk-1 --container-mount-disk
+      name=disk-1,mount-path="/mounted",partition=1
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--container-mount-disk]: Container mount disk
+          cannot specify a partition when the disk is created with --create-disk:
+          disk name [disk-1], partition [1]'

@@ -18,16 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class LevelConditionsListTest(accesscontextmanager.Base):
+class LevelConditionsListTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -44,8 +45,8 @@ class LevelConditionsListTest(accesscontextmanager.Base):
         ),
         level)
 
-  def testList_MissingRequired(self, track):
-    self.SetUpForTrack(track)
+  def testList_MissingRequired(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager levels conditions list '
@@ -61,19 +62,20 @@ class LevelConditionsListTest(accesscontextmanager.Base):
             conditions=[
                 self.messages.Condition(
                     ipSubnetworks=['127.0.0.1/24', '10.0.0.0/8'],
+                    devicePolicy=self.messages.DevicePolicy(
+                        requireScreenlock=True),
                     members=['user:a@example.com', 'user:b@example.com']),
                 self.messages.Condition(
                     requiredAccessLevels=[
                         'accessPolicies/my_policy/accessLevels/other_level',
-                        'accessPolicies/my_policy/accessLevels/other_level2'],
+                        'accessPolicies/my_policy/accessLevels/other_level2'
+                    ],
                     negate=True)
-
-            ]
-        ),
+            ]),
         name=name)
 
-  def testList(self, track):
-    self.SetUpForTrack(track)
+  def testList(self):
+    self.SetUpForTrack(self.track)
     level = self._MakeBasicLevel('my_level')
     self._ExpectGet(level, 'my_policy')
 
@@ -83,18 +85,24 @@ class LevelConditionsListTest(accesscontextmanager.Base):
     self.AssertOutputContains("""\
         Conditions are joined with AND operator.
 
-        +------------------------------------------------------------------------+
-        |                          ACCESS LEVEL CONDITIONS                       |
-        +---------+----------------+--------------------+------------------------+
-        | NEGATED | IP_SUBNETWORKS |      MEMBERS       | REQUIRED_ACCESS_LEVELS |
-        +---------+----------------+--------------------+------------------------+
-        |         | 127.0.0.1/24   | user:a@example.com |                        |
-        |         | 10.0.0.0/8     | user:b@example.com |                        |
-        +---------+----------------+--------------------+------------------------+
-        | True    |                |                    | other_level            |
-        |         |                |                    | other_level2           |
-        +---------+----------------+--------------------+------------------------+
-        """, normalize_space=True)
+        +-------------------------------------------------------------------------------------------------+
+        |                          ACCESS LEVEL CONDITIONS                                                |
+        +---------+------------------------+----------------+--------------------+------------------------+
+        | NEGATED | DEVICE_POLICY          | IP_SUBNETWORKS | MEMBERS            | REQUIRED_ACCESS_LEVELS |
+        +---------+------------------------+----------------+--------------------+------------------------+
+        |         | requireScreenlock=True | 127.0.0.1/24   | user:a@example.com |                        |
+        |         |                        | 10.0.0.0/8     | user:b@example.com |                        |
+        +---------+------------------------+----------------+--------------------+------------------------+
+        | True    |                        |                |                    | other_level            |
+        |         |                        |                |                    | other_level2           |
+        +---------+------------------------+----------------+--------------------+------------------------+
+      """, normalize_space=True)
+
+
+class LevelConditionsListTestAlpha(LevelConditionsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

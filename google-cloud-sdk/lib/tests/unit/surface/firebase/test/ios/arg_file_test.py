@@ -56,6 +56,8 @@ class IosArgFileTests(unit_base.IosUnitTestBase):
     self.assertEqual(args.results_dir, 'my/ios/results')
     self.assertEqual(args.results_history_name, 'history2')
     self.assertEqual(args.timeout, 25 * 60)
+    self.assertEqual(args.xctestrun_file, '.xctestrun2')
+    self.assertEqual(args.xcode_version, '9.1.1')
 
   # Test type arg validation tests
 

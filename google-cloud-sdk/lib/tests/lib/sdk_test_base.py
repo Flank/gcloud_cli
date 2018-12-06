@@ -14,12 +14,12 @@
 # limitations under the License.
 
 """A base class for tests depending on Cloud SDK structural setup."""
-from __future__ import absolute_import
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import copy
 import datetime
 import functools
 import inspect
@@ -27,6 +27,7 @@ import io
 import numbers
 import os
 import socket
+import subprocess
 import sys
 import tempfile
 import traceback
@@ -103,22 +104,69 @@ class SdkBase(test_case.Base):
   this base class.
   """
 
-  def __CleanProperties(self):
-    """Make sure properties are set to a clean state between tests.
+  _REAL_POPEN = subprocess.Popen
+  _TEST_PROPERTIES = ['CLOUDSDK_CONFIG', 'HOME']
 
-    This should be called once before and once after the test runs. The
-    properties in _clean_properties will be set to whatever value is stored
-    there. All other properties will be set to None.
-    """
+  @classmethod
+  def SetUpClass(cls):
+    cls._active_properties = copy.copy(
+        named_configs.ActivePropertiesFile.Load())
+    cls.__InitProperties()
+
+  @classmethod
+  def __InitProperties(cls):
+    class_properties = {
+        # Runtime root should be set back to whatever value it started with
+        ('app', 'runtime_root'): properties.VALUES.app.runtime_root.Get(),
+        ('core', 'check_gce_metadata'): False,
+        ('component_manager', 'disable_update_check'): True,
+        ('core', 'disable_usage_reporting'): True,
+        ('core', 'should_prompt_to_enable_api'): False,
+    }
     for section in properties.VALUES:
       for prop in section:
-        if (section.name, prop.name) in self._clean_properties:
-          prop.Set(self._clean_properties[(section.name, prop.name)])
+        if (section.name, prop.name) in class_properties:
+          prop.Set(class_properties[(section.name, prop.name)])
         else:
           prop.Set(None)
+    cls._environ = os.environ.copy()
 
-    # Invalidate cache between tests.
-    named_configs.ActivePropertiesFile.Invalidate()
+  def __ResetPropertyValues(self, setup=False):
+    """Resets the property environment values.
+
+    Args:
+      setup: True if this is in the SetUp call, False for TearDown/CleanUp
+    """
+    if setup:
+      # Add the per-test properties to the per-class environment.
+      old_environ = os.environ
+      os.environ = self._environ.copy()
+    else:
+      # Restore os.environ test properties to the spot where the environ
+      # altered state check froze it's copy.
+      old_environ = self._environ
+    for k in self._TEST_PROPERTIES:
+      os.environ[k] = old_environ.get(k)
+
+  def __ResetPropertyFile(self, setup=False):
+    """Resets the active property file cached values.
+
+    Args:
+      setup: True if this is in the SetUp call, False for TearDown
+    """
+    # pylint: disable=protected-access
+    named_configs.ActivePropertiesFile._PROPERTIES = copy.copy(
+        self._active_properties)
+
+  def __CleanProperties(self, setup=False):
+    """Make sure properties are set to a clean state between tests.
+
+    Args:
+      setup: True if this is in the SetUp call, False for TearDown
+    """
+    # Methods split for test performance monitoring.
+    self.__ResetPropertyValues(setup=setup)
+    self.__ResetPropertyFile(setup=setup)
 
   @staticmethod
   def _IsTestClass(clazz):
@@ -136,6 +184,7 @@ class SdkBase(test_case.Base):
       raise Exception('Please specify the new limit in bytes.')
 
     def Decorator(func_or_cls):
+      """The SetDirsSizeLimit decorator."""
       if inspect.isclass(func_or_cls):
         if not SdkBase._IsTestClass(func_or_cls):
           raise Exception('Directory size limit can only be changed on a test '
@@ -206,6 +255,13 @@ class SdkBase(test_case.Base):
   def _VerifyInstallProps(self):
     self.assertEqual(self.install_props, self._GetInstallPropsStats())
 
+  def __Popen(self, *args, **kwargs):
+    """Makes sure os.environ gets export to subprocess children."""
+    if 'env' not in kwargs:
+      kwargs['env'] = {encoding.Encode(k): encoding.Encode(v)
+                       for k, v in six.iteritems(os.environ)}
+    return self._REAL_POPEN(*args, **kwargs)
+
   def SetUp(self):
     self._prev_log_level = log.getLogger().getEffectiveLevel()
     self.__root_dir = file_utils.TemporaryDirectory()
@@ -216,11 +272,14 @@ class SdkBase(test_case.Base):
         os.environ, config.CLOUDSDK_CONFIG, self.global_config_path,
         encoding='utf-8')
 
+    # MONKEYPATCH: We'd like to StartObjectPatch but Popen is patched elsewhere.
+    subprocess.Popen = self.__Popen
+
     # Redirect home to a temp directory.
     self.home_path = self.CreateTempDir()
     self.StartEnvPatch({'HOME': self.home_path})
     self.mock_get_home_path = self.StartPatch(
-        'googlecloudsdk.core.util.platforms.GetHomePath',
+        'googlecloudsdk.core.util.files.GetHomeDir',
         return_value=self.home_path)
     self.mock_expandvars = self.StartPatch(
         'os.path.expandvars', autospec=True, return_value=self.home_path)
@@ -228,16 +287,7 @@ class SdkBase(test_case.Base):
     self.addCleanup(resources.REGISTRY.Clear)
 
     # Make sure there is nothing in the environment before the tests starts.
-    self._clean_properties = {
-        # Runtime root should be set back to whatever value it started with
-        ('app', 'runtime_root'): properties.VALUES.app.runtime_root.Get(),
-        ('core', 'check_gce_metadata'): False,
-        ('component_manager', 'disable_update_check'): True,
-        ('core', 'disable_usage_reporting'): True,
-        ('core', 'should_prompt_to_enable_api'): False,
-        ('core', 'allow_py3'): True,
-    }
-    self.__CleanProperties()
+    self.__CleanProperties(setup=True)
     self.addCleanup(self.__CleanProperties)
 
     # Turn these off for tests.
@@ -279,6 +329,7 @@ class SdkBase(test_case.Base):
     self.temp_path = None
     self.global_config_path = None
     os.environ.pop(config.CLOUDSDK_CONFIG, None)
+    subprocess.Popen = self._REAL_POPEN
 
   def CreateTempDir(self, name=None):
     if name:

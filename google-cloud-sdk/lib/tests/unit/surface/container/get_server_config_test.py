@@ -32,14 +32,12 @@ class GetServerConfigTestGA(base.GATestBase,
     self.ExpectGetServerConfig(self.ZONE)
     self.Run(self.get_server_config_command_base +
              ' --zone={0}'.format(self.ZONE))
-    self.AssertOutputContains('changelist 12345')
     self.AssertOutputContains('validMasterVersions:')
 
   def testRegion(self):
     self.ExpectGetServerConfig(self.REGION)
     self.Run(self.get_server_config_command_base +
              ' --region={0}'.format(self.REGION))
-    self.AssertOutputContains('changelist 12345')
     self.AssertOutputContains('validMasterVersions:')
 
   def testMissingZoneAndRegion(self):

@@ -21,15 +21,11 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsDescribeTest(base.CloudIotRegistryBase):
+class CredentialsDescribeTestGA(base.CloudIotRegistryBase):
 
   def SetUp(self):
     x509_details = self.messages.X509CertificateDetails(
@@ -42,8 +38,7 @@ class CredentialsDescribeTest(base.CloudIotRegistryBase):
         self._CreateRegistryCredential('other dummy contents')
     ]
 
-  def testDescribe(self, track):
-    self.track = track
+  def testDescribe(self):
     self._ExpectGet(self.registry_credentials)
     results = self.Run(
         'iot registries credentials describe 0'
@@ -53,8 +48,7 @@ class CredentialsDescribeTest(base.CloudIotRegistryBase):
 
     self.assertEqual(results, self.registry_credentials[0])
 
-  def testDescribe_Output(self, track):
-    self.track = track
+  def testDescribe_Output(self):
     self._ExpectGet(self.registry_credentials)
     self.Run(
         'iot registries credentials describe 0'
@@ -68,8 +62,7 @@ class CredentialsDescribeTest(base.CloudIotRegistryBase):
             subject: my-registry
         """, normalize_space=True)
 
-  def testDescribe_BadIndex(self, track):
-    self.track = track
+  def testDescribe_BadIndex(self):
     self._ExpectGet(self.registry_credentials)
 
     with self.AssertRaisesExceptionMatches(
@@ -82,8 +75,7 @@ class CredentialsDescribeTest(base.CloudIotRegistryBase):
           '    --registry my-registry '
           '    --region us-central1')
 
-  def testDescribe_RelativeName(self, track):
-    self.track = track
+  def testDescribe_RelativeName(self):
     self._ExpectGet(self.registry_credentials)
     registry_name = ('projects/{}/'
                      'locations/us-central1/'
@@ -95,6 +87,18 @@ class CredentialsDescribeTest(base.CloudIotRegistryBase):
         '    --registry {} '.format(registry_name))
 
     self.assertEqual(results, self.registry_credentials[0])
+
+
+class CredentialsDescribeTestBeta(CredentialsDescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsDescribeTestAlpha(CredentialsDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

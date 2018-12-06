@@ -1,14 +1,13 @@
 NAME
     gcloud iam service-accounts remove-iam-policy-binding - remove IAM policy
-        binding for a service account
+        binding of a service account
 
 SYNOPSIS
     gcloud iam service-accounts remove-iam-policy-binding SERVICE_ACCOUNT
         --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    This command removes a policy binding to the IAM policy of a service
-    account, given an IAM_ACCOUNT and the binding.
+    Remove an IAM policy binding of a service account.
 
     When managing IAM roles, you can treat a service account either as a
     resource or as an identity. This command is to remove a policy binding from
@@ -17,11 +16,17 @@ DESCRIPTION
     on a project, use the $ gcloud projects commands.
 
 POSITIONAL ARGUMENTS
-     SERVICE_ACCOUNT
-        The service account to remove the policy binding from. The account
-        should be formatted either as a numeric service account ID or as an
-        email, like this: 123456789876543212345 or
-        my-iam-account@somedomain.com.
+     ServiceAccount resource - The service account for which to remove IAM
+     policy binding from. This represents a Cloud resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument
+     [service_account] on the command line with a fully specified name; set the
+     property [core/project]; provide the argument [--project] on the command
+     line. This must be specified.
+
+       SERVICE_ACCOUNT
+          ID of the serviceAccount or fully qualified identifier for the
+          serviceAccount.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -43,21 +48,26 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the iam/v1 API. The full documentation for this API can
+    be found at: https://cloud.google.com/iam/
 
 EXAMPLES
-    The following command will remove an IAM policy binding for the role of
-    'roles/editor' for the user 'test-user@gmail.com' on service account with
-    identifier 'my-iam-account@somedomain.com'
+    To remove an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' on a service account with identifier
+    'my-iam-account@somedomain.com', run:
 
         $ gcloud iam service-accounts remove-iam-policy-binding \
             my-iam-account@somedomain.com \
             --member='user:test-user@gmail.com' --role='roles/editor'
 
-    The following command will remove an IAM policy binding for the role of
-    'roles/editor' from all authenticated users on service account
-    'my-iam-account@somedomain.com':
+    To remove an IAM policy binding for the role of 'roles/editor' from all
+    authenticated users on service account 'my-iam-account@somedomain.com',
+    run:
 
         $ gcloud iam service-accounts remove-iam-policy-binding \
             my-iam-account@somedomain.com --member='allAuthenticatedUsers' \

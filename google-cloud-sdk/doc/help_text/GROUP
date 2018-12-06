@@ -3,10 +3,10 @@ NAME
 
 SYNOPSIS
     gcloud GROUP | COMMAND [--account=ACCOUNT] [--configuration=CONFIGURATION]
-        [--flatten=[KEY,...]] [--format=FORMAT] [--help] [--project=PROJECT_ID]
-        [--quiet, -q] [--verbosity=VERBOSITY; default="warning"]
-        [--version, -v] [-h] [--log-http] [--trace-token=TRACE_TOKEN]
-        [--no-user-output-enabled]
+        [--flags-file=YAML_FILE] [--flatten=[KEY,...]] [--format=FORMAT]
+        [--help] [--project=PROJECT_ID] [--quiet, -q]
+        [--verbosity=VERBOSITY; default="warning"] [--version, -v] [-h]
+        [--log-http] [--trace-token=TRACE_TOKEN] [--no-user-output-enabled]
 
 DESCRIPTION
     The gcloud CLI manages authentication, local configuration, developer
@@ -23,6 +23,13 @@ GLOBAL FLAGS
         configurations. You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME]
         environment variable to set the equivalent of this flag for a terminal
         session.
+
+     --flags-file=YAML_FILE
+        A YAML or JSON file that specifies a --flag:value dictionary. Useful
+        for specifying complex flag values with special characters that work
+        with any command interpreter. Additionally, each --flags-file arg is
+        replaced by its constituent flags. See $ gcloud topic flags-file for
+        more information.
 
      --flatten=[KEY,...]
         Flatten name[] output resource slices in KEY into separate records for
@@ -102,6 +109,9 @@ GROUPS
      beta
         (BETA) Beta versions of gcloud commands.
 
+     bigtable
+        Manage your Cloud Bigtable storage.
+
      builds
         Create and manage builds for Google Cloud Build.
 
@@ -177,6 +187,9 @@ GROUPS
      pubsub
         Manage Cloud Pub/Sub topics and subscriptions.
 
+     redis
+        Manage Cloud Memorystore Redis resources.
+
      services
         List, enable and disable APIs and services.
 
@@ -187,7 +200,7 @@ GROUPS
         Command groups for Cloud Spanner.
 
      sql
-        Manage Cloud SQL databases.
+        Create and manage Google Cloud SQL databases.
 
      topic
         gcloud supplementary help.
@@ -202,7 +215,7 @@ COMMANDS
         Provide feedback to the Google Cloud SDK team.
 
      help
-        Prints detailed help messages for the specified commands.
+        Search gcloud help text.
 
      info
         Display information about the current gcloud environment.

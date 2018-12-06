@@ -18,16 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class PerimetersCreateTest(accesscontextmanager.Base):
+class PerimetersCreateTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -35,25 +36,27 @@ class PerimetersCreateTest(accesscontextmanager.Base):
   def _ExpectCreate(self, perimeter, policy):
     policy_name = 'accessPolicies/{}'.format(policy)
     m = self.messages
-    req_type = m.AccesscontextmanagerAccessPoliciesAccessZonesCreateRequest
-    self.client.accessPolicies_accessZones.Create.Expect(
-        req_type(parent=policy_name, accessZone=perimeter),
+    req_type = (
+        m.AccesscontextmanagerAccessPoliciesServicePerimetersCreateRequest)
+    self.client.accessPolicies_servicePerimeters.Create.Expect(
+        req_type(parent=policy_name, servicePerimeter=perimeter),
         self.messages.Operation(name='operations/my-op', done=False))
     self._ExpectGetOperation('operations/my-op')
-    get_req_type = m.AccesscontextmanagerAccessPoliciesAccessZonesGetRequest
-    self.client.accessPolicies_accessZones.Get.Expect(
+    get_req_type = (
+        m.AccesscontextmanagerAccessPoliciesServicePerimetersGetRequest)
+    self.client.accessPolicies_servicePerimeters.Get.Expect(
         get_req_type(name=perimeter.name), perimeter)
 
-  def testCreate_MissingRequired(self, track):
-    self.SetUpForTrack(track)
+  def testCreate_MissingRequired(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must be specified'):
       self.Run(
           'access-context-manager perimeters create my_perimeter '
           '    --policy MY_POLICY --title "My Title"')
 
-  def testCreate(self, track):
-    self.SetUpForTrack(track)
+  def testCreate(self):
+    self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -61,7 +64,7 @@ class PerimetersCreateTest(accesscontextmanager.Base):
         restricted_services=[],
         unrestricted_services=[],
         access_levels=[],
-        type_='ZONE_TYPE_REGULAR')
+        type_='PERIMETER_TYPE_REGULAR')
     self._ExpectCreate(perimeter, 'MY_POLICY')
 
     result = self.Run(
@@ -72,8 +75,8 @@ class PerimetersCreateTest(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter)
 
-  def testCreate_PolicyFromProperty(self, track):
-    self.SetUpForTrack(track)
+  def testCreate_PolicyFromProperty(self):
+    self.SetUpForTrack(self.track)
     policy = 'my_acm_policy'
     properties.VALUES.access_context_manager.policy.Set(policy)
     perimeter = self._MakePerimeter(
@@ -83,8 +86,9 @@ class PerimetersCreateTest(accesscontextmanager.Base):
         restricted_services=[],
         unrestricted_services=[],
         access_levels=[],
-        type_='ZONE_TYPE_REGULAR')
-    perimeter.name = 'accessPolicies/{}/accessZones/MY_PERIMETER'.format(policy)
+        type_='PERIMETER_TYPE_REGULAR')
+    perimeter.name = 'accessPolicies/{}/servicePerimeters/MY_PERIMETER'.format(
+        policy)
     self._ExpectCreate(perimeter, policy)
 
     result = self.Run(
@@ -94,8 +98,8 @@ class PerimetersCreateTest(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter)
 
-  def testCreate_AllParamsRestrictedServices(self, track):
-    self.SetUpForTrack(track)
+  def testCreate_AllParamsRestrictedServices(self):
+    self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -103,7 +107,7 @@ class PerimetersCreateTest(accesscontextmanager.Base):
         restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
         unrestricted_services=['*'],
         access_levels=['MY_LEVEL', 'MY_LEVEL_2'],
-        type_='ZONE_TYPE_BRIDGE')
+        type_='PERIMETER_TYPE_BRIDGE')
     self._ExpectCreate(perimeter, 'MY_POLICY')
 
     result = self.Run(
@@ -117,8 +121,8 @@ class PerimetersCreateTest(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter)
 
-  def testCreate_AllParamsUnrestrictedServices(self, track):
-    self.SetUpForTrack(track)
+  def testCreate_AllParamsUnrestrictedServices(self):
+    self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -126,7 +130,7 @@ class PerimetersCreateTest(accesscontextmanager.Base):
         restricted_services=['*'],
         unrestricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
         access_levels=['MY_LEVEL', 'MY_LEVEL_2'],
-        type_='ZONE_TYPE_BRIDGE')
+        type_='PERIMETER_TYPE_BRIDGE')
     self._ExpectCreate(perimeter, 'MY_POLICY')
 
     result = self.Run(
@@ -139,6 +143,12 @@ class PerimetersCreateTest(accesscontextmanager.Base):
     )
 
     self.assertEqual(result, perimeter)
+
+
+class PerimetersCreateTestAlpha(PerimetersCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

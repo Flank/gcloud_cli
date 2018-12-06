@@ -18,15 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
-from tests.lib.surface.compute import xpn_test_base
+from tests.lib.surface.compute import shared_vpc_test_base
 
 
-@parameterized.parameters(
-    base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
-class RemoveTest(xpn_test_base.XpnTestBase):
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class RemoveTest(shared_vpc_test_base.SharedVpcTestBase):
 
   def testRemove_NoProject(self, track):
     self._SetUp(track)
@@ -37,15 +39,8 @@ class RemoveTest(xpn_test_base.XpnTestBase):
 
   def testRemove(self, track):
     self._SetUp(track)
-    self._testRemove('shared-vpc')
-
-  def testRemove_xpn(self, track):
-    self._SetUp(track)
-    self._testRemove('xpn')
-
-  def _testRemove(self, module_name):
-    self.Run('compute {} associated-projects remove --host-project xpn-host '
-             'xpn-user'.format(module_name))
+    self.Run('compute shared-vpc associated-projects remove --host-project '
+             'xpn-host xpn-user')
     self.xpn_client.DisableXpnAssociatedProject.assert_called_once_with(
         'xpn-host', 'xpn-user')
     self.get_xpn_client_mock.assert_called_once_with(self.track)

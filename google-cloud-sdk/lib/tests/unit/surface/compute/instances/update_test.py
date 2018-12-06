@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import scope
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
@@ -178,7 +178,7 @@ class UpdateTestBaseClass(sdk_test_base.WithFakeAuth,
     return 'v1'
 
   def ReleaseTrack(self):
-    return base.ReleaseTrack.GA
+    return calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.track = self.ReleaseTrack()
@@ -293,7 +293,7 @@ class SetMinCpuPlatformTestBeta(SetMinCpuPlatformTest):
     return 'beta'
 
   def ReleaseTrack(self):
-    return base.ReleaseTrack.BETA
+    return calliope_base.ReleaseTrack.BETA
 
 
 class SetMinCpuPlatformTestAlpha(SetMinCpuPlatformTestBeta):
@@ -302,7 +302,7 @@ class SetMinCpuPlatformTestAlpha(SetMinCpuPlatformTestBeta):
     return 'alpha'
 
   def ReleaseTrack(self):
-    return base.ReleaseTrack.ALPHA
+    return calliope_base.ReleaseTrack.ALPHA
 
 
 class DeletionProtectionTest(UpdateTestBaseClass, parameterized.TestCase):
@@ -311,7 +311,7 @@ class DeletionProtectionTest(UpdateTestBaseClass, parameterized.TestCase):
     return 'v1'
 
   def ReleaseTrack(self):
-    return base.ReleaseTrack.GA
+    return calliope_base.ReleaseTrack.GA
 
   def ExpectSetDeletionProtection(self, client, deletion_protection):
     messages = self.messages
@@ -369,7 +369,7 @@ class InstancesSetShieldedVMConfigAlphaTest(UpdateTestBaseClass,
     return 'alpha'
 
   def ReleaseTrack(self):
-    return base.ReleaseTrack.ALPHA
+    return calliope_base.ReleaseTrack.ALPHA
 
   def ExpectShieldedVMConfig(self, client, shielded_vm_config):
     messages = self.messages
@@ -456,7 +456,7 @@ class InstancesSetShieldedVMConfigBetaTest(
     return 'beta'
 
   def ReleaseTrack(self):
-    return base.ReleaseTrack.BETA
+    return calliope_base.ReleaseTrack.BETA
 
 
 class InstancesSetShieldedVMIntegrityPolicyAlphaTest(UpdateTestBaseClass,
@@ -466,7 +466,7 @@ class InstancesSetShieldedVMIntegrityPolicyAlphaTest(UpdateTestBaseClass,
     return 'alpha'
 
   def ReleaseTrack(self):
-    return base.ReleaseTrack.ALPHA
+    return calliope_base.ReleaseTrack.ALPHA
 
   def ExpectShieldedVMIntegrityPolicy(self, client,
                                       shielded_vm_integrity_policy):
@@ -530,7 +530,7 @@ class InstancesSetShieldedVMIntegrityPolicyBetaTest(
     return 'beta'
 
   def ReleaseTrack(self):
-    return base.ReleaseTrack.BETA
+    return calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

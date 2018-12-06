@@ -31,10 +31,9 @@ class Delete(base.NamespacesUnitTestBase):
     self.mock_client.projects_namespaces.Delete.Expect(
         self.messages.KubernetespolicyProjectsNamespacesDeleteRequest(
             name=test_namespace.name),
-        test_namespace)
+        self.messages.Empty())
 
-    result = self.RunNamespaces('delete', test_namespace.name)
-    self.assertEqual(test_namespace, result)
+    self.RunNamespaces('delete', test_namespace.name)
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha pubsub subscriptions seek \- this feature is part of an invite\-only release of the Cloud Pub/Sub API
+gcloud alpha pubsub subscriptions seek \- resets a subscription's backlog to a point in time or to a given snapshot
 
 
 
@@ -18,10 +18,7 @@ gcloud alpha pubsub subscriptions seek \- this feature is part of an invite\-onl
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR Resets a subscription's backlog to a point in time or to a given
-snapshot. This feature is part of an invitation\-only release of the underlying
-Cloud Pub/Sub API. The command will generate errors unless you have access to
-this API. This restriction should be relaxed in the near future. Please contact
-cloud\-pubsub@google.com with any questions in the meantime.
+snapshot.
 
 
 
@@ -32,15 +29,15 @@ cloud\-pubsub@google.com with any questions in the meantime.
 
 Subscription resource \- Name of the subscription to affect. This represents a
 Cloud resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: provide the flag
-[subscription] on the command line with a fully specified name; provide the flag
-[\-\-project] on the command line; set the property [core/project]. This must be
-specified.
+can be set in other ways. To set the [project] attribute: provide the argument
+[subscription] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
 
 .RS 2m
 .TP 2m
 \fISUBSCRIPTION\fR
-The ID of the subscription or a fully qualified identifier for the subscription.
+ID of the subscription or fully qualified identifier for the subscription.
 
 
 .RE
@@ -87,9 +84,9 @@ not set, it defaults to the currently selected cloud project.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -99,5 +96,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta pubsub subscriptions seek
+.RE
 

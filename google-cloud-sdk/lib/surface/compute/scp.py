@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.compute import iap_tunnel
 from googlecloudsdk.command_lib.compute import scp_utils
 from googlecloudsdk.command_lib.util.ssh import ip
 
@@ -58,6 +59,10 @@ If the zone cannot be determined, you will be prompted for it.  Use the
 `--zone` flag to avoid being prompted:
 
   $ {command} --recurse example-instance:~/narnia ~/wardrobe --zone us-central1-a
+
+To specify the project, zone, and recurse all together, run:
+
+  $ {command} --project "my-gcp-project" --zone "us-east1-b" --recurse ~/foo-folder/ gcp-instance-name:~/
 """,
 }
 
@@ -84,9 +89,11 @@ def _Args(parser):
       help='Extra flag to be sent to scp. This flag may be repeated.')
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class ScpGA(base.Command):
   """Copy files to and from Google Compute Engine virtual machines via scp."""
+
+  category = 'Tools'
 
   @staticmethod
   def Args(parser):
@@ -117,8 +124,8 @@ class ScpGA(base.Command):
     return self._Run(args)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class ScpAlpha(ScpGA):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class ScpBeta(ScpGA):
   """Copy files to and from Google Compute Engine virtual machines via scp."""
 
   @staticmethod
@@ -128,7 +135,7 @@ class ScpAlpha(ScpGA):
     Args:
       parser: An argparse.ArgumentParser.
     """
-    _Args(parser)
+    super(ScpBeta, ScpBeta).Args(parser)
     parser.add_argument(
         '--internal-ip',
         default=False,
@@ -157,5 +164,21 @@ class ScpAlpha(ScpGA):
     return self._Run(args, ip_type)
 
 
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ScpAlpha(ScpBeta):
+  """Copy files to and from Google Compute Engine virtual machines via scp."""
+
+  @staticmethod
+  def Args(parser):
+    """Set up arguments for this command.
+
+    Args:
+      parser: An argparse.ArgumentParser.
+    """
+    super(ScpAlpha, ScpAlpha).Args(parser)
+    iap_tunnel.AddConnectionHelperArgs(parser)
+
+
 ScpAlpha.detailed_help = _DETAILED_HELP
+ScpBeta.detailed_help = _DETAILED_HELP
 ScpGA.detailed_help = _DETAILED_HELP

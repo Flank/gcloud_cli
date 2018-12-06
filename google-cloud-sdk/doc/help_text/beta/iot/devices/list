@@ -3,36 +3,41 @@ NAME
 
 SYNOPSIS
     gcloud beta iot devices list (--registry=REGISTRY : --region=REGION)
-        [--device-ids=[[ID,...],...]] [--device-num-ids=[[NUM_ID,...],...]]
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
+        [--device-ids=[DEVICE_IDS,...]] [--device-num-ids=[DEVICE_NUM_IDS,...]]
+        [--device-type=DEVICE_TYPE] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) List devices.
 
 REQUIRED FLAGS
-     Registry resource - The device registry in which to show devices. The
+     Registry resource - The registry you want to list the devices for. The
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: provide the flag
-     [--registry] on the command line with a fully specified name; provide the
-     flag [--project] on the command line; set the property [core/project].
-     This must be specified.
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [--registry] on the command line with a fully specified name;
+     provide the argument [--project] on the command line; set the property
+     [core/project]. This must be specified.
 
        --registry=REGISTRY
-          The ID of the registry or a fully qualified identifier for the
-          registry. This flag must be specified if any of the other arguments
-          in this group are specified.
+          ID of the registry or fully qualified identifier for the registry.
+          This flag must be specified if any of the other arguments in this
+          group are specified.
 
        --region=REGION
-          The Cloud region for the registry.
+          The name of the Cloud IoT region.
 
 FLAGS
-     --device-ids=[[ID,...],...]
+     --device-ids=[DEVICE_IDS,...]
         If given, show only devices with one of the provided IDs.
 
-     --device-num-ids=[[NUM_ID,...],...]
+     --device-num-ids=[DEVICE_NUM_IDS,...]
         If given, show only devices with one of the provided numerical IDs.
+
+     --device-type=DEVICE_TYPE
+        If specified, show only devices of that type. If left unspecified, show
+        devices of any type. DEVICE_TYPE must be one of: gateway, non-gateway.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -65,8 +70,13 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the cloudiot/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/iot
 
 NOTES
     This command is currently in BETA and may change without notice. These

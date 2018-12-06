@@ -24,9 +24,9 @@ A keyring is a toplevel logical grouping of keys.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -37,7 +37,7 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBadd\-iam\-policy\-binding\fR
-Add IAM policy binding to a keyring.
+Add IAM policy binding for a kms keyring.
 
 .TP 2m
 \fBcreate\fR
@@ -57,7 +57,7 @@ List keyrings within a location.
 
 .TP 2m
 \fBremove\-iam\-policy\-binding\fR
-Remove a policy binding from a keyring.
+Remove IAM policy binding for a kms keyring.
 
 .TP 2m
 \fBset\-iam\-policy\fR

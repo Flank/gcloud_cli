@@ -19,10 +19,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class Certainly(base.Command):
+class Certainly(calliope_base.Command):
   """A command in a unicode supported group."""
 
   @staticmethod

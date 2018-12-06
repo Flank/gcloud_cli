@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Updates the settings of a Cloud SQL instance."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.sql import api_util as common_api_util
@@ -191,6 +192,7 @@ def AddBaseArgs(parser):
 def AddBetaArgs(parser):
   """Adds beta args and flags to the parser."""
   flags.AddInstanceResizeLimit(parser)
+  flags.AddNetwork(parser)
   labels_util.AddUpdateLabelsFlags(parser, enable_clear=True)
 
 
@@ -285,7 +287,7 @@ class Patch(base.UpdateCommand):
     AddBaseArgs(parser)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class PatchBeta(base.UpdateCommand):
   """Updates the settings of a Cloud SQL instance."""
 
@@ -297,18 +299,3 @@ class PatchBeta(base.UpdateCommand):
     """Args is called by calliope to gather arguments for this command."""
     AddBaseArgs(parser)
     AddBetaArgs(parser)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class PatchAlpha(base.UpdateCommand):
-  """Updates the settings of a Cloud SQL instance."""
-
-  def Run(self, args):
-    return RunBasePatchCommand(args, self.ReleaseTrack())
-
-  @staticmethod
-  def Args(parser):
-    """Args is called by calliope to gather arguments for this command."""
-    AddBaseArgs(parser)
-    AddBetaArgs(parser)
-    flags.AddNetwork(parser)

@@ -4,13 +4,11 @@ NAME
 SYNOPSIS
     gcloud alpha redis instances COMMAND [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (ALPHA) Manage Cloud Memorystore Redis instances.
-
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -30,12 +28,37 @@ COMMANDS
      update
         (ALPHA) Update Memorystore Redis instances.
 
+EXAMPLES
+    To create an instance with the name my-redis-instance, run:
+
+        $ gcloud alpha redis instances create my-redis-instance
+
+    To delete an instance with the name my-redis-instance, run:
+
+        $ gcloud alpha redis instances delete my-redis-instance
+
+    To display the details for an instance with the name my-redis-instance,
+    run:
+
+        $ gcloud alpha redis instances describe my-redis-instance
+
+    To list all the instances, run:
+
+        $ gcloud alpha redis instances list
+
+    To set the label env to prod for an instance with the name
+    my-redis-instance, run:
+
+        $ gcloud alpha redis instances my-redis-instance \
+            --update-labels=env=prod
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud redis instances
         $ gcloud beta redis instances
 

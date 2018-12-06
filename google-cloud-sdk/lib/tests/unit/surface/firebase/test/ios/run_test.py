@@ -59,7 +59,7 @@ GOOD_ARGS = os.path.join(unit_base.TEST_DATA_PATH, 'good_args')
 class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
   """Unit tests for `gcloud firebase test ios run` command."""
 
-  def BuildRequestMatrix(self, project, devices, timeout):
+  def BuildRequestMatrix(self, project, devices, timeout, xcode_version):
     """Build a client-side version of a TestMatrix proto."""
     return self.testing_msgs.TestMatrix(
         clientInfo=self.testing_msgs.ClientInfo(
@@ -68,7 +68,7 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
                 self.testing_msgs.ClientInfoDetail(
                     key='Cloud SDK Version', value=config.CLOUD_SDK_VERSION),
                 self.testing_msgs.ClientInfoDetail(
-                    key='Release Track', value=str('ALPHA')),
+                    key='Release Track', value=str('GA')),
             ]),
         environmentMatrix=self.testing_msgs.EnvironmentMatrix(
             iosDeviceList=self.testing_msgs.IosDeviceList(iosDevices=devices)),
@@ -80,9 +80,10 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
                 projectId=project)),
         testSpecification=self.testing_msgs.TestSpecification(
             iosXcTest=self.testing_msgs.IosXcTest(
-                testsZip=self.testing_msgs.
-                FileReference(gcsPath='gs://{db}/{uo}/{tz}'.format(
-                    db=self.results_bucket, uo=self.results_dir, tz=TEST_ZIP))),
+                testsZip=self.testing_msgs
+                .FileReference(gcsPath='gs://{db}/{uo}/{tz}'.format(
+                    db=self.results_bucket, uo=self.results_dir, tz=TEST_ZIP)),
+                xcodeVersion=xcode_version),
             iosTestSetup=self.testing_msgs.IosTestSetup(),
             disableVideoRecording=False,
             testTimeout=timeout))
@@ -128,9 +129,11 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
                          devices,
                          project=PROJECT_ID,
                          matrix_state=M_FINISHED,
-                         timeout='900s'):
+                         timeout='900s',
+                         xcode_version=None):
     """Set expectations for iOS matrix creation; return the response matrix."""
-    req_matrix = self.BuildRequestMatrix(project, devices, timeout)
+    req_matrix = self.BuildRequestMatrix(project, devices, timeout,
+                                         xcode_version)
     res_matrix = self.BuildResponseMatrix(req_matrix, MATRIX_ID, matrix_state)
 
     self.testing_client.projects_testMatrices.Create.Expect(
@@ -258,6 +261,16 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
              '--async '.format(run=commands.IOS_TEST_RUN, tz=TEST_PATH))
     self.AssertErrMatches(r'Upload.*bundle.zip')
     self.AssertErrMatches(r'bucket.*/storage/browser/pail/dir9/]')
+    self.AssertErrContains('[matrix-ios1] has been created')
+
+  def testXcTest_SpecificXcodeVersion(self):
+    self.ExpectInitializeSettings()
+    self.ExpectFileUpload(TEST_ZIP)
+    self.ExpectMatrixCreate([DEFAULT_DEVICE], xcode_version='9.2.0')
+
+    self.Run('{run} --test={tz} --async --xcode-version=9.2.0'.format(
+        run=commands.IOS_TEST_RUN, tz=TEST_PATH))
+    self.AssertErrMatches(r'Upload.*bundle.zip')
     self.AssertErrContains('[matrix-ios1] has been created')
 
   def testXcTest_MostArgsReadFromYamlFile(self):

@@ -103,7 +103,8 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
 
     # Expect that we both create a key and start the environment
     self.expectCreatePublicKey()
-    self.expectStartEnvironment(response=self.makeOperation(name='some-op'))
+    self.expectStartEnvironment(
+        response=self.messages.Operation(name='some-op'))
     self.expectGetOperation(name='some-op')
     self.expectGetEnvironment()
     util.PrepareEnvironment(self.makeArgs())
@@ -117,7 +118,8 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
         ))
 
     # Expect that we start the environment, but don't create a key
-    self.expectStartEnvironment(response=self.makeOperation(name='some-op'))
+    self.expectStartEnvironment(
+        response=self.messages.Operation(name='some-op'))
     self.expectGetOperation(name='some-op')
     self.expectGetEnvironment()
     util.PrepareEnvironment(self.makeArgs())
@@ -156,7 +158,7 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
 
     # Expect that we will start it and poll the operation until it is done
     self.expectStartEnvironment(
-        response=self.makeOperation(name='my-op', done=False))
+        response=self.messages.Operation(name='my-op', done=False))
     self.expectGetOperation(
         'my-op', response=self.makeOperation(name='my-op', done=False))
     self.expectGetOperation(

@@ -11,7 +11,7 @@ gcloud alpha dlp datasources gcs inspect \- schedules a job to inspect content i
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dlp datasources gcs inspect\fR \fIPATH\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] (\fB\-\-output\-tables\fR=[\fIOUTPUT_TABLES\fR,...]\ |\ \fB\-\-output\-topics\fR=[\fIOUTPUT_TOPICS\fR,...]) [\fB\-\-exclude\-info\-types\fR] [\fB\-\-file\-size\-limit\fR=\fIFILE_SIZE_LIMIT\fR;\ default=1024] [\fB\-\-include\-quote\fR] [\fB\-\-job\-id\fR=\fIJOB_ID\fR] [\fB\-\-max\-findings\fR=\fIMAX_FINDINGS\fR;\ default=1000] [\fB\-\-max\-findings\-per\-item\fR=\fIMAX_FINDINGS_PER_ITEM\fR] [\fB\-\-max\-time\fR=\fIMAX_TIME\fR] [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-min\-time\fR=\fIMIN_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dlp datasources gcs inspect\fR \fIPATH\fR [\fB\-\-exclude\-info\-types\fR] [\fB\-\-file\-size\-limit\fR=\fIFILE_SIZE_LIMIT\fR;\ default=1024] [\fB\-\-include\-quote\fR] [\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]] [\fB\-\-job\-id\fR=\fIJOB_ID\fR] [\fB\-\-max\-findings\fR=\fIMAX_FINDINGS\fR] [\fB\-\-max\-findings\-per\-item\fR=\fIMAX_FINDINGS_PER_ITEM\fR] [\fB\-\-max\-time\fR=\fIMAX_TIME\fR] [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-min\-time\fR=\fIMIN_TIME\fR] [\fB\-\-output\-table\fR=\fIOUTPUT_TABLE\fR\ |\ \fB\-\-output\-topics\fR=[\fIOUTPUT_TOPICS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,39 +37,7 @@ Google Cloud Storage URL to scan for files with optional wildcard character
 .RE
 .sp
 
-.SH "REQUIRED FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]
-Which infoTypes to scan input for. The values must correspond to infoType values
-found in documentation. For more information about valid infoTypes, see
-infoTypes Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
-
-.TP 2m
-
-Exactly one of these must be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-output\-tables\fR=[\fIOUTPUT_TABLES\fR,...]
-Publishes results of a Cloud DLP job to one or more BigQuery tables. BigQuery
-tables are uniquely identified by their project_id, dataset_id, and table_id in
-the format \f5<project_id>.<dataset_id>.<table_id>\fR.
-
-.TP 2m
-\fB\-\-output\-topics\fR=[\fIOUTPUT_TOPICS\fR,...]
-Publishes the results of a Cloud DLP job to one or more Cloud Pub/Sub topics.
-
-Note: The topic must have given publishing access rights to the DLP API service
-account executing the Cloud DLP job.
-
-
-.RE
-.RE
-.sp
-
-.SH "OPTIONAL FLAGS"
+.SH "FLAGS"
 
 .RS 2m
 .TP 2m
@@ -89,6 +57,12 @@ If True, the server will attempt to filter out profanities, replacing all but
 the initial character in each filtered word with asterisks, e.g. "f**\fB".
 
 .TP 2m
+\fR\-\-info\-types\fB=[\fIINFOTYPE\fR,...]
+Which infoTypes to scan input for. The values must correspond to infoType values
+found in documentation. For more information about valid infoTypes, see
+infoTypes Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
+
+.TP 2m
 \fR\-\-job\-id\fB=\fIJOB_ID\fR
 Optional job ID to use for the created job. If not provided, a job ID will
 automatically be generated. Must be unique within the project. The job ID can
@@ -97,10 +71,10 @@ match the regular expression: \f5[a\-zA\-Z\e\ed\-]+\fR. The maximum length is
 100 characters. Can be empty to allow the system to generate one.
 
 .TP 2m
-\fR\-\-max\-findings\fB=\fIMAX_FINDINGS\fR; default=1000
+\fR\-\-max\-findings\fB=\fIMAX_FINDINGS\fR
 Maximum number of findings that will be returned per execution.
 
-If not specified, will return up to the system maximum of 1000 findings.
+If not specified, no limits are applied.
 
 .TP 2m
 \fR\-\-max\-findings\-per\-item\fB=\fIMAX_FINDINGS_PER_ITEM\fR
@@ -132,17 +106,38 @@ If max\-time is omitted then there is no maximum time limit.
 
 See $ gcloud topic datetimes for information on time formats.
 
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fR\-\-output\-table\fB=\fIOUTPUT_TABLE\fR
+Publishes results of a Cloud DLP job a BigQuery table. BigQuery tables are
+uniquely identified by their project_id, dataset_id, and table_id in the format
+\f5<project_id>.<dataset_id>.<table_id>\fR or
+\f5<project_id>.<dataset_id>.<table_id>\fR. If no table_id is specified, DLP
+will create a table for you.
+
+.TP 2m
+\fR\-\-output\-topics\fB=[\fIOUTPUT_TOPICS\fR,...]
+Publishes the results of a Cloud DLP job to one or more Cloud Pub/Sub topics.
+
+Note: The topic must have given publishing access rights to the DLP API service
+account executing the Cloud DLP job.
+
 
 \fR
+.RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

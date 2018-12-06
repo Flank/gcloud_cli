@@ -1,0 +1,78 @@
+
+.TH "GCLOUD_BETA_DATAPROC_CLUSTERS_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta dataproc clusters import \- import a cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta dataproc clusters import\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This will create a new cluster with the given configuration. If a
+cluster with this name already exists, an error will be thrown.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the cluster to import.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+Path to a YAML file containing cluster configuration export data. The YAML file
+must not contain any output\-only fields. Alternatively, you may omit this flag
+to read from standard input. A schema describing the export/import format can be
+found in:
+$CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1beta2/Cluster.yaml.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

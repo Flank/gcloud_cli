@@ -10,7 +10,10 @@ SYNOPSIS
         [--force] [--guest-os-features=[GUEST_OS_FEATURE,...]]
         [--labels=[KEY=VALUE,...]] [--licenses=[LICENSES,...]]
         [--no-require-csek-key-create] [--source-disk-zone=SOURCE_DISK_ZONE]
-        [--source-image-project=SOURCE_IMAGE_PROJECT] [GCLOUD_WIDE_FLAG ...]
+        [--source-image-project=SOURCE_IMAGE_PROJECT]
+        [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
+          --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute images create is used to create custom disk images. The
@@ -158,10 +161,29 @@ OPTIONAL FLAGS
         The project name of the source image. Must also specify either
         --source-image or --source-image-family when using this flag.
 
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the image. The arguments in this group can be used to
+     specify the attributes of this resource.
+
+       --kms-key=KMS_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --kms-keyring=KMS_KEYRING
+          The KMS keyring of the key.
+
+       --kms-location=KMS_LOCATION
+          The Cloud location for the key.
+
+       --kms-project=KMS_PROJECT
+          The Cloud project for the key.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

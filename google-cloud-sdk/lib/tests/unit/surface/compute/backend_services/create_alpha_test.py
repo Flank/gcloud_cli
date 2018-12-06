@@ -197,6 +197,35 @@ class WithHealthcheckApiTest(CreateTestBase):
                 timeoutSec=30),
             project='my-project'))],)
 
+  def testLoadBalancingSchemeInternalManaged(self):
+    messages = self.messages
+    self.Run("""
+        compute backend-services create my-backend-service
+          --protocol HTTP
+          --load-balancing-scheme internal_managed
+          --health-checks health-check-1
+          --health-checks-region us-west1
+          --region us-west1
+    """)
+
+    self.CheckRequests([(
+        self.compute.regionBackendServices, 'Insert',
+        messages.ComputeRegionBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                name='my-backend-service',
+                backends=[],
+                healthChecks=[
+                    (self.compute_uri + '/projects/'
+                     'my-project/regions/us-west1/healthChecks/health-check-1')
+                ],
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                loadBalancingScheme=(
+                    messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                    .INTERNAL_MANAGED),
+                timeoutSec=30),
+            region='us-west1',
+            project='my-project'))],)
+
   def testSimpleSslCase(self):
     messages = self.messages
     self.Run("""
@@ -993,9 +1022,8 @@ class WithCdnSignedUrlApiTest(CreateTestBase):
   def testSetInvalidCacheMaxAge(self):
     """Tests creating backend service with an invalid cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: '
-        r'invalid-value'):
+        "argument --signed-url-cache-max-age: Failed to parse duration: "
+        "Duration unit 'invalid-value' must be preceded by a number"):
       self.Run("""
           compute backend-services create backend-service-1
           --global
@@ -1006,8 +1034,8 @@ class WithCdnSignedUrlApiTest(CreateTestBase):
   def testSetCacheMaxAgeNegative(self):
     """Tests creating backend service with a negative cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: -1'):
+        'argument --signed-url-cache-max-age: value must be greater than or '
+        'equal to 0; received: -1'):
       self.Run("""
           compute backend-services create backend-service-1
           --global

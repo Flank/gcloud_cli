@@ -1,0 +1,801 @@
+title: A test of basic filestore instance functionality.
+release_tracks: [BETA]
+skip:
+  reason: API flakiness
+  bug: b/116627496
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: filestore instances create $$filestore-test-instance1$$ --location us-central1-c
+      --tier STANDARD --file-share=name="my_vol",capacity=1TB --network=name=filestore-net,reserved-ip-range="10.210.186.248/29"
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+- execute:
+  - command: filestore instances list --location us-central1-c --filter 'name:$$filestore-test-instance1$$'
+      --format 'table(name,state,tier)'
+  - stdout: |
+      INSTANCE_NAME                                 STATE  TIER
+      $$filestore-test-instance1$$  READY  STANDARD
+- execute:
+  - command: filestore instances describe $$filestore-test-instance1$$ --location
+      us-central1-c --format 'text(name,state,description,tier,fileShares)'
+  - stdout: |
+      fileShares[0].capacityGb: 1024
+      fileShares[0].name:       my_vol
+      name:                     projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+      state:                    READY
+      tier:                     STANDARD
+- execute:
+  - command: filestore instances update $$filestore-test-instance1$$ --location us-central1-c
+      --description "New description" --update-labels key1=value1 --file-share name="my_vol",capacity=2TB
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+- execute:
+  - command: filestore instances describe $$filestore-test-instance1$$ --location
+      us-central1-c --format 'text(name,state,description,tier,fileShares)'
+  - stdout: |
+      description:              New description
+      fileShares[0].capacityGb: 2048
+      fileShares[0].name:       my_vol
+      name:                     projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+      state:                    READY
+      tier:                     STANDARD
+- execute:
+  - command: filestore instances delete $$filestore-test-instance1$$ --location us-central1-c
+  - prompt:
+    - message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$.
+        Are you sure?
+    - input: y
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+actions:
+
+- generate_resource_id:
+    reference: filestore-test-instance1
+    prefix: filestore-test-instance
+- execute_command:
+    command: filestore instances create $$filestore-test-instance1$$ --location us-central1-c
+      --tier STANDARD --file-share=name="my_vol",capacity=1TB --network=name=filestore-net,reserved-ip-range="10.210.186.248/29"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-c/instances?alt=json&instanceId=$$filestore-test-instance1$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              fileShares:
+              - capacityGb: '1024'
+                name: my_vol
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.210.186.248/29
+              tier: STANDARD
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '525'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-c/operations/operation-1537555151962-57665f4a7c2e8-0d0defdf-0dc4d2e3
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2018-09-21T18:39:12.704476063Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+              verb: create
+              cancelRequested: false
+              apiVersion: v1beta1
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: filestore instances list --location us-central1-c --filter 'name:$$filestore-test-instance1$$'
+      --format 'table(name,state,tier)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-c/instances?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '10993'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            instances:
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180902-230207-nq24
+              state: READY
+              createTime: '2018-09-02T23:02:11.783434172Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.34.32.128/29
+                ipAddresses:
+                - 10.34.32.130
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180820-202735-9g9n
+              state: READY
+              createTime: '2018-08-20T20:27:37.085263Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.207.87.152/29
+                ipAddresses:
+                - 10.207.87.154
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180917-111948-tx3x
+              state: READY
+              createTime: '2018-09-17T11:19:51.027455724Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.121.74.200/29
+                ipAddresses:
+                - 10.121.74.202
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180912-072618-tg3p
+              state: READY
+              createTime: '2018-09-12T07:26:20.507680700Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.74.11.208/29
+                ipAddresses:
+                - 10.74.11.210
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180912-000546-lseo
+              state: READY
+              createTime: '2018-09-12T00:05:48.896088810Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.166.94.240/29
+                ipAddresses:
+                - 10.166.94.242
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180902-010332-ms7x
+              state: READY
+              createTime: '2018-09-02T01:03:35.649153774Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.114.136.112/29
+                ipAddresses:
+                - 10.114.136.114
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180902-060017-g62x
+              description: New description
+              state: READY
+              createTime: '2018-09-02T06:00:21.758197826Z'
+              tier: STANDARD
+              labels:
+                key1: value1
+              fileShares:
+              - name: my_vol
+                capacityGb: '2048'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.162.201.184/29
+                ipAddresses:
+                - 10.162.201.186
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180822-010016-qubj
+              state: READY
+              createTime: '2018-08-22T01:00:17.856413Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.20.53.128/29
+                ipAddresses:
+                - 10.20.53.130
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180820-202732-hudw
+              description: New description
+              state: READY
+              createTime: '2018-08-20T20:27:33.784880Z'
+              tier: STANDARD
+              labels:
+                key1: value1
+              fileShares:
+              - name: my_vol
+                capacityGb: '2048'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.192.188.48/29
+                ipAddresses:
+                - 10.192.188.50
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180912-000552-1n4k
+              state: READY
+              createTime: '2018-09-12T00:05:55.165356053Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.59.91.64/29
+                ipAddresses:
+                - 10.59.91.66
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180822-005840-6x6a
+              state: READY
+              createTime: '2018-08-22T00:58:41.892942Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.63.253.88/29
+                ipAddresses:
+                - 10.63.253.90
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180908-031946-s1l7
+              state: READY
+              createTime: '2018-09-08T03:19:50.022621682Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.22.231.0/29
+                ipAddresses:
+                - 10.22.231.2
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+              state: READY
+              createTime: '2018-09-21T18:39:12.696905281Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.210.186.248/29
+                ipAddresses:
+                - 10.210.186.250
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180831-184106-63j6
+              description: New description
+              state: READY
+              createTime: '2018-08-31T18:41:07.980844287Z'
+              tier: STANDARD
+              labels:
+                key1: value1
+              fileShares:
+              - name: my_vol
+                capacityGb: '2048'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.115.241.192/29
+                ipAddresses:
+                - 10.115.241.194
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180904-060509-4cqt
+              state: READY
+              createTime: '2018-09-04T06:05:14.560567555Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.59.176.112/29
+                ipAddresses:
+                - 10.59.176.114
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180911-111642-cbrt
+              state: READY
+              createTime: '2018-09-11T11:16:44.625823832Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.224.32.128/29
+                ipAddresses:
+                - 10.224.32.130
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180917-151646-p59j
+              state: READY
+              createTime: '2018-09-17T15:16:49.143050300Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.7.11.8/29
+                ipAddresses:
+                - 10.7.11.10
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180905-120402-iqu7
+              state: READY
+              createTime: '2018-09-05T12:04:05.951950395Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.195.194.104/29
+                ipAddresses:
+                - 10.195.194.106
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180831-191022-5h7d
+              state: READY
+              createTime: '2018-08-31T19:10:24.777558510Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.224.110.216/29
+                ipAddresses:
+                - 10.224.110.218
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-c/instances?alt=json&pageSize=100
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '10993'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            instances:
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180902-230207-nq24
+              state: READY
+              createTime: '2018-09-02T23:02:11.783434172Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.34.32.128/29
+                ipAddresses:
+                - 10.34.32.130
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180820-202735-9g9n
+              state: READY
+              createTime: '2018-08-20T20:27:37.085263Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.207.87.152/29
+                ipAddresses:
+                - 10.207.87.154
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180917-111948-tx3x
+              state: READY
+              createTime: '2018-09-17T11:19:51.027455724Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.121.74.200/29
+                ipAddresses:
+                - 10.121.74.202
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180912-072618-tg3p
+              state: READY
+              createTime: '2018-09-12T07:26:20.507680700Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.74.11.208/29
+                ipAddresses:
+                - 10.74.11.210
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180912-000546-lseo
+              state: READY
+              createTime: '2018-09-12T00:05:48.896088810Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.166.94.240/29
+                ipAddresses:
+                - 10.166.94.242
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180902-010332-ms7x
+              state: READY
+              createTime: '2018-09-02T01:03:35.649153774Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.114.136.112/29
+                ipAddresses:
+                - 10.114.136.114
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180902-060017-g62x
+              description: New description
+              state: READY
+              createTime: '2018-09-02T06:00:21.758197826Z'
+              tier: STANDARD
+              labels:
+                key1: value1
+              fileShares:
+              - name: my_vol
+                capacityGb: '2048'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.162.201.184/29
+                ipAddresses:
+                - 10.162.201.186
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180822-010016-qubj
+              state: READY
+              createTime: '2018-08-22T01:00:17.856413Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.20.53.128/29
+                ipAddresses:
+                - 10.20.53.130
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180820-202732-hudw
+              description: New description
+              state: READY
+              createTime: '2018-08-20T20:27:33.784880Z'
+              tier: STANDARD
+              labels:
+                key1: value1
+              fileShares:
+              - name: my_vol
+                capacityGb: '2048'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.192.188.48/29
+                ipAddresses:
+                - 10.192.188.50
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180912-000552-1n4k
+              state: READY
+              createTime: '2018-09-12T00:05:55.165356053Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.59.91.64/29
+                ipAddresses:
+                - 10.59.91.66
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180822-005840-6x6a
+              state: READY
+              createTime: '2018-08-22T00:58:41.892942Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.63.253.88/29
+                ipAddresses:
+                - 10.63.253.90
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180908-031946-s1l7
+              state: READY
+              createTime: '2018-09-08T03:19:50.022621682Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.22.231.0/29
+                ipAddresses:
+                - 10.22.231.2
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+              state: READY
+              createTime: '2018-09-21T18:39:12.696905281Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.210.186.248/29
+                ipAddresses:
+                - 10.210.186.250
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180831-184106-63j6
+              description: New description
+              state: READY
+              createTime: '2018-08-31T18:41:07.980844287Z'
+              tier: STANDARD
+              labels:
+                key1: value1
+              fileShares:
+              - name: my_vol
+                capacityGb: '2048'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.115.241.192/29
+                ipAddresses:
+                - 10.115.241.194
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180904-060509-4cqt
+              state: READY
+              createTime: '2018-09-04T06:05:14.560567555Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.59.176.112/29
+                ipAddresses:
+                - 10.59.176.114
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180911-111642-cbrt
+              state: READY
+              createTime: '2018-09-11T11:16:44.625823832Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.224.32.128/29
+                ipAddresses:
+                - 10.224.32.130
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180917-151646-p59j
+              state: READY
+              createTime: '2018-09-17T15:16:49.143050300Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.7.11.8/29
+                ipAddresses:
+                - 10.7.11.10
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180905-120402-iqu7
+              state: READY
+              createTime: '2018-09-05T12:04:05.951950395Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.195.194.104/29
+                ipAddresses:
+                - 10.195.194.106
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/filestore-test-instance-20180831-191022-5h7d
+              state: READY
+              createTime: '2018-08-31T19:10:24.777558510Z'
+              tier: STANDARD
+              fileShares:
+              - name: my_vol
+                capacityGb: '1024'
+              networks:
+              - network: filestore-net
+                reservedIpRange: 10.224.110.216/29
+                ipAddresses:
+                - 10.224.110.218
+    - expect_stdout: |
+        INSTANCE_NAME                                 STATE  TIER
+        $$filestore-test-instance1$$  READY  STANDARD
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore instances describe $$filestore-test-instance1$$ --location
+      us-central1-c --format 'text(name,state,description,tier,fileShares)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '481'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+            state: READY
+            createTime: '2018-09-21T18:39:12.696905281Z'
+            tier: STANDARD
+            fileShares:
+            - name: my_vol
+              capacityGb: '1024'
+            networks:
+            - network: filestore-net
+              reservedIpRange: 10.210.186.248/29
+              ipAddresses:
+              - 10.210.186.250
+    - expect_stdout: |
+        fileShares[0].capacityGb: 1024
+        fileShares[0].name:       my_vol
+        name:                     projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+        state:                    READY
+        tier:                     STANDARD
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore instances update $$filestore-test-instance1$$ --location us-central1-c
+      --description "New description" --update-labels key1=value1 --file-share name="my_vol",capacity=2TB
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '481'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+            state: READY
+            createTime: '2018-09-21T18:39:12.696905281Z'
+            tier: STANDARD
+            fileShares:
+            - name: my_vol
+              capacityGb: '1024'
+            networks:
+            - network: filestore-net
+              reservedIpRange: 10.210.186.248/29
+              ipAddresses:
+              - 10.210.186.250
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$?alt=json&updateMask=description%2Clabels%2CfileShares
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: New description
+              fileShares:
+              - capacityGb: '1024'
+                name: my_vol
+              - capacityGb: '2048'
+                name: my_vol
+              labels:
+                key1: value1
+              name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+              networks:
+              - ipAddresses:
+                - 10.210.186.250
+                network: filestore-net
+                reservedIpRange: 10.210.186.248/29
+              state: READY
+              tier: STANDARD
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '525'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-c/operations/operation-1537555262843-57665fb43ab20-600d30a7-da3e644a
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2018-09-21T18:41:02.881268596Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+              verb: update
+              cancelRequested: false
+              apiVersion: v1beta1
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore instances describe $$filestore-test-instance1$$ --location
+      us-central1-c --format 'text(name,state,description,tier,fileShares)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '557'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+            description: New description
+            state: READY
+            createTime: '2018-09-21T18:39:12.696905281Z'
+            tier: STANDARD
+            labels:
+              key1: value1
+            fileShares:
+            - name: my_vol
+              capacityGb: '2048'
+            networks:
+            - network: filestore-net
+              reservedIpRange: 10.210.186.248/29
+              ipAddresses:
+              - 10.210.186.250
+    - expect_stdout: |
+        description:              New description
+        fileShares[0].capacityGb: 2048
+        fileShares[0].name:       my_vol
+        name:                     projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+        state:                    READY
+        tier:                     STANDARD
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore instances delete $$filestore-test-instance1$$ --location us-central1-c
+    cleanup_for: filestore-test-instance1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$.
+          Are you sure?
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '525'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-c/operations/operation-1537555292844-57665fd0d7248-0315aa88-dcbb5d5a
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2018-09-21T18:41:32.861431111Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-central1-c/instances/$$filestore-test-instance1$$
+              verb: delete
+              cancelRequested: false
+              apiVersion: v1beta1
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_exit:
+        code: 0

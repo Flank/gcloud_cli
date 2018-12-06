@@ -31,6 +31,7 @@ from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import retry
 from tests.lib import cli_test_base
+from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.scenario import assertions
@@ -63,11 +64,15 @@ def CreateStreamMocker(test_base_instance):
 class ScenarioTestBase(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD):
   """A base class for all scenario tests."""
 
-  def RunScenario(self, spec_path, track, execution_mode, update_modes):
+  def RunScenario(self, spec_path, track, execution_mode, update_modes,
+                  debug=False):
     full_spec_path = sdk_test_base.SdkBase.Resource(spec_path)
     spec_data = yaml.load_path(full_spec_path, round_trip=True)
     validator = schema.Validator(spec_data)
-    self.assertTrue(validator.Validate())
+    try:
+      validator.Validate()
+    except schema.ValidationError as e:
+      self.fail(e)
 
     spec = schema.Scenario.FromData(spec_data)
     if spec.skip:
@@ -79,8 +84,8 @@ class ScenarioTestBase(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD):
     stream_mocker = CreateStreamMocker(self)
 
     scenario_context = schema.ScenarioContext(
-        spec_path, full_spec_path, spec_data, execution_mode, update_modes,
-        stream_mocker, self.Run)
+        spec_path, full_spec_path, spec_data, track, execution_mode,
+        update_modes, stream_mocker, self.Run, debug)
     if execution_mode == session.ExecutionMode.LOCAL:
       self.StartObjectPatch(retry, '_SleepMs')
 
@@ -95,6 +100,9 @@ class ScenarioTestBase(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD):
             c.ExecuteCleanup(scenario_context)
         # Continue raising the original error.
         raise
+
+    if update_modes:
+      spec.UpdateSummary(scenario_context)
 
 
 # pylint: disable=protected-access, This is really dirty stuff, but it's ok,
@@ -151,6 +159,7 @@ class Interceptor(sdk_test_base.SdkBase):
 
     self.current_action = None
     self.file_replacements = {}
+    self.ref_replacements = {}
 
     # Intercept command execution so we know what command was run.
     original_run = cli_test_base.CliTestBase.Run
@@ -158,12 +167,14 @@ class Interceptor(sdk_test_base.SdkBase):
       """An override for when self.Run() gets called."""
       self._StartNewCommandExecution()
       command = cmd
-      if isinstance(command, list):
+      if yaml.list_like(command) or isinstance(command, tuple):
         command = ' '.join(command)
       command = re.sub(r'\s+', ' ', command)
       command = command.replace('\n', ' ').strip()
       for full_path, name in self.file_replacements.items():
         command = command.replace(full_path, name)
+      for name, ref in self.ref_replacements.items():
+        command = command.replace(name, ref)
 
       if self.current_action['execute_command']['command']:
         raise ValueError('This test already ran a command')
@@ -191,6 +202,30 @@ class Interceptor(sdk_test_base.SdkBase):
       return full_path
     self.StartObjectPatch(test_case.Base, 'Touch', autospec=True,
                           side_effect=InterceptTouch)
+
+    real_resource_name_generator = e2e_utils.GetResourceNameGenerator
+    def InterceptResourceNameGenerator(*args, **kwargs):
+      """An override for the e2e resource name generator."""
+      prefix = kwargs.get('prefix')
+      if prefix is None and args:
+        prefix = args[0]
+      real_generator = real_resource_name_generator(*args, **kwargs)
+      index = 0
+
+      while True:
+        index = index + 1
+        ref = (prefix if prefix else 'resource') + str(index)
+        new_name = next(real_generator)
+        self.ref_replacements[new_name] = '$$' + ref + '$$'
+
+        Interceptor.SCENARIO_DATA['actions'].append({
+            'generate_resource_id': OrderedDict([
+                ('reference', ref),
+                ('prefix', prefix)])})
+        yield new_name
+
+    self.StartObjectPatch(e2e_utils, 'GetResourceNameGenerator', autospec=True,
+                          side_effect=InterceptResourceNameGenerator)
 
   def _StartNewCommandExecution(self):
     if self.current_action:
@@ -227,13 +262,7 @@ class ApiToolsInterceptor(Interceptor):
                ('return_response', OrderedDict(
                    [('headers', {'status': '200'}), ('body', None)]))]))])
 
-      parts = self_._MockedMethod__key.split('.')
-      # Key looks like: CloudIOTv1.projects_location_registries.Create
-      real_client = self_._MockedMethod__mocked_client._Client__real_client
-      service_name, method_name = parts[1], parts[2]
-      method_config = getattr(real_client, service_name).GetMethodConfig(
-          method_name)
-      request_field = method_config.request_field
+      request_field = self_.method_config().request_field
       request_body = json.loads(encoding.MessageToJson(request))[request_field]
 
       data['api_call']['expect_request']['body'] = request_body

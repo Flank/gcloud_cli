@@ -52,6 +52,7 @@ class TestIosVersionsDescribeTest(unit_base.IosMockClientTest):
     self.AssertOutputContains("id: '6.0'")
     self.AssertOutputContains('majorVersion: 6')
     self.AssertOutputContains('minorVersion: 0')
+    self.AssertOutputContains('supportedXcodeVersionIds:\n- ')
     self.AssertOutputContains('tags:\n- default')
 
   def testIosVersionsDescribe_ApiThrowsHttpError(self):

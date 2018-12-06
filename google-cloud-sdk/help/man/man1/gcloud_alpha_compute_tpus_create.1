@@ -11,7 +11,7 @@ gcloud alpha compute tpus create \- create a new Cloud TPU
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-preemptible\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-version\fR=\fIVERSION\fR (\fB\-\-range\fR=\fIRANGE\fR\ |\ \fB\-\-use\-service\-networking\fR) [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-preemptible\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -29,15 +29,15 @@ gcloud alpha compute tpus create \- create a new Cloud TPU
 Tpu resource \- The Cloud TPU you want to create. The arguments in this group
 can be used to specify the attributes of this resource. (NOTE) Some attributes
 are not given arguments in this group but can be set in other ways. To set the
-[project] attribute: provide the flag [tpu] on the command line with a fully
-specified name; provide the flag [\-\-project] on the command line; set the
+[project] attribute: provide the argument [tpu] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
 property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fITPU\fR
-The ID of the tpu or a fully qualified identifier for the tpu. This positional
-must be specified if any of the other arguments in this group are specified.
+ID of the tpu or fully qualified identifier for the tpu. This positional must be
+specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
@@ -58,6 +58,16 @@ If not specified, will use \f5default\fR compute/zone.
 Specifies the network that this TPU will be a part of.
 
 .TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+TensorFlow version for the TPU, such as \f51.6\fR. For a list of available
+TensorFlow versions please see https://www.tensorflow.org/versions/.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-range\fR=\fIRANGE\fR
 CIDR Range for the TPU.
 
@@ -68,11 +78,16 @@ CIDR range conflicts with any networks in the user's provided network, or the
 provided network is peered with another network that is using that CIDR range.
 
 .TP 2m
-\fB\-\-version\fR=\fIVERSION\fR
-TensorFlow version for the TPU, such as \f51.6\fR. For a list of available
-TensorFlow versions please see https://www.tensorflow.org/versions/.
+\fB\-\-use\-service\-networking\fR
+If provided, the TPU will be configured via the Service Networking (SN) API
+instead of using a CIDR range. The Service Networking API should be enabled on
+the project before creating the TPU.
+
+For more information on Service Networking see
+https://cloud.google.com/service\-infrastructure/docs/service\-networking/getting\-started.
 
 
+.RE
 .RE
 .sp
 
@@ -112,16 +127,16 @@ Preemptible TPUs cannot be restarted.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "API REFERENCE"
 
-This command uses the \fBtpu/v1\fR API. The full documentation for this API can
-be found at: https://cloud.google.com/tpu/
+This command uses the \fBtpu/v1alpha1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/tpu/
 
 
 
@@ -132,7 +147,8 @@ The following command creates a TPU with ID \f5my\-tpu\fR and CIDR range
 (with other defaults supplied by API):
 
 .RS 2m
-$ gcloud alpha compute tpus create  my\-tpu \-\-range 10.240.0.0/29
+$ gcloud alpha compute tpus create  my\-tpu \-\-range 10.240.0.0/29 \e
+    \-\-network default
 .RE
 
 

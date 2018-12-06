@@ -19,5 +19,5 @@
       "priority": 2147483647
     }
   ],
-  "selfLink": "https://www.googleapis.com/compute/beta/projects/my-project/global/securityPolicies/my-policy"
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/my-project/global/securityPolicies/my-policy"
 }

@@ -21,18 +21,16 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsDescribeTest(base.CloudIotBase):
+class CredentialsDescribeTestGA(base.CloudIotBase):
 
-  def testDescribe(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testDescribe(self):
     device_credentials = [
         self.messages.DeviceCredential(expirationTime='2016-01-01T00:00Z'),
         self.messages.DeviceCredential(expirationTime='2017-01-01T00:00Z'),
@@ -47,8 +45,7 @@ class CredentialsDescribeTest(base.CloudIotBase):
 
     self.assertEqual(results, device_credentials[0])
 
-  def testDescribe_Output(self, track):
-    self.track = track
+  def testDescribe_Output(self):
     device_credentials = [
         self.messages.DeviceCredential(expirationTime='2016-01-01T00:00Z'),
         self.messages.DeviceCredential(
@@ -70,8 +67,7 @@ class CredentialsDescribeTest(base.CloudIotBase):
           key: dummy contents
         """, normalize_space=True)
 
-  def testDescribe_BadIndex(self, track):
-    self.track = track
+  def testDescribe_BadIndex(self):
     device_credentials = [
         self.messages.DeviceCredential(expirationTime='2016-01-01T00:00Z'),
         self.messages.DeviceCredential(expirationTime='2017-01-01T00:00Z'),
@@ -88,8 +84,7 @@ class CredentialsDescribeTest(base.CloudIotBase):
           '    --registry my-registry '
           '    --region us-central1')
 
-  def testDescribe_RelativeName(self, track):
-    self.track = track
+  def testDescribe_RelativeName(self):
     device_credentials = [
         self.messages.DeviceCredential(expirationTime='2016-01-01T00:00Z'),
         self.messages.DeviceCredential(expirationTime='2017-01-01T00:00Z'),
@@ -106,6 +101,18 @@ class CredentialsDescribeTest(base.CloudIotBase):
         '    --device {} '.format(device_name))
 
     self.assertEqual(results, device_credentials[0])
+
+
+class CredentialsDescribeTestBeta(CredentialsDescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsDescribeTestAlpha(CredentialsDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

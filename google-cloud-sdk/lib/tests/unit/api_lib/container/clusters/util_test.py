@@ -109,11 +109,13 @@ class ClusterConfigTestBase(base.UnitTestBase):
   def _PersistConfig(self, cluster):
     return c_util.ClusterConfig.Persist(cluster, self.PROJECT_ID)
 
-  def _TestGetCredentials(self, cluster):
+  def _TestGetCredentials(self, cluster, use_internal_ip=False):
     properties.VALUES.compute.zone.Set(self.ZONE)
     self.ExpectGetCluster(cluster)
-    self.Run(self.COMMAND_BASE + ' clusters get-credentials '
-             + self.CLUSTER_NAME)
+    cmd = self.COMMAND_BASE + ' clusters get-credentials ' + self.CLUSTER_NAME
+    if use_internal_ip:
+      cmd += ' --internal-ip'
+    self.Run(cmd)
     c_config = c_util.ClusterConfig.Load(
         self.CLUSTER_NAME, self.ZONE, self.PROJECT_ID)
     self.assertIsNotNone(c_config)
@@ -166,8 +168,7 @@ class KubeconfigTestGA(base.GATestBase, base.UnitTestBase):
 
   def testKubeconfigEnvvar(self):
     default_path = kconfig.Kubeconfig.DefaultPath()
-    env_path = os.path.join(
-        os.path.expanduser('~'), 'other_kubeconfig')
+    env_path = os.path.join(file_utils.GetHomeDir(), 'other_kubeconfig')
     file_utils.MakeDir(os.path.dirname(default_path))
     with open(default_path, 'w') as fp:
       fp.write(_EXISTING_KUBECONFIG)
@@ -544,6 +545,37 @@ class ClusterConfigTestGA(base.GATestBase, ClusterConfigTestBase):
     self.assertIsNotNone(user)
     self.assertEqual(user['name'], 'user')
     self.assertEqual(user['user']['auth-provider']['name'], 'gcp')
+
+  def testGetCredentialsInternalIP(self):
+    cluster = self._RunningPrivateCluster()
+    c_config = self._TestGetCredentials(cluster, use_internal_ip=True)
+    self._TestDefaultAuth(c_config)
+
+  def testGetCredentialsNonPrivateClusterInternalIP(self):
+    name = 'newcluster'
+    properties.VALUES.compute.zone.Set(self.ZONE)
+    cluster = self._RunningCluster(name=name, zone=self.ZONE)
+    self.ExpectGetCluster(cluster)
+    with self.assertRaises(c_util.Error):
+      self.Run(self.COMMAND_BASE + ' clusters get-credentials ' + name +
+               ' --internal-ip')
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID))
+    self.AssertErrContains('cluster newcluster is not a private cluster.')
+
+  def testGetCredentialsNoPrivateEndpointInternalIP(self):
+    name = 'newcluster'
+    properties.VALUES.compute.zone.Set(self.ZONE)
+    cluster = self._RunningPrivateCluster(name=name, zone=self.ZONE,
+                                          privateEndpoint='')
+    self.ExpectGetCluster(cluster)
+    with self.assertRaises(c_util.Error):
+      self.Run(self.COMMAND_BASE + ' clusters get-credentials ' + name +
+               ' --internal-ip')
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID))
+    self.AssertErrContains('cluster newcluster is missing private endpoint. '
+                           'Is it still PROVISIONING?')
 
 
 class ClusterConfigTestBeta(base.BetaTestBase, ClusterConfigTestGA):

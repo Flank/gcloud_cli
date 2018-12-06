@@ -74,6 +74,14 @@ class DlpOrganizationsDeidentifyTemplatesListRequest(_messages.Message):
   r"""A DlpOrganizationsDeidentifyTemplatesListRequest object.
 
   Fields:
+    orderBy: Optional comma separated list of fields to order by, followed by
+      `asc` or `desc` postfix. This list is case-insensitive, default sorting
+      order is ascending, redundant space characters are insignificant.
+      Example: `name asc,update_time, create_time desc`  Supported fields are:
+      - `create_time`: corresponds to time the template was created. -
+      `update_time`: corresponds to time the template was last updated. -
+      `name`: corresponds to template's name. - `display_name`: corresponds to
+      template's display name.
     pageSize: Optional size of the page, can be limited by server. If zero
       server returns a page of max size 100.
     pageToken: Optional page token to continue retrieval. Comes from previous
@@ -82,9 +90,10 @@ class DlpOrganizationsDeidentifyTemplatesListRequest(_messages.Message):
       organizations/my-org-id.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  orderBy = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class DlpOrganizationsDeidentifyTemplatesPatchRequest(_messages.Message):
@@ -146,6 +155,14 @@ class DlpOrganizationsInspectTemplatesListRequest(_messages.Message):
   r"""A DlpOrganizationsInspectTemplatesListRequest object.
 
   Fields:
+    orderBy: Optional comma separated list of fields to order by, followed by
+      `asc` or `desc` postfix. This list is case-insensitive, default sorting
+      order is ascending, redundant space characters are insignificant.
+      Example: `name asc,update_time, create_time desc`  Supported fields are:
+      - `create_time`: corresponds to time the template was created. -
+      `update_time`: corresponds to time the template was last updated. -
+      `name`: corresponds to template's name. - `display_name`: corresponds to
+      template's display name.
     pageSize: Optional size of the page, can be limited by server. If zero
       server returns a page of max size 100.
     pageToken: Optional page token to continue retrieval. Comes from previous
@@ -154,9 +171,10 @@ class DlpOrganizationsInspectTemplatesListRequest(_messages.Message):
       organizations/my-org-id.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  orderBy = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class DlpOrganizationsInspectTemplatesPatchRequest(_messages.Message):
@@ -218,6 +236,14 @@ class DlpOrganizationsStoredInfoTypesListRequest(_messages.Message):
   r"""A DlpOrganizationsStoredInfoTypesListRequest object.
 
   Fields:
+    orderBy: Optional comma separated list of fields to order by, followed by
+      `asc` or `desc` postfix. This list is case-insensitive, default sorting
+      order is ascending, redundant space characters are insignificant.
+      Example: `name asc, display_name, create_time desc`  Supported fields
+      are:  - `create_time`: corresponds to time the most recent version of
+      the resource was created. - `state`: corresponds to the state of the
+      resource. - `name`: corresponds to resource name. - `display_name`:
+      corresponds to info type's display name.
     pageSize: Optional size of the page, can be limited by server. If zero
       server returns a page of max size 100.
     pageToken: Optional page token to continue retrieval. Comes from previous
@@ -226,9 +252,10 @@ class DlpOrganizationsStoredInfoTypesListRequest(_messages.Message):
       organizations/my-org-id.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  orderBy = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class DlpOrganizationsStoredInfoTypesPatchRequest(_messages.Message):
@@ -334,6 +361,14 @@ class DlpProjectsDeidentifyTemplatesListRequest(_messages.Message):
   r"""A DlpProjectsDeidentifyTemplatesListRequest object.
 
   Fields:
+    orderBy: Optional comma separated list of fields to order by, followed by
+      `asc` or `desc` postfix. This list is case-insensitive, default sorting
+      order is ascending, redundant space characters are insignificant.
+      Example: `name asc,update_time, create_time desc`  Supported fields are:
+      - `create_time`: corresponds to time the template was created. -
+      `update_time`: corresponds to time the template was last updated. -
+      `name`: corresponds to template's name. - `display_name`: corresponds to
+      template's display name.
     pageSize: Optional size of the page, can be limited by server. If zero
       server returns a page of max size 100.
     pageToken: Optional page token to continue retrieval. Comes from previous
@@ -342,9 +377,10 @@ class DlpProjectsDeidentifyTemplatesListRequest(_messages.Message):
       organizations/my-org-id.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  orderBy = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class DlpProjectsDeidentifyTemplatesPatchRequest(_messages.Message):
@@ -432,6 +468,13 @@ class DlpProjectsDlpJobsListRequest(_messages.Message):
       inspected_storage = cloud_storage OR inspected_storage = bigquery *
       inspected_storage = cloud_storage AND (state = done OR state = canceled)
       The length of this field should be no more than 500 characters.
+    orderBy: Optional comma separated list of fields to order by, followed by
+      `asc` or `desc` postfix. This list is case-insensitive, default sorting
+      order is ascending, redundant space characters are insignificant.
+      Example: `name asc, end_time asc, create_time desc`  Supported fields
+      are:  - `create_time`: corresponds to time the job was created. -
+      `end_time`: corresponds to time the job ended. - `name`: corresponds to
+      job's name. - `state`: corresponds to `state`
     pageSize: The standard list page size.
     pageToken: The standard list page token.
     parent: The parent resource name, for example projects/my-project-id.
@@ -451,10 +494,11 @@ class DlpProjectsDlpJobsListRequest(_messages.Message):
     RISK_ANALYSIS_JOB = 2
 
   filter = _messages.StringField(1)
-  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(3)
-  parent = _messages.StringField(4, required=True)
-  type = _messages.EnumField('TypeValueValuesEnum', 5)
+  orderBy = _messages.StringField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
+  type = _messages.EnumField('TypeValueValuesEnum', 6)
 
 
 class DlpProjectsImageRedactRequest(_messages.Message):
@@ -514,6 +558,14 @@ class DlpProjectsInspectTemplatesListRequest(_messages.Message):
   r"""A DlpProjectsInspectTemplatesListRequest object.
 
   Fields:
+    orderBy: Optional comma separated list of fields to order by, followed by
+      `asc` or `desc` postfix. This list is case-insensitive, default sorting
+      order is ascending, redundant space characters are insignificant.
+      Example: `name asc,update_time, create_time desc`  Supported fields are:
+      - `create_time`: corresponds to time the template was created. -
+      `update_time`: corresponds to time the template was last updated. -
+      `name`: corresponds to template's name. - `display_name`: corresponds to
+      template's display name.
     pageSize: Optional size of the page, can be limited by server. If zero
       server returns a page of max size 100.
     pageToken: Optional page token to continue retrieval. Comes from previous
@@ -522,9 +574,10 @@ class DlpProjectsInspectTemplatesListRequest(_messages.Message):
       organizations/my-org-id.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  orderBy = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class DlpProjectsInspectTemplatesPatchRequest(_messages.Message):
@@ -588,9 +641,10 @@ class DlpProjectsJobTriggersListRequest(_messages.Message):
       default sorting order is ascending, redundant space characters are
       insignificant.  Example: `name asc,update_time, create_time desc`
       Supported fields are:  - `create_time`: corresponds to time the
-      triggeredJob was created. - `update_time`: corresponds to time the
-      triggeredJob was last updated. - `name`: corresponds to JobTrigger's
-      name.
+      JobTrigger was created. - `update_time`: corresponds to time the
+      JobTrigger was last updated. - `name`: corresponds to JobTrigger's name.
+      - `display_name`: corresponds to JobTrigger's display name. - `status`:
+      corresponds to JobTrigger's status.
     pageSize: Optional size of the page, can be limited by a server.
     pageToken: Optional page token to continue retrieval. Comes from previous
       call to ListJobTriggers. `order_by` field must not change for subsequent
@@ -662,6 +716,14 @@ class DlpProjectsStoredInfoTypesListRequest(_messages.Message):
   r"""A DlpProjectsStoredInfoTypesListRequest object.
 
   Fields:
+    orderBy: Optional comma separated list of fields to order by, followed by
+      `asc` or `desc` postfix. This list is case-insensitive, default sorting
+      order is ascending, redundant space characters are insignificant.
+      Example: `name asc, display_name, create_time desc`  Supported fields
+      are:  - `create_time`: corresponds to time the most recent version of
+      the resource was created. - `state`: corresponds to the state of the
+      resource. - `name`: corresponds to resource name. - `display_name`:
+      corresponds to info type's display name.
     pageSize: Optional size of the page, can be limited by server. If zero
       server returns a page of max size 100.
     pageToken: Optional page token to continue retrieval. Comes from previous
@@ -670,9 +732,10 @@ class DlpProjectsStoredInfoTypesListRequest(_messages.Message):
       organizations/my-org-id.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  orderBy = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class DlpProjectsStoredInfoTypesPatchRequest(_messages.Message):
@@ -786,6 +849,9 @@ class GooglePrivacyDlpV2BigQueryOptions(_messages.Message):
     SampleMethodValueValuesEnum:
 
   Fields:
+    excludedFields: References to fields excluded from scanning. This allows
+      you to skip inspection of entire columns which you know have no
+      findings.
     identifyingFields: References to fields uniquely identifying rows within
       the table. Nested fields in the format, like `person.birthdate.year`,
       are allowed.
@@ -816,11 +882,12 @@ class GooglePrivacyDlpV2BigQueryOptions(_messages.Message):
     TOP = 1
     RANDOM_START = 2
 
-  identifyingFields = _messages.MessageField('GooglePrivacyDlpV2FieldId', 1, repeated=True)
-  rowsLimit = _messages.IntegerField(2)
-  rowsLimitPercent = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  sampleMethod = _messages.EnumField('SampleMethodValueValuesEnum', 4)
-  tableReference = _messages.MessageField('GooglePrivacyDlpV2BigQueryTable', 5)
+  excludedFields = _messages.MessageField('GooglePrivacyDlpV2FieldId', 1, repeated=True)
+  identifyingFields = _messages.MessageField('GooglePrivacyDlpV2FieldId', 2, repeated=True)
+  rowsLimit = _messages.IntegerField(3)
+  rowsLimitPercent = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  sampleMethod = _messages.EnumField('SampleMethodValueValuesEnum', 5)
+  tableReference = _messages.MessageField('GooglePrivacyDlpV2BigQueryTable', 6)
 
 
 class GooglePrivacyDlpV2BigQueryTable(_messages.Message):
@@ -1058,8 +1125,8 @@ class GooglePrivacyDlpV2CloudStorageFileSet(_messages.Message):
 
 
 class GooglePrivacyDlpV2CloudStorageOptions(_messages.Message):
-  r"""Options defining a file or a set of files (path ending with *) within a
-  Google Cloud Storage bucket.
+  r"""Options defining a file or a set of files within a Google Cloud Storage
+  bucket.
 
   Enums:
     FileTypesValueListEntryValuesEnum:
@@ -1075,9 +1142,11 @@ class GooglePrivacyDlpV2CloudStorageOptions(_messages.Message):
       between 0 and 100, inclusively. Both 0 and 100 means no limit. Defaults
       to 0. Only one of bytes_limit_per_file and bytes_limit_per_file_percent
       can be specified.
-    fileSet: A GooglePrivacyDlpV2FileSet attribute.
+    fileSet: The set of one or more files to scan.
     fileTypes: List of file type groups to include in the scan. If empty, all
-      files are scanned and available data format processors are applied.
+      files are scanned and available data format processors are applied. In
+      addition, the binary content of the selected files is always scanned as
+      well.
     filesLimitPercent: Limits the number of files to scan to this percentage
       of the input FileSet. Number of files scanned is rounded down. Must be
       between 0 and 100, inclusively. Both 0 and 100 means no limit. Defaults
@@ -1127,6 +1196,50 @@ class GooglePrivacyDlpV2CloudStoragePath(_messages.Message):
   """
 
   path = _messages.StringField(1)
+
+
+class GooglePrivacyDlpV2CloudStorageRegexFileSet(_messages.Message):
+  r"""Message representing a set of files in a Cloud Storage bucket. Regular
+  expressions are used to allow fine-grained control over which files in the
+  bucket to include.  Included files are those that match at least one item in
+  `include_regex` and do not match any items in `exclude_regex`. Note that a
+  file that matches items from both lists will _not_ be included. For a match
+  to occur, the entire file path (i.e., everything in the url after the bucket
+  name) must match the regular expression.  For example, given the input
+  `{bucket_name: "mybucket", include_regex: ["directory1/.*"], exclude_regex:
+  ["directory1/excluded.*"]}`:  * `gs://mybucket/directory1/myfile` will be
+  included * `gs://mybucket/directory1/directory2/myfile` will be included
+  (`.*` matches across `/`) * `gs://mybucket/directory0/directory1/myfile`
+  will _not_ be included (the full path doesn't match any items in
+  `include_regex`) * `gs://mybucket/directory1/excludedfile` will _not_ be
+  included (the path matches an item in `exclude_regex`)  If `include_regex`
+  is left empty, it will match all files by default (this is equivalent to
+  setting `include_regex: [".*"]`).  Some other common use cases:  *
+  `{bucket_name: "mybucket", exclude_regex: [".*\.pdf"]}` will include all
+  files in `mybucket` except for .pdf files * `{bucket_name: "mybucket",
+  include_regex: ["directory/[^/]+"]}` will include all files directly under
+  `gs://mybucket/directory/`, without matching across `/`
+
+  Fields:
+    bucketName: The name of a Cloud Storage bucket. Required.
+    excludeRegex: A list of regular expressions matching file paths to
+      exclude. All files in the bucket that match at least one of these
+      regular expressions will be excluded from the scan.  Regular expressions
+      use RE2 [syntax](https://github.com/google/re2/wiki/Syntax); a guide can
+      be found under the google/re2 repository on GitHub.
+    includeRegex: A list of regular expressions matching file paths to
+      include. All files in the bucket that match at least one of these
+      regular expressions will be included in the set of files, except for
+      those that also match an item in `exclude_regex`. Leaving this field
+      empty will match all files by default (this is equivalent to including
+      `.*` in the list).  Regular expressions use RE2
+      [syntax](https://github.com/google/re2/wiki/Syntax); a guide can be
+      found under the google/re2 repository on GitHub.
+  """
+
+  bucketName = _messages.StringField(1)
+  excludeRegex = _messages.StringField(2, repeated=True)
+  includeRegex = _messages.StringField(3, repeated=True)
 
 
 class GooglePrivacyDlpV2Color(_messages.Message):
@@ -1226,9 +1339,12 @@ class GooglePrivacyDlpV2ContentLocation(_messages.Message):
 
   Fields:
     containerName: Name of the container where the finding is located. The top
-      level name is the source file name or table name. Nested names could be
-      absent if the embedded object has no string identifier (for an example
-      an image contained within a document).
+      level name is the source file name or table name. Names of some common
+      storage containers are formatted as follows:  * BigQuery tables:
+      `<project_id>:<dataset_id>.<table_id>` * Cloud Storage files:
+      `gs://<bucket>/<path>` * Datastore namespace: <namespace>  Nested names
+      could be absent if the embedded object has no string identifier (for an
+      example an image contained within a document).
     containerTimestamp: Findings container modification timestamp, if
       applicable. For Google Cloud Storage contains last file modification
       timestamp. For BigQuery table contains last_modified_time property. For
@@ -1443,6 +1559,9 @@ class GooglePrivacyDlpV2CustomInfoType(_messages.Message):
   specific sensitive information configurable to the data in question.
 
   Enums:
+    ExclusionTypeValueValuesEnum: If set to EXCLUSION_TYPE_EXCLUDE this
+      infoType will not cause a finding to be returned. It still can be used
+      for rules matching.
     LikelihoodValueValuesEnum: Likelihood to return for this CustomInfoType.
       This base value can be altered by a detection rule if the finding meets
       the criteria specified by the rule. Defaults to `VERY_LIKELY` if not
@@ -1453,8 +1572,14 @@ class GooglePrivacyDlpV2CustomInfoType(_messages.Message):
       CustomInfoType. Rules are applied in order that they are specified. Not
       supported for the `surrogate_type` CustomInfoType.
     dictionary: A list of phrases to detect as a CustomInfoType.
-    infoType: All CustomInfoTypes must have a name that does not conflict with
-      built-in InfoTypes or other CustomInfoTypes.
+    exclusionType: If set to EXCLUSION_TYPE_EXCLUDE this infoType will not
+      cause a finding to be returned. It still can be used for rules matching.
+    infoType: CustomInfoType can either be a new infoType, or an extension of
+      built-in infoType, when the name matches one of existing infoTypes and
+      that infoType is specified in `InspectContent.info_types` field.
+      Specifying the latter adds findings to the one detected by the system.
+      If built-in info type is not specified in `InspectContent.info_types`
+      list then the name is treated as a custom info type.
     likelihood: Likelihood to return for this CustomInfoType. This base value
       can be altered by a detection rule if the finding meets the criteria
       specified by the rule. Defaults to `VERY_LIKELY` if not specified.
@@ -1464,6 +1589,19 @@ class GooglePrivacyDlpV2CustomInfoType(_messages.Message):
     surrogateType: Message for detecting output from deidentification
       transformations that support reversing.
   """
+
+  class ExclusionTypeValueValuesEnum(_messages.Enum):
+    r"""If set to EXCLUSION_TYPE_EXCLUDE this infoType will not cause a
+    finding to be returned. It still can be used for rules matching.
+
+    Values:
+      EXCLUSION_TYPE_UNSPECIFIED: A finding of this custom info type will not
+        be excluded from results.
+      EXCLUSION_TYPE_EXCLUDE: A finding of this custom info type will be
+        excluded from final results, but can still affect rule execution.
+    """
+    EXCLUSION_TYPE_UNSPECIFIED = 0
+    EXCLUSION_TYPE_EXCLUDE = 1
 
   class LikelihoodValueValuesEnum(_messages.Enum):
     r"""Likelihood to return for this CustomInfoType. This base value can be
@@ -1487,11 +1625,12 @@ class GooglePrivacyDlpV2CustomInfoType(_messages.Message):
 
   detectionRules = _messages.MessageField('GooglePrivacyDlpV2DetectionRule', 1, repeated=True)
   dictionary = _messages.MessageField('GooglePrivacyDlpV2Dictionary', 2)
-  infoType = _messages.MessageField('GooglePrivacyDlpV2InfoType', 3)
-  likelihood = _messages.EnumField('LikelihoodValueValuesEnum', 4)
-  regex = _messages.MessageField('GooglePrivacyDlpV2Regex', 5)
-  storedType = _messages.MessageField('GooglePrivacyDlpV2StoredType', 6)
-  surrogateType = _messages.MessageField('GooglePrivacyDlpV2SurrogateType', 7)
+  exclusionType = _messages.EnumField('ExclusionTypeValueValuesEnum', 3)
+  infoType = _messages.MessageField('GooglePrivacyDlpV2InfoType', 4)
+  likelihood = _messages.EnumField('LikelihoodValueValuesEnum', 5)
+  regex = _messages.MessageField('GooglePrivacyDlpV2Regex', 6)
+  storedType = _messages.MessageField('GooglePrivacyDlpV2StoredType', 7)
+  surrogateType = _messages.MessageField('GooglePrivacyDlpV2SurrogateType', 8)
 
 
 class GooglePrivacyDlpV2DatastoreKey(_messages.Message):
@@ -1546,7 +1685,7 @@ class GooglePrivacyDlpV2DateShiftConfig(_messages.Message):
 
 
 class GooglePrivacyDlpV2DateTime(_messages.Message):
-  r"""Message for a date time object.
+  r"""Message for a date time object. e.g. 2018-01-01, 5th August.
 
   Enums:
     DayOfWeekValueValuesEnum:
@@ -1900,6 +2039,69 @@ class GooglePrivacyDlpV2Error(_messages.Message):
   timestamps = _messages.StringField(2, repeated=True)
 
 
+class GooglePrivacyDlpV2ExcludeInfoTypes(_messages.Message):
+  r"""List of exclude infoTypes.
+
+  Fields:
+    infoTypes: InfoType list in ExclusionRule rule drops a finding when it
+      overlaps or contained within with a finding of an infoType from this
+      list. For example, for `InspectionRuleSet.info_types` containing
+      "PHONE_NUMBER"` and `exclusion_rule` containing
+      `exclude_info_types.info_types` with "EMAIL_ADDRESS" the phone number
+      findings are dropped if they overlap with EMAIL_ADDRESS finding. That
+      leads to "555-222-2222@example.org" to generate only a single finding,
+      namely email address.
+  """
+
+  infoTypes = _messages.MessageField('GooglePrivacyDlpV2InfoType', 1, repeated=True)
+
+
+class GooglePrivacyDlpV2ExclusionRule(_messages.Message):
+  r"""The rule that specifies conditions when findings of infoTypes specified
+  in `InspectionRuleSet` are removed from results.
+
+  Enums:
+    MatchingTypeValueValuesEnum: How the rule is applied, see MatchingType
+      documentation for details.
+
+  Fields:
+    dictionary: Dictionary which defines the rule.
+    excludeInfoTypes: Set of infoTypes for which findings would affect this
+      rule.
+    matchingType: How the rule is applied, see MatchingType documentation for
+      details.
+    regex: Regular expression which defines the rule.
+  """
+
+  class MatchingTypeValueValuesEnum(_messages.Enum):
+    r"""How the rule is applied, see MatchingType documentation for details.
+
+    Values:
+      MATCHING_TYPE_UNSPECIFIED: Invalid.
+      MATCHING_TYPE_FULL_MATCH: Full match.  - Dictionary: join of Dictionary
+        results matched complete finding quote - Regex: all regex matches fill
+        a finding quote start to end - Exclude info type: completely inside
+        affecting info types findings
+      MATCHING_TYPE_PARTIAL_MATCH: Partial match.  - Dictionary: at least one
+        of the tokens in the finding matches - Regex: substring of the finding
+        matches - Exclude info type: intersects with affecting info types
+        findings
+      MATCHING_TYPE_INVERSE_MATCH: Inverse match.  - Dictionary: no tokens in
+        the finding match the dictionary - Regex: finding doesn't match the
+        regex - Exclude info type: no intersection with affecting info types
+        findings
+    """
+    MATCHING_TYPE_UNSPECIFIED = 0
+    MATCHING_TYPE_FULL_MATCH = 1
+    MATCHING_TYPE_PARTIAL_MATCH = 2
+    MATCHING_TYPE_INVERSE_MATCH = 3
+
+  dictionary = _messages.MessageField('GooglePrivacyDlpV2Dictionary', 1)
+  excludeInfoTypes = _messages.MessageField('GooglePrivacyDlpV2ExcludeInfoTypes', 2)
+  matchingType = _messages.EnumField('MatchingTypeValueValuesEnum', 3)
+  regex = _messages.MessageField('GooglePrivacyDlpV2Regex', 4)
+
+
 class GooglePrivacyDlpV2Expressions(_messages.Message):
   r"""An expression, consisting or an operator and conditions.
 
@@ -1965,11 +2167,15 @@ class GooglePrivacyDlpV2FileSet(_messages.Message):
   r"""Set of files to scan.
 
   Fields:
-    url: The url, in the format `gs://<bucket>/<path>`. Trailing wildcard in
-      the path is allowed.
+    regexFileSet: The regex-filtered set of files to scan. Exactly one of
+      `url` or `regex_file_set` must be set.
+    url: The Cloud Storage url of the file(s) to scan, in the format
+      `gs://<bucket>/<path>`. Trailing wildcard in the path is allowed.
+      Exactly one of `url` or `regex_file_set` must be set.
   """
 
-  url = _messages.StringField(1)
+  regexFileSet = _messages.MessageField('GooglePrivacyDlpV2CloudStorageRegexFileSet', 1)
+  url = _messages.StringField(2)
 
 
 class GooglePrivacyDlpV2Finding(_messages.Message):
@@ -2137,7 +2343,8 @@ class GooglePrivacyDlpV2InfoType(_messages.Message):
     name: Name of the information type. Either a name of your choosing when
       creating a CustomInfoType, or one of the names listed at
       https://cloud.google.com/dlp/docs/infotypes-reference when specifying a
-      built-in type.
+      built-in type. InfoType names should conform to the pattern
+      [a-zA-Z0-9_]{1,64}.
   """
 
   name = _messages.StringField(1)
@@ -2262,6 +2469,9 @@ class GooglePrivacyDlpV2InspectConfig(_messages.Message):
     minLikelihood: Only returns findings equal or above this threshold. The
       default is POSSIBLE. See https://cloud.google.com/dlp/docs/likelihood to
       learn more.
+    ruleSet: Set of rules to apply to the findings for this InspectConfig.
+      Exclusion rules, contained in the set are executed in the end, other
+      rules are executed in the order they are specified for each info type.
   """
 
   class ContentOptionsValueListEntryValuesEnum(_messages.Enum):
@@ -2302,6 +2512,7 @@ class GooglePrivacyDlpV2InspectConfig(_messages.Message):
   infoTypes = _messages.MessageField('GooglePrivacyDlpV2InfoType', 5, repeated=True)
   limits = _messages.MessageField('GooglePrivacyDlpV2FindingLimits', 6)
   minLikelihood = _messages.EnumField('MinLikelihoodValueValuesEnum', 7)
+  ruleSet = _messages.MessageField('GooglePrivacyDlpV2InspectionRuleSet', 8, repeated=True)
 
 
 class GooglePrivacyDlpV2InspectContentRequest(_messages.Message):
@@ -2409,6 +2620,34 @@ class GooglePrivacyDlpV2InspectTemplate(_messages.Message):
   updateTime = _messages.StringField(6)
 
 
+class GooglePrivacyDlpV2InspectionRule(_messages.Message):
+  r"""A single inspection rule to be applied to infoTypes, specified in
+  `InspectionRuleSet`.
+
+  Fields:
+    exclusionRule: Exclusion rule.
+    hotwordRule: Hotword-based detection rule.
+  """
+
+  exclusionRule = _messages.MessageField('GooglePrivacyDlpV2ExclusionRule', 1)
+  hotwordRule = _messages.MessageField('GooglePrivacyDlpV2HotwordRule', 2)
+
+
+class GooglePrivacyDlpV2InspectionRuleSet(_messages.Message):
+  r"""Rule set for modifying a set of infoTypes to alter behavior under
+  certain circumstances, depending on the specific details of the rules within
+  the set.
+
+  Fields:
+    infoTypes: List of infoTypes this rule set is applied to.
+    rules: Set of rules to be applied to infoTypes. The rules are applied in
+      order.
+  """
+
+  infoTypes = _messages.MessageField('GooglePrivacyDlpV2InfoType', 1, repeated=True)
+  rules = _messages.MessageField('GooglePrivacyDlpV2InspectionRule', 2, repeated=True)
+
+
 class GooglePrivacyDlpV2JobTrigger(_messages.Message):
   r"""Contains a configuration to make dlp api calls on a repeating basis. See
   https://cloud.google.com/dlp/docs/concepts-job-triggers to learn more.
@@ -2421,7 +2660,7 @@ class GooglePrivacyDlpV2JobTrigger(_messages.Message):
     description: User provided description (max 256 chars)
     displayName: Display name (max 100 chars)
     errors: A stream of errors encountered when the trigger was activated.
-      Repeated errors may result in the JobTrigger automaticaly being paused.
+      Repeated errors may result in the JobTrigger automatically being paused.
       Will return the last 100 errors. Whenever the JobTrigger is modified
       this list will be cleared. Output only field.
     inspectJob: A GooglePrivacyDlpV2InspectJobConfig attribute.
@@ -2470,7 +2709,7 @@ class GooglePrivacyDlpV2KAnonymityConfig(_messages.Message):
   Fields:
     entityId: Optional message indicating that multiple rows might be
       associated to a single individual. If the same entity_id is associated
-      to multiple quasi-identifier tuples over distict rows, we consider the
+      to multiple quasi-identifier tuples over distinct rows, we consider the
       entire collection of tuples as the composite quasi-identifier. This
       collection is a multiset: the order in which the different tuples appear
       in the dataset is ignored, but their frequency is taken into account.
@@ -2931,8 +3170,9 @@ class GooglePrivacyDlpV2OutputStorageConfig(_messages.Message):
       object. If appending to an existing table, any columns from the
       predefined schema that are missing will be added. No columns in the
       existing table will be deleted.  If unspecified, then all available
-      columns will be used for a new table, and no changes will be made to an
-      existing table.
+      columns will be used for a new table or an (existing) table with no
+      schema, and no changes will be made to an existing table that has a
+      schema.
 
   Fields:
     outputSchema: Schema used for writing the findings for Inspect jobs. This
@@ -2940,8 +3180,9 @@ class GooglePrivacyDlpV2OutputStorageConfig(_messages.Message):
       Columns are derived from the `Finding` object. If appending to an
       existing table, any columns from the predefined schema that are missing
       will be added. No columns in the existing table will be deleted.  If
-      unspecified, then all available columns will be used for a new table,
-      and no changes will be made to an existing table.
+      unspecified, then all available columns will be used for a new table or
+      an (existing) table with no schema, and no changes will be made to an
+      existing table that has a schema.
     table: Store findings in an existing table or a new table in an existing
       dataset. If table_id is not set a new one will be generated for you with
       the following format: dlp_googleapis_yyyy_mm_dd_[dlp_job_id]. Pacific
@@ -2961,8 +3202,9 @@ class GooglePrivacyDlpV2OutputStorageConfig(_messages.Message):
     derived from the `Finding` object. If appending to an existing table, any
     columns from the predefined schema that are missing will be added. No
     columns in the existing table will be deleted.  If unspecified, then all
-    available columns will be used for a new table, and no changes will be
-    made to an existing table.
+    available columns will be used for a new table or an (existing) table with
+    no schema, and no changes will be made to an existing table that has a
+    schema.
 
     Values:
       OUTPUT_SCHEMA_UNSPECIFIED: <no description>
@@ -3170,7 +3412,7 @@ class GooglePrivacyDlpV2QuoteInfo(_messages.Message):
   r"""Message for infoType-dependent details parsed from quote.
 
   Fields:
-    dateTime: A GooglePrivacyDlpV2DateTime attribute.
+    dateTime: The date time indicated by the quote.
   """
 
   dateTime = _messages.MessageField('GooglePrivacyDlpV2DateTime', 1)
@@ -3302,7 +3544,9 @@ class GooglePrivacyDlpV2Regex(_messages.Message):
   r"""Message defining a custom regular expression.
 
   Fields:
-    pattern: Pattern defining the regular expression.
+    pattern: Pattern defining the regular expression. Its syntax
+      (https://github.com/google/re2/wiki/Syntax) can be found under the
+      google/re2 repository on GitHub.
   """
 
   pattern = _messages.StringField(1)
@@ -3570,9 +3814,7 @@ class GooglePrivacyDlpV2StoredInfoTypeVersion(_messages.Message):
 
 
 class GooglePrivacyDlpV2StoredType(_messages.Message):
-  r"""CustomInfoType implementation that loads an existing `StoredInfoType`
-  resource for scanning in `InspectDataSource`. Not currently supported in
-  `InspectContent`.
+  r"""A reference to a StoredInfoType to use with scanning.
 
   Fields:
     createTime: Timestamp indicating when the version of the `StoredInfoType`
@@ -3771,7 +4013,7 @@ class GooglePrivacyDlpV2TransformationSummary(_messages.Message):
     fieldTransformations: The field transformation that was applied. If
       multiple field transformations are requested for a single field, this
       list will contain all of them; otherwise, only one is supplied.
-    infoType: Set if the transformation was limited to a specific info_type.
+    infoType: Set if the transformation was limited to a specific InfoType.
     recordSuppress: The specific suppression option these stats apply to.
     results: A GooglePrivacyDlpV2SummaryResult attribute.
     transformation: The specific transformation these stats apply to.
@@ -4041,19 +4283,21 @@ class GoogleRpcStatus(_messages.Message):
 
 
 class GoogleTypeDate(_messages.Message):
-  r"""Represents a whole calendar date, e.g. date of birth. The time of day
-  and time zone are either specified elsewhere or are not significant. The
-  date is relative to the Proleptic Gregorian Calendar. The day may be 0 to
-  represent a year and month where the day is not significant, e.g. credit
-  card expiration date. The year may be 0 to represent a month and day
-  independent of year, e.g. anniversary date. Related types are
+  r"""Represents a whole or partial calendar date, e.g. a birthday. The time
+  of day and time zone are either specified elsewhere or are not significant.
+  The date is relative to the Proleptic Gregorian Calendar. This can
+  represent:  * A full date, with non-zero year, month and day values * A
+  month and day value, with a zero year, e.g. an anniversary * A year on its
+  own, with zero month and day values * A year and month value, with a zero
+  day, e.g. a credit card expiration date  Related types are
   google.type.TimeOfDay and `google.protobuf.Timestamp`.
 
   Fields:
     day: Day of month. Must be from 1 to 31 and valid for the year and month,
-      or 0 if specifying a year/month where the day is not significant.
-    month: Month of year. Must be from 1 to 12, or 0 if specifying a date
-      without a month.
+      or 0 if specifying a year by itself or a year and month where the day is
+      not significant.
+    month: Month of year. Must be from 1 to 12, or 0 if specifying a year
+      without a month and day.
     year: Year of date. Must be from 1 to 9999, or 0 if specifying a date
       without a year.
   """

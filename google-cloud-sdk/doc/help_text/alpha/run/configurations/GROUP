@@ -1,0 +1,46 @@
+NAME
+    gcloud alpha run configurations - view and manage your Cloud Run
+        configurations
+
+SYNOPSIS
+    gcloud alpha run configurations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) View and manage your Cloud Run configurations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Obtain details about a given configuration.
+
+     list
+        (ALPHA) List available Configurations.
+
+     update
+        (ALPHA) Update Cloud Run environment variables and other configuration
+        settings.
+
+EXAMPLES
+    To update one or more env vars:
+
+        $ gcloud alpha run configurations update \
+            --update-env-vars KEY1=VALUE1,KEY2=VALUE2
+
+    To remove one or more env vars:
+
+        $ gcloud alpha run configurations update --remove-env-vars KEY1,KEY2
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

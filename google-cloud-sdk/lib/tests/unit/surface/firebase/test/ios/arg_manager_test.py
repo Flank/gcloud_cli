@@ -149,6 +149,14 @@ class IosArgsTests(unit_base.IosMockClientTest):
     msg = six.text_type(ex_ctx.exception)
     self.assertIn("'ver' is not a valid dimension name", msg)
 
+  def testPrepareArgs_InvalidXcodeVersion(self):
+    args = self.NewTestArgs(test='a', xcode_version='v99')
+    arg_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.XcodeVersionNotFoundError) as ex_ctx:
+      arg_mgr.Prepare(args)
+    msg = six.text_type(ex_ctx.exception)
+    self.assertIn("'v99' is not a supported Xcode version", msg)
+
   def testPrepareArgs_StripsOffResultsBucketGcsPrefix(self):
     args = self.NewTestArgs(results_bucket='gs://a-bucket', test='a')
     arg_mgr = _IosArgManagerWithFakeCatalog()

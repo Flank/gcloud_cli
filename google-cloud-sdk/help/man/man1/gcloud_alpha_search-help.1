@@ -11,15 +11,23 @@ gcloud alpha search\-help \- search the help text of gcloud commands
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha search\-help\fR \fITERM\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha search\-help\fR \fITERM\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR;\ default=5] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...];\ default="~relevance"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Search the help text of gcloud commands for a term of interest.
-Prints the command name and a summary of the help text for any general release
-command whose help text contains the searched term.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Search the help text of gcloud commands.
+
+\f5search\-help\fR is deprecated. Please use \f5gcloud help\fR instead.
+
+Search the help text of gcloud commands for a term of interest. Prints the
+command name and a summary of the help text for any general release command
+whose help text contains the searched term.
+
+By default, results are sorted from most to least relevant, using a localized
+rating that is based on several heuristics and that may change in future runs of
+this command.
 
 
 
@@ -34,12 +42,49 @@ Term to search for.
 .RE
 .sp
 
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR; default=5
+Maximum number of resources to list. The default is \fB5\fR. This flag interacts
+with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]; default="~relevance"
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR. The
+default is \fB~relevance\fR.
+
+
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

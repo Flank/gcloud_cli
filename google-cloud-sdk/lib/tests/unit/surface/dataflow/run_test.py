@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
+
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -62,7 +64,7 @@ class RunUnitTest(base.DataflowMockingTestBase,
             JOB_1_ID, environment=self.fake_environment),
         gcs_location='gs://foo',
         job_name='myjob',
-        parameters={'bar': 'foo', 'baz': 'quux'})
+        parameters=collections.OrderedDict([('bar', 'foo'), ('baz', 'quux')]))
     result = self.Run('dataflow jobs run myjob --gcs-location=gs://foo'
                       ' --parameters=bar=foo,baz=quux')
     self.assertEqual(JOB_1_ID, result.id)
@@ -74,7 +76,7 @@ class RunUnitTest(base.DataflowMockingTestBase,
             JOB_1_ID, environment=self.fake_environment, region=my_region),
         gcs_location='gs://foo',
         job_name='myjob',
-        parameters={'bar': 'foo', 'baz': 'quux'},
+        parameters=collections.OrderedDict([('bar', 'foo'), ('baz', 'quux')]),
         location=my_region)
     result = self.Run('dataflow jobs run myjob --gcs-location=gs://foo'
                       ' --parameters=bar=foo,baz=quux --region=' + my_region)

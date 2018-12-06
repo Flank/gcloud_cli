@@ -1,6 +1,6 @@
 NAME
     gcloud beta pubsub subscriptions add-iam-policy-binding - add IAM policy
-        binding for a subscription
+        binding to a subscription
 
 SYNOPSIS
     gcloud beta pubsub subscriptions add-iam-policy-binding SUBSCRIPTION
@@ -10,15 +10,15 @@ DESCRIPTION
     (BETA) Add an IAM policy binding to a Cloud Pub/Sub Subscription.
 
 POSITIONAL ARGUMENTS
-     Subscription resource - Name of the subscription to add an IAM policy
-     binding to. This represents a Cloud resource. (NOTE) Some attributes are
-     not given arguments in this group but can be set in other ways. To set the
-     [project] attribute: provide the flag [subscription] on the command line
-     with a fully specified name; provide the flag [--project] on the command
+     Subscription resource - The subscription to add the IAM policy binding.
+     This represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [subscription] on the command line with a
+     fully specified name; provide the argument [--project] on the command
      line; set the property [core/project]. This must be specified.
 
        SUBSCRIPTION
-          The ID of the subscription or a fully qualified identifier for the
+          ID of the subscription or fully qualified identifier for the
           subscription.
 
 REQUIRED FLAGS
@@ -41,13 +41,17 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the pubsub/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/pubsub/docs
 
 EXAMPLES
-    The following command will add an IAM policy binding for the role of
-    'roles/editor' for the user 'test-user@gmail.com' on a subscription with
-    identifier 'my-subscription'
+    To add an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' with subscription 'my-subscription', run:
 
         $ gcloud beta pubsub subscriptions add-iam-policy-binding \
             my-subscription --member='user:test-user@gmail.com' \
@@ -55,9 +59,7 @@ EXAMPLES
 
     For a service account test-proj1@example.domain.com, the following command
     will add an IAM policy binding for the role of 'roles/editor' to the given
-    service account:
-
-        $ gcloud beta pubsub subscriptions add-iam-policy-binding \
+    service account:        $ gcloud beta pubsub subscriptions add-iam-policy-binding \
             test-proj1@example.domain.com \
             --member='serviceAccount:test-proj1@example.domain.com' \
             --role='roles/editor'
@@ -68,7 +70,7 @@ EXAMPLES
 
         $ gcloud beta pubsub subscriptions add-iam-policy-binding \
             my-subscription --member='allAuthenticatedUsers' \
-            --role='roles/editor'
+            --role='roles/editor
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

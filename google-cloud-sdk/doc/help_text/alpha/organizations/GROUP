@@ -20,14 +20,15 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding for a organization.
+        (ALPHA) Add IAM policy binding for an organization.
 
      describe
         (ALPHA) Show metadata for an organization.
@@ -39,7 +40,7 @@ COMMANDS
         (ALPHA) List organizations accessible by the active account.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding for a organization.
+        (ALPHA) Remove IAM policy binding for an organization.
 
      set-iam-policy
         (ALPHA) Set IAM policy for an organization.

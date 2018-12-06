@@ -64,36 +64,36 @@ Print a list of resource URIs instead of the default output.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "API REFERENCE"
 
-This command uses the \fBredis/v1beta1\fR API. The full documentation for this
-API can be found at: https://cloud.google.com/memorystore/docs/redis/
+This command uses the \fBredis/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/memorystore/docs/redis/
 
 
 
 .SH "EXAMPLES"
 
-The following command lists all the regions where you can create Redis
-instances:
+To list all the regions where Redis instances can be created, run:
 
 .RS 2m
-$ gcloud alpha redis regions list
+$ gcloud beta redis regions list
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud redis regions list
 $ gcloud alpha redis regions list
 .RE
 

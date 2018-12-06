@@ -749,5 +749,71 @@ class MultitypeTestsFourWayParentChild(concepts_test_base.MultitypeTestBase,
           expected_type, [str(r.type_) for r in parsed])
 
 
+class MultitypeTestsExtraAncestor(concepts_test_base.MultitypeTestBase,
+                                  parameterized.TestCase):
+  """Tests for a resource that may have an extra parameter in its path."""
+
+  def SetUp(self):
+    # The child.
+    self.resource = self.multitype_extra_attribute_in_path
+
+  @parameterized.named_parameters(
+      # If the extra param is actively specified, use the extra-param-having
+      # type.
+      ('ExtraActivelySpecified', True,
+       'projects/my-project/cases/my-case/shelves/my-shelf/books/my-book'),
+      # Otherwise, use the parent type.
+      ('ExtraNotActivelySpecified', False,
+       'projects/my-project/shelves/my-shelf/books/my-book'))
+  def testInitialize(self, active, expected):
+    fallthroughs_map = {
+        'project': [
+            deps.Fallthrough(lambda: 'my-project', 'h', active=True)],
+        'shelf': [deps.Fallthrough(lambda: 'my-shelf', 'h', active=True)],
+        'case': [deps.Fallthrough(lambda: 'my-case', 'h', active=active)],
+        'book': [deps.Fallthrough(lambda: 'my-book', 'h', active=True)]}
+    self.assertEqual(
+        expected,
+        self.resource.Initialize(fallthroughs_map).result.RelativeName())
+
+  @parameterized.named_parameters(
+      ('FullySpecifiedNoExtra', None, None, None,
+       'projects/my-project/shelves/my-shelf/books/my-book',
+       'projects/my-project/shelves/my-shelf/books/my-book'),
+      ('FullySpecifiedExtra', None, None, None,
+       'projects/my-project/cases/my-case/shelves/my-shelf/books/my-book',
+       'projects/my-project/cases/my-case/shelves/my-shelf/books/my-book'),
+      ('PartiallySpecifiedNoExtra', 'my-proj', None, 'my-shelf', 'my-book',
+       'projects/my-proj/shelves/my-shelf/books/my-book'),
+      ('PartiallySpecifiedExtra', 'my-proj', 'my-case', 'my-shelf', 'my-book',
+       'projects/my-proj/cases/my-case/shelves/my-shelf/books/my-book'))
+  def testInitializeWithAnchor(self, proj_value, case_value, shelf_value,
+                               book_value, expected):
+    book_fallthrough = deps.Fallthrough(lambda: book_value, 'h', active=True)
+    fallthroughs_map = {
+        'project': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.book_collection,
+                'projectsId'),
+            deps.Fallthrough(lambda: proj_value, 'h', active=True)],
+        'case': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.book_collection,
+                'casesId'),
+            deps.Fallthrough(lambda: case_value, 'h', active=True)],
+        'shelf': [
+            deps.FullySpecifiedAnchorFallthrough(
+                book_fallthrough,
+                self.book_collection,
+                'shelvesId'),
+            deps.Fallthrough(lambda: shelf_value, 'h')],
+        'book': [book_fallthrough]}
+    self.assertEqual(
+        expected,
+        self.resource.Initialize(fallthroughs_map).result.RelativeName())
+
+
 if __name__ == '__main__':
   test_case.main()

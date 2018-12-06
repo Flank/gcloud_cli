@@ -174,21 +174,14 @@ class CommonArgFileTests(unit_base.TestUnitTestBase):
       arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-abcd', COMMON_ARGS)
     msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [timeout]', msg)
-    self.assertIn('given value must be of the form INTEGER[UNIT]', msg)
+    self.assertIn("Duration unit 'abcd' must be preceded by a number", msg)
 
   def testDurations_InvalidUnits(self):
     with self.assertRaises(exceptions.InvalidArgException) as e:
       arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-10e', COMMON_ARGS)
     msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [timeout]', msg)
-    self.assertIn('unit must be one of s, m, h, d; received: e', msg)
-
-  def testDurations_InvalidFloatValue(self):
-    with self.assertRaises(exceptions.InvalidArgException) as e:
-      arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-1.1h', COMMON_ARGS)
-    msg = six.text_type(e.exception)
-    self.assertIn('Invalid value for [timeout]', msg)
-    self.assertIn('given value must be of the form INTEGER[UNIT]', msg)
+    self.assertIn("Unknown character 'E' in duration", msg)
 
   def testDurations_TimeoutBelowLowerBound(self):
     with self.assertRaises(exceptions.InvalidArgException) as e:

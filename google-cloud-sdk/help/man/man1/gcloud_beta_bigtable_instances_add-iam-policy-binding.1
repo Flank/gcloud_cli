@@ -29,14 +29,14 @@ gcloud beta bigtable instances add\-iam\-policy\-binding \- add an IAM policy bi
 Instance resource \- The Cloud Bigtable instance to which to add the IAM policy
 binding. This represents a Cloud resource. (NOTE) Some attributes are not given
 arguments in this group but can be set in other ways. To set the [project]
-attribute: provide the flag [instance] on the command line with a fully
-specified name; provide the flag [\-\-project] on the command line; set the
+attribute: provide the argument [instance] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
 property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fIINSTANCE\fR
-The ID of the instance or a fully qualified identifier for the instance.
+ID of the instance or fully qualified identifier for the instance.
 
 
 .RE
@@ -79,9 +79,9 @@ Define the role of the member.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -92,12 +92,29 @@ this API can be found at: https://cloud.google.com/bigtable/
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To add an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' with instance 'my\-instance', run:
 
 .RS 2m
+$ gcloud beta bigtable instances add\-iam\-policy\-binding \e
+    my\-instance \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud bigtable instances add\-iam\-policy\-binding
 $ gcloud alpha bigtable instances add\-iam\-policy\-binding
 .RE
 

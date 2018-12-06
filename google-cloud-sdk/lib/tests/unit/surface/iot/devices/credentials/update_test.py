@@ -22,15 +22,14 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import util
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsUpdateTest(base.CloudIotBase):
+class CredentialsUpdateTestGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.device_credentials = [
@@ -48,8 +47,7 @@ class CredentialsUpdateTest(base.CloudIotBase):
             ))
     ]
 
-  def testUpdate(self, track):
-    self.track = track
+  def testUpdate(self):
     new_device_credential = self.messages.DeviceCredential(
         expirationTime='2018-01-01T00:00:00.000Z',
         publicKey=self.messages.PublicKeyCredential(
@@ -71,8 +69,7 @@ class CredentialsUpdateTest(base.CloudIotBase):
     self.assertEqual(result, expected_device)
     self.AssertLogContains('Updated credentials for device [my-device].')
 
-  def testUpdate_BadIndex(self, track):
-    self.track = track
+  def testUpdate_BadIndex(self):
     self._ExpectGet(self.device_credentials)
 
     with self.AssertRaisesExceptionMatches(util.BadCredentialIndexError,
@@ -84,8 +81,7 @@ class CredentialsUpdateTest(base.CloudIotBase):
           '    --region us-central1 '
           '    --expiration-time 2018-01-01T00:00Z')
 
-  def testUpdate_NoChange(self, track):
-    self.track = track
+  def testUpdate_NoChange(self):
     self._ExpectGet(self.device_credentials)
     self._ExpectPatch(self.device_credentials)
 
@@ -100,8 +96,7 @@ class CredentialsUpdateTest(base.CloudIotBase):
         credentials=self.device_credentials)
     self.assertEqual(result, expected_device)
 
-  def testUpdate_InvalidTime(self, track):
-    self.track = track
+  def testUpdate_InvalidTime(self):
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Failed to parse date/time'):
       self.Run(
@@ -111,8 +106,7 @@ class CredentialsUpdateTest(base.CloudIotBase):
           '    --region us-central1'
           '    --expiration-time bad-time')
 
-  def testUpdate_RelativeName(self, track):
-    self.track = track
+  def testUpdate_RelativeName(self):
     new_device_credential = self.messages.DeviceCredential(
         expirationTime='2018-01-01T00:00:00.000Z',
         publicKey=self.messages.PublicKeyCredential(
@@ -134,6 +128,18 @@ class CredentialsUpdateTest(base.CloudIotBase):
         id='my-device',
         credentials=[self.device_credentials[0], new_device_credential])
     self.assertEqual(result, expected_device)
+
+
+class CredentialsUpdateTestBeta(CredentialsUpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsUpdateTestAlpha(CredentialsUpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

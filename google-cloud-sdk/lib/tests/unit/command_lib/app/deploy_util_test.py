@@ -27,7 +27,7 @@ from googlecloudsdk.api_lib.app import env
 from googlecloudsdk.api_lib.app import runtime_builders
 from googlecloudsdk.api_lib.app import version_util
 from googlecloudsdk.api_lib.app import yaml_parsing
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.app import deploy_util
 from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
@@ -47,9 +47,9 @@ RUNTIME_CUSTOM = 'custom'
 class GetRuntimeBuilderStrategyTest(sdk_test_base.SdkBase):
   """Tests for deploy_util.GetRuntimeBuilderStrategy."""
 
-  ALPHA = base.ReleaseTrack.ALPHA
-  BETA = base.ReleaseTrack.BETA
-  GA = base.ReleaseTrack.GA
+  ALPHA = calliope_base.ReleaseTrack.ALPHA
+  BETA = calliope_base.ReleaseTrack.BETA
+  GA = calliope_base.ReleaseTrack.GA
   TRACKS = (ALPHA, BETA, GA)
 
   def testGetRuntimeBuilderStrategy_WhitelistByDefault(self):
@@ -97,7 +97,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
   def testDoesntRequireImage(self):
     self.service_mock.RequiresImage.return_value = False
     result = self.deployer._PossiblyBuildAndPush(
-        None, self.service_mock, None, None, None, None,
+        None, self.service_mock, None, None, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
     self.assertIsNone(result)
 
@@ -108,7 +108,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
         'BuildAndPushDockerImage',
         return_value=self.fake_image_artifact)
     result = self.deployer._PossiblyBuildAndPush(
-        self.fake_version, self.service_mock, None, None, None, None,
+        self.fake_version, self.service_mock, None, None, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
     self.assertEqual(result.identifier, self.fake_image)
 
@@ -117,7 +117,8 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     self.service_mock.parsed.skip_files.regex.return_value = True
     self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
     result = self.deployer._PossiblyBuildAndPush(
-        self.fake_version, self.service_mock, None, self.fake_image, None, None,
+        self.fake_version, self.service_mock, None, None,
+        self.fake_image, None, None,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
     self.AssertErrContains(
         'WARNING: Deployment of service [default] will ignore the skip_files '
@@ -130,7 +131,8 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     self.service_mock.parsed.skip_files.regex.return_value = True
     self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
     result = self.deployer._PossiblyBuildAndPush(
-        self.fake_version, self.service_mock, None, self.fake_image, None, None,
+        self.fake_version, self.service_mock, None, None,
+        self.fake_image, None, None,
         deploy_util.FlexImageBuildOptions.ON_SERVER)
     self.AssertErrContains(
         'WARNING: Deployment of service [default] will ignore the skip_files '
@@ -143,7 +145,8 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     self.service_mock.RequiresImage.return_value = False
     self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
     result = self.deployer._PossiblyBuildAndPush(
-        self.fake_version, self.service_mock, None, self.fake_image, None, None,
+        self.fake_version, self.service_mock, None, None,
+        self.fake_image, None, None,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
     self.assertEqual(result.identifier, self.fake_image)
 
@@ -152,7 +155,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     self.service_mock.GetAppYamlBasename.return_value = 'zap.yaml'
     self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
     result = self.deployer._PossiblyBuildAndPush(
-        self.fake_version, self.service_mock, None, None, None, None,
+        self.fake_version, self.service_mock, None, None, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_SERVER)
     self.assertEqual(result.identifier, {'appYamlPath': 'zap.yaml'})
 
@@ -162,7 +165,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     properties.VALUES.app.cloud_build_timeout.Set('333')
     self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
     result = self.deployer._PossiblyBuildAndPush(
-        self.fake_version, self.service_mock, None, None, None, None,
+        self.fake_version, self.service_mock, None, None, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_SERVER)
     self.assertEqual(result.identifier,
                      {'appYamlPath': 'zap.yaml',
@@ -176,7 +179,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     copy_files_mock = self.StartObjectPatch(deploy_app_command_util,
                                             'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
-        self.fake_image, mock_service_info, None, None,
+        self.fake_image, mock_service_info, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
     self.assertIsNone(result)
     copy_files_mock.assert_not_called()
@@ -189,7 +192,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     copy_files_mock = self.StartObjectPatch(deploy_app_command_util,
                                             'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
-        self.fake_image, mock_service_info, None, None,
+        self.fake_image, mock_service_info, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
     self.assertIsNone(result)
     copy_files_mock.assert_not_called()
@@ -202,11 +205,11 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     copy_files_mock = self.StartObjectPatch(
         deploy_app_command_util, 'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
-        None, mock_service_info, None, None,
+        None, mock_service_info, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
     self.assertIsNotNone(result)
     copy_files_mock.assert_called_once_with(
-        mock_service_info, None, None, max_file_size=None)
+        None, None, None, max_file_size=None)
 
   def testPossiblyUploadFiles_BuildOnServer(self):
     """If build image on server, and hermetic service, upload files."""
@@ -216,11 +219,11 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     copy_files_mock = self.StartObjectPatch(
         deploy_app_command_util, 'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
-        None, mock_service_info, None, None,
+        None, mock_service_info, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_SERVER)
     self.assertIsNotNone(result)
     copy_files_mock.assert_called_once_with(
-        mock_service_info, None, None, max_file_size=None)
+        None, None, None, max_file_size=None)
 
   def testPossiblyUploadFiles_Standard(self):
     """Check the standard path, specifically file size limit."""
@@ -230,11 +233,11 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     copy_files_mock = self.StartObjectPatch(
         deploy_app_command_util, 'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
-        None, mock_service_info, None, None, None)
+        None, mock_service_info, None, None, None, None)
     self.assertIsNotNone(result)
     # Check that the file size limitation is in effect
     copy_files_mock.assert_called_once_with(
-        mock_service_info, None, None, max_file_size=32 * 1024 * 1024)
+        None, None, None, max_file_size=32 * 1024 * 1024)
 
 
 class PrintPostDeployHintsTest(sdk_test_base.WithLogCapture):

@@ -24,18 +24,16 @@ import os
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import util
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsCreateTest(base.CloudIotBase):
+class CredentialsCreateTestGA(base.CloudIotBase):
 
-  def testCreate_InvalidType(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testCreate_InvalidType(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.CERTIFICATE_CONTENTS)
     with self.AssertRaisesExceptionMatches(
@@ -50,8 +48,7 @@ class CredentialsCreateTest(base.CloudIotBase):
           '    --path {}'.format(new_credential_path))
       self.AssertErrContains('Invalid key type [bad-type]')
 
-  def testCreate_MissingType(self, track):
-    self.track = track
+  def testCreate_MissingType(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.CERTIFICATE_CONTENTS)
     with self.AssertRaisesArgumentErrorMatches(
@@ -63,8 +60,7 @@ class CredentialsCreateTest(base.CloudIotBase):
           '    --region us-central1 '
           '    --path {}'.format(new_credential_path))
 
-  def testCreate_InvalidPath(self, track):
-    self.track = track
+  def testCreate_InvalidPath(self):
     with self.AssertRaisesExceptionMatches(util.InvalidKeyFileError,
                                            'Could not read key file'):
       self.Run(
@@ -75,8 +71,7 @@ class CredentialsCreateTest(base.CloudIotBase):
           '    --type rsa-x509-pem'
           '    --path {} '.format(os.path.join(self.temp_path, 'bad.pub')))
 
-  def testCreate_MissingPath(self, track):
-    self.track = track
+  def testCreate_MissingPath(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --path: Must be specified.'):
       self.Run(
@@ -86,8 +81,7 @@ class CredentialsCreateTest(base.CloudIotBase):
           '    --region us-central1 '
           '    --type rsa-x509-pem')
 
-  def testCreate_Empty(self, track):
-    self.track = track
+  def testCreate_Empty(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.CERTIFICATE_CONTENTS)
     new_credential = self.messages.DeviceCredential(
@@ -110,8 +104,7 @@ class CredentialsCreateTest(base.CloudIotBase):
     self.assertEqual(results, expected_device)
     self.AssertLogContains('Created credentials for device [my-device].')
 
-  def testCreate_CredentialExists(self, track):
-    self.track = track
+  def testCreate_CredentialExists(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.PUBLIC_KEY_CONTENTS)
     old_credential = self.messages.DeviceCredential(
@@ -138,8 +131,7 @@ class CredentialsCreateTest(base.CloudIotBase):
         id='my-device', credentials=[old_credential, new_credential])
     self.assertEqual(results, expected_device)
 
-  def testCreate_BadExpirationTime(self, track):
-    self.track = track
+  def testCreate_BadExpirationTime(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.CERTIFICATE_CONTENTS)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
@@ -153,8 +145,7 @@ class CredentialsCreateTest(base.CloudIotBase):
           '    --path {} '
           '    --expiration-time BADTIME'.format(new_credential_path))
 
-  def testCreate_IncludeExpirationTime(self, track):
-    self.track = track
+  def testCreate_IncludeExpirationTime(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.CERTIFICATE_CONTENTS)
     new_credential = self.messages.DeviceCredential(
@@ -179,8 +170,7 @@ class CredentialsCreateTest(base.CloudIotBase):
                                            credentials=[new_credential])
     self.assertEqual(results, expected_device)
 
-  def testCreate_ThreeCredentialsExist(self, track):
-    self.track = track
+  def testCreate_ThreeCredentialsExist(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.CERTIFICATE_CONTENTS)
     old_credential = self.messages.DeviceCredential(
@@ -202,8 +192,7 @@ class CredentialsCreateTest(base.CloudIotBase):
           '    --type es256-pem '
           '    --path {}'.format(new_credential_path))
 
-  def testCreate_RelativeName(self, track):
-    self.track = track
+  def testCreate_RelativeName(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.CERTIFICATE_CONTENTS)
     new_credential = self.messages.DeviceCredential(
@@ -226,6 +215,18 @@ class CredentialsCreateTest(base.CloudIotBase):
     expected_device = self.messages.Device(id='my-device',
                                            credentials=[new_credential])
     self.assertEqual(results, expected_device)
+
+
+class CredentialsCreateTestBeta(CredentialsCreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsCreateTestAlpha(CredentialsCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

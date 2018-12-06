@@ -72,6 +72,12 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.accesscontextmanager.v1alpha',
             client_classpath='accesscontextmanager_v1alpha_client.AccesscontextmanagerV1alpha',
             messages_modulepath='accesscontextmanager_v1alpha_messages',
+            default_version=False
+        ),
+        'v1beta': APIDef(
+            class_path='googlecloudsdk.third_party.apis.accesscontextmanager.v1beta',
+            client_classpath='accesscontextmanager_v1beta_client.AccesscontextmanagerV1beta',
+            messages_modulepath='accesscontextmanager_v1beta_messages',
             default_version=True
         ),
     },
@@ -109,6 +115,22 @@ MAP = {
             client_classpath='appengine_v1beta_client.AppengineV1beta',
             messages_modulepath='appengine_v1beta_messages',
             default_version=False
+        ),
+    },
+    'bigquery': {
+        'v2': APIDef(
+            class_path='googlecloudsdk.third_party.apis.bigquery.v2',
+            client_classpath='bigquery_v2_client.BigqueryV2',
+            messages_modulepath='bigquery_v2_messages',
+            default_version=True
+        ),
+    },
+    'bigquerydatatransfer': {
+        'v1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.bigquerydatatransfer.v1',
+            client_classpath='bigquerydatatransfer_v1_client.BigquerydatatransferV1',
+            messages_modulepath='bigquerydatatransfer_v1_messages',
+            default_version=True
         ),
     },
     'bigtableadmin': {
@@ -160,6 +182,14 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.categorymanager.v1alpha2',
             client_classpath='categorymanager_v1alpha2_client.CategorymanagerV1alpha2',
             messages_modulepath='categorymanager_v1alpha2_messages',
+            default_version=True
+        ),
+    },
+    'cloudasset': {
+        'v1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.cloudasset.v1beta1',
+            client_classpath='cloudasset_v1beta1_client.CloudassetV1beta1',
+            messages_modulepath='cloudasset_v1beta1_messages',
             default_version=True
         ),
     },
@@ -258,6 +288,12 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.cloudscheduler.v1alpha1',
             client_classpath='cloudscheduler_v1alpha1_client.CloudschedulerV1alpha1',
             messages_modulepath='cloudscheduler_v1alpha1_messages',
+            default_version=False
+        ),
+        'v1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.cloudscheduler.v1beta1',
+            client_classpath='cloudscheduler_v1beta1_client.CloudschedulerV1beta1',
+            messages_modulepath='cloudscheduler_v1beta1_messages',
             default_version=True
         ),
     },
@@ -282,6 +318,12 @@ MAP = {
             messages_modulepath='cloudtasks_v2beta2_messages',
             default_version=True
         ),
+        'v2beta3': APIDef(
+            class_path='googlecloudsdk.third_party.apis.cloudtasks.v2beta3',
+            client_classpath='cloudtasks_v2beta3_client.CloudtasksV2beta3',
+            messages_modulepath='cloudtasks_v2beta3_messages',
+            default_version=False
+        ),
     },
     'composer': {
         'v1': APIDef(
@@ -289,6 +331,12 @@ MAP = {
             client_classpath='composer_v1_client.ComposerV1',
             messages_modulepath='composer_v1_messages',
             default_version=True
+        ),
+        'v1alpha2': APIDef(
+            class_path='googlecloudsdk.third_party.apis.composer.v1alpha2',
+            client_classpath='composer_v1alpha2_client.ComposerV1alpha2',
+            messages_modulepath='composer_v1alpha2_messages',
+            default_version=False
         ),
         'v1beta1': APIDef(
             class_path='googlecloudsdk.third_party.apis.composer.v1beta1',
@@ -343,6 +391,12 @@ MAP = {
             client_classpath='containeranalysis_v1alpha1_client.ContaineranalysisV1alpha1',
             messages_modulepath='containeranalysis_v1alpha1_messages',
             default_version=True
+        ),
+        'v1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.containeranalysis.v1beta1',
+            client_classpath='containeranalysis_v1beta1_client.ContaineranalysisV1beta1',
+            messages_modulepath='containeranalysis_v1beta1_messages',
+            default_version=False
         ),
     },
     'dataflow': {
@@ -424,32 +478,28 @@ MAP = {
             messages_modulepath='dns_v1_messages',
             default_version=True
         ),
-        'v1alpha2': APIDef(
-            class_path='googlecloudsdk.third_party.apis.dns.v1alpha2',
-            client_classpath='dns_v1alpha2_client.DnsV1alpha2',
-            messages_modulepath='dns_v1alpha2_messages',
-            default_version=False
-        ),
-        'v1beta1': APIDef(
-            class_path='googlecloudsdk.third_party.apis.dns.v1beta1',
-            client_classpath='dns_v1beta1_client.DnsV1beta1',
-            messages_modulepath='dns_v1beta1_messages',
-            default_version=False
-        ),
         'v1beta2': APIDef(
             class_path='googlecloudsdk.third_party.apis.dns.v1beta2',
             client_classpath='dns_v1beta2_client.DnsV1beta2',
             messages_modulepath='dns_v1beta2_messages',
             default_version=False
         ),
-        'v2beta1': APIDef(
-            class_path='googlecloudsdk.third_party.apis.dns.v2beta1',
-            client_classpath='dns_v2beta1_client.DnsV2beta1',
-            messages_modulepath='dns_v2beta1_messages',
-            default_version=False
+    },
+    'eventflow': {
+        'v1beta2': APIDef(
+            class_path='googlecloudsdk.third_party.apis.eventflow.v1beta2',
+            client_classpath='eventflow_v1beta2_client.EventflowV1beta2',
+            messages_modulepath='eventflow_v1beta2_messages',
+            default_version=True
         ),
     },
     'file': {
+        'v1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.file.v1',
+            client_classpath='file_v1_client.FileV1',
+            messages_modulepath='file_v1_messages',
+            default_version=False
+        ),
         'v1alpha1': APIDef(
             class_path='googlecloudsdk.third_party.apis.file.v1alpha1',
             client_classpath='file_v1alpha1_client.FileV1alpha1',
@@ -502,6 +552,22 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.iam.v1',
             client_classpath='iam_v1_client.IamV1',
             messages_modulepath='iam_v1_messages',
+            default_version=True
+        ),
+    },
+    'iamcredentials': {
+        'v1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.iamcredentials.v1',
+            client_classpath='iamcredentials_v1_client.IamcredentialsV1',
+            messages_modulepath='iamcredentials_v1_messages',
+            default_version=True
+        ),
+    },
+    'iap': {
+        'v1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.iap.v1beta1',
+            client_classpath='iap_v1beta1_client.IapV1beta1',
+            messages_modulepath='iap_v1beta1_messages',
             default_version=True
         ),
     },
@@ -580,6 +646,12 @@ MAP = {
         ),
     },
     'redis': {
+        'v1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.redis.v1',
+            client_classpath='redis_v1_client.RedisV1',
+            messages_modulepath='redis_v1_messages',
+            default_version=True
+        ),
         'v1alpha1': APIDef(
             class_path='googlecloudsdk.third_party.apis.redis.v1alpha1',
             client_classpath='redis_v1alpha1_client.RedisV1alpha1',
@@ -590,6 +662,14 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.redis.v1beta1',
             client_classpath='redis_v1beta1_client.RedisV1beta1',
             messages_modulepath='redis_v1beta1_messages',
+            default_version=False
+        ),
+    },
+    'remotebuildexecution': {
+        'v1alpha': APIDef(
+            class_path='googlecloudsdk.third_party.apis.remotebuildexecution.v1alpha',
+            client_classpath='remotebuildexecution_v1alpha_client.RemotebuildexecutionV1alpha',
+            messages_modulepath='remotebuildexecution_v1alpha_messages',
             default_version=True
         ),
     },

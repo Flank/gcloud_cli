@@ -23,11 +23,12 @@ import os
 
 from apitools.base.py import http_wrapper
 from googlecloudsdk.api_lib.functions import exceptions
+from googlecloudsdk.api_lib.functions import util as functions_util
+from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.functions.deploy import source_util
 from googlecloudsdk.command_lib.util import gcloudignore
-from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core.util import archive
 from googlecloudsdk.core.util import files as file_utils
 from tests.lib import parameterized
@@ -66,12 +67,6 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
       self.assertEqual(src_dir, expected_src_dir)
 
     return FakeMakeZipFromDir
-
-  def FakeExec(self, args, no_exit, out_func, err_func):
-    """Mock implementation for execution_utils.Exec."""
-    del out_func, err_func
-    self.assertTrue(no_exit)
-    return 0
 
   def GetFunctionRelativePath(self, project, location, name):
     return 'projects/{}/locations/{}/functions/{}'.format(
@@ -257,12 +252,10 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
           exception=testutil.CreateTestHttpError(404, 'Not Found'))
 
 
-@test_case.Filters.SkipOnPy3('Will fail with new python change', 'b/112181287')
 class FunctionsDeployTest(FunctionsDeployTestBase,
                           parameterized.TestCase):
 
   def SetUp(self):
-    self.StartObjectPatch(storage_util, '_GetGsutilPath', return_value='gsutil')
     self.StartObjectPatch(storage_util.ObjectReference, 'ToUrl',
                           return_value=_DEFAULT_GS_BUCKET)
 
@@ -344,8 +337,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.StartObjectPatch(
         gcloudignore, 'GetFileChooserForDir', return_value=mock_chooser)
     self.StartObjectPatch(archive, 'MakeZipFromDir')
-    # Mock out uploading the archive containing the function to cloud Storage.
-    self.StartObjectPatch(execution_utils, 'Exec', self.FakeExec)
     self.ExpectGetFunction(region=region)
 
     self._ExpectGenerateUploadUrl(region=region)
@@ -392,8 +383,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.StartObjectPatch(
         gcloudignore, 'GetFileChooserForDir', return_value=mock_chooser)
     self.StartObjectPatch(archive, 'MakeZipFromDir')
-    # Mock out uploading the archive containing the function to cloud Storage.
-    self.StartObjectPatch(execution_utils, 'Exec', self.FakeExec)
 
     self.ExpectGetFunction()
 
@@ -442,8 +431,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.StartObjectPatch(
         gcloudignore, 'GetFileChooserForDir', return_value=mock_chooser)
     self.StartObjectPatch(archive, 'MakeZipFromDir')
-    # Mock out uploading the archive containing the function to cloud Storage.
-    self.StartObjectPatch(execution_utils, 'Exec', self.FakeExec)
 
     self.ExpectGetFunction()
 
@@ -486,7 +473,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
-  @test_case.Filters.SkipOnPy3('Failing with new python change', 'b/112181287')
   def testDeployFromLocalDirWithSourceFlag(self):
     # Mock out making archive containing the function to deploy.
     mock_chooser = mock.MagicMock(gcloudignore.FileChooser)
@@ -494,15 +480,17 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.StartObjectPatch(
         gcloudignore, 'GetFileChooserForDir', return_value=mock_chooser)
     self.StartObjectPatch(archive, 'MakeZipFromDir')
-    self.StartObjectPatch(os.path, 'exists', lambda _: True)
-    self.StartObjectPatch(os.path, 'isdir', lambda _: True)
+    # This mocks the validation that --source is a directory. Originally
+    # these tests were mocking os.path, so this is a slight improvement.
+    self.StartObjectPatch(
+        functions_util,
+        'ValidateDirectoryExistsOrRaiseFunctionError',
+        lambda directory: directory)
     self.MockUnpackedSourcesDirSize()
     # Mock out making archive containing the function to deploy.
     self.StartObjectPatch(
         archive, 'MakeZipFromDir',
         self._GetFakeMakeZipFromDir(expected_src_dir='my/functions/directory'))
-    # Mock out uploading the archive containing the function to cloud Storage.
-    self.StartObjectPatch(execution_utils, 'Exec', self.FakeExec)
 
     self.ExpectGetFunction()
 
@@ -831,7 +819,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.StartObjectPatch(
         archive, 'MakeZipFromDir', self._GetFakeMakeZipFromDir())
 
-    self.StartObjectPatch(execution_utils, 'Exec', return_value=0)
     function_name = self.GetFunctionRelativePath(
         self.Project(), self.GetRegion(), 'my-test')
     original_source_archive_url = 'gs://bucket'
@@ -862,7 +849,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.StartObjectPatch(
         source_util, '_GenerateRemoteZipFileName', lambda a: zip_name)
 
-    self.StartObjectPatch(execution_utils, 'Exec', return_value=0)
     function_name = self.GetFunctionRelativePath(
         self.Project(), self.GetRegion(), 'my-test')
     original_source_archive_url = 'gs://bucket'
@@ -1046,15 +1032,9 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
       self.Run(
           'functions deploy my-test --remove-labels=deployment ')
 
-  @test_case.Filters.SkipOnPy3('Failing with new python change', 'b/112181287')
   def testCreateOversized(self):
     self.StartObjectPatch(
         file_utils, 'GetTreeSizeBytes', self.ReturnOverMaxSize)
-    def IsGitFile(f):
-      return not (f.endswith('.git') or f.endswith('.gitignore'))
-    self.StartObjectPatch(os.path, 'exists', side_effect=IsGitFile)
-    self.StartObjectPatch(os.path, 'isdir', return_value=True)
-
     self.ExpectGetFunction()
 
     with self.assertRaisesRegex(
@@ -1068,7 +1048,9 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
   def testSourceFilesAndFailedUpload(self):
     self.StartObjectPatch(
         file_utils, 'GetTreeSizeBytes', self.ReturnUnderMaxSize)
-    self.StartObjectPatch(execution_utils, 'Exec', return_value=1)
+    upload_mock = self.StartObjectPatch(storage_api.StorageClient,
+                                        'CopyFileToGCS')
+    upload_mock.side_effect = calliope_exceptions.BadFileException
     function_name = self.GetFunctionRelativePath(
         self.Project(), self.GetRegion(), 'my-test')
     self.mock_client.projects_locations_functions.Get.Expect(

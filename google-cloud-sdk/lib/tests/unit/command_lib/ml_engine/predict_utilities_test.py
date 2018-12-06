@@ -50,6 +50,12 @@ class ReadPredictInstancesTest(base.MlBetaPlatformTestBase):
     expected_instances = ['abcd']
     self.assertEqual(expected_instances, instances)
 
+  def testTextInstancesUTF8BOM(self):
+    instance_file = io.BytesIO(b'\xef\xbb\xbfabcd')
+    instances = predict_utilities.ReadInstances(instance_file, TEXT_FORMAT)
+    expected_instances = ['abcd']
+    self.assertEqual(expected_instances, instances)
+
   def testTextInstancesTrailingNewline(self):
     instance_file = io.BytesIO(b'abcd\n')
     instances = predict_utilities.ReadInstances(instance_file, TEXT_FORMAT)

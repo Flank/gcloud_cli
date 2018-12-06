@@ -16,8 +16,8 @@
 
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 

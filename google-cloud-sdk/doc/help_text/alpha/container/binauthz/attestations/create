@@ -39,17 +39,18 @@ REQUIRED FLAGS
      used to specify the attributes of this resource. This must be specified.
 
        --attestor=ATTESTOR
-          The ID of the attestor or a fully qualified identifier for the
-          attestor. This flag must be specified if any of the other arguments
-          in this group are specified.
+          ID of the attestor or fully qualified identifier for the attestor.
+          This flag must be specified if any of the other arguments in this
+          group are specified.
 
        --attestor-project=ATTESTOR_PROJECT
           The Cloud project for the attestor.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To create an attestation in the project "my_proj" as the attestor with

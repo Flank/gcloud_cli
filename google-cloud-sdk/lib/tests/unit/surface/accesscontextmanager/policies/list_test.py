@@ -18,15 +18,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class PoliciesListTest(accesscontextmanager.Base):
+class PoliciesListTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -47,8 +48,8 @@ class PoliciesListTest(accesscontextmanager.Base):
         ),
         self.messages.ListAccessPoliciesResponse(accessPolicies=policies))
 
-  def testList(self, track):
-    self.SetUpForTrack(track)
+  def testList(self):
+    self.SetUpForTrack(self.track)
 
     organization_id = '12345'
     policy = self._MakePolicy('MY_POLICY',
@@ -60,8 +61,8 @@ class PoliciesListTest(accesscontextmanager.Base):
 
     self.assertEqual(results, [policy])
 
-  def testList_Format(self, track):
-    self.SetUpForTrack(track)
+  def testList_Format(self):
+    self.SetUpForTrack(self.track)
     properties.VALUES.core.user_output_enabled.Set(True)
 
     organization_id = '12345'
@@ -75,6 +76,12 @@ class PoliciesListTest(accesscontextmanager.Base):
         NAME      ORGANIZATION  TITLE
         MY_POLICY 12345         My Policy
         """, normalize_space=True)
+
+
+class PoliciesListTestAlpha(PoliciesListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -21,10 +21,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class Help(base.Command):
+class Help(calliope_base.Command):
 
   @staticmethod
   def Args(parser):

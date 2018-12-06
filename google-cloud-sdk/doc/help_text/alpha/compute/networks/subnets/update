@@ -9,6 +9,7 @@ SYNOPSIS
         [--flow-sampling=FLOW_SAMPLING] [--metadata=METADATA] [--region=REGION]
         [--add-secondary-ranges=PROPERTY=VALUE,[...] | --[no-]enable-flow-logs
           | --[no-]enable-private-ip-google-access
+          | --[no-]enable-private-ipv6-access
           | --remove-secondary-ranges=PROPERTY=VALUE,[...] | --role=ROLE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -30,10 +31,13 @@ FLAGS
         interval-15-min.
 
      --drain-timeout=DRAIN_TIMEOUT; default="0s"
-        The drain timeout specifies the upper bound in seconds on the amount of
-        time allowed to drain connections from the current ACTIVE subnetwork to
-        the current BACKUP subnetwork. The drain timeout is only applicable
-        when the [--set-role-active] flag is being used.
+        The time period for draining traffic from Internal HTTP(S) Load
+        Balancer proxies that are assigned addresses in the current ACTIVE
+        subnetwork. For example, 1h, 60m and 3600s each specify a duration of 1
+        hour for draining the traffic. Longer times reduce the number of
+        proxies that are draining traffic at any one time, and so improve the
+        availability of proxies for load balancing. The drain timeout is only
+        applicable when the [--role=ACTIVE] flag is being used.
 
      --flow-sampling=FLOW_SAMPLING
         Can only be specified if VPC flow logging for this subnetwork is
@@ -91,6 +95,11 @@ FLAGS
             --enable-private-ip-google-access to enable and
             --no-enable-private-ip-google-access to disable.
 
+         --[no-]enable-private-ipv6-access
+            Enable/disable private IPv6 access for the subnet. Use
+            --enable-private-ipv6-access to enable and
+            --no-enable-private-ipv6-access to disable.
+
          --remove-secondary-ranges=PROPERTY=VALUE,[...]
             Removes secondary ranges from the subnetwork.
 
@@ -108,13 +117,14 @@ FLAGS
 
             ROLE must be (currently only one value is supported):
 
-         ACTIVE
-            The ACTIVE subnet that is currently used.
+             ACTIVE
+                The ACTIVE subnet that is currently used.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

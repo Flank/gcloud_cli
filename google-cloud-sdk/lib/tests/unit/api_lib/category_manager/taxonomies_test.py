@@ -45,9 +45,11 @@ class TaxonomiesTest(base.CategoryManagerUnitTestBase):
     self.taxonomies = [self.taxonomy1, self.taxonomy2, self.taxonomy3]
 
   def testListTaxonomies(self):
-    self.ExpectProjectTaxonomyList(self.Project(), self.taxonomies)
+    self.ExpectProjectTaxonomyList(
+        self.Project(),
+        self.messages.ListTaxonomiesResponse(taxonomies=self.taxonomies))
     actual_taxonomies = taxonomies.ListTaxonomies(utils.GetProjectResource())
-    self.assertEqual(actual_taxonomies, self.taxonomies)
+    self.assertEqual(actual_taxonomies.taxonomies, self.taxonomies)
 
   def testCreateTaxonomy(self):
     expected_taxonomy = self.messages.Taxonomy(

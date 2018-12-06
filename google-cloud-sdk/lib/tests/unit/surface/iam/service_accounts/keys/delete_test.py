@@ -26,6 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA,
                           calliope_base.ReleaseTrack.GA)
@@ -38,7 +39,7 @@ class DeleteTest(unit_test_base.BaseTest):
             name=('projects/-/serviceAccounts/'
                   'test@test-project.iam.gserviceaccount.com'
                   '/keys/deadbeefdeafbeef')),
-        response=self.msgs.ServiceAccountKey())
+        response=self.msgs.Empty())
 
     self.Run('iam service-accounts keys delete '
              '--iam-account test@test-project.iam.gserviceaccount.com '
@@ -63,7 +64,7 @@ class DeleteTest(unit_test_base.BaseTest):
     self.client.projects_serviceAccounts_keys.Delete.Expect(
         request=self.msgs.IamProjectsServiceAccountsKeysDeleteRequest(
             name=key_name),
-        response=self.msgs.ServiceAccountKey())
+        response=self.msgs.Empty())
 
     self.Run('iam service-accounts keys delete '
              '--iam-account test@test-project.iam.gserviceaccount.com '
@@ -96,7 +97,7 @@ class DeleteTest(unit_test_base.BaseTest):
         request=self.msgs.IamProjectsServiceAccountsKeysDeleteRequest(
             name=('projects/-/serviceAccounts/%s/keys/deadbeefdeafbeef' %
                   self.sample_unique_id)),
-        response=self.msgs.ServiceAccountKey())
+        response=self.msgs.Empty())
 
     try:
       self.Run('iam service-accounts keys delete --iam-account %s '

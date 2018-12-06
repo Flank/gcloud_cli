@@ -1,0 +1,66 @@
+
+.TH "GCLOUD_COMPUTE_SECURITY\-POLICIES_RULES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute security\-policies rules delete \- delete Google Compute Engine security policy rules
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute security\-policies rules delete\fR [\fIPRIORITY\fR\ ...] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute security\-policies rules delete\fR is used to delete security
+policy rules.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+[\fIPRIORITY\fR ...]
+The priority of the rules to delete. Rules are evaluated in order from highest
+priority to lowest priority where 0 is the highest priority and 2147483647 is
+the lowest priority.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
+The security policy that this rule belongs to.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute security\-policies rules delete
+$ gcloud beta compute security\-policies rules delete
+.RE
+

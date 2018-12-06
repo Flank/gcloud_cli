@@ -115,6 +115,10 @@ class ProxiedAuthTests(sdk_test_base.SdkBase):
     # things blow up.
     c_store.Store(creds)
 
+  def testNotInvalid(self):
+    creds = devshell.DevshellCredentials()
+    self.assertFalse(creds.invalid)
+
 
 class EncodingTests(sdk_test_base.SdkBase):
 

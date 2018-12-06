@@ -392,11 +392,13 @@ toc:
     self.AssertOutputContains("""\
 {
   "_flags_": [
+    "---flag-file-line-",
     "--authority-selector",
     "--authorization-token-file",
     "--configuration",
     "--credential-file-override",
     "--document",
+    "--flags-file",
     "--flatten",
     "--format",
     "--help",
@@ -664,11 +666,13 @@ toc:
     self.AssertOutputContains("""\
 {
   "_flags_": [
+    "---flag-file-line-=:FLAG_FILE_LINE_:",
     "--authority-selector=:AUTHORITY_SELECTOR:",
     "--authorization-token-file=:AUTHORIZATION_TOKEN_FILE:",
     "--configuration=:CONFIGURATION:",
     "--credential-file-override=:CREDENTIAL_FILE_OVERRIDE:",
     "--document=:dict:",
+    "--flags-file=:YAML_FILE:",
     "--flatten=:list:",
     "--format=:FORMAT:",
     "--help",

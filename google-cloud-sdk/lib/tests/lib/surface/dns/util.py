@@ -55,13 +55,30 @@ def GetManagedZones(api_version="v1"):
   ]
 
 
-def GetManagedZoneBeforeCreation(api_version="v1"):
-  return GetMessages(api_version).ManagedZone(
+def GetManagedZoneBeforeCreation(messages, dns_sec_config=False):
+  """Generate a create message for a managed zone."""
+  m = messages
+  mzone = m.ManagedZone(
+      creationTime=None,
       description="Zone!",
       dnsName="zone.com.",
-      kind="dns#managedZone",
+      kind=u"dns#managedZone",
       name="mz",
-      nameServers=[])
+  )
+
+  if dns_sec_config:
+    nonexistence = m.ManagedZoneDnsSecConfig.NonExistenceValueValuesEnum.nsec3
+    mzone.dnssecConfig = m.ManagedZoneDnsSecConfig(
+        defaultKeySpecs=[],
+        kind=u"dns#managedZoneDnsSecConfig",
+        nonExistence=nonexistence,
+        state=m.ManagedZoneDnsSecConfig.StateValueValuesEnum.on,
+    )
+
+  if hasattr(messages.ManagedZone, "VisibilityValueValuesEnum"):
+    mzone.visibility = messages.ManagedZone.VisibilityValueValuesEnum.public
+
+  return mzone
 
 
 def GetBaseARecord():

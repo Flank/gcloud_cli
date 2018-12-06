@@ -12,6 +12,8 @@ SYNOPSIS
         [--container-env=[KEY=VALUE, ...,...]]
         [--container-env-file=CONTAINER_ENV_FILE]
         [--container-image=CONTAINER_IMAGE]
+        [--container-mount-disk=[mode=MODE],
+          [mount-path=MOUNT-PATH],[name=NAME],[partition=PARTITION]]
         [--container-mount-host-path=[host-path=HOSTPATH,
           mount-path=MOUNTPATH[,mode=MODE],...]]
         [--container-mount-tmpfs=[mount-path=MOUNTPATH,...]]
@@ -21,7 +23,7 @@ SYNOPSIS
         [--create-disk=[PROPERTY=VALUE,...]] [--description=DESCRIPTION]
         [--disk=[auto-delete=AUTO-DELETE],[boot=BOOT],
           [device-name=DEVICE-NAME],[mode=MODE],[name=NAME],[scope=SCOPE]]
-        [--labels=[KEY=VALUE,...]]
+        [--labels=[KEY=VALUE,...]] [--local-nvdimm=[size=SIZE]]
         [--local-ssd=[device-name=DEVICE-NAME],
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
@@ -67,7 +69,7 @@ FLAGS
         Enabled by default, use --no-boot-disk-auto-delete to disable.
 
      --boot-disk-device-name=BOOT_DISK_DEVICE_NAME
-        The name the guest operating system will see for the boot disk as. This
+        The name the guest operating system will see for the boot disk. This
         option can only be specified if a new boot disk is being created (as
         opposed to mounting an existing persistent disk).
 
@@ -141,6 +143,28 @@ FLAGS
         Full container image name, which should be pulled onto VM instance, eg.
         docker.io/tomcat.
 
+     --container-mount-disk=[mode=MODE],[mount-path=MOUNT-PATH],[name=NAME],[partition=PARTITION]
+        Mounts a disk to the specified mount path in the container. Multiple '
+        flags are allowed. Must be used with --disk or --create-disk.
+
+         name
+            Name of the disk. If exactly one additional disk is attached to the
+            instance using --disk or --create-disk, specifying disk name here
+            is optional. The name of the single additional disk will be used by
+            default.
+
+         mount-path
+            Path on container to mount to. Mount paths with spaces and commas
+            (and other special characters) are not supported by this command.
+
+         partition
+            Optional. The partition of the disk to mount. Multiple partitions
+            of a disk may be mounted. May not be used with --create-disk.
+
+         mode
+            Volume mount mode: rw (read/write) or ro (read-only). Defaults to
+            rw. Fails if the disk mode is ro and volume mount mode is rw.
+
      --container-mount-host-path=[host-path=HOSTPATH,mount-path=MOUNTPATH[,mode=MODE],...]
         Mounts a volume by using host-path.
 
@@ -148,7 +172,8 @@ FLAGS
             Path on host to mount from.
 
          mount-path
-            Path on container to mount to.
+            Path on container to mount to. Mount paths with spaces and commas
+            (and other special characters) are not supported by this command.
 
          mode
             Volume mount mode: rw (read/write) or ro (read-only).
@@ -159,7 +184,9 @@ FLAGS
         Mounts empty tmpfs into container at MOUNTPATH.
 
          mount-path
-            Path on container to mount to.
+            Path on container to mount to. Mount paths with spaces and commas
+            (and other special characters) are not supported by this command.
+
      --container-privileged
         Specify whether to run container in privileged mode.
 
@@ -184,12 +211,17 @@ FLAGS
 
          name
             Specifies the name of the disk. This option cannot be specified if
-            more than one instance is being created.
+            more than one instance is being created. Must specify this option
+            if attaching the disk to a container with --container-mount-disk.
+
+         description
+            Optional textual description for the disk being created.
 
          mode
             Specifies the mode of the disk. Supported options are ro for
             read-only and rw for read-write. If omitted, rw is used as a
-            default.
+            default. It is an error to create a disk in ro mode if attaching it
+            to a container with --container-mount-disk.
 
          image
             Specifies the name of the image that the disk will be initialized
@@ -231,8 +263,12 @@ FLAGS
 
          device-name
             An optional name that indicates the disk name the guest operating
-            system will see. If omitted, a device name of the form
-            persistent-disk-N will be used.
+            system will see. Must be the same as name if used with
+            --container-mount-disk. If omitted, a device name of the form
+            persistent-disk-N will be used. If omitted and used with
+            --container-mount-disk (where the name of the container mount disk
+            is the same as in this flag), a device name equal to disk name will
+            be used.
 
          auto-delete
             If yes, this persistent disk will be automatically deleted when the
@@ -266,8 +302,12 @@ FLAGS
 
          device-name
             An optional name that indicates the disk name the guest operating
-            system will see. If omitted, a device name of the form
-            persistent-disk-N will be used.
+            system will see. Must be the same as name if used with
+            --container-mount-disk. If omitted, a device name of the form
+            persistent-disk-N will be used. If omitted and used with
+            --container-mount-disk (where the name of the container mount disk
+            is the same as in this flag), a device name equal to disk name will
+            be used.
 
          auto-delete
             If yes, this persistent disk will be automatically deleted when the
@@ -288,6 +328,16 @@ FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     --local-nvdimm=[size=SIZE]
+        Attaches a local NVDIMM to the instances.
+
+         size
+            Optional. Size of the NVDIMM disk. The value must be a whole number
+            followed by a size unit of KB for kilobyte, MB for megabyte, GB for
+            gigabyte, or TB for terabyte. For example, 3TB will produce a 3
+            terabyte disk. Allowed values are: 3TB and 6TB and the default is 3
+            TB.
 
      --local-ssd=[device-name=DEVICE-NAME],[interface=INTERFACE],[size=SIZE]
         Attaches a local SSD to the instances.
@@ -558,22 +608,24 @@ FLAGS
           The --maintenance-policy flag is now deprecated. Please use
           --on-host-maintenance instead. MAINTENANCE_POLICY must be one of:
 
-       MIGRATE
-          The instances should be migrated to a new host. This will temporarily
-          impact the performance of instances during a migration event.
-       TERMINATE
-          The instances should be terminated.
+           MIGRATE
+              The instances should be migrated to a new host. This will
+              temporarily impact the performance of instances during a
+              migration event.
+           TERMINATE
+              The instances should be terminated.
 
        --on-host-maintenance=MAINTENANCE_POLICY
           Specifies the behavior of the instances when their host machines
           undergo maintenance. The default is MIGRATE. MAINTENANCE_POLICY must
           be one of:
 
-       MIGRATE
-          The instances should be migrated to a new host. This will temporarily
-          impact the performance of instances during a migration event.
-       TERMINATE
-          The instances should be terminated.
+           MIGRATE
+              The instances should be migrated to a new host. This will
+              temporarily impact the performance of instances during a
+              migration event.
+           TERMINATE
+              The instances should be terminated.
 
      At most one of these may be specified:
 
@@ -609,74 +661,49 @@ FLAGS
           If not provided, the instance will be assigned the default scopes,
           described below.
 
-          SCOPE can be either the full URI of the scope or an alias. Available
-          aliases are:
+          SCOPE can be either the full URI of the scope or an alias. default
+          scopes are assigned to all instances. Available aliases are:
 
-              default
-                Scopes assigned to instances by default:
-                - https://www.googleapis.com/auth/devstorage.read_only
-                - https://www.googleapis.com/auth/logging.write
-                - https://www.googleapis.com/auth/monitoring.write
-                - https://www.googleapis.com/auth/pubsub
-                - https://www.googleapis.com/auth/service.management.readonly
-                - https://www.googleapis.com/auth/servicecontrol
-                - https://www.googleapis.com/auth/trace.append
+            Alias                  URI
+            bigquery               https://www.googleapis.com/auth/bigquery
+            cloud-platform         https://www.googleapis.com/auth/cloud-platform
+            cloud-source-repos     https://www.googleapis.com/auth/source.full_control
+            cloud-source-repos-ro  https://www.googleapis.com/auth/source.read_only
+            compute-ro             https://www.googleapis.com/auth/compute.readonly
+            compute-rw             https://www.googleapis.com/auth/compute
+            datastore              https://www.googleapis.com/auth/datastore
+            default                https://www.googleapis.com/auth/devstorage.read_only
+                                   https://www.googleapis.com/auth/logging.write
+                                   https://www.googleapis.com/auth/monitoring.write
+                                   https://www.googleapis.com/auth/pubsub
+                                   https://www.googleapis.com/auth/service.management.readonly
+                                   https://www.googleapis.com/auth/servicecontrol
+                                   https://www.googleapis.com/auth/trace.append
+            gke-default            https://www.googleapis.com/auth/devstorage.read_only
+                                   https://www.googleapis.com/auth/logging.write
+                                   https://www.googleapis.com/auth/monitoring
+                                   https://www.googleapis.com/auth/service.management.readonly
+                                   https://www.googleapis.com/auth/servicecontrol
+                                   https://www.googleapis.com/auth/trace.append
+            logging-write          https://www.googleapis.com/auth/logging.write
+            monitoring             https://www.googleapis.com/auth/monitoring
+            monitoring-write       https://www.googleapis.com/auth/monitoring.write
+            pubsub                 https://www.googleapis.com/auth/pubsub
+            service-control        https://www.googleapis.com/auth/servicecontrol
+            service-management     https://www.googleapis.com/auth/service.management.readonly
+            sql (deprecated)       https://www.googleapis.com/auth/sqlservice
+            sql-admin              https://www.googleapis.com/auth/sqlservice.admin
+            storage-full           https://www.googleapis.com/auth/devstorage.full_control
+            storage-ro             https://www.googleapis.com/auth/devstorage.read_only
+            storage-rw             https://www.googleapis.com/auth/devstorage.read_write
+            taskqueue              https://www.googleapis.com/auth/taskqueue
+            trace                  https://www.googleapis.com/auth/trace.append
+            userinfo-email         https://www.googleapis.com/auth/userinfo.email
 
-              bigquery
-                - https://www.googleapis.com/auth/bigquery
-
-              cloud-platform
-                - https://www.googleapis.com/auth/cloud-platform
-
-              compute-ro
-                - https://www.googleapis.com/auth/compute.readonly
-
-              compute-rw
-                - https://www.googleapis.com/auth/compute
-
-              datastore
-                - https://www.googleapis.com/auth/datastore
-
-              logging-write
-                - https://www.googleapis.com/auth/logging.write
-
-              monitoring
-                - https://www.googleapis.com/auth/monitoring
-
-              monitoring-write
-                - https://www.googleapis.com/auth/monitoring.write
-
-              service-control
-                - https://www.googleapis.com/auth/servicecontrol
-
-              service-management
-                - https://www.googleapis.com/auth/service.management.readonly
-
-              sql (DEPRECATED)
-                - https://www.googleapis.com/auth/sqlservice:
-
-              sql-admin
-                - https://www.googleapis.com/auth/sqlservice.admin
-
-              storage-full
-                - https://www.googleapis.com/auth/devstorage.full_control
-
-              storage-ro
-                - https://www.googleapis.com/auth/devstorage.read_only
-
-              storage-rw
-                - https://www.googleapis.com/auth/devstorage.read_write
-
-              taskqueue
-                - https://www.googleapis.com/auth/taskqueue
-
-              userinfo-email
-                - https://www.googleapis.com/auth/userinfo.email
-
-          DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice'
+          DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice
           account scope and sql alias do not provide SQL instance management
           capabilities and have been deprecated. Please, use
-          'https://www.googleapis.com/auth/sqlservice.admin' or sql-admin to
+          https://www.googleapis.com/auth/sqlservice.admin or sql-admin to
           manage your Google SQL Service instances.
 
        --no-scopes
@@ -700,8 +727,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To run the gcr.io/google-containers/busybox image on an instance named
@@ -722,7 +750,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud compute instances create-with-container
         $ gcloud beta compute instances create-with-container
 

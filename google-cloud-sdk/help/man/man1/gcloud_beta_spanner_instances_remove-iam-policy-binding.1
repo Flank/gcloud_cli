@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta spanner instances remove\-iam\-policy\-binding \- remove an IAM policy binding from a Cloud Spanner instance
+gcloud beta spanner instances remove\-iam\-policy\-binding \- remove IAM policy binding of a Cloud Spanner instance
 
 
 
@@ -17,7 +17,7 @@ gcloud beta spanner instances remove\-iam\-policy\-binding \- remove an IAM poli
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Remove an IAM policy binding from a Cloud Spanner instance.
+\fB(BETA)\fR Remove an IAM policy binding of a Cloud Spanner instance.
 
 
 
@@ -29,15 +29,15 @@ gcloud beta spanner instances remove\-iam\-policy\-binding \- remove an IAM poli
 Instance resource \- The Cloud Spanner instance to remove the IAM policy binding
 from. This represents a Cloud resource. (NOTE) Some attributes are not given
 arguments in this group but can be set in other ways. To set the [project]
-attribute: provide the flag [instance] on the command line with a fully
+attribute: provide the argument [instance] on the command line with a fully
 specified name; set the property [spanner/instance] with a fully specified name;
-provide the flag [\-\-project] on the command line; set the property
-[core/project].
+set the property [core/project]; provide the argument [\-\-project] on the
+command line.
 
 .RS 2m
 .TP 2m
 [\fIINSTANCE\fR]
-The ID of the instance or a fully qualified identifier for the instance.
+ID of the instance or fully qualified identifier for the instance.
 
 
 .RE
@@ -80,9 +80,9 @@ The role to remove the member from.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -90,6 +90,22 @@ help\fR for details.
 
 This command uses the \fBspanner/v1\fR API. The full documentation for this API
 can be found at: https://cloud.google.com/spanner/
+
+
+
+.SH "EXAMPLES"
+
+To Remove an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' with instance 'my\-instance', run:
+
+.RS 2m
+$ gcloud beta spanner instances remove\-iam\-policy\-binding \e
+    my\-instance \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
 
 
 

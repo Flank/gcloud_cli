@@ -14,12 +14,13 @@ POSITIONAL ARGUMENTS
      Tpu resource - The Cloud TPU you want to create. The arguments in this
      group can be used to specify the attributes of this resource. (NOTE) Some
      attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: provide the flag [tpu] on the
-     command line with a fully specified name; provide the flag [--project] on
-     the command line; set the property [core/project]. This must be specified.
+     ways. To set the [project] attribute: provide the argument [tpu] on the
+     command line with a fully specified name; provide the argument [--project]
+     on the command line; set the property [core/project]. This must be
+     specified.
 
        TPU
-          The ID of the tpu or a fully qualified identifier for the tpu. This
+          ID of the tpu or fully qualified identifier for the tpu. This
           positional must be specified if any of the other arguments in this
           group are specified.
 
@@ -71,8 +72,9 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
     This command uses the tpu/v1 API. The full documentation for this API can
@@ -83,7 +85,8 @@ EXAMPLES
     10.240.0.0/29 in the default user project, network and compute/region (with
     other defaults supplied by API):
 
-        $ gcloud compute tpus create  my-tpu --range 10.240.0.0/29
+        $ gcloud compute tpus create  my-tpu --range 10.240.0.0/29 \
+            --network default
 
     The following command creates a TPU with ID my-tpu with explicit values for
     all required and optional parameters:

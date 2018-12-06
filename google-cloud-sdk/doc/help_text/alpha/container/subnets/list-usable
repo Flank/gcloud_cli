@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha container subnets list-usable - returns subnets usable for
+    gcloud alpha container subnets list-usable - list subnets usable for
         cluster creation in a specific project
 
 SYNOPSIS
@@ -13,10 +13,10 @@ DESCRIPTION
     IAM policy of the project's Google Kubernetes Engine Service Account. Use
     the --project flag to evaluate subnet usability in different projects. This
     list may differ from the list returned by Google Compute Engine's
-    list-usable command which returns subnets only usable by the caller.
+    list-usable command, which returns subnets only usable by the caller.
 
     To show subnetworks shared from a Shared-VPC host project, use
-    --network-project to specify the project which owns the subnetworks.
+    --network-project to specify the project that owns the subnetworks.
 
 FLAGS
      --network-project=NETWORK_PROJECT
@@ -57,19 +57,20 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     List all subnetworks usable for cluster creation in project my-project.
 
-        $ gcloud container subnets list-usable \
+        $ gcloud alpha container subnets list-usable \
           --project my-project
 
     List all subnetworks existing in project my-shared-host-project usable for
     cluster creation in project my-service-project.
 
-        $ gcloud container subnets list-usable \
+        $ gcloud alpha container subnets list-usable \
            --project my-service-project \
            --network-project my-shared-host-project
 
@@ -78,5 +79,7 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta container subnets list-usable
 

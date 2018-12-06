@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 import itertools
 
 from googlecloudsdk.api_lib.compute import constants
+from googlecloudsdk.api_lib.compute import exceptions
 from googlecloudsdk.api_lib.compute import request_helper
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
-from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers as compute_completers
 from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.core import properties
@@ -356,8 +356,8 @@ class AllScopes(object):
         repr(self.projects), repr(self.zonal), repr(self.regional))
 
 
-class ListException(exceptions.ToolException):
-  pass
+class ListException(exceptions.Error):
+  """Base exception for lister exceptions"""
 
 
 # TODO(b/38256601) - Drop these flags
@@ -393,9 +393,9 @@ def AddBaseListerArgs(parser, hidden=False):
 
 
 # TODO(b/38256601) - Drop these flags
-def AddZonalListerArgs(parser):
+def AddZonalListerArgs(parser, hidden=False):
   """Add arguments defined by base_classes.ZonalLister."""
-  AddBaseListerArgs(parser)
+  AddBaseListerArgs(parser, hidden)
   parser.add_argument(
       '--zones',
       action=actions.DeprecationAction(
@@ -406,6 +406,7 @@ def AddZonalListerArgs(parser):
           '--filter="zone:( europe-west1-b europe-west1-c )".'),
       metavar='ZONE',
       help='If provided, only resources from the given zones are queried.',
+      hidden=hidden,
       type=arg_parsers.ArgList(min_length=1),
       completer=compute_completers.ZonesCompleter,
       default=[])

@@ -703,6 +703,28 @@ class DisksSnapshotBetaTest(DisksSnapshotTestBase):
         max_wait_ms=None
     )
 
+  def testStorageLocation(self):
+    disk_ref = self._GetDiskRef('disk-1')
+    snapshot_ref = self._GetSnapshotRef('random-name-0')
+    storage_location = 'us-west1'
+    operation_ref = self._GetOperationRef('operation-1')
+
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref,
+                                        storage_location='us-west1'),
+         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
+    ])
+
+    self.Run('compute disks snapshot {disk}  --zone central2-a '
+             '--storage-location {storage_location} --async'
+             .format(disk=disk_ref.Name(), storage_location=storage_location))
+
+    self.AssertOutputEquals('')
+    self.AssertErrEquals(
+        'Disk snapshot in progress for [{}].\n'
+        'Use [gcloud compute operations describe URI] command to check '
+        'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
+
 
 class DisksSnapshotTestAlpha(DisksSnapshotTestBase):
 

@@ -29,11 +29,17 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
     properties.VALUES.core.disable_prompts.Set(True)
 
   def testSQLCommands(self):
-    self.CreateInstance()
+    self.CreateInstance('D1')
     self.DoTestBackupList()
     self.DoTestInstanceOperations()
     self.DoTestConnect()
     self.DoTestOperations()
+
+  @test_case.Filters.skip('Failing', 'b/119035730')
+  @sdk_test_base.Filters.RunOnlyInBundle
+  def testConnectWithProxy(self):
+    self.CreateInstance('db-g1-small')
+    self.DoTestConnectWithProxy()
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def DoTestBackupList(self):
@@ -67,21 +73,20 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
 
     self.assertTrue(exec_patched.called)
 
-    # The first index of call_args is a list of ordered arguments the mock was
-    # called with. The second index is a dict of keyword arguments.
-    # Exec is called with just a single argument, a list of args to pass on to
-    # the subprocess.
-    exec_ordered_argumnents = exec_patched.call_args[0]
-    subprocess_args = exec_ordered_argumnents[0]
-    (actual_mysql_path, actual_host_flag, actual_ip_address, actual_user_flag,
-     actual_username, actual_pass_flag) = subprocess_args
-    self.assertEqual(mocked_mysql_path, actual_mysql_path)
-    self.assertEqual('-h', actual_host_flag)
-    # Basic check that it's an IPv6 address. IPv4 uses '.' instead of ':'.
-    self.assertIn(':', actual_ip_address)
-    self.assertEqual('-u', actual_user_flag)
-    self.assertEqual('root', actual_username)
-    self.assertEqual('-p', actual_pass_flag)
+  def DoTestConnectWithProxy(self):
+    # Mock the fact that we have mysql in path.
+    mocked_mysql_path = 'mysql'
+    self.StartPatch(
+        'googlecloudsdk.core.util.files.FindExecutableOnPath',
+        return_value=mocked_mysql_path)
+
+    # Mock the actual execution of mysql and assert it's called at the end.
+    exec_patched = self.StartPatch(
+        'googlecloudsdk.core.execution_utils.Exec', return_value=True)
+    self.Run('beta sql connect {0} --user root --port 9476 --quiet'.format(
+        self.test_instance))
+
+    self.assertTrue(exec_patched.called)
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def DoTestOperations(self):
@@ -105,11 +110,15 @@ class PsqlE2ETest(base.PsqlIntegrationTestBase):
 
   def SetUp(self):
     properties.VALUES.core.disable_prompts.Set(True)
+    self.CreateInstance('db-g1-small')
 
   @test_case.Filters.RunOnlyWithEnv('KOKORO_ROOT', 'Needs to be run with ipv4.')
   def testSQLCommands(self):
-    self.CreateInstance()
     self.DoTestConnect()
+
+  @sdk_test_base.Filters.RunOnlyInBundle
+  def testConnectWithProxy(self):
+    self.DoTestConnectWithProxy()
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def DoTestConnect(self):
@@ -131,21 +140,21 @@ class PsqlE2ETest(base.PsqlIntegrationTestBase):
 
     self.assertTrue(exec_patched.called)
 
-    # The first index of call_args is a list of ordered arguments the mock was
-    # called with. The second index is a dict of keyword arguments.
-    # Exec is called with just a single argument, a list of args to pass on to
-    # the subprocess.
-    exec_ordered_argumnents = exec_patched.call_args[0]
-    subprocess_args = exec_ordered_argumnents[0]
-    (actual_psql_path, actual_host_flag, actual_ip_address, actual_user_flag,
-     actual_username, actual_pass_flag) = subprocess_args
-    self.assertEqual(mocked_psql_path, actual_psql_path)
-    self.assertEqual('-h', actual_host_flag)
-    # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
-    self.assertIn('.', actual_ip_address)
-    self.assertEqual('-U', actual_user_flag)
-    self.assertEqual('root', actual_username)
-    self.assertEqual('-W', actual_pass_flag)
+  def DoTestConnectWithProxy(self):
+    # Mock the fact that we have psql in path.
+    mocked_psql_path = 'psql'
+    self.StartPatch(
+        'googlecloudsdk.core.util.files.FindExecutableOnPath',
+        return_value=mocked_psql_path)
+
+    # Mock the actual execution of psql and assert it's called at the end.
+    exec_patched = self.StartPatch(
+        'googlecloudsdk.core.execution_utils.Exec', return_value=True)
+
+    self.Run('beta sql connect {0} --user root --port 9477 --quiet'.format(
+        self.test_instance))
+
+    self.assertTrue(exec_patched.called)
 
 
 if __name__ == '__main__':

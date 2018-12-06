@@ -54,8 +54,7 @@ from googlecloudsdk.core.resource import resource_property
 from googlecloudsdk.core.resource import resource_transform
 from googlecloudsdk.core.resource import table_printer
 from googlecloudsdk.core.resource import yaml_printer
-
-from typing import List, Tuple
+from googlecloudsdk.core.util import typing  # pylint: disable=unused-import
 
 
 class Error(core_exceptions.Error):
@@ -116,7 +115,7 @@ class MultiPrinter(resource_printer_base.ResourcePrinter):
   def __init__(self, *args, **kwargs):
     super(MultiPrinter, self).__init__(*args, **kwargs)
     # pylint: disable=line-too-long
-    self.columns = []  # type: List[Tuple[resource_projection_spec.ProjectionSpec._Column, resource_printer_base.ResourcePrinter]]
+    self.columns = []  # type: typing.List[typing.Tuple[resource_projection_spec.ProjectionSpec._Column, resource_printer_base.ResourcePrinter]]
     # pylint: disable=line-too-long
     for col in self.column_attributes.Columns():
       if not col.attribute.subformat:
@@ -140,6 +139,7 @@ class PrinterAttributes(resource_printer_base.ResourcePrinter):
     disable: Disables formatted output and does not consume the resources.
     json-decode: Decodes string values that are JSON compact encodings of list
       and dictionary objects. This may become the default.
+    pager: If True, sends output to a pager.
     private: Disables log file output. Use this for sensitive resource data
       that should not be displayed in log files. Explicit command line IO
       redirection overrides this attribute.

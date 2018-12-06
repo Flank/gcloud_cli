@@ -18,9 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class SubGroup(base.Group):
+class SubGroup(calliope_base.Group):
   """Internal tests subgroup."""
   pass

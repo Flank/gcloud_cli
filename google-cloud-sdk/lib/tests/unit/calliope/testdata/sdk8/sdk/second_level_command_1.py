@@ -18,9 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class SecondLevelCommand1(base.Command):
-  """gcloud sdk tests command."""
+class SecondLevelCommand1(calliope_base.Command):
+  """gcloud sdk tests command, matches for `zero`."""
   pass

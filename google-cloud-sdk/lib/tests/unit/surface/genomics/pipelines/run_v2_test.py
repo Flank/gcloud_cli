@@ -104,9 +104,9 @@ PIPELINE_CLI_OBJECT = messages.RunPipelineRequest(
     pipeline=messages.Pipeline(
         actions=[
             messages.Action(
-                imageUri='google/cloud-sdk:alpine',
+                imageUri='google/cloud-sdk:slim',
                 commands=['/bin/sh', '-c',
-                          'gsutil -q cp gs://bucket/in ${in}'],
+                          'gsutil -m -q cp gs://bucket/in ${in}'],
                 mounts=[messages.Mount(
                     disk='gcloud-shared',
                     path='/gcloud-shared')]),
@@ -118,17 +118,17 @@ PIPELINE_CLI_OBJECT = messages.RunPipelineRequest(
                     disk='gcloud-shared',
                     path='/gcloud-shared')]),
             messages.Action(
-                imageUri='google/cloud-sdk:alpine',
+                imageUri='google/cloud-sdk:slim',
                 commands=['/bin/sh', '-c',
-                          'gsutil -q cp ${out} gs://bucket/out'],
+                          'gsutil -m -q cp ${out} gs://bucket/out'],
                 mounts=[messages.Mount(
                     disk='gcloud-shared',
                     path='/gcloud-shared')]),
             messages.Action(
-                imageUri='google/cloud-sdk:alpine',
+                imageUri='google/cloud-sdk:slim',
                 commands=[
                     '/bin/sh', '-c',
-                    'gsutil -q cp /google/logs/output gs://bucket/'],
+                    'gsutil -m -q cp /google/logs/output gs://bucket/'],
                 flags=[
                     messages.Action.FlagsValueListEntryValuesEnum.ALWAYS_RUN])],
         resources=messages.Resources(
@@ -233,13 +233,13 @@ class RunTest(base.GenomicsUnitTest):
   def testPipelinesRun_CustomMachine_Memory(self):
     request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
     request.pipeline.resources.virtualMachine.machineType = 'custom-1-4096'
-    self._runFileTest(request, PIPELINE_MINIMAL_JSON, ['--memory', '4.096'])
+    self._runFileTest(request, PIPELINE_MINIMAL_JSON, ['--memory', '4'])
 
   def testPipelinesRun_CustomMachine_CpusAndMemory(self):
     request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
     request.pipeline.resources.virtualMachine.machineType = 'custom-2-4096'
     self._runFileTest(request, PIPELINE_MINIMAL_JSON,
-                      ['--cpus', '2', '--memory', '4.096'])
+                      ['--cpus', '2', '--memory', '4'])
 
   def testPipelinesRun_Regions(self):
     request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
@@ -275,10 +275,10 @@ class RunTest(base.GenomicsUnitTest):
   def testPipelinesRun_Logging(self):
     request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
     request.pipeline.actions.append(messages.Action(
-        imageUri='google/cloud-sdk:alpine',
+        imageUri='google/cloud-sdk:slim',
         commands=[
             '/bin/sh', '-c',
-            'gsutil -q cp /google/logs/output gs://bucket/'],
+            'gsutil -m -q cp /google/logs/output gs://bucket/'],
         flags=[messages.Action.FlagsValueListEntryValuesEnum.ALWAYS_RUN]))
     self._runFileTest(request, PIPELINE_MINIMAL_JSON,
                       ['--logging', 'gs://bucket/'])
@@ -307,3 +307,8 @@ class RunTest(base.GenomicsUnitTest):
         '--inputs', 'in=gs://bucket/in', '--outputs', 'out=gs://bucket/out',
         '--logging', 'gs://bucket/', '--preemptible', '--zones', 'us-east1-d',
         '--disk-size', 'gcloud-shared:200'])
+
+  def testPipelinesRun_Set(self):
+    self._runFileTest(PIPELINE_OBJECT, PIPELINE_JSON,
+                      ['--env-vars', 'key=value'])
+

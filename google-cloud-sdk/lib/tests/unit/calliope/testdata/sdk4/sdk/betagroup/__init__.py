@@ -18,11 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class BetaGroup(base.Group):
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.BETA)
+class BetaGroup(calliope_base.Group):
   """gcloud sdk tests subgroup."""
 
   @staticmethod

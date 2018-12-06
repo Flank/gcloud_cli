@@ -1,10 +1,23 @@
 title: Create a service account key
 release_tracks: [GA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam service-accounts keys create some_key_file --iam-account test-account@fake-project.iam.gserviceaccount.com
+  - write_file: some_key_file
+  - write_file: some_key_file
+  - stderr: |
+      created key [ba708b556b50d4f3b081164aca2c56a8ee232069] of type [json] as [some_key_file] for [test-account@fake-project.iam.gserviceaccount.com]
 actions:
 
 - execute_command:
     command: iam service-accounts keys create some_key_file --iam-account test-account@fake-project.iam.gserviceaccount.com
     events:
+    - expect_file_written:
+        path: some_key_file
+        contents: ''
+        is_private: true
     - api_call:
         expect_request:
           uri: https://iam.googleapis.com/v1/projects/-/serviceAccounts/test-account@fake-project.iam.gserviceaccount.com/keys?alt=json

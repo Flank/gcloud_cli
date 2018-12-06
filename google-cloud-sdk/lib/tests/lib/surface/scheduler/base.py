@@ -33,10 +33,10 @@ class SchedulerTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def SetUp(self):
     self.client = mock.Client(client_class=apis.GetClientClass('cloudscheduler',
-                                                               'v1alpha1'))
+                                                               'v1beta1'))
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
-    self.messages = apis.GetMessagesModule('cloudscheduler', 'v1alpha1')
+    self.messages = apis.GetMessagesModule('cloudscheduler', 'v1beta1')
     app_engine_api_version = (
         appengine_api_client_base.AppengineApiClientBase.ApiVersion())
     self.app_engine_client = mock.Client(

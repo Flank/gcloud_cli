@@ -30,6 +30,39 @@ from tests.lib import test_case
 import six
 
 
+_FILTER_RESOURCE = [
+    {
+        'stuff': [
+            {'a': 10, 'b': 20, 'c': 30, 'd': 40},
+            {'a': 20, 'b': 30, 'c': 40, 'd': 50},
+            {'a': 60, 'b': 70, 'c': 80, 'd': 90},
+        ]
+    },
+    {
+        'stuff': [
+            {'a': 11, 'b': 21, 'c': 31, 'd': 41},
+            {'a': 61, 'b': 71, 'c': 81, 'd': 91},
+        ],
+    },
+    {
+        'stuff': [
+            {'a': 12, 'b': 22, 'c': 32, 'd': 42},
+            {'a': 22, 'b': 32, 'c': 42, 'd': 52},
+            {'a': 62, 'b': 72, 'c': 82, 'd': 92},
+            {'a': 13, 'b': 23, 'c': 33, 'd': 43},
+            {'a': 23, 'b': 33, 'c': 43, 'd': 53},
+            {'a': 63, 'b': 73, 'c': 83, 'd': 93},
+            {'a': 14, 'b': 24, 'c': 34, 'd': 44},
+            {'a': 24, 'b': 34, 'c': 44, 'd': 54},
+            {'a': 64, 'b': 74, 'c': 84, 'd': 94},
+            {'a': 15, 'b': 25, 'c': 35, 'd': 45},
+            {'a': 25, 'b': 35, 'c': 45, 'd': 55},
+            {'a': 65, 'b': 75, 'c': 85, 'd': 95},
+        ],
+    },
+]
+
+
 _FLOAT_RESOURCE = [
     9e-08,
     -9e-07,
@@ -266,7 +299,7 @@ class ResourceTransformTest(test_case.Base):
       kwargs: Optional name=value args.
       projection: The parent ProjectionSpec.
     """
-    self.maxDiff = 4096
+    self.maxDiff = 4096  # pylint: disable=invalid-name
     actual = []
     if kwargs is None:
       kwargs = {}
@@ -454,7 +487,7 @@ class ResourceTransformTest(test_case.Base):
     resource = [times.ParseDateTime(x, tzinfo=times.UTC) for x in strings]
     kwargs = {
         'tz_default': 'UTC',
-        'tz': 'US/Pacific'
+        'tz': 'America/Los_Angeles'
     }
     expected = ['2016-01-19T10:51:11.265000-0800',
                 '2016-01-19T10:51:11.265000-0800',
@@ -491,7 +524,7 @@ class ResourceTransformTest(test_case.Base):
                 for x in strings]
     kwargs = {
         'tz_default': 'UTC',
-        'tz': 'US/Pacific'
+        'tz': 'America/Los_Angeles'
     }
     expected = ['2016-01-19T10:51:11.265000-0800',
                 '2016-01-19T10:51:11.265000-0800',
@@ -500,29 +533,29 @@ class ResourceTransformTest(test_case.Base):
     self.Run(resource, None, resource_transform.TransformDate,
              ['%Y-%m-%dT%H:%M:%S.%f%z'], expected, kwargs)
 
-  def testTransformDateUSEastern(self):
+  def testTransformDateAmericaNewYork(self):
     resource = [1234567890123, 1244567890123]
     kwargs = {
         'format': '%Y-%m-%dT%H:%M:%S%z',
         'unit': '1000',
-        'tz_default': 'US/Eastern'
+        'tz_default': 'America/New_York'
     }
     expected = ['2009-02-13T18:31:30-0500', '2009-06-09T13:18:10-0400']
     self.Run(resource, None, resource_transform.TransformDate, [], expected,
              kwargs)
 
-  def testTransformDateUSPacific(self):
+  def testTransformDateAmericaLosAngeles(self):
     resource = [1234567890123456, 1244567890123456]
     kwargs = {
         'format': '%Y-%m-%dT%H:%M:%S%z',
         'unit': '1000000',
-        'tz_default': 'US/Pacific'
+        'tz_default': 'America/Los_Angeles'
     }
     expected = ['2009-02-13T15:31:30-0800', '2009-06-09T10:18:10-0700']
     self.Run(resource, None, resource_transform.TransformDate, [], expected,
              kwargs)
 
-  def testTransformDateUSEasternAllParts(self):
+  def testTransformDateAmericaNewTorkAllParts(self):
     resource = [
         {
             'year': '2009', 'month': '02', 'day': '13',
@@ -547,7 +580,7 @@ class ResourceTransformTest(test_case.Base):
     ]
     kwargs = {
         'format': '%Y-%m-%dT%H:%M:%S.%f%z',
-        'tz_default': 'US/Eastern'
+        'tz_default': 'America/New_York'
     }
     expected = [
         '2009-02-13T18:31:30.123456-0500',
@@ -558,7 +591,7 @@ class ResourceTransformTest(test_case.Base):
     self.Run(resource, None, resource_transform.TransformDate, [], expected,
              kwargs)
 
-  def testTransformDateUSEasternThreeParts(self):
+  def testTransformDateAmericaNewTorkThreeParts(self):
     resource = [
         {
             'month': '02', 'day': '13', 'hour': '18',
@@ -569,7 +602,7 @@ class ResourceTransformTest(test_case.Base):
     ]
     kwargs = {
         'format': '%m-%dT%H%z',
-        'tz_default': 'US/Eastern'
+        'tz_default': 'America/New_York'
     }
     expected = [
         '02-13T18-0500',
@@ -578,7 +611,7 @@ class ResourceTransformTest(test_case.Base):
     self.Run(resource, None, resource_transform.TransformDate, [], expected,
              kwargs)
 
-  def testTransformDateUSEasternTwoParts(self):
+  def testTransformDateAmericaNewTorkTwoParts(self):
     resource = [
         {
             'month': '02', 'day': '13',
@@ -589,7 +622,7 @@ class ResourceTransformTest(test_case.Base):
     ]
     kwargs = {
         'format': '%m-%d%z',
-        'tz': 'US/Eastern'
+        'tz': 'America/New_York'
     }
     expected = [
         '',
@@ -598,13 +631,13 @@ class ResourceTransformTest(test_case.Base):
     self.Run(resource, None, resource_transform.TransformDate, [], expected,
              kwargs)
 
-  def testTransformDateFromStringUSEastern(self):
+  def testTransformDateFromStringAmericaNewTork(self):
     resource = ['2016-01-19T10:51:11.941-08:00',
                 '2016-01-19T10:51:11.941-0800',
                 '2016-01-19T10:51:11.941',
                 'February 11, 2015 12:00:00']
     kwargs = {
-        'tz_default': 'US/Eastern'
+        'tz_default': 'America/New_York'
     }
     expected = ['2016-01-19T10:51:11.941000-0800',
                 '2016-01-19T10:51:11.941000-0800',
@@ -1029,6 +1062,7 @@ class ResourceTransformTest(test_case.Base):
         {'k1': 'v2.1', 'k3': 'v2.3'},
         {'k1': 1, 'k2': 2, 'k3': 3},
         {'foo': 'bar'},
+        {'k1': 1, 'k2': None, 'k3': '', 'k4': 4},
         1234,
     ]
     expected = [
@@ -1036,6 +1070,7 @@ class ResourceTransformTest(test_case.Base):
         ['v2.1', 'v2.3'],
         [1, 3, 2],
         [],
+        [1, 4],
         [],
     ]
 
@@ -1047,6 +1082,34 @@ class ResourceTransformTest(test_case.Base):
     with self.assertRaisesRegex(resource_exceptions.InternalError, msg):
       self.Run(self._resource, 'fatal', resource_transform.TransformFatal,
                [msg], [])
+
+  def testTransformFilterTrue(self):
+    self.Run(_FILTER_RESOURCE, 'stuff', resource_transform.TransformFilter,
+             [''],
+             [[{u'a': 10, u'b': 20, u'c': 30, u'd': 40},
+               {u'a': 20, u'b': 30, u'c': 40, u'd': 50},
+               {u'a': 60, u'b': 70, u'c': 80, u'd': 90}],
+              [{u'a': 11, u'b': 21, u'c': 31, u'd': 41},
+               {u'a': 61, u'b': 71, u'c': 81, u'd': 91}],
+              [{u'a': 12, u'b': 22, u'c': 32, u'd': 42},
+               {u'a': 22, u'b': 32, u'c': 42, u'd': 52},
+               {u'a': 62, u'b': 72, u'c': 82, u'd': 92},
+               {u'a': 13, u'b': 23, u'c': 33, u'd': 43},
+               {u'a': 23, u'b': 33, u'c': 43, u'd': 53},
+               {u'a': 63, u'b': 73, u'c': 83, u'd': 93},
+               {u'a': 14, u'b': 24, u'c': 34, u'd': 44},
+               {u'a': 24, u'b': 34, u'c': 44, u'd': 54},
+               {u'a': 64, u'b': 74, u'c': 84, u'd': 94},
+               {u'a': 15, u'b': 25, u'c': 35, u'd': 45},
+               {u'a': 25, u'b': 35, u'c': 45, u'd': 55},
+               {u'a': 65, u'b': 75, u'c': 85, u'd': 95}]])
+
+  def testTransformFilterA1(self):
+    self.Run(_FILTER_RESOURCE, 'stuff', resource_transform.TransformFilter,
+             ['a:10 OR c:44'],
+             [[{u'a': 10, u'b': 20, u'c': 30, u'd': 40}],
+              [],
+              [{u'a': 24, u'b': 34, u'c': 44, u'd': 54}]])
 
   def testTransformFirstOfNoNames(self):
     self.Run(self._resource, None, resource_transform.TransformFirstOf,
@@ -1083,6 +1146,30 @@ class ResourceTransformTest(test_case.Base):
     self.Run(self._resource, None, resource_transform.TransformFirstOf,
              ['Foo', 'Bar', 'status'],
              ['PASSED', 'FAILED', 'WARNING', 'DOWN', 'UNKNOWN', '', ''])
+
+  def testTransformFlatten(self):
+    resource = [
+        {
+            'list': [1, 2, 3, 4],
+            'dict': {'a': [1, 2], 'b': [3, 4, 5], 'c': [6], 'd': [7, 8, 9]},
+        },
+    ]
+    self.Run(resource, None, resource_transform.TransformFlatten,
+             [],
+             ['dict=a=1,2,b=3,4,5,c=6,d=7,8,9,list=1,2,3,4'])
+
+  def testTransformFlattenValue(self):
+    resource = [
+        {
+            'list': [1, 2, 3, 4],
+            'dict': {'a': [1, 2], 'b': [3, 4, 5], 'c': [6], 'd': [7, 8, 9]},
+        },
+    ]
+    kwargs = {'show': 'values'}
+    self.Run(resource, None, resource_transform.TransformFlatten,
+             [],
+             ['1,2,3,4,5,6,7,8,9,1,2,3,4'],
+             kwargs)
 
   def testTransformFloatWithPrecisionDefault(self):
     expected = [
@@ -1904,7 +1991,9 @@ class ResourceTransformRealRegistryTest(test_case.Base):
         'error',
         'extract',
         'fatal',
+        'filter',
         'firstof',
+        'flatten',
         'float',
         'format',
         'group',

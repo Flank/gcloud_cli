@@ -18,10 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import io
 import os
 import socket
 
+from googlecloudsdk.core.credentials import gce
 from googlecloudsdk.core.credentials import gce_cache
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -29,7 +32,7 @@ import mock
 import six
 
 
-class GCECacheTest(sdk_test_base.SdkBase):
+class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
 
   def SetUp(self):
     self.current_time = 1000
@@ -41,7 +44,7 @@ class GCECacheTest(sdk_test_base.SdkBase):
     self._SetUpServerResponse(error=six.moves.urllib.error.URLError(''))
 
   def _SetUpFile(self, contents, mtime):
-    with open(self.tempfilepath, 'w') as f:
+    with io.open(self.tempfilepath, 'w') as f:
       f.write(contents)
     os.utime(self.tempfilepath, (0, mtime))
 
@@ -217,6 +220,29 @@ class GCECacheTest(sdk_test_base.SdkBase):
     self.assertEqual(on_gce_cache.expiration_time,
                      self.current_time + gce_cache._GCE_CACHE_MAX_AGE)
     # Don't check the cache file because we mocked out open() and gave errors.
+
+  @parameterized.parameters(
+      (gce._GCEMetadata.Project, None),
+      (gce._GCEMetadata.Accounts, []),
+      (gce._GCEMetadata.DefaultAccount, None),
+      (gce._GCEMetadata.Zone, None),
+      (gce._GCEMetadata.Region, None),
+  )
+  def testHandleConnectionError(self, method, expected):
+    self._SetUpFile('True', self.current_time - gce_cache._GCE_CACHE_MAX_AGE)
+    gce_cache._SINGLETON_ON_GCE_CACHE = gce_cache._OnGCECache()
+
+    self.assertTrue(gce_cache.GetOnGCE())
+    md = gce._GCEMetadata()
+    self.assertTrue(md.connected)
+
+    # The server is set up to be an error though, so reset things when it fails.
+    self.assertEqual(expected, method(md))
+    # Class thinks it's no longer connected.
+    self.assertFalse(md.connected)
+    # Cache was actually reset also.
+    self.assertFalse(gce_cache.GetOnGCE())
+    self.AssertFileExistsWithContents('False', self.tempfilepath)
 
 
 if __name__ == '__main__':

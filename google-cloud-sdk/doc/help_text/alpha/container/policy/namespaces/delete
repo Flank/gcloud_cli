@@ -12,19 +12,19 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      Namespace resource - The namespace to delete. This represents a Cloud
      resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: provide the flag
-     [namespace] on the command line with a fully specified name; provide the
-     flag [--project] on the command line; set the property [core/project].
-     This must be specified.
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [namespace] on the command line with a fully specified name;
+     provide the argument [--project] on the command line; set the property
+     [core/project]. This must be specified.
 
        NAMESPACE
-          The ID of the namespace or a fully qualified identifier for the
-          namespace.
+          ID of the namespace or fully qualified identifier for the namespace.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

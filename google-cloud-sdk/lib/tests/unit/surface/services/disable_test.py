@@ -20,148 +20,55 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.services import exceptions
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
-from six.moves import range
-from six.moves import zip
 
 
-class ServicesDisableTest(unit_test_base.SV1UnitTestBase):
-  """Unit tests for service management disable command."""
-
-  def testServicesDisable(self):
-    operation_name = 'operation-12345-67890'
-
-    self.mocked_client.services.Disable.Expect(
-        request=self.services_messages.ServicemanagementServicesDisableRequest(
-            serviceName=self.DEFAULT_SERVICE_NAME,
-            disableServiceRequest=self.services_messages.DisableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=operation_name,
-            done=False,
-        )
-    )
-
-    self.MockOperationWait(operation_name)
-
-    self.WriteInput('y\n')
-    self.Run('services disable %s' % self.DEFAULT_SERVICE_NAME)
-    self.AssertErrContains(operation_name)
-    self.AssertErrContains('Operation finished successfully.')
-
-  def testServicesMultiDisable(self):
-    num_services = 3
-    service_names = ['service-name%d.googleapis.com' % i
-                     for i in range(num_services)]
-    operation_names = ['operation-12345-%d' % i for i in range(num_services)]
-
-    messages = self.services_messages
-    for service_name, operation_name in zip(service_names, operation_names):
-      self.mocked_client.services.Disable.Expect(
-          request=messages.ServicemanagementServicesDisableRequest(
-              serviceName=service_name,
-              disableServiceRequest=messages.DisableServiceRequest(
-                  consumerId='project:' + self.PROJECT_NAME
-              )
-          ),
-          response=messages.Operation(
-              name=operation_name,
-              done=False,
-          )
-      )
-      self.MockOperationWait(operation_name)
-
-    self.WriteInput('y\n')
-    self.Run('services disable %s' % ' '.join(service_names))
-    for operation_name in operation_names:
-      self.AssertErrContains(operation_name)
-    self.AssertErrContains('Operation finished successfully.')
-
-  def testServicesDisableAsync(self):
-    operation_name = 'operation-12345-67890'
-
-    self.mocked_client.services.Disable.Expect(
-        request=self.services_messages.ServicemanagementServicesDisableRequest(
-            serviceName=self.DEFAULT_SERVICE_NAME,
-            disableServiceRequest=self.services_messages.DisableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=operation_name,
-            done=False,
-        )
-    )
-
-    self.WriteInput('y\n')
-    self.Run('services disable %s --async' %
-             self.DEFAULT_SERVICE_NAME)
-    self.AssertErrContains(operation_name)
-    self.AssertErrContains('Asynchronous operation is in progress')
-
-  def testServicesDisableConsumer(self):
-    operation_name = 'operation-12345-67890'
-    consumer_project = 'another-consumer-project'
-
-    self.mocked_client.services.Disable.Expect(
-        request=self.services_messages.ServicemanagementServicesDisableRequest(
-            serviceName=self.DEFAULT_SERVICE_NAME,
-            disableServiceRequest=self.services_messages.DisableServiceRequest(
-                consumerId='project:' + consumer_project
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(operation_name)
-
-    self.WriteInput('y\n')
-    self.Run('services disable %s --project %s' %
-             (self.DEFAULT_SERVICE_NAME, consumer_project))
-    self.AssertErrContains(operation_name)
-    self.AssertErrContains('Operation finished successfully.')
-
-
-class DisableAlphaTest(unit_test_base.SUUnitTestBase):
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class DisableTest(unit_test_base.SUUnitTestBase):
   """Unit tests for services disable command."""
   OPERATION_NAME = 'operations/abc.0000000000'
 
-  def testDisable(self):
+  def testDisable(self, track):
+    self.track = track
     self.ExpectDisableApiCall(self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    self.Run('alpha services disable %s' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services disable %s' % self.DEFAULT_SERVICE_NAME)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testDisableForce(self):
+  def testDisableForce(self, track):
+    self.track = track
     self.ExpectDisableApiCall(self.OPERATION_NAME, force=True)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
-    self.Run('alpha services disable %s --force' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services disable %s --force' % self.DEFAULT_SERVICE_NAME)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testDisableAsync(self):
+  def testDisableAsync(self, track):
+    self.track = track
     self.ExpectDisableApiCall(self.OPERATION_NAME)
 
-    self.Run('alpha services disable %s --async' % self.DEFAULT_SERVICE_NAME)
+    self.Run('services disable %s --async' % self.DEFAULT_SERVICE_NAME)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
-  def testDisablePermissionDenied(self):
+  def testDisablePermissionDenied(self, track):
+    self.track = track
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
     self.ExpectDisableApiCall(None, error=server_error)
 
     with self.assertRaisesRegex(
         exceptions.EnableServicePermissionDeniedException, r'Error.'):
-      self.Run('alpha services disable %s' % self.DEFAULT_SERVICE_NAME)
+      self.Run('services disable %s' % self.DEFAULT_SERVICE_NAME)
 
 
 if __name__ == '__main__':

@@ -32,6 +32,8 @@ from .prediction_utils import BaseModel
 from .prediction_utils import COLUMNARIZE_TIME
 from .prediction_utils import copy_model_to_local
 from .prediction_utils import decode_base64
+from .prediction_utils import detect_framework
+from .prediction_utils import does_signature_contain_str
 from .prediction_utils import ENCODE_TIME
 from .prediction_utils import ENGINE
 from .prediction_utils import FRAMEWORK
@@ -42,6 +44,7 @@ from .prediction_utils import SCIKIT_LEARN_FRAMEWORK_NAME
 from .prediction_utils import SESSION_RUN_ENGINE_NAME
 from .prediction_utils import SESSION_RUN_TIME
 from .prediction_utils import SIGNATURE_KEY
+from .prediction_utils import SK_XGB_FRAMEWORK_NAME
 from .prediction_utils import Stats
 from .prediction_utils import TENSORFLOW_FRAMEWORK_NAME
 from .prediction_utils import Timer

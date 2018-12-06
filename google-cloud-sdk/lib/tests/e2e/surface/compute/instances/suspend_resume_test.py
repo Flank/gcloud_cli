@@ -23,6 +23,7 @@ import logging
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 from tests.lib import e2e_utils
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 
@@ -44,6 +45,7 @@ class SuspendResumeTest(e2e_test_base.BaseTest):
     self.instance_names_used.append(name)
     return name
 
+  @test_case.Filters.skip('Failing', 'b/113081083')
   def testInstanceSuspendResume(self):
     name = self.GetInstanceName()
     self.CreateInstance(name)
@@ -54,6 +56,7 @@ class SuspendResumeTest(e2e_test_base.BaseTest):
     self.Run('compute instances list --zones {0}'.format(self.zone))
     self.AssertNewOutputNotContains(name)
 
+  @test_case.Filters.skip('Failing', 'b/113081083')
   def testInstanceSuspendWithDiscardTrue(self):
     name = self.GetInstanceName()
     self.CreateInstance(name)

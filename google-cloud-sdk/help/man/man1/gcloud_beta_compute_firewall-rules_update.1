@@ -105,9 +105,9 @@ $ gcloud beta compute firewall\-rules update MY\-RULE \e
 
 .TP 2m
 \fB\-\-disabled\fR
-Use this flag to disable a firewall rule and stop it from being enforced in the
-network. In the case of disabled firewall rules, the associated network behaves
-as if the firewall rule did not exist. To enable a disabled rule instead, use:
+Disable a firewall rule and stop it from being enforced in the network. If a
+firewall rule is disabled, the associated network behaves as if the rule did not
+exist. To enable a disabled rule, use:
 
 .RS 2m
 $ gcloud beta compute firewall\-rules update MY\-RULE \-\-no\-disabled
@@ -246,9 +246,9 @@ $ gcloud beta compute firewall\-rules update MY\-RULE \-\-target\-tags
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

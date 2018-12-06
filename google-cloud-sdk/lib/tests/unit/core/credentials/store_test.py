@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import contextlib
 import datetime
 import json
+
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import gce as c_gce
@@ -190,6 +191,16 @@ gs_oauth2_refresh_token = fake-token
     with self.assertRaisesRegex(
         store.InvalidCredentialFileException,
         r'Failed to load credential file: \[non-existing-file\]'):
+      store.Load()
+
+  @test_case.Filters.skip('Flaky', 'b/119435008')
+  def testServiceAccountImpersonationNotConfiguredError(self):
+    store.Store(self.fake_cred)
+    properties.VALUES.auth.impersonate_service_account.Set('asdf@google.com')
+    with self.assertRaisesRegex(
+        store.AccountImpersonationError,
+        r'gcloud is configured to impersonate service account '
+        r'\[asdf@google.com\] but impersonation support is not available.'):
       store.Load()
 
   def testNoAccountError(self):

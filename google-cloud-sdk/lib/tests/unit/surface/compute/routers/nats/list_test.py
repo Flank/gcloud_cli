@@ -15,6 +15,7 @@
 """Tests for the list subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 import textwrap
@@ -25,40 +26,44 @@ from tests.lib.surface.compute import router_test_base
 from tests.lib.surface.compute import router_test_utils
 
 
-class AlphaListTest(router_test_base.RouterTestBase):
+class ListTest(router_test_base.RouterTestBase):
 
   def SetUp(self):
-    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
+    self.SelectApi(calliope_base.ReleaseTrack.GA, 'v1')
+    self.router = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='v1')
+    self.version = 'v1'
 
   def testList(self):
-    router = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, track='alpha')
-    router.nats = [
+    self.router.nats = [
         self.messages.RouterNat(
             name='nat-1',
-            natIpAllocateOption=self.messages.RouterNat.
-            NatIpAllocateOptionValueValuesEnum.AUTO_ONLY,
-            sourceSubnetworkIpRangesToNat=self.messages.RouterNat.
-            SourceSubnetworkIpRangesToNatValueValuesEnum.
-            ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES),
+            natIpAllocateOption=self.messages.RouterNat
+            .NatIpAllocateOptionValueValuesEnum.AUTO_ONLY,
+            sourceSubnetworkIpRangesToNat=self.messages.RouterNat
+            .SourceSubnetworkIpRangesToNatValueValuesEnum
+            .ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES),
         self.messages.RouterNat(
             name='nat-2',
-            natIpAllocateOption=self.messages.RouterNat.
-            NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
+            natIpAllocateOption=self.messages.RouterNat
+            .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
             natIps=[
-                ('https://www.googleapis.com/compute/alpha/projects/'
-                 'fake-project/regions/us-central1/addresses/address-1'),
-                ('https://www.googleapis.com/compute/alpha/projects/'
-                 'fake-project/regions/us-central1/addresses/address-2'),
-                ('https://www.googleapis.com/compute/alpha/projects/'
-                 'fake-project/regions/us-central1/addresses/address-3'),
+                ('https://www.googleapis.com/compute/{0}/projects/'
+                 'fake-project/regions/us-central1/addresses/address-1').format(
+                     self.version),
+                ('https://www.googleapis.com/compute/{0}/projects/'
+                 'fake-project/regions/us-central1/addresses/address-2').format(
+                     self.version),
+                ('https://www.googleapis.com/compute/{0}/projects/'
+                 'fake-project/regions/us-central1/addresses/address-3').format(
+                     self.version),
             ],
-            sourceSubnetworkIpRangesToNat=self.messages.RouterNat.
-            SourceSubnetworkIpRangesToNatValueValuesEnum.
-            ALL_SUBNETWORKS_ALL_IP_RANGES)
+            sourceSubnetworkIpRangesToNat=self.messages.RouterNat
+            .SourceSubnetworkIpRangesToNatValueValuesEnum
+            .ALL_SUBNETWORKS_ALL_IP_RANGES)
     ]
 
-    self.ExpectGet(router)
+    self.ExpectGet(self.router)
 
     self.Run("""
         compute routers nats list --router my-router
@@ -72,6 +77,24 @@ class AlphaListTest(router_test_base.RouterTestBase):
             nat-2 MANUAL_ONLY ALL_SUBNETWORKS_ALL_IP_RANGES
             """),
         normalize_space=True)
+
+
+class BetaListTest(ListTest):
+
+  def SetUp(self):
+    self.SelectApi(calliope_base.ReleaseTrack.BETA, 'beta')
+    self.router = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='beta')
+    self.version = 'beta'
+
+
+class AlphaListTest(BetaListTest):
+
+  def SetUp(self):
+    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
+    self.router = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='alpha')
+    self.version = 'alpha'
 
 
 if __name__ == '__main__':

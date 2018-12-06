@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import copy
 import textwrap
 
@@ -80,14 +81,16 @@ class ClustersCreateUnitTest(
         "I don't think this is going to work.",
     ]
     self.ExpectCreateCluster()
-    operation = self.MakeOperation(warnings=warnings[:2])
+    operation = self.MakeOperation(
+        metadata=collections.OrderedDict([('warnings', warnings[:2])]))
     self.ExpectGetOperation(operation)
     self.ExpectGetOperation(operation)
-    operation = self.MakeOperation(warnings=warnings)
+    operation = self.MakeOperation(
+        metadata=collections.OrderedDict([('warnings', warnings)]))
     self.ExpectGetOperation(operation)
     operation = self.MakeCompletedOperation(
         error=self.MakeRpcError(),
-        warnings=warnings)
+        metadata=collections.OrderedDict([('warnings', warnings)]))
     self.ExpectGetOperation(operation)
 
   def testCreateClusterDefaults(self):
@@ -177,14 +180,12 @@ class ClustersCreateUnitTest(
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/dataproc-stuff',
     ]
-    cluster_properties = {
-        'core:com.foo': 'foo',
-        'hdfs:com.bar': 'bar',
-    }
-    cluster_metadata = {
-        'key1': 'value1',
-        'key2': 'value2',
-    }
+    cluster_properties = collections.OrderedDict([
+        ('core:com.foo', 'foo'),
+        ('hdfs:com.bar', 'bar')])
+    cluster_metadata = collections.OrderedDict([
+        ('key1', 'value1'),
+        ('key2', 'value2')])
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         configBucket=bucket,
@@ -200,12 +201,15 @@ class ClustersCreateUnitTest(
         initializationActions=initialization_actions,
         serviceAccount=service_account,
         serviceAccountScopes=scope_uris,
-        properties=encoding.DictToMessage(
+        internalIpOnly=True,
+        properties=encoding.DictToAdditionalPropertyMessage(
             cluster_properties, self.messages.SoftwareConfig.PropertiesValue),
         tags=['tag1', 'tag2'],
-        metadata=encoding.DictToMessage(
+        metadata=encoding.DictToAdditionalPropertyMessage(
             cluster_metadata, self.messages.GceClusterConfig.MetadataValue))
 
+    self.AddEncryptionConfig(expected_request_cluster,
+                             'projects/p/locations/l/keyRings/kr/cryptoKeys/k')
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
@@ -225,9 +229,14 @@ class ClustersCreateUnitTest(
         '--num-preemptible-workers {num_preemptible} '
         '--service-account {service_account} '
         '--scopes {scopes} '
+        '--no-address '
         '--properties core:com.foo=foo,hdfs:com.bar=bar '
         '--tags tag1,tag2 '
         '--metadata key1=value1,key2=value2 '
+        '--gce-pd-kms-key-project=p '
+        '--gce-pd-kms-key-location=l '
+        '--gce-pd-kms-key-keyring=kr '
+        '--gce-pd-kms-key=k '
     ).format(
         project=project,
         cluster=cluster_name,
@@ -372,7 +381,7 @@ class ClustersCreateUnitTest(
     self.AssertErrNotMatches(r'.*(WARNING(.|\n)*){4}')
 
   def testCreateSingleNode(self):
-    dataproc_properties = encoding.DictToMessage({
+    dataproc_properties = encoding.DictToAdditionalPropertyMessage({
         constants.ALLOW_ZERO_WORKERS_PROPERTY: 'true'
     }, self.messages.SoftwareConfig.PropertiesValue)
     expected_request_cluster = self.MakeCluster(properties=dataproc_properties)
@@ -387,7 +396,7 @@ class ClustersCreateUnitTest(
     self.AssertMessagesEqual(expected_response_cluster, result)
 
   def testCreateSingleNodeUsingNumWorkersFlag(self):
-    dataproc_properties = encoding.DictToMessage({
+    dataproc_properties = encoding.DictToAdditionalPropertyMessage({
         constants.ALLOW_ZERO_WORKERS_PROPERTY: 'true'
     }, self.messages.SoftwareConfig.PropertiesValue)
     expected_request_cluster = self.MakeCluster(
@@ -570,6 +579,67 @@ class ClustersCreateUnitTest(
         '--image-version may be specified.'):
       self.RunDataproc(command)
 
+  def testCreateClusterWithIncompleteGcePdKmsKeyFlags_NoLocation(self):
+    """Test command partially specified gce-pd-kms-key flags fail."""
+    # No Location
+    with self.AssertRaisesExceptionMatches(
+        exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
+      self.RunDataproc(
+          ('clusters create {cluster} --zone={zone} '
+           '--gce-pd-kms-key-project={keyProject} '
+           '--gce-pd-kms-key-keyring={keyRing} '
+           '--gce-pd-kms-key={key}').format(
+               cluster='test-cluster',
+               zone='test-zone',
+               keyProject='test-project',
+               keyRing='test-keyring',
+               key='test-key'))
+
+  def testCreateClusterWithIncompleteGcePdKmsKeyFlags_NoKeyring(self):
+    """Test command partially specified gce-pd-kms-key flags fail."""
+    # No KeyRing
+    with self.AssertRaisesExceptionMatches(
+        exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
+      self.RunDataproc(
+          ('clusters create {cluster} --zone={zone} '
+           '--gce-pd-kms-key-project={keyProject} '
+           '--gce-pd-kms-key-location={keyLocation} '
+           '--gce-pd-kms-key={key}').format(
+               cluster='test-cluster',
+               zone='test-zone',
+               keyProject='test-project',
+               keyLocation='test-key-location',
+               key='test-key'))
+
+  def testCreateClusterWithIncompleteGcePdKmsKeyFlags_NoKey(self):
+    """Test command partially specified gce-pd-kms-key flags fail."""
+    # No Key
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --gce-pd-kms-key-keyring --gce-pd-kms-key-location '
+        '--gce-pd-kms-key-project: --gce-pd-kms-key must be specified.'):
+      self.RunDataproc(
+          ('clusters create {cluster} --zone={zone} '
+           '--gce-pd-kms-key-project={keyProject} '
+           '--gce-pd-kms-key-location={keyLocation} '
+           '--gce-pd-kms-key-keyring={keyRing}').format(
+               cluster='test-cluster',
+               zone='test-zone',
+               keyProject='test-project',
+               keyLocation='test-key-location',
+               keyRing='test-keyring'))
+
+  def testCreateClusterWithInvalidRelativeName(self):
+    """Test command partially specified gce-pd-kms-key flags fail."""
+    # Invalid relative name
+    with self.AssertRaisesExceptionMatches(
+        exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
+      self.RunDataproc(
+          ('clusters create {cluster} --zone={zone} '
+           '--gce-pd-kms-key={key}').format(
+               cluster='test-cluster',
+               zone='test-zone',
+               key='locations/l/keyRings/kr/cryptoKeys/k'))
+
 
 class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                                  base.DataprocTestBaseBeta):
@@ -610,7 +680,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                            worker_min_cpu_platform)
     self.AddEncryptionConfig(expected_request_cluster,
                              'projects/p/locations/l/keyRings/kr/cryptoKeys/k')
-
+    self.AddComponents(expected_request_cluster, ['ANACONDA', 'ZEPPELIN'])
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
@@ -635,6 +705,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                '--gce-pd-kms-key-location=l '
                '--gce-pd-kms-key-keyring=kr '
                '--gce-pd-kms-key=k '
+               '--optional-components=anaconda,zeppelin '
                '--zone {zone} ').format(
                    project=project,
                    cluster=cluster_name,
@@ -798,44 +869,39 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
     result = self.RunDataproc(command)
     self.AssertMessagesEqual(expected_response_cluster, result)
 
-    # No KeyRing
-    with self.AssertRaisesExceptionMatches(
-        exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
-      self.RunDataproc(
-          ('clusters create {cluster} --zone={zone} '
-           '--gce-pd-kms-key-project={keyProject} '
-           '--gce-pd-kms-key-location={keyLocation} '
-           '--gce-pd-kms-key={key}').format(
-               cluster='test-cluster',
-               zone='test-zone',
-               keyProject='test-project',
-               keyLocation='test-key-location',
-               key='test-key'))
+  def testCreateClusterAllocationAffinity(self):
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    allocation_affinity = 'specific'
+    allocation_label = 'key=name,value=test'
+    allocation_label_key = 'name'
+    allocation_label_value = 'test'
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name, projectId=project, zoneUri=zone)
+    self.AddAllocationAffinity(expected_request_cluster, allocation_affinity,
+                               allocation_label_key, allocation_label_value)
 
-    # No Key
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --gce-pd-kms-key-keyring --gce-pd-kms-key-location '
-        '--gce-pd-kms-key-project: --gce-pd-kms-key must be specified.'):
-      self.RunDataproc(
-          ('clusters create {cluster} --zone={zone} '
-           '--gce-pd-kms-key-project={keyProject} '
-           '--gce-pd-kms-key-location={keyLocation} '
-           '--gce-pd-kms-key-keyring={keyRing}').format(
-               cluster='test-cluster',
-               zone='test-zone',
-               keyProject='test-project',
-               keyLocation='test-key-location',
-               keyRing='test-keyring'))
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
 
-    # Invalid relative name
-    with self.AssertRaisesExceptionMatches(
-        exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
-      self.RunDataproc(
-          ('clusters create {cluster} --zone={zone} '
-           '--gce-pd-kms-key={key}').format(
-               cluster='test-cluster',
-               zone='test-zone',
-               key='locations/l/keyRings/kr/cryptoKeys/k'))
+    command = ('clusters --project {project} create {cluster} '
+               '--zone {zone} '
+               '--allocation-affinity {allocation_affinity} '
+               '--allocation-label {allocation_label} ').format(
+                   project=project,
+                   cluster=cluster_name,
+                   zone=zone,
+                   allocation_affinity=allocation_affinity,
+                   allocation_label=allocation_label)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
 
 if __name__ == '__main__':
   sdk_test_base.main()

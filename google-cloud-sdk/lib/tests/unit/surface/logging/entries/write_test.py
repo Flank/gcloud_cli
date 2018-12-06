@@ -36,7 +36,7 @@ class EntriesWriteTest(base.LoggingTestBase):
       log_entry.logName = 'projects/my-project/logs/my-log'
     self.mock_client_v2.entries.Write.Expect(
         v2.WriteLogEntriesRequest(entries=[log_entry]),
-        v2.Empty())
+        v2.WriteLogEntriesResponse())
 
   def testWriteWithDefaults(self):
     self._setExpect(fixture.CreateLogEntry('my-payload'))

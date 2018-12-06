@@ -19,11 +19,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import config
 from googlecloudsdk.core import log
 
 
-class Sdk(base.Group):
+class Sdk(calliope_base.Group):
   """Test commands for running DeprecationUtils Tests."""
 

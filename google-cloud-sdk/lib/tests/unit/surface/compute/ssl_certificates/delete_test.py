@@ -24,11 +24,15 @@ from tests.lib.surface.compute import test_base
 
 class SslCertificatesDeleteTest(test_base.BaseTest):
 
+  def SetUp(self):
+    self.SelectApi('v1')
+
+  def RunDelete(self, command):
+    self.Run('compute ssl-certificates delete ' + command)
+
   def testWithSingleNetwork(self):
     messages = self.messages
-    self.Run("""
-        compute ssl-certificates delete cert-1 --quiet
-        """)
+    self.RunDelete('cert-1 --quiet')
 
     self.CheckRequests(
         [(self.compute.sslCertificates,
@@ -40,9 +44,7 @@ class SslCertificatesDeleteTest(test_base.BaseTest):
 
   def testWithManyCertificates(self):
     messages = self.messages
-    self.Run("""
-        compute ssl-certificates delete cert-1 cert-2 cert-3 --quiet
-        """)
+    self.RunDelete('cert-1 cert-2 cert-3 --quiet')
 
     self.CheckRequests(
         [(self.compute.sslCertificates,
@@ -67,9 +69,7 @@ class SslCertificatesDeleteTest(test_base.BaseTest):
   def testPromptingWithYes(self):
     messages = self.messages
     self.WriteInput('y\n')
-    self.Run("""
-        compute ssl-certificates delete cert-1 cert-2 cert-3
-        """)
+    self.RunDelete('cert-1 cert-2 cert-3')
 
     self.CheckRequests(
         [(self.compute.sslCertificates,
@@ -94,9 +94,66 @@ class SslCertificatesDeleteTest(test_base.BaseTest):
   def testPromptingWithNo(self):
     self.WriteInput('n\n')
     with self.AssertRaisesToolExceptionRegexp('Deletion aborted by user.'):
-      self.Run("""
-          compute ssl-certificates delete cert-1 cert-2 cert-3
-          """)
+      self.RunDelete('cert-1 cert-2 cert-3')
+
+    self.CheckRequests()
+
+
+class SslCertificatesDeleteAlphaTest(SslCertificatesDeleteTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+
+  def RunDelete(self, command):
+    self.Run('alpha compute ssl-certificates delete ' + command)
+
+  def testWithSingleNetwork(self):
+    messages = self.messages
+    self.RunDelete('--region us-west-1 cert-1 --quiet')
+
+    self.CheckRequests([
+        (self.compute.regionSslCertificates, 'Delete',
+         messages.ComputeRegionSslCertificatesDeleteRequest(
+             sslCertificate='cert-1', project='my-project', region='us-west-1'))
+    ],)
+
+  def testWithManyCertificates(self):
+    messages = self.messages
+    self.RunDelete('--region us-west-1 cert-1 cert-2 cert-3 --quiet')
+
+    self.CheckRequests([
+        (self.compute.regionSslCertificates, 'Delete',
+         messages.ComputeRegionSslCertificatesDeleteRequest(
+             sslCertificate='cert-1', project='my-project',
+             region='us-west-1')),
+        (self.compute.regionSslCertificates, 'Delete',
+         messages.ComputeRegionSslCertificatesDeleteRequest(
+             sslCertificate='cert-2', project='my-project',
+             region='us-west-1')),
+        (self.compute.regionSslCertificates, 'Delete',
+         messages.ComputeRegionSslCertificatesDeleteRequest(
+             sslCertificate='cert-3', project='my-project', region='us-west-1'))
+    ],)
+
+  def testPromptingWithYes(self):
+    messages = self.messages
+    self.WriteInput('y\n')
+    self.RunDelete('--global cert-1 cert-2 cert-3')
+
+    self.CheckRequests([(self.compute.sslCertificates, 'Delete',
+                         messages.ComputeSslCertificatesDeleteRequest(
+                             sslCertificate='cert-1', project='my-project')),
+                        (self.compute.sslCertificates, 'Delete',
+                         messages.ComputeSslCertificatesDeleteRequest(
+                             sslCertificate='cert-2', project='my-project')),
+                        (self.compute.sslCertificates, 'Delete',
+                         messages.ComputeSslCertificatesDeleteRequest(
+                             sslCertificate='cert-3', project='my-project'))],)
+
+  def testPromptingWithNo(self):
+    self.WriteInput('n\n')
+    with self.AssertRaisesToolExceptionRegexp('Deletion aborted by user.'):
+      self.RunDelete('--global cert-1 cert-2 cert-3')
 
     self.CheckRequests()
 

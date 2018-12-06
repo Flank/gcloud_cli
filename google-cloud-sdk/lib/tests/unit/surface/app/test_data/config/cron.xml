@@ -1,0 +1,13 @@
+<cronentries>
+  <cron>
+    <url>/cron/sendmessages</url>
+    <description>Send all due notifications</description>
+    <schedule>every 5 minutes</schedule>
+  </cron>
+  <cron>
+    <url>/cron/exportreportstocerp</url>
+    <description>Automatically export reports of last quarter to cerp everyday</description>
+    <schedule>every day 18:05</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
+</cronentries>

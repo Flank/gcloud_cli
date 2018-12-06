@@ -64,7 +64,7 @@ class CachedResultTest(test_case.TestCase):
     self.assertEqual(result.GetAttrThunk('value_3', negate)(), [-3])
 
 
-class AddAndParseArgs(test_case.WithOutputCapture, parameterized.TestCase):
+class AddAndParseListArgs(test_case.WithOutputCapture, parameterized.TestCase):
 
   def SetUp(self):
     self.parser = util.ArgumentParser()
@@ -157,6 +157,37 @@ class AddAndParseArgs(test_case.WithOutputCapture, parameterized.TestCase):
     if expected:
       expected = ['projects/fake-project/topics/' + e for e in expected]
     self.assertEqual(after, expected)
+
+
+class AddAndParseDictArgs(test_case.WithOutputCapture):
+
+  def testHelp(self):
+    parser = util.ArgumentParser()
+    repeated.AddPrimitiveArgs(
+        parser,
+        'foo',
+        'bars',
+        'bars',
+        additional_help='Helps you bar.',
+        is_dict_args=True)
+
+    with self.assertRaises(SystemExit):
+      parser.parse_known_args(['--help'])
+
+    self.AssertOutputContains("""\
+--update-bars BARS Update the given key-value pairs in the current bars.
+ """, normalize_space=True)
+    self.AssertOutputContains(
+        '--clear-bars Empty the current bars.', normalize_space=True)
+    self.AssertOutputContains("""\
+--remove-bars BARS Remove the key-value pairs from the current bars with
+the given keys.
+""", normalize_space=True)
+    self.AssertOutputContains("""\
+--set-bars BARS Completely replace the current bars with the given key-
+value pairs.
+""", normalize_space=True)
+
 
 if __name__ == '__main__':
   test_case.main()

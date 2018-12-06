@@ -26,6 +26,7 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.kms import base
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.BETA,
                           calliope_base.ReleaseTrack.GA)
 class CryptoKeysUpdateTest(base.KmsMockTest):

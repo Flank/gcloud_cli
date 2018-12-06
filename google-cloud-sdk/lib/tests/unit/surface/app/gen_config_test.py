@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -80,6 +79,7 @@ APP_YAML_GO_VM_FALSE = textwrap.dedent("""\
     """)
 
 
+@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
 @test_case.Filters.DoNotRunIf(not properties.VALUES.app.runtime_root.Get(),
                               'No app runtime root is configured')
 class GenConfigTest(cli_test_base.CliTestBase, util.WithAppData,

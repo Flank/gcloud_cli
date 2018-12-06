@@ -8,7 +8,7 @@ gcloud markdown - markdown group docstring index
 
 ## SYNOPSIS
 
-`gcloud markdown` _COMMAND_ [*--optional-flag* _OPTIONAL_FLAG_] *--required-flag* _REQUIRED_FLAG_ [_GLOBAL-FLAG ..._]
+`gcloud markdown` _COMMAND_ [*--optional-flag* _OPTIONAL_FLAG_] *--required-flag* _REQUIRED_FLAG_ [_GCLOUD-WIDE-FLAG ..._]
 
 ## DESCRIPTION
 
@@ -31,15 +31,13 @@ Markdown lists are supported:
 * Last item for now.
 ** Last sub-item for now.
 
-Did the end of list work? Also, format="csv" tables are recognized:
+Did the end of list work? Also, tables are recognized:
 
-[options="header",format="csv",grid="none",frame="none"]
-|========
-Alias,Project,Image Name
-a1a1a,p1p1p,i1ii1
-a222,p2,i22222i2222
-a3aaaa3a3a3,p3p3pp3p,iii3i3i
-|========
+Alias | Project | Image Name
+--- | --- | ---
+a1a1a | p1p1p | i1ii1
+a222 | p2 | i22222i2222
+a3aaaa3a3a3 | p3p3pp3p | iii3i3i
 
 Did the end of table work?
 
@@ -106,7 +104,7 @@ Optional flag.
 Required flag.
 
 
-## GLOBAL FLAGS
+## GCLOUD WIDE FLAGS
 
 Run *$ link:../[gcloud] help* for a description of flags available to
 all commands.

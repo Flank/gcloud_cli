@@ -5,23 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha pubsub subscriptions update \- this feature is part of an invite\-only release of the Cloud Pub/Sub API
+gcloud alpha pubsub subscriptions update \- updates an existing Cloud Pub/Sub subscription
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha pubsub subscriptions update\fR \fISUBSCRIPTION\fR [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha pubsub subscriptions update\fR \fISUBSCRIPTION\fR [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Updates an existing Cloud Pub/Sub subscription. This feature is
-part of an invitation\-only release of the underlying Cloud Pub/Sub API. The
-command will generate errors unless you have access to this API. This
-restriction should be relaxed in the near future. Please contact
-cloud\-pubsub@google.com with any questions in the meantime.
+\fB(ALPHA)\fR Updates an existing Cloud Pub/Sub subscription.
 
 
 
@@ -32,15 +28,15 @@ cloud\-pubsub@google.com with any questions in the meantime.
 
 Subscription resource \- Name of the subscription to update. This represents a
 Cloud resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: provide the flag
-[subscription] on the command line with a fully specified name; provide the flag
-[\-\-project] on the command line; set the property [core/project]. This must be
-specified.
+can be set in other ways. To set the [project] attribute: provide the argument
+[subscription] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
 
 .RS 2m
 .TP 2m
 \fISUBSCRIPTION\fR
-The ID of the subscription or a fully qualified identifier for the subscription.
+ID of the subscription or fully qualified identifier for the subscription.
 
 
 .RE
@@ -54,6 +50,14 @@ The ID of the subscription or a fully qualified identifier for the subscription.
 \fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR
 The number of seconds the system will wait for a subscriber to acknowledge
 receiving a message before re\-attempting delivery.
+
+.TP 2m
+\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR
+The subscription will expire if it is inactive for the given period. Valid
+values are strings of the form INTEGER[UNIT], where UNIT is one of "s", "m",
+"h", and "d" for seconds, minutes, hours, and days, respectively. If the unit is
+omitted, seconds is assumed. This flag additionally accepts the special value
+"never" to indicate that the subscription will never expire.
 
 .TP 2m
 \fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR
@@ -121,9 +125,9 @@ ignored.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -133,5 +137,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta pubsub subscriptions update
+.RE
 

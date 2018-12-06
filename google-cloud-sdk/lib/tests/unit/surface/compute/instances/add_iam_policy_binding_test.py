@@ -65,8 +65,7 @@ class AddIamPolicyBindingTest(test_base.BaseTest,
               project='my-project',
               zone='zone-1',
               zoneSetPolicyRequest=self.messages.ZoneSetPolicyRequest(
-                  bindings=policy.bindings,
-                  etag=policy.etag))),
+                  policy=policy))),
         ]
     )
 

@@ -39,16 +39,33 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
-    Describe container analysis data for a specified image:
+    Describe the specified image:
 
         $ gcloud alpha container images describe \
             gcr.io/myproject/myimage@digest
               OR
         $ gcloud alpha container images describe gcr.io/myproject/myimage:tag
+
+    Find the digest for a tag:
+
+        $ gcloud alpha container images describe \
+            gcr.io/myproject/myimage:tag \
+            --format='value(image_summary.digest)'
+              OR
+        $ gcloud alpha container images describe \
+            gcr.io/myproject/myimage:tag \
+            --format='value(image_summary.fully_qualified_digest)'
+
+    See package vulnerabilities found by the Container Analysis API for the
+    specified image:
+
+        $ gcloud alpha container images describe \
+            gcr.io/myproject/myimage@digest --show-package-vulnerability
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

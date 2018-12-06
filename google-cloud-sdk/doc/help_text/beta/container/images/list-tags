@@ -3,8 +3,12 @@ NAME
         specified image
 
 SYNOPSIS
-    gcloud beta container images list-tags IMAGE_NAME [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE]
+    gcloud beta container images list-tags IMAGE_NAME
+        [--occurrence-filter=OCCURRENCE_FILTER; default='kind
+          = "BUILD_DETAILS" OR kind = "IMAGE_BASIS" OR kind = "DISCOVERY"']
+        [--no-show-occurrences]
+        [--show-occurrences-from=SHOW_OCCURRENCES_FROM; default=10]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]; default="~timestamp"] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -16,6 +20,17 @@ POSITIONAL ARGUMENTS
      IMAGE_NAME
         The name of the image to list tags for. The name format should be
         *.gcr.io/PROJECT_ID/IMAGE_PATH[:TAG|@sha256:DIGEST].
+
+FLAGS
+     --occurrence-filter=OCCURRENCE_FILTER; default='kind = "BUILD_DETAILS" OR kind = "IMAGE_BASIS" OR kind = "DISCOVERY"'
+        A filter for the Occurrences which will be summarized.
+
+     --show-occurrences
+        Whether to show summaries of the various Occurrence types. Enabled by
+        default, use --no-show-occurrences to disable.
+
+     --show-occurrences-from=SHOW_OCCURRENCES_FROM; default=10
+        How many of the most recent images for which to summarize Occurences.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -46,8 +61,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     List the tags in a specified image:

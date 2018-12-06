@@ -31,15 +31,15 @@ continuously re\-attempt delivery of the bad message for 7 days.
 
 Topic resource \- Name of the topic to publish messages to. This represents a
 Cloud resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: provide the flag
-[topic] on the command line with a fully specified name; provide the flag
+can be set in other ways. To set the [project] attribute: provide the argument
+[topic] on the command line with a fully specified name; provide the argument
 [\-\-project] on the command line; set the property [core/project]. This must be
 specified.
 
 .RS 2m
 .TP 2m
 \fITOPIC\fR
-The ID of the topic or a fully qualified identifier for the topic.
+ID of the topic or fully qualified identifier for the topic.
 
 .RE
 .sp
@@ -77,9 +77,9 @@ https://cloud.google.com/pubsub/docs/publisher#publish
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -88,8 +88,8 @@ help\fR for details.
 To publish messages in a batch to a specific Cloud Pub/Sub topic, run:
 
 .RS 2m
-$ gcloud beta pubsub topics publish mytopic "Hello World!" \e
-    \-\-attribute KEY1=VAL1,KEY2=VAL2
+$ gcloud beta pubsub topics publish mytopic \e
+    \-\-message "Hello World!" \-\-attribute KEY1=VAL1,KEY2=VAL2
 .RE
 
 

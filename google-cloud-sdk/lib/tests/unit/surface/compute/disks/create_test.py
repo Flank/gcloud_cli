@@ -952,7 +952,8 @@ class DisksCreateTestWithCsekKeys(test_base.BaseTest):
         ])
 
   def testCsekKeyMissingRequired(self):
-    with self.AssertRaisesToolExceptionRegexp('Key required for resource'):
+    with self.AssertRaisesExceptionMatches(
+        csek_utils.MissingCsekException, 'Key required for resource'):
       self.Run("""
           compute disks create disk-1 --zone central2-a \
                --csek-key-file {0}
@@ -1009,13 +1010,14 @@ class DisksCreateTestWithCsekKeysBeta(test_base.BaseTest):
               zone='central2-a'))])
 
 
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class DisksCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
+class DisksCreateTestWithKmsKeysGa(test_base.BaseTest):
 
-  def testKmsKeyWithKeyNameArgsOk(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def SetupApiAndTrack(self):
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testKmsKeyWithKeyNameArgsOk(self):
+    self.SetupApiAndTrack()
     self.Run("""
         compute disks create wrappedkeydisk --zone central2-a \
             --kms-key=projects/key-project/locations/global/keyRings/disk-ring/cryptoKeys/disk-key
@@ -1036,9 +1038,8 @@ class DisksCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               project='my-project',
               zone='central2-a'))])
 
-  def testKmsKeyWithKeyPartArgsOk(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def testKmsKeyWithKeyPartArgsOk(self):
+    self.SetupApiAndTrack()
     self.Run("""
         compute disks create wrappedkeydisk --zone central2-a \
             --kms-project=key-project --kms-location=global \
@@ -1060,9 +1061,8 @@ class DisksCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               project='my-project',
               zone='central2-a'))])
 
-  def testKmsKeyWithoutProjectOk(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def testKmsKeyWithoutProjectOk(self):
+    self.SetupApiAndTrack()
     self.Run("""
         compute disks create wrappedkeydisk --zone central2-a \
             --kms-location=global \
@@ -1084,9 +1084,45 @@ class DisksCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               project='my-project',
               zone='central2-a'))])
 
-  def testKmsKeyRegionFallthrough(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def testMissingKeyRing(self):
+    self.SetupApiAndTrack()
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'KMS cryptokey resource was not fully specified.'):
+      self.Run("""
+          compute disks create wrappedkeydisk --zone central2-a \
+              --kms-location=global \
+              --kms-key=disk-key
+          """)
+
+  def testMissingKey(self):
+    self.SetupApiAndTrack()
+    with self.AssertRaisesArgumentError():
+      self.Run("""
+          compute disks create wrappedkeydisk --zone central2-a \
+              --kms-location=global \
+              --kms-keyring=disk-ring
+          """)
+
+  def testConflictKmsKeyNameWithCsekKeyFile(self):
+    self.SetupApiAndTrack()
+    self.WriteInput(self.GetKeyFileContent())
+    with self.assertRaises(exceptions.ConflictingArgumentsException):
+      self.Run("""
+          compute disks create hamlet --zone central2-a \
+              --kms-key=projects/key-project/locations/global/keyRings/disk-ring/cryptoKeys/disk-key \
+              --csek-key-file -
+          """)
+
+
+class DisksCreateTestWithKmsKeysBeta(DisksCreateTestWithKmsKeysGa):
+
+  def SetupApiAndTrack(self):
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testKmsKeyRegionFallthrough(self):
+    self.SetupApiAndTrack()
     self.make_requests.side_effect = iter([
         [],
         [
@@ -1126,40 +1162,15 @@ class DisksCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               region='central2'))],
     )
 
-  def testMissingKeyRing(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
-    with self.AssertRaisesExceptionMatches(
-        exceptions.InvalidArgumentException,
-        'KMS cryptokey resource was not fully specified.'):
-      self.Run("""
-          compute disks create wrappedkeydisk --zone central2-a \
-              --kms-location=global \
-              --kms-key=disk-key
-          """)
 
-  def testMissingKey(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
-    with self.AssertRaisesArgumentError():
-      self.Run("""
-          compute disks create wrappedkeydisk --zone central2-a \
-              --kms-location=global \
-              --kms-keyring=disk-ring
-          """)
+class DisksCreateTestWithKmsKeysAlpha(DisksCreateTestWithKmsKeysBeta):
 
-  def testConflictKmsKeyNameWithCsekKeyFile(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
-    self.WriteInput(self.GetKeyFileContent())
-    with self.assertRaises(exceptions.ConflictingArgumentsException):
-      self.Run("""
-          compute disks create hamlet --zone central2-a \
-              --kms-key=projects/key-project/locations/global/keyRings/disk-ring/cryptoKeys/disk-key \
-              --csek-key-file -
-          """)
+  def SetupApiAndTrack(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
                           (calliope_base.ReleaseTrack.BETA, 'beta'))
 class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
@@ -1422,6 +1433,7 @@ class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
     )
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
                           (calliope_base.ReleaseTrack.BETA, 'beta'))
 class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,

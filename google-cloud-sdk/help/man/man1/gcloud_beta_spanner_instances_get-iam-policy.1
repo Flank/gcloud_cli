@@ -34,15 +34,15 @@ additional details.
 Instance resource \- The Cloud Spanner instance for which to display the IAM
 policy. This represents a Cloud resource. (NOTE) Some attributes are not given
 arguments in this group but can be set in other ways. To set the [project]
-attribute: provide the flag [instance] on the command line with a fully
+attribute: provide the argument [instance] on the command line with a fully
 specified name; set the property [spanner/instance] with a fully specified name;
-provide the flag [\-\-project] on the command line; set the property
-[core/project].
+set the property [core/project]; provide the argument [\-\-project] on the
+command line.
 
 .RS 2m
 .TP 2m
 [\fIINSTANCE\fR]
-The ID of the instance or a fully qualified identifier for the instance.
+ID of the instance or fully qualified identifier for the instance.
 
 
 .RE
@@ -88,9 +88,9 @@ flag interacts with other flags that are applied in this order:
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

@@ -8,14 +8,14 @@ gcloud hidden-group hidden-command - *(ALPHA)* hidden command docstring index
 
 ## SYNOPSIS
 
-`gcloud hidden-group hidden-command` [_GLOBAL-FLAG ..._]
+`gcloud hidden-group hidden-command` [_GCLOUD-WIDE-FLAG ..._]
 
 ## DESCRIPTION
 
 *(ALPHA)* Hidden command docstring description.
 
 
-## GLOBAL FLAGS
+## GCLOUD WIDE FLAGS
 
 Run *$ link:../[gcloud] help* for a description of flags available to
 all commands.

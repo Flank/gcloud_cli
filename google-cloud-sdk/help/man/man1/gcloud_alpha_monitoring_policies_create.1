@@ -28,9 +28,6 @@ condition will be appended to the list of conditions.
 For information about the JSON/YAML format of an alerting policy:
 https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies
 
-\fBNote:\fR When specifying the Channel as a YAML/JSON, the use of
-\f5channelLabels\fR as an alternative name for \f5labels\fR is supported.
-
 
 
 .SH "FLAGS"
@@ -51,15 +48,16 @@ by the \f5core/project\fR property will be used, in that order.
 .RE
 .sp
 .IP "\(em" 2m
-Channel Relative Name: \f5projects/my\-project/notificationChannels/channel\-id0
+Channel Relative Name:
+\f5projects/my\-project/notificationChannels/channel\-id0\fR
 .IP "\(em" 2m
 Channel URI:
 https://monitoring.googleapis.com/v3/projects/my\-project/notificationChannels/channel\-id0
 This represents a Cloud resource. (NOTE) Some attributes are not given arguments
 in this group but can be set in other ways. To set the [project] attribute:
-provide the flag [\-\-notification\-channels] on the command line with a fully
-specified name; provide the flag [\-\-project] on the command line; set the
-property [core/project].
+provide the argument [\-\-notification\-channels] on the command line with a
+fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project].
 .RE
 .RE
 .sp
@@ -122,7 +120,7 @@ be triggered.
 .TP 2m
 
 Policy Settings. If any of these are specified, they will overwrite fields in
-the \fR\-\-policy\f5 or \fR\-\-policy\-from\-file\f5 flags if specified.
+the \f5\-\-policy\fR or \f5\-\-policy\-from\-file\fR flags if specified.
 
 .RS 2m
 .TP 2m
@@ -138,9 +136,9 @@ disable.
 \fB\-\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to add.
 
-Keys must start with a lowercase character and contain only hyphens (\fR\-\f5),
-underscores (\fR_\f5), lowercase characters, and numbers. Values must contain
-only hyphens (\fR\-\f5), underscores (\fR_\f5), lowercase characters, and
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
 
 If the policy was given as a JSON/YAML object from a string or file, this flag
@@ -153,8 +151,8 @@ Documentation
 .RS 2m
 .TP 2m
 \fB\-\-documentation\-format\fR=\fIDOCUMENTATION_FORMAT\fR; default="text/markdown"
-The MIME type that should be used with \fR\-\-documentation\f5 or
-\fR\-\-documentation\-from\-file\f5. Currently, only "text/markdown" is
+The MIME type that should be used with \f5\-\-documentation\fR or
+\f5\-\-documentation\-from\-file\fR. Currently, only "text/markdown" is
 supported.
 
 .TP 2m
@@ -188,7 +186,6 @@ The policy as a string. In either JSON or YAML format.
 The path to a JSON or YAML file containing the policy.
 
 
-\fR
 .RE
 .RE
 .sp
@@ -196,9 +193,9 @@ The path to a JSON or YAML file containing the policy.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

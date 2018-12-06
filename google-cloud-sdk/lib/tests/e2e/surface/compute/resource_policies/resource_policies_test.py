@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import contextlib
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_test_base
@@ -30,11 +30,12 @@ class ResourcePoliciesTest(e2e_test_base.BaseTest):
   """Resource policies tests."""
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.registry = resources.REGISTRY.Clone()
     self.registry.RegisterApiByName('compute', 'alpha')
 
-  def _GetResourceName(self):
+  @staticmethod
+  def _GetResourceName():
     return next(e2e_utils.GetResourceNameGenerator(
         prefix='gcloud-compute-test'))
 
@@ -79,3 +80,18 @@ class ResourcePoliciesTest(e2e_test_base.BaseTest):
     with self._CreateVmMaintenancePolicy() as policy_name:
       with self._CreateInstance() as instance_name:
         self._TestAddPolicyAndDescribeInstance(instance_name, policy_name)
+
+  def testCreateBackupSchedulePolicy(self):
+    policy_name = self._GetResourceName()
+    try:
+      self.Run('compute resource-policies create-backup-schedule {0} '
+               '--region {1} --start-time 04:00Z --hourly-schedule 2 '
+               '--max-retention-days 1 '
+               '--on-source-disk-delete apply-retention-policy'.format(
+                   policy_name, self.region))
+      self.Run('compute resource-policies describe {0} --region {1}'.format(
+          policy_name, self.region))
+      self.AssertNewOutputContains('APPLY_RETENTION_POLICY')
+    finally:
+      self.Run('compute resource-policies delete {0} --region {1} '
+               '--quiet'.format(policy_name, self.region))

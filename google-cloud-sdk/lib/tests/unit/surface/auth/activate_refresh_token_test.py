@@ -66,8 +66,8 @@ class ActivateRefreshTokenTest(cli_test_base.CliTestBase):
     self.assertEqual('myproj', properties.VALUES.core.project.Get())
     self.AssertOutputEquals('')
     self.AssertErrEquals(
-        'Refresh token: Activated refresh token credentials: '
-        '[foo@google.com]\n')
+        '{"ux": "PROMPT_RESPONSE", "message": "Refresh token: "}'
+        'Activated refresh token credentials: [foo@google.com]\n')
 
   def testActivate_RefreshException(self):
     self.StartObjectPatch(store, 'Refresh',

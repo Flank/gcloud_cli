@@ -26,18 +26,25 @@ import json
 import os
 import re
 import sys
+import tempfile
+
+from apitools.base.py import batch
+from apitools.base.py import http_wrapper
 import enum
 
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import config
-from googlecloudsdk.core import http
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
 from tests.lib.scenario import assertions
 from tests.lib.scenario import events as events_lib
+from tests.lib.scenario import reference_resolver
+
 
 import httplib2
 import mock
+import six
+
 
 _UX_TYPES = [ux.name for ux in console_io.UXElementType]
 _UX_RE = re.compile(r'^{{\"ux\": \"({})\"'.format('|'.join(_UX_TYPES)))
@@ -79,28 +86,36 @@ class StreamMocker(object):
 class Session(object):
   """Runs a scenario session and checks assertions."""
 
-  def __init__(self, events_generator, failures, stream_mocker, execution_mode,
-               resource_ref_resolver, action_location=None):
-    self._events = []
-    self._events_generator = events_generator
-    self._LoadNextEvent()
+  DONE = object()
 
-    self._last_repeatable_api_call_event = None
+  def __init__(self, events_generator, failures, stream_mocker, execution_mode,
+               ignore_api_calls, resource_ref_resolver, action_location=None,
+               debug=False):
+    self._processed_events = []
+    self.__next_event = None
+    self._events_generator = events_generator
+    self._processing_batch_request = False
 
     self._failures = failures
     self._stream_mocker = stream_mocker
     self._execution_mode = execution_mode
+    self._ignore_api_calls = ignore_api_calls
     self._action_location = action_location
     self._resource_ref_resolver = resource_ref_resolver
+    self._debug = debug
 
     self._user_input_already_given = False
     self._exit_was_handled = False
 
-    # pylint:disable=protected-access
-    self._real_http_client = http._CreateRawHttpClient()
     self._orig_request_method = httplib2.Http.request
     self._request_patch = mock.patch.object(
-        httplib2.Http, 'request', side_effect=self._HandleRequest)
+        httplib2.Http, 'request', autospec=True,
+        side_effect=self._HandleRequest)
+    # pylint:disable=protected-access
+    self._orig_batch_request_method = batch.BatchHttpRequest._Execute
+    self._batch_request_patch = mock.patch.object(
+        batch.BatchHttpRequest, '_Execute', autospec=True,
+        side_effect=self._HandleBatchRequest)
 
     self._orig_stdout_write = sys.stdout.write
     self._captured_stdout = ''
@@ -130,97 +145,106 @@ class Session(object):
     self._log_error_patch = mock.patch.object(
         calliope_exceptions, '_LogKnownError')
 
+  def _Debug(self, msg, *args):
+    if not self._debug:
+      return
+    if six.PY2:
+      msg = msg.format(*args).encode('utf-8')
+    sys.__stderr__.write(msg + '\n')
+
   def _Handle(self, event, *args, **kwargs):
     self._failures.AddAll(event.Handle(*args, **kwargs))
 
-  def _LoadNextEvent(self):
-    try:
-      self._events.append(next(self._events_generator))
-    except StopIteration:
-      self._events.append(None)
+  @property
+  def _next_event(self):
+    """Gets the event that is queued to be used next.
 
-  def _CurrentEvent(self):
-    return self._events[-1]
+    All of this is basically to ensure the events are loaded from the generator
+    as late as possible. The loading of some events depend on things from
+    previous event executions.
+
+    Returns:
+      Event, The next event or None if there are no more events.
+    """
+    if self.__next_event is None:
+      try:
+        self.__next_event = next(self._events_generator)
+      except StopIteration:
+        self.__next_event = Session.DONE
+    if self.__next_event == Session.DONE:
+      return None
+    return self.__next_event
+
+  @property
+  def _last_event(self):
+    """Gets the event that was last processed."""
+    if self._processed_events:
+      return self._processed_events[-1]
+    return None
+
+  def _ConsumeEvent(self):
+    """Moves the next event to the list of processed events."""
+    current_event = self.__next_event
+    self._InsertEvent(self.__next_event)
+    self.__next_event = None
+    return current_event
 
   def _InsertEvent(self, event):
-    self._events.insert(-1, event)
+    """Inserts a new event at the end of the processed list."""
+    self._processed_events.append(event)
 
-  def _GetOrCreateCurrentEvent(self, expected_type, advance=True):
-    """Gets the next matching event from the event stream.
-
-    If there are no more events or if the next event is not of the requested
-    type, a new evernt is generated to match and inserted into the stream.
+  def _GetOrCreateNextEvent(self, expected_type):
+    """Gets the next event or creates a new one if the next one doesn't match.
 
     Args:
       expected_type: events_lib.Event, The type of event that should be next.
-      advance: bool, If true, the next event is returned and a new event is
-        taken off the queue. If false, we don't advance the queue because we are
-        going to do it manually later. When getting the next event, it is
-        generated at that time (because events is a generator). Sometimes we
-        need to delay the loading of the next event until the previous is
-        completely finished, because its execution affects the loading of the
-        next event.
 
     Returns:
-      events_lib.Event, the event to use.
+      events_lib.Event: The event to use.
     """
-    current_event = self._CurrentEvent()
-    if not current_event or current_event.EventType() != expected_type:
-      if current_event:
-        location = current_event.UpdateContext().Location()
-      elif len(self._events) > 1:
-        e = self._events[-2]
-        location = e.UpdateContext().Location() if e else self._action_location
-      else:
-        location = self._action_location
+    self._Debug('Looking for event of type: [{}]', expected_type)
 
-      current_event = expected_type.Impl().ForMissing(location)
-      self._InsertEvent(current_event)
-    elif advance:
-      self._LoadNextEvent()
+    # Throw out any optional api_call events that were not used.
+    if expected_type != events_lib.EventType.API_CALL:
+      while (self._next_event and
+             self._next_event.EventType() == events_lib.EventType.API_CALL and
+             self._next_event.IsOptional()):
+        self._ConsumeEvent()
+
+    # If API calls are being ignored, we never intercept those events. Just
+    # ignore any api_call events we find in the stream.
+    if self._ignore_api_calls:
+      while (self._next_event and
+             self._next_event.EventType() == events_lib.EventType.API_CALL):
+        self._ConsumeEvent()
+
+    if self._next_event and self._next_event.EventType() == expected_type:
+      self._Debug('  Found matching event: [{}]', self._next_event)
+      return self._ConsumeEvent()
+
+    # No more events or the wrong event type.
+    if self._next_event:
+      location = self._next_event.UpdateContext().Location()
+      self._Debug('  Found wrong type: [{}] at [{}]',
+                  self._next_event.EventType(), location)
+    elif self._last_event:
+      location = self._last_event.UpdateContext().Location()
+    else:
+      location = self._action_location
+
+    current_event = expected_type.Impl().ForMissing(location)
+    self._Debug('  Inserting missing event')
+    self._InsertEvent(current_event)
     return current_event
 
-  def _GetLastRepeatableAPICallOrNext(self, uri, method, body, response):
-    """For an API call, get either the previous or next event.
-
-    If an api_call declares that it can be repeated, we are allowed to reuse it
-    multiple times. This is useful for operation polling where there are many
-    of the same request. We only return the previously used event if the request
-    and response are a verbatim match.
-
-    Args:
-      uri: str, The URI being requested.
-      method: str, The HTTP method being used in the request.
-      body: str, The body of the request.
-      response: str, The real response returned by the server.
-
-    Returns:
-       (APICallEvent, bool): The event to use and whether the processing of the
-       event should trigger the event to be consumed. If reusing an old event,
-       we shouldn't consume the next event in the sequence. If we are using a
-       new event, we have to move on after we a done.
-    """
-    if self._last_repeatable_api_call_event:
-      if self._last_repeatable_api_call_event.Matches(
-          uri, method, body, response):
-        # Event matches, reuse the same event for the new call.
-        self._last_repeatable_api_call_event.MarkRepeated()
-        return (self._last_repeatable_api_call_event.Event(), False)
-      else:
-        # Not a match, we have moved on to a new api call, don't try to use the
-        # old one again.
-        self._failures.AddAll(self._last_repeatable_api_call_event.Check())
-        self._last_repeatable_api_call_event = None
-
-    # Get a new event to use for this request.
-    current_event = self._GetOrCreateCurrentEvent(
-        events_lib.EventType.API_CALL, advance=False)
-    self._last_repeatable_api_call_event = events_lib.RepeatableAPICall(
-        uri, method, body, current_event, response)
-    return (current_event, True)
-
-  def _HandleRequest(self, uri, method, body, headers, *args, **kwargs):
+  def _HandleRequest(self, self_, uri, method, body, headers, *args, **kwargs):
     """Mock http request function."""
+    if self._processing_batch_request:
+      # When in batch mode, effectively unmock the http request method because
+      # we are intercepting elsewhere.
+      return self._MakeRealRequest(
+          self_, uri, method, body, headers, *args, **kwargs)
+
     self._ProcessStdout()
     self._ProcessStderr()
 
@@ -228,53 +252,188 @@ class Session(object):
     # have a bunch of if/else switches.
     if self._execution_mode == ExecutionMode.LOCAL:
       return self._HandleRequestLocal(uri, method, body, headers)
-    return self._HandleRequestRemote(
-        uri, method, body, headers, *args, **kwargs)
+
+    # For remote mode, make the actual call and then process the result.
+    response = self._MakeRealRequest(
+        self_, uri, method, body, headers, *args, **kwargs)
+    return self._HandleRequestRemote(response, uri, method, body, headers)
+
+  def _MakeRealRequest(
+      self, self_, uri, method, body, headers, *args, **kwargs):
+    """Convenience for mocking during testing."""
+    return self._orig_request_method(
+        self_, uri, method, body, headers, *args, **kwargs)
+
+  def _HandleBatchRequest(self, self_, *args, **kwargs):
+    """Mock apitools batch request.
+
+    Batch requests are difficult to deal with so instead of saving them as a
+    batch we intercept the call and split the batch out into its constituent
+    calls for the purposes of the scenario.
+
+    Args:
+      self_: The apitools BatchRequest object this is mocked into.
+      *args: Arguments to the underlying method.
+      **kwargs: Arguments to the underlying method.
+    """
+    self._ProcessStdout()
+    self._ProcessStderr()
+
+    self._processing_batch_request = True
+    try:
+      # In local mode we don't have to make any calls or execute the batch
+      # since we already have the canned data to return.
+      if self._execution_mode == ExecutionMode.LOCAL:
+        # Reach into the batch request and pull out the individual requests.
+        # pylint: disable=protected-access, This isn't great because we are
+        # reaching deeply into apitools, but since this is only part of a
+        # testing framework, it's OK.
+        for key, request_response in sorted(
+            self_._BatchHttpRequest__request_response_handlers.items()):
+          # request_response has the form (request, response, handler)
+          request = request_response[0]
+          # Handle each request in the batch as if it was called directly.
+          headers, body = self._HandleRequestLocal(
+              request.url, request.http_method, request.body, request.headers)
+          # Normally this is done in our http request wrapper via setting
+          # response_encoding. In the batch case, we are injecting the data
+          # directly into apitools and not going through the wrapper so we need
+          # to ensure it is in the same format it would be if the call had
+          # actually been made.
+          if six.PY3:
+            body = body.decode('utf-8')
+          # Construct and save the batch response for this request based on the
+          # canned data we have saved.
+          response = http_wrapper.Response(
+              headers, body, self_._BatchHttpRequest__batch_url)
+          # Save the responses into to the tuple stored in the batch request
+          # object. This code is the same as in BatchHttpRequest object
+          # so the end result is a properly mocked out batch request.
+          self_._BatchHttpRequest__request_response_handlers[key] = (
+              self_._BatchHttpRequest__request_response_handlers[key]._replace(
+                  response=response))
+      else:
+        # In remote mode, we actually want to make the real call. Call the
+        # underlying request method to execute the batch.
+        self._orig_batch_request_method(self_, *args, **kwargs)
+        # At this point, the batch request has already saved the individual
+        # responses back into the data structure with each request.
+        # pylint: disable=protected-access
+        for key, request_response in sorted(
+            self_._BatchHttpRequest__request_response_handlers.items()):
+          # Pull out all the individual request/responses and process them
+          # as if they were called individually.
+          request, response = request_response[0], request_response[1]
+          self._HandleRequestRemote(
+              (response[0], response[1]), request.url, request.http_method,
+              request.body, request.headers)
+    finally:
+      self._processing_batch_request = False
+
+  def _GetOperationIfPollingRequest(self, uri, method):
+    for e in self._processed_events:
+      if e.EventType() == events_lib.EventType.API_CALL:
+        op = e.GetMatchingOperationForRequest(uri, method)
+        if op:
+          return op
+    return None
 
   def _HandleRequestLocal(self, uri, method, body, headers):
     """Handle a local request by using canned response data."""
-    current_event = self._GetOrCreateCurrentEvent(
-        events_lib.EventType.API_CALL, advance=False)
+    self._Debug('Handling API request: [{}]', uri)
 
-    # Validate the request assertions.
-    self._Handle(current_event, uri, method, headers, body)
+    # This is a polling request for an operation we got back previously. Have
+    # the operation generate a fake response.
+    op = self._GetOperationIfPollingRequest(uri, method)
+    if op:
+      return op.Respond()
 
+    # Find the correct event to use and validate the request assertions.
+    current_event, failures = self._HandleRequestHelper(
+        None, uri, method, body, headers)
+    self._failures.AddAll(failures)
     # Use canned response data or pause if no response is registered.
     if current_event.UpdateContext().WasMissing():
       raise PauseError(
           'Pausing execution so API response can be added to expect_api_call '
           'at location: {}'.format(current_event.UpdateContext().Location()))
-    response = current_event.GetResponsePayload()
 
-    # Validate the response assertions.
+    response = current_event.GetResponsePayload()
+    # Validate the response assertions now that we have a response.
     self._failures.AddAll(current_event.HandleResponse(
         response[0], response[1], self._resource_ref_resolver))
-
-    self._LoadNextEvent()
     return response
 
-  def _HandleRequestRemote(self, uri, method, body, headers, *args, **kwargs):
+  def _HandleRequestRemote(self, response, uri, method, body, headers):
     """Handle a remote request by making a real API call."""
-    response = self._orig_request_method(
-        self._real_http_client, uri, method, body, headers, *args, **kwargs)
+    self._Debug('Handling API request: [{}]', uri)
+    self._Debug('  Method: [{}]', method)
+    self._Debug('  Body: [{}]', body)
+    self._Debug('  Response Body: [{}]', response[1])
 
-    (current_event, should_advance) = self._GetLastRepeatableAPICallOrNext(
-        uri, method, body, response)
+    # This is a polling request for an operation we got back previously. No
+    # need to do any more validation, just return the real API response.
+    op = self._GetOperationIfPollingRequest(uri, method)
+    if op:
+      return response
 
-    # Validate the request assertions.
-    self._Handle(current_event, uri, method, headers, body)
-
+    event, failures = self._HandleRequestHelper(
+        response, uri, method, body, headers)
+    self._failures.AddAll(failures)
     # Update the canned response data.
     if self._failures.ShouldUpdateResponsePayloads():
-      self._failures.AddAll(current_event.UpdateResponsePayload(*response))
-
-    # Validate the response assertions.
-    self._failures.AddAll(current_event.HandleResponse(
-        response[0], response[1], self._resource_ref_resolver))
-
-    if should_advance:
-      self._LoadNextEvent()
+      self._failures.AddAll(event.UpdateResponsePayload(*response))
     return response
+
+  def _HandleRequestHelper(self, response, uri, method, body, headers):
+    """Helper to figure out which event to use for the call."""
+    if (self._last_event and
+        self._last_event.EventType() == events_lib.EventType.API_CALL and
+        self._last_event.CanBeRepeated()):
+      # The last event was an api_call. Attempt to reuse it if it matches.
+      failures = self._GetApiCallFailures(
+          self._last_event, response, uri, method, body, headers, dry_run=True)
+      if not failures or self._last_event.MatchesPreviousCall(
+          uri, method, body, response):
+        self._Debug('Found matching repeatable event for [{}]', uri)
+        self._last_event.MarkRepeated()
+        failures.extend(self._last_event.CheckRepeatable())
+        return (self._last_event, failures)
+      else:
+        self._Debug('No matching repeatable event for [{}]', uri)
+
+    # No matching repeatable event, get a new one.
+    current_event = self._GetOrCreateNextEvent(events_lib.EventType.API_CALL)
+    failures = self._GetApiCallFailures(
+        current_event, response, uri, method, body, headers, dry_run=True)
+    while failures and current_event.IsOptional():
+      # If the request and response assertions don't exactly match, and if the
+      # current event is optional, just skip it and use the next event to
+      # process this request.
+      self._Debug('Skipping optional api_call event: [{}]', current_event)
+      current_event = self._GetOrCreateNextEvent(events_lib.EventType.API_CALL)
+      failures = self._GetApiCallFailures(
+          current_event, response, uri, method, body, headers, dry_run=True)
+
+    failures = self._GetApiCallFailures(
+        current_event, response, uri, method, body, headers, dry_run=False)
+    current_event.MarkCalledWith(uri, method, body, response)
+    return (current_event, failures)
+
+  def _GetApiCallFailures(
+      self, event, response, uri, method, body, headers, dry_run):
+    """Gets assertion failures for a given request/response."""
+    failures = []
+    # Validate the request assertions.
+    failures.extend(event.Handle(uri, method, headers, body, dry_run))
+    # Validate the response assertions only if we are in REMOTE mode and we have
+    # a response to validate.
+    if response is not None:
+      generate_extras = not dry_run
+      failures.extend(event.HandleResponse(
+          response[0], response[1], self._resource_ref_resolver, dry_run,
+          generate_extras))
+    return failures
 
   def _HandleStdout(self, *args, **kwargs):
     self._ProcessStderr()
@@ -312,7 +471,7 @@ class Session(object):
   def _HandleUxEvent(self, ux_json_data):
     """Handle UX Events."""
     ux_type = events_lib.EventType[ux_json_data['ux']]
-    current_event = self._GetOrCreateCurrentEvent(ux_type)
+    current_event = self._GetOrCreateNextEvent(ux_type)
     self._Handle(current_event, ux_json_data)
 
     if ux_type.HasUserInput():
@@ -322,14 +481,14 @@ class Session(object):
   def _ProcessStdout(self):
     if not self._captured_stdout:
       return
-    current_event = self._GetOrCreateCurrentEvent(events_lib.EventType.STDOUT)
+    current_event = self._GetOrCreateNextEvent(events_lib.EventType.STDOUT)
     self._Handle(current_event, self._captured_stdout)
     self._captured_stdout = ''
 
   def _ProcessStderr(self):
     if not self._captured_stderr:
       return
-    current_event = self._GetOrCreateCurrentEvent(events_lib.EventType.STDERR)
+    current_event = self._GetOrCreateNextEvent(events_lib.EventType.STDERR)
     self._Handle(current_event, self._captured_stderr)
     self._captured_stderr = ''
 
@@ -344,11 +503,19 @@ class Session(object):
   def _HandleFileWriteImpl(self, is_binary, path, private=False, append=False):
     """Intercept calls to write files."""
     abs_path = os.path.abspath(path)
+
+    cwd = os.path.abspath(os.getcwd())
     config_dir = os.path.abspath(config.Paths().global_config_dir)
-    home_dir = os.path.abspath(os.path.expanduser('~'))
-    if not (abs_path.startswith(os.path.abspath(os.getcwd())) or
-            abs_path.startswith(home_dir) or
-            abs_path.startswith(config_dir)):
+    home_dir = os.path.abspath(files.GetHomeDir())
+    is_known_location = (abs_path.startswith(cwd) or
+                         abs_path.startswith(home_dir) or
+                         abs_path.startswith(config_dir))
+    # We have to do this because under tests, all the above are actually under
+    # the temp directory because they are mocked out.
+    temp_dir = os.path.abspath(tempfile.gettempdir())
+    is_temp = abs_path.startswith(temp_dir) and not is_known_location
+
+    if not (is_known_location or is_temp):
       raise Error('Command is attempting to write file outside of current '
                   'working directory: [{}]'.format(abs_path))
 
@@ -361,11 +528,11 @@ class Session(object):
         yield fw
 
     # After they close it, capture what happened.
-    if abs_path.startswith(config_dir):
-      # Ignore any files written to config for assertion purposes.
+    if abs_path.startswith(config_dir) or is_temp:
+      # Ignore any files written to config or tmp for assertion purposes.
       return
 
-    current_event = self._GetOrCreateCurrentEvent(
+    current_event = self._GetOrCreateNextEvent(
         events_lib.EventType.FILE_WRITTEN)
     if is_binary:
       contents = files.ReadBinaryFileContents(path)
@@ -386,7 +553,7 @@ class Session(object):
       self._ProcessStdout()
       self._ProcessStderr()
 
-      current_event = self._GetOrCreateCurrentEvent(
+      current_event = self._GetOrCreateNextEvent(
           events_lib.EventType.USER_INPUT)
 
       lines = current_event.Lines()
@@ -400,7 +567,7 @@ class Session(object):
     self._ProcessStdout()
     self._ProcessStderr()
 
-    current_event = self._GetOrCreateCurrentEvent(events_lib.EventType.EXIT)
+    current_event = self._GetOrCreateNextEvent(events_lib.EventType.EXIT)
     self._Handle(current_event, exc)
     self._exit_was_handled = True
 
@@ -408,7 +575,9 @@ class Session(object):
     self._stdout_patch.start()
     self._stderr_patch.start()
     self._stdin_patch.start()
-    self._request_patch.start()
+    if not self._ignore_api_calls:
+      self._request_patch.start()
+      self._batch_request_patch.start()
     self._file_writer_patch.start()
     self._binary_file_writer_patch.start()
     self._exit_patch.start()
@@ -421,30 +590,38 @@ class Session(object):
     self._stdout_patch.stop()
     self._stderr_patch.stop()
     self._stdin_patch.stop()
-    self._request_patch.stop()
+    if not self._ignore_api_calls:
+      self._request_patch.stop()
+      self._batch_request_patch.stop()
     self._file_writer_patch.stop()
     self._binary_file_writer_patch.stop()
     self._exit_patch.stop()
     self._log_error_patch.stop()
 
+    # TODO(b/116717592): Refactor context manager top properly handle crashes.
+    error_handled = False  # surpress error propagation
     if not self._exit_was_handled and not (
-        exc_val and isinstance(exc_val, Error)):
+        exc_val and isinstance(
+            exc_val, (Error, reference_resolver.Error, events_lib.Error))):
       # If we get here, there is either no exception or it is not an exception
       # type known to calliope (it would be a crash), since that would have been
-      # handled by a intercepted call to _HandleError already.
+      # handled by a intercepted call to _Handlexit already.
       # Framework errors should not be handled here as they represent errors in
       # the test, not in the running command.
       self._HandleExit(exc_val)
+      error_handled = True
 
-    # Create failures for extra assertions that did not get triggered.
-    if exc_type is None:
-      event = self._CurrentEvent()
-      while event:
+    # Consume the rest of events so they get into the processed events stream.
+    # If there is no exception, the additional events were not used and should
+    # be failures.
+    while self._next_event:
+      if exc_type is None:
         self._failures.Add(
-            assertions.Failure.ForExtraAssertion(event.UpdateContext()))
-        self._LoadNextEvent()
-        event = self._CurrentEvent()
+            assertions.Failure.ForExtraAssertion(
+                self._next_event.UpdateContext()))
+      self._ConsumeEvent()
+    return error_handled
 
   def GetEventSequence(self):
     return [event.UpdateContext().BackingData()
-            for event in self._events if event is not None]
+            for event in self._processed_events if event is not None]

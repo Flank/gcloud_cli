@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import argparse
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
 class ExceptionAction(argparse.Action):
@@ -33,7 +33,7 @@ class ExceptionAction(argparse.Action):
     raise Exception('Everything has gone wrong!')
 
 
-class NewStyleGroup(base.Group):
+class NewStyleGroup(calliope_base.Group):
   """Group short help.
 
   Group long help.

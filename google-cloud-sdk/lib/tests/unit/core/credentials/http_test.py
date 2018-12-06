@@ -196,6 +196,16 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
     self.assertDictContainsSubset(expect_headers,
                                   self.request_mock.call_args[0][3])
 
+    # If forced, always use the header if when in legacy mode.
+    properties.VALUES.billing.quota_project.Set(
+        properties.VALUES.billing.LEGACY)
+    properties.VALUES.core.project.Set('foo')
+    http.Http(enable_resource_quota=True, force_resource_quota=True).request(
+        'http://foo.com', 'GET', None, {})
+    expect_headers = self._EncodeHeaders({'X-Goog-User-Project': 'foo'})
+    self.assertDictContainsSubset(expect_headers,
+                                  self.request_mock.call_args[0][3])
+
 
 class HttpTestGCECreds(HttpTestBase, sdk_test_base.WithFakeComputeAuth):
 

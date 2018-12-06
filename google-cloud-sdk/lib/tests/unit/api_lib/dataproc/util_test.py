@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
+
 from apitools.base.py import encoding
 
 from googlecloudsdk import calliope
@@ -126,10 +128,9 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta):
                                             0)
 
   def testWaitForWorkflowTemplateOperationCreateClusterError(self):
-    operation = self.MakeCompletedOperation()
     operation = self.MakeCompletedOperation(
-        createCluster={'error': 'create error.',
-                       'operationId': 'test id'})
+        metadata={'createCluster': collections.OrderedDict([
+            ('error', 'create error.'), ('operationId', 'test id')])})
     self.ExpectGetOperation()
     self.ExpectGetOperation()
     self.ExpectGetOperation(operation=operation)
@@ -141,10 +142,9 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta):
                                             0)
 
   def testWaitForWorkflowTemplateOperationDeleteClusterError(self):
-    operation = self.MakeCompletedOperation()
     operation = self.MakeCompletedOperation(
-        deleteCluster={'error': 'delete error.',
-                       'operationId': 'test id'})
+        metadata={'deleteCluster': collections.OrderedDict([
+            ('error', 'delete error.'), ('operationId', 'test id')])})
     self.ExpectGetOperation()
     self.ExpectGetOperation()
     self.ExpectGetOperation(operation=operation)

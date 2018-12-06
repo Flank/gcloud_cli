@@ -12,13 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Test base for compute resource policies unit tests."""
+"""Test calliope_base for compute resource policies unit tests."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib.surface.compute import test_base
 
@@ -28,7 +28,7 @@ class TestBase(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.region = 'us-central1'
     self.reg = resources.REGISTRY.Clone()
     self.reg.RegisterApiByName('compute', 'alpha')

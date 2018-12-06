@@ -24,27 +24,18 @@ from apitools.base.protorpclite import util as protorpc_util
 
 from googlecloudsdk.api_lib.sql import exceptions
 from googlecloudsdk.api_lib.sql import network
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.sql import base
 
-BASE_ARGS_LENGTH = 6
+import mock
 
 
 class _BaseConnectTest(object):
-
-  messages = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
   time_of_connection = network.GetCurrentTime()
 
-  def MockIPWhitelisting(self, error=False):
-    # Mock the connection time.
-    self.StartPatch(
-        'googlecloudsdk.api_lib.sql.network.GetCurrentTime',
-        return_value=self.time_of_connection)
-
-    # Mock GET and PATCH endpoints
+  def ExpectInstanceGet(self):
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
             instance=self.instance['id'],
@@ -52,7 +43,7 @@ class _BaseConnectTest(object):
         ),
         self.messages.DatabaseInstance(
             # pylint:disable=line-too-long
-            backendType='SECOND_GEN',
+            backendType=self.instance['backendType'],
             connectionName='{0}:us-central1:{1}'.format(self.Project(),
                                                         self.instance['id']),
             currentDiskSize=None,
@@ -78,8 +69,8 @@ class _BaseConnectTest(object):
             replicaConfiguration=None,
             replicaNames=[],
             selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
-            format(self.Project(), self.instance['id']),
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
+            .format(self.Project(), self.instance['id']),
             serverCaCert=self.messages.SslCert(
                 cert=
                 '-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
@@ -143,10 +134,19 @@ class _BaseConnectTest(object):
             state='RUNNABLE',
             suspensionReason=[],
         ))
+
+  def MockIPWhitelisting(self, error=False):
+    # Mock the connection time.
+    self.StartPatch(
+        'googlecloudsdk.api_lib.sql.network.GetCurrentTime',
+        return_value=self.time_of_connection)
+
+    # Mock GET and PATCH endpoints
+    self.ExpectInstanceGet()
     patch_request = self.messages.SqlInstancesPatchRequest(
         databaseInstance=self.messages.DatabaseInstance(
             # pylint:disable=line-too-long
-            backendType='SECOND_GEN',
+            backendType=self.instance['backendType'],
             connectionName='{0}:us-central1:{1}'.format(self.Project(),
                                                         self.instance['id']),
             currentDiskSize=None,
@@ -172,8 +172,8 @@ class _BaseConnectTest(object):
             replicaConfiguration=None,
             replicaNames=[],
             selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
-            format(self.Project(), self.instance['id']),
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
+            .format(self.Project(), self.instance['id']),
             serverCaCert=self.messages.SslCert(
                 cert=
                 '-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
@@ -349,7 +349,7 @@ class _BaseConnectTest(object):
           ),
           self.messages.DatabaseInstance(
               # pylint:disable=line-too-long
-              backendType='SECOND_GEN',
+              backendType=self.instance['backendType'],
               connectionName='{0}:us-central1:{1}'.format(
                   self.Project(), self.instance['id']),
               currentDiskSize=None,
@@ -375,8 +375,8 @@ class _BaseConnectTest(object):
               replicaConfiguration=None,
               replicaNames=[],
               selfLink=
-              'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
-              format(self.Project(), self.instance['id']),
+              'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
+              .format(self.Project(), self.instance['id']),
               serverCaCert=self.messages.SslCert(
                   cert=
                   '-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
@@ -453,17 +453,30 @@ class _BaseConnectTest(object):
               suspensionReason=[],
           ))
 
+  def MockProxyStartAndInstanceGet(self):
+    # Mock checking that the Cloud SQL Proxy component is installed.
+    self.StartPatch(
+        'googlecloudsdk.command_lib.emulators.util.EnsureComponentIsInstalled',
+        return_value=None)
+    # Mock starting the proxy.
+    self.StartPatch(
+        'googlecloudsdk.api_lib.sql.instances.StartCloudSqlProxy',
+        return_value=mock.Mock())
+
+    self.ExpectInstanceGet()
+
 
 class _BaseMysqlConnectTest(_BaseConnectTest):
   instance = {
       'id': 'mysql-instance',
       'tier': 'db-n1-standard-2',
-      'databaseVersion': 'MYSQL_5_6'
+      'databaseVersion': 'MYSQL_5_6',
+      'backendType': 'SECOND_GEN'
   }
 
   def RunMysqlConnectTest(self, user=None):
     """Base function for connecting to MySQL instance."""
-    self.MockIPWhitelisting()
+    self.MockConnectionSetup()
 
     mocked_mysql_path = 'mysql'
     self.StartPatch(
@@ -488,6 +501,14 @@ class _BaseMysqlConnectTest(_BaseConnectTest):
     # call_args[0][0] gives us subprocess_args.
     exec_ordered_arguments = exec_patched.call_args[0]
     subprocess_args = exec_ordered_arguments[0]
+    self.AssertMysqlArgsAreCorrect(subprocess_args, mocked_mysql_path,
+                                   mysql_user)
+
+  def MockConnectionSetup(self):
+    self.MockIPWhitelisting()
+
+  def AssertMysqlArgsAreCorrect(self, subprocess_args, mocked_mysql_path,
+                                mysql_user):
     (actual_mysql_path, actual_host_flag, actual_ip_address, actual_user_flag,
      actual_username, actual_pass_flag) = subprocess_args
     self.assertEqual(mocked_mysql_path, actual_mysql_path)
@@ -504,27 +525,8 @@ class _BaseMysqlConnectTest(_BaseConnectTest):
   def testMysqlConnectWithUser(self):
     self.RunMysqlConnectTest(user='someone')
 
-  def testWhitelistError(self):
-    self.MockIPWhitelisting(error=True)
-
-    with self.AssertRaisesHttpExceptionRegexp(r'Invalid instance property'):
-      self.Run('sql connect {0} --user root'.format(self.instance['id']))
-
-  def testInstanceNotFound(self):
-    self.mocked_client.instances.Get.Expect(
-        self.messages.SqlInstancesGetRequest(
-            instance='nosuchinstance',
-            project=self.Project()),
-        exception=http_error.MakeHttpError(
-            403,
-            'The client is not authorized to make this request.',
-            url=('https://www.googleapis.com/sql/v1beta4/projects'
-                 '/google.com%3Acloudsdktest/instances/noinstance?alt=json')))
-    with self.assertRaises(exceptions.ResourceNotFoundError):
-      self.Run('sql connect nosuchinstance')
-
   def testOSErrorOnExec(self):
-    self.MockIPWhitelisting()
+    self.MockConnectionSetup()
 
     mocked_mysql_path = 'mysql'
     self.StartPatch(
@@ -548,13 +550,49 @@ class _BaseMysqlConnectTest(_BaseConnectTest):
 
 
 class MysqlConnectGATest(_BaseMysqlConnectTest, base.SqlMockTestGA):
-  pass
+
+  def testWhitelistError(self):
+    self.MockIPWhitelisting(error=True)
+
+    with self.AssertRaisesHttpExceptionRegexp(r'Invalid instance property'):
+      self.Run('sql connect {0} --user root'.format(self.instance['id']))
+
+  def testInstanceNotFound(self):
+    self.mocked_client.instances.Get.Expect(
+        self.messages.SqlInstancesGetRequest(
+            instance='nosuchinstance', project=self.Project()),
+        exception=http_error.MakeHttpError(
+            403,
+            'The client is not authorized to make this request.',
+            url=('https://www.googleapis.com/sql/v1beta4/projects'
+                 '/google.com%3Acloudsdktest/instances/noinstance?alt=json')))
+    with self.assertRaises(exceptions.ResourceNotFoundError):
+      self.Run('sql connect nosuchinstance')
 
 
-class MysqlConnectBetaTest(_BaseMysqlConnectTest, base.SqlMockTestBeta):
+class MysqlV2ConnectBetaTest(_BaseMysqlConnectTest, base.SqlMockTestBeta):
+  """Mocks out connecting to V2 instances through the proxy."""
+
+  def MockConnectionSetup(self):
+    self.MockProxyStartAndInstanceGet()
+
+  def AssertMysqlArgsAreCorrect(self, subprocess_args, mocked_mysql_path,
+                                mysql_user):
+    (actual_mysql_path, actual_host_flag, actual_ip_address, actual_port_flag,
+     actual_port, actual_user_flag, actual_username,
+     actual_pass_flag) = subprocess_args
+    self.assertEqual(mocked_mysql_path, actual_mysql_path)
+    self.assertEqual('-h', actual_host_flag)
+    # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
+    self.assertIn('.', actual_ip_address)
+    self.assertIn('-P', actual_port_flag)
+    self.assertIn('9470', actual_port)
+    self.assertEqual('-u', actual_user_flag)
+    self.assertEqual(mysql_user, actual_username)
+    self.assertEqual('-p', actual_pass_flag)
 
   def testDatabaseFlagError(self):
-    self.MockIPWhitelisting()
+    self.MockConnectionSetup()
 
     mocked_mysql_path = 'mysql'
     self.StartPatch(
@@ -576,15 +614,32 @@ class MysqlConnectBetaTest(_BaseMysqlConnectTest, base.SqlMockTestBeta):
       self.Run('sql connect {0} --database somedb'.format(self.instance['id']))
 
 
+class MysqlV1ConnectBetaTest(_BaseMysqlConnectTest, base.SqlMockTestBeta):
+  """Mocks out connecting to V1 instances with whitelisting."""
+
+  instance = {
+      'id': 'mysql-instance',
+      'tier': 'D1',
+      'databaseVersion': 'MYSQL_5_6',
+      'backendType': 'FIRST_GEN'
+  }
+
+  def MockConnectionSetup(self):
+    self.ExpectInstanceGet()
+    self.MockIPWhitelisting()
+
+
 class _BasePsqlConnectTest(_BaseConnectTest):
+  base_args_length = 8
   instance = {
       'id': 'psql-instance',
       'tier': 'db-custom-1-1024',
-      'databaseVersion': 'POSTGRES_9_6'
+      'databaseVersion': 'POSTGRES_9_6',
+      'backendType': 'SECOND_GEN'
   }
 
   def RunPsqlConnectTest(self, database=None):
-    self.MockIPWhitelisting()
+    self.MockConnectionSetup()
 
     mocked_psql_path = 'psql'
     self.StartPatch(
@@ -607,8 +662,15 @@ class _BasePsqlConnectTest(_BaseConnectTest):
     # call_args[0][0] gives us subprocess_args.
     exec_ordered_arguments = exec_patched.call_args[0]
     subprocess_args = exec_ordered_arguments[0]
+    self.AssertPsqlArgsAreCorrect(subprocess_args, mocked_psql_path)
+
+  def MockConnectionSetup(self):
+    self.MockIPWhitelisting()
+
+  def AssertPsqlArgsAreCorrect(self, subprocess_args, mocked_psql_path):
+    base_args_length = 6
     (actual_psql_path, actual_host_flag, actual_ip_address, actual_user_flag,
-     actual_username, actual_pass_flag) = subprocess_args[:BASE_ARGS_LENGTH]
+     actual_username, actual_pass_flag) = subprocess_args[:base_args_length]
     self.assertEqual(mocked_psql_path, actual_psql_path)
     self.assertEqual('-h', actual_host_flag)
     # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
@@ -618,8 +680,8 @@ class _BasePsqlConnectTest(_BaseConnectTest):
     self.assertEqual('-W', actual_pass_flag)
 
     # Check for additional args.
-    if len(subprocess_args) > BASE_ARGS_LENGTH:
-      (actual_db_flag, actual_db) = subprocess_args[BASE_ARGS_LENGTH:]
+    if len(subprocess_args) > base_args_length:
+      (actual_db_flag, actual_db) = subprocess_args[base_args_length:]
       self.assertEqual('-d', actual_db_flag)
       self.assertEqual('somedb', actual_db)
 
@@ -628,6 +690,30 @@ class _BasePsqlConnectTest(_BaseConnectTest):
 
 
 class _BasePsqlConnectBetaTest(_BasePsqlConnectTest):
+
+  def MockConnectionSetup(self):
+    self.MockProxyStartAndInstanceGet()
+
+  def AssertPsqlArgsAreCorrect(self, subprocess_args, mocked_psql_path):
+    base_args_length = 8
+    (actual_psql_path, actual_host_flag, actual_ip_address, actual_port_flag,
+     actual_port, actual_user_flag, actual_username,
+     actual_pass_flag) = subprocess_args[:base_args_length]
+    self.assertEqual(mocked_psql_path, actual_psql_path)
+    self.assertEqual('-h', actual_host_flag)
+    # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
+    self.assertIn('.', actual_ip_address)
+    self.assertIn('-p', actual_port_flag)
+    self.assertIn('9470', actual_port)
+    self.assertEqual('-U', actual_user_flag)
+    self.assertEqual('postgres', actual_username)
+    self.assertEqual('-W', actual_pass_flag)
+
+    # Check for additional args.
+    if len(subprocess_args) > base_args_length:
+      (actual_db_flag, actual_db) = subprocess_args[base_args_length:]
+      self.assertEqual('-d', actual_db_flag)
+      self.assertEqual('somedb', actual_db)
 
   def testPsqlConnectWithDatabase(self):
     self.RunPsqlConnectTest('somedb')

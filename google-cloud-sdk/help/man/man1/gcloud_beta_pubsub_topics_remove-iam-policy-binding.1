@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta pubsub topics remove\-iam\-policy\-binding \- remove IAM policy binding for a topic
+gcloud beta pubsub topics remove\-iam\-policy\-binding \- remove IAM policy binding of a topic
 
 
 
@@ -17,7 +17,7 @@ gcloud beta pubsub topics remove\-iam\-policy\-binding \- remove IAM policy bind
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Removes an IAM policy binding for a Cloud Pub/Sub Topic.
+\fB(BETA)\fR Remove an IAM policy binding of a Cloud Pub/Sub Topic.
 
 
 
@@ -26,17 +26,17 @@ gcloud beta pubsub topics remove\-iam\-policy\-binding \- remove IAM policy bind
 .RS 2m
 .TP 2m
 
-Topic resource \- Name of the topic to remove an IAM policy binding from. This
+Topic resource \- The topic to remove the IAM policy binding from. This
 represents a Cloud resource. (NOTE) Some attributes are not given arguments in
 this group but can be set in other ways. To set the [project] attribute: provide
-the flag [topic] on the command line with a fully specified name; provide the
-flag [\-\-project] on the command line; set the property [core/project]. This
-must be specified.
+the argument [topic] on the command line with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
 
 .RS 2m
 .TP 2m
 \fITOPIC\fR
-The ID of the topic or a fully qualified identifier for the topic.
+ID of the topic or fully qualified identifier for the topic.
 
 
 .RE
@@ -79,17 +79,23 @@ The role to remove the member from.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBpubsub/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/pubsub/docs
 
 
 
 .SH "EXAMPLES"
 
-The following command will remove an IAM policy binding for the role of
-\'roles/editor' for the user 'test\-user@gmail.com' on topic with identifier
-\'my\-topic'
+To Remove an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' with topic 'my\-topic', run:
 
 .RS 2m
 $ gcloud beta pubsub topics remove\-iam\-policy\-binding my\-topic \e

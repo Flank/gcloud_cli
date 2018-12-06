@@ -28,6 +28,24 @@
                     "value": "JKL"
                   },
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -128,6 +146,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -289,6 +325,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -372,6 +426,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -605,6 +677,24 @@
           "constraints": {
             "arguments": [
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -705,6 +795,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -866,6 +974,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -949,6 +1075,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -1170,6 +1314,24 @@
               "constraints": {
                 "arguments": [
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -1270,6 +1432,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -1431,6 +1611,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -1514,6 +1712,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -1733,6 +1949,24 @@
               "constraints": {
                 "arguments": [
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -1833,6 +2067,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -1942,7 +2194,7 @@
                     ],
                     "completer": null,
                     "default": null,
-                    "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n+",
+                    "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n:::\n+",
                     "is_global": false,
                     "is_group": false,
                     "is_hidden": false,
@@ -2016,6 +2268,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -2099,6 +2369,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -2252,7 +2540,7 @@
                   ],
                   "completer": null,
                   "default": null,
-                  "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n+",
+                  "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n:::\n+",
                   "is_global": false,
                   "is_group": false,
                   "is_hidden": false,
@@ -2339,6 +2627,24 @@
               "commands": {},
               "constraints": {
                 "arguments": [
+                  {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
                   {
                     "attr": {
                       "property": {
@@ -2440,6 +2746,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -2601,6 +2925,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -2684,6 +3026,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -2903,6 +3263,24 @@
               "constraints": {
                 "arguments": [
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -3003,6 +3381,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -3164,6 +3560,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -3247,6 +3661,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -3469,6 +3901,24 @@
                   "constraints": {
                     "arguments": [
                       {
+                        "attr": {},
+                        "category": null,
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "Internal *--flags-file* flag, line number, and source file.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": true,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "---flag-file-line-",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "FLAG_FILE_LINE_"
+                      },
+                      {
                         "attr": {
                           "property": {
                             "name": "auth/authority_selector"
@@ -3569,6 +4019,24 @@
                         "nargs": "1",
                         "type": "dict",
                         "value": "ATTRIBUTES"
+                      },
+                      {
+                        "attr": {},
+                        "category": "GLOBAL",
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": false,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "--flags-file",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "YAML_FILE"
                       },
                       {
                         "attr": {},
@@ -3730,6 +4198,24 @@
                     "is_required": false
                   },
                   "flags": {
+                    "---flag-file-line-": {
+                      "attr": {},
+                      "category": null,
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "Internal *--flags-file* flag, line number, and source file.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": true,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "---flag-file-line-",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "FLAG_FILE_LINE_"
+                    },
                     "--authority-selector": {
                       "attr": {
                         "property": {
@@ -3813,6 +4299,24 @@
                       "nargs": "0",
                       "type": "string",
                       "value": "CREDENTIAL_FILE_OVERRIDE"
+                    },
+                    "--flags-file": {
+                      "attr": {},
+                      "category": "GLOBAL",
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": false,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "--flags-file",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "YAML_FILE"
                     },
                     "--flatten": {
                       "attr": {},
@@ -4048,6 +4552,24 @@
                         "value": "EUREKA"
                       },
                       {
+                        "attr": {},
+                        "category": null,
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "Internal *--flags-file* flag, line number, and source file.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": true,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "---flag-file-line-",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "FLAG_FILE_LINE_"
+                      },
+                      {
                         "attr": {
                           "property": {
                             "name": "auth/authority_selector"
@@ -4195,6 +4717,24 @@
                         "nargs": "1",
                         "type": "dict",
                         "value": "ATTRIBUTES"
+                      },
+                      {
+                        "attr": {},
+                        "category": "GLOBAL",
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": false,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "--flags-file",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "YAML_FILE"
                       },
                       {
                         "attr": {},
@@ -4403,6 +4943,24 @@
                     "is_required": false
                   },
                   "flags": {
+                    "---flag-file-line-": {
+                      "attr": {},
+                      "category": null,
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "Internal *--flags-file* flag, line number, and source file.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": true,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "---flag-file-line-",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "FLAG_FILE_LINE_"
+                    },
                     "--authority-selector": {
                       "attr": {
                         "property": {
@@ -4522,6 +5080,24 @@
                       "nargs": "0",
                       "type": "string",
                       "value": "DELETE_ON"
+                    },
+                    "--flags-file": {
+                      "attr": {},
+                      "category": "GLOBAL",
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": false,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "--flags-file",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "YAML_FILE"
                     },
                     "--flatten": {
                       "attr": {},
@@ -4792,6 +5368,24 @@
               "constraints": {
                 "arguments": [
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -4892,6 +5486,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -5053,6 +5665,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -5136,6 +5766,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -5370,6 +6018,24 @@
                     "value": "PDQ"
                   },
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -5510,6 +6176,24 @@
                     "nargs": "3",
                     "type": "string",
                     "value": "STOOGE"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -5743,6 +6427,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -5866,6 +6568,24 @@
                   "nargs": "3",
                   "type": "string",
                   "value": "STOOGE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -6190,6 +6910,24 @@
           "constraints": {
             "arguments": [
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -6290,6 +7028,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -6451,6 +7207,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -6534,6 +7308,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -6752,6 +7544,24 @@
           "constraints": {
             "arguments": [
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -6852,6 +7662,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -7013,6 +7841,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -7096,6 +7942,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -7312,6 +8176,24 @@
       "constraints": {
         "arguments": [
           {
+            "attr": {},
+            "category": null,
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "Internal *--flags-file* flag, line number, and source file.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": true,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "---flag-file-line-",
+            "nargs": "0",
+            "type": "string",
+            "value": "FLAG_FILE_LINE_"
+          },
+          {
             "attr": {
               "property": {
                 "name": "auth/authority_selector"
@@ -7412,6 +8294,24 @@
             "nargs": "1",
             "type": "dict",
             "value": "ATTRIBUTES"
+          },
+          {
+            "attr": {},
+            "category": "GLOBAL",
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": false,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "--flags-file",
+            "nargs": "0",
+            "type": "string",
+            "value": "YAML_FILE"
           },
           {
             "attr": {},
@@ -7573,6 +8473,24 @@
         "is_required": false
       },
       "flags": {
+        "---flag-file-line-": {
+          "attr": {},
+          "category": null,
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "Internal *--flags-file* flag, line number, and source file.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": true,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "---flag-file-line-",
+          "nargs": "0",
+          "type": "string",
+          "value": "FLAG_FILE_LINE_"
+        },
         "--authority-selector": {
           "attr": {
             "property": {
@@ -7656,6 +8574,24 @@
           "nargs": "0",
           "type": "string",
           "value": "CREDENTIAL_FILE_OVERRIDE"
+        },
+        "--flags-file": {
+          "attr": {},
+          "category": "GLOBAL",
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": false,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "--flags-file",
+          "nargs": "0",
+          "type": "string",
+          "value": "YAML_FILE"
         },
         "--flatten": {
           "attr": {},
@@ -7894,6 +8830,24 @@
                     "value": "JKL"
                   },
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -7994,6 +8948,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -8155,6 +9127,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -8238,6 +9228,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -8471,6 +9479,24 @@
           "constraints": {
             "arguments": [
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -8571,6 +9597,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -8732,6 +9776,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -8815,6 +9877,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -9054,6 +10134,24 @@
                         "value": "JKL"
                       },
                       {
+                        "attr": {},
+                        "category": null,
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "Internal *--flags-file* flag, line number, and source file.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": true,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "---flag-file-line-",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "FLAG_FILE_LINE_"
+                      },
+                      {
                         "attr": {
                           "property": {
                             "name": "auth/authority_selector"
@@ -9154,6 +10252,24 @@
                         "nargs": "1",
                         "type": "dict",
                         "value": "ATTRIBUTES"
+                      },
+                      {
+                        "attr": {},
+                        "category": "GLOBAL",
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": false,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "--flags-file",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "YAML_FILE"
                       },
                       {
                         "attr": {},
@@ -9333,6 +10449,24 @@
                     "is_required": false
                   },
                   "flags": {
+                    "---flag-file-line-": {
+                      "attr": {},
+                      "category": null,
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "Internal *--flags-file* flag, line number, and source file.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": true,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "---flag-file-line-",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "FLAG_FILE_LINE_"
+                    },
                     "--authority-selector": {
                       "attr": {
                         "property": {
@@ -9416,6 +10550,24 @@
                       "nargs": "0",
                       "type": "string",
                       "value": "CREDENTIAL_FILE_OVERRIDE"
+                    },
+                    "--flags-file": {
+                      "attr": {},
+                      "category": "GLOBAL",
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": false,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "--flags-file",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "YAML_FILE"
                     },
                     "--flatten": {
                       "attr": {},
@@ -9670,6 +10822,24 @@
                   "constraints": {
                     "arguments": [
                       {
+                        "attr": {},
+                        "category": null,
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "Internal *--flags-file* flag, line number, and source file.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": true,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "---flag-file-line-",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "FLAG_FILE_LINE_"
+                      },
+                      {
                         "attr": {
                           "property": {
                             "name": "auth/authority_selector"
@@ -9770,6 +10940,24 @@
                         "nargs": "1",
                         "type": "dict",
                         "value": "ATTRIBUTES"
+                      },
+                      {
+                        "attr": {},
+                        "category": "GLOBAL",
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": false,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "--flags-file",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "YAML_FILE"
                       },
                       {
                         "attr": {},
@@ -9949,6 +11137,24 @@
                     "is_required": false
                   },
                   "flags": {
+                    "---flag-file-line-": {
+                      "attr": {},
+                      "category": null,
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "Internal *--flags-file* flag, line number, and source file.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": true,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "---flag-file-line-",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "FLAG_FILE_LINE_"
+                    },
                     "--authority-selector": {
                       "attr": {
                         "property": {
@@ -10032,6 +11238,24 @@
                       "nargs": "0",
                       "type": "string",
                       "value": "CREDENTIAL_FILE_OVERRIDE"
+                    },
+                    "--flags-file": {
+                      "attr": {},
+                      "category": "GLOBAL",
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": false,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "--flags-file",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "YAML_FILE"
                     },
                     "--flatten": {
                       "attr": {},
@@ -10270,6 +11494,24 @@
                   "constraints": {
                     "arguments": [
                       {
+                        "attr": {},
+                        "category": null,
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "Internal *--flags-file* flag, line number, and source file.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": true,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "---flag-file-line-",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "FLAG_FILE_LINE_"
+                      },
+                      {
                         "attr": {
                           "property": {
                             "name": "auth/authority_selector"
@@ -10370,6 +11612,24 @@
                         "nargs": "1",
                         "type": "dict",
                         "value": "ATTRIBUTES"
+                      },
+                      {
+                        "attr": {},
+                        "category": "GLOBAL",
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": false,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "--flags-file",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "YAML_FILE"
                       },
                       {
                         "attr": {},
@@ -10589,6 +11849,24 @@
                     "is_required": false
                   },
                   "flags": {
+                    "---flag-file-line-": {
+                      "attr": {},
+                      "category": null,
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "Internal *--flags-file* flag, line number, and source file.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": true,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "---flag-file-line-",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "FLAG_FILE_LINE_"
+                    },
                     "--authority-selector": {
                       "attr": {
                         "property": {
@@ -10672,6 +11950,24 @@
                       "nargs": "0",
                       "type": "string",
                       "value": "CREDENTIAL_FILE_OVERRIDE"
+                    },
+                    "--flags-file": {
+                      "attr": {},
+                      "category": "GLOBAL",
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": false,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "--flags-file",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "YAML_FILE"
                     },
                     "--flatten": {
                       "attr": {},
@@ -10948,6 +12244,24 @@
               "constraints": {
                 "arguments": [
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -11048,6 +12362,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -11227,6 +12559,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -11310,6 +12660,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -11547,6 +12915,24 @@
               "constraints": {
                 "arguments": [
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -11647,6 +13033,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -11756,7 +13160,7 @@
                     ],
                     "completer": null,
                     "default": null,
-                    "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n+",
+                    "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n:::\n+",
                     "is_global": false,
                     "is_group": false,
                     "is_hidden": false,
@@ -11830,6 +13234,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -11913,6 +13335,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -12066,7 +13506,7 @@
                   ],
                   "completer": null,
                   "default": null,
-                  "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n+",
+                  "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n:::\n+",
                   "is_global": false,
                   "is_group": false,
                   "is_hidden": false,
@@ -12153,6 +13593,24 @@
               "commands": {},
               "constraints": {
                 "arguments": [
+                  {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
                   {
                     "attr": {
                       "property": {
@@ -12254,6 +13712,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -12415,6 +13891,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -12498,6 +13992,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -12717,6 +14229,24 @@
               "constraints": {
                 "arguments": [
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -12817,6 +14347,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -12978,6 +14526,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -13061,6 +14627,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -13283,6 +14867,24 @@
                   "constraints": {
                     "arguments": [
                       {
+                        "attr": {},
+                        "category": null,
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "Internal *--flags-file* flag, line number, and source file.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": true,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "---flag-file-line-",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "FLAG_FILE_LINE_"
+                      },
+                      {
                         "attr": {
                           "property": {
                             "name": "auth/authority_selector"
@@ -13383,6 +14985,24 @@
                         "nargs": "1",
                         "type": "dict",
                         "value": "ATTRIBUTES"
+                      },
+                      {
+                        "attr": {},
+                        "category": "GLOBAL",
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": false,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "--flags-file",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "YAML_FILE"
                       },
                       {
                         "attr": {},
@@ -13544,6 +15164,24 @@
                     "is_required": false
                   },
                   "flags": {
+                    "---flag-file-line-": {
+                      "attr": {},
+                      "category": null,
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "Internal *--flags-file* flag, line number, and source file.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": true,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "---flag-file-line-",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "FLAG_FILE_LINE_"
+                    },
                     "--authority-selector": {
                       "attr": {
                         "property": {
@@ -13627,6 +15265,24 @@
                       "nargs": "0",
                       "type": "string",
                       "value": "CREDENTIAL_FILE_OVERRIDE"
+                    },
+                    "--flags-file": {
+                      "attr": {},
+                      "category": "GLOBAL",
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": false,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "--flags-file",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "YAML_FILE"
                     },
                     "--flatten": {
                       "attr": {},
@@ -13862,6 +15518,24 @@
                         "value": "EUREKA"
                       },
                       {
+                        "attr": {},
+                        "category": null,
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "Internal *--flags-file* flag, line number, and source file.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": true,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "---flag-file-line-",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "FLAG_FILE_LINE_"
+                      },
+                      {
                         "attr": {
                           "property": {
                             "name": "auth/authority_selector"
@@ -14009,6 +15683,24 @@
                         "nargs": "1",
                         "type": "dict",
                         "value": "ATTRIBUTES"
+                      },
+                      {
+                        "attr": {},
+                        "category": "GLOBAL",
+                        "choices": [],
+                        "completer": null,
+                        "default": null,
+                        "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                        "is_global": true,
+                        "is_group": false,
+                        "is_hidden": false,
+                        "is_mutex": false,
+                        "is_positional": false,
+                        "is_required": false,
+                        "name": "--flags-file",
+                        "nargs": "0",
+                        "type": "string",
+                        "value": "YAML_FILE"
                       },
                       {
                         "attr": {},
@@ -14217,6 +15909,24 @@
                     "is_required": false
                   },
                   "flags": {
+                    "---flag-file-line-": {
+                      "attr": {},
+                      "category": null,
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "Internal *--flags-file* flag, line number, and source file.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": true,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "---flag-file-line-",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "FLAG_FILE_LINE_"
+                    },
                     "--authority-selector": {
                       "attr": {
                         "property": {
@@ -14336,6 +16046,24 @@
                       "nargs": "0",
                       "type": "string",
                       "value": "DELETE_ON"
+                    },
+                    "--flags-file": {
+                      "attr": {},
+                      "category": "GLOBAL",
+                      "choices": [],
+                      "completer": null,
+                      "default": null,
+                      "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                      "is_global": true,
+                      "is_group": false,
+                      "is_hidden": false,
+                      "is_mutex": false,
+                      "is_positional": false,
+                      "is_required": false,
+                      "name": "--flags-file",
+                      "nargs": "0",
+                      "type": "string",
+                      "value": "YAML_FILE"
                     },
                     "--flatten": {
                       "attr": {},
@@ -14606,6 +16334,24 @@
               "constraints": {
                 "arguments": [
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -14706,6 +16452,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -14867,6 +16631,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -14950,6 +16732,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -15184,6 +16984,24 @@
                     "value": "PDQ"
                   },
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -15324,6 +17142,24 @@
                     "nargs": "3",
                     "type": "string",
                     "value": "STOOGE"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -15557,6 +17393,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -15680,6 +17534,24 @@
                   "nargs": "3",
                   "type": "string",
                   "value": "STOOGE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -16004,6 +17876,24 @@
           "constraints": {
             "arguments": [
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -16104,6 +17994,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -16265,6 +18173,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -16348,6 +18274,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -16566,6 +18510,24 @@
           "constraints": {
             "arguments": [
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -16666,6 +18628,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -16827,6 +18807,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -16910,6 +18908,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -17126,6 +19142,24 @@
       "constraints": {
         "arguments": [
           {
+            "attr": {},
+            "category": null,
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "Internal *--flags-file* flag, line number, and source file.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": true,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "---flag-file-line-",
+            "nargs": "0",
+            "type": "string",
+            "value": "FLAG_FILE_LINE_"
+          },
+          {
             "attr": {
               "property": {
                 "name": "auth/authority_selector"
@@ -17226,6 +19260,24 @@
             "nargs": "1",
             "type": "dict",
             "value": "ATTRIBUTES"
+          },
+          {
+            "attr": {},
+            "category": "GLOBAL",
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": false,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "--flags-file",
+            "nargs": "0",
+            "type": "string",
+            "value": "YAML_FILE"
           },
           {
             "attr": {},
@@ -17387,6 +19439,24 @@
         "is_required": false
       },
       "flags": {
+        "---flag-file-line-": {
+          "attr": {},
+          "category": null,
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "Internal *--flags-file* flag, line number, and source file.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": true,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "---flag-file-line-",
+          "nargs": "0",
+          "type": "string",
+          "value": "FLAG_FILE_LINE_"
+        },
         "--authority-selector": {
           "attr": {
             "property": {
@@ -17470,6 +19540,24 @@
           "nargs": "0",
           "type": "string",
           "value": "CREDENTIAL_FILE_OVERRIDE"
+        },
+        "--flags-file": {
+          "attr": {},
+          "category": "GLOBAL",
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": false,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "--flags-file",
+          "nargs": "0",
+          "type": "string",
+          "value": "YAML_FILE"
         },
         "--flatten": {
           "attr": {},
@@ -17705,6 +19793,24 @@
                 "value": "JKL"
               },
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -17805,6 +19911,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -17966,6 +20090,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -18049,6 +20191,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -18281,6 +20441,24 @@
       "constraints": {
         "arguments": [
           {
+            "attr": {},
+            "category": null,
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "Internal *--flags-file* flag, line number, and source file.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": true,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "---flag-file-line-",
+            "nargs": "0",
+            "type": "string",
+            "value": "FLAG_FILE_LINE_"
+          },
+          {
             "attr": {
               "property": {
                 "name": "auth/authority_selector"
@@ -18381,6 +20559,24 @@
             "nargs": "1",
             "type": "dict",
             "value": "ATTRIBUTES"
+          },
+          {
+            "attr": {},
+            "category": "GLOBAL",
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": false,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "--flags-file",
+            "nargs": "0",
+            "type": "string",
+            "value": "YAML_FILE"
           },
           {
             "attr": {},
@@ -18542,6 +20738,24 @@
         "is_required": false
       },
       "flags": {
+        "---flag-file-line-": {
+          "attr": {},
+          "category": null,
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "Internal *--flags-file* flag, line number, and source file.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": true,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "---flag-file-line-",
+          "nargs": "0",
+          "type": "string",
+          "value": "FLAG_FILE_LINE_"
+        },
         "--authority-selector": {
           "attr": {
             "property": {
@@ -18625,6 +20839,24 @@
           "nargs": "0",
           "type": "string",
           "value": "CREDENTIAL_FILE_OVERRIDE"
+        },
+        "--flags-file": {
+          "attr": {},
+          "category": "GLOBAL",
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": false,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "--flags-file",
+          "nargs": "0",
+          "type": "string",
+          "value": "YAML_FILE"
         },
         "--flatten": {
           "attr": {},
@@ -18845,6 +21077,24 @@
           "constraints": {
             "arguments": [
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -18945,6 +21195,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -19054,7 +21322,7 @@
                 ],
                 "completer": null,
                 "default": null,
-                "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n+",
+                "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n:::\n+",
                 "is_global": false,
                 "is_group": false,
                 "is_hidden": false,
@@ -19128,6 +21396,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -19211,6 +21497,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -19364,7 +21668,7 @@
               ],
               "completer": null,
               "default": null,
-              "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n+",
+              "description": "Ordered Choices. _ORDERED_CHOICES_ must be one of:\n+\n*a-1g*::: first\n*a-10g*::: second\n*a-100g*::: third\n:::\n+",
               "is_global": false,
               "is_group": false,
               "is_hidden": false,
@@ -19450,6 +21754,24 @@
           "commands": {},
           "constraints": {
             "arguments": [
+              {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
               {
                 "attr": {
                   "property": {
@@ -19551,6 +21873,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -19712,6 +22052,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -19795,6 +22153,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -20013,6 +22389,24 @@
           "constraints": {
             "arguments": [
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -20113,6 +22507,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -20274,6 +22686,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -20357,6 +22787,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -20578,6 +23026,24 @@
               "constraints": {
                 "arguments": [
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -20678,6 +23144,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -20839,6 +23323,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -20922,6 +23424,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "CREDENTIAL_FILE_OVERRIDE"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -21156,6 +23676,24 @@
                     "value": "EUREKA"
                   },
                   {
+                    "attr": {},
+                    "category": null,
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "Internal *--flags-file* flag, line number, and source file.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": true,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "---flag-file-line-",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "FLAG_FILE_LINE_"
+                  },
+                  {
                     "attr": {
                       "property": {
                         "name": "auth/authority_selector"
@@ -21303,6 +23841,24 @@
                     "nargs": "1",
                     "type": "dict",
                     "value": "ATTRIBUTES"
+                  },
+                  {
+                    "attr": {},
+                    "category": "GLOBAL",
+                    "choices": [],
+                    "completer": null,
+                    "default": null,
+                    "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                    "is_global": true,
+                    "is_group": false,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false,
+                    "name": "--flags-file",
+                    "nargs": "0",
+                    "type": "string",
+                    "value": "YAML_FILE"
                   },
                   {
                     "attr": {},
@@ -21511,6 +24067,24 @@
                 "is_required": false
               },
               "flags": {
+                "---flag-file-line-": {
+                  "attr": {},
+                  "category": null,
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "Internal *--flags-file* flag, line number, and source file.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": true,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "---flag-file-line-",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "FLAG_FILE_LINE_"
+                },
                 "--authority-selector": {
                   "attr": {
                     "property": {
@@ -21630,6 +24204,24 @@
                   "nargs": "0",
                   "type": "string",
                   "value": "DELETE_ON"
+                },
+                "--flags-file": {
+                  "attr": {},
+                  "category": "GLOBAL",
+                  "choices": [],
+                  "completer": null,
+                  "default": null,
+                  "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                  "is_global": true,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": false,
+                  "is_required": false,
+                  "name": "--flags-file",
+                  "nargs": "0",
+                  "type": "string",
+                  "value": "YAML_FILE"
                 },
                 "--flatten": {
                   "attr": {},
@@ -21899,6 +24491,24 @@
           "constraints": {
             "arguments": [
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -21999,6 +24609,24 @@
                 "nargs": "1",
                 "type": "dict",
                 "value": "ATTRIBUTES"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -22160,6 +24788,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -22243,6 +24889,24 @@
               "nargs": "0",
               "type": "string",
               "value": "CREDENTIAL_FILE_OVERRIDE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -22476,6 +25140,24 @@
                 "value": "PDQ"
               },
               {
+                "attr": {},
+                "category": null,
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "Internal *--flags-file* flag, line number, and source file.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": true,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "---flag-file-line-",
+                "nargs": "0",
+                "type": "string",
+                "value": "FLAG_FILE_LINE_"
+              },
+              {
                 "attr": {
                   "property": {
                     "name": "auth/authority_selector"
@@ -22616,6 +25298,24 @@
                 "nargs": "3",
                 "type": "string",
                 "value": "STOOGE"
+              },
+              {
+                "attr": {},
+                "category": "GLOBAL",
+                "choices": [],
+                "completer": null,
+                "default": null,
+                "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+                "is_global": true,
+                "is_group": false,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false,
+                "name": "--flags-file",
+                "nargs": "0",
+                "type": "string",
+                "value": "YAML_FILE"
               },
               {
                 "attr": {},
@@ -22849,6 +25549,24 @@
             "is_required": false
           },
           "flags": {
+            "---flag-file-line-": {
+              "attr": {},
+              "category": null,
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "Internal *--flags-file* flag, line number, and source file.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": true,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "---flag-file-line-",
+              "nargs": "0",
+              "type": "string",
+              "value": "FLAG_FILE_LINE_"
+            },
             "--authority-selector": {
               "attr": {
                 "property": {
@@ -22972,6 +25690,24 @@
               "nargs": "3",
               "type": "string",
               "value": "STOOGE"
+            },
+            "--flags-file": {
+              "attr": {},
+              "category": "GLOBAL",
+              "choices": [],
+              "completer": null,
+              "default": null,
+              "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+              "is_global": true,
+              "is_group": false,
+              "is_hidden": false,
+              "is_mutex": false,
+              "is_positional": false,
+              "is_required": false,
+              "name": "--flags-file",
+              "nargs": "0",
+              "type": "string",
+              "value": "YAML_FILE"
             },
             "--flatten": {
               "attr": {},
@@ -23295,6 +26031,24 @@
       "constraints": {
         "arguments": [
           {
+            "attr": {},
+            "category": null,
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "Internal *--flags-file* flag, line number, and source file.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": true,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "---flag-file-line-",
+            "nargs": "0",
+            "type": "string",
+            "value": "FLAG_FILE_LINE_"
+          },
+          {
             "attr": {
               "property": {
                 "name": "auth/authority_selector"
@@ -23395,6 +26149,24 @@
             "nargs": "1",
             "type": "dict",
             "value": "ATTRIBUTES"
+          },
+          {
+            "attr": {},
+            "category": "GLOBAL",
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": false,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "--flags-file",
+            "nargs": "0",
+            "type": "string",
+            "value": "YAML_FILE"
           },
           {
             "attr": {},
@@ -23556,6 +26328,24 @@
         "is_required": false
       },
       "flags": {
+        "---flag-file-line-": {
+          "attr": {},
+          "category": null,
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "Internal *--flags-file* flag, line number, and source file.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": true,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "---flag-file-line-",
+          "nargs": "0",
+          "type": "string",
+          "value": "FLAG_FILE_LINE_"
+        },
         "--authority-selector": {
           "attr": {
             "property": {
@@ -23639,6 +26429,24 @@
           "nargs": "0",
           "type": "string",
           "value": "CREDENTIAL_FILE_OVERRIDE"
+        },
+        "--flags-file": {
+          "attr": {},
+          "category": "GLOBAL",
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": false,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "--flags-file",
+          "nargs": "0",
+          "type": "string",
+          "value": "YAML_FILE"
         },
         "--flatten": {
           "attr": {},
@@ -23856,6 +26664,24 @@
       "constraints": {
         "arguments": [
           {
+            "attr": {},
+            "category": null,
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "Internal *--flags-file* flag, line number, and source file.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": true,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "---flag-file-line-",
+            "nargs": "0",
+            "type": "string",
+            "value": "FLAG_FILE_LINE_"
+          },
+          {
             "attr": {
               "property": {
                 "name": "auth/authority_selector"
@@ -23956,6 +26782,24 @@
             "nargs": "1",
             "type": "dict",
             "value": "ATTRIBUTES"
+          },
+          {
+            "attr": {},
+            "category": "GLOBAL",
+            "choices": [],
+            "completer": null,
+            "default": null,
+            "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+            "is_global": true,
+            "is_group": false,
+            "is_hidden": false,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false,
+            "name": "--flags-file",
+            "nargs": "0",
+            "type": "string",
+            "value": "YAML_FILE"
           },
           {
             "attr": {},
@@ -24117,6 +26961,24 @@
         "is_required": false
       },
       "flags": {
+        "---flag-file-line-": {
+          "attr": {},
+          "category": null,
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "Internal *--flags-file* flag, line number, and source file.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": true,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "---flag-file-line-",
+          "nargs": "0",
+          "type": "string",
+          "value": "FLAG_FILE_LINE_"
+        },
         "--authority-selector": {
           "attr": {
             "property": {
@@ -24200,6 +27062,24 @@
           "nargs": "0",
           "type": "string",
           "value": "CREDENTIAL_FILE_OVERRIDE"
+        },
+        "--flags-file": {
+          "attr": {},
+          "category": "GLOBAL",
+          "choices": [],
+          "completer": null,
+          "default": null,
+          "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+          "is_global": true,
+          "is_group": false,
+          "is_hidden": false,
+          "is_mutex": false,
+          "is_positional": false,
+          "is_required": false,
+          "name": "--flags-file",
+          "nargs": "0",
+          "type": "string",
+          "value": "YAML_FILE"
         },
         "--flatten": {
           "attr": {},
@@ -24415,6 +27295,24 @@
   "constraints": {
     "arguments": [
       {
+        "attr": {},
+        "category": null,
+        "choices": [],
+        "completer": null,
+        "default": null,
+        "description": "Internal *--flags-file* flag, line number, and source file.",
+        "is_global": true,
+        "is_group": false,
+        "is_hidden": true,
+        "is_mutex": false,
+        "is_positional": false,
+        "is_required": false,
+        "name": "---flag-file-line-",
+        "nargs": "0",
+        "type": "string",
+        "value": "FLAG_FILE_LINE_"
+      },
+      {
         "attr": {
           "property": {
             "name": "auth/authority_selector"
@@ -24515,6 +27413,24 @@
         "nargs": "1",
         "type": "dict",
         "value": "ATTRIBUTES"
+      },
+      {
+        "attr": {},
+        "category": "GLOBAL",
+        "choices": [],
+        "completer": null,
+        "default": null,
+        "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+        "is_global": true,
+        "is_group": false,
+        "is_hidden": false,
+        "is_mutex": false,
+        "is_positional": false,
+        "is_required": false,
+        "name": "--flags-file",
+        "nargs": "0",
+        "type": "string",
+        "value": "YAML_FILE"
       },
       {
         "attr": {},
@@ -24676,6 +27592,24 @@
     "is_required": false
   },
   "flags": {
+    "---flag-file-line-": {
+      "attr": {},
+      "category": null,
+      "choices": [],
+      "completer": null,
+      "default": null,
+      "description": "Internal *--flags-file* flag, line number, and source file.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": true,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "---flag-file-line-",
+      "nargs": "0",
+      "type": "string",
+      "value": "FLAG_FILE_LINE_"
+    },
     "--authority-selector": {
       "attr": {
         "property": {
@@ -24777,6 +27711,24 @@
       "nargs": "1",
       "type": "dict",
       "value": "ATTRIBUTES"
+    },
+    "--flags-file": {
+      "attr": {},
+      "category": "GLOBAL",
+      "choices": [],
+      "completer": null,
+      "default": null,
+      "description": "A YAML or JSON file that specifies a *--flag*:*value* dictionary.\nUseful for specifying complex flag values with special characters\nthat work with any command interpreter. Additionally, each\n*--flags-file* arg is replaced by its constituent flags. See\n$ gcloud topic flags-file for more information.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--flags-file",
+      "nargs": "0",
+      "type": "string",
+      "value": "YAML_FILE"
     },
     "--flatten": {
       "attr": {},

@@ -1,0 +1,192 @@
+title: compute instances start with a key, when the instance doesn't have a key
+release_tracks: [GA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances start z1 --zone us-east1-b --csek-key-file key.json
+  - progress_tracker:
+    - message: Starting instance(s) z1
+    - status: SUCCESS
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z1].
+actions:
+- write_file:
+    path: key.json
+    contents: |
+      [
+        {
+        "uri": "https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a/disks/z4",
+        "key": "acXTX3rxrKAFTF0tYVLvydU1riRZTvUNC4g5I11NY2c=",
+        "key-type": "raw"
+        }
+      ]
+- execute_command:
+    command: compute instances start z1 --zone us-east1-b --csek-key-file key.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            canIpForward: false
+            cpuPlatform: Intel Haswell
+            creationTimestamp: '2017-11-09T14:46:41.706-08:00'
+            deletionProtection: false
+            disks:
+            - autoDelete: true
+              boot: true
+              deviceName: persistent-disk-0
+              diskSizeGb: '10'
+              index: 0
+              interface: SCSI
+              kind: compute#attachedDisk
+              licenses:
+              - https://www.googleapis.com/compute/beta/projects/bct-staging-functional/global/licenses/debian-9-stretch
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/disks/z1
+              type: PERSISTENT
+            id: '8068861246250247231'
+            kind: compute#instance
+            labelFingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
+            metadata:
+              fingerprint: Tewg-kYB2-A=
+              kind: compute#metadata
+            name: z1
+            networkInterfaces:
+            - accessConfigs:
+              - kind: compute#accessConfig
+                name: external-nat
+                natIP: 70.32.155.98
+                networkTier: PREMIUM
+                type: ONE_TO_ONE_NAT
+              fingerprint: dfMqpsGB18c=
+              kind: compute#networkInterface
+              name: nic0
+              network: https://www.googleapis.com/compute/beta/projects/fake-project/global/networks/default
+              networkIP: 10.240.0.12
+            scheduling:
+              automaticRestart: true
+              onHostMaintenance: MIGRATE
+              preemptible: false
+            selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z1
+            serviceAccounts:
+            - email: 341306109951-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            startRestricted: false
+            status: RUNNING
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z1/start?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            endTime: '2017-11-09T14:48:23.781-08:00'
+            id: '6216496457699648984'
+            insertTime: '2017-11-09T14:48:23.781-08:00'
+            kind: compute#operation
+            name: operation-1510267703508-55d9499fbbc3f-01d5f26c-85b0a6d2
+            operationType: start
+            progress: 100
+            selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/operations/operation-1510267703508-55d9499fbbc3f-01d5f26c-85b0a6d2
+            startTime: '2017-11-09T14:48:23.781-08:00'
+            status: DONE
+            targetId: '8068861246250247231'
+            targetLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z1
+            zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+    - expect_progress_tracker:
+        message: Starting instance(s) z1
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            canIpForward: false
+            cpuPlatform: Intel Haswell
+            creationTimestamp: '2017-11-09T14:46:41.706-08:00'
+            deletionProtection: false
+            disks:
+            - autoDelete: true
+              boot: true
+              deviceName: persistent-disk-0
+              diskSizeGb: '10'
+              index: 0
+              interface: SCSI
+              kind: compute#attachedDisk
+              licenses:
+              - https://www.googleapis.com/compute/beta/projects/bct-staging-functional/global/licenses/debian-9-stretch
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/disks/z1
+              type: PERSISTENT
+            id: '8068861246250247231'
+            kind: compute#instance
+            labelFingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
+            metadata:
+              fingerprint: Tewg-kYB2-A=
+              kind: compute#metadata
+            name: z1
+            networkInterfaces:
+            - accessConfigs:
+              - kind: compute#accessConfig
+                name: external-nat
+                natIP: 70.32.155.98
+                networkTier: PREMIUM
+                type: ONE_TO_ONE_NAT
+              fingerprint: dfMqpsGB18c=
+              kind: compute#networkInterface
+              name: nic0
+              network: https://www.googleapis.com/compute/beta/projects/fake-project/global/networks/default
+              networkIP: 10.240.0.12
+            scheduling:
+              automaticRestart: true
+              onHostMaintenance: MIGRATE
+              preemptible: false
+            selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z1
+            serviceAccounts:
+            - email: 341306109951-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            startRestricted: false
+            status: RUNNING
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z1].
+    - expect_exit:
+        code: 0

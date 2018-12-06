@@ -17,15 +17,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class PoliciesCreateTest(accesscontextmanager.Base):
+class PoliciesCreateTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -43,8 +44,8 @@ class PoliciesCreateTest(accesscontextmanager.Base):
     self._ExpectGetOperation('operations/my-op',
                              resource_name='accessPolicies/67890')
 
-  def testCreate(self, track):
-    self.SetUpForTrack(track)
+  def testCreate(self):
+    self.SetUpForTrack(self.track)
 
     organization_id = '12345'
     policy_req = self._MakePolicy(None,
@@ -58,6 +59,12 @@ class PoliciesCreateTest(accesscontextmanager.Base):
                       '    --organization 12345')
     self.assertEqual(result.additionalProperties[0].value.string_value,
                      'accessPolicies/67890')
+
+
+class PoliciesCreateTestAlpha(PoliciesCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

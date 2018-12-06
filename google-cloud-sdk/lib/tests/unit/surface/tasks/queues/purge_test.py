@@ -39,7 +39,7 @@ class QueuesPurgeTest(test_base.CloudTasksTestBase, test_case.WithInput):
         self.messages.CloudtasksProjectsLocationsQueuesPurgeRequest(
             name='projects/{}/locations/us-central1/queues/{}'.format(
                 self.Project(), 'my-queue')),
-        response=self.messages.Empty())
+        response=self.messages.Queue())
     self.WriteInput('Y')
 
     output = self.Run('tasks queues purge my-queue')
@@ -52,7 +52,7 @@ class QueuesPurgeTest(test_base.CloudTasksTestBase, test_case.WithInput):
     self.queues_service.Purge.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPurgeRequest(
             name=queue_name),
-        response=self.messages.Empty())
+        response=self.messages.Queue())
     self.WriteInput('Y')
 
     self.Run('tasks queues purge {}'.format(queue_name))
@@ -77,7 +77,7 @@ class QueuesPurgeTest(test_base.CloudTasksTestBase, test_case.WithInput):
         self.messages.CloudtasksProjectsLocationsQueuesPurgeRequest(
             name='projects/{}/locations/us-central2/queues/{}'.format(
                 self.Project(), 'my-queue')),
-        response=self.messages.Empty())
+        response=self.messages.Queue())
     self.WriteInput('Y')
 
     output = self.Run('tasks queues purge my-queue --location=us-central2')

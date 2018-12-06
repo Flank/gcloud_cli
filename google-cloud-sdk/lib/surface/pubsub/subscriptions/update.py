@@ -29,16 +29,9 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class UpdateAlpha(base.UpdateCommand):
-  """This feature is part of an invite-only release of the Cloud Pub/Sub API.
-
-  Updates an existing Cloud Pub/Sub subscription.
-  This feature is part of an invitation-only release of the underlying
-  Cloud Pub/Sub API. The command will generate errors unless you have access to
-  this API. This restriction should be relaxed in the near future. Please
-  contact cloud-pubsub@google.com with any questions in the meantime.
-  """
+  """Updates an existing Cloud Pub/Sub subscription."""
 
   @classmethod
   def Args(cls, parser):
@@ -57,8 +50,8 @@ class UpdateAlpha(base.UpdateCommand):
         command invocation.
 
     Returns:
-      A serialized object (dict) describing the results of the operation.
-      This description fits the Resource described in the ResourceRegistry under
+      A serialized object (dict) describing the results of the operation. This
+      description fits the Resource described in the ResourceRegistry under
       'pubsub.projects.subscriptions'.
 
     Raises:
@@ -71,6 +64,14 @@ class UpdateAlpha(base.UpdateCommand):
     labels_update = labels_util.ProcessUpdateArgsLazy(
         args, client.messages.Subscription.LabelsValue,
         orig_labels_thunk=lambda: client.Get(subscription_ref).labels)
+
+    no_expiration = False
+    expiration_period = getattr(args, 'expiration_period', None)
+    if expiration_period:
+      if expiration_period == subscriptions.NEVER_EXPIRATION_PERIOD_VALUE:
+        no_expiration = True
+        expiration_period = None
+
     try:
       result = client.Patch(
           subscription_ref,
@@ -78,7 +79,9 @@ class UpdateAlpha(base.UpdateCommand):
           push_config=util.ParsePushConfig(args.push_endpoint),
           retain_acked_messages=args.retain_acked_messages,
           labels=labels_update.GetOrNone(),
-          message_retention_duration=args.message_retention_duration)
+          message_retention_duration=args.message_retention_duration,
+          no_expiration=no_expiration,
+          expiration_period=expiration_period)
     except subscriptions.NoFieldsSpecifiedError:
       if not any(args.IsSpecified(arg) for arg in ('clear_labels',
                                                    'update_labels',

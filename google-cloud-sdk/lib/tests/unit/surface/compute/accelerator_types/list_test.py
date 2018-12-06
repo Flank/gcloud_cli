@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.accelerator_types import flags
 from tests.lib import completer_test_base
 from tests.lib import test_case
@@ -61,7 +61,7 @@ class AcceleratorTypesListTest(test_base.BaseTest,
     ]
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.GA
     self.SelectApi('v1')
 
   def testAggregatedOutput(self):

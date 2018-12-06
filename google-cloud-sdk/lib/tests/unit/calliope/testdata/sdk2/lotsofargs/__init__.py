@@ -18,10 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class Lotsofargs(base.Group):
+class Lotsofargs(calliope_base.Group):
   """A group with required and optional flags."""
 
   @staticmethod

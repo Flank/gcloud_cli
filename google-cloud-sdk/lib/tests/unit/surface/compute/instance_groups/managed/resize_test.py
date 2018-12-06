@@ -20,9 +20,11 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
+from mock import patch
 
 
 class InstanceGroupManagersResizeTest(test_base.BaseTest):
@@ -110,6 +112,14 @@ class InstanceGroupManagersResizeTest(test_base.BaseTest):
         'received: -3'):
       self.Run(
           'compute instance-groups managed resize group-1 --size -3')
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run('compute instance-groups managed resize group-1 '
+               '--zone central2-a --size 1')
 
 
 class InstanceGroupManagersResizeZonalTest(test_base.BaseTest):

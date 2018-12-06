@@ -178,7 +178,7 @@ def FormatDurationForJson(duration):
   return num + 's'
 
 
-def ParseDuration(string, calendar=False):
+def ParseDuration(string, calendar=False, default_suffix=None):
   """Parses a duration string and returns a Duration object.
 
   Durations using only hours, miniutes, seconds and microseconds are exact.
@@ -198,6 +198,7 @@ def ParseDuration(string, calendar=False):
   Args:
     string: The ISO 8601 duration/period string to parse.
     calendar: Use duration units larger than hours if True.
+    default_suffix: Use this suffix if string is an unqualified int.
 
   Raises:
     DurationSyntaxError: Invalid duration syntax.
@@ -207,6 +208,12 @@ def ParseDuration(string, calendar=False):
     An iso_duration.Duration object for the given ISO 8601 duration/period
     string.
   """
+  if default_suffix:
+    try:
+      seconds = int(string)
+      string = '{}{}'.format(seconds, default_suffix)
+    except ValueError:
+      pass
   try:
     return iso_duration.Duration(calendar=calendar).Parse(string)
   except (AttributeError, OverflowError) as e:
@@ -446,6 +453,7 @@ def ParseDateTime(string, fmt=None, tzinfo=LOCAL):
   defaults = GetDateTimeDefaults(tzinfo=tzinfo)
   tzgetter = _TzInfoOrOffsetGetter()
 
+  exc = None
   try:
     dt = parser.parse(string, tzinfos=tzgetter.Get, default=defaults)
     if tzinfo and not tzgetter.timezone_was_specified:
@@ -454,9 +462,9 @@ def ParseDateTime(string, fmt=None, tzinfo=LOCAL):
       dt = dt.replace(tzinfo=tzinfo)
     return dt
   except OverflowError as e:
-    exc = DateTimeValueError(six.text_type(e))
+    exc = exceptions.ExceptionContext(DateTimeValueError(six.text_type(e)))
   except (AttributeError, ValueError, TypeError) as e:
-    exc = DateTimeSyntaxError(six.text_type(e))
+    exc = exceptions.ExceptionContext(DateTimeSyntaxError(six.text_type(e)))
     if not tzgetter.timezone_was_specified:
       # Good ole parser.parse() has a tzinfos kwarg that it sometimes ignores.
       # Compensate here when the string ends with a tz.
@@ -465,9 +473,11 @@ def ParseDateTime(string, fmt=None, tzinfo=LOCAL):
         try:
           dt = parser.parse(prefix, default=defaults)
         except OverflowError as e:
-          exc = DateTimeValueError(six.text_type(e))
+          exc = exceptions.ExceptionContext(
+              DateTimeValueError(six.text_type(e)))
         except (AttributeError, ValueError, TypeError) as e:
-          exc = DateTimeSyntaxError(six.text_type(e))
+          exc = exceptions.ExceptionContext(
+              DateTimeSyntaxError(six.text_type(e)))
         else:
           return dt.replace(tzinfo=explicit_tzinfo)
 
@@ -476,7 +486,7 @@ def ParseDateTime(string, fmt=None, tzinfo=LOCAL):
     return ParseDuration(string).GetRelativeDateTime(Now(tzinfo=tzinfo))
   except Error:
     # Not a duration - reraise the datetime parse error.
-    raise exc
+    exc.Reraise()
 
 
 def GetDateTimeFromTimeStamp(timestamp, tzinfo=LOCAL):

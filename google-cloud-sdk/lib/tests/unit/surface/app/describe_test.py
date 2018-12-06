@@ -23,7 +23,7 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock as apitools_mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.app import exceptions as app_exceptions
 from googlecloudsdk.core import properties
 from tests.lib import test_case
@@ -75,7 +75,7 @@ class DescribeAppTest(api_test_util.ApiTestBase):
 class BetaDescribeAppTest(api_test_util.ApiTestBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.messages = core_apis.GetMessagesModule('appengine',
                                                 'v1beta')
     self.mock_client = apitools_mock.Client(
@@ -91,7 +91,7 @@ class BetaDescribeAppTest(api_test_util.ApiTestBase):
     self.ExpectGetApplicationRequest(self.Project(),
                                      split_health_checks=True,
                                      track=self.track)
-    self.Run('app describe', base.ReleaseTrack.BETA)
+    self.Run('app describe', calliope_base.ReleaseTrack.BETA)
     self.AssertOutputEquals('codeBucket: {0}-staging.appspot.com\n'
                             'defaultHostname: {0}.appspot.com\n'
                             'featureSettings:\n'

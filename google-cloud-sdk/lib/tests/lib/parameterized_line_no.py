@@ -54,8 +54,19 @@ from __future__ import unicode_literals
 import inspect
 
 
-def LineNo(*args):
+def LineNo(*args, **kwargs):
   """Inserts the current line number into the parameters name field."""
   lineno = inspect.currentframe().f_back.f_lineno
   name = ':{}:'.format(lineno)
+  if kwargs:
+    return [name] + list(args) + [kwargs]
+  return [name] + list(args)
+
+
+def LabelLineNo(label, *args, **kwargs):
+  """Inserts label and current line number into the parameters name field."""
+  lineno = inspect.currentframe().f_back.f_lineno
+  name = '{}:{}:'.format(label, lineno)
+  if kwargs:
+    return [name] + list(args) + [kwargs]
   return [name] + list(args)

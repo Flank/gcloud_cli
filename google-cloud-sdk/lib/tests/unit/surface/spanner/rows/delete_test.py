@@ -20,14 +20,10 @@ from __future__ import unicode_literals
 
 import textwrap
 from apitools.base.py import extra_types
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
-from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
-@parameterized.named_parameters(('Beta', calliope_base.ReleaseTrack.BETA),
-                                ('Alpha', calliope_base.ReleaseTrack.ALPHA))
 class RowsDeleteTest(base.SpannerTestBase):
   """Cloud Spanner rows delete tests."""
 
@@ -84,7 +80,7 @@ class RowsDeleteTest(base.SpannerTestBase):
                 mutations=mutations,
                 singleUseTransaction=self.msgs.TransactionOptions(
                     readWrite=self.msgs.ReadWrite()))),
-        response=self.msgs.Empty())
+        response=self.msgs.CommitResponse())
 
   def _GivenDdlResponse(self):
     table1_ddl = textwrap.dedent("""
@@ -108,8 +104,7 @@ class RowsDeleteTest(base.SpannerTestBase):
         response=self.msgs.GetDatabaseDdlResponse(
             statements=[table1_ddl, table2_ddl]))
 
-  def testDeleteWithSingleKey(self, track):
-    self.track = track
+  def testDeleteWithSingleKey(self):
     self._GivenDdlResponse()
 
     session = self.msgs.Session(name=self.session_ref.RelativeName())
@@ -120,8 +115,7 @@ class RowsDeleteTest(base.SpannerTestBase):
     self.Run('spanner rows delete --keys=1 --table=Singers '
              '--database=mydb --instance=myins')
 
-  def testDeleteWithMultiKeys(self, track):
-    self.track = track
+  def testDeleteWithMultiKeys(self):
     self._GivenDdlResponse()
 
     session = self.msgs.Session(name=self.session_ref.RelativeName())

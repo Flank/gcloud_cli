@@ -1,0 +1,130 @@
+
+.TH "GCLOUD_BETA_COMPUTE_SOLE\-TENANCY_NODE\-TEMPLATES_GET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute sole\-tenancy node\-templates get\-iam\-policy \- get the IAM Policy for a Google Compute Engine node template
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute sole\-tenancy node\-templates get\-iam\-policy\fR (\fINODE_TEMPLATE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute sole\-tenancy node\-templates
+get\-iam\-policy\fR displays the IAM policy associated with a Google Compute
+Engine node template. If formatted as JSON, the output can be edited and used as
+a policy file for set\-iam\-policy. The output includes an "etag" field
+identifying the version emitted and allowing detection of concurrent policy
+updates; see $ {parent} set\-iam\-policy for additional details.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Node template resource \- The node template for which to display the IAM policy.
+The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[node_template] on the command line with a fully specified name; set the
+property [core/project]; provide the argument [\-\-project] on the command line.
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fINODE_TEMPLATE\fR
+ID of the node_template or fully qualified identifier for the node_template.
+This positional must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Google Compute Engine region.
+
+
+.RE
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/beta\fR API. The full documentation for this
+API can be found at:
+https://developers.google.com/compute/docs/reference/latest/
+
+
+
+.SH "EXAMPLES"
+
+To print the IAM policy for a given node template, run:
+
+.RS 2m
+$ gcloud beta compute sole\-tenancy node\-templates get\-iam\-policy \e
+    my\-node\-template
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute sole\-tenancy node\-templates get\-iam\-policy
+.RE
+

@@ -1,0 +1,64 @@
+NAME
+    gcloud compute security-policies rules update - update a Google Compute
+        Engine security policy rule
+
+SYNOPSIS
+    gcloud compute security-policies rules update PRIORITY [--action=ACTION]
+        [--description=DESCRIPTION] [--preview]
+        [--security-policy=SECURITY_POLICY]
+        [--expression=EXPRESSION | --src-ip-ranges=[SRC_IP_RANGE,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute security-policies rules update is used to update security
+    policy rules.
+
+    For example to update the description and IP ranges of a rule at priority
+    1000, run:
+
+        $ gcloud compute security-policies rules update 1000 \
+            --security-policy my-policy \
+            --description "block 1.2.3.4/32" \
+            --src-ip-ranges 1.2.3.4/32
+
+POSITIONAL ARGUMENTS
+     PRIORITY
+        The priority of the rule to update. Rules are evaluated in order from
+        highest priority to lowest priority where 0 is the highest priority and
+        2147483647 is the lowest priority.
+
+FLAGS
+     --action=ACTION
+        The action to take if the request matches the match condition. ACTION
+        must be one of: allow, deny-403, deny-404, deny-502.
+
+     --description=DESCRIPTION
+        An optional, textual description for the rule.
+
+     --preview
+        If specified, the action will not be enforced.
+
+     --security-policy=SECURITY_POLICY
+        The security policy that this rule belongs to.
+
+     Security policy rule matcher. At most one of these may be specified:
+
+       --expression=EXPRESSION
+          The Cloud Armor rules language expression to match for this rule.
+
+       --src-ip-ranges=[SRC_IP_RANGE,...]
+          The source IPs/IP ranges to match for this rule. To match all IPs
+          specify *.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute security-policies rules update
+        $ gcloud beta compute security-policies rules update
+

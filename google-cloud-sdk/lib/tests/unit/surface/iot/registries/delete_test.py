@@ -21,22 +21,20 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.cloudiot import registries as registries_api
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class RegistriesDeleteTest(base.CloudIotBase):
+class RegistriesDeleteTestGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.registries_client = registries_api.RegistriesClient(self.client,
                                                              self.messages)
 
-  def testDelete(self, track):
-    self.track = track
+  def testDelete(self):
     self.client.projects_locations_registries.Delete.Expect(
         self.messages.CloudiotProjectsLocationsRegistriesDeleteRequest(
             name='projects/{}/locations/us-central1/registries/{}'.format(
@@ -48,8 +46,7 @@ class RegistriesDeleteTest(base.CloudIotBase):
     self.AssertErrContains('You are about to delete registry [my-registry]')
     self.AssertLogContains('Deleted registry [my-registry].')
 
-  def testDelete_RelativeName(self, track):
-    self.track = track
+  def testDelete_RelativeName(self):
     registry_name = ('projects/{}/'
                      'locations/us-central1/'
                      'registries/my-registry').format(self.Project())
@@ -62,6 +59,18 @@ class RegistriesDeleteTest(base.CloudIotBase):
     self.Run('iot registries delete {}'.format(registry_name))
     self.AssertErrContains('You are about to delete registry [my-registry]')
     self.AssertLogContains('Deleted registry [my-registry].')
+
+
+class RegistriesDeleteTestBeta(RegistriesDeleteTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class RegistriesDeleteTestAlpha(RegistriesDeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

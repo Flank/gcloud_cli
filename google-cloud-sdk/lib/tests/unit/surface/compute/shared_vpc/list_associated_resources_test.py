@@ -18,15 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
-from tests.lib.surface.compute import xpn_test_base
+from tests.lib.surface.compute import shared_vpc_test_base
 
 
-@parameterized.parameters(
-    base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
-class ListAssociatedResourcesTest(xpn_test_base.XpnTestBase):
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class ListAssociatedResourcesTest(shared_vpc_test_base.SharedVpcTestBase):
 
   def testListAssociatedResources_NoProject(self, track):
     self._SetUp(track)
@@ -37,13 +39,6 @@ class ListAssociatedResourcesTest(xpn_test_base.XpnTestBase):
 
   def testListAssociatedResources(self, track):
     self._SetUp(track)
-    self._testListAssociatedResources('shared-vpc')
-
-  def testListAssociatedResources_xpn(self, track):
-    self._SetUp(track)
-    self._testListAssociatedResources('xpn')
-
-  def _testListAssociatedResources(self, module_name):
     xpn_types = self.messages.XpnResourceId.TypeValueValuesEnum
 
     self.xpn_client.ListEnabledResources.return_value = iter([
@@ -54,7 +49,7 @@ class ListAssociatedResourcesTest(xpn_test_base.XpnTestBase):
             type=xpn_types.XPN_RESOURCE_TYPE_UNSPECIFIED),
     ])
 
-    self.Run('compute {} list-associated-resources foo'.format(module_name))
+    self.Run('compute shared-vpc list-associated-resources foo')
 
     self.AssertOutputEquals("""\
         RESOURCE_ID            RESOURCE_TYPE

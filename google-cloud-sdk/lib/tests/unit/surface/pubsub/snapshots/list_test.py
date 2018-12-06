@@ -32,7 +32,7 @@ class SnapshotsListTest(base.CloudPubsubTestBase,
                         sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     properties.VALUES.core.user_output_enabled.Set(True)
     self.svc = self.client.projects_snapshots.List
     self.project_ref = util.ParseProject(self.Project())

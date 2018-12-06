@@ -55,16 +55,13 @@ class SetIamPolicyTest(test_base.BaseTest):
         """.format(self.temp_file))
 
     self.CheckRequests(
-        [(self.compute.subnetworks,
-          'SetIamPolicy',
+        [(self.compute.subnetworks, 'SetIamPolicy',
           messages.ComputeSubnetworksSetIamPolicyRequest(
               resource='resource',
               project='my-project',
               region='region-1',
               regionSetPolicyRequest=messages.RegionSetPolicyRequest(
-                  bindings=policy.bindings,
-                  etag=policy.etag)))],
-    )
+                  policy=policy)))])
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
@@ -74,6 +71,8 @@ class SetIamPolicyTest(test_base.BaseTest):
               role: owner
             etag: ZXRhZ1R3bw==
             """))
+    self.AssertErrContains(
+        'subnetwork [projects/my-project/regions/region-1/subnetworks/resource')
 
   def testBadJsonOrYamlSetIamPolicyProject(self):
     temp_file = self.Touch(self.temp_path, 'bad', contents='bad')

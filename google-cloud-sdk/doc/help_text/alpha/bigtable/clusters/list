@@ -13,9 +13,9 @@ FLAGS
      Instance resource - The instances to list clusters for. This represents a
      Cloud resource. (NOTE) Some attributes are not given arguments in this
      group but can be set in other ways. To set the [project] attribute:
-     provide the flag [--instances] on the command line with a fully specified
-     name; provide the flag [--project] on the command line; set the property
-     [core/project].
+     provide the argument [--instances] on the command line with a fully
+     specified name; provide the argument [--project] on the command line; set
+     the property [core/project].
 
        --instances=[INSTANCES,...]
           IDs of the instances or fully qualified identifiers for the
@@ -52,8 +52,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To list all clusters in an instance, run:
@@ -70,7 +71,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud bigtable clusters list
         $ gcloud beta bigtable clusters list
 

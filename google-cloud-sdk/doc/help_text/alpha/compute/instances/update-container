@@ -4,9 +4,11 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute instances update-container INSTANCE_NAME
-        [--container-image=CONTAINER_IMAGE] [--container-privileged]
-        [--container-restart-policy=POLICY] [--container-stdin]
-        [--container-tty] [--zone=ZONE]
+        [--container-image=CONTAINER_IMAGE]
+        [--container-mount-disk=[mode=MODE],
+          [mount-path=MOUNT-PATH],[name=NAME],[partition=PARTITION]]
+        [--container-privileged] [--container-restart-policy=POLICY]
+        [--container-stdin] [--container-tty] [--zone=ZONE]
         [--clear-container-args | --container-arg=CONTAINER_ARG]
         [--clear-container-command | --container-command=CONTAINER_COMMAND]
         [--container-env=[KEY=VALUE, ...,...]
@@ -40,6 +42,29 @@ FLAGS
         Sets container image in the declaration to the specified value.
 
         Empty string is not allowed.
+
+     --container-mount-disk=[mode=MODE],[mount-path=MOUNT-PATH],[name=NAME],[partition=PARTITION]
+        Mounts a disk to the container by using mount-path or updates how the
+        volume is mounted if the same mount path has already been declared. The
+        disk must already be attached to the instance with a device-name that
+        matches the disk name. Multiple flags are allowed.
+
+         name
+            Name of the disk. Can be omitted if exactly one additional disk is
+            attached to the instance. The name of the single additional disk
+            will be used by default.
+
+         mount-path
+            Path on container to mount to. Mount paths with spaces and commas
+            (and other special characters) are not supported by this command.
+
+         partition
+            Optional. The partition of the disk to mount. Multiple partitions
+            of a disk may be mounted.
+
+         mode
+            Volume mount mode: rw (read/write) or ro (read-only). Defaults to
+            rw. Fails if the disk mode is ro and volume mount mode is rw.
 
      --container-privileged
         Sets permission to run container to the specified value.
@@ -143,7 +168,8 @@ FLAGS
             Path on host to mount from.
 
          mount-path
-            Path on container to mount to.
+            Path on container to mount to. Mount paths with spaces and commas
+            (and other special characters) are not supported by this command.
 
          mode
             Volume mount mode: rw (read/write) or ro (read-only).
@@ -154,18 +180,20 @@ FLAGS
         Mounts empty tmpfs into container at MOUNTPATH.
 
          mount-path
-            Path on container to mount to.
-     --remove-container-mounts=[MOUNTPATH[,MOUNTPATH,...],...]
+            Path on container to mount to. Mount paths with spaces and commas
+            (and other special characters) are not supported by this command.
 
-        Removes volume mounts (host-path, tmpfs) with mountPath: MOUNTPATH from
-        container declaration.
+     --remove-container-mounts=[MOUNTPATH[,MOUNTPATH,...],...]
+        Removes volume mounts (host-path, tmpfs, disk) with mountPath:
+        MOUNTPATH from container declaration.
 
         Does nothing, if a volume mount is not declared.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To run the gcr.io/google-containers/busybox image on an instance named
@@ -186,7 +214,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud compute instances update-container
         $ gcloud beta compute instances update-container
 

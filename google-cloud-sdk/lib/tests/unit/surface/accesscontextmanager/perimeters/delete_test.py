@@ -18,47 +18,49 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA,))
-class PerimetersDeleteTest(accesscontextmanager.Base):
+class PerimetersDeleteTestBeta(accesscontextmanager.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(True)
 
   def _ExpectDelete(self, perimeter, policy):
-    perimeter_name = 'accessPolicies/{}/accessZones/{}'.format(
+    perimeter_name = 'accessPolicies/{}/servicePerimeters/{}'.format(
         policy, perimeter)
     m = self.messages
-    request_type = m.AccesscontextmanagerAccessPoliciesAccessZonesDeleteRequest
-    self.client.accessPolicies_accessZones.Delete.Expect(
+    request_type = (
+        m.AccesscontextmanagerAccessPoliciesServicePerimetersDeleteRequest)
+    self.client.accessPolicies_servicePerimeters.Delete.Expect(
         request_type(name=perimeter_name),
         self.messages.Operation(name='operations/my-op', done=False))
     self._ExpectGetOperation('operations/my-op')
 
-  def testDelete_MissingRequired(self, track):
-    self.SetUpForTrack(track)
+  def testDelete_MissingRequired(self):
+    self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager perimeters delete --policy my_policy')
 
-  def testDelete_Prompt(self, track):
-    self.SetUpForTrack(track)
+  def testDelete_Prompt(self):
+    self.SetUpForTrack(self.track)
     with self.assertRaises(console_io.UnattendedPromptError):
       self.Run(
           'access-context-manager perimeters delete my_perimeter '
           '--policy my_policy'
       )
 
-  def testDelete(self, track):
-    self.SetUpForTrack(track)
+  def testDelete(self):
+    self.SetUpForTrack(self.track)
     self._ExpectDelete('my_perimeter', 'my_policy')
 
     self.Run(
@@ -67,8 +69,8 @@ class PerimetersDeleteTest(accesscontextmanager.Base):
 
     self.AssertOutputEquals('')
 
-  def testDelete_PolicyFromProperty(self, track):
-    self.SetUpForTrack(track)
+  def testDelete_PolicyFromProperty(self):
+    self.SetUpForTrack(self.track)
     policy = 'my_acm_policy'
     properties.VALUES.access_context_manager.policy.Set(policy)
     self._ExpectDelete('my_perimeter', policy)
@@ -76,6 +78,12 @@ class PerimetersDeleteTest(accesscontextmanager.Base):
     self.Run('access-context-manager perimeters delete my_perimeter --quiet')
 
     self.AssertOutputEquals('')
+
+
+class PerimetersDeleteTestAlpha(PerimetersDeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

@@ -20,12 +20,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import cgi
+import io
 import json
 import os
-import StringIO
 import traceback
-import urllib
-import urllib2
 
 from googlecloudsdk.api_lib.app import appengine_client
 from googlecloudsdk.api_lib.app import util
@@ -37,6 +35,10 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.app import api_test_util
 from googlecloudsdk.third_party.appengine.tools import appengine_rpc_test_util
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 
 
 class WithFakeRPC(sdk_test_base.SdkBase):
@@ -77,13 +79,25 @@ class WithFakeRPC(sdk_test_base.SdkBase):
       if '?' in url:
         query_string = url.split('?', 1)[1]
       self.assertEqual(expected_params, cgi.parse_qs(query_string))
-      self.assertEqual(expected_body, request.get_data())
+      # urllib2.Request uses get_data(), while urllib.request.Request uses .data
+      req_data = request.get_data() if hasattr(request,
+                                               'get_data') else request.data
+      # Convert the request data to bytes on py3. This may fail however if the
+      # string contains un-encodable characters, in which case we won't encode.
+      if isinstance(req_data, six.text_type):
+        try:
+          req_data = req_data.encode()
+        except UnicodeDecodeError:
+          pass
+      if req_data is None:
+        req_data = b''
+      self.assertEqual(expected_body, req_data)
       if response_code < 400:
         return appengine_rpc_test_util.TestRpcServer.MockResponse(
             response_body, response_code)
       else:
-        raise urllib2.HTTPError('url', response_code, 'msg', {},
-                                StringIO.StringIO(response_body))
+        raise six.moves.urllib.error.HTTPError('url', response_code, 'msg', {},
+                                               io.BytesIO(response_body))
 
     self.AddResponseHandler(expected_url, Handle)
 
@@ -96,7 +110,7 @@ class WithFakeRPC(sdk_test_base.SdkBase):
 
   def _MakeURL(self, url, params=None):
     if params:
-      url += '?' + urllib.urlencode(sorted(params.items()))
+      url += '?' + six.moves.urllib.parse.urlencode(sorted(params.items()))
     return url
 
   def _WasRequested(self, url):
@@ -146,6 +160,8 @@ dispatch:
 - url: '*/tasks/hello_module2'
   service: module2
 """)
+
+  DISPATCH_EMPTY_DATA = ('dispatch.yaml', """dispatch:""")
 
   DOS_DATA = ('dos.yaml', """\
 blacklist:

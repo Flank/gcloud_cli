@@ -60,7 +60,7 @@ class ClustersDiagnoseUnitTest(unit_base.DataprocUnitTestBase):
         response=response,
         exception=exception)
 
-  def ExpectDiagnoseCalls(self, response=None, exception=None):
+  def ExpectDiagnoseCalls(self, response=None):
     response = self.messages.Operation.ResponseValue()
     response.additionalProperties = [
         self.messages.Operation.ResponseValue.AdditionalProperty(
@@ -72,8 +72,7 @@ class ClustersDiagnoseUnitTest(unit_base.DataprocUnitTestBase):
     self.ExpectDiagnoseCluster()
     self.ExpectGetOperation()
     self.ExpectGetOperation(
-        operation=self.MakeCompletedOperation(
-            response=response, exception=exception))
+        operation=self.MakeCompletedOperation(response=response))
 
   def testDiagnoseCluster(self):
     self.ExpectDiagnoseCalls()

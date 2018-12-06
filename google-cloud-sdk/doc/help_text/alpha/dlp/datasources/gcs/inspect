@@ -3,14 +3,15 @@ NAME
         content in a Google Cloud Storage bucket
 
 SYNOPSIS
-    gcloud alpha dlp datasources gcs inspect PATH --info-types=[INFOTYPE,...]
-        (--output-tables=[OUTPUT_TABLES,...]
-          | --output-topics=[OUTPUT_TOPICS,...]) [--exclude-info-types]
+    gcloud alpha dlp datasources gcs inspect PATH [--exclude-info-types]
         [--file-size-limit=FILE_SIZE_LIMIT; default=1024] [--include-quote]
-        [--job-id=JOB_ID] [--max-findings=MAX_FINDINGS; default=1000]
+        [--info-types=[INFOTYPE,...]] [--job-id=JOB_ID]
+        [--max-findings=MAX_FINDINGS]
         [--max-findings-per-item=MAX_FINDINGS_PER_ITEM] [--max-time=MAX_TIME]
         [--min-likelihood=MIN_LIKELIHOOD; default="possible"]
-        [--min-time=MIN_TIME] [GCLOUD_WIDE_FLAG ...]
+        [--min-time=MIN_TIME]
+        [--output-table=OUTPUT_TABLE | --output-topics=[OUTPUT_TOPICS,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Schedules a job to inspect content in a Google Cloud Storage bucket
@@ -24,29 +25,7 @@ POSITIONAL ARGUMENTS
         Google Cloud Storage URL to scan for files with optional wildcard
         character (*) -- for example, gs://my-bucket/*.
 
-REQUIRED FLAGS
-     --info-types=[INFOTYPE,...]
-        Which infoTypes to scan input for. The values must correspond to
-        infoType values found in documentation. For more information about
-        valid infoTypes, see infoTypes Reference
-        (https://cloud.google.com/dlp/docs/infotypes-reference)
-
-     Exactly one of these must be specified:
-
-       --output-tables=[OUTPUT_TABLES,...]
-          Publishes results of a Cloud DLP job to one or more BigQuery tables.
-          BigQuery tables are uniquely identified by their project_id,
-          dataset_id, and table_id in the format
-          <project_id>.<dataset_id>.<table_id>.
-
-       --output-topics=[OUTPUT_TOPICS,...]
-          Publishes the results of a Cloud DLP job to one or more Cloud Pub/Sub
-          topics.
-
-          Note: The topic must have given publishing access rights to the DLP
-          API service account executing the Cloud DLP job.
-
-OPTIONAL FLAGS
+FLAGS
      --exclude-info-types
         Whether or not to exclude type information of the findings. Type
         information is included by default.
@@ -61,6 +40,12 @@ OPTIONAL FLAGS
         all but the initial character in each filtered word with asterisks,
         e.g. "f**".
 
+     --info-types=[INFOTYPE,...]
+        Which infoTypes to scan input for. The values must correspond to
+        infoType values found in documentation. For more information about
+        valid infoTypes, see infoTypes Reference
+        (https://cloud.google.com/dlp/docs/infotypes-reference)
+
      --job-id=JOB_ID
         Optional job ID to use for the created job. If not provided, a job ID
         will automatically be generated. Must be unique within the project. The
@@ -69,11 +54,10 @@ OPTIONAL FLAGS
         The maximum length is 100 characters. Can be empty to allow the system
         to generate one.
 
-     --max-findings=MAX_FINDINGS; default=1000
+     --max-findings=MAX_FINDINGS
         Maximum number of findings that will be returned per execution.
 
-        If not specified, will return up to the system maximum of 1000
-        findings.
+        If not specified, no limits are applied.
 
      --max-findings-per-item=MAX_FINDINGS_PER_ITEM
         Maximum number of findings that will be returned for each item scanned.
@@ -100,10 +84,27 @@ OPTIONAL FLAGS
 
         See $ gcloud topic datetimes for information on time formats.
 
+     At most one of these may be specified:
+
+       --output-table=OUTPUT_TABLE
+          Publishes results of a Cloud DLP job a BigQuery table. BigQuery
+          tables are uniquely identified by their project_id, dataset_id, and
+          table_id in the format <project_id>.<dataset_id>.<table_id> or
+          <project_id>.<dataset_id>.<table_id>. If no table_id is specified,
+          DLP will create a table for you.
+
+       --output-topics=[OUTPUT_TOPICS,...]
+          Publishes the results of a Cloud DLP job to one or more Cloud Pub/Sub
+          topics.
+
+          Note: The topic must have given publishing access rights to the DLP
+          API service account executing the Cloud DLP job.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
     This command uses the dlp/v2 API. The full documentation for this API can

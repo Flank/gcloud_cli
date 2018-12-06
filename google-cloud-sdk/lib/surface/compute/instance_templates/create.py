@@ -366,18 +366,21 @@ def _RunCreate(compute_api,
   else:
     boot_disk_list = []
 
-  local_ssds = []
-  for x in args.local_ssd or []:
-    local_ssd = instance_utils.CreateLocalSsdMessage(
-        compute_api.resources,
-        client.messages,
-        x.get('device-name'),
-        x.get('interface'),
-        x.get('size'))
-    local_ssds.append(local_ssd)
+  local_nvdimms = instance_utils.CreateLocalNvdimmMessages(
+      args,
+      compute_api.resources,
+      client.messages,
+  )
+
+  local_ssds = instance_utils.CreateLocalSsdMessages(
+      args,
+      compute_api.resources,
+      client.messages,
+  )
 
   disks = (
-      boot_disk_list + persistent_disks + persistent_create_disks + local_ssds
+      boot_disk_list + persistent_disks + persistent_create_disks +
+      local_nvdimms + local_ssds
   )
 
   machine_type = instance_utils.InterpretMachineType(
@@ -439,7 +442,7 @@ class Create(base.CreateCommand):
   instances in any zone.
   """
   _support_source_instance = True
-  _support_kms = False
+  _support_kms = True
 
   @classmethod
   def Args(cls, parser):
@@ -465,6 +468,7 @@ class Create(base.CreateCommand):
         base_classes.ComputeApiHolder(base.ReleaseTrack.GA),
         args,
         support_source_instance=self._support_source_instance,
+        support_kms=self._support_kms
     )
 
 
@@ -545,6 +549,7 @@ class CreateAlpha(Create):
         support_shielded_vms=cls._support_shielded_vms,
         support_kms=cls._support_kms
     )
+    instances_flags.AddLocalNvdimmArgs(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.ALPHA)
 
   def Run(self, args):

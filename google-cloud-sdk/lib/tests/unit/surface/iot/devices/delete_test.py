@@ -21,21 +21,19 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.cloudiot import devices as devices_api
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class DevicesDeleteTest(base.CloudIotBase):
+class DevicesDeleteTestGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.devices_client = devices_api.DevicesClient(self.client, self.messages)
 
-  def testDelete(self, track):
-    self.track = track
+  def testDelete(self):
     device_name = ('projects/{}/'
                    'locations/us-central1/'
                    'registries/my-registry/'
@@ -52,8 +50,7 @@ class DevicesDeleteTest(base.CloudIotBase):
 
     self.AssertLogContains('Deleted device [my-device].')
 
-  def testDelete_RelativeName(self, track):
-    self.track = track
+  def testDelete_RelativeName(self):
     device_name = ('projects/{}/'
                    'locations/us-central1/'
                    'registries/my-registry/'
@@ -69,6 +66,18 @@ class DevicesDeleteTest(base.CloudIotBase):
                    'devices/my-device').format(self.Project())
     self.WriteInput('y\n')
     self.Run('iot devices delete {}'.format(device_name))
+
+
+class DevicesDeleteTestBeta(DevicesDeleteTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DevicesDeleteTestAlpha(DevicesDeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

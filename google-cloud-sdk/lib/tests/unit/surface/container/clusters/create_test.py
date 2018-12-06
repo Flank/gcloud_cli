@@ -28,11 +28,11 @@ from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.container import constants
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.console import console_io
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.container import base
+
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
@@ -243,6 +243,14 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
             'https://www.googleapis.com/auth/servicecontrol',
             'https://www.googleapis.com/auth/trace.append',
         ],
+        'issueClientCertificate':
+            False,
+        'metadata':
+            self.msgs.NodeConfig.MetadataValue(
+                additionalProperties=[
+                    self.msgs.NodeConfig.MetadataValue.AdditionalProperty(
+                        key=key, value=value)
+                    for key, value in [('key', 'value'), ('key2', 'value2')]]),
     }
     cluster_kwargs['nodePools'] = [self._MakeDefaultNodePool(
         nodePoolName='default-pool-{pool}'.format(pool=pool_index),
@@ -302,7 +310,8 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         '--enable-autoupgrade '
         '--enable-master-authorized-networks '
         '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 '
-        .format(**cluster_kwargs))
+        '--no-issue-client-certificate '
+        '--metadata key=value,key2=value2'.format(**cluster_kwargs))
     self.AssertOutputMatches(
         (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
          'NUM_NODES STATUS\n'
@@ -321,15 +330,13 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
     # have a warning at the top depending on if kubectl is currently available,
     # which can vary depending on environment.
     self.AssertErrContains("""This will disable the autorepair feature for \
-nodes. Please see
-https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more
+nodes. Please see \
+https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more \
 information on node autorepairs.
-
-This will enable the autoupgrade feature for nodes. Please see
-https://cloud.google.com/kubernetes-engine/docs/node-management for more
+This will enable the autoupgrade feature for nodes. Please see \
+https://cloud.google.com/kubernetes-engine/docs/node-management for more \
 information on node autoupgrades.
-
-{{"ux": "PROGRESS_TRACKER", "message": "Creating cluster my-little-cluster-kubernetes-is-magic", "status": "SUCCESS"}}
+{{"ux": "PROGRESS_TRACKER", "message": "Creating cluster my-little-cluster-kubernetes-is-magic in us-central1-f", "status": "SUCCESS"}}
 Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-little-cluster-kubernetes-is-magic].
 To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/us-central1-f/my-little-cluster-kubernetes-is-magic?project=fake-project-id
 kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
@@ -702,9 +709,10 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
         'issuance of the client certificate using the '
         '`--[no-]issue-client-certificate` flag.')
 
-  @parameterized.parameters('', '--username=admin', '--enable-basic-auth')
+  @parameterized.parameters('--username=admin', '--enable-basic-auth')
   def testEnableBasicAuth(self, flags):
     cluster_kwargs = {
+        'username': 'admin',
         'management': self.messages.NodeManagement(autoRepair=True),
     }
     # Cluster create returns operation pending
@@ -728,11 +736,11 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
   @parameterized.parameters('--username=""', '--no-enable-basic-auth')
   def testDisableBasicAuth(self, flags):
     cluster_kwargs = {
+        'username': '',
         'management': self.messages.NodeManagement(autoRepair=True),
     }
     # Cluster create returns operation pending
     expected_cluster = self._MakeCluster(**cluster_kwargs)
-    expected_cluster.masterAuth.username = ''
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     # Get operation returns done
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
@@ -780,8 +788,9 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
     }
     expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
         cluster_kwargs)
-    (expected_cluster.masterAuth.clientCertificateConfig
-     .issueClientCertificate) = expect_issue
+    expected_cluster.masterAuth = self.messages.MasterAuth(
+        clientCertificateConfig=(self.messages.ClientCertificateConfig(
+            issueClientCertificate=expect_issue)))
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.ExpectGetCluster(return_cluster)
@@ -931,6 +940,101 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
                 endpoint=return_cluster.endpoint,
                 status=return_cluster.status,),
         normalize_space=True)
+
+  def testCreateWithMetadataFromFile(self):
+    cluster_kwargs = {
+        'metadata':
+            self.msgs.NodeConfig.MetadataValue(
+                additionalProperties=[
+                    self.msgs.NodeConfig.MetadataValue.AdditionalProperty(
+                        key='file_key', value='file_value'),
+                ],),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
+    }
+    md_file_path = self.Touch(self.temp_path, contents='file_value')
+
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(
+        return_args, clusterApiVersion='0.18.2', currentMasterVersion1='0.18.2')
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--metadata-from-file file_key={path}'.format(
+            name=self.CLUSTER_NAME, path=md_file_path))
+    self.AssertOutputContains('RUNNING')
+
+  def testEnablePrivateNodes(self):
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+        'name': self.CLUSTER_NAME,
+    }
+
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(
+        createSubnetwork=False,
+        useIpAliases=True,
+    )
+    expected_cluster.ipAllocationPolicy = policy
+    config = self._MakePrivateClusterConfig(
+        enablePrivateNodes=True,
+        masterIpv4Cidr='172.16.10.0/28')
+    expected_cluster.privateClusterConfig = config
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-ip-alias '
+        '--enable-private-nodes '
+        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
+  def testEnablePrivateEndpoint(self):
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+        'name': self.CLUSTER_NAME,
+    }
+
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(
+        createSubnetwork=False,
+        useIpAliases=True,
+    )
+    expected_cluster.ipAllocationPolicy = policy
+    config = self._MakePrivateClusterConfig(
+        enablePrivateNodes=True,
+        enablePrivateEndpoint=True,
+        masterIpv4Cidr='172.16.10.0/28')
+    expected_cluster.privateClusterConfig = config
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-ip-alias '
+        '--enable-private-nodes '
+        '--enable-private-endpoint '
+        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
 
 
 class CreateTestGAOnly(CreateTestGA):
@@ -1386,8 +1490,8 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
                         resourceType='nvidia-tesla-k80', maximum=4, minimum=1),
                 ]),
         'workloadMetadataConfig':
-            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig.
-                                     NodeMetadataValueValuesEnum.SECURE),
+            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig
+                                     .NodeMetadataValueValuesEnum.SECURE),
         'verticalPodAutoscaling':
             m.VerticalPodAutoscaling(enabled=True),
     }
@@ -1564,8 +1668,15 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
     }
 
     expected_cluster = self._MakeCluster(**cluster_kwargs)
-    expected_cluster.privateCluster = True
-    expected_cluster.masterIpv4CidrBlock = '172.16.10.0/28'
+    policy = self._MakeIPAllocationPolicy(
+        createSubnetwork=False,
+        useIpAliases=True,
+    )
+    expected_cluster.ipAllocationPolicy = policy
+    config = self._MakePrivateClusterConfig(
+        enablePrivateNodes=True,
+        masterIpv4Cidr='172.16.10.0/28')
+    expected_cluster.privateClusterConfig = config
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     return_args = cluster_kwargs.copy()
@@ -1575,6 +1686,7 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
 
     self.Run(
         self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-ip-alias '
         '--private-cluster '
         '--master-ipv4-cidr=172.16.10.0/28 '
         '--quiet'.format(name=self.CLUSTER_NAME))
@@ -1659,6 +1771,266 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         '--no-enable-autoprovisioning --min-cpu 10 --max-cpu 20 '
         '--min-memory 16 --max-memory 128')
 
+  def testCreateResourceLimitsFromFile(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=False,
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=1, maximum=2),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=10, maximum=20),
+                    m.ResourceLimit(
+                        resourceType='nvidia-tesla-k80', minimum=1, maximum=2),
+                    m.ResourceLimit(
+                        resourceType='nvidia-tesla-p100', minimum=0, maximum=1)
+                ]),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(targetLink=self.TARGET_LINK.format(
+            self.API_VERSION,
+            self.PROJECT_NUM,
+            self.ZONE,
+            cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    autoprovisioning_config = self.Touch(
+        self.temp_path, 'autoprovisioning-config', contents="""
+- resourceType: 'cpu'
+  minimum: 1
+  maximum: 2
+- resourceType: 'memory'
+  minimum: 10
+  maximum: 20
+- resourceType: 'nvidia-tesla-k80'
+  minimum: 1
+  maximum: 2
+- resourceType: 'nvidia-tesla-p100'
+  minimum: 0
+  maximum: 1
+        """)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--no-enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testDefaultMaxPodsConstraint(self):
+    cluster_kwargs = {
+        'defaultMaxPodsConstraint':
+            self.msgs.MaxPodsConstraint(maxPodsPerNode=30),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
+    }
+    # Cluster create returns operation pending
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(
+        clusterIpv4Cidr=None, createSubnetwork=False, useIpAliases=True)
+    expected_cluster.ipAllocationPolicy = policy
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(
+        return_args,
+        ipAllocationPolicy=policy,
+        maxPodsConstraint=cluster_kwargs.get('maxPodsConstraint'))
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-ip-alias '
+        '--default-max-pods-per-node=30 '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
+  def testDefaultMaxPodsConstraintBadArgs(self):
+    command = (
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {name} --quiet --default-max-pods-per-node=30'.format(
+            name=self.CLUSTER_NAME))
+    self.AssertRaisesExceptionMatches(
+        c_util.Error,
+        api_adapter.DEFAULT_MAX_PODS_PER_NODE_WITHOUT_IP_ALIAS_ERROR_MSG,
+        self.Run, command)
+
+  def testCreateEnableAddonsIstio(self):
+    mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                istioConfig=self.msgs.IstioConfig(disabled=False, auth=mtls)),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
+                             self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.7.0'))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard,Istio'
+        ' --istio-config=auth=mtls_strict'
+        .format(self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateEnableAddonsIstioNoAuth(self):
+    auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                istioConfig=self.msgs.IstioConfig(disabled=False, auth=auth)),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
+                             self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.7.0'))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard,Istio'
+        .format(self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateDisableAddonsIstio(self):
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True)),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
+                             self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.7.0'))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard'
+        .format(self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateValidateAddonsIstioConfig(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard,Istio'
+          ' --istio-config=auth=mtl_strict'
+          .format(self.CLUSTER_NAME))
+    self.AssertErrContains('auth is either MTLS_PERMISSIVE or MTLS_STRICT')
+
+  def testCreateValidateAddonsIstio(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard'
+          ' --istio-config=auth=mtls_strict'
+          .format(self.CLUSTER_NAME))
+    self.AssertErrContains('--addon=Istio must be specified')
+
+  @parameterized.named_parameters(('IstioEnabled', 'Istio,CloudRun'),
+                                  ('IstioAutoEnabled', 'CloudRun'))
+  def testCreateEnableAddonsCloudRun(self, addons):
+    auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=False),
+                istioConfig=self.msgs.IstioConfig(disabled=False, auth=auth)),
+        'management':
+            self.messages.NodeManagement(autoRepair=True),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
+    self.Run(
+        (self.clusters_command_base.format(self.ZONE) + ' create {0}'
+         ' --addons=HttpLoadBalancing,KubernetesDashboard,' + addons).format(
+             self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testResourceUsageExportConfig(self):
+    self._TestResourceUsageExportConfig('', None)
+    self._TestResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=dataset_id',
+        self.messages.ResourceUsageExportConfig(
+            bigqueryDestination=self.messages.BigQueryDestination(
+                datasetId='dataset_id')))
+    self._TestResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=dataset_id '
+        '--no-enable-network-egress-metering',
+        self.messages.ResourceUsageExportConfig(
+            bigqueryDestination=self.messages.BigQueryDestination(
+                datasetId='dataset_id')))
+    self._TestResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=dataset_id '
+        '--enable-network-egress-metering',
+        self.messages.ResourceUsageExportConfig(
+            bigqueryDestination=self.messages.BigQueryDestination(
+                datasetId='dataset_id'),
+            enableNetworkEgressMetering=True))
+
+  def _TestResourceUsageExportConfig(self, flags, export_config):
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
+        cluster_kwargs)
+    expected_cluster.resourceUsageExportConfig = export_config
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(return_cluster)
+    self.Run('{base} create {name} {flags} --quiet'.format(
+        base=self.clusters_command_base.format(self.ZONE),
+        name=self.CLUSTER_NAME,
+        flags=flags))
+
+  def testCreateInvalidResourceUsageConfig(self):
+    err_msg = """\
+Cannot use --[no-]enable-network-egress-metering without \
+--resource-usage-bigquery-dataset."""
+    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
+      self.Run('{base} create {name} --quiet {flag}'.format(
+          base=self.clusters_command_base.format(self.ZONE),
+          name=self.CLUSTER_NAME,
+          flag='--enable-network-egress-metering'))
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
@@ -1675,13 +2047,15 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         'binaryAuthorization':
             m.BinaryAuthorization(enabled=True),
         'workloadMetadataConfig':
-            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig.
-                                     NodeMetadataValueValuesEnum.SECURE),
+            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig
+                                     .NodeMetadataValueValuesEnum.SECURE),
         'localSsdVolumeConfigs': [
             m.LocalSsdVolumeConfig(count=2, type='nvme', format=format_enum.FS),
             m.LocalSsdVolumeConfig(
                 count=1, type='scsi', format=format_enum.BLOCK),
         ],
+        'databaseEncryptionKey':
+            'projects/p/locations/l/keyRings/kr/cryptoKeys/k',
     }
     cluster_kwargs['nodePools'] = [self._MakeDefaultNodePool(
         nodePoolName='default-pool',
@@ -1710,12 +2084,16 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
     return_cluster = self._MakeCluster(**return_args)
     self.ExpectGetCluster(return_cluster)
     self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create my-cluster --num-nodes=500 '
+        self.clusters_command_base.format(self.ZONE) + ' create my-cluster '
+        '--num-nodes=500 '
         '--enable-binauthz '
         '--workload-metadata-from-node=secure '
         '--local-ssd-volumes count=2,type=nvme,format=fs '
-        '--local-ssd-volumes count=1,type=scsi,format=block ')
+        '--local-ssd-volumes count=1,type=scsi,format=block '
+        '--database-encryption-key-project=p '
+        '--database-encryption-key-location=l '
+        '--database-encryption-key-keyring=kr '
+        '--database-encryption-key=k ')
     self.AssertOutputMatches(
         (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
          'NUM_NODES STATUS\n'
@@ -1727,13 +2105,6 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
                 endpoint=return_cluster.endpoint,
                 status=return_cluster.status,),
         normalize_space=True)
-
-  def testCreateShowsChargesWarning(self):
-    with self.assertRaises(console_io.UnattendedPromptError):
-      self.Run(
-          self.regional_clusters_command_base.format(self.REGION) +
-          ' create {0}'.format(self.CLUSTER_NAME))
-    self.AssertErrContains('in the future you may be charged for it')
 
   def testEnableSharedNetwork(self):
     cluster_kwargs = {
@@ -1820,67 +2191,9 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
           ' create {0} --local-ssd-volumes'.format(self.CLUSTER_NAME))
     self.AssertErrContains('argument --local-ssd-volumes')
 
-  class ServerlessAddon(parameterized.TestCase):
-
-    @parameterized.named_parameters(
-        ('IstioEnabled', 'Istio,Serverless'),
-        ('IstioAutoEnabled', 'Serverless'))
-    def testCreateEnableAddonsServerless(self, addons):
-      auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
-      cluster_kwargs = {
-          'addonsConfig': self.msgs.AddonsConfig(
-              httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
-              horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
-                  disabled=True),
-              kubernetesDashboard=self.msgs.KubernetesDashboard(
-                  disabled=False),
-              networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                  disabled=True),
-              serverlessConfig=self.msgs.ServerlessConfig(
-                  disabled=False),
-              istioConfig=self.msgs.IstioConfig(
-                  disabled=False,
-                  auth=auth)),
-      }
-      self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
-                               self._MakeOperation())
-      self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-      self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' create {0}'
-          ' --addons=HttpLoadBalancing,KubernetesDashboard,' + addons
-          .format(self.CLUSTER_NAME))
-      self.AssertOutputContains('RUNNING')
-
-  def testCreateEnableAddonsIstio(self):
-    mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
-    cluster_kwargs = {
-        'addonsConfig':
-            self.msgs.AddonsConfig(
-                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
-                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
-                    disabled=True),
-                kubernetesDashboard=self.msgs.KubernetesDashboard(
-                    disabled=False),
-                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                    disabled=True),
-                istioConfig=self.msgs.IstioConfig(disabled=False, auth=mtls)),
-        'management':
-            self.messages.NodeManagement(autoRepair=True),
-    }
-    self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
-                             self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.ExpectGetCluster(self._RunningClusterForVersion('1.7.0'))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard,Istio'
-        ' --istio-config=auth=mutual_tls'
-        .format(self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-
-  def testCreateEnableAddonsIstioNoAuth(self):
+  @parameterized.named_parameters(('IstioEnabled', 'Istio,CloudRun'),
+                                  ('IstioAutoEnabled', 'CloudRun'))
+  def testCreateEnableAddonsCloudRun(self, addons):
     auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
     cluster_kwargs = {
         'addonsConfig':
@@ -1892,106 +2205,25 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
                     disabled=False),
                 networkPolicyConfig=self.msgs.NetworkPolicyConfig(
                     disabled=True),
+                serverlessConfig=self.msgs.ServerlessConfig(disabled=False),
                 istioConfig=self.msgs.IstioConfig(disabled=False, auth=auth)),
         'management':
             self.messages.NodeManagement(autoRepair=True),
     }
-    self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
-                             self._MakeOperation())
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.ExpectGetCluster(self._RunningClusterForVersion('1.7.0'))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard,Istio'
-        .format(self.CLUSTER_NAME))
+        (self.clusters_command_base.format(self.ZONE) + ' create {0}'
+         ' --addons=HttpLoadBalancing,KubernetesDashboard,' + addons).format(
+             self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
-
-  def testCreateDisableAddonsIstio(self):
-    cluster_kwargs = {
-        'addonsConfig':
-            self.msgs.AddonsConfig(
-                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
-                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
-                    disabled=True),
-                kubernetesDashboard=self.msgs.KubernetesDashboard(
-                    disabled=False),
-                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                    disabled=True)),
-        'management':
-            self.messages.NodeManagement(autoRepair=True),
-    }
-    self.ExpectCreateCluster(self._MakeCluster(**cluster_kwargs),
-                             self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.ExpectGetCluster(self._RunningClusterForVersion('1.7.0'))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard'
-        .format(self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-
-  def testCreateValidateAddonsIstioConfig(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard,Istio'
-          ' --istio-config=auth=mutal_tls'
-          .format(self.CLUSTER_NAME))
-    self.AssertErrContains('auth is either NONE or MUTUAL_TLS')
-
-  def testCreateValidateAddonsIstio(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard'
-          ' --istio-config=auth=mutual_tls'
-          .format(self.CLUSTER_NAME))
-    self.AssertErrContains('--addon=Istio must be specified')
-
-  def testDefaultMaxPodsConstraint(self):
-    cluster_kwargs = {
-        'defaultMaxPodsConstraint':
-            self.msgs.MaxPodsConstraint(maxPodsPerNode=30),
-        'management':
-            self.messages.NodeManagement(autoRepair=True),
-    }
-    # Cluster create returns operation pending
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    policy = self._MakeIPAllocationPolicy(
-        clusterIpv4Cidr=None, createSubnetwork=False, useIpAliases=True)
-    expected_cluster.ipAllocationPolicy = policy
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    return_args = cluster_kwargs.copy()
-    self.updateResponse(
-        return_args,
-        ipAllocationPolicy=policy,
-        maxPodsConstraint=cluster_kwargs.get('maxPodsConstraint'))
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--enable-ip-alias '
-        '--default-max-pods-per-node=30 '
-        '--quiet'.format(name=self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-    self.AssertErrContains('Created')
-
-  def testDefaultMaxPodsConstraintBadArgs(self):
-    command = (
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {name} --quiet --default-max-pods-per-node=30'.format(
-            name=self.CLUSTER_NAME))
-    self.AssertRaisesExceptionMatches(
-        c_util.Error,
-        api_adapter.DEFAULT_MAX_PODS_PER_NODE_WITHOUT_IP_ALIAS_ERROR_MSG,
-        self.Run, command)
 
   @parameterized.parameters(
       ('--no-enable-managed-pod-identity', False),
-      ('--enable-managed-pod-identity', True),
+      ('--enable-managed-pod-identity --federating-service-account=foo',
+       True),
   )
   def testEnableManagedPodIdentity(self, flags, expect_enable):
     cluster_kwargs = {
@@ -2001,7 +2233,8 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         cluster_kwargs)
     if expect_enable:
       expected_cluster.managedPodIdentityConfig = \
-              self.messages.ManagedPodIdentityConfig(enabled=True)
+            self.messages.ManagedPodIdentityConfig(
+                enabled=True, federatingServiceAccount='foo')
     # Create cluster expects cluster and returns pending operation.
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     # Get operation returns done operation.
@@ -2014,32 +2247,76 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
                  name=self.CLUSTER_NAME,
                  flags=flags))
 
+  def testEnableManagedPodIdentityError(self):
+    expected_msg = ('Cannot use --federating-service-account without '
+                    '--enable-managed-pod-identity')
+    with self.AssertRaisesExceptionMatches(c_util.Error, expected_msg):
+      self.Run('{base} create {name} {flags} '
+               '--quiet'.format(
+                   base=self.clusters_command_base.format(self.ZONE),
+                   name=self.CLUSTER_NAME,
+                   flags='--federating-service-account=foo'))
+
   @parameterized.parameters(
-      ('test_dataset_id'),
-      (''),
+      ('--node-pool-name=some-node-pool', 'some-node-pool'),
+      (None, 'default-pool'),
   )
-  def testResourceUsageExportConfig(self, dataset_id):
+  def testNodePoolNameForSinglePool(self, param, expected):
     cluster_kwargs = {
         'management': self.messages.NodeManagement(autoRepair=True),
     }
+    cmd = '{base} create {name}'.format(
+        base=self.clusters_command_base.format(self.ZONE),
+        name=self.CLUSTER_NAME)
+    if param is not None:
+      cmd = '{cmd} {param}'.format(cmd=cmd, param=param)
+
+    cluster_kwargs['nodePools'] = [
+        self._MakeDefaultNodePool(
+            nodePoolName=expected, initialNodeCount=1, **cluster_kwargs)
+    ]
     expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
         cluster_kwargs)
-    flags = ''
-    if dataset_id:
-      flags = '--resource-usage-bigquery-dataset={dataset_id}'.format(
-          dataset_id=dataset_id)
-      bigquery_destination = self.messages.BigQueryDestination(
-          datasetId=dataset_id)
-      expected_cluster.resourceUsageExportConfig = \
-          self.messages.ResourceUsageExportConfig(
-              bigqueryDestination=bigquery_destination)
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.ExpectGetCluster(return_cluster)
-    self.Run('{base} create {name} {flags} --quiet'.format(
+
+    self.Run(cmd + ' --num-nodes=1')
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
+  @parameterized.parameters(
+      ('--node-pool-name=some-node-pool', 'some-node-pool'),
+      (None, 'default-pool'),
+  )
+  def testNodePoolNameForMultiplePools(self, param, expected):
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    cmd = '{base} create {name}'.format(
         base=self.clusters_command_base.format(self.ZONE),
-        name=self.CLUSTER_NAME,
-        flags=flags))
+        name=self.CLUSTER_NAME)
+    if param is not None:
+      cmd = '{cmd} {param}'.format(cmd=cmd, param=param)
+
+    # Expect 1999 nodes in four pools (500 + 500 + 500 + 499)
+    cluster_kwargs['nodePools'] = [
+        self._MakeDefaultNodePool(
+            nodePoolName='{expected}-{pool}'.format(
+                expected=expected, pool=pool_index),
+            initialNodeCount=500 if pool_index < 3 else 499,
+            **cluster_kwargs) for pool_index in range(4)
+    ]
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
+        cluster_kwargs)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(return_cluster)
+
+    # Create 500 node pools with 1999 nodes - 500 - 500 - 500 - 499
+    self.Run(cmd + ' --num-nodes=1999 --max-nodes-per-pool=500')
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
 
   def testEnableAuthenticatorSecurityGroups(self):
     cluster_kwargs = {
@@ -2065,6 +2342,101 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         '--quiet'.format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
+
+  @parameterized.parameters(
+      ('--security-profile=test-profile-1', 'test-profile-1', False),
+      ('--security-profile=test-profile-1 --security-profile-runtime-rules',
+       'test-profile-1', False),
+      ('--security-profile=test-profile-1 --no-security-profile-runtime-rules',
+       'test-profile-1', True),
+      ('', None, None),
+  )
+  def testSecurityProfile(self, flags,
+                          expect_profile, expect_disable_runtime_rules):
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
+        cluster_kwargs)
+    if expect_profile is not None:
+      expected_cluster.securityProfile = self.messages.SecurityProfile(
+          name=expect_profile,
+          disableRuntimeRules=expect_disable_runtime_rules)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(return_cluster)
+    self.Run('{base} create {name} {flags} --quiet'.format(
+        base=self.clusters_command_base.format(self.ZONE),
+        name=self.CLUSTER_NAME,
+        flags=flags))
+
+  def testPartiallySpecifiedDatabaseEncryptionKey(self):
+    key_flags = [
+        '--database-encryption-key-project=p',
+        '--database-encryption-key-location=global',
+        '--database-encryption-key-keyring=kr',
+        '--database-encryption-key=key',
+    ]
+
+    # selectively drop --database-encrytpion-* flags, 1 at a time (not project).
+    for i in range(1, 3):
+      flags = ' '.join([f for index, f in enumerate(key_flags) if index != i])
+      with self.AssertRaisesExceptionMatches(
+          exceptions.InvalidArgumentException,
+          'Invalid value for [--database-encryption-key]: not fully specified.'
+      ):
+        self.Run('{base} create {name} {flags} '.format(
+            base=self.clusters_command_base.format(self.ZONE),
+            name=self.CLUSTER_NAME,
+            flags=flags))
+
+  def testEnableTpuServiceNetworking(self):
+    cluster_kwargs = {
+        'enableTpu': True,
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    # Cluster create returns operation pending
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(
+        useIpAliases=True,
+        createSubnetwork=False,
+        tpuUseServiceNetworking=True,
+    )
+    expected_cluster.ipAllocationPolicy = policy
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-ip-alias '
+        '--enable-tpu '
+        '--enable-tpu-service-networking '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
+  @parameterized.parameters(
+      ('--enable-ip-alias --enable-tpu-service-networking',
+       c_util.Error,
+       api_adapter.PREREQUISITE_OPTION_ERROR_MSG.format(
+           prerequisite='enable-tpu', opt='enable-tpu-service-networking')),
+      ('--enable-ip-alias --enable-tpu --tpu-ipv4-cidr=10.1.0.0/20 '
+       '--enable-tpu-service-networking',
+       cli_test_base.MockArgumentError,
+       'At most one of --enable-tpu-service-networking | '
+       '--tpu-ipv4-cidr may be specified'),
+  )
+  def testEnableTpuBadArgs(self, flags, expected_err, expected_msg):
+    command = (
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {name} --quiet '.format(name=self.CLUSTER_NAME) + flags)
+    self.AssertRaisesExceptionMatches(expected_err, expected_msg, self.Run,
+                                      command)
 
 
 if __name__ == '__main__':

@@ -25,7 +25,6 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
@@ -36,10 +35,10 @@ _ETAG_CONFIRM_PROMPT = (
     r'overwrite concurrent policy changes.')
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class SetIamPolicy(base.CloudIotBase):
+class SetIamPolicyGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -60,7 +59,7 @@ class SetIamPolicy(base.CloudIotBase):
             self.messages.Binding(role='roles/viewer', members=['allUsers'])
         ],
         etag=(etag_bin if include_etag else None))
-    f = self.Touch(self.temp_path, 'policy.yaml', contents='''\
+    f = self.Touch(self.temp_path, 'policy.yaml', contents="""\
         {{
           "version": 1,
           "bindings": [
@@ -73,11 +72,10 @@ class SetIamPolicy(base.CloudIotBase):
               "members": ["allUsers"]
             }}
           ]{}
-        }}'''.format(etag_field))
+        }}""".format(etag_field))
     return policy, f
 
-  def testSetIamPolicy(self, track):
-    self.track = track
+  def testSetIamPolicy(self):
     policy, in_file = self._CreatePolicyAndFile()
 
     self.client.projects_locations_registries.SetIamPolicy.Expect(
@@ -95,8 +93,7 @@ class SetIamPolicy(base.CloudIotBase):
     self.assertEqual(result, policy)
     self.AssertLogContains('Updated IAM policy for registry [my-registry].')
 
-  def testSetIamPolicyYaml(self, track):
-    self.track = track
+  def testSetIamPolicyYaml(self):
     policy = self.messages.Policy(
         version=1,
         bindings=[
@@ -129,14 +126,12 @@ class SetIamPolicy(base.CloudIotBase):
 
     self.assertEqual(result, policy)
 
-  def testMissingInputFile(self, track):
-    self.track = track
+  def testMissingInputFile(self):
     with self.assertRaises(exceptions.Error):
       self.Run('iot registries set-iam-policy my-registry --region us-central1 '
                '/file-does-not-exist')
 
-  def testPromptNoEtagYesSucceeds(self, track):
-    self.track = track
+  def testPromptNoEtagYesSucceeds(self):
     policy, in_file = self._CreatePolicyAndFile()
 
     self.client.projects_locations_registries.SetIamPolicy.Expect(
@@ -153,8 +148,7 @@ class SetIamPolicy(base.CloudIotBase):
              '{0}'.format(in_file))
     self.AssertErrContains(_ETAG_CONFIRM_PROMPT)
 
-  def testPromptNoEtagNoFails(self, track):
-    self.track = track
+  def testPromptNoEtagNoFails(self):
     _, in_file = self._CreatePolicyAndFile()
     self.WriteInput('n\n')
     with self.assertRaises(console_io.OperationCancelledError):
@@ -162,8 +156,7 @@ class SetIamPolicy(base.CloudIotBase):
                '{0}'.format(in_file))
     self.AssertErrContains(_ETAG_CONFIRM_PROMPT)
 
-  def testNoPromptWithEtag(self, track):
-    self.track = track
+  def testNoPromptWithEtag(self):
     policy, in_file = self._CreatePolicyAndFile(include_etag=True)
 
     self.client.projects_locations_registries.SetIamPolicy.Expect(
@@ -178,8 +171,7 @@ class SetIamPolicy(base.CloudIotBase):
              '{0}'.format(in_file))
     self.AssertErrNotContains(_ETAG_CONFIRM_PROMPT)
 
-  def testSetIamPolicy_RelativeName(self, track):
-    self.track = track
+  def testSetIamPolicy_RelativeName(self):
     policy, in_file = self._CreatePolicyAndFile()
 
     registry_name = 'projects/{}/locations/us-central1/registries/{}'.format(
@@ -194,6 +186,18 @@ class SetIamPolicy(base.CloudIotBase):
 
     self.Run('iot registries set-iam-policy {0} {1}'
              .format(registry_name, in_file))
+
+
+class SetIamPolicyBeta(SetIamPolicyGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class SetIamPolicyAlpha(SetIamPolicyBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

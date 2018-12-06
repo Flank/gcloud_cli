@@ -26,10 +26,11 @@ from __future__ import unicode_literals
 import collections
 
 from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import yaml_location_value
 from googlecloudsdk.core.util import files
+from googlecloudsdk.core.util import typing  # pylint: disable=unused-import
 
 from ruamel import yaml
-from typing import Any, AnyStr, Generator, IO, Iterable, Optional, Union  # pylint: disable=unused-import, for pytype
 
 
 # YAML unfortunately uses a bunch of global class state for this kind of stuff.
@@ -47,6 +48,13 @@ yaml.add_representer(
     Dumper=yaml.dumper.RoundTripDumper)
 
 
+# Always output None as "null", instead of just empty.
+yaml.add_representer(
+    type(None),
+    lambda self, _: self.represent_scalar('tag:yaml.org,2002:null', 'null'),
+    Dumper=yaml.dumper.RoundTripDumper)
+
+
 class Error(exceptions.Error):
   """Top level error for this module.
 
@@ -60,7 +68,7 @@ class Error(exceptions.Error):
   """
 
   def __init__(self, e, verb, f=None):
-    # type: (Exception, str, Optional[str]) -> None
+    # type: (Exception, typing.Text, typing.Optional[str]) -> None
     file_text = ' from [{}]'.format(f) if f else ''
     super(Error, self).__init__(
         'Failed to {} YAML{}: {}'.format(verb, file_text, e))
@@ -72,7 +80,7 @@ class YAMLParseError(Error):
   """An error that wraps all YAML parsing errors."""
 
   def __init__(self, e, f=None):
-    # type: (Exception, Optional[str]) -> None
+    # type: (Exception, typing.Optional[str]) -> None
     super(YAMLParseError, self).__init__(e, verb='parse', f=f)
 
 
@@ -84,8 +92,8 @@ class FileLoadError(Error):
     super(FileLoadError, self).__init__(e, verb='load', f=f)
 
 
-def load(stream, file_hint=None, round_trip=False):
-  # type: (Union[str, IO[AnyStr]], Optional[str]) -> Any
+def load(stream, file_hint=None, round_trip=False, location_value=False):
+  # type: (typing.Union[str, typing.IO[typing.AnyStr]], typing.Optional[str], typing.Optional[bool], typing.Optional[bool]) -> typing.Any  # pylint: disable=line-too-long
   """Loads YAML from the given steam.
 
   Args:
@@ -97,6 +105,10 @@ def load(stream, file_hint=None, round_trip=False):
       coming from.
     round_trip: bool, True to use the RoundTripLoader which preserves ordering
       and line numbers.
+    location_value: bool, True to use a loader that preserves ordering and line
+      numbers for all values. Each YAML data item is an object with value and
+      lc attributes, where lc.line and lc.col are the line and column location
+      for the item in the YAML source file.
 
   Raises:
     YAMLParseError: If the data could not be parsed.
@@ -105,6 +117,8 @@ def load(stream, file_hint=None, round_trip=False):
     The parsed YAML data.
   """
   try:
+    if location_value:
+      return yaml_location_value.LocationValueLoad(stream)
     loader = yaml.RoundTripLoader if round_trip else yaml.SafeLoader
     return yaml.load(stream, loader, version='1.1')
   except yaml.YAMLError as e:
@@ -112,7 +126,7 @@ def load(stream, file_hint=None, round_trip=False):
 
 
 def load_all(stream, file_hint=None):
-  # type: (Union[str, IO[AnyStr]], Optional[str]) -> Generator[Any]
+  # type: (typing.Union[str, typing.IO[typing.AnyStr]], typing.Optional[str]) -> typing.Generator[typing.Any]  # pylint: disable=line-too-long
   """Loads multiple YAML documents from the given steam.
 
   Args:
@@ -133,14 +147,18 @@ def load_all(stream, file_hint=None):
     raise YAMLParseError(e, f=file_hint)
 
 
-def load_path(path, round_trip=False):
-  # type: (str) -> Any
+def load_path(path, round_trip=False, location_value=False):
+  # type: (str, typing.Optional[bool], typing.Optional[bool]) -> typing.Any
   """Loads YAML from the given file path.
 
   Args:
     path: str, A file path to open and read from.
     round_trip: bool, True to use the RoundTripLoader which preserves ordering
       and line numbers.
+    location_value: bool, True to use a loader that preserves ordering and line
+      numbers for all values. Each YAML data item is an object with value and
+      lc attributes, where lc.line and lc.col are the line and column location
+      for the item in the YAML source file.
 
   Raises:
     YAMLParseError: If the data could not be parsed.
@@ -151,13 +169,14 @@ def load_path(path, round_trip=False):
   """
   try:
     with files.FileReader(path) as fp:
-      return load(fp, file_hint=path, round_trip=round_trip)
+      return load(fp, file_hint=path, round_trip=round_trip,
+                  location_value=location_value)
   except files.Error as e:
     raise FileLoadError(e, f=path)
 
 
 def load_all_path(path):
-  # type: (str) -> Generator[Any]
+  # type: (str) -> typing.Generator[typing.Any]
   """Loads multiple YAML documents from the given file path.
 
   Args:
@@ -181,7 +200,7 @@ def load_all_path(path):
 
 
 def dump(data, stream=None, round_trip=False, **kwargs):
-  # type: (Any, Optional[IO[AnyStr]], Any) -> str
+  # type: (typing.Any, typing.Optional[typing.IO[typing.AnyStr]], typing.Any, typing.Optional[typing.Dict]) -> str  # pylint: disable=line-too-long
   """Dumps the given YAML data to the stream.
 
   Args:
@@ -200,7 +219,7 @@ def dump(data, stream=None, round_trip=False, **kwargs):
 
 
 def dump_all(documents, stream=None, **kwargs):
-  # type: (Iterable[Any], Optional[IO[AnyStr]], Any) -> str
+  # type: (typing.Iterable[typing.Any], typing.Optional[typing.IO[typing.AnyStr]], typing.Any) -> str  # pylint: disable=line-too-long
   """Dumps multiple YAML documents to the stream.
 
   Args:
@@ -216,7 +235,7 @@ def dump_all(documents, stream=None, **kwargs):
 
 
 def convert_to_block_text(data):
-  # type: (Union[dict, list]) -> None
+  # type: (typing.Union[dict, list]) -> None
   r"""This processes the given dict or list so it will render as block text.
 
   By default, the yaml dumper will write multiline strings out as a double
@@ -227,3 +246,13 @@ def convert_to_block_text(data):
     data: {} or [], The data structure to process.
   """
   yaml.scalarstring.walk_tree(data)
+
+
+def list_like(item):
+  """Return True if the item is like a list: a MutableSequence."""
+  return isinstance(item, collections.MutableSequence)
+
+
+def dict_like(item):
+  """Return True if the item is like a dict: a MutableMapping."""
+  return isinstance(item, collections.MutableMapping)

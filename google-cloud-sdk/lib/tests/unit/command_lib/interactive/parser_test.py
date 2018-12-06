@@ -76,6 +76,7 @@ class ParseCommandTests(subtests.Base):
     self.Run([[T('compute', L.GROUP, self.compute_tree, 0, 7)]],
              'compute')
     self.Run([[T('compute', L.GROUP, self.compute_tree, 0, 7),
+               T(';', L.SPECIAL, self.tree, 7, 8),
                T('compute', L.GROUP, self.compute_tree, 8, 15)]],
              'compute;compute')
     self.Run(

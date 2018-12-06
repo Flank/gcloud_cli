@@ -431,7 +431,7 @@ class KeygenCommandBuildTest(CommandTestBase):
     """Test building non-interactive."""
     self.AssertCommandBuild(
         ssh.KeygenCommand('/key/file'),
-        ['ssh-keygen', '-P', '', '-t', 'rsa', '-f', '/key/file'],
+        ['ssh-keygen', '-N', '', '-t', 'rsa', '-f', '/key/file'],
         'winkeygen /key/file')
 
   def testInteractive(self):
@@ -445,7 +445,7 @@ class KeygenCommandBuildTest(CommandTestBase):
     self.can_prompt.return_value = True
     self.AssertCommandBuild(
         ssh.KeygenCommand('/key/file', allow_passphrase=False),
-        ['ssh-keygen', '-P', '', '-t', 'rsa', '-f', '/key/file'],
+        ['ssh-keygen', '-N', '', '-t', 'rsa', '-f', '/key/file'],
         'winkeygen /key/file')
 
 

@@ -19,11 +19,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import itertools
 from dateutil import tz
 
-from googlecloudsdk.api_lib.cloudiot import devices as devices_api
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iot import flags
+from googlecloudsdk.command_lib.iot import util as command_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import times
 from tests.lib import cli_test_base
@@ -32,13 +32,13 @@ from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
+class DevicesCreateTestGA(base.CloudIotBase, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.devices_client = devices_api.DevicesClient(self.client, self.messages)
-
     self.StartObjectPatch(times, 'LOCAL', tz.tzutc())
-
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def _ExpectCreate(self, device):
@@ -51,11 +51,7 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
             device=device),
         device)
 
-  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                            calliope_base.ReleaseTrack.BETA,
-                            calliope_base.ReleaseTrack.GA)
-  def testCreate_NoOptions(self, track):
-    self.track = track
+  def testCreate_NoOptions(self):
     device = self.messages.Device(
         id='my-device',
         blocked=False
@@ -70,15 +66,11 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
     self.assertEqual(results, device)
     self.AssertLogContains('Created device [my-device].')
 
-  @parameterized.parameters(itertools.product(
-      [calliope_base.ReleaseTrack.ALPHA, calliope_base.ReleaseTrack.BETA,
-       calliope_base.ReleaseTrack.GA],
-      [(True, '--blocked'),
-       (False, '--no-blocked')]
-  ))
-  def testCreate_BlockedFlags(self, track, data):
-    blocked, blocked_flag = data
-    self.track = track
+  @parameterized.parameters(
+      (True, '--blocked'),
+      (False, '--no-blocked')
+  )
+  def testCreate_BlockedFlags(self, blocked, blocked_flag):
     device = self.messages.Device(
         id='my-device',
         blocked=blocked,
@@ -94,23 +86,19 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
 
     self.assertEqual(results, device)
 
-  @parameterized.parameters(itertools.product(
-      [calliope_base.ReleaseTrack.ALPHA, calliope_base.ReleaseTrack.BETA,
-       calliope_base.ReleaseTrack.GA],
-      [('rsa-pem', 'RSA_PEM', base.CloudIotBase.PUBLIC_KEY_CONTENTS),
-       ('RSA_PEM', 'RSA_PEM', base.CloudIotBase.PUBLIC_KEY_CONTENTS),
-       ('es256-pem', 'ES256_PEM', base.CloudIotBase.PUBLIC_KEY_CONTENTS),
-       ('ES256_PEM', 'ES256_PEM', base.CloudIotBase.PUBLIC_KEY_CONTENTS),
-       ('rsa-x509-pem', 'RSA_X509_PEM', base.CloudIotBase.CERTIFICATE_CONTENTS),
-       ('RSA_X509_PEM', 'RSA_X509_PEM', base.CloudIotBase.CERTIFICATE_CONTENTS),
-       ('es256-x509-pem', 'ES256_X509_PEM',
-        base.CloudIotBase.CERTIFICATE_CONTENTS),
-       ('ES256_X509_PEM', 'ES256_X509_PEM',
-        base.CloudIotBase.CERTIFICATE_CONTENTS),]
-  ))
-  def testCreate_ValidCredentialTypes(self, track, data):
-    key_type, type_enum, key_contents = data
-    self.track = track
+  @parameterized.parameters(
+      ('rsa-pem', 'RSA_PEM', base.CloudIotBase.PUBLIC_KEY_CONTENTS),
+      ('RSA_PEM', 'RSA_PEM', base.CloudIotBase.PUBLIC_KEY_CONTENTS),
+      ('es256-pem', 'ES256_PEM', base.CloudIotBase.PUBLIC_KEY_CONTENTS),
+      ('ES256_PEM', 'ES256_PEM', base.CloudIotBase.PUBLIC_KEY_CONTENTS),
+      ('rsa-x509-pem', 'RSA_X509_PEM', base.CloudIotBase.CERTIFICATE_CONTENTS),
+      ('RSA_X509_PEM', 'RSA_X509_PEM', base.CloudIotBase.CERTIFICATE_CONTENTS),
+      ('es256-x509-pem', 'ES256_X509_PEM',
+       base.CloudIotBase.CERTIFICATE_CONTENTS),
+      ('ES256_X509_PEM', 'ES256_X509_PEM',
+       base.CloudIotBase.CERTIFICATE_CONTENTS),
+  )
+  def testCreate_ValidCredentialTypes(self, key_type, type_enum, key_contents):
     key_path = self.Touch(self.temp_path, 'temp.pub', contents=key_contents)
     expiration_time = '2017-01-01T00:00:00.000Z'
     device = self.messages.Device(
@@ -137,11 +125,7 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
     self.assertEqual(results, device)
     self.AssertLogContains('Created device [my-device].')
 
-  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                            calliope_base.ReleaseTrack.BETA,
-                            calliope_base.ReleaseTrack.GA)
-  def testCreate_WithCredentialsDeprecatedTypes(self, track):
-    self.track = track
+  def testCreate_WithCredentialsDeprecatedTypes(self):
     new_credential_cert_path = self.Touch(self.temp_path, 'certificate.pub',
                                           contents=self.CERTIFICATE_CONTENTS)
     new_credential_key_path = self.Touch(self.temp_path, 'key.pub',
@@ -178,11 +162,7 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
     self.assertEqual(results, device)
     self.AssertLogContains('Created device [my-device].')
 
-  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                            calliope_base.ReleaseTrack.BETA,
-                            calliope_base.ReleaseTrack.GA)
-  def testCreate_WithCredentialsBadKeySpecification(self, track):
-    self.track = track
+  def testCreate_WithCredentialsBadKeySpecification(self):
     with self.AssertRaisesExceptionMatches(
         cli_test_base.MockArgumentError,
         'valid keys are [expiration-time, path, type]; received: bad-key'):
@@ -193,11 +173,7 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
            '    --public-key path={},type=es256,bad-key=bad-value').format(
                self.public_key))
 
-  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                            calliope_base.ReleaseTrack.BETA,
-                            calliope_base.ReleaseTrack.GA)
-  def testCreate_WithCredentialsBadKeyType(self, track):
-    self.track = track
+  def testCreate_WithCredentialsBadKeyType(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.PUBLIC_KEY_CONTENTS)
     with self.assertRaisesRegex(
@@ -209,11 +185,7 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
            '    --public-key path={},type=bad-key-type,').format(
                new_credential_path))
 
-  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                            calliope_base.ReleaseTrack.BETA,
-                            calliope_base.ReleaseTrack.GA)
-  def testCreate_WithCredentialsBadDateTime(self, track):
-    self.track = track
+  def testCreate_WithCredentialsBadDateTime(self):
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.PUBLIC_KEY_CONTENTS)
     with self.AssertRaisesExceptionMatches(
@@ -226,11 +198,7 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
            '    --public-key path={},type=es256,expiration-time=not-a-datetime,'
           ).format(new_credential_path))
 
-  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                            calliope_base.ReleaseTrack.BETA,
-                            calliope_base.ReleaseTrack.GA)
-  def testCreate_WithMetadata(self, track):
-    self.track = track
+  def testCreate_WithMetadata(self):
     metadata_path = self.Touch(self.temp_path, 'value.txt', 'file_value')
     device = self.messages.Device(
         id='my-device',
@@ -249,11 +217,7 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
          '    --metadata=key=value '
          '    --metadata-from-file=file_key={} '.format(metadata_path)))
 
-  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                            calliope_base.ReleaseTrack.BETA,
-                            calliope_base.ReleaseTrack.GA)
-  def testCreate_RelativeName(self, track):
-    self.track = track
+  def testCreate_RelativeName(self):
     device = self.messages.Device(
         id='my-device',
         blocked=False
@@ -268,6 +232,107 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
         'iot devices create {}'.format(device_name))
 
     self.assertEqual(results, device)
+
+
+class DevicesCreateTestBeta(DevicesCreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  @parameterized.parameters(
+      ('none', 'NONE'), ('info', 'INFO'), ('error', 'ERROR'), ('Info', 'INFO'),
+      ('ErRoR', 'ERROR'), ('NONE', 'NONE'), ('debug', 'DEBUG'),
+      ('dEbUg', 'DEBUG'), ('DEBUG', 'DEBUG'))
+  def testCreate_WithLogLevel(self, log_level, log_level_enum):
+    device = self.messages.Device(
+        id='my-device',
+        blocked=False,
+        logLevel=self.messages.Device.LogLevelValueValuesEnum(log_level_enum))
+    self._ExpectCreate(device)
+
+    results = self.Run('iot devices create my-device '
+                       '    --registry my-registry'
+                       '    --region us-central1'
+                       '    --log-level {}'.format(log_level))
+
+    self.assertEqual(results, device)
+    self.AssertLogContains('Created device [my-device].')
+
+  def testCreate_WithInvalidLogLevel(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        "argument --log-level: Invalid choice: 'just-whenever-dude'"):
+      self.Run('iot devices create my-device '
+               '    --registry my-registry'
+               '    --region us-central1'
+               '    --log-level just-whenever-dude')
+
+  @parameterized.parameters('gateway', 'non-gateway')
+  def testCreate_WithGatewayType(self, gateway_type):
+    gateway_enum = flags.CREATE_GATEWAY_ENUM_MAPPER.GetEnumForChoice(
+        gateway_type)
+    device = self.messages.Device(
+        id='my-device',
+        blocked=False,
+        gatewayConfig=self.messages.GatewayConfig(gatewayType=gateway_enum)
+    )
+    self._ExpectCreate(device)
+
+    device_name = ('projects/{}/'
+                   'locations/us-central1/'
+                   'registries/my-registry/'
+                   'devices/my-device').format(self.Project())
+    results = self.Run(
+        'iot devices create {} --device-type {}'.format(device_name,
+                                                        gateway_type))
+
+    self.assertEqual(results, device)
+
+  @parameterized.parameters('association-only', 'device-auth-token-only',
+                            'association-and-device-auth-token')
+  def testCreate_WithAuthMethod(self, auth_method):
+    gateway_enum = (
+        self.messages.GatewayConfig.GatewayTypeValueValuesEnum.GATEWAY)
+    auth_method_enum = (
+        self.messages.GatewayConfig.GatewayAuthMethodValueValuesEnum
+        .lookup_by_name(auth_method.upper().replace('-', '_')))
+
+    device = self.messages.Device(
+        id='my-device',
+        blocked=False,
+        gatewayConfig=self.messages.GatewayConfig(
+            gatewayType=gateway_enum, gatewayAuthMethod=auth_method_enum))
+    self._ExpectCreate(device)
+
+    device_name = ('projects/{}/'
+                   'locations/us-central1/'
+                   'registries/my-registry/'
+                   'devices/my-device').format(self.Project())
+    results = self.Run('iot devices create {} --device-type gateway '
+                       '--auth-method {}'.format(device_name, auth_method))
+
+    self.assertEqual(results, device)
+
+  def testCreate_WithAuthTypeAndNoGatewayTypeFails(self):
+    with self.AssertRaisesExceptionMatches(command_util.InvalidAuthMethodError,
+                                           'auth_method can only be set on '
+                                           'gateway devices.'):
+      self.Run('iot devices create my-device'
+               ' --registry my-registry'
+               ' --region us-central1 --device-type non-gateway'
+               ' --auth-method association-only')
+
+    with self.AssertRaisesExceptionMatches(command_util.InvalidAuthMethodError,
+                                           'auth_method can only be set on '
+                                           'gateway devices.'):
+      self.Run('iot devices create my-device'
+               ' --registry my-registry'
+               ' --region us-central1 --auth-method association-only')
+
+
+class DevicesCreateTestAlpha(DevicesCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

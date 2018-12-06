@@ -13,39 +13,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the security policy rules update subcommand."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class SecurityPolicyRulesUpdateTestBeta(test_base.BaseTest,
-                                        parameterized.TestCase):
+class SecurityPolicyRulesUpdateTest(test_base.BaseTest, parameterized.TestCase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', 'v1')
     self.my_policy_ref = self.resources.Create(
         'compute.securityPolicies',
         securityPolicy='my-policy',
         project='my-project')
 
   def CheckSecurityPolicyRuleRequest(self, priority, rule):
-    self.CheckRequests(
-        [(self.compute.securityPolicies, 'PatchRule',
-          self.messages.ComputeSecurityPoliciesPatchRuleRequest(
-              project='my-project',
-              priority=priority,
-              securityPolicyRule=rule,
-              securityPolicy='my-policy'))],
-    )
+    self.CheckRequests([(self.compute.securityPolicies, 'PatchRule',
+                         self.messages.ComputeSecurityPoliciesPatchRuleRequest(
+                             project='my-project',
+                             priority=priority,
+                             securityPolicyRule=rule,
+                             securityPolicy='my-policy'))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
@@ -55,8 +53,8 @@ class SecurityPolicyRulesUpdateTestBeta(test_base.BaseTest,
         description='my rule',
         priority=1000,
         match=messages.SecurityPolicyRuleMatcher(
-            versionedExpr=messages.SecurityPolicyRuleMatcher.
-            VersionedExprValueValuesEnum('SRC_IPS_V1'),
+            versionedExpr=messages.SecurityPolicyRuleMatcher
+            .VersionedExprValueValuesEnum('SRC_IPS_V1'),
             config=messages.SecurityPolicyRuleMatcherConfig(
                 srcIpRanges=['1.1.1.1'])),
         action='allow',
@@ -75,10 +73,7 @@ class SecurityPolicyRulesUpdateTestBeta(test_base.BaseTest,
   def testWithNoMatch(self):
     messages = self.messages
     expected_rule = messages.SecurityPolicyRule(
-        description='my rule',
-        priority=1000,
-        action='allow',
-        preview=True)
+        description='my rule', priority=1000, action='allow', preview=True)
 
     self.Run("""
         compute security-policies rules update 1000
@@ -99,8 +94,8 @@ class SecurityPolicyRulesUpdateTestBeta(test_base.BaseTest,
         description='my rule',
         priority=1000,
         match=messages.SecurityPolicyRuleMatcher(
-            versionedExpr=messages.SecurityPolicyRuleMatcher.
-            VersionedExprValueValuesEnum('SRC_IPS_V1'),
+            versionedExpr=messages.SecurityPolicyRuleMatcher
+            .VersionedExprValueValuesEnum('SRC_IPS_V1'),
             config=messages.SecurityPolicyRuleMatcherConfig(
                 srcIpRanges=['1.1.1.1'])),
         action=expected_action,
@@ -127,8 +122,8 @@ class SecurityPolicyRulesUpdateTestBeta(test_base.BaseTest,
         description='my rule',
         priority=1000,
         match=messages.SecurityPolicyRuleMatcher(
-            versionedExpr=messages.SecurityPolicyRuleMatcher.
-            VersionedExprValueValuesEnum('SRC_IPS_V1'),
+            versionedExpr=messages.SecurityPolicyRuleMatcher
+            .VersionedExprValueValuesEnum('SRC_IPS_V1'),
             config=messages.SecurityPolicyRuleMatcherConfig(
                 srcIpRanges=['1.1.1.1'])),
         action='allow',
@@ -168,11 +163,24 @@ class SecurityPolicyRulesUpdateTestBeta(test_base.BaseTest,
         """.format(invalid_priority))
 
 
-class SecurityPolicyRulesUpdateTestAlpha(SecurityPolicyRulesUpdateTestBeta):
+class SecurityPolicyRulesUpdateTestBeta(SecurityPolicyRulesUpdateTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.my_policy_ref = self.resources.Create(
+        'compute.securityPolicies',
+        securityPolicy='my-policy',
+        project='my-project')
+
+
+class SecurityPolicyRulesUpdateTestAlpha(SecurityPolicyRulesUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'alpha')
     self.my_policy_ref = self.resources.Create(

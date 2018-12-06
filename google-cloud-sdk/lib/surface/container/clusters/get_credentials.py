@@ -79,6 +79,10 @@ class GetCredentials(base.Command):
         'name',
         help='Name of the cluster to get credentials for.',
         action=actions.StoreProperty(properties.VALUES.container.cluster))
+    parser.add_argument(
+        '--internal-ip',
+        help='Whether to use the internal IP address of the cluster endpoint.',
+        action='store_true')
 
   def Run(self, args):
     """This is what gets called when the user runs this command.
@@ -108,4 +112,5 @@ class GetCredentials(base.Command):
               cluster_ref.projectId))
     if not adapter.IsRunning(cluster):
       log.warning(NOT_RUNNING_MSG.format(cluster_ref.clusterId))
-    util.ClusterConfig.Persist(cluster, cluster_ref.projectId)
+    util.ClusterConfig.Persist(cluster, cluster_ref.projectId,
+                               args.internal_ip)

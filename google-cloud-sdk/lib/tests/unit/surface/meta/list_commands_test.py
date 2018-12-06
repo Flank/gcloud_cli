@@ -80,7 +80,7 @@ gcloud markdown markdown-command
     """Test the list of the non-hidden commands with flags via Run()."""
     self.Run('meta list-commands --flags')
     self.AssertOutputEquals("""\
-gcloud --authority-selector --authorization-token-file --configuration --credential-file-override --document --flatten --format --help --http-timeout --log-http --top-group-flag --user-output-enabled --verbosity -h
+gcloud ---flag-file-line- --authority-selector --authorization-token-file --configuration --credential-file-override --document --flags-file --flatten --format --help --http-timeout --log-http --top-group-flag --user-output-enabled --verbosity -h
 gcloud markdown
 gcloud markdown markdown-command --choices-dict --choices-dict-arg-list --choices-dict-bloviate --choices-dict-only-one-choice-yes-we-really-do-this --choices-list --choices-list-arg-list --choices-list-only-one-choice-yes-we-really-do-this --dict-flag --filter --list-flag --optional-flag --question-flag --root-flag --store-false-default-false-flag --store-false-default-none-flag --store-false-default-true-flag --store-true-default-false-flag --store-true-default-none-flag --store-true-default-true-flag --value-flag --y-common-flag --z-required-flag
 """)
@@ -89,7 +89,7 @@ gcloud markdown markdown-command --choices-dict --choices-dict-arg-list --choice
     """Test the list of the non-hidden commands with flags/values via Run()."""
     self.Run('meta list-commands --flags --flag-values')
     self.AssertOutputEquals("""\
-gcloud --authority-selector=:AUTHORITY_SELECTOR: --authorization-token-file=:AUTHORIZATION_TOKEN_FILE: --configuration=:CONFIGURATION: --credential-file-override=:CREDENTIAL_FILE_OVERRIDE: --document=:dict: --flatten=:list: --format=:FORMAT: --help --http-timeout=:HTTP_TIMEOUT: --log-http --top-group-flag=:TOP_GROUP_FLAG: --user-output-enabled --verbosity=critical,debug,error,info,none,warning -h
+gcloud ---flag-file-line-=:FLAG_FILE_LINE_: --authority-selector=:AUTHORITY_SELECTOR: --authorization-token-file=:AUTHORIZATION_TOKEN_FILE: --configuration=:CONFIGURATION: --credential-file-override=:CREDENTIAL_FILE_OVERRIDE: --document=:dict: --flags-file=:YAML_FILE: --flatten=:list: --format=:FORMAT: --help --http-timeout=:HTTP_TIMEOUT: --log-http --top-group-flag=:TOP_GROUP_FLAG: --user-output-enabled --verbosity=critical,debug,error,info,none,warning -h
 gcloud markdown
 gcloud markdown markdown-command --choices-dict-arg-list=:list: --choices-dict-bloviate=bar,foo,none --choices-dict-only-one-choice-yes-we-really-do-this=this-is-it --choices-dict=bar,foo,none --choices-list-arg-list=:list: --choices-list-only-one-choice-yes-we-really-do-this=this-is-it --choices-list=bar,foo,none --dict-flag=:dict: --filter=:EXPRESSION: --list-flag=:list: --optional-flag=:OPTIONAL_FLAG: --question-flag=:QUESTION_FLAG: --root-flag=:ROOT_PATH: --store-false-default-false-flag --store-false-default-none-flag --store-false-default-true-flag --store-true-default-false-flag --store-true-default-none-flag --store-true-default-true-flag --value-flag=:VALUE_FLAG: --y-common-flag=:Y_COMMON_FLAG: --z-required-flag=:Z_REQUIRED_FLAG:
 """)
@@ -109,7 +109,7 @@ gcloud markdown markdown-command
     """Test the list of the non-hidden commands via Run()."""
     self.Run('meta list-commands --hidden --flags')
     self.AssertOutputEquals("""\
-gcloud --authority-selector --authorization-token-file --configuration --credential-file-override --document --flatten --format --help --http-timeout --log-http --top-group-flag --user-output-enabled --verbosity -h
+gcloud ---flag-file-line- --authority-selector --authorization-token-file --configuration --credential-file-override --document --flags-file --flatten --format --help --http-timeout --log-http --top-group-flag --user-output-enabled --verbosity -h
 gcloud hidden-group
 gcloud hidden-group hidden-command
 gcloud markdown
@@ -194,7 +194,7 @@ class RunListCommandsCompletionsTest(calliope_test_base.CalliopeTestBase):
     """Test the completions list of all commands via Run()."""
     self.Run('meta list-commands --completions')
     self.AssertOutputContains("""\
-_SC__GLOBAL_FLAGS_=(--authority-selector=:AUTHORITY_SELECTOR: --authorization-token-file=:AUTHORIZATION_TOKEN_FILE: --configuration=:CONFIGURATION: --credential-file-override=:CREDENTIAL_FILE_OVERRIDE: --document=:dict: --flatten=:list: --format=:FORMAT: --help --http-timeout=:HTTP_TIMEOUT: --log-http --user-output-enabled --verbosity=critical,debug,error,info,none,warning -h)
+_SC__GCLOUD_WIDE_FLAGS_=(---flag-file-line-=:FLAG_FILE_LINE_: --authority-selector=:AUTHORITY_SELECTOR: --authorization-token-file=:AUTHORIZATION_TOKEN_FILE: --configuration=:CONFIGURATION: --credential-file-override=:CREDENTIAL_FILE_OVERRIDE: --document=:dict: --flags-file=:YAML_FILE: --flatten=:list: --format=:FORMAT: --help --http-timeout=:HTTP_TIMEOUT: --log-http --user-output-enabled --verbosity=critical,debug,error,info,none,warning -h)
 _SC_gcloud=(version alpha beta internal sdk)
 _SC_gcloud__version=()
 _SC_gcloud__alpha=(version internal sdk)
@@ -253,7 +253,7 @@ _SC_gcloud__sdk__subgroup__subgroup_command_a=(--delete-in=:DELETE_IN: --delete-
     """Test the completions list of the sdk subgroup commands via Run()."""
     self.Run('meta list-commands --completions gcloud.sdk')
     self.AssertOutputContains("""\
-_SC__GLOBAL_FLAGS_=(--authority-selector=:AUTHORITY_SELECTOR: --authorization-token-file=:AUTHORIZATION_TOKEN_FILE: --configuration=:CONFIGURATION: --credential-file-override=:CREDENTIAL_FILE_OVERRIDE: --document=:dict: --flatten=:list: --format=:FORMAT: --help --http-timeout=:HTTP_TIMEOUT: --log-http --user-output-enabled --verbosity=critical,debug,error,info,none,warning -h)
+_SC__GCLOUD_WIDE_FLAGS_=(---flag-file-line-=:FLAG_FILE_LINE_: --authority-selector=:AUTHORITY_SELECTOR: --authorization-token-file=:AUTHORIZATION_TOKEN_FILE: --configuration=:CONFIGURATION: --credential-file-override=:CREDENTIAL_FILE_OVERRIDE: --document=:dict: --flags-file=:YAML_FILE: --flatten=:list: --format=:FORMAT: --help --http-timeout=:HTTP_TIMEOUT: --log-http --user-output-enabled --verbosity=critical,debug,error,info,none,warning -h)
 _SC_gcloud=(sdk)
 _SC_gcloud__sdk=(hidden-command ordered-choices second-level-command-1 second-level-command-b xyzzy hiddengroup subgroup)
 _SC_gcloud__sdk__hidden_command=()

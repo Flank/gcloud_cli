@@ -20,12 +20,13 @@ from __future__ import unicode_literals
 
 import argparse
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.ALPHA)
-class HiddenGroup(base.Group):
+@calliope_base.Hidden
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.GA,
+                             calliope_base.ReleaseTrack.ALPHA)
+class HiddenGroup(calliope_base.Group):
   """Hidden Group docstring index.
 
   Hidden group docstring description.

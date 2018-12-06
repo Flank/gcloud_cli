@@ -1402,13 +1402,13 @@ MACHINE_TYPES = [
 ]
 
 
-def MakeInstanceGroupManagersWithCurrentActions(
-    api,
-    current_actions_count,
-    scope_type='zone',
-    scope_name='zone-1',
-    current_actions_state='creating',
-    is_stable=None):
+def MakeInstanceGroupManagersWithActions(api,
+                                         current_actions_count,
+                                         scope_type='zone',
+                                         scope_name='zone-1',
+                                         actions_state='creating',
+                                         pending_actions_count=None,
+                                         is_stable=None):
   """Creates instance group manages with current actions tests resources."""
   used_messages = _GetMessagesForApi(api)
   igm = used_messages.InstanceGroupManager(
@@ -1430,11 +1430,14 @@ def MakeInstanceGroupManagersWithCurrentActions(
                         .format(api)),
       targetPools=[],
       targetSize=1)
-  igm.currentActions = used_messages.InstanceGroupManagerActionsSummary(
-      **{
-          current_actions_state: current_actions_count,
-          'none': (10 - current_actions_count)
-      })
+  igm.currentActions = used_messages.InstanceGroupManagerActionsSummary(**{
+      actions_state: current_actions_count,
+      'none': (10 - current_actions_count)
+  })
+  if pending_actions_count is not None:
+    pending_actions = used_messages.InstanceGroupManagerPendingActionsSummary(
+        **{actions_state: pending_actions_count})
+    igm.pendingActions = pending_actions
 
   if is_stable is not None:
     igm.status = used_messages.InstanceGroupManagerStatus(isStable=is_stable)
@@ -1627,6 +1630,61 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
             'projects/my-project/{1}/{2}'
             .format(api, scope_type + 's', scope_name))
   return group_managers
+
+
+def MakeMachineImages(msgs, api):
+  """Creates a set of Machine Image messages for the given API version.
+
+  Args:
+    msgs: The compute messages API handle.
+    api: The API version for which to create the machine images.
+
+  Returns:
+    A list of message objects representing machine images.
+  """
+  prefix = _COMPUTE_PATH + '/' + api
+  return [
+      msgs.MachineImage(
+          name='machine-image-1',
+          description='Machine Image 1',
+          status=msgs.MachineImage.StatusValueValuesEnum.READY,
+          selfLink=(prefix + '/projects/my-project/'
+                    'global/machineImages/machine-image-1'),
+          sourceInstanceProperties=msgs.SourceInstanceProperties(
+              machineType='n1-standard-1',
+              disks=[
+                  msgs.SavedAttachedDisk(
+                      autoDelete=True,
+                      boot=True,
+                      deviceName='device-1',
+                      mode=(msgs.SavedAttachedDisk.
+                            ModeValueValuesEnum.READ_WRITE),
+                      source='disk-1',
+                      type=(msgs.SavedAttachedDisk.
+                            TypeValueValuesEnum.PERSISTENT),
+                  ),
+                  msgs.SavedAttachedDisk(
+                      autoDelete=True,
+                      boot=True,
+                      deviceName='device-2',
+                      mode=(msgs.SavedAttachedDisk.
+                            ModeValueValuesEnum.READ_ONLY),
+                      type=(msgs.SavedAttachedDisk.
+                            TypeValueValuesEnum.SCRATCH),
+                  ),
+              ])),
+
+      msgs.MachineImage(
+          name='machine-image-2',
+          description='Machine Image 2',
+          status=msgs.MachineImage.StatusValueValuesEnum.CREATING,
+          selfLink=(prefix + '/projects/my-project/'
+                    'global/machineImages/machine-image-2')),
+  ]
+
+
+MACHINE_IMAGES_ALPHA = MakeMachineImages(alpha_messages, 'alpha')
+MACHINE_IMAGES = MACHINE_IMAGES_ALPHA
 
 
 NETWORKS_V1 = [
@@ -1991,11 +2049,17 @@ def MakeOsloginClient(version, use_extended_profile=False):
       loginProfile=login_profile)
 
   class _OsloginUsers(object):
+    """Mock OS Login Users class."""
 
     @classmethod
     def ImportSshPublicKey(cls, message):
       del cls, message  # Unused
       return import_public_key_response
+
+    @classmethod
+    def GetLoginProfile(cls, message):
+      del cls, message  # Unused
+      return login_profile
 
   class _OsloginClient(object):
     users = _OsloginUsers
@@ -2382,6 +2446,73 @@ SSL_CERTIFICATES = [
     ),
 ]
 
+BETA_SSL_CERTIFICATES = [
+    beta_messages.SslCertificate(
+        type=beta_messages.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
+        name='ssl-cert-1',
+        selfManaged=beta_messages.SslCertificateSelfManagedSslCertificate(
+            certificate=(textwrap.dedent("""\
+                -----BEGIN CERTIFICATE-----
+                MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
+                UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
+                CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj
+                bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL
+                MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0
+                bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw
+                FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC
+                gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6
+                bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s
+                wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG
+                9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT
+                zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob
+                v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
+                -----END CERTIFICATE-----"""))),
+        creationTimestamp='2017-12-18T11:11:11.000-07:00',
+        expireTime='2018-12-18T11:11:11.000-07:00',
+        description='Self-managed certificate.',
+        selfLink=_BETA_URI_PREFIX + 'global/sslCertificates/ssl-cert-1',
+    ),
+    beta_messages.SslCertificate(
+        name='ssl-cert-2',
+        type=beta_messages.SslCertificate.TypeValueValuesEnum.
+        MANAGED,
+        managed=beta_messages.SslCertificateManagedSslCertificate(
+            domains=[
+                'test1.certsbridge.com',
+                # Punycode for Ṳᾔḯ¢◎ⅾℯ.certsbridge.com
+                'xn--8a342mzfam5b18csni3w.certsbridge.com',
+            ],
+            status=beta_messages.SslCertificateManagedSslCertificate.
+            StatusValueValuesEnum.ACTIVE,
+            domainStatus=beta_messages.
+            SslCertificateManagedSslCertificate.DomainStatusValue(
+                additionalProperties=[
+                    beta_messages.SslCertificateManagedSslCertificate.
+                    DomainStatusValue.AdditionalProperty(
+                        key='test1.certsbridge.com',
+                        value=beta_messages.
+                        SslCertificateManagedSslCertificate.
+                        DomainStatusValue.AdditionalProperty.
+                        ValueValueValuesEnum.ACTIVE,
+                    ),
+                    beta_messages.SslCertificateManagedSslCertificate.
+                    DomainStatusValue.AdditionalProperty(
+                        key='xn--8a342mzfam5b18csni3w.certsbridge.com',
+                        value=beta_messages.
+                        SslCertificateManagedSslCertificate.
+                        DomainStatusValue.
+                        AdditionalProperty.
+                        ValueValueValuesEnum.FAILED_CAA_FORBIDDEN,
+                    ),
+                ])),
+        creationTimestamp='2017-12-17T10:00:00.000-07:00',
+        expireTime='2018-12-17T10:00:00.000-07:00',
+        description='Managed certificate.',
+        selfLink=_BETA_URI_PREFIX +
+        'global/sslCertificates/ssl-cert-2',
+    ),
+]
+
 ALPHA_SSL_CERTIFICATES = [
     alpha_messages.SslCertificate(
         type=alpha_messages.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
@@ -2410,6 +2541,7 @@ ALPHA_SSL_CERTIFICATES = [
     ),
     alpha_messages.SslCertificate(
         name='ssl-cert-2',
+        region='us-west-1',
         type=alpha_messages.SslCertificate.TypeValueValuesEnum.
         MANAGED,
         managed=alpha_messages.SslCertificateManagedSslCertificate(
@@ -2427,24 +2559,25 @@ ALPHA_SSL_CERTIFICATES = [
                     DomainStatusValue.AdditionalProperty(
                         key='test1.certsbridge.com',
                         value=alpha_messages.
-                        SslCertificateManagedSslCertificate.DomainStatusValue.
-                        AdditionalProperty.ValueValueValuesEnum.
-                        ACTIVE,
+                        SslCertificateManagedSslCertificate.
+                        DomainStatusValue.AdditionalProperty.
+                        ValueValueValuesEnum.ACTIVE,
                     ),
                     alpha_messages.SslCertificateManagedSslCertificate.
                     DomainStatusValue.AdditionalProperty(
                         key='xn--8a342mzfam5b18csni3w.certsbridge.com',
                         value=alpha_messages.
-                        SslCertificateManagedSslCertificate.DomainStatusValue.
-                        AdditionalProperty.ValueValueValuesEnum.
-                        FAILED_CAA_FORBIDDEN,
+                        SslCertificateManagedSslCertificate.
+                        DomainStatusValue.
+                        AdditionalProperty.
+                        ValueValueValuesEnum.FAILED_CAA_FORBIDDEN,
                     ),
                 ])),
         creationTimestamp='2017-12-17T10:00:00.000-07:00',
         expireTime='2018-12-17T10:00:00.000-07:00',
         description='Managed certificate.',
         selfLink=_ALPHA_URI_PREFIX +
-        'global/sslCertificates/ssl-cert-2',
+        'regions/us-west-1/sslCertificates/ssl-cert-2',
     ),
 ]
 
@@ -2502,6 +2635,7 @@ def MakeTargetHttpsProxies(msgs, api):
               long_prefix + '/global/targetHttpsProxies/target-https-proxy-3'))]
 
 
+TARGET_HTTPS_PROXIES_ALPHA = MakeTargetHttpsProxies(alpha_messages, 'alpha')
 TARGET_HTTPS_PROXIES_BETA = MakeTargetHttpsProxies(beta_messages, 'beta')
 TARGET_HTTPS_PROXIES_V1 = MakeTargetHttpsProxies(messages, 'v1')
 

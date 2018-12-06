@@ -32,6 +32,18 @@ class ResourcePresentationSpecTest(concepts_test_base.ConceptsTestBase,
                                    parameterized.TestCase):
   """Test for presentation specs."""
 
+  def testPresentationSpecValidatesFlagNameOverrides(self):
+    """Test error is raised if an incorrect attribute name is provided."""
+    with self.AssertRaisesExceptionMatches(
+        ValueError,
+        'Attempting to override the name for an attribute not present in the '
+        'concept: [booksId]. Available attributes: [project, shelf, book]'):
+      presentation_specs.ResourcePresentationSpec(
+          '--book',
+          self.resource_spec,
+          'The book',
+          flag_name_overrides={'booksId': '--book-flag'})
+
   @parameterized.named_parameters(
       ('Simple', False, {}, {'shelf': '--shelf', 'book': '--book'}),
       ('WithPrefixes', True, {}, {'shelf': '--book-shelf', 'book': '--book'}),

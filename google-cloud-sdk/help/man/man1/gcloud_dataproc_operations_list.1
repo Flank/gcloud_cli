@@ -100,9 +100,9 @@ flag interacts with other flags that are applied in this order:
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -112,6 +112,12 @@ To see the list of all operations, run:
 
 .RS 2m
 $ gcloud dataproc operations list
+.RE
+
+To see the list of all create cluster operations, run:
+
+.RS 2m
+$ gcloud dataproc operations list \-\-filter='operationType = CREATE'
 .RE
 
 To see the list of all active operations in a cluster named mycluster, run:

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,8 @@ from __future__ import unicode_literals
 
 import textwrap
 
+from googlecloudsdk.core import log
+from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.resource import resource_printer_base
 from tests.lib.core.resource import resource_printer_test_base
@@ -155,6 +157,13 @@ table format projection:
     printer.Print(resource)
     actual = printer.GetTestOutput()
     self.assertEqual(expected, actual)
+
+  def testFinishPager(self):
+    mock_more = self.StartObjectPatch(console_io, 'More')
+    resources = []
+    resource_printer.Print(resources,
+                           'json[pager]')
+    mock_more.assert_called_once_with('[]\n', out=log.out)
 
   def testPageMarker(self):
     resource = [[1, 2, 3], ['a', 'b', 'c'],

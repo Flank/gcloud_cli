@@ -9,8 +9,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -19,7 +20,7 @@ COMMANDS
         (BETA) Acknowledges one or more messages on the specified subscription.
 
      add-iam-policy-binding
-        (BETA) Add IAM policy binding for a subscription.
+        (BETA) Add IAM policy binding to a subscription.
 
      create
         (BETA) Creates one or more Cloud Pub/Sub subscriptions.
@@ -50,10 +51,17 @@ COMMANDS
         (BETA) Pulls one or more Cloud Pub/Sub messages from a subscription.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding for a subscription.
+        (BETA) Remove IAM policy binding of a subscription.
+
+     seek
+        (BETA) Resets a subscription's backlog to a point in time or to a given
+        snapshot.
 
      set-iam-policy
         (BETA) Set IAM policy for a subscription.
+
+     update
+        (BETA) Updates an existing Cloud Pub/Sub subscription.
 
 NOTES
     This command is currently in BETA and may change without notice. These

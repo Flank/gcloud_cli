@@ -337,12 +337,6 @@ class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
     self.assertEqual(result[0].name, sub_ref.RelativeName())
     self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
-
-class SubscriptionsCreateAlphaTest(SubscriptionsCreateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def testRetentionPullSubscriptionsCreate(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
     topic_ref = util.ParseTopic('topic1', self.Project())
@@ -423,6 +417,45 @@ class SubscriptionsCreateAlphaTest(SubscriptionsCreateTest):
     self.AssertErrEquals(
         'Created subscription [{}].\n'.format(sub_ref.RelativeName()))
 
+  def testNoExpirationSubscriptionCreate(self):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        topic=topic_ref.RelativeName(),
+        expirationPolicy=self.msgs.ExpirationPolicy())
+
+    result = self.ExpectCreatedSubscriptions(
+        ('pubsub subscriptions create subs1 --topic topic1'
+         ' --expiration-period never'),
+        [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].expirationPolicy.ttl, None)
+
+  def testExpirationSubscriptionCreate(self):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        topic=topic_ref.RelativeName(),
+        expirationPolicy=self.msgs.ExpirationPolicy(ttl='604800s'))
+
+    result = self.ExpectCreatedSubscriptions(
+        ('pubsub subscriptions create subs1 --topic topic1'
+         ' --expiration-period 7d'),
+        [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].expirationPolicy.ttl, '604800s')
+
+
+class SubscriptionsCreateAlphaTest(SubscriptionsCreateBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import textwrap
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import completer_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -59,8 +59,9 @@ class DiskTypesDescribeTest(test_base.BaseTest,
             zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
-  @parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
-                            (base.ReleaseTrack.BETA, 'beta'))
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
+  @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                            (calliope_base.ReleaseTrack.BETA, 'beta'))
   def testSimpleRegionalCase(self, track, api_version):
     self.track = track
     self.SelectApi(api_version)
@@ -86,7 +87,7 @@ class DiskTypesDescribeTest(test_base.BaseTest,
     self.assertIs(result, mock)
 
   def testUriRegionalCase(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
     mock = object()
     self.make_requests.side_effect = [
@@ -108,8 +109,9 @@ class DiskTypesDescribeTest(test_base.BaseTest,
     )
     self.assertIs(result, mock)
 
-  @parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
-                            (base.ReleaseTrack.BETA, 'beta'))
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
+  @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                            (calliope_base.ReleaseTrack.BETA, 'beta'))
   def testPromptRegionalCase(self, track, api_version):
     self.track = track
     self.SelectApi(api_version)

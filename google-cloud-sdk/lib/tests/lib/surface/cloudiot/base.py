@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock
 
+
 from googlecloudsdk.api_lib.cloudiot import devices as devices_api
 from googlecloudsdk.api_lib.cloudiot import registries as registries_api
 from googlecloudsdk.api_lib.util import apis
@@ -49,6 +50,20 @@ class CloudIotBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
                          '-----BEGIN PUBLIC KEY-----\n'
                          '111111111111111111111111111\n'
                          '-----END PUBLIC KEY-----')
+
+  def _GetGateway(self, name='my-gateway', num_id=12345):
+    gateway_enum = (
+        self.messages.GatewayConfig.GatewayTypeValueValuesEnum.GATEWAY)
+    auth_method_enum = (
+        self.messages.GatewayConfig.GatewayAuthMethodValueValuesEnum.
+        ASSOCIATION_ONLY)
+
+    return self.messages.Device(
+        id=name,
+        numId=num_id,
+        blocked=False,
+        gatewayConfig=self.messages.GatewayConfig(
+            gatewayType=gateway_enum, gatewayAuthMethod=auth_method_enum))
 
   def _ExpectGet(self, credentials=None, config=None):
     credentials = credentials or []
@@ -172,7 +187,8 @@ class CloudIotRegistryBase(CloudIotBase):
                             mqtt_enabled=True,
                             http_enabled=True,
                             event_notification_configs=None,
-                            state_pubsub_topic_name=None):
+                            state_pubsub_topic_name=None,
+                            log_level=None):
     credentials = credentials or []
     event_configs = []
     if event_notification_configs is not None:
@@ -196,13 +212,18 @@ class CloudIotRegistryBase(CloudIotBase):
     else:
       http_config = None
 
+    if log_level is not None:
+      log_level = (
+          self.messages.DeviceRegistry.LogLevelValueValuesEnum(log_level))
+
     registry = self.messages.DeviceRegistry(
         id=registry_id,
         credentials=credentials,
         eventNotificationConfigs=event_configs,
         stateNotificationConfig=state_notification_config,
         mqttConfig=mqtt_config,
-        httpConfig=http_config)
+        httpConfig=http_config,
+        logLevel=log_level)
 
     return registry
 
@@ -227,7 +248,8 @@ class CloudIotRegistryBase(CloudIotBase):
 class CloudIotDeviceBase(CloudIotBase):
   """Base for testing devices commands."""
 
-  def _MakeDevices(self, n=10, registry='my-registry', project=None):
+  def _MakeDevices(self, n=10, registry='my-registry', project=None,
+                   gateway_config=None):
     devices = []
     for i in range(n):
       device_name = ('projects/{}/'
@@ -240,13 +262,15 @@ class CloudIotDeviceBase(CloudIotBase):
           id='d{}'.format(i),
           numId=i,
           blocked=False,
+          gatewayConfig=gateway_config,
       )
       devices.append(device)
     return devices
 
   def _ExpectListDevices(self, devices, device_ids=None, device_num_ids=None,
                          registry='my-registry', field_mask='blocked,name',
-                         project=None):
+                         project=None, gateway_type=None,
+                         gateway_list_device=None):
     registry_name = ('projects/{}/'
                      'locations/us-central1/'
                      'registries/{}').format(project or self.Project(),
@@ -256,7 +280,9 @@ class CloudIotDeviceBase(CloudIotBase):
             parent=registry_name,
             deviceIds=device_ids or [],
             deviceNumIds=device_num_ids or [],
-            fieldMask=field_mask
+            fieldMask=field_mask,
+            gatewayListOptions_gatewayType=gateway_type,
+            gatewayListOptions_associationsGatewayId=gateway_list_device
         ),
         self.messages.ListDevicesResponse(
             devices=devices))

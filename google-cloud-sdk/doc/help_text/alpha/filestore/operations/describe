@@ -13,22 +13,24 @@ POSITIONAL ARGUMENTS
      Operation resource - The operation to describe. The arguments in this
      group can be used to specify the attributes of this resource. (NOTE) Some
      attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: provide the flag [operation] on the
-     command line with a fully specified name; provide the flag [--project] on
-     the command line; set the property [core/project]. This must be specified.
+     ways. To set the [project] attribute: provide the argument [operation] on
+     the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
 
        OPERATION
-          The ID of the operation or a fully qualified identifier for the
-          operation. This positional must be specified if any of the other
-          arguments in this group are specified.
+          ID of the operation or fully qualified identifier for the operation.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
 
        --location=LOCATION
           The location of the operation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     The following command shows the details for the Cloud Filestore operation

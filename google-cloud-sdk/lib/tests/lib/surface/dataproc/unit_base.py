@@ -12,16 +12,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Base for all Dataproc unit tests."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import difflib
 
 from apitools.base.py import encoding
+from apitools.base.py import extra_types
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.dataproc import util
@@ -32,7 +33,6 @@ from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
 from tests.lib.surface.dataproc import base
 import six
-
 
 _API_VERSION = 'v1'
 _BETA_API_VERSION = 'v1beta2'
@@ -66,8 +66,8 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
   @classmethod
   def SetUpClass(cls):
     cls._messages = core_apis.GetMessagesModule('dataproc', _API_VERSION)
-    cls._beta_messages = core_apis.GetMessagesModule(
-        'dataproc', _BETA_API_VERSION)
+    cls._beta_messages = core_apis.GetMessagesModule('dataproc',
+                                                     _BETA_API_VERSION)
 
   @property
   def api_version(self):
@@ -83,14 +83,14 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
 
   def OperationName(self, op_id=None):
     return ('projects/{project}/regions/{region}/operations/{id}'.format(
-        project=self.Project(), region=self.REGION,
+        project=self.Project(),
+        region=self.REGION,
         id=op_id or self.OPERATION_ID))
 
   def ClusterUri(self):
     return ('https://dataproc.googleapis.com/{version}/projects/{project}/'
             'regions/global/clusters/test-cluster'.format(
-                version=self.api_version,
-                project=self.Project()))
+                version=self.api_version, project=self.Project()))
 
   def ZoneUri(self):
     return 'us-central1-a'
@@ -115,15 +115,18 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         kwargs = {}
       kwargs.update({'poll_period_s': 0})
       return real_wait_for_operation(*args, **kwargs)
+
     self.StartObjectPatch(
         util, 'WaitForOperation').side_effect = nosleep_for_operation
 
     real_wait_for_deletion = util.WaitForResourceDeletion
+
     def nosleep_for_deletion(*args, **kwargs):
       if not kwargs:
         kwargs = {}
       kwargs.update({'poll_period_s': 0})
       return real_wait_for_deletion(*args, **kwargs)
+
     self.StartObjectPatch(
         util, 'WaitForResourceDeletion').side_effect = nosleep_for_deletion
 
@@ -144,19 +147,37 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     status_dict.update(kwargs)
     return encoding.DictToMessage(status_dict, self.messages.Status)
 
-  def MakeOperation(self, **kwargs):
+  def MakeOperation(self, name=None, done=False, error=None, response=None,
+                    metadata=None):
+    metadata = metadata or {}
+    new_metadata = collections.OrderedDict()
+    for key, value in metadata.items():
+      new_metadata[key] = self._MakeJsonValue(value)
     return self.messages.Operation(
-        name=kwargs.pop('name', self.OperationName()),
-        done=kwargs.pop('done', False),
-        error=kwargs.pop('error', None),
-        response=kwargs.pop('response', None),
-        metadata=encoding.DictToMessage(
-            kwargs, self.messages.Operation.MetadataValue),
+        name=name or self.OperationName(),
+        done=done,
+        error=error,
+        response=response,
+        metadata=encoding.DictToAdditionalPropertyMessage(
+            new_metadata, self.messages.Operation.MetadataValue),
     )
 
+  def _MakeJsonValue(self, value):
+    if isinstance(value, list):
+      return extra_types.JsonValue(
+          array_value=extra_types.JsonArray(
+              entries=[self._MakeJsonValue(v) for v in value]))
+    elif isinstance(value, dict):
+      return extra_types.JsonValue(
+          object_value=extra_types.JsonObject(
+              properties=[extra_types.JsonObject.Property(
+                  key=k, value=self._MakeJsonValue(v))
+                          for k, v in value.items()]
+          ))
+    return extra_types.JsonValue(string_value=value)
+
   def MakeCompletedOperation(self, **kwargs):
-    kwargs['done'] = True
-    return self.MakeOperation(**kwargs)
+    return self.MakeOperation(done=True, **kwargs)
 
   def MakeCluster(self, **kwargs):
     secondary_worker_config = None
@@ -248,12 +269,18 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
   def MakeRunningCluster(self, **kwargs):
     # Create dict of defaults set by cluster.
     running_cluster_defaults = {
-        'workerConfigNumInstances': self.DEFAULT_NUM_WORKERS,
-        'serviceAccountScopes': self.DEFAULT_SCOPES,
-        'clusterUuid': self.CLUSTER_UUID,
-        'configBucket': self.GCS_BUCKET,
-        'status': self.messages.ClusterStatus(
-            state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)}
+        'workerConfigNumInstances':
+            self.DEFAULT_NUM_WORKERS,
+        'serviceAccountScopes':
+            self.DEFAULT_SCOPES,
+        'clusterUuid':
+            self.CLUSTER_UUID,
+        'configBucket':
+            self.GCS_BUCKET,
+        'status':
+            self.messages.ClusterStatus(
+                state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+    }
     running_cluster_defaults.update(kwargs)
     return self.MakeCluster(**running_cluster_defaults)
 
@@ -273,6 +300,16 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     encryption_config = self.messages.EncryptionConfig()
     encryption_config.gcePdKmsKeyName = kms_key
     cluster.config.encryptionConfig = encryption_config
+
+  def AddComponents(self, cluster, components):
+    if not cluster.config.softwareConfig:
+      cluster.config.softwareConfig = self.messages.SoftwareConfig()
+
+    software_config_cls = self.messages.SoftwareConfig
+    cluster.config.softwareConfig.optionalComponents.extend(
+        list(
+            map(software_config_cls.OptionalComponentsValueListEntryValuesEnum,
+                components)))
 
   def ExpectGetCluster(self, cluster=None, region=None, exception=None):
     if not region:
@@ -303,8 +340,10 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         exception=exception)
 
   def FilterOutPageMarkers(self, resource_list):
-    return [resource for resource in resource_list
-            if not isinstance(resource, resource_printer_base.PageMarker)]
+    return [
+        resource for resource in resource_list
+        if not isinstance(resource, resource_printer_base.PageMarker)
+    ]
 
   # Mostly stolen from apitools.base.py.test.mock.UnexpectedRequestException
   def AssertMessagesEqual(self, expected, actual):
@@ -372,6 +411,30 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         response=response,
         exception=exception)
 
+  def AddAllocationAffinity(self, cluster, allocation_affinity, allocation_key,
+                            allocation_values):
+    if allocation_affinity is not None:
+      type_msgs = (
+          self.messages.AllocationAffinity.ConsumeAllocationTypeValueValuesEnum)
+
+      if allocation_affinity == 'none':
+        allocation_type = type_msgs.NO_ALLOCATION
+        allocation_key = None
+        allocation_values = []
+      elif allocation_affinity == 'specific':
+        allocation_type = type_msgs.SPECIFIC_ALLOCATION
+        allocation_values = [allocation_values]
+      else:
+        allocation_type = type_msgs.ANY_ALLOCATION
+        allocation_key = None
+        allocation_values = []
+
+      affinity_message = self.messages.AllocationAffinity(
+          consumeAllocationType=allocation_type,
+          key=allocation_key,
+          values=allocation_values)
+      cluster.config.gceClusterConfig.allocationAffinity = affinity_message
+
 
 class DataprocIAMUnitTestBase(DataprocUnitTestBase):
   """Base test class for all Dataproc IAM unit tests."""
@@ -386,6 +449,7 @@ class DataprocIAMUnitTestBase(DataprocUnitTestBase):
 
     Args:
         clear_fields: list of policy fields to clear.
+
     Returns:
         IAM policy.
     """
@@ -479,7 +543,7 @@ class MessageEqualityAssertionError(AssertionError):
 
     diff_lines = difflib.unified_diff(expected_lines, actual_lines)
 
-    message = '\n'.join(
-        ['expected: {expected}', 'actual: {actual}', 'diff:']
-        + list(diff_lines)).format(expected=expected_repr, actual=actual_repr)
+    message = '\n'.join(['expected: {expected}', 'actual: {actual}', 'diff:'] +
+                        list(diff_lines)).format(
+                            expected=expected_repr, actual=actual_repr)
     super(MessageEqualityAssertionError, self).__init__(message)

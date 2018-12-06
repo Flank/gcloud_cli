@@ -16,8 +16,8 @@
 
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 
 
@@ -42,12 +42,23 @@ class Client(object):
             project=zone_ref.project,
             managedZone=zone_ref.managedZone))
 
-  def Patch(self, zone_ref, dnssec_config=None, description=None, labels=None):
+  def Patch(self,
+            zone_ref,
+            dnssec_config=None,
+            description=None,
+            labels=None,
+            private_visibility_config=None,
+            forwarding_config=None):
+    """Managed Zones Update Request."""
     zone = self.messages.ManagedZone(
         name=zone_ref.Name(),
         dnssecConfig=dnssec_config,
         description=description,
         labels=labels)
+    if private_visibility_config:
+      zone.privateVisibilityConfig = private_visibility_config
+    if forwarding_config:
+      zone.forwardingConfig = forwarding_config
     return self._service.Patch(
         self.messages.DnsManagedZonesPatchRequest(
             managedZoneResource=zone,

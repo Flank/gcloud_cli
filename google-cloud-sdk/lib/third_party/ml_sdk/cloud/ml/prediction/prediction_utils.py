@@ -17,11 +17,15 @@ import collections
 from contextlib import contextmanager
 import logging
 import os
+import pickle
 import subprocess
+import sys
 import time
 import timeit
 from ._interfaces import Model
 import six
+
+from tensorflow.python.framework import dtypes
 
 
 # --------------------------
@@ -31,10 +35,26 @@ ENGINE = "Prediction-Engine"
 ENGINE_RUN_TIME = "Prediction-Engine-Run-Time"
 FRAMEWORK = "Framework"
 SCIKIT_LEARN_FRAMEWORK_NAME = "scikit_learn"
+SK_XGB_FRAMEWORK_NAME = "sk_xgb"
 XGBOOST_FRAMEWORK_NAME = "xgboost"
 TENSORFLOW_FRAMEWORK_NAME = "tensorflow"
 PREPROCESS_TIME = "Prediction-Preprocess-Time"
 POSTPROCESS_TIME = "Prediction-Postprocess-Time"
+
+# Default model names
+DEFAULT_MODEL_FILE_NAME_JOBLIB = "model.joblib"
+DEFAULT_MODEL_FILE_NAME_PICKLE = "model.pkl"
+
+TENSORFLOW_SPECIFIC_MODEL_FILE_NAMES = (
+    "saved_model.pb",
+    "saved_model.pbtxt",
+)
+SCIKIT_LEARN_MODEL_FILE_NAMES = (
+    DEFAULT_MODEL_FILE_NAME_JOBLIB,
+    DEFAULT_MODEL_FILE_NAME_PICKLE,
+)
+XGBOOST_SPECIFIC_MODEL_FILE_NAMES = ("model.bst",)
+
 
 # Additional TF keyword arguments
 INPUTS_KEY = "inputs"
@@ -249,6 +269,41 @@ class BaseModel(Model):
     """
     pass
 
+  def get_signature(self, signature_name=None):
+    """Gets model signature of inputs and outputs.
+
+    Currently only used for Tensorflow model. May be extended for use with
+    XGBoost and Sklearn in the future.
+
+    Args:
+      signature_name: str of name of signature
+
+    Returns:
+      (str, SignatureDef): signature key, SignatureDef
+    """
+    return None, None
+
+
+def should_base64_decode(framework, model, signature_name):
+  """Determines if base64 decoding is required.
+
+  Returns False if framework is not TF.
+  Returns True if framework is TF and is a user model.
+  Returns True if framework is TF and model contains a str input.
+  Returns False if framework is TF and model does not contain str input.
+
+  Args:
+    framework: ML framework of prediction app
+    model: model object
+    signature_name: str of name of signature
+  Returns:
+    bool
+
+  """
+  return (framework == TENSORFLOW_FRAMEWORK_NAME and
+          (not isinstance(model, BaseModel) or
+           does_signature_contain_str(model.get_signature(signature_name)[1])))
+
 
 def decode_base64(data):
   if isinstance(data, list):
@@ -260,6 +315,27 @@ def decode_base64(data):
       return {k: decode_base64(v) for k, v in six.iteritems(data)}
   else:
     return data
+
+
+def does_signature_contain_str(signature=None):
+  """Return true if input signature contains a string dtype.
+
+  This is used to determine if we should proceed with base64 decoding.
+
+  Args:
+    signature: SignatureDef protocol buffer
+
+  Returns:
+    bool
+  """
+
+  # if we did not receive a signature we assume the model could require
+  # a string in it's input
+  if signature is None:
+    return True
+
+  return any(v.dtype == dtypes.string.as_datatype_enum
+             for v in signature.inputs.values())
 
 
 def copy_model_to_local(gcs_path, dest_path):
@@ -303,3 +379,153 @@ def copy_model_to_local(gcs_path, dest_path):
     raise
   logging.debug("Files copied from %s to %s: took %f seconds", gcs_path,
                 dest_path, time.time() - copy_start_time)
+
+
+def load_joblib_or_pickle_model(model_path):
+  """Loads either a .joblib or .pkl file from GCS or from local.
+
+  Loads one of DEFAULT_MODEL_FILE_NAME_JOBLIB or DEFAULT_MODEL_FILE_NAME_PICKLE
+  files if they exist. This is used for both sklearn and xgboost.
+
+  Arguments:
+    model_path: The path to the directory that contains the model file. This
+      path can be either a local path or a GCS path.
+
+  Raises:
+    PredictionError: If there is a problem while loading the file.
+
+  Returns:
+    A loaded scikit-learn or xgboost predictor object or None if neither
+    DEFAULT_MODEL_FILE_NAME_JOBLIB nor DEFAULT_MODEL_FILE_NAME_PICKLE files are
+    found.
+  """
+  if model_path.startswith("gs://"):
+    copy_model_to_local(model_path, LOCAL_MODEL_PATH)
+    model_path = LOCAL_MODEL_PATH
+
+  try:
+    model_file_name_joblib = os.path.join(model_path,
+                                          DEFAULT_MODEL_FILE_NAME_JOBLIB)
+    model_file_name_pickle = os.path.join(model_path,
+                                          DEFAULT_MODEL_FILE_NAME_PICKLE)
+    if os.path.exists(model_file_name_joblib):
+      model_file_name = model_file_name_joblib
+      try:
+        # Load joblib only when needed. If we put this at the top, we need to
+        # add a dependency to sklearn anywhere that prediction_lib is called.
+        from sklearn.externals import joblib  # pylint: disable=g-import-not-at-top
+      except Exception as e:
+        error_msg = "Could not import sklearn module."
+        logging.critical(error_msg)
+        raise PredictionError(PredictionError.FAILED_TO_LOAD_MODEL, error_msg)
+
+      logging.info("Loading model %s using joblib.", model_file_name)
+      return joblib.load(model_file_name)
+
+    elif os.path.exists(model_file_name_pickle):
+      model_file_name = model_file_name_pickle
+      logging.info("Loading model %s using pickle.", model_file_name)
+      with open(model_file_name, "rb") as f:
+        return pickle.loads(f.read())
+
+    return None
+
+  except Exception as e:
+    raw_error_msg = str(e)
+    if "unsupported pickle protocol" in raw_error_msg:
+      error_msg = (
+          "Could not load the model: {}. {}. Please make sure the model was "
+          "exported using python {}. Otherwise, please specify the correct "
+          "'python_version' parameter when deploying the model.").format(
+              model_file_name, raw_error_msg, sys.version_info[0])
+    else:
+      error_msg = "Could not load the model: {}. {}.".format(
+          model_file_name, raw_error_msg)
+    logging.critical(error_msg)
+    raise PredictionError(PredictionError.FAILED_TO_LOAD_MODEL, error_msg)
+
+
+def detect_sk_xgb_framework_from_obj(model_obj):
+  """Distinguish scikit-learn and xgboost using model object.
+
+  Arguments:
+    model_obj: A loaded model object
+
+  Raises:
+    PredictionError: If there is a problem detecting framework from object.
+
+  Returns:
+    Either scikit-learn framework or xgboost framework
+  """
+  # detect framework type from model object
+  if "sklearn" in type(model_obj).__module__:
+    return SCIKIT_LEARN_FRAMEWORK_NAME
+  elif "xgboost" in type(model_obj).__module__:
+    return XGBOOST_FRAMEWORK_NAME
+  else:
+    error_msg = (
+        "Invalid model type detected: {}.{}. "
+        "Please make sure the model file is an exported sklearn model, "
+        "xgboost model or pipeline.").format(
+            type(model_obj).__module__,
+            type(model_obj).__name__)
+    logging.critical(error_msg)
+    raise PredictionError(PredictionError.FAILED_TO_LOAD_MODEL, error_msg)
+
+
+def _count_num_files_in_path(model_path, specified_file_names):
+  """Count how many specified files exist in model_path.
+
+  Args:
+    model_path: The local path to the directory that contains the model file.
+    specified_file_names: The file names to be checked
+
+  Returns:
+    An integer indicating how many specified_file_names are found in model_path.
+  """
+  num_matches = 0
+  for file_name in specified_file_names:
+    if os.path.exists(os.path.join(model_path, file_name)):
+      num_matches += 1
+
+  return num_matches
+
+
+def detect_framework(model_path):
+  """Detect framework from model_path by analyzing file extensions.
+
+  Args:
+    model_path: The local path to the directory that contains the model file.
+
+  Raises:
+    PredictionError: If framework can not be identified from model path.
+
+  Returns:
+    A string representing the identified framework or None (custom code is
+    assumed in this situation).
+  """
+  num_tensorflow_models = _count_num_files_in_path(
+      model_path, TENSORFLOW_SPECIFIC_MODEL_FILE_NAMES)
+  num_xgboost_models = _count_num_files_in_path(
+      model_path, XGBOOST_SPECIFIC_MODEL_FILE_NAMES)
+  num_sklearn_models = _count_num_files_in_path(model_path,
+                                                SCIKIT_LEARN_MODEL_FILE_NAMES)
+
+  num_matches = num_tensorflow_models + num_xgboost_models + num_sklearn_models
+  if num_matches > 1:
+    error_msg = "Multiple model files are found in the model_path: {}".format(
+        model_path)
+    logging.critical(error_msg)
+    raise PredictionError(PredictionError.FAILED_TO_LOAD_MODEL, error_msg)
+
+  if num_tensorflow_models == 1:
+    return TENSORFLOW_FRAMEWORK_NAME
+  elif num_xgboost_models == 1:
+    return XGBOOST_FRAMEWORK_NAME
+  elif num_sklearn_models == 1:
+    model_obj = load_joblib_or_pickle_model(model_path)
+    return detect_sk_xgb_framework_from_obj(model_obj)
+  else:
+    logging.warning(("Model files are not found in the model_path."
+                     "Assumed to be custom code."))
+    return None

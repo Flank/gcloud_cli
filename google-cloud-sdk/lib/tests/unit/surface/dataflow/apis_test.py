@@ -83,7 +83,7 @@ class ApisUnitTest(base.DataflowMockingTestBase,
         location=base.DEFAULT_REGION,
         startTime='start_time')
     self.mocked_client.projects_locations_jobs.GetMetrics.Expect(
-        request, apis.GetMessagesModule().MetricUpdate())
+        request, apis.GetMessagesModule().JobMetrics())
     apis.Metrics.Get(job_id=base.JOB_1_ID,
                      project_id=self.Project(),
                      start_time='start_time')

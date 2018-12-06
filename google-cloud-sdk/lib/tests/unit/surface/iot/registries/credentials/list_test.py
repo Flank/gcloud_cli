@@ -20,7 +20,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
@@ -36,10 +35,7 @@ TABLE_FIELDS = [
 ]
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsListTest(base.CloudIotRegistryBase):
+class CredentialsListTestGA(base.CloudIotRegistryBase):
 
   def SetUp(self):
     x509_details = self.messages.X509CertificateDetails(
@@ -65,8 +61,7 @@ class CredentialsListTest(base.CloudIotRegistryBase):
     self.output = '\n'.join([self.header, self.output_with_details,
                              self.output_without_details, ''])
 
-  def testList(self, track):
-    self.track = track
+  def testList(self):
     self._ExpectGet(self.registry_credentials)
 
     results = self.Run(
@@ -102,8 +97,7 @@ class CredentialsListTest(base.CloudIotRegistryBase):
             },
         ])
 
-  def testList_Output(self, track):
-    self.track = track
+  def testList_Output(self):
     self._ExpectGet(self.registry_credentials)
 
     self.Run(
@@ -113,8 +107,7 @@ class CredentialsListTest(base.CloudIotRegistryBase):
 
     self.AssertOutputEquals(self.output, normalize_space=True)
 
-  def testList_RelativeName(self, track):
-    self.track = track
+  def testList_RelativeName(self):
     self._ExpectGet(self.registry_credentials)
 
     device_name = ('projects/{}/'
@@ -124,6 +117,18 @@ class CredentialsListTest(base.CloudIotRegistryBase):
         'iot registries credentials list'
         '    --registry {}'.format(device_name))
     self.AssertOutputEquals(self.output, normalize_space=True)
+
+
+class CredentialsListTestBeta(CredentialsListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsListTestAlpha(CredentialsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

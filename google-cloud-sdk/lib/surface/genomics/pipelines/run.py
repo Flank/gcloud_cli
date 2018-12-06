@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import base64
 from googlecloudsdk.api_lib import genomics as lib
 from googlecloudsdk.api_lib.genomics import exceptions
 from googlecloudsdk.api_lib.genomics import genomics_util
@@ -31,7 +32,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 import six
 
-CLOUD_SDK_IMAGE = 'google/cloud-sdk:alpine'
+CLOUD_SDK_IMAGE = 'google/cloud-sdk:slim'
 SHARED_DISK = 'gcloud-shared'
 
 
@@ -58,9 +59,11 @@ def _ValidateAndMergeArgInputs(args):
     files.Error
   """
 
+  is_local_file = {}
+
   # If no inputs from file, then no validation or merge needed
   if not args.inputs_from_file:
-    return args.inputs
+    return args.inputs, is_local_file
 
   # Initialize the merged dictionary
   arg_inputs = {}
@@ -80,8 +83,9 @@ def _ValidateAndMergeArgInputs(args):
   # Read up the inputs-from-file and add the values from the file
   for key, value in six.iteritems(args.inputs_from_file):
     arg_inputs[key] = files.ReadFileContents(value)
+    is_local_file[key] = True
 
-  return arg_inputs
+  return arg_inputs, is_local_file
 
 
 class Run(base.SilentCommand):
@@ -166,6 +170,13 @@ class Run(base.SilentCommand):
             which must end in `.log`, in which case that path will be
             used. Stdout and stderr logs from the run are also generated and
             output as `-stdout.log` and `-stderr.log`.''')
+
+    parser.add_argument(
+        '--env-vars',
+        category=base.COMMONLY_USED_FLAGS,
+        metavar='NAME=VALUE',
+        type=arg_parsers.ArgDict(),
+        help='''List of key-value pairs to set as environment variables.''')
 
     labels_util.AddCreateLabelsFlags(parser)
 
@@ -320,7 +331,7 @@ https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_regio
       raise exceptions.GenomicsError(
           'Either --pipeline-file or --command-line is required.')
 
-    arg_inputs = _ValidateAndMergeArgInputs(args)
+    arg_inputs, is_local_file = _ValidateAndMergeArgInputs(args)
 
     request = None
     if v2:
@@ -344,7 +355,7 @@ https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_regio
       if args.memory or args.cpus:
         # Default to n1-standard1 sizes.
         virtual_machine.machineType = 'custom-%d-%d' % (
-            args.cpus or 1, (args.memory or 3.84) * 1000)
+            args.cpus or 1, (args.memory or 3.75) * 1024)
 
       if args.preemptible:
         virtual_machine.preemptible = args.preemptible
@@ -379,8 +390,14 @@ https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_regio
             env[name] = input_generator.Generate()
             pipeline.actions.insert(0, genomics_messages.Action(
                 imageUri=CLOUD_SDK_IMAGE,
-                commands=['/bin/sh', '-c', 'gsutil -q cp %s ${%s}' % (value,
-                                                                      name)]))
+                commands=['/bin/sh', '-c', 'gsutil -m -q cp %s ${%s}' %
+                          (value, name)]))
+          elif name in is_local_file:
+            env[name] = input_generator.Generate()
+            pipeline.actions.insert(0, genomics_messages.Action(
+                imageUri=CLOUD_SDK_IMAGE,
+                commands=['/bin/sh', '-c', 'echo "%s" | base64 -d > ${%s}' %
+                          (base64.b64encode(value), name)]))
           else:
             env[name] = value
 
@@ -390,8 +407,11 @@ https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_regio
           env[name] = output_generator.Generate()
           pipeline.actions.append(genomics_messages.Action(
               imageUri=CLOUD_SDK_IMAGE,
-              commands=['/bin/sh', '-c', 'gsutil -q cp ${%s} %s' % (name,
-                                                                    value)]))
+              commands=['/bin/sh', '-c', 'gsutil -m -q cp ${%s} %s' % (name,
+                                                                       value)]))
+      if args.env_vars:
+        for name, value in args.env_vars.items():
+          env[name] = value
 
       # Merge any existing pipeline arguments into the generated environment and
       # update the pipeline.
@@ -418,7 +438,7 @@ https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_regio
         pipeline.actions.append(genomics_messages.Action(
             imageUri=CLOUD_SDK_IMAGE,
             commands=['/bin/sh', '-c',
-                      'gsutil -q cp /google/logs/output ' + args.logging],
+                      'gsutil -m -q cp /google/logs/output ' + args.logging],
             flags=[(genomics_messages.Action
                     .FlagsValueListEntryValuesEnum.ALWAYS_RUN)]))
 

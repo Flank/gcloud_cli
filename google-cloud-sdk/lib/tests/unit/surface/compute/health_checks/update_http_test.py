@@ -21,14 +21,16 @@ from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
 
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class HealthChecksUpdateHttpTest(test_base.BaseTest,
-                                 test_case.WithOutputCapture):
+class HealthChecksUpdateHttpTest(
+    test_base.BaseTest, test_case.WithOutputCapture, parameterized.TestCase):
 
   def testNoArgs(self):
     with self.AssertRaisesToolExceptionRegexp(
@@ -804,13 +806,6 @@ class HealthChecksUpdateHttpTest(test_base.BaseTest,
             --proxy-header bad_value
           """)
 
-
-class HealthChecksCreateHttpBetaTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
-
   def testResponseOption(self):
     self.make_requests.side_effect = iter([
         [self.messages.HealthCheck(
@@ -882,6 +877,267 @@ class HealthChecksCreateHttpBetaTest(test_base.BaseTest):
                       requestPath='/testpath')),
               project='my-project'))],
     )
+
+
+class HealthChecksUpdateHttpBetaTest(HealthChecksUpdateHttpTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
+  def testPortOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', port=80, requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update http my-health-check --port 8888')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com',
+                      port=8888,
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      requestPath='/testpath')),
+              project='my-project'))],
+    )
+
+  def testPortNameOptionWithPreexistingPortName(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com', portName='old-port'))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update http my-health-check '
+             '--port-name new-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com',
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
+                      portName='new-port')),
+              project='my-project'))],
+    )
+
+  def testPortNameOptionWithoutPreexistingPortName(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com'))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update http my-health-check '
+             '--port-name new-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com',
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
+                      portName='new-port')),
+              project='my-project'))],
+    )
+
+  def testUnsetPortNameOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    portName='happy-port', requestPath='/testpath'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http my-health-check --port-name ''
+        """)
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      requestPath='/testpath')),
+              project='my-project'))],
+    )
+
+  def testPortAndPortNameOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    host='www.example.com'))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update http my-health-check '
+             '--port 8888 --port-name new-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      host='www.example.com',
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      port=8888)),
+              project='my-project'))],
+    )
+
+  def testUseServingPortOption(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck())
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update http my-health-check '
+             '--use-serving-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_SERVING_PORT))),
+              project='my-project'))],
+    )
+
+  def testUseServingPortOptionWithPreexistingPortName(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck(
+                    portName='old-port'))
+        ],
+        [],
+    ])
+
+    self.Run('compute health-checks update http my-health-check '
+             '--use-serving-port')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                  httpHealthCheck=self.messages.HTTPHealthCheck(
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_SERVING_PORT))),
+              project='my-project'))],
+    )
+
+  @parameterized.parameters(('--port', 80), ('--port-name', 'my-port'))
+  def testUseServingPortOptionErrors(self, flag, flag_value):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
+                httpHealthCheck=self.messages.HTTPHealthCheck())
+        ],
+        [],
+    ])
+
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [--use-serving-port]: {0} cannot '
+        'be specified when using: --use-serving-port'.format(flag)):
+      self.Run("""
+          compute health-checks update http my-health-check
+          --use-serving-port {0} {1}
+      """.format(flag, flag_value))
 
 
 class RegionHealthChecksCreateHttpTest(test_base.BaseTest):
@@ -1183,6 +1439,9 @@ class RegionHealthChecksCreateHttpTest(test_base.BaseTest):
                   httpHealthCheck=self.messages.HTTPHealthCheck(
                       host='www.example.com',
                       port=8888,
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
                       requestPath='/testpath')),
               project='my-project',
               region='us-west-1'))],
@@ -1216,7 +1475,11 @@ class RegionHealthChecksCreateHttpTest(test_base.BaseTest):
                   name='my-health-check',
                   type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
                   httpHealthCheck=self.messages.HTTPHealthCheck(
-                      host='www.example.com', portName='new-port')),
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
+                      host='www.example.com',
+                      portName='new-port')),
               project='my-project',
               region='us-west-1'))],
     )
@@ -1249,7 +1512,11 @@ class RegionHealthChecksCreateHttpTest(test_base.BaseTest):
                   name='my-health-check',
                   type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
                   httpHealthCheck=self.messages.HTTPHealthCheck(
-                      host='www.example.com', portName='new-port')),
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
+                      host='www.example.com',
+                      portName='new-port')),
               project='my-project',
               region='us-west-1'))],
     )
@@ -1284,6 +1551,9 @@ class RegionHealthChecksCreateHttpTest(test_base.BaseTest):
                   name='my-health-check',
                   type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
                   httpHealthCheck=self.messages.HTTPHealthCheck(
+                      portSpecification=(
+                          self.messages.HTTPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
                       requestPath='/testpath')),
               project='my-project',
               region='us-west-1'))],

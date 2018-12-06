@@ -9,6 +9,7 @@ import abc
 import collections
 import datetime
 import hashlib
+import httplib
 import itertools
 import json
 import logging
@@ -177,6 +178,208 @@ def _ParseJobIdentifier(identifier):
             match.groupdict().get('location', None),
             match.groupdict().get('job_id', None))
   return (None, None, None)
+
+
+def _ParseReservationIdentifier(identifier):
+  """Parses the reservation identifier string into its components.
+
+  Args:
+    identifier: String specifying the reservation identifier in the format
+    "project_id:reservation_id", "project_id:location.reservation_id", or
+    "reservation_id". reservation_id can be a path of type 'foo/bar'.
+
+  Returns:
+    A tuple of three elements: containing project_id, location, and
+    reservation_id. If an element is not found, it is represented by None.
+
+  Raises:
+    BigqueryError: if the identifier could not be parsed.
+  """
+
+  pattern = re.compile(r"""
+  ^((?P<project_id>[\w:\-.]*[\w:\-]+):)?
+  ((?P<location>[\w\-]+)\.)?
+  (?P<reservation_id>[\w\-\/]*)$
+  """, re.X)
+
+  match = re.search(pattern, identifier)
+  if not match:
+    raise BigqueryError(
+        'Could not parse reservation identifier: %s' % identifier)
+
+  project_id = match.groupdict().get('project_id', None)
+  location = match.groupdict().get('location', None)
+  reservation_id = match.groupdict().get('reservation_id', None)
+  return (project_id, location, reservation_id)
+
+
+def _ParseReservationPath(path):
+  """Parses the reservation path string into its components.
+
+  Args:
+    path: String specifying the reservation path in the format
+      projects/<project_id>/locations/<location>/reservations/<reservation_id>
+
+  Returns:
+    A tuple of three elements: containing project_id, location and
+    reservation_id. If an element is not found, it is represented by None.
+
+  Raises:
+    BigqueryError: if the path could not be parsed.
+  """
+
+  pattern = re.compile(
+      r"""
+  ^projects\/(?P<project_id>[\w:\-.]*[\w:\-]+)?
+  \/locations\/(?P<location>[\w\-]+)?
+  \/reservations\/(?P<reservation_id>[\w\-\/]+)$
+  """, re.X)
+
+  match = re.search(pattern, path)
+  if not match:
+    raise BigqueryError('Could not parse reservation path: %s' % path)
+
+  project_id = match.groupdict().get('project_id', None)
+  location = match.groupdict().get('location', None)
+  reservation_id = match.groupdict().get('reservation_id', None)
+  return (project_id, location, reservation_id)
+
+
+def _ParseSlotPoolIdentifier(identifier):
+  """Parses the slot pool identifier string into its components.
+
+  Args:
+    identifier: String specifying the slot pool identifier in the format
+    "project_id:reservation_id.slot_pool_id",
+    "project_id:location.reservation_id.slot_pool_id", or
+      "reservation_id.slot_pool_id". reservation_id must be that of a top level
+      reservation.
+
+  Returns:
+    A tuple of four elements: containing project_id, location, reservation_id
+    and slot_pool_id. If an element is not found, it is represented by None.
+
+  Raises:
+    BigqueryError: if the identifier could not be parsed.
+  """
+
+  pattern = re.compile(r"""
+  ^((?P<project_id>[\w:\-.]*[\w:\-]+):)?
+  ((?P<location>[\w\-]+)\.)?
+  (?P<reservation_id>[\w\-\/]+)\.
+  (?P<slot_pool_id>[\w]+)$
+  """, re.X)
+
+  match = re.search(pattern, identifier)
+  if not match:
+    raise BigqueryError('Could not parse slot pool identifier: %s' % identifier)
+
+  project_id = match.groupdict().get('project_id', None)
+  location = match.groupdict().get('location', None)
+  reservation_id = match.groupdict().get('reservation_id', None)
+  slot_pool_id = match.groupdict().get('slot_pool_id', None)
+  return (project_id, location, reservation_id, slot_pool_id)
+
+
+def _ParseSlotPoolPath(path):
+  """Parses the slot pool path string into its components.
+
+  Args:
+    path: String specifying the slot pool path in the format
+    projects/<project_id>/locations/<location>/
+      reservations/<reservation_id>/slotPools/<slot_pool_id>
+    The reservation_id must be that of a top level reservation.
+
+  Returns:
+    A tuple of four elements: containing project_id, location, reservation_id
+    and slot_pool_id. If an element is not found, it is represented by None.
+
+  Raises:
+    BigqueryError: if the path could not be parsed.
+  """
+
+  pattern = re.compile(r"""
+  ^projects\/(?P<project_id>[\w:\-.]*[\w:\-]+)?
+  \/locations\/(?P<location>[\w\-]+)?
+  \/reservations\/(?P<reservation_id>[\w\-]+)?
+  \/slotPools\/(?P<slot_pool_id>[\w]+)$
+  """, re.X)
+
+  match = re.search(pattern, path)
+  if not match:
+    raise BigqueryError('Could not parse slot pool path: %s' % path)
+
+  project_id = match.groupdict().get('project_id', None)
+  location = match.groupdict().get('location', None)
+  reservation_id = match.groupdict().get('reservation_id', None)
+  slot_pool_id = match.groupdict().get('slot_pool_id', None)
+  return (project_id, location, reservation_id, slot_pool_id)
+
+
+def _ParseReservationGrantIdentifier(identifier):
+  """Parses the reservation grant identifier string into its components.
+
+  Args:
+    identifier: String specifying the reservation grant identifier in the format
+    "project_id:reservation_grant_id",
+    "project_id:location.reservation_grant_id", or "reservation_grant_id".
+
+  Returns:
+    A tuple of three elements: containing project_id, location, and
+    reservation_grant_id. If an element is not found, it is represented by None.
+
+  Raises:
+    BigqueryError: if the identifier could not be parsed.
+  """
+
+  pattern = re.compile(r"""
+  ^((?P<project_id>[\w:\-.]*[\w:\-]+):)?
+  ((?P<location>[\w\-]+)\.)?
+  (?P<reservation_grant_id>[\w\-_]*)$
+  """, re.X)
+
+  match = re.search(pattern, identifier)
+  if not match:
+    raise BigqueryError(
+        'Could not parse reservation grant identifier: %s' % identifier)
+
+  project_id = match.groupdict().get('project_id', None)
+  location = match.groupdict().get('location', None)
+  reservation_grant_id = match.groupdict().get('reservation_grant_id', None)
+  return (project_id, location, reservation_grant_id)
+
+
+def _ParseReservationGrantPath(path):
+  """Parses the reservation grant path string into its components.
+
+  Args:
+    path: String specifying the reservation grant path in the format
+      projects/<project_id>/locations/<location>/
+      reservationGrants/<reservation_grant_id>
+
+  Returns:
+    A tuple of three elements: containing project_id, location and
+    reservation_grant_id. If an element is not found, it is represented by None.
+
+  Raises:
+    BigqueryError: if the path could not be parsed.
+  """
+
+  pattern = re.compile(
+      r"""
+  ^projects\/(?P<project_id>[\w:\-.]*[\w:\-]+)?
+  \/locations\/(?P<location>[\w\-]+)?
+  \/reservationGrants\/(?P<reservation_grant_id>[\w\-_]+)$
+  """, re.X)
+
+  match = re.search(pattern, path)
+  if not match:
+    raise BigqueryError('Could not parse reservation path: %s' % path)
+
+  project_id = match.groupdict().get('project_id', None)
+  location = match.groupdict().get('location', None)
+  reservation_grant_id = match.groupdict().get('reservation_grant_id', None)
+  return (project_id, location, reservation_grant_id)
 
 
 def ConfigurePythonLogger(apilog=None):
@@ -588,6 +791,7 @@ class BigqueryClient(object):
       setattr(self, key, value)
     self._apiclient = None
     self._op_transfer_client = None
+    self._op_reservation_client = None
     for required_flag in ('api', 'api_version'):
       if required_flag not in kwds:
         raise ValueError('Missing required flag: %s' % (required_flag,))
@@ -674,12 +878,22 @@ class BigqueryClient(object):
       max_retries = 3
       iterations = 0
       while iterations < max_retries and discovery_document is None:
+        if iterations > 0:
+          # Wait briefly before retrying with exponentially increasing wait.
+          time.sleep(2 ** iterations)
         try:
           if discovery_url is None:
             discovery_url = self.GetDiscoveryUrl().format(
                 api='bigquery', apiVersion=self.api_version)
-          _, discovery_document = http.request(discovery_url)
-        except (httplib2.HttpLib2Error, googleapiclient.errors.HttpError), e:
+          logging.info('Requesting discovery document from %s', discovery_url)
+          response_metadata, discovery_document = http.request(discovery_url)
+          if response_metadata.get('status') >= '400':
+            msg = 'Got %s response from discovery url: %s' % (
+                response_metadata.get('status'), discovery_url)
+            logging.error('%s:\n%s', msg, discovery_document)
+            raise BigqueryCommunicationError(msg)
+        except (httplib2.HttpLib2Error, googleapiclient.errors.HttpError,
+                httplib.HTTPException), e:
           # We can't find the specified server. This can be thrown for
           # multiple reasons, so inspect the error.
           if hasattr(e, 'content'):
@@ -701,8 +915,6 @@ class BigqueryClient(object):
           # Don't retry in this case.
           raise BigqueryCommunicationError(
               'Invalid API name or version: %s' % (str(e),))
-        # Wait briefly before retrying with exponentially increasing wait.
-        time.sleep(2 ** iterations)
         iterations += 1
     try:
       return discovery.build_from_document(
@@ -745,6 +957,19 @@ class BigqueryClient(object):
     return self._op_transfer_client
 
 
+
+  def GetReservationApiClient(self,
+                              reservationserver_address=None,
+                              reservationserver_bns_address=None):
+    """Return the apiclient that supports reservation operations."""
+    path = reservationserver_address
+    if path is None:
+      path = 'https://bigqueryreservation.googleapis.com'
+    if not self._op_reservation_client:
+      discovery_url = (path + '/$discovery/rest?version=v1alpha1')
+      self._op_reservation_client = self.BuildApiClient(
+      discovery_url=discovery_url)
+    return self._op_reservation_client
 
   #################################
   ## Utility methods
@@ -819,7 +1044,9 @@ class BigqueryClient(object):
 
   @staticmethod
   def ValidatePrintFormat(print_format):
-    if print_format not in ['show', 'list', 'view', 'make']:
+    if print_format not in [
+        'show', 'list', 'view', 'materialized_view', 'make'
+    ]:
       raise ValueError('Unknown format: %s' % (print_format,))
 
   @staticmethod
@@ -830,6 +1057,21 @@ class BigqueryClient(object):
     else:
       project_id, _, dataset_id = identifier.rpartition(':')
       return project_id, dataset_id
+
+  @staticmethod
+  def _ShiftInformationSchema(dataset_id, table_id):
+    """Moves "INFORMATION_SCHEMA" to table_id for dataset qualified tables."""
+    if not dataset_id or not table_id:
+      return dataset_id, table_id
+
+    dataset_parts = dataset_id.split('.')
+    if dataset_parts[-1] != 'INFORMATION_SCHEMA' or table_id in (
+        'SCHEMATA', 'SCHEMATA_OPTIONS'):
+      # We don't shift unless INFORMATION_SCHEMA is present and table_id is for
+      # a dataset qualified table.
+      return dataset_id, table_id
+
+    return '.'.join(dataset_parts[:-1]), 'INFORMATION_SCHEMA.' + table_id
 
   @staticmethod
   def _ParseIdentifier(identifier):
@@ -867,6 +1109,9 @@ class BigqueryClient(object):
       dataset_id = ''
       table_id = dataset_and_table_id
 
+    dataset_id, table_id = BigqueryClient._ShiftInformationSchema(
+        dataset_id, table_id)
+
     return project_id, dataset_id, table_id
 
   def GetProjectReference(self, identifier=''):
@@ -881,7 +1126,7 @@ class BigqueryClient(object):
         return ApiClientHelper.ProjectReference.Create(projectId=project_id)
     except ValueError:
       pass
-    if project_id is '':
+    if project_id == '':
       raise BigqueryClientError('Please provide a project ID.')
     else:
       raise BigqueryClientError('Cannot determine project described by %s' % (
@@ -981,6 +1226,80 @@ class BigqueryClient(object):
     raise BigqueryError('Cannot determine job described by %s' % (
         identifier,))
 
+  def GetReservationReference(self, identifier=None, default_location=None,
+                              default_reservation_id=None):
+    """Determine a ReservationReference from an identifier and location."""
+    project_id, location, reservation_id = _ParseReservationIdentifier(
+        identifier)
+    project_id = project_id or self.project_id
+    if not project_id:
+      raise BigqueryError('Project id not specified.')
+    location = location or default_location
+    if not location:
+      raise BigqueryError('Location not specified.')
+    reservation_id = reservation_id or default_reservation_id
+    if not reservation_id:
+      raise BigqueryError('Reservation name not specified.')
+    return ApiClientHelper.ReservationReference.Create(
+        projectId=project_id,
+        location=location,
+        reservationId=reservation_id)
+
+  def GetSlotPoolReference(self, identifier=None, path=None,
+                           default_location=None,
+                           default_reservation_id=None,
+                           default_slot_pool_id=None):
+    """Determine a SlotPoolReference from an identifier and location."""
+    if identifier is not None:
+      project_id, location, reservation_id, slot_pool_id = _ParseSlotPoolIdentifier(
+          identifier)
+    elif path is not None:
+      project_id, location, reservation_id, slot_pool_id = _ParseSlotPoolPath(
+          path)
+    else:
+      raise BigqueryError('Either identifier or path must be specified.')
+    project_id = project_id or self.project_id
+    if not project_id:
+      raise BigqueryError('Project id not specified.')
+    location = location or default_location
+    if not location:
+      raise BigqueryError('Location not specified.')
+    reservation_id = reservation_id or default_reservation_id
+    if not reservation_id:
+      raise BigqueryError('Reservation name not specified.')
+    slot_pool_id = slot_pool_id or default_slot_pool_id
+    if not slot_pool_id:
+      raise BigqueryError('Slot pool id not specified.')
+    return ApiClientHelper.SlotPoolReference.Create(
+        projectId=project_id,
+        location=location,
+        reservationId=reservation_id,
+        slotPoolId=slot_pool_id)
+
+  def GetReservationGrantReference(self, identifier=None, path=None,
+                                   default_location=None,
+                                   default_reservation_grant_id=None):
+    """Determine a ReservationGrantReference from an identifier and location."""
+    if identifier is not None:
+      (project_id, location,
+       reservation_grant_id) = _ParseReservationGrantIdentifier(identifier)
+    elif path is not None:
+      (project_id, location,
+       reservation_grant_id) = _ParseReservationGrantPath(path)
+    project_id = project_id or self.project_id
+    if not project_id:
+      raise BigqueryError('Project id not specified.')
+    location = location or default_location
+    if not location:
+      raise BigqueryError('Location not specified.')
+    reservation_grant_id = reservation_grant_id or default_reservation_grant_id
+    if not reservation_grant_id:
+      raise BigqueryError('ReservationGrantId not specified.')
+    return ApiClientHelper.ReservationGrantReference.Create(
+        projectId=project_id,
+        location=location,
+        reservationGrantId=reservation_grant_id)
+
   def GetObjectInfo(self, reference):
     """Get all data returned by the server about a specific object."""
     # Projects are handled separately, because we only have
@@ -1049,6 +1368,236 @@ class BigqueryClient(object):
     return transfer_client.projects().locations().transferConfigs().runs().get(
         name=identifier).execute()
 
+
+  def CreateReservation(self, reference, slots, use_parent):
+    """Create a reservation with the given reservation reference.
+
+    Arguments:
+      reference: Reservation to create.
+      slots: Number of slots allocated to this reservation subtree.
+      use_parent: Specifies whether queries are submitted to run in the parent.
+
+    Returns:
+      Reservation object that was created.
+    """
+    reservation = {}
+    reservation['slot_capacity'] = slots
+    reservation['use_parent_reservation'] = use_parent
+    client = self.GetReservationApiClient()
+
+    if '/' in reference.reservationId:
+      path = reference.path()
+      pos = path.rfind('/')
+      parent = path[:pos]
+      reservation_id = path[pos + 1:]
+      return client.projects().locations().reservations().createReservation(
+          parent=parent, body=reservation,
+          reservationId=reservation_id).execute()
+    else:
+      parent = 'projects/%s/locations/%s' % (
+          reference.projectId, reference.location)
+      return client.projects().locations().reservations().create(
+          parent=parent, body=reservation,
+          reservationId=reference.reservationId).execute()
+
+  def ListReservations(self, reference, page_size, page_token):
+    """List reservations in the project and location for the given reference.
+
+    Arguments:
+      reference: Reservation reference containing project and location.
+      page_size: Number of results to show.
+      page_token: Token to retrieve the next page of results.
+
+    Returns:
+      Reservation object that was created.
+    """
+    parent = 'projects/%s/locations/%s' % (
+        reference.projectId,
+        reference.location
+        )
+    client = self.GetReservationApiClient()
+    return client.projects().locations().reservations().list(
+        parent=parent, pageSize=page_size, pageToken=page_token).execute()
+
+  def GetReservation(self, reference):
+    """Gets a reservation with the given reservation reference.
+
+    Arguments:
+      reference: Reservation to get.
+
+    Returns:
+      Reservation object corresponding to the given id.
+    """
+    client = self.GetReservationApiClient()
+    return client.projects().locations().reservations().get(
+        name=reference.path()).execute()
+
+  def DeleteReservation(self, reference, force):
+    """Deletes a reservation with the given reservation reference.
+
+    Arguments:
+      reference: Reservation to delete.
+      force: If true, all child reservations are also deleted.
+    """
+    client = self.GetReservationApiClient()
+    client.projects().locations().reservations().delete(
+        name=reference.path(), force=force).execute()
+
+  def UpdateReservation(self, reference, slots, use_parent):
+    """Updates a reservation with the given reservation reference.
+
+    Arguments:
+      reference: Reservation to update.
+      slots: Number of slots allocated to this reservation subtree.
+      use_parent: Specifies whether queries are submitted to run in the parent.
+
+    Returns:
+      Reservation object that was updated.
+    """
+    reservation = {}
+    update_mask = ''
+    if slots is not None:
+      reservation['slot_capacity'] = slots
+      update_mask += 'slot_capacity,'
+    if use_parent is not None:
+      reservation['use_parent_reservation'] = use_parent
+      update_mask += 'use_parent_reservation.value,'
+    client = self.GetReservationApiClient()
+    return client.projects().locations().reservations().patch(
+        name=reference.path(), updateMask=update_mask,
+        body=reservation).execute()
+
+  def CreateSlotPool(self, reference, slots, plan):
+    """Create a slot pool within the given reservation reference.
+
+    Arguments:
+      reference: Reservation to create a slot pool within.
+      slots: Number of slots in this pool.
+      plan: Commitment plan for this slot pool.
+
+    Returns:
+      A long running operation.
+    """
+    slot_pool = {}
+    slot_pool['slot_count'] = slots
+    slot_pool['plan'] = plan
+    client = self.GetReservationApiClient()
+    return client.projects().locations().reservations().slotPools().create(
+        parent=reference.path(), body=slot_pool).execute()
+
+  def ListSlotPools(self, reference, page_size, page_token):
+    """List slot pools for the given reservation.
+
+    Arguments:
+      reference: Reservation reference for the parent.
+      page_size: Number of results to show.
+      page_token: Token to retrieve the next page of results.
+
+    Returns:
+      Reservation object that was created.
+    """
+    client = self.GetReservationApiClient()
+    return client.projects().locations().reservations().slotPools().list(
+        parent=reference.path(), pageSize=page_size,
+        pageToken=page_token).execute()
+
+  def GetSlotPool(self, reference):
+    """Gets a slot pool with the given slot pool reference.
+
+    Arguments:
+      reference: Slot pool to get.
+
+    Returns:
+      Slot pool object corresponding to the given id.
+    """
+    client = self.GetReservationApiClient()
+    return client.projects().locations().reservations().slotPools().get(
+        name=reference.path()).execute()
+
+  def DeleteSlotPool(self, reference):
+    """Deletes a slot pool with the given slot pool reference.
+
+    Arguments:
+      reference: Slot pool to delete.
+    """
+    client = self.GetReservationApiClient()
+    client.projects().locations().reservations().slotPools().delete(
+        name=reference.path()).execute()
+
+  def CreateReservationGrant(self, reference, reservation_id, job_type):
+    """Creates a reservation grant for given project, location, job_type.
+
+    Arguments:
+      reference: Reference to the project and location to create the grant.
+      reservation_id: Reference to reservation for the grant.
+      job_type: Type of jobs for this grant.
+
+    Returns:
+      ReservationGrant object that was created.
+
+    Raises:
+      BigqueryError: if grant cannot be created.
+    """
+    reservation_grant = {}
+    if not reservation_id:
+      raise BigqueryError('reservation_id not specified.')
+    reservation_reference = self.GetReservationReference(reservation_id,
+                                                         reference.location)
+    reservation_grant['reservation'] = reservation_reference.path()
+    if not job_type:
+      raise BigqueryError('job_type not specified.')
+    reservation_grant['job_type'] = job_type
+    client = self.GetReservationApiClient()
+    parent = 'projects/%s/locations/%s' % (reference.projectId,
+                                           reference.location)
+    return client.projects().locations().reservationGrants().create(
+        parent=parent, body=reservation_grant).execute()
+
+  def DeleteReservationGrant(self, reference):
+    """Deletes given reservation grant.
+
+    Arguments:
+      reference: Reference to the reservation grant.
+    """
+    client = self.GetReservationApiClient()
+    client.projects().locations().reservationGrants().delete(
+        name=reference.path()).execute()
+
+  def ListReservationGrants(self, reference, page_size, page_token):
+    """Lists reservations grants for given project and location.
+
+    Arguments:
+      reference: Reference to the project and location.
+      page_size: Number of results to show.
+      page_token: Token to retrieve the next page of results.
+
+    Returns:
+      list of ReservationGrant objects.
+    """
+    parent = 'projects/%s/locations/%s' % (
+        reference.projectId,
+        reference.location
+        )
+    client = self.GetReservationApiClient()
+    return client.projects().locations().reservationGrants().list(
+        parent=parent, pageSize=page_size, pageToken=page_token).execute()
+
+  def ListReservationGrantsForReservation(
+      self, reference, page_size, page_token):
+    """Lists reservations grants for given reservation.
+
+    Arguments:
+      reference: Reference to the reservation.
+      page_size: Number of results to show.
+      page_token: Token to retrieve the next page of results.
+
+    Returns:
+      list of ReservationGrant objects.
+    """
+    client = self.GetReservationApiClient()
+    return client.projects().locations().reservations().listReservationGrants(
+        name=reference.path(), pageSize=page_size,
+        pageToken=page_token).execute()
 
   def ReadSchemaAndRows(self, table_dict, start_row=None, max_rows=None,
                         selected_fields=None):
@@ -1154,7 +1703,7 @@ class BigqueryClient(object):
     elif reference_type == ApiClientHelper.TransferRunReference:
       if print_format == 'show':
         for column in BigqueryClient.columns_to_include_for_transfer_run:
-          if column is not 'name':
+          if column != 'name':
             formatter.AddColumns((column,))
       elif print_format == 'list':
         for column in BigqueryClient.columns_to_include_for_transfer_run:
@@ -1194,8 +1743,17 @@ class BigqueryClient(object):
           formatter.AddColumns(('kmsKeyName',))
       if print_format == 'view':
         formatter.AddColumns(('Query',))
+      if print_format == 'materialized_view':
+        formatter.AddColumns(('Query',))
     elif reference_type == ApiClientHelper.EncryptionServiceAccount:
       formatter.AddColumns(object_info.keys())
+    elif reference_type == ApiClientHelper.ReservationReference:
+      formatter.AddColumns(('name', 'slotCapacity', 'useParentReservation'))
+    elif reference_type == ApiClientHelper.SlotPoolReference:
+      formatter.AddColumns(('name', 'slotCount', 'plan', 'state',
+                            'commitmentEndTime'))
+    elif reference_type == ApiClientHelper.ReservationGrantReference:
+      formatter.AddColumns(('name', 'reservation', 'jobType'))
     else:
       raise ValueError('Unknown reference type: %s' % (
           reference_type.__name__,))
@@ -1363,6 +1921,12 @@ class BigqueryClient(object):
       return BigqueryClient.FormatTrasferLogInfo(object_info)
     elif object_type == ApiClientHelper.EncryptionServiceAccount:
       return object_info
+    elif object_type == ApiClientHelper.ReservationReference:
+      return BigqueryClient.FormatReservationInfo(object_info)
+    elif object_type == ApiClientHelper.SlotPoolReference:
+      return BigqueryClient.FormatSlotPoolInfo(object_info)
+    elif object_type == ApiClientHelper.ReservationGrantReference:
+      return BigqueryClient.FormatReservationGrantInfo(object_info)
     else:
       raise ValueError('Unknown object type: %s' % (object_type,))
 
@@ -1492,6 +2056,8 @@ class BigqueryClient(object):
       result['Type'] = result['type']
       if 'view' in result and 'query' in result['view']:
         result['Query'] = result['view']['query']
+      if 'materializedView' in result and 'query' in result['materializedView']:
+        result['Query'] = result['materializedView']['query']
       if result['type'] == 'EXTERNAL':
         if 'externalDataConfiguration' in result:
           result['Total URIs'] = len(
@@ -1547,6 +2113,84 @@ class BigqueryClient(object):
     result = {}
     for key, value in transfer_run_info.iteritems():
       if key in BigqueryClient.columns_to_include_for_transfer_run:
+        result[key] = value
+    return result
+
+  @staticmethod
+  def FormatReservationInfo(reservation):
+    """Prepare a reservation for printing.
+
+    Arguments:
+      reservation: reservation to format.
+
+    Returns:
+      A dictionary of reservation properties.
+    """
+    result = {}
+    for key, value in reservation.iteritems():
+      if key == 'name':
+        project_id, location, reservation_id = _ParseReservationPath(value)
+        reference = ApiClientHelper.ReservationReference.Create(
+            projectId=project_id,
+            location=location,
+            reservationId=reservation_id)
+        result[key] = reference.__str__()
+      else:
+        result[key] = value
+    # Default values not passed along in the response.
+    if 'slotCapacity' not in result.keys():
+      result['slotCapacity'] = '0'
+    return result
+
+  @staticmethod
+  def FormatSlotPoolInfo(slot_pool):
+    """Prepare a slot pool for printing.
+
+    Arguments:
+      slot_pool: slot pool to format.
+
+    Returns:
+      A dictionary of slot pool properties.
+    """
+    result = {}
+    for key, value in slot_pool.iteritems():
+      if key == 'name':
+        project_id, location, reservation_id, slot_pool_id = _ParseSlotPoolPath(
+            value)
+        reference = ApiClientHelper.SlotPoolReference.Create(
+            projectId=project_id,
+            location=location,
+            reservationId=reservation_id,
+            slotPoolId=slot_pool_id)
+        result[key] = reference.__str__()
+      else:
+        result[key] = value
+    # Default values not passed along in the response.
+    if 'slotCount' not in result.keys():
+      result['slotCount'] = '0'
+    return result
+
+  @staticmethod
+  def FormatReservationGrantInfo(reservation_grant):
+    """Prepare a reservation_grant for printing.
+
+    Arguments:
+      reservation_grant: reservation_grant to format.
+
+    Returns:
+      A dictionary of reservation_grant properties.
+    """
+    result = {}
+    for key, value in reservation_grant.iteritems():
+      if key == 'name':
+        project_id, location, reservation_grant_id = _ParseReservationGrantPath(
+            value)
+        reference = ApiClientHelper.ReservationGrantReference.Create(
+            projectId=project_id,
+            location=location,
+            reservationGrantId=reservation_grant_id)
+        result[key] = reference.__str__()
+      else:
         result[key] = value
     return result
 
@@ -2069,10 +2713,17 @@ class BigqueryClient(object):
     except BigqueryNotFoundError:
       return False
 
-  def CreateDataset(self, reference, ignore_existing=False, description=None,
-                    display_name=None, acl=None,
-                    default_table_expiration_ms=None,
-                    data_location=None):
+  def CreateDataset(
+      self,
+      reference,
+      ignore_existing=False,
+      description=None,
+      display_name=None,
+      acl=None,
+      default_table_expiration_ms=None,
+      default_partition_expiration_ms=None,
+      data_location=None,
+      labels=None):
     """Create a dataset corresponding to DatasetReference.
 
     Args:
@@ -2084,9 +2735,12 @@ class BigqueryClient(object):
       acl: an optional ACL for the dataset, as a list of dicts.
       default_table_expiration_ms: Default expiration time to apply to
         new tables in this dataset.
+      default_partition_expiration_ms: Default partition expiration time to
+        apply to new partitioned tables in this dataset.
       data_location: Location where the data in this dataset should be
         stored. Must be either 'EU' or 'US'. If specified, the project that
         owns the dataset must be enabled for data location.
+      labels: An optional dict of labels.
 
     Raises:
       TypeError: if reference is not a DatasetReference.
@@ -2105,8 +2759,14 @@ class BigqueryClient(object):
       body['access'] = acl
     if default_table_expiration_ms is not None:
       body['defaultTableExpirationMs'] = default_table_expiration_ms
+    if default_partition_expiration_ms is not None:
+      body['defaultPartitionExpirationMs'] = default_partition_expiration_ms
     if data_location is not None:
       body['location'] = data_location
+    if labels:
+      body['labels'] = {}
+      for label_key, label_value in labels.items():
+        body['labels'][label_key] = label_value
     try:
       self.apiclient.datasets().insert(
           body=body,
@@ -2124,12 +2784,15 @@ class BigqueryClient(object):
       display_name=None,
       expiration=None,
       view_query=None,
+      materialized_view_query=None,
       external_data_config=None,
       view_udf_resources=None,
       use_legacy_sql=None,
       labels=None,
       time_partitioning=None,
       clustering=None,
+      range_partitioning=None,
+      require_partition_filter=None,
       destination_kms_key=None):
     """Create a table corresponding to TableReference.
 
@@ -2143,6 +2806,7 @@ class BigqueryClient(object):
       expiration: optional expiration time in milliseconds since the epoch for
         tables or views.
       view_query: an optional Sql query for views.
+      materialized_view_query: an optional Standard SQL query for materialized views.
       external_data_config: defines a set of external resources used to create
         an external table. For example, a BigQuery table backed by CSV files
         in GCS.
@@ -2153,6 +2817,10 @@ class BigqueryClient(object):
       time_partitioning: if set, enables time based partitioning on the table
         and configures the partitioning.
       clustering: if set, enables and configures clustering on the table.
+      range_partitioning: if set, enables range partitioning on the table and
+        configures the partitioning.
+      require_partition_filter: if set, partition filter is required for
+        queires over this table.
       destination_kms_key: User specified KMS key for encryption.
 
     Raises:
@@ -2179,6 +2847,9 @@ class BigqueryClient(object):
         body['view'] = view_args
         if use_legacy_sql is not None:
           view_args['useLegacySql'] = use_legacy_sql
+      if materialized_view_query is not None:
+        materialized_view_args = {'query': materialized_view_query}
+        body['materializedView'] = materialized_view_args
       if external_data_config is not None:
         body['externalDataConfiguration'] = external_data_config
       if labels is not None:
@@ -2187,6 +2858,10 @@ class BigqueryClient(object):
         body['timePartitioning'] = time_partitioning
       if clustering is not None:
         body['clustering'] = clustering
+      if range_partitioning is not None:
+        body['rangePartitioning'] = range_partitioning
+      if require_partition_filter is not None:
+        body['requirePartitionFilter'] = require_partition_filter
       if destination_kms_key is not None:
         body['encryptionConfiguration'] = {'kmsKeyName': destination_kms_key}
       self.apiclient.tables().insert(
@@ -2250,8 +2925,7 @@ class BigqueryClient(object):
         name=data_source_retrieval).execute()
 
     if params:
-      update_items = self.ProcessParamsFlag(
-          params, data_source_info, update_items)
+      update_items = self.ProcessParamsFlag(params, update_items)
       update_mask.append('transfer_config.params,')
 
     # if refresh window provided, check that data source supports it
@@ -2328,8 +3002,7 @@ class BigqueryClient(object):
     # checks that all required params are given
     # if a param that isn't required is provided, it is ignored.
     if params:
-      create_items = self.ProcessParamsFlag(
-          params, data_source_info, create_items)
+      create_items = self.ProcessParamsFlag(params, create_items)
     else:
       raise BigqueryError(
           'Parameters must be provided.')
@@ -2344,16 +3017,12 @@ class BigqueryClient(object):
         authorizationCode=authorization_code).execute()
     return new_transfer_config['name']
 
-  def ProcessParamsFlag(
-      self, params, data_source_info, items):
-    """Processes the Refresh Window Days flag.
+  def ProcessParamsFlag(self, params, items):
+    """Processes the params flag.
 
     Args:
       params: The user specified parameters. The parameters should be in JSON
-      format given as a string. Ex: --params="{'param':'value'}". The
-      params should be the required values needed for each data source and will
-      vary.
-      data_source_info: The data source of the transfer config.
+      format given as a string. Ex: --params="{'param':'value'}".
       items: The body that contains information of all the flags set.
 
     Returns:
@@ -2363,23 +3032,11 @@ class BigqueryClient(object):
       BigqueryError: If there is an error with the given params.
     """
     try:
-      params_of_data_source = data_source_info['parameters']
-      data_source_param_ids = []
-      for param in params_of_data_source:
-        data_source_param_ids.append(param['paramId'])
       parsed_params = json.loads(params)
     except:
       raise BigqueryError(
           'Parameters should be specified in JSON format'
           ' when creating the transfer configuration.')
-    for given_param in parsed_params:
-      if given_param not in data_source_param_ids:
-        raise BigqueryError(
-            'Parameter \'%s\' does not exist.' % given_param)
-    for param in data_source_param_ids:
-      if param not in parsed_params.keys():
-        raise BigqueryError(
-            'Parameter \'%s\' must be provided.' % param)
     items['params'] = parsed_params
     return items
 
@@ -2413,21 +3070,25 @@ class BigqueryClient(object):
           'Data source \'%s\' does not'
           ' support refresh window days.' % data_source)
 
-  def UpdateTable(self,
-                  reference,
-                  schema=None,
-                  description=None,
-                  display_name=None,
-                  expiration=None,
-                  view_query=None,
-                  external_data_config=None,
-                  view_udf_resources=None,
-                  use_legacy_sql=None,
-                  labels_to_set=None,
-                  label_keys_to_remove=None,
-                  time_partitioning=None,
-                  etag=None,
-                  encryption_configuration=None):
+  def UpdateTable(
+      self,
+      reference,
+      schema=None,
+      description=None,
+      display_name=None,
+      expiration=None,
+      view_query=None,
+      materialized_view_query=None,
+      external_data_config=None,
+      view_udf_resources=None,
+      use_legacy_sql=None,
+      labels_to_set=None,
+      label_keys_to_remove=None,
+      time_partitioning=None,
+      range_partitioning=None,
+      require_partition_filter=None,
+      etag=None,
+      encryption_configuration=None):
     """Updates a table.
 
     Args:
@@ -2438,6 +3099,7 @@ class BigqueryClient(object):
       expiration: optional expiration time in milliseconds since the epoch for
         tables or views. Specifying 0 removes expiration time.
       view_query: an optional Sql query to update a view.
+      materialized_view_query: an optional Standard SQL query for materialized views.
       external_data_config: defines a set of external resources used to create
         an external table. For example, a BigQuery table backed by CSV files
         in GCS.
@@ -2449,6 +3111,10 @@ class BigqueryClient(object):
         table.
       time_partitioning: if set, enables time based partitioning on the table
         and configures the partitioning.
+      range_partitioning: if set, enables range partitioning on the table and
+        configures the partitioning.
+      require_partition_filter: if set, partition filter is required for
+        queires over this table.
       etag: if set, checks that etag in the existing table matches.
       encryption_configuration: Updates the encryption configuration.
 
@@ -2482,6 +3148,9 @@ class BigqueryClient(object):
       if use_legacy_sql is not None:
         view_args['useLegacySql'] = use_legacy_sql
       table['view'] = view_args
+    if materialized_view_query is not None:
+      materialized_view_args = {'query': materialized_view_query}
+      table['materializedView'] = materialized_view_args
     if external_data_config is not None:
       table['externalDataConfiguration'] = external_data_config
     if 'labels' not in table:
@@ -2494,6 +3163,10 @@ class BigqueryClient(object):
         table['labels'][label_key] = None
     if time_partitioning is not None:
       table['timePartitioning'] = time_partitioning
+    if range_partitioning is not None:
+      table['rangePartitioning'] = range_partitioning
+    if require_partition_filter is not None:
+      table['requirePartitionFilter'] = require_partition_filter
 
     request = self.apiclient.tables().patch(body=table, **dict(reference))
 
@@ -2512,6 +3185,7 @@ class BigqueryClient(object):
       display_name=None,
       acl=None,
       default_table_expiration_ms=None,
+      default_partition_expiration_ms=None,
       labels_to_set=None,
       label_keys_to_remove=None,
       etag=None):
@@ -2524,6 +3198,9 @@ class BigqueryClient(object):
       acl: an optional ACL for the dataset, as a list of dicts.
       default_table_expiration_ms: optional number of milliseconds for the
         default expiration duration for new tables created in this dataset.
+      default_partition_expiration_ms: optional number of milliseconds for the
+        default partition expiration duration for new partitioned tables created
+        in this dataset.
       labels_to_set: an optional dict of labels to set on this dataset.
       label_keys_to_remove: an optional list of label keys to remove from this
         dataset.
@@ -2550,6 +3227,11 @@ class BigqueryClient(object):
       dataset['access'] = acl
     if default_table_expiration_ms is not None:
       dataset['defaultTableExpirationMs'] = default_table_expiration_ms
+    if default_partition_expiration_ms is not None:
+      if default_partition_expiration_ms == 0:
+        dataset['defaultPartitionExpirationMs'] = None
+      else:
+        dataset['defaultPartitionExpirationMs'] = default_partition_expiration_ms
     if 'labels' not in dataset:
       dataset['labels'] = {}
     if labels_to_set:
@@ -3124,10 +3806,12 @@ class BigqueryClient(object):
   ## Wrappers for job types
   #################################
 
-  def RunQuery(self, **kwds):
+  def RunQuery(self, start_row, max_rows, **kwds):
     """Run a query job synchronously, and return the result.
 
     Args:
+      start_row: first row to read.
+      max_rows: number of rows to read.
       **kwds: Passed on to self.Query.
 
     Returns:
@@ -3138,7 +3822,9 @@ class BigqueryClient(object):
     new_kwds['sync'] = True
     job = self.Query(**new_kwds)
 
-    return self.ReadSchemaAndJobRows(job['jobReference'])
+    return self.ReadSchemaAndJobRows(job['jobReference'],
+                                     start_row=start_row,
+                                     max_rows=max_rows)
 
   def RunQueryRpc(self,
                   query,
@@ -3297,6 +3983,7 @@ class BigqueryClient(object):
       time_partitioning=None,
       destination_encryption_configuration=None,
       clustering=None,
+      range_partitioning=None,
       **kwds):
     # pylint: disable=g-doc-args
     """Execute the given query, returning the created job.
@@ -3345,6 +4032,8 @@ class BigqueryClient(object):
           destination table.
       destination_encryption_configuration: Optional. Allows user to encrypt the
           table created from a query job with a Cloud KMS key.
+      range_partitioning: Optional. Provides range partitioning specification
+          for the destination table.
       **kwds: Passed on to self.ExecuteJob.
 
     Raises:
@@ -3389,7 +4078,8 @@ class BigqueryClient(object):
         query_parameters=query_parameters,
         time_partitioning=time_partitioning,
         clustering=clustering,
-        min_completion_ratio=min_completion_ratio)
+        min_completion_ratio=min_completion_ratio,
+        range_partitioning=range_partitioning)
     request = {'query': query_config}
     _ApplyParameters(request, dry_run=dry_run,
                      labels=labels)
@@ -3418,6 +4108,8 @@ class BigqueryClient(object):
       time_partitioning=None,
       clustering=None,
       destination_encryption_configuration=None,
+      use_avro_logical_types=None,
+      range_partitioning=None,
       **kwds):
     """Load the given data into BigQuery.
 
@@ -3463,6 +4155,12 @@ class BigqueryClient(object):
           destination table.
       destination_encryption_configuration: Optional. Allows user to encrypt the
           table created from a load job with Cloud KMS key.
+      use_avro_logical_types: Optional. Allows user to override default
+          behaviour for Avro logical types. If this is set, Avro fields with
+          logical types will be interpreted into their corresponding types (ie.
+          TIMESTAMP), instead of only using their raw types (ie. INTEGER).
+      range_partitioning: Optional. Provides range partitioning specification
+          for the destination table.
       **kwds: Passed on to self.ExecuteJob.
 
     Returns:
@@ -3478,6 +4176,8 @@ class BigqueryClient(object):
       upload_file = sources[0]
     if schema is not None:
       load_config['schema'] = {'fields': BigqueryClient.ReadSchema(schema)}
+    if use_avro_logical_types is not None:
+      load_config['useAvroLogicalTypes'] = use_avro_logical_types
     if destination_encryption_configuration:
       load_config['destinationEncryptionConfiguration'] = (
           destination_encryption_configuration)
@@ -3499,7 +4199,8 @@ class BigqueryClient(object):
         null_marker=null_marker,
         time_partitioning=time_partitioning,
         clustering=clustering,
-        autodetect=autodetect)
+        autodetect=autodetect,
+        range_partitioning=range_partitioning)
     return self.ExecuteJob(configuration={'load': load_config},
                            upload_file=upload_file, **kwds)
 
@@ -3878,3 +4579,33 @@ class ApiClientHelper(object):
     # cases, i.e. datasets, tables, etc.
     typename = None
 
+
+  class ReservationReference(Reference):
+    _required_fields = frozenset(('projectId', 'location', 'reservationId'))
+    _format_str = '%(projectId)s:%(location)s.%(reservationId)s'
+    _path_str = 'projects/%(projectId)s/locations/%(location)s/reservations/%(reservationId)s'
+    typename = 'reservation'
+
+    def path(self):
+      return self._path_str % dict(self)
+
+  class SlotPoolReference(Reference):
+    _required_fields = frozenset(('projectId', 'location', 'reservationId',
+                                  'slotPoolId'))
+    _format_str = '%(projectId)s:%(location)s.%(reservationId)s.%(slotPoolId)s'
+    _path_str = 'projects/%(projectId)s/locations/%(location)s/reservations/%(reservationId)s/slotPools/%(slotPoolId)s'
+    typename = 'slot pool'
+
+    def path(self):
+      return self._path_str % dict(self)
+
+  class ReservationGrantReference(Reference):
+    _required_fields = frozenset((
+        'projectId', 'location', 'reservationGrantId'))
+    _format_str = '%(projectId)s:%(location)s.%(reservationGrantId)s'
+    _path_str = ('projects/%(projectId)s/locations/%(location)s/'
+                 'reservationGrants/%(reservationGrantId)s')
+    typename = 'reservation grant'
+
+    def path(self):
+      return self._path_str % dict(self)

@@ -15,11 +15,11 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute health-checks create http is used to create a
-    HTTP health check. HTTP health checks monitor instances in a load balancer
-    controlled by a target pool. All arguments to the command are optional
-    except for the name of the health check. For more information on load
-    balancing, see
+    (BETA) gcloud beta compute health-checks create http is used to create an
+    HTTP non-legacy health check. HTTP health checks monitor instances in a
+    load balancer controlled by a target pool. All arguments to the command are
+    optional except for the name of the health check. For more information on
+    load balancing, see
     https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/
 
 POSITIONAL ARGUMENTS
@@ -97,8 +97,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

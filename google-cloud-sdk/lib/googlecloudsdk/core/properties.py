@@ -31,7 +31,6 @@ from googlecloudsdk.core.configurations import named_configs
 from googlecloudsdk.core.configurations import properties_file as prop_files_lib
 from googlecloudsdk.core.docker import constants as const_lib
 from googlecloudsdk.core.util import encoding
-from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import http_proxy_types
 from googlecloudsdk.core.util import times
 
@@ -140,6 +139,15 @@ def _BooleanValidator(property_name, value):
         '(See http://yaml.org/type/bool.html)'.format(
             property_name, value,
             ', '.join([x if x else "''" for x in accepted_strings])))
+
+
+def _BuildTimeoutValidator(timeout):
+  """Validates build timeouts."""
+  if timeout is None:
+    return
+  seconds = times.ParseDuration(timeout, default_suffix='s').total_seconds
+  if seconds <= 0:
+    raise InvalidValueError('Timeout must be a positive time duration.')
 
 
 class Error(exceptions.Error):
@@ -264,7 +272,9 @@ class _Sections(object):
     self.proxy = _SectionProxy()
     self.pubsub = _SectionPubsub()
     self.redis = _SectionRedis()
+    self.run = _SectionRun()
     self.spanner = _SectionSpanner()
+    self.storage = _SectionStorage()
     self.test = _SectionTest()
 
     sections = [
@@ -293,6 +303,7 @@ class _Sections(object):
         self.ml_engine,
         self.proxy,
         self.redis,
+        self.run,
         self.spanner,
         self.test,
     ]
@@ -569,6 +580,34 @@ class _Section(object):
     return result
 
 
+class _SectionRun(_Section):
+  """Contains the properties for the 'run' section."""
+
+  def __init__(self):
+    super(_SectionRun, self).__init__('run', hidden=True)
+    self.region = self._Add(
+        'region',
+        default='us-central1',
+        help_text='The default region to use when working with Google '
+        'Run resources. When a `--region` flag is required '
+        'but not provided, the command will fall back to this value, if set. '
+        'To see valid choices, run `gcloud run regions list`.')
+
+    self.namespace = self._Add(
+        'namespace',
+        help_text='Kubernetes namespace to create Run resources in.',
+        hidden=True)
+
+    self.cluster = self._Add(
+        'cluster',
+        help_text='GKE cluster to use. '
+        'Knative must be installed in this cluster.')
+
+    self.cluster_location = self._Add(
+        'cluster_location',
+        help_text='Zone or region of the GKE cluster to use.')
+
+
 class _SectionSpanner(_Section):
   """Contains the properties for the 'spanner' section."""
 
@@ -667,18 +706,9 @@ class _SectionApp(_Section):
         'trigger_build_server_side',
         hidden=True,
         default=None)
-    def CloudBuildTimeoutValidator(build_timeout):
-      if build_timeout is None:
-        return
-      try:
-        seconds = int(build_timeout)  # bare int means seconds
-      except ValueError:
-        seconds = times.ParseDuration(build_timeout).total_seconds
-      if seconds <= 0:
-        raise InvalidValueError('Timeout must be a positive time duration.')
     self.cloud_build_timeout = self._Add(
         'cloud_build_timeout',
-        validator=CloudBuildTimeoutValidator,
+        validator=_BuildTimeoutValidator,
         help_text='Timeout, in seconds, to wait for Docker builds to '
                   'complete during deployments. All Docker builds now use the '
                   'Cloud Build API.')
@@ -734,15 +764,6 @@ class _SectionApp(_Section):
         default='gs://runtime-builders/',
         hidden=True)
 
-    # TODO(b/27101941): This property is a temporary fallback in case issues
-    # are caused by changing the GA command to enable the Flexible Environment
-    # API with Service Management before deploying Flexible apps. Remove if
-    # change is successful.
-    self.use_deprecated_preparation = self._AddBool(
-        'use_deprecated_preparation',
-        default=False,
-        hidden=True)
-
 
 class _SectionBuilds(_Section):
   """Contains the properties for the 'builds' section."""
@@ -750,18 +771,9 @@ class _SectionBuilds(_Section):
   def __init__(self):
     super(_SectionBuilds, self).__init__('builds')
 
-    def TimeoutValidator(timeout):
-      if timeout is None:
-        return
-      try:
-        seconds = int(timeout)  # bare int means seconds
-      except ValueError:
-        seconds = times.ParseDuration(timeout).total_seconds
-      if seconds <= 0:
-        raise InvalidValueError('Timeout must be a positive time duration.')
     self.timeout = self._Add(
         'timeout',
-        validator=TimeoutValidator,
+        validator=_BuildTimeoutValidator,
         help_text='Timeout, in seconds, to wait for builds to complete.')
     self.check_tag = self._AddBool(
         'check_tag',
@@ -769,6 +781,12 @@ class _SectionBuilds(_Section):
         hidden=True,
         help_text='If True, validate that the --tag value to builds '
         'submit is in the gcr.io or *.gcr.io namespace.')
+    self.use_kaniko = self._AddBool(
+        'use_kaniko',
+        default=False,
+        hidden=True,
+        help_text='If True, kaniko will be used to build images described by '
+        'a Dockerfile, instead of `docker build`.')
 
 
 class _SectionContainer(_Section):
@@ -804,18 +822,9 @@ class _SectionContainer(_Section):
         'these tracks always use the new behavior. See `--scopes` help for '
         'more info.')
 
-    def BuildTimeoutValidator(build_timeout):
-      if build_timeout is None:
-        return
-      try:
-        seconds = int(build_timeout)  # bare int means seconds
-      except ValueError:
-        seconds = times.ParseDuration(build_timeout).total_seconds
-      if seconds <= 0:
-        raise InvalidValueError('Timeout must be a positive time duration.')
     self.build_timeout = self._Add(
         'build_timeout',
-        validator=BuildTimeoutValidator,
+        validator=_BuildTimeoutValidator,
         help_text='Timeout, in seconds, to wait for container builds to '
         'complete.')
     self.build_check_tag = self._AddBool(
@@ -993,30 +1002,12 @@ class _SectionCore(_Section):
         default=True,
         hidden=True,
         help_text='If true, allow a Python 3 interpreter to run gcloud.')
-
-    def CaptureSessionFileValidator(filename):
-      """Validates if session could be captured to given file."""
-      if filename is None:
-        return
-      if not isinstance(filename, six.string_types):
-        raise InvalidValueError('Filename is not string')
-      dirname = os.path.dirname(os.path.realpath(filename))
-      if not os.path.exists(dirname):
-        while not os.path.exists(os.path.dirname(dirname)):
-          dirname = os.path.dirname(dirname)
-        raise InvalidValueError('Directory {} does not exist'.format(dirname))
-      try:
-        has_write_access = files.HasWriteAccessInDir(dirname)
-      except ValueError as e:  # dirname is not a directory
-        raise InvalidValueError(e.message)
-      if not has_write_access:
-        raise InvalidValueError('Can\'t write to {}'.format(filename))
-
-    self.capture_session_file = self._Add(
-        'capture_session_file',
+    self.color_theme = self._Add(
+        'color_theme',
+        help_text='Color palette for output.',
         hidden=True,
-        validator=CaptureSessionFileValidator,
-        help_text='If provided, will capture session to the file')
+        default='off',
+        choices=['off', 'normal', 'testing'])
 
     def ShowStructuredLogsValidator(show_structured_logs):
       if show_structured_logs is None:
@@ -1146,6 +1137,8 @@ class _SectionAuth(_Section):
         'authorization_token_file', hidden=True)
     self.credential_file_override = self._Add(
         'credential_file_override', hidden=True)
+    self.impersonate_service_account = self._Add(
+        'impersonate_service_account', hidden=True)
 
 
 class _SectionBilling(_Section):
@@ -1426,6 +1419,7 @@ class _SectionApiEndpointOverrides(_Section):
   def __init__(self):
     super(_SectionApiEndpointOverrides, self).__init__(
         'api_endpoint_overrides', hidden=True)
+    self.accesscontextmanager = self._Add('accesscontextmanager')
     self.apikeys = self._Add('apikeys')
     self.appengine = self._Add('appengine')
     self.bigtableadmin = self._Add('bigtableadmin')
@@ -1442,6 +1436,8 @@ class _SectionApiEndpointOverrides(_Section):
     self.cloudkms = self._Add('cloudkms')
     self.cloudresourcemanager = self._Add('cloudresourcemanager')
     self.cloudresourcesearch = self._Add('cloudresourcesearch')
+    self.cloudscheduler = self._Add('cloudscheduler')
+    self.cloudtasks = self._Add('cloudtasks')
     self.composer = self._Add('composer')
     self.compute = self._Add('compute')
     self.container = self._Add('container')
@@ -1457,6 +1453,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.firestore = self._Add('firestore')
     self.genomics = self._Add('genomics')
     self.iam = self._Add('iam')
+    self.kubernetespolicy = self._Add('kubernetespolicy')
     self.language = self._Add('language')
     self.logging = self._Add('logging')
     self.manager = self._Add('manager')
@@ -1467,6 +1464,10 @@ class _SectionApiEndpointOverrides(_Section):
     self.replicapoolupdater = self._Add('replicapoolupdater')
     self.runtimeconfig = self._Add('runtimeconfig')
     self.redis = self._Add('redis')
+    # TODO(b/119917957): rename to 'run' once control plane finishes renaming,
+    # which will be reflected in third_party/apis/apis_map.py See b/117986529
+    # for additional context.
+    self.run = self._Add('serverless')
     self.servicemanagement = self._Add('servicemanagement')
     self.serviceregistry = self._Add('serviceregistry')
     self.serviceuser = self._Add('serviceuser')
@@ -1555,6 +1556,25 @@ class _SectionRedis(_Section):
         help_text='Default region to use when working with Cloud '
         'Memorystore for Redis resources. When a `region` is required but not '
         'provided by a flag, the command will fall back to this value, if set.')
+
+
+class _SectionStorage(_Section):
+  """Contains the properties for the 'storage' section."""
+
+  def __init__(self):
+    super(_SectionStorage, self).__init__('storage')
+    self.chunk_size = self._Add(
+        'chunk_size',
+        default=104857600,  # gsutil's default chunksize (1024 * 1024 * 100)
+        help_text='Chunk size used for uploading and downloading from '
+                  'Cloud Storage.')
+    # TODO(b/109938541): Remove this after implementation seems stable.
+    self.use_gsutil = self._AddBool(
+        'use_gsutil',
+        default=False,
+        hidden=True,
+        help_text='If True, use the deprecated upload implementation which '
+                  'uses gsutil.')
 
 
 class _Property(object):

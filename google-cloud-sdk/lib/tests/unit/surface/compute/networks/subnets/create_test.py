@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instances move subcommand."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -262,6 +263,46 @@ class SubnetsCreateTestAlpha(SubnetsCreateTest):
               region='us-central1',
               project='my-project'))],)
 
+  def testCreateWithPrivateV6AccessEnabled(self):
+    """Test creating a subnet with --enable-private-v6-access."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1 --enable-private-ipv6-access
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  enablePrivateV6Access=True),
+              region='us-central1',
+              project='my-project'))],)
+
+  def testCreateWithPrivateV6AccessDisabled(self):
+    """Test creating a subnet with --no-enable-private-ipv6-access."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1 --no-enable-private-ipv6-access
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  enablePrivateV6Access=False),
+              region='us-central1',
+              project='my-project'))],)
+
 
 class SubnetsCreateInternalHttpsLoadBalancerTest(test_base.BaseTest):
 
@@ -295,7 +336,7 @@ class SubnetsCreateInternalHttpsLoadBalancerTest(test_base.BaseTest):
     self.Run("""
         compute networks subnets create my-subnet --network my-network
         --range 10.240.0.0/16 --region us-central1
-        --purpose private-rfc-1918
+        --purpose private
         """)
 
     self.CheckRequests(
@@ -308,7 +349,7 @@ class SubnetsCreateInternalHttpsLoadBalancerTest(test_base.BaseTest):
                   ipCidrRange='10.240.0.0/16',
                   privateIpGoogleAccess=False,
                   purpose=self.messages.Subnetwork.PurposeValueValuesEnum.
-                  PRIVATE_RFC_1918),
+                  PRIVATE),
               region='us-central1',
               project='my-project'))],)
 

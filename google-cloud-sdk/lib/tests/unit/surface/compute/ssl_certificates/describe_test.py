@@ -71,6 +71,92 @@ class SslCertificatesDescribeTest(test_base.BaseTest,
             """))
 
 
+class SslCertificatesDescribeBetaTest(test_base.BaseTest,
+                                      test_case.WithOutputCapture):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.SetEncoding('utf8')
+
+  def testSelfManagedCase(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [test_resources.BETA_SSL_CERTIFICATES[0]],
+    ])
+
+    self.Run("""
+        beta compute ssl-certificates describe ssl-cert-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.sslCertificates,
+          'Get',
+          messages.ComputeSslCertificatesGetRequest(
+              sslCertificate='ssl-cert-1',
+              project='my-project'))],
+    )
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+                creationTimestamp: '2017-12-18T11:11:11.000-07:00'
+                description: Self-managed certificate.
+                expireTime: '2018-12-18T11:11:11.000-07:00'
+                name: ssl-cert-1
+                selfLink: https://www.googleapis.com/compute/beta/projects/my-project/global/sslCertificates/ssl-cert-1
+                selfManaged:
+                  certificate: |-
+                    -----BEGIN CERTIFICATE-----
+                    MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
+                    UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
+                    CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj
+                    bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL
+                    MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0
+                    bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw
+                    FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC
+                    gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6
+                    bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s
+                    wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG
+                    9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT
+                    zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob
+                    v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
+                    -----END CERTIFICATE-----
+                type: SELF_MANAGED
+            """))
+
+  def testManagedCase(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [test_resources.BETA_SSL_CERTIFICATES[1]],
+    ])
+
+    self.Run("""
+        beta compute ssl-certificates describe ssl-cert-2
+        """)
+
+    self.CheckRequests([(self.compute.sslCertificates, 'Get',
+                         messages.ComputeSslCertificatesGetRequest(
+                             sslCertificate='ssl-cert-2',
+                             project='my-project'))],)
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+                creationTimestamp: '2017-12-17T10:00:00.000-07:00'
+                description: Managed certificate.
+                expireTime: '2018-12-17T10:00:00.000-07:00'
+                managed:
+                  domainStatus:
+                    test1.certsbridge.com: ACTIVE
+                    xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
+                  domains:
+                  - test1.certsbridge.com
+                  - xn--8a342mzfam5b18csni3w.certsbridge.com
+                  status: ACTIVE
+                name: ssl-cert-2
+                selfLink: https://www.googleapis.com/compute/beta/projects/my-project/global/sslCertificates/ssl-cert-2
+                type: MANAGED
+            """))
+
+
 class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
                                        test_case.WithOutputCapture):
 
@@ -85,7 +171,7 @@ class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
     ])
 
     self.Run("""
-        alpha compute ssl-certificates describe ssl-cert-1
+        alpha compute ssl-certificates describe --global ssl-cert-1
         """)
 
     self.CheckRequests(
@@ -130,16 +216,14 @@ class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
     ])
 
     self.Run("""
-        alpha compute ssl-certificates describe ssl-cert-2
+        alpha compute ssl-certificates describe --region us-west-1 ssl-cert-2
         """)
 
-    self.CheckRequests(
-        [(self.compute.sslCertificates,
-          'Get',
-          messages.ComputeSslCertificatesGetRequest(
-              sslCertificate='ssl-cert-2',
-              project='my-project'))],
-    )
+    self.CheckRequests([(self.compute.regionSslCertificates, 'Get',
+                         messages.ComputeRegionSslCertificatesGetRequest(
+                             sslCertificate='ssl-cert-2',
+                             project='my-project',
+                             region='us-west-1'))],)
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
@@ -155,7 +239,8 @@ class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
                   - xn--8a342mzfam5b18csni3w.certsbridge.com
                   status: ACTIVE
                 name: ssl-cert-2
-                selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/global/sslCertificates/ssl-cert-2
+                region: us-west-1
+                selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
                 type: MANAGED
             """))
 

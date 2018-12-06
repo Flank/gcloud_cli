@@ -58,8 +58,9 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To list all firewall rules in a project in table form, run:
@@ -84,7 +85,8 @@ EXAMPLES
                 sourceTags.list():label=SRC_TAGS,
                 sourceServiceAccounts.list():label=SRC_SVC_ACCT,
                 targetTags.list():label=TARGET_TAGS,
-                targetServiceAccounts.list():label=TARGET_SVC_ACCT
+                targetServiceAccounts.list():label=TARGET_SVC_ACCT,
+                disabled
             )"
 
 NOTES

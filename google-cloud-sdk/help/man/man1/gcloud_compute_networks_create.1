@@ -11,7 +11,7 @@ gcloud compute networks create \- create a Google Compute Engine network
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute networks create\fR \fINAME\fR [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR;\ default="regional"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-range\fR=\fIRANGE\fR] [\fB\-\-mode\fR=\fINETWORK_TYPE\fR\ |\ \fB\-\-subnet\-mode\fR=\fIMODE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute networks create\fR \fINAME\fR [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR;\ default="regional"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-range\fR=\fIRANGE\fR] [\fB\-\-subnet\-mode\fR=\fIMODE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -56,9 +56,10 @@ BGP routes.
 Cloud Routers in this network advertise subnetworks from their local region only
 to their BGP peers, and program instances in their local region only with the
 router's best learned BGP routes.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the network.
@@ -77,34 +78,12 @@ Platform features are not supported on legacy networks. Please be advised that
 legacy networks may not be supported in the future.
 
 .TP 2m
-
-At most one of these may be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-mode\fR=\fINETWORK_TYPE\fR
-(REMOVED) The network type.
-
-\f5mode\fR has been removed. Please use \f5subnet\-mode\fR instead.
-\fINETWORK_TYPE\fR must be one of:
-
-.TP 2m
-\fBauto\fR
-Subnets are created automatically. This is the recommended selection.
-.TP 2m
-\fBcustom\fR
-Create subnets manually.
-.TP 2m
-\fBlegacy\fR
-Create an old style network that has a range and cannot have subnets. This is
-not recommended for new networks.
-
-.TP 2m
 \fB\-\-subnet\-mode\fR=\fIMODE\fR
 The subnet mode of the network. If not specified, defaults to AUTO.
 
 \fIMODE\fR must be one of:
 
+.RS 2m
 .TP 2m
 \fBauto\fR
 Subnets are created automatically. This is the recommended selection.
@@ -115,18 +94,20 @@ Create subnets manually.
 \fBlegacy\fR
 Create an old style network that has a range and cannot have subnets. This is
 not recommended for new networks.
-
-
 .RE
+.sp
+
+
+
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

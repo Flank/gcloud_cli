@@ -263,10 +263,11 @@ class _BaseInstancesCloneTest(object):
         ))
 
     self.Run('sql instances clone clone-instance-7 clone-instance-7a')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME               DATABASE_VERSION  LOCATION    TIER  ADDRESS  STATUS
-clone-instance-7a  MYSQL_5_5         us-central  D1    -        RUNNABLE
+NAME               DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS  STATUS
+clone-instance-7a  MYSQL_5_5         us-central  D1    -               -                RUNNABLE
 """,
         normalize_space=True)
 
@@ -629,10 +630,11 @@ user: 170350250316@developer.gserviceaccount.com
 
     self.Run('sql instances clone --bin-log-file-name bin.log '
              '--bin-log-position 1111 clone-instance-7 clone-instance-7a')
+    # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
-NAME               DATABASE_VERSION  LOCATION    TIER  ADDRESS  STATUS
-clone-instance-7a  MYSQL_5_5         us-central  D1    -        RUNNABLE
+NAME               DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+clone-instance-7a  MYSQL_5_5         us-central  D1    -               -               RUNNABLE
 """,
         normalize_space=True)
 

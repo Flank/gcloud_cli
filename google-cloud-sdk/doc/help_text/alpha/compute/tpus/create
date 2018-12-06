@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK
-        --range=RANGE --version=VERSION
+        --version=VERSION (--range=RANGE | --use-service-networking)
         [--accelerator-type=ACCELERATOR_TYPE; default="v2-8"] [--async]
         [--description=DESCRIPTION] [--preemptible] [GCLOUD_WIDE_FLAG ...]
 
@@ -14,12 +14,13 @@ POSITIONAL ARGUMENTS
      Tpu resource - The Cloud TPU you want to create. The arguments in this
      group can be used to specify the attributes of this resource. (NOTE) Some
      attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: provide the flag [tpu] on the
-     command line with a fully specified name; provide the flag [--project] on
-     the command line; set the property [core/project]. This must be specified.
+     ways. To set the [project] attribute: provide the argument [tpu] on the
+     command line with a fully specified name; provide the argument [--project]
+     on the command line; set the property [core/project]. This must be
+     specified.
 
        TPU
-          The ID of the tpu or a fully qualified identifier for the tpu. This
+          ID of the tpu or fully qualified identifier for the tpu. This
           positional must be specified if any of the other arguments in this
           group are specified.
 
@@ -32,19 +33,29 @@ REQUIRED FLAGS
      --network=NETWORK
         Specifies the network that this TPU will be a part of.
 
-     --range=RANGE
-        CIDR Range for the TPU.
-
-        The IP range that the TPU will select an IP address from. Must be in
-        CIDR notation and a /29 range, for example 192.168.0.0/29. Errors will
-        occur if the CIDR range has already been used for a currently existing
-        TPU, the CIDR range conflicts with any networks in the user's provided
-        network, or the provided network is peered with another network that is
-        using that CIDR range.
-
      --version=VERSION
         TensorFlow version for the TPU, such as 1.6. For a list of available
         TensorFlow versions please see https://www.tensorflow.org/versions/.
+
+     Exactly one of these must be specified:
+
+       --range=RANGE
+          CIDR Range for the TPU.
+
+          The IP range that the TPU will select an IP address from. Must be in
+          CIDR notation and a /29 range, for example 192.168.0.0/29. Errors
+          will occur if the CIDR range has already been used for a currently
+          existing TPU, the CIDR range conflicts with any networks in the
+          user's provided network, or the provided network is peered with
+          another network that is using that CIDR range.
+
+       --use-service-networking
+          If provided, the TPU will be configured via the Service Networking
+          (SN) API instead of using a CIDR range. The Service Networking API
+          should be enabled on the project before creating the TPU.
+
+          For more information on Service Networking see
+          https://cloud.google.com/service-infrastructure/docs/service-networking/getting-started.
 
 OPTIONAL FLAGS
      --accelerator-type=ACCELERATOR_TYPE; default="v2-8"
@@ -71,19 +82,21 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
-    This command uses the tpu/v1 API. The full documentation for this API can
-    be found at: https://cloud.google.com/tpu/
+    This command uses the tpu/v1alpha1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/tpu/
 
 EXAMPLES
     The following command creates a TPU with ID my-tpu and CIDR range
     10.240.0.0/29 in the default user project, network and compute/region (with
     other defaults supplied by API):
 
-        $ gcloud alpha compute tpus create  my-tpu --range 10.240.0.0/29
+        $ gcloud alpha compute tpus create  my-tpu --range 10.240.0.0/29 \
+            --network default
 
     The following command creates a TPU with ID my-tpu with explicit values for
     all required and optional parameters:

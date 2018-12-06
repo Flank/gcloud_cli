@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -27,11 +27,11 @@ from tests.lib.surface.compute import test_base
 def RunInTracks(alpha=True, beta=True, ga=True):
   args = []
   if alpha:
-    args.append(('Alpha', base.ReleaseTrack.ALPHA, 'alpha'))
+    args.append(('Alpha', calliope_base.ReleaseTrack.ALPHA, 'alpha'))
   if beta:
-    args.append(('Beta', base.ReleaseTrack.BETA, 'beta'))
+    args.append(('Beta', calliope_base.ReleaseTrack.BETA, 'beta'))
   if ga:
-    args.append(('GA', base.ReleaseTrack.GA, 'v1'))
+    args.append(('GA', calliope_base.ReleaseTrack.GA, 'v1'))
   return parameterized.named_parameters(*args)
 
 

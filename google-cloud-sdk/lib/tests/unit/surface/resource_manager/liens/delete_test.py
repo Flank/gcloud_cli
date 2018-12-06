@@ -30,7 +30,7 @@ class LiensDeleteTest(testbase.LiensUnitTestBase):
     self.mock_liens.Delete.Expect(
         liens.LiensMessages().CloudresourcemanagerLiensDeleteRequest(
             liensId='pt123-abc'),
-        'pt123-abc')
+        liens.LiensMessages().Empty())
     self.RunLiens('delete', 'pt123-abc')
     self.AssertErrContains('Deleted [liens/pt123-abc].')
 

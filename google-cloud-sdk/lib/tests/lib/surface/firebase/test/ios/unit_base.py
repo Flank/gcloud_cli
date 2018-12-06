@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import matrix_ops
 from googlecloudsdk.api_lib.firebase.test.ios import matrix_creator
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.firebase.test import test_utils
 from tests.lib.surface.firebase.test import unit_base
@@ -41,7 +41,7 @@ IOS_CATALOG_GET = (
 ALL_BETA_TEST_RUN_ARGS = [
     'async', 'device', 'network_profile', 'record_video', 'results_bucket',
     'results_dir', 'results_history_name', 'test', 'timeout', 'type',
-    'xctestrun_file'
+    'xcode_version', 'xctestrun_file'
 ]
 
 ALL_TEST_RUN_ARGS = {'ga': [], 'beta': ALL_BETA_TEST_RUN_ARGS}
@@ -100,7 +100,7 @@ class IosMockClientTest(unit_base.TestMockClientTest):
   def CreateMatrixCreator(self,
                           args,
                           history_id='hist1',
-                          release_track=base.ReleaseTrack.GA.id):
+                          release_track=calliope_base.ReleaseTrack.GA.id):
     """Construct and return an iOS MatrixCreator object with a mocked client.
 
     Args:

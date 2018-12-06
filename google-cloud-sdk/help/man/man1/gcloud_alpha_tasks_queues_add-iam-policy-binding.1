@@ -5,19 +5,20 @@
 
 .SH "NAME"
 .HP
-gcloud alpha tasks queues add\-iam\-policy\-binding \- add IAM policy binding for a queue
+gcloud alpha tasks queues add\-iam\-policy\-binding \- add IAM policy binding for a tasks queue
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha tasks queues add\-iam\-policy\-binding\fR \fIQUEUE\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha tasks queues add\-iam\-policy\-binding\fR (\fIQUEUE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Add an IAM policy binding to a queue's access policy.
+\fB(ALPHA)\fR Add an IAM policy binding to a tasks queue's access policy. One
+binding consists of a member, a role, and an optional condition.
 
 
 
@@ -25,11 +26,26 @@ gcloud alpha tasks queues add\-iam\-policy\-binding \- add IAM policy binding fo
 
 .RS 2m
 .TP 2m
+
+Queue resource \- The task queue for which to add IAM policy binding to. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [queue] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
 \fIQUEUE\fR
-The queue to add the IAM policy binding to.
+ID of the queue or fully qualified identifier for the queue. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location name.
 
 
-
+.RE
 .RE
 .sp
 
@@ -66,46 +82,87 @@ Define the role of the member.
 .RE
 .sp
 
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+
+Condition of the binding to be added. When condition is explicitly specified as
+\f5None\fR (e.g. \-\-condition=None), a binding without a condition is added.
+When \-\-condition is specified and is not a \f5None\fR condition,
+\f5\-\-role\fR cannot be a primitive role. Primitive roles are
+\f5roles/editor\fR, \f5roles/owner\fR, and \f5roles/viewer\fR.
+
+.TP 2m
+\fBexpression\fR
+(Required) Expression of the condition which evaluates to True or False. This
+uses a subset of Common Expression Language syntax.
+
+.TP 2m
+\fBtitle\fR
+(Required) Title for the expression, i.e. a short string describing its purpose.
+
+.TP 2m
+\fBdescription\fR
+(Optional) Description for the expression. This is a longer text which describes
+the expression.
+
+NOTE: An unsatisfied condition will not allow access via this binding.
+
+.TP 2m
+\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR
+Path to a local JSON or YAML file that defines the condition. To see available
+fields, see the help for \f5\-\-condition\fR.
+
+
+.RE
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudtasks/v2beta2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/tasks/
 
 
 
 .SH "EXAMPLES"
 
-The following command will add an IAM policy binding for the role of
-\'roles/cloudtasks.queueAdmin' for the user 'test\-user@gmail.com' on a queue
-with identifier 'my\-queue'
+To add an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' with queue 'my\-queue' and location='my\-location', run:
 
 .RS 2m
 $ gcloud alpha tasks queues add\-iam\-policy\-binding my\-queue \e
-    \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/cloudtasks.queueAdmin'
+    \-\-location='my\-location' \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor'
 .RE
 
-For a service account \f5test\-proj1@example.domain.com\fR, the following
-command will add an IAM policy binding for the role of
-\'roles/cloudtasks.queueAdmin' to the given service account:
-
-.RS 2m
-$ gcloud alpha tasks queues add\-iam\-policy\-binding \e
-    test\-proj1@example.domain.com \e
-    \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
-    \-\-role='roles/cloudtasks.queueAdmin'
-.RE
-
-The following command will add an IAM policy binding for the role of
-\'roles/cloudtasks.queueAdmin' for all authenticated users on a queue with
-identifier 'my\-queue':
+To add an IAM policy binding which expires at the end of the year 2018 for the
+role of 'roles/cloudtasks.queueAdmin' and the user 'test\-user@gmail.com' with
+queue 'my\-queue' and location='my\-location', run:
 
 .RS 2m
 $ gcloud alpha tasks queues add\-iam\-policy\-binding my\-queue \e
-    \-\-member='allAuthenticatedUsers' \e
-    \-\-role='roles/cloudtasks.queueAdmin'
+    \-\-location='my\-location' \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/cloudtasks.queueAdmin' \e
+    \-\-condition='expression=request.time <
+ timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+tion=Expires at midnight on 2018\-12\-31'
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy

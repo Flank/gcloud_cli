@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 import argparse
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
@@ -36,7 +36,7 @@ class PrintColorAction(argparse.Action):
                 .format(properties.VALUES.core.disable_color.Get()))
 
 
-class Sdk5(base.Group):
+class Sdk5(calliope_base.Group):
 
   @staticmethod
   def Args(parser):

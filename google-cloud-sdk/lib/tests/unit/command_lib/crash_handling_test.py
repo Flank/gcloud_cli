@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,7 +81,7 @@ class LogAndExceptionsAndMessages(cli_test_base.CliTestBase):
     exception = Exception(msg)
     properties.VALUES.core.disable_usage_reporting.Set(False)
     crash_handling.HandleGcloudCrash(exception)
-    self.report_error_mock.assert_called_with(exception, is_crash=True)
+    self.report_error_mock.assert_called_with(is_crash=True)
     self.AssertErrContains('gcloud crashed')
     self.AssertErrContains('If you would like to report this issue, please run '
                            'the following command:')
@@ -97,7 +97,7 @@ class LogAndExceptionsAndMessages(cli_test_base.CliTestBase):
     exception = Exception(msg)
     properties.VALUES.core.disable_usage_reporting.Set(False)
     crash_handling.HandleGcloudCrash(exception)
-    self.report_error_mock.assert_called_with(exception, is_crash=True)
+    self.report_error_mock.assert_called_with(is_crash=True)
     self.AssertErrContains(msg)
     self.AssertErrContains('gcloud crashed')
     self.AssertErrContains('If you would like to report this issue, please run '
@@ -169,7 +169,7 @@ class TestingErrorReporting(cli_test_base.CliTestBase):
     properties.VALUES.metrics.command_name.Set(COMMAND)
     self.StartObjectPatch(metrics, 'GetCIDIfMetricsEnabled', return_value=CID)
 
-    crash_handling.ReportError(Exception(), is_crash=False)
+    crash_handling.ReportError(is_crash=False)
 
     self.assertTrue(self.report_event_mock.called)
     args, _ = self.report_event_mock.call_args_list[0]

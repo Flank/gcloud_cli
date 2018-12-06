@@ -15,11 +15,12 @@
 """Commands for reading and manipulating NATs."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Nats(base.Group):
   """List, create, describe and delete Google Compute Engine NATs."""
 

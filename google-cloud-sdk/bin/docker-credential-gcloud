@@ -13,6 +13,12 @@
 # (a) always defined by the preamble
 # (u) user definition overrides preamble
 
+# Wrapper around 'which' and 'command -v', tries which first, then falls back
+# to command -v
+_cloudsdk_which() {
+  which "$1" 2>/dev/null || command -v "$1" 2>/dev/null
+}
+
 # Determines the real cloud sdk root dir given the script path.
 # Would be easier with a portable "readlink -f".
 _cloudsdk_root_dir() {
@@ -21,7 +27,7 @@ _cloudsdk_root_dir() {
         ;;
   */*)  _cloudsdk_path=$PWD/$1
         ;;
-  *)    _cloudsdk_path=$(which "$1")
+  *)    _cloudsdk_path=$(_cloudsdk_which $1)
         case $_cloudsdk_path in
         /*) ;;
         *)  _cloudsdk_path=$PWD/$_cloudsdk_path ;;
@@ -67,15 +73,15 @@ CLOUDSDK_ROOT_DIR=$(_cloudsdk_root_dir "$0")
 # if CLOUDSDK_PYTHON is empty
 if [ -z "$CLOUDSDK_PYTHON" ]; then
   # if python2 exists then plain python may point to a version != 2
-  if which python2 >/dev/null; then
+  if _cloudsdk_which python2 >/dev/null; then
     CLOUDSDK_PYTHON=python2
-  elif which python2.7 >/dev/null; then
+  elif _cloudsdk_which python2.7 >/dev/null; then
     # this is what some OS X versions call their built-in Python
     CLOUDSDK_PYTHON=python2.7
-  elif which python >/dev/null; then
+  elif _cloudsdk_which python >/dev/null; then
     # Use unversioned python if it exists.
     CLOUDSDK_PYTHON=python
-  elif which python3 >/dev/null; then
+  elif _cloudsdk_which python3 >/dev/null; then
     # We support python3, but only want to default to it if nothing else is
     # found.
     CLOUDSDK_PYTHON=python3

@@ -42,17 +42,18 @@ Data format of the input files. \fIDATA_FORMAT\fR must be one of:
 .RS 2m
 .TP 2m
 \fBtext\fR
-Text files with instances separated by the new\-line character.
+Text files; see https://www.tensorflow.org/guide/datasets#consuming_text_data
 .TP 2m
 \fBtf\-record\fR
 TFRecord files; see
-https://www.tensorflow.org/versions/r0.12/how_tos/reading_data/index.html#file\-formats
+https://www.tensorflow.org/guide/datasets#consuming_tfrecord_data
 .TP 2m
 \fBtf\-record\-gzip\fR
 GZIP\-compressed TFRecord files.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-input\-paths\fR=\fIINPUT_PATH\fR,[\fIINPUT_PATH\fR,...]
 Google Cloud Storage paths to the instances to run prediction on.
@@ -162,13 +163,18 @@ must be specified if any of the other arguments in this group are specified.
 \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR
 The available types of accelerators. \fIACCELERATOR_TYPE\fR must be one of:
 
+.RS 2m
 .TP 2m
 \fBnvidia\-tesla\-k80\fR
 NVIDIA Tesla K80 GPU
 .TP 2m
 \fBnvidia\-tesla\-p100\fR
-NVIDIA Tesla P100 GPU. + This flag must be specified if any of the other
-arguments in this group are specified.
+NVIDIA Tesla P100 GPU.
+.RE
+.sp
+
+This flag must be specified if any of the other arguments in this group are
+specified.
 
 
 .RE
@@ -178,9 +184,9 @@ arguments in this group are specified.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

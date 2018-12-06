@@ -43,7 +43,6 @@ from googlecloudsdk.api_lib.cloudbuild import logs as cloudbuild_logs
 from googlecloudsdk.api_lib.services import enable_api
 from googlecloudsdk.api_lib.services import exceptions as sm_exceptions
 from googlecloudsdk.api_lib.storage import storage_api
-from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.api_lib.util import exceptions as api_lib_exceptions
 from googlecloudsdk.calliope import base as calliope_base
@@ -51,6 +50,7 @@ from googlecloudsdk.command_lib.app import create_util
 from googlecloudsdk.command_lib.app import deploy_util
 from googlecloudsdk.command_lib.app import exceptions as app_exceptions
 from googlecloudsdk.command_lib.app import output_helpers
+from googlecloudsdk.command_lib.app import source_files_util
 from googlecloudsdk.command_lib.app import staging
 from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
@@ -184,10 +184,6 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
     self.pool_mock.map.side_effect = map
     self.StartPatch('multiprocessing.Pool').return_value = self.pool_mock
     self.temp_path = os.path.realpath(self.temp_path)
-
-    # Add cleanup for modifying app property.
-    self.addCleanup(properties.VALUES.app.use_deprecated_preparation.Set,
-                    properties.VALUES.app.use_deprecated_preparation.Get())
 
   def ExpectServiceDeployed(self, service, version, set_default=1,
                             set_default_success=True,
@@ -640,7 +636,10 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.StartObjectPatch(file_utils, 'RmTree')
     exec_mock = self.StartObjectPatch(execution_utils, 'Exec', return_value=0)
 
-    # These methods are inspecting the app directory
+    get_source_files_mock = self.StartObjectPatch(
+        source_files_util, 'GetSourceFiles', autospec=True,
+        return_value=['f1', 'f2'])
+
     build_mock = self.StartObjectPatch(
         deploy_util.ServiceDeployer, '_PossiblyBuildAndPush',
         return_value=None)
@@ -671,11 +670,15 @@ class DeployWithApiTests(DeployWithApiTestsBase):
          staging_dir], no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
 
     self.assertNotEqual(unstaged_app_dir, staging_dir)
-    # Check that the methods that walk the files utilize staging_dir
+
+    get_source_files_mock.assert_called_once_with(
+        staging_dir, mock.ANY, mock.ANY, mock.ANY, mock.ANY, unstaged_app_dir)
+
     build_mock.assert_called_once_with(
-        mock.ANY, mock.ANY, staging_dir, mock.ANY, mock.ANY, mock.ANY,
-        deploy_util.FlexImageBuildOptions.ON_CLIENT)
-    upload_files_mock.assert_called_once_with(mock.ANY, staging_dir, mock.ANY,
+        mock.ANY, mock.ANY, staging_dir, ['f1', 'f2'], mock.ANY, mock.ANY,
+        mock.ANY, deploy_util.FlexImageBuildOptions.ON_CLIENT)
+    upload_files_mock.assert_called_once_with(staging_dir,
+                                              ['f1', 'f2'], mock.ANY,
                                               max_file_size=32 * 1024 * 1024)
 
   def testDeploy_CustomStaging(self):
@@ -1373,11 +1376,11 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
 class FlexDeployWithApiTests(DeployWithFlexBase):
 
   def SetUp(self):
-    self.service_messages = apis.GetMessagesModule('servicemanagement',
-                                                   'v1')
+    self.service_messages = core_apis.GetMessagesModule('servicemanagement',
+                                                        'v1')
     self.mock_service_client = apitools_mock.Client(
-        apis.GetClientClass('servicemanagement', 'v1'),
-        real_client=apis.GetClientInstance(
+        core_apis.GetClientClass('servicemanagement', 'v1'),
+        real_client=core_apis.GetClientInstance(
             'servicemanagement', 'v1', no_http=True))
     self.mock_service_client.Mock()
     # If any API calls were made but weren't expected, this will throw an error
@@ -1609,68 +1612,6 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
     with self.assertRaisesRegex(api_lib_exceptions.HttpException, r'Message'):
       self.Run('app deploy {} --version=1'.format(self.service_path))
 
-  def testDeploy_EnableFlex_PropertyOverride(self):
-    """Test that deploy does not use service management if override is set."""
-    properties.VALUES.app.use_deprecated_preparation.Set(True)
-    self.WriteVmRuntime('app.yaml', 'java')
-    handle_http = {'expected_params': {'app_id': [self.Project()]},
-                   'expected_body': '',
-                   'response_code': 200}
-    self.AddResponse('https://appengine.google.com/api/vms/prepare',
-                     **handle_http)
-    image = 'us.gcr.io/fake-project/appengine/default.1:latest'
-
-    handlers = self.DefaultHandlers(with_static=True)
-    beta_settings = self.VmBetaSettings()
-
-    self.ExpectServiceDeployed('default', '1',
-                               deployment=self.GetDeploymentMessage(
-                                   filenames=['app.yaml'],
-                                   container_image_url=image
-                               ),
-                               version_call_args={'vm': True,
-                                                  'runtime': 'vm'},
-                               handlers=handlers,
-                               beta_settings=beta_settings)
-    properties.VALUES.core.user_output_enabled.Set(True)
-    self.Run(
-        ('app deploy --bucket=gs://default-bucket/ --version=1 {0}').format(
-            self.FullPath('app.yaml')))
-
-  def testDeploy_EnableFlex_PropertyOverride_PrepareFails(self):
-    """Test that service deploys and warns when PrepareManagedVms fails."""
-    properties.VALUES.app.use_deprecated_preparation.Set(True)
-    self.WriteVmRuntime('app.yaml', 'java')
-    handle_http = {'expected_params': {'app_id': [self.Project()]},
-                   'expected_body': '',
-                   'response_code': 400,
-                   'response_body': ('TEMPORARY_ERROR: '
-                                     'Unable to check API status\n')}
-    self.AddResponse('https://appengine.google.com/api/vms/prepare',
-                     **handle_http)
-    image = 'us.gcr.io/fake-project/appengine/default.1:latest'
-
-    handlers = self.DefaultHandlers(with_static=True)
-    beta_settings = self.VmBetaSettings()
-
-    self.ExpectServiceDeployed('default', '1',
-                               deployment=self.GetDeploymentMessage(
-                                   filenames=['app.yaml'],
-                                   container_image_url=image
-                               ),
-                               version_call_args={'vm': True,
-                                                  'runtime': 'vm'},
-                               handlers=handlers,
-                               beta_settings=beta_settings)
-    properties.VALUES.core.user_output_enabled.Set(True)
-    self.Run(
-        ('app deploy --bucket=gs://default-bucket/ --version=1 {0}').format(
-            self.FullPath('app.yaml')))
-
-    self.AssertErrContains(
-        "WARNING: We couldn't validate that your project is ready to deploy "
-        'to App Engine Flexible Environment.')
-
 
 class DeployWithApiTestsCWD(DeployWithApiTestsBase, sdk_test_base.WithTempCWD):
 
@@ -1799,6 +1740,49 @@ class BetaDeploy(DeployWithFlexBase):
                service_path)
 
     self.load_cloud_build_mock.assert_not_called()
+
+  def testDeploy_NoCache(self):
+    """Check that --no-cache correctly populates Version.betaSettings."""
+    self.WriteApp('app.yaml')
+    self.ExpectServiceDeployed(
+        'default', '1',
+        deployment=self.GetDeploymentMessage(filenames=['app.yaml']),
+        beta_settings=self.BetaSettings(**{'no-cache': 'true'}))
+
+    self.Run('app deploy --no-cache --version=1 {0}'.format(
+        self.FullPath('app.yaml')))
+
+    url = 'https://{project}.appspot.com'.format(project=self.Project())
+    self.AssertErrContains('Deployed service [default] to [{0}]'.format(url))
+    self.AssertPostDeployHints(default_service=True)
+
+  def testDeploy_DispatchYaml(self):
+    """Dispatch.yaml is deployed through Admin API."""
+    self.WriteConfig(self.DISPATCH_DATA)
+    self.ExpectGetApplicationRequest(self.Project())
+
+    # expect patch
+    rule = self.messages.UrlDispatchRule(
+        domain='*',
+        path='/tasks/hello_module2',
+        service='module2')
+    self.mock_client.apps.Patch.Expect(
+        request=self.messages.AppengineAppsPatchRequest(
+            name='apps/{}'.format(self.Project()),
+            application=self.messages.Application(
+                dispatchRules=[rule]),
+            updateMask='dispatchRules,'),
+        response=self.messages.Operation(done=True))
+    structured_output = self.Run('app deploy {0}'.format(
+        self.FullPath(self.DISPATCH_DATA[0])))
+
+    self.assertEqual(structured_output, {
+        'configs': ['dispatch'],
+        'versions': []
+    })
+    self.AssertNotRequested('https://appengine.google.com/api/dispatch/update',
+                            {'app_id': self.Project()})
+    self.AssertPostDeployHints(dispatch=True)
 
 if __name__ == '__main__':
   test_case.main()

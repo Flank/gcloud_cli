@@ -8,8 +8,8 @@ SYNOPSIS
 DESCRIPTION
     (BETA) gcloud beta compute target-http-proxies update is used to change the
     URL map of existing target HTTP proxies. A target HTTP proxy is referenced
-    by one or more forwarding rules which define which packets the proxy is
-    responsible for routing. The target HTTP proxy in turn points to a URL map
+    by one or more forwarding rules which specify the network traffic that the
+    proxy is responsible for routing. The target HTTP proxy points to a URL map
     that defines the rules for routing the requests. The URL map's job is to
     map URLs to backend services which handle the actual requests.
 
@@ -25,8 +25,9 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

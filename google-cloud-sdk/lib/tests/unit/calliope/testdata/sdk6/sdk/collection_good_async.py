@@ -19,14 +19,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class CollectionGoodAsync(base.ListCommand):
+class CollectionGoodAsync(calliope_base.ListCommand):
 
   @staticmethod
   def Args(parser):
-    base.ASYNC_FLAG.AddToParser(parser)
+    calliope_base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, unused_args):
     return None

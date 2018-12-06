@@ -28,8 +28,7 @@ class ProjectSinksGetTest(base.LoggingTestBase):
 
   def testGet(self):
     test_sink = self.msgs.LogSink(
-        name='my-sink', destination='dest', startTime='startTime',
-        endTime='endTime', includeChildren=True)
+        name='my-sink', destination='dest', includeChildren=True)
     self.mock_client_v2.projects_sinks.Get.Expect(
         self.msgs.LoggingProjectsSinksGetRequest(
             sinkName='projects/my-project/sinks/my-sink'),
@@ -37,8 +36,6 @@ class ProjectSinksGetTest(base.LoggingTestBase):
     self.RunLogging('sinks describe my-sink')
     self.AssertOutputContains(test_sink.name)
     self.AssertOutputContains(test_sink.destination)
-    self.AssertOutputContains(test_sink.startTime)
-    self.AssertOutputContains(test_sink.endTime)
     self.AssertOutputContains('includeChildren: true')
 
   def testGetNoPerms(self):

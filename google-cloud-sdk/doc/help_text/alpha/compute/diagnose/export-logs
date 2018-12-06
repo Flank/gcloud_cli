@@ -1,0 +1,59 @@
+NAME
+    gcloud alpha compute diagnose export-logs - triggers instance to gather
+        logs and upload them to a Cloud Storage Bucket
+
+SYNOPSIS
+    gcloud alpha compute diagnose export-logs INSTANCE_NAME
+        [--collect-process-traces] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Gathers logs from a running Compute Engine VM and exports them to a
+    Google Cloud Storage Bucket. Outputs a path to the logs within the Bucket.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        Name of the instance to operate on.
+
+FLAGS
+     --collect-process-traces
+        Collect a 10 minute trace of the running system. On Windows, this
+        utilizes Windows Performance Recorder. It records CPU, disk, file, and
+        network activity during that time.
+
+     --zone=ZONE
+        Zone of the instance to operate on. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

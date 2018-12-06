@@ -332,9 +332,8 @@ class BackendBucketUpdateGaTest(test_base.BaseTest):
   def testSetInvalidCacheMaxAge(self):
     """Tests updating backend bucket with an invalid cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: '
-        r'invalid-value'):
+        "argument --signed-url-cache-max-age: Failed to parse duration: "
+        "Duration unit 'invalid-value' must be preceded by a number"):
       self.RunUpdate(
           'backend-bucket-2-enable-cdn-true --signed-url-cache-max-age '
           'invalid-value')
@@ -342,8 +341,8 @@ class BackendBucketUpdateGaTest(test_base.BaseTest):
   def testSetCacheMaxAgeNegative(self):
     """Tests updating backend bucket with a negative cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: -1'):
+        'argument --signed-url-cache-max-age: value must be greater than or '
+        'equal to 0; received: -1'):
       self.RunUpdate(
           'backend-bucket-2-enable-cdn-true --signed-url-cache-max-age -1')
 

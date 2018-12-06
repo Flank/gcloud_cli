@@ -18,10 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+from mock import patch
 
 TIME_NOW_STR = str(test_base.FakeDateTime.now())
 
@@ -75,7 +77,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
 
   def SetUp(self):
     SetUpClass(self, 'beta')
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions('beta',
                                                                      self.ZONE)
     self.StartPatch('datetime.datetime', test_base.FakeDateTime)
@@ -152,12 +154,20 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     ) = '0/' + TIME_NOW_STR
     self.checkUpdateRequest(get_request, update_request)
 
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run('compute instance-groups managed rolling-action restart {} '
+               '--zone {}'.format(self.IGM_NAME_A, self.ZONE))
+
 
 class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
 
   def SetUp(self):
     SetUpClass(self, 'beta')
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
         'beta', self.REGION, 'region')
     self.StartPatch('datetime.datetime', test_base.FakeDateTime)
@@ -240,7 +250,7 @@ class InstanceGroupManagersUpdateInstancesAlphaZonalTest(
 
   def SetUp(self):
     SetUpClass(self, 'alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions('alpha',
                                                                      self.ZONE)
 
@@ -250,7 +260,7 @@ class InstanceGroupManagersUpdateInstancesAlphaRegionalTest(
 
   def SetUp(self):
     SetUpClass(self, 'alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
         'alpha', self.REGION, 'region')
 

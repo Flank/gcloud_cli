@@ -10,8 +10,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -19,9 +20,6 @@ GROUPS
      binauthz
         (BETA) Manage attestations for Binary Authorization on Google Cloud
         Platform.
-
-     builds
-        (BETA) (DEPRECATED) Create and manage builds.
 
      clusters
         (BETA) Deploy and teardown Google Kubernetes Engine clusters.
@@ -35,6 +33,9 @@ GROUPS
 
      operations
         (BETA) Get and list operations for Google Kubernetes Engine clusters.
+
+     subnets
+        (BETA) Manage subnets to be used by Google Kubernetes Engine clusters.
 
 COMMANDS
     COMMAND is one of the following:

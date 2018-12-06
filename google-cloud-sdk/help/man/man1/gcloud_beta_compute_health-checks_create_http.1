@@ -18,10 +18,11 @@ gcloud beta compute health\-checks create http \- create a HTTP health check to 
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute health\-checks create http\fR is used to
-create a HTTP health check. HTTP health checks monitor instances in a load
-balancer controlled by a target pool. All arguments to the command are optional
-except for the name of the health check. For more information on load balancing,
-see https://cloud.google.com/compute/docs/load\-balancing\-and\-autoscaling/
+create an HTTP non\-legacy health check. HTTP health checks monitor instances in
+a load balancer controlled by a target pool. All arguments to the command are
+optional except for the name of the health check. For more information on load
+balancing, see
+https://cloud.google.com/compute/docs/load\-balancing\-and\-autoscaling/
 
 
 
@@ -74,9 +75,10 @@ No proxy header is added.
 .TP 2m
 \fBPROXY_V1\fR
 Adds the header "PROXY UNKNOWN\er\en".
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-request\-path\fR=\fIREQUEST_PATH\fR; default="/"
 The request path that this health check monitors. For example,
@@ -138,9 +140,9 @@ service.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

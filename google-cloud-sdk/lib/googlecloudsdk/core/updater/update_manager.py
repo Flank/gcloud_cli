@@ -331,7 +331,7 @@ class UpdateManager(object):
 
     cwd = None
     try:
-      cwd = encoding.Decode(os.path.realpath(os.getcwd()))
+      cwd = os.path.realpath(file_utils.GetCWD())
     except OSError:
       log.debug('Could not determine CWD, assuming detached directory not '
                 'under SDK root.')
@@ -1248,7 +1248,7 @@ To revert your SDK to the previously installed version, you may run:
 
     backup_has_bundled_python = (
         BUNDLED_PYTHON_COMPONENT in
-        install_state.BackupInstallationState().InstalledComponents())
+        install_state.BackupInstallationState().InstalledComponents())  # pytype: disable=attribute-error
     if self.IsPythonBundled() and not backup_has_bundled_python:
       log.warning(BUNDLED_PYTHON_REMOVAL_WARNING)
 

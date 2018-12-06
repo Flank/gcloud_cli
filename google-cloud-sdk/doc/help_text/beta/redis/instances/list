@@ -9,19 +9,19 @@ SYNOPSIS
 DESCRIPTION
     (BETA) List all Redis instances under the specified project and region.
 
-    You can specify the maximum number of instances to list using the --limit
-    flag.
+    To specify the maximum number of instances to list, use the --limit flag.
 
 FLAGS
      Region resource - The region of the instances to display. This represents
      a Cloud resource. (NOTE) Some attributes are not given arguments in this
      group but can be set in other ways. To set the [project] attribute:
-     provide the flag [--region] on the command line with a fully specified
+     provide the argument [--region] on the command line with a fully specified
      name; set the property [redis/region] with a fully specified name; provide
-     the flag [--project] on the command line; set the property [core/project].
+     the argument [--project] on the command line; set the property
+     [core/project].
 
        --region=REGION
-          The ID of the region or a fully qualified identifier for the region.
+          ID of the region or fully qualified identifier for the region.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -54,21 +54,23 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
-    This command uses the redis/v1beta1 API. The full documentation for this
-    API can be found at: https://cloud.google.com/memorystore/docs/redis/
+    This command uses the redis/v1 API. The full documentation for this API can
+    be found at: https://cloud.google.com/memorystore/docs/redis/
 
 EXAMPLES
-    The following command lists a maximum of five instances:
+    To list up to five instances, run:
 
-        $ gcloud alpha redis instances list --limit=5
+        $ gcloud beta redis instances list --limit=5
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud redis instances list
         $ gcloud alpha redis instances list
 

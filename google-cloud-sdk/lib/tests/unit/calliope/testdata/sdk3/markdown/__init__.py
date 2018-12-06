@@ -20,10 +20,10 @@ from __future__ import unicode_literals
 
 import argparse
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class Markdown(base.Group):
+class Markdown(calliope_base.Group):
   """Markdown group docstring index.
 
   Markdown group docstring description.
@@ -52,13 +52,11 @@ class Markdown(base.Group):
 
           Did the end of list work? Also, format="csv" tables are recognized:
 
-          [options="header",format="csv",grid="none",frame="none"]
-          |========
-          Alias,Project,Image Name
-          a1a1a,p1p1p,i1ii1
-          a222,p2,i22222i2222
-          a3aaaa3a3a3,p3p3pp3p,iii3i3i
-          |========
+          Alias | Project | Image Name
+          --- | --- | ---
+          a1a1a | p1p1p | i1ii1
+          a222 | p2 | i22222i2222
+          a3aaaa3a3a3 | p3p3pp3p | iii3i3i
 
           Did the end of table work?
 

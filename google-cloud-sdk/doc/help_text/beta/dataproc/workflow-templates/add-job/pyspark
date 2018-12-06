@@ -1,5 +1,5 @@
 NAME
-    gcloud beta dataproc workflow-templates add-job pyspark - add a PySPark job
+    gcloud beta dataproc workflow-templates add-job pyspark - add a PySpark job
         to the workflow template
 
 SYNOPSIS
@@ -12,7 +12,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...] [-- JOB_ARGS ...]
 
 DESCRIPTION
-    (BETA) Add a PySPark job to the workflow template.
+    (BETA) Add a PySpark job to the workflow template.
 
 POSITIONAL ARGUMENTS
      PY_FILE
@@ -66,7 +66,7 @@ OPTIONAL FLAGS
 
      --py-files=[PY_FILE,...]
         Comma separated list of Python files to be provided to the job. Must be
-        one of the following file formats" .py, ,.zip, or .egg
+        one of the following file formats ".py, .zip, or .egg".
 
      --region=REGION
         Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
@@ -82,9 +82,13 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc workflow-templates add-job pyspark
 

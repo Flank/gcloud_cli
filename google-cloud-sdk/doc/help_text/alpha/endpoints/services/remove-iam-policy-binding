@@ -1,17 +1,23 @@
 NAME
     gcloud alpha endpoints services remove-iam-policy-binding - remove IAM
-        policy binding for a service
+        policy binding of a service
 
 SYNOPSIS
     gcloud alpha endpoints services remove-iam-policy-binding SERVICE
-        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+        --member=MEMBER --role=ROLE
+        [--all | --condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Removes an IAM policy binding from a service's access policy.
+    (ALPHA) Remove an IAM policy binding from the IAM policy of a service. One
+    binding consists of a member, a role, and an optional condition.
 
 POSITIONAL ARGUMENTS
-     SERVICE
-        The name of the service from which the member is to be removed.
+     Service resource - The device registry for which to remove IAM policy
+     binding from. This represents a Cloud resource. This must be specified.
+
+       SERVICE
+          ID of the service or fully qualified identifier for the service.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -31,30 +37,81 @@ REQUIRED FLAGS
      --role=ROLE
         The role to remove the member from.
 
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --all
+          Remove all bindings with this role and member, irrespective of any
+          conditions.
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be removed. When condition is explicitly
+          specified as None (e.g. --condition=None), it matches a binding
+          without a condition. Otherwise, only the binding with a condition
+          which exactly matches the specified condition (including the optional
+          description) will be removed.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the servicemanagement/v1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/service-management/
 
 EXAMPLES
-    The following command will remove an IAM policy binding for the role of
+    To remove an IAM policy binding for the role of
     'roles/servicemanagement.serviceConsumer' for the user
-    'test-user@gmail.com' on service with identifier 'my-service'
+    'test-user@gmail.com' with service 'my-service', run:
 
         $ gcloud alpha endpoints services remove-iam-policy-binding \
             my-service --member='user:test-user@gmail.com' \
             --role='roles/servicemanagement.serviceConsumer'
 
-    The following command will remove an IAM policy binding for the role of
+    To remove an IAM policy binding for the role of
     'roles/servicemanagement.serviceConsumer' from all authenticated users on
-    service 'my-service':
+    service 'my-service', run:
 
         $ gcloud alpha endpoints services remove-iam-policy-binding \
             my-service --member='allAuthenticatedUsers' \
             --role='roles/servicemanagement.serviceConsumer'
 
-    See https://cloud.google.com/iam/docs/managing-policies for details of
-    policy role and member types.
+    To remove an IAM policy binding which expires at the end of the year 2018
+    for the role of 'roles/servicemanagement.quotaAdmin' and the user
+    'test-user@gmail.com' with service 'my-service', run:
+
+        $ gcloud alpha endpoints services remove-iam-policy-binding \
+            my-service --member='user:test-user@gmail.com' \
+            --role='roles/servicemanagement.quotaAdmin' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details on
+    policy role and member types. See
+    https://cloud.google.com/iam/docs/conditions-overview for details on
+    conditions.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

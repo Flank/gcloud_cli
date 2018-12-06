@@ -3,10 +3,11 @@ NAME
 
 SYNOPSIS
     gcloud meta test [NAME ...]
-        [--argumenterror-outside-argparse | --core-exception
+        (--arg-dict=[ATTRIBUTES,...] | --arg-list=[ITEMS,...]
+          | --argumenterror-outside-argparse | --core-exception
           | --exec-file=SCRIPT_FILE | --interrupt | --is-interactive
           | --progress-tracker=SECONDS | --prompt-completer=MODULE_PATH
-          | --sleep=SECONDS | --uncaught-exception] [GCLOUD_WIDE_FLAG ...]
+          | --sleep=SECONDS | --uncaught-exception) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     This command sets up scenarios for testing the gcloud command and CLI.
@@ -15,8 +16,14 @@ POSITIONAL ARGUMENTS
      [NAME ...]
         command_lib.compute.TestCompleter instance name test.
 
-FLAGS
-     At most one of these may be specified:
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --arg-dict=[ATTRIBUTES,...]
+          ArgDict flag value test.
+
+       --arg-list=[ITEMS,...]
+          ArgList flag value test.
 
        --argumenterror-outside-argparse
           Trigger a calliope.parser_errors.ArgumentError exception outside of
@@ -50,8 +57,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is an internal implementation detail and may change or

@@ -3,8 +3,10 @@ NAME
 
 SYNOPSIS
     gcloud beta iot devices create
-        (DEVICE : --region=REGION --registry=REGISTRY) [--blocked]
-        [--metadata=[KEY=VALUE,...]] [--metadata-from-file=[KEY=PATH,...]]
+        (DEVICE : --region=REGION --registry=REGISTRY)
+        [--auth-method=AUTH_METHOD] [--blocked] [--device-type=DEVICE_TYPE]
+        [--log-level=LOG_LEVEL] [--metadata=[KEY=VALUE,...]]
+        [--metadata-from-file=[KEY=PATH,...]]
         [--public-key=[path=PATH,
           type=TYPE,[expiration-time=EXPIRATION-TIME],...]]
         [GCLOUD_WIDE_FLAG ...]
@@ -13,25 +15,42 @@ DESCRIPTION
     (BETA) Create a new device.
 
 POSITIONAL ARGUMENTS
-     Device resource - The device to create. The arguments in this group can be
-     used to specify the attributes of this resource. (NOTE) Some attributes
-     are not given arguments in this group but can be set in other ways. To set
-     the [project] attribute: provide the flag [device] on the command line
-     with a fully specified name; provide the flag [--project] on the command
-     line; set the property [core/project]. This must be specified.
+     Device resource - The device you want to create. The arguments in this
+     group can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument [device] on the
+     command line with a fully specified name; provide the argument [--project]
+     on the command line; set the property [core/project]. This must be
+     specified.
 
        DEVICE
-          The ID of the device or a fully qualified identifier for the device.
-          This positional must be specified if any of the other arguments in
-          this group are specified.
+          ID of the device or fully qualified identifier for the device. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
 
        --region=REGION
-          The Cloud region for the device.
+          The name of the Cloud IoT region.
 
        --registry=REGISTRY
-          The device registry for the device.
+          The name of the Cloud IoT registry.
 
 FLAGS
+     --auth-method=AUTH_METHOD
+        The authorization/authentication method used by devices in relation to
+        the gateway. This property is set only on gateways. If left
+        unspecified, devices will not be able to access the gateway.
+        AUTH_METHOD must be one of:
+
+         association-and-device-auth-token
+            The device is authenticated through both device credentials and
+            gateway association.
+         association-only
+            The device is authenticated through the gateway association only.
+            Device credentials are ignored if provided.
+         device-auth-token-only
+            The device is authenticated through its own credentials. Gateway
+            association is not checked.
+
      --blocked
         If blocked, connections from this device will fail.
 
@@ -39,6 +58,25 @@ FLAGS
         example, the sensor is generating bad data and needs maintenance.
 
         Connections to device is not blocked by default.
+
+     --device-type=DEVICE_TYPE
+        Whether this device is a gateway. If unspecified, non-gateway is
+        assumed. DEVICE_TYPE must be one of: gateway, non-gateway.
+
+     --log-level=LOG_LEVEL
+        The default logging verbosity for activity from devices in this
+        registry. The verbosity level can be overridden by setting a specific
+        device's log level. LOG_LEVEL must be one of:
+
+         debug
+            All events will be logged.
+         error
+            Error events will be logged.
+         info
+            Informational events will be logged, such as connections and
+            disconnections. Also includes error events.
+         none
+            Disables logging.
 
      --metadata=[KEY=VALUE,...]
         The metadata key/value pairs assigned to devices. This metadata is not
@@ -100,8 +138,13 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the cloudiot/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/iot
 
 NOTES
     This command is currently in BETA and may change without notice. These

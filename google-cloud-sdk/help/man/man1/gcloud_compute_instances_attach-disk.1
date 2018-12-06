@@ -72,7 +72,9 @@ more details.
 .TP 2m
 \fB\-\-device\-name\fR=\fIDEVICE_NAME\fR
 An optional name that indicates the disk name the guest operating system will
-see. (Note: Device name does not correspond to mounted volume name)
+see. (Note: Device name does not correspond to mounted volume name). Must match
+the disk name if the disk is going to be mounted to a container with
+\-\-container\-mount\-disk (alpha feature).
 
 .TP 2m
 \fB\-\-mode\fR=\fIMODE\fR; default="rw"
@@ -86,9 +88,10 @@ Read\-only.
 \fBrw\fR
 Read\-write. It is an error to attach a disk in read\-write mode to more than
 one instance.
-
 .RE
 .sp
+
+
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 Zone of the instance to operate on. If not specified, you may be prompted to
@@ -125,9 +128,9 @@ Alternatively, the zone can be stored in the environment variable
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

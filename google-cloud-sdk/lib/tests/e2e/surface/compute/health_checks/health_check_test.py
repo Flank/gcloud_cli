@@ -116,6 +116,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
         'type': 'HTTP',
         'httpHealthCheck': {
             'port': 80,
+            'portSpecification': 'USE_FIXED_PORT',
             'proxyHeader': 'NONE',
             'requestPath': '/',
         }
@@ -132,6 +133,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
     expect_updated_params = {
         'httpHealthCheck': {
             'port': 8080,
+            'portSpecification': 'USE_FIXED_PORT',
             'proxyHeader': 'PROXY_V1',
             'requestPath': '/healthz/hc',
         }
@@ -156,6 +158,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
         'type': 'HTTPS',
         'httpsHealthCheck': {
             'port': 80,
+            'portSpecification': 'USE_FIXED_PORT',
             'proxyHeader': 'NONE',
             'requestPath': '/'
         }
@@ -172,6 +175,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
     expect_updated_params = {
         'httpsHealthCheck': {
             'port': 8080,
+            'portSpecification': 'USE_FIXED_PORT',
             'proxyHeader': 'PROXY_V1',
             'requestPath': '/healthz/hc'
         }
@@ -196,6 +200,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
         'type': 'TCP',
         'tcpHealthCheck': {
             'port': 80,
+            'portSpecification': 'USE_FIXED_PORT',
             'proxyHeader': 'NONE',
         }
     })
@@ -212,6 +217,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
     expect_updated_params = {
         'tcpHealthCheck': {
             'port': 8080,
+            'portSpecification': 'USE_FIXED_PORT',
             'request': 'HelloWorld',
             'response': 'Hello',
             'proxyHeader': 'PROXY_V1',
@@ -237,6 +243,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
         'type': 'SSL',
         'sslHealthCheck': {
             'port': 80,
+            'portSpecification': 'USE_FIXED_PORT',
             'proxyHeader': 'NONE',
         }
     })
@@ -253,6 +260,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
     expect_updated_params = {
         'sslHealthCheck': {
             'port': 8080,
+            'portSpecification': 'USE_FIXED_PORT',
             'request': 'HelloWorld',
             'response': 'Hello',
             'proxyHeader': 'PROXY_V1',

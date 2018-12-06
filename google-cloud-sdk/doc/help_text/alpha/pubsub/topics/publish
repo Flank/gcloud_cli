@@ -17,12 +17,12 @@ POSITIONAL ARGUMENTS
      Topic resource - Name of the topic to publish messages to. This represents
      a Cloud resource. (NOTE) Some attributes are not given arguments in this
      group but can be set in other ways. To set the [project] attribute:
-     provide the flag [topic] on the command line with a fully specified name;
-     provide the flag [--project] on the command line; set the property
-     [core/project]. This must be specified.
+     provide the argument [topic] on the command line with a fully specified
+     name; provide the argument [--project] on the command line; set the
+     property [core/project]. This must be specified.
 
        TOPIC
-          The ID of the topic or a fully qualified identifier for the topic.
+          ID of the topic or fully qualified identifier for the topic.
 
      [MESSAGE_BODY]
         (DEPRECATED) The body of the message to publish to the given topic
@@ -44,14 +44,15 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To publish messages in a batch to a specific Cloud Pub/Sub topic, run:
 
-        $ gcloud alpha pubsub topics publish mytopic "Hello World!" \
-            --attribute KEY1=VAL1,KEY2=VAL2
+        $ gcloud alpha pubsub topics publish mytopic \
+            --message "Hello World!" --attribute KEY1=VAL1,KEY2=VAL2
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

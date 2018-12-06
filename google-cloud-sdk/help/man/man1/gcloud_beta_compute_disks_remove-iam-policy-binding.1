@@ -104,17 +104,16 @@ Alternatively, the zone can be stored in the environment variable
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-The following command will remove an IAM policy binding for the role of
-\'roles/compute.securityAdmin' for the user 'test\-user@gmail.com' on disk with
-identifier 'my\-disk'
+To remove an IAM policy binding for the role of 'roles/compute.securityAdmin'
+for the user 'test\-user@gmail.com' on disk with identifier 'my\-disk', run:
 
 .RS 2m
 $ gcloud beta compute disks remove\-iam\-policy\-binding my\-disk \e
@@ -122,8 +121,8 @@ $ gcloud beta compute disks remove\-iam\-policy\-binding my\-disk \e
     \-\-role='roles/compute.securityAdmin'
 .RE
 
-The following command will remove an IAM policy binding for the role of
-\'roles/compute.securityAdmin' from all authenticated users on disk 'my\-disk':
+To remove an IAM policy binding for the role of 'roles/compute.securityAdmin'
+from all authenticated users on disk 'my\-disk', run:
 
 .RS 2m
 $ gcloud beta compute disks remove\-iam\-policy\-binding my\-disk \e

@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import managed_instance_groups_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -55,7 +55,7 @@ class ManagesInstanceGroupUtilsTest(cli_test_base.CliTestBase,
     )
 
   def testAddAutoscalersToMigs(self):
-    holder = base_classes.ComputeApiHolder(base.ReleaseTrack.GA)
+    holder = base_classes.ComputeApiHolder(calliope_base.ReleaseTrack.GA)
     region = ('https://www.googleapis.com/compute/v1/projects/{}/regions/'
               'us-central1').format(self.Project())
     migs = [{'region': region, 'name': 'my-mig'}]
@@ -75,7 +75,7 @@ class ManagesInstanceGroupUtilsTest(cli_test_base.CliTestBase,
     self.assertEqual(migs[0]['autoscaler'], autoscaler)
 
   def testAddAutoscalersToMigs_MismatchedRegionProjects(self):
-    holder = base_classes.ComputeApiHolder(base.ReleaseTrack.GA)
+    holder = base_classes.ComputeApiHolder(calliope_base.ReleaseTrack.GA)
     region = ('https://www.googleapis.com/compute/v1/projects/{}/regions/'
               'us-central1').format(self.Project())
     migs = [{'region': region, 'name': 'my-mig'}]

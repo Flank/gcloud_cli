@@ -74,7 +74,8 @@ class FirewallRulesCreateTest(test_base.BaseTest):
             ],
             denied=[
                 self.messages.Firewall.DeniedValueListEntry(IPProtocol='all')
-            ])
+            ],
+            disabled=False)
     ]]
 
     self.Run("""
@@ -90,8 +91,8 @@ class FirewallRulesCreateTest(test_base.BaseTest):
 
     self.AssertOutputEquals(
         """\
-      NAME        NETWORK  DIRECTION  PRIORITY  ALLOW   DENY
-      firewall-1  default  INGRESS    65534     tcp:80  all
+      NAME        NETWORK  DIRECTION  PRIORITY  ALLOW   DENY  DISABLED
+      firewall-1  default  INGRESS    65534     tcp:80  all   False
       """,
         normalize_space=True)
 
@@ -397,51 +398,6 @@ class FirewallRulesCreateTest(test_base.BaseTest):
         name='firewall-1',
         targetServiceAccounts=['tgt_acct1@google.com', 'tgt_acct2@google.com'])
 
-
-class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
-
-  def SetUp(self):
-    self.api_version = 'beta'
-    self.SelectApi(self.api_version)
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
-
-  def testDefaultOptions(self):
-    self.make_requests.side_effect = [[
-        self.messages.Firewall(
-            name='firewall-1',
-            network='default',
-            direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
-            priority=65534,
-            allowed=[
-                self.messages.Firewall.AllowedValueListEntry(
-                    IPProtocol='tcp', ports=['80'])
-            ],
-            denied=[
-                self.messages.Firewall.DeniedValueListEntry(IPProtocol='all')
-            ],
-            disabled=False)
-    ]]
-
-    self.Run("""
-        compute firewall-rules create firewall-1
-          --allow tcp:80
-        """)
-    self.CheckFirewallRequest(
-        allowed=[
-            self.messages.Firewall.AllowedValueListEntry(
-                IPProtocol='tcp', ports=['80'])
-        ],
-        name='firewall-1')
-
-    self.AssertOutputEquals(
-        """\
-      NAME        NETWORK  DIRECTION  PRIORITY  ALLOW   DENY  DISABLED
-      firewall-1  default  INGRESS    65534     tcp:80  all   False
-      """,
-        normalize_space=True)
-
   def testDisabled(self):
     self.Run("""
         compute firewall-rules create firewall-1
@@ -457,20 +413,15 @@ class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
         disabled=True,
         sourceRanges=[])
 
-  def testEnabled(self):
-    self.Run("""
-        compute firewall-rules create firewall-1
-             --action allow
-             --rules 123
-             --no-disabled
-        """)
-    self.CheckFirewallRequest(
-        allowed=[
-            self.messages.Firewall.AllowedValueListEntry(IPProtocol='123')
-        ],
-        name='firewall-1',
-        disabled=False,
-        sourceRanges=[])
+
+class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
+
+  def SetUp(self):
+    self.api_version = 'beta'
+    self.SelectApi(self.api_version)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
 
   def testEnableLogging(self):
     self.Run("""
@@ -497,42 +448,6 @@ class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'alpha')
-
-  def testDefaultOptions(self):
-    self.make_requests.side_effect = [[
-        self.messages.Firewall(
-            name='firewall-1',
-            network='default',
-            direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
-            priority=65534,
-            allowed=[
-                self.messages.Firewall.AllowedValueListEntry(
-                    IPProtocol='tcp', ports=['80'])
-            ],
-            denied=[
-                self.messages.Firewall.DeniedValueListEntry(IPProtocol='all')
-            ],
-            disabled=False)
-    ]]
-
-    self.Run("""
-        compute firewall-rules create firewall-1
-          --allow tcp:80
-        """)
-    self.CheckFirewallRequest(
-        allowed=[
-            self.messages.Firewall.AllowedValueListEntry(
-                IPProtocol='tcp', ports=['80'])
-        ],
-        name='firewall-1')
-
-    self.AssertOutputEquals(
-        """\
-      NAME        NETWORK  DIRECTION  PRIORITY  ALLOW   DENY  DISABLED
-      firewall-1  default  INGRESS    65534     tcp:80  all   False
-      """,
-        normalize_space=True)
-
 
 if __name__ == '__main__':
   test_case.main()

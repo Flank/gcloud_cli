@@ -45,8 +45,8 @@ def _ApplyEnvVarsArgsToFunction(function, args):
   return updated_fields
 
 
-def _Run(args, track=None, enable_runtime=False, enable_max_instances=False,
-         enable_connected_vpc=False, enable_env_vars=False):
+def _Run(args, track=None, enable_runtime=True, enable_max_instances=False,
+         enable_connected_vpc=False, enable_service_account=False):
   """Run a function deployment with the given args."""
   # Check for labels that start with `deployment`, which is not allowed.
   labels_util.CheckNoDeploymentLabels('--remove-labels', args.remove_labels)
@@ -92,6 +92,9 @@ def _Run(args, track=None, enable_runtime=False, enable_max_instances=False,
   if args.memory:
     function.availableMemoryMb = utils.BytesToMb(args.memory)
     updated_fields.append('availableMemoryMb')
+  if enable_service_account and args.service_account:
+    function.serviceAccountEmail = args.service_account
+    updated_fields.append('serviceAccountEmail')
   if enable_runtime:
     if args.IsSpecified('runtime'):
       function.runtime = args.runtime
@@ -106,6 +109,9 @@ def _Run(args, track=None, enable_runtime=False, enable_max_instances=False,
     if args.connected_vpc:
       function.network = args.connected_vpc
       updated_fields.append('network')
+    if args.vpc_connector:
+      function.vpcConnector = args.vpc_connector
+      updated_fields.append('vpcConnector')
 
   # Populate trigger properties of function based on trigger args.
   if args.trigger_http:
@@ -128,7 +134,7 @@ def _Run(args, track=None, enable_runtime=False, enable_max_instances=False,
 
   # Populate source properties of function based on source args.
   # Only Add source to function if its explicitly provided, a new function,
-  # using a stage budget or deploy of an existing function that previously
+  # using a stage bucket or deploy of an existing function that previously
   # used local source.
   if (args.source or args.stage_bucket or is_new_function or
       function.sourceUploadUrl):
@@ -140,8 +146,8 @@ def _Run(args, track=None, enable_runtime=False, enable_max_instances=False,
                                    args.remove_labels, args.clear_labels):
     updated_fields.append('labels')
 
-  if enable_env_vars:
-    updated_fields.extend(_ApplyEnvVarsArgsToFunction(function, args))
+  # Apply environment variables args to function
+  updated_fields.extend(_ApplyEnvVarsArgsToFunction(function, args))
 
   if is_new_function:
     return api_util.CreateFunction(function,
@@ -176,6 +182,11 @@ class Deploy(base.Command):
     # Add args for specifying the function trigger
     flags.AddTriggerFlagGroup(parser)
 
+    flags.AddRuntimeFlag(parser)
+
+    # Add args for specifying environment variables
+    env_vars_util.AddUpdateEnvVarsFlags(parser)
+
   def Run(self, args):
     return _Run(args, track=self.ReleaseTrack())
 
@@ -188,12 +199,10 @@ class DeployBeta(base.Command):
   def Args(parser):
     """Register flags for this command."""
     Deploy.Args(parser)
-    flags.AddRuntimeFlag(parser)
-    env_vars_util.AddUpdateEnvVarsFlags(parser)
+    flags.AddServiceAccountFlag(parser)
 
   def Run(self, args):
-    return _Run(args, track=self.ReleaseTrack(), enable_runtime=True,
-                enable_env_vars=True)
+    return _Run(args, track=self.ReleaseTrack(), enable_service_account=True)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -204,12 +213,10 @@ class DeployAlpha(base.Command):
   def Args(parser):
     """Register flags for this command."""
     Deploy.Args(parser)
-    flags.AddRuntimeFlag(parser)
-    env_vars_util.AddUpdateEnvVarsFlags(parser)
     flags.AddMaxInstancesFlag(parser)
-    flags.AddConnectedVPCFlag(parser)
+    flags.AddConnectedVPCMutexGroup(parser)
+    flags.AddServiceAccountFlag(parser)
 
   def Run(self, args):
-    return _Run(args, track=self.ReleaseTrack(), enable_runtime=True,
-                enable_max_instances=True, enable_connected_vpc=True,
-                enable_env_vars=True)
+    return _Run(args, track=self.ReleaseTrack(), enable_max_instances=True,
+                enable_connected_vpc=True, enable_service_account=True)

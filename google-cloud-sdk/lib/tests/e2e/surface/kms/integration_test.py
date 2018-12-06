@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import base64
 import os
 
+from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import files
 from tests.lib import parameterized
@@ -34,6 +35,27 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
     self.glbl = 'global'
     self.keyring = next(self.keyring_namer)
     self.RunKms('keyrings', 'create', self.keyring, '--location', self.glbl)
+
+  def TearDown(self):
+    self.cleanupCryptoKeyVersionsUnderKeyRing(self.keyring)
+
+  def cleanupCryptoKeyVersionsUnderKeyRing(self, keyring_id):
+    keys = self.RunKms('keys', 'list', '--keyring', keyring_id, '--location',
+                       self.glbl, '--limit', '50', '--no-user-output-enabled')
+    for ck in keys:
+      self.cleanupCryptoKeyVersionsUnderKey(ck.name)
+
+  def cleanupCryptoKeyVersionsUnderKey(self, cryptokey_resource_name):
+    versions = self.RunKms('keys', 'versions', 'list', '--key',
+                           cryptokey_resource_name, '--limit', '50',
+                           '--no-user-output-enabled')
+    messages = core_apis.GetMessagesModule('cloudkms', 'v1')
+    for ckv in versions:
+      if ckv.state in [
+          messages.CryptoKeyVersion.StateValueValuesEnum.ENABLED,
+          messages.CryptoKeyVersion.StateValueValuesEnum.DISABLED
+      ]:
+        self.RunKms('keys', 'versions', 'destroy', ckv.name)
 
   def testCreateWithLabels(self):
     cryptokey = next(self.cryptokey_namer)

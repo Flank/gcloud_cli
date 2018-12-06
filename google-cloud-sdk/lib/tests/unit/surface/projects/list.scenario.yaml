@@ -1,5 +1,17 @@
 title: List projects
 release_tracks: [GA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: projects list
+  - stdout: |
+      PROJECT_ID  NAME          PROJECT_NUMBER
+      project_id  project_name  0
+      project_id  project_name  0
+      project_id  project_name  0
+      project_id  project_name  0
+      project_id  project_name  0
 actions:
 - execute_command:
     command: projects list
@@ -8,7 +20,7 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects?alt=json&filter=lifecycleState%3AACTIVE&pageSize=500
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
@@ -66,7 +78,7 @@ actions:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects?alt=json&filter=lifecycleState%3AACTIVE&pageSize=500&pageToken=asdf
           method: GET
           headers: {}
-          body:
+          body: null
     - expect_stdout: |
         PROJECT_ID  NAME          PROJECT_NUMBER
         project_id  project_name  0

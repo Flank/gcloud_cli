@@ -1,0 +1,184 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_ALLOCATIONS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute allocations create \- create a Compute Engine zonal allocation
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute allocations create\fR \fIALLOCATION\fR \fB\-\-commitment\fR=\fICOMMITMENT\fR (\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR\ \fB\-\-vm\-count\fR=\fIVM_COUNT\fR\ :\ \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]\ \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR\ \fB\-\-require\-specific\-allocation\fR) [\fB\-\-commitment\-region\fR=\fICOMMITMENT_REGION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Compute Engine zonal allocation.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIALLOCATION\fR
+Name of the zonal allocation to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-commitment\fR=\fICOMMITMENT\fR
+Name of the regional commitment to operate on.
+
+.TP 2m
+
+Manage the specific SKU allocation properties to create This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
+The type of machine (name only) which has fixed number of vCPUs and fixed amount
+of memory. This also includes specifying custom machine type following
+custom\-NUMBER_OF_CPUS\-AMOUNT_OF_MEMORY pattern. This flag must be specified if
+any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-vm\-count\fR=\fIVM_COUNT\fR
+The number of resources that are allocated to this allocation. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
+Manage the configuration of the type and number of accelerator cards attached.
+
+.TP 2m
+\fBcount\fR
+The number of pieces of the accelerator to attach to the allocation.
+
+.TP 2m
+\fBtype\fR
+The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of accelerator
+to attach to the allocation. Use 'gcloud compute accelerator\-types list' to
+learn about all available accelerator types.
+
+.TP 2m
+\fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]
+Manage the size and the interface of local SSD to use.
+
+.TP 2m
+\fBinterface\fR
+The kind of disk interface exposed to the VM for this SSD. Valid values are
+\f5\fIscsi\fR\fR and \f5\fInvme\fR\fR. SCSI is the default and is supported by
+more guest operating systems. NVME may provide higher performance.
+
+.TP 2m
+\fBsize\fR
+The size of the local SSD in base\-2 GB.
+.TP 2m
+\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR
+The minimum cpu platform of the allocation.
+
+.TP 2m
+\fB\-\-require\-specific\-allocation\fR
+Indicates whether the allocation can be consumed by VMs with "any allocation"
+defined. If enabled, then only VMs that target the allocation by name using
+\-\-allocation\-affinity can consume this allocation. It also indicates that if
+true, the existing instances are also accounted in the allocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-commitment\-region\fR=\fICOMMITMENT_REGION\fR
+Region of the regional commitment to operate on. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A text description of the allocation to create.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the zonal allocation to create. If not specified and the
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
+zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

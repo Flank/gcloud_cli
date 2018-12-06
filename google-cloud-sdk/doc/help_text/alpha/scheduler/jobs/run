@@ -10,23 +10,24 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      Job resource - The job you want to run. This represents a Cloud resource.
      (NOTE) Some attributes are not given arguments in this group but can be
-     set in other ways. To set the [project] attribute: provide the flag [job]
-     on the command line with a fully specified name; provide the flag
-     [--project] on the command line; set the property [core/project]. To set
-     the [location] attribute: provide the flag [job] on the command line with
-     a fully specified name; as the location of the current project's App
-     Engine App. This must be specified.
+     set in other ways. To set the [project] attribute: provide the argument
+     [job] on the command line with a fully specified name; provide the
+     argument [--project] on the command line; set the property [core/project].
+     To set the [location] attribute: provide the argument [job] on the command
+     line with a fully specified name; as the location of the current project's
+     App Engine App. This must be specified.
 
        JOB
-          The ID of the job or a fully qualified identifier for the job.
+          ID of the job or fully qualified identifier for the job.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 API REFERENCE
-    This command uses the cloudscheduler/v1alpha1 API. The full documentation
+    This command uses the cloudscheduler/v1beta1 API. The full documentation
     for this API can be found at: https://cloud.google.com/scheduler/
 
 NOTES
@@ -34,5 +35,7 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta scheduler jobs run
 

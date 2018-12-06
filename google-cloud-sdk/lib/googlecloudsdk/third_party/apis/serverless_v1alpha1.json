@@ -6,7 +6,7 @@
   "canonicalName": "Serverless Engine",
   "version": "v1alpha1",
   "revision": "0",
-  "title": "Cloud Serverless Engine API",
+  "title": "Serverless Engine API",
   "description": "Deploy and manage user provided container images that scale automatically based on HTTP traffic.",
   "ownerDomain": "google.com",
   "ownerName": "Google",
@@ -156,7 +156,7 @@
     },
     "Service": {
       "id": "Service",
-      "description": "Service is a convenience resource to create, group and manipulate a Route,\nConfiguration(s), and Revision(s) that represent a single function,\napplication, or microservice. The Service spec has several modes\/types that\nrepresent different patterns for interacting the underlying Elafros\nresources, from always deploying the latest Revision, pinning specific\nrevisions, to canarying gradual rollouts.",
+      "description": "Service is a convenience resource to create, group and manipulate a Route,\nConfiguration(s), and Revision(s) that represent a single function,\napplication, or microservice. The Service spec has several modes\/types that\nrepresent different patterns for interacting the underlying Knative\nresources, from always deploying the latest Revision, pinning specific\nrevisions, to canarying gradual rollouts.",
       "type": "object",
       "properties": {
         "apiVersion": {
@@ -195,7 +195,7 @@
           "type": "string"
         },
         "namespace": {
-          "description": "Namespace defines the space within each name must be unique. An empty\nnamespace is equivalent to the \"default\" namespace, but \"default\" is the\ncanonical representation. Not all objects are required to be scoped to a\nnamespace - the value of this field for those objects will be empty.\n\nMust be a DNS_LABEL.\nCannot be updated.\nMore info: http:\/\/kubernetes.io\/docs\/user-guide\/namespaces\n+optional",
+          "description": "Namespace defines the space within each name must be unique. In Cloud Run\nthis must be equal to either the project ID or project number.",
           "type": "string"
         },
         "selfLink": {
@@ -365,7 +365,7 @@
           "$ref": "RevisionTemplate"
         },
         "generation": {
-          "description": "For open Knative: metadata.generation does not work yet, this\nis a stopgap way of specifying generation\nIGNORED BY GSE.\n+optional",
+          "description": "For open Knative: metadata.generation does not work yet, this\nis a stopgap way of specifying generation\n+optional",
           "type": "integer",
           "format": "int32"
         }
@@ -391,20 +391,16 @@
       "description": "RevisionSpec holds the desired state of the Revision (from the client).",
       "type": "object",
       "properties": {
-        "buildName": {
-          "description": "BuildName optionally holds the name of the Build responsible for\nproducing the container image for its Revision.",
-          "type": "string"
-        },
         "container": {
           "description": "Container defines the unit of execution for this Revision.\nIn the context of a Revision, we disallow a number of the fields of\nthis Container, including: name, resources, ports, and volumeMounts.",
           "$ref": "Container"
         },
         "concurrencyModel": {
-          "description": "ConcurrencyModel specifies the desired concurrency model\n(Single or Multi) for the Revision. Defaults to Multi.\n+optional",
+          "description": "ConcurrencyModel specifies the desired concurrency model\n(Single or Multi) for the Revision. Defaults to Multi.\nDeprecated in favor of ContainerConcurrency.\n+optional",
           "type": "string"
         },
-        "timeoutSeconds": {
-          "description": "Maximum time the instance is allowed for responding to a request.\n+optional",
+        "containerConcurrency": {
+          "description": "ContainerConcurrency specifies the maximum allowed in-flight (concurrent)\nrequests per container of the Revision. Values are:\n- `0` thread-safe, the system should manage the max concurrency. This is\n   the default value.\n- `1` not-thread-safe. Single concurrency\n- `2-N` thread-safe, max concurrency of N",
           "type": "integer",
           "format": "int32"
         },
@@ -429,7 +425,7 @@
           ]
         },
         "generation": {
-          "description": "For open Knative: metadata.generation does not work yet, this\nis a stopgap way of specifying generation\nIGNORED BY GSE.\n+optional",
+          "description": "For open Knative: metadata.generation does not work yet, this\nis a stopgap way of specifying generation\n+optional",
           "type": "integer",
           "format": "int32"
         }
@@ -1007,6 +1003,21 @@
           "description": "Generation of the service that was last processed by the controller.",
           "type": "integer",
           "format": "int32"
+        },
+        "traffic": {
+          "description": "Traffic holds the configured traffic distribution from the related Route.\nThese entries will always contain RevisionName references.\nWhen ConfigurationName appears in the spec for runLatest, this will hold\nthe LatestReadyRevisionName that was last observed.",
+          "type": "array",
+          "items": {
+            "$ref": "TrafficTarget"
+          }
+        },
+        "latestReadyRevisionName": {
+          "description": "From ConfigurationStatus.\nLatestReadyRevisionName holds the name of the latest Revision stamped out\nfrom this Service's Configuration that has had its \"Ready\" condition become\n\"True\". +optional",
+          "type": "string"
+        },
+        "latestCreatedRevisionName": {
+          "description": "From ConfigurationStatus.\nLatestCreatedRevisionName is the last revision that was created from this\nService's Configuration. It might not be ready yet, for that use\nLatestReadyRevisionName. +optional",
+          "type": "string"
         }
       }
     },
@@ -1016,7 +1027,7 @@
       "type": "object",
       "properties": {
         "type": {
-          "description": "ServiceConditionType is used to communicate the status of the\nreconciliation process. See also:\nhttps:\/\/github.com\/elafros\/elafros\/blob\/master\/docs\/spec\/errors.md#error-conditions-and-reporting\nTypes include: \"Ready\", \"Failed\".",
+          "description": "ServiceConditionType is used to communicate the status of the\nreconciliation process. See also:\nhttps:\/\/github.com\/knative\/serving\/blob\/master\/docs\/spec\/errors.md#error-conditions-and-reporting\nTypes include: \"Ready\", \"Failed\".",
           "type": "string"
         },
         "status": {
@@ -1035,6 +1046,30 @@
           "description": "Last time the condition transitioned from one status to another.\n+optional",
           "type": "string",
           "format": "google-datetime"
+        }
+      }
+    },
+    "TrafficTarget": {
+      "id": "TrafficTarget",
+      "description": "TrafficTarget holds a single entry of the routing table for a Route.",
+      "type": "object",
+      "properties": {
+        "configurationName": {
+          "description": "ConfigurationName of a configuration to whose latest revision we will\nsend this portion of traffic. When the \"status.latestReadyRevisionName\"\nof the referenced configuration changes, we will automatically migrate\ntraffic from the prior \"latest ready\" revision to the new one. This field\nis never set in Route's status, only its spec. This is mutually exclusive\nwith RevisionName.",
+          "type": "string"
+        },
+        "revisionName": {
+          "description": "RevisionName of a specific revision to which to send this portion of\ntraffic. This is mutually exclusive with ConfigurationName.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name is optionally used to expose a dedicated hostname for referencing this\ntarget exclusively. It has the form: {name}.${route.status.domain}\n+optional",
+          "type": "string"
+        },
+        "percent": {
+          "description": "Percent specifies percent of the traffic to this Revision or Configuration.\nThis defaults to zero if unspecified.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -1100,7 +1135,7 @@
     },
     "Route": {
       "id": "Route",
-      "description": "Route is responsible for configuring ingress over a collection of Revisions.\nSome of the Revisions a Route distributes traffic over may be specified by\nreferencing the Configuration responsible for creating them; in these cases\nthe Route is additionally responsible for monitoring the Configuration for\n\"latest ready\" revision changes, and smoothly rolling out latest revisions.\nSee also:\nhttps:\/\/github.com\/elafros\/elafros\/blob\/master\/docs\/spec\/overview.md#route",
+      "description": "Route is responsible for configuring ingress over a collection of Revisions.\nSome of the Revisions a Route distributes traffic over may be specified by\nreferencing the Configuration responsible for creating them; in these cases\nthe Route is additionally responsible for monitoring the Configuration for\n\"latest ready\" revision changes, and smoothly rolling out latest revisions.\nSee also:\nhttps:\/\/github.com\/knative\/serving\/blob\/master\/docs\/spec\/overview.md#route",
       "type": "object",
       "properties": {
         "apiVersion": {
@@ -1131,38 +1166,14 @@
       "type": "object",
       "properties": {
         "traffic": {
-          "description": "Traffic specifies how to distribute traffic over a collection of Elafros\nRevisions and Configurations.",
+          "description": "Traffic specifies how to distribute traffic over a collection of Knative\nRevisions and Configurations.",
           "type": "array",
           "items": {
             "$ref": "TrafficTarget"
           }
         },
         "generation": {
-          "description": "For open Knative: metadata.generation does not work yet, this\nis a stopgap way of specifying generation\nIGNORED BY GSE.\n+optional",
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "TrafficTarget": {
-      "id": "TrafficTarget",
-      "description": "TrafficTarget holds a single entry of the routing table for a Route.",
-      "type": "object",
-      "properties": {
-        "configurationName": {
-          "description": "ConfigurationName of a configuration to whose latest revision we will\nsend this portion of traffic. When the \"status.latestReadyRevisionName\"\nof the referenced configuration changes, we will automatically migrate\ntraffic from the prior \"latest ready\" revision to the new one. This field\nis never set in Route's status, only its spec. This is mutually exclusive\nwith RevisionName.",
-          "type": "string"
-        },
-        "revisionName": {
-          "description": "RevisionName of a specific revision to which to send this portion of\ntraffic. This is mutually exclusive with ConfigurationName.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Name is optionally used to expose a dedicated hostname for referencing this\ntarget exclusively. It has the form: {name}.${route.status.domain}\n+optional",
-          "type": "string"
-        },
-        "percent": {
-          "description": "Percent specifies percent of the traffic to this Revision or Configuration.\nThis defaults to zero if unspecified.",
+          "description": "For open Knative: metadata.generation does not work yet, this\nis a stopgap way of specifying generation\n+optional",
           "type": "integer",
           "format": "int32"
         }
@@ -1174,7 +1185,7 @@
       "type": "object",
       "properties": {
         "domain": {
-          "description": "Domain holds the top-level domain that will distribute traffic over the\nprovided targets. It generally has the form\n{route-name}.{route-namespace}.{cluster-level-suffix}",
+          "description": "Domain holds the top-level domain that will distribute traffic over the\nprovided targets. It generally has the form\nhttps:\/\/{route-hash}-{project-hash}-{cluster-level-suffix}.a.run.app",
           "type": "string"
         },
         "traffic": {
@@ -1208,7 +1219,7 @@
       "type": "object",
       "properties": {
         "type": {
-          "description": "RouteConditionType is used to communicate the status of the reconciliation\nprocess. See also:\nhttps:\/\/github.com\/elafros\/elafros\/blob\/master\/docs\/spec\/errors.md#error-conditions-and-reporting\nTypes include: \"RolloutInProgress\", \"TrafficDropped\".",
+          "description": "RouteConditionType is used to communicate the status of the reconciliation\nprocess. See also:\nhttps:\/\/github.com\/knative\/serving\/blob\/master\/docs\/spec\/errors.md#error-conditions-and-reporting\nTypes include: \"RolloutInProgress\", \"TrafficDropped\".",
           "type": "string"
         },
         "status": {
@@ -1258,7 +1269,7 @@
     },
     "Configuration": {
       "id": "Configuration",
-      "description": "Configuration represents the \"floating HEAD\" of a linear history of\nRevisions, and optionally how the containers those revisions reference are\nbuilt. Users create new Revisions by updating the Configuration's spec. The\n\"latest created\" revision's name is available under status, as is the \"latest\nready\" revision's name. See also:\nhttps:\/\/github.com\/elafros\/elafros\/blob\/master\/docs\/spec\/overview.md#configuration",
+      "description": "Configuration represents the \"floating HEAD\" of a linear history of\nRevisions, and optionally how the containers those revisions reference are\nbuilt. Users create new Revisions by updating the Configuration's spec. The\n\"latest created\" revision's name is available under status, as is the \"latest\nready\" revision's name. See also:\nhttps:\/\/github.com\/knative\/serving\/blob\/master\/docs\/spec\/overview.md#configuration",
       "type": "object",
       "properties": {
         "apiVersion": {
@@ -1316,7 +1327,7 @@
       "type": "object",
       "properties": {
         "type": {
-          "description": "ConfigurationConditionType is used to communicate the status of the\nreconciliation process. See also:\nhttps:\/\/github.com\/elafros\/elafros\/blob\/master\/docs\/spec\/errors.md#error-conditions-and-reporting\nTypes include:\"LatestRevisionReady\"",
+          "description": "ConfigurationConditionType is used to communicate the status of the\nreconciliation process. See also:\nhttps:\/\/github.com\/knative\/serving\/blob\/master\/docs\/spec\/errors.md#error-conditions-and-reporting\nTypes include:\"LatestRevisionReady\"",
           "type": "string"
         },
         "status": {
@@ -1366,7 +1377,7 @@
     },
     "Revision": {
       "id": "Revision",
-      "description": "Revision is an immutable snapshot of code and configuration.\nSee also:\nhttps:\/\/github.com\/elafros\/elafros\/blob\/master\/docs\/spec\/overview.md#revision",
+      "description": "Revision is an immutable snapshot of code and configuration.\nSee also:\nhttps:\/\/github.com\/knative\/serving\/blob\/master\/docs\/spec\/overview.md#revision",
       "type": "object",
       "properties": {
         "apiVersion": {
@@ -1401,7 +1412,7 @@
           "type": "string"
         },
         "conditions": {
-          "description": "List of observed RevisionConditions, indicating the current state\nof the Revision.",
+          "description": "List of observed RevisionConditions, indicating the current state\nof the Revision. As a Revision is being prepared, it will incrementally\nupdate conditions \"ResourcesAvailable\", \"ContainerHealthy\", and \"Active\",\nwhich contribute to the overall \"Ready\" condition.",
           "type": "array",
           "items": {
             "$ref": "RevisionCondition"
@@ -1415,6 +1426,10 @@
           "description": "ObservedGeneration is the 'Generation' of the Configuration that\nwas last processed by the controller. The observed generation is updated\neven if the controller failed to process the spec and create the Revision.",
           "type": "integer",
           "format": "int32"
+        },
+        "imageDigest": {
+          "description": "ImageDigest holds the resolved digest for the image specified\nwithin .Spec.Container.Image. The digest is resolved during the creation\nof Revision. This field holds the digest value regardless of whether\na tag or digest was originally specified in the Container object. It\nmay be empty if the image comes from a registry listed to skip resolution.",
+          "type": "string"
         }
       }
     },
@@ -1424,7 +1439,7 @@
       "type": "object",
       "properties": {
         "type": {
-          "description": "RevisionConditionType is used to communicate the status of the\nreconciliation process. See also:\nhttps:\/\/github.com\/elafros\/elafros\/blob\/master\/docs\/spec\/errors.md#error-conditions-and-reporting\nTypes include: \"Ready\", \"Failed\", \"BuildComplete\", \"BuildFailed\"",
+          "description": "RevisionConditionType is used to communicate the status of the\nreconciliation process. See also:\nhttps:\/\/github.com\/knative\/serving\/blob\/master\/docs\/spec\/errors.md#error-conditions-and-reporting\nTypes include:\n\n* \"Ready\": True when the Revision is ready.\n* \"ResourcesAvailable\": True when underlying resources have been\nprovisioned.\n* \"ContainerHealthy\": True when the Revision readiness check completes.\n* \"Active\": True when the Revision may receive traffic.",
           "type": "string"
         },
         "status": {
@@ -1600,7 +1615,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "The project and location from which the services should be listed.",
+                      "description": "The project ID or project number from which the services should be listed.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1613,7 +1628,7 @@
                       "format": "int32"
                     },
                     "includeUninitialized": {
-                      "description": "Kubernetes-compatible parameter. Not used by GSE.",
+                      "description": "Kubernetes-compatible parameter. Not used by Cloud Run.",
                       "location": "query",
                       "type": "boolean"
                     },
@@ -1686,7 +1701,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "The project and location in which the service should be created, specified\nin the format `projects\/*\/locations\/*`.",
+                      "description": "The project ID or project number in which this service should be created.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1733,7 +1748,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Rpc to replace a service.\nOnly the metadata and spec are modifiable but after the Replace request,\nGoogle Serverless Engine will work to make the ServiceStatus match the\nrequested ServiceSpec.\nMay use metadata.resourceVersion to enforce update from last read for\nconcurrency control."
+                  "description": "Rpc to replace a service.\nOnly the metadata and spec are modifiable but after the Replace request,\nCloud Run will work to make the ServiceStatus match the\nrequested ServiceSpec.\nMay use metadata.resourceVersion to enforce update from last read for\nconcurrency control."
                 },
                 "delete": {
                   "id": "serverless.projects.locations.services.delete",
@@ -1749,7 +1764,7 @@
                       "type": "string"
                     },
                     "orphanDependents": {
-                      "description": "Deprecated.\nKubernetes-compatible attribute that specifies the cascade behavior on\ndelete. GSE only supports cascading behavior, so this must be false.\nThis attribute is deprecated, and might be replaced with PropagationPolicy\nSee https:\/\/github.com\/kubernetes\/kubernetes\/issues\/46659 for more info.",
+                      "description": "Deprecated.\nKubernetes-compatible attribute that specifies the cascade behavior on\ndelete. Cloud Run only supports cascading behavior, so this must be false.\nThis attribute is deprecated, and might be replaced with PropagationPolicy\nSee https:\/\/github.com\/kubernetes\/kubernetes\/issues\/46659 for more info.",
                       "location": "query",
                       "type": "boolean"
                     }
@@ -1791,7 +1806,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Rpc to update a service.\nOnly the metadata and spec are modifiable but after the Update request,\nGoogle Serverless Engine will work to make the ServiceStatus match the\nrequested ServiceSpec.\nMay use metadata.resourceVersion to enforce update from last read for\nconcurrency control."
+                  "description": "Rpc to update a service.\nOnly the metadata and spec are modifiable but after the Update request,\nCloud Run will work to make the ServiceStatus match the\nrequested ServiceSpec.\nMay use metadata.resourceVersion to enforce update from last read for\nconcurrency control."
                 }
               }
             },
@@ -1804,7 +1819,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "The project and location from which the routes should be listed.",
+                      "description": "The project ID or project number from which the routes should be listed.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1817,7 +1832,7 @@
                       "format": "int32"
                     },
                     "includeUninitialized": {
-                      "description": "Kubernetes-compatible parameter. Not used by GSE.",
+                      "description": "Kubernetes-compatible parameter. Not used by Cloud Run.",
                       "location": "query",
                       "type": "boolean"
                     },
@@ -1881,7 +1896,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Rpc to get information about a route.\nThis will cause the route to stop serving traffic."
+                  "description": "Rpc to get information about a route."
                 }
               }
             },
@@ -1894,7 +1909,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "The project and location from which the configurations should be listed.",
+                      "description": "The project ID or project number from which the configurations should be\nlisted.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1907,7 +1922,7 @@
                       "format": "int32"
                     },
                     "includeUninitialized": {
-                      "description": "Kubernetes-compatible parameter. Not used by GSE.",
+                      "description": "Kubernetes-compatible parameter. Not used by Cloud Run.",
                       "location": "query",
                       "type": "boolean"
                     },
@@ -1984,7 +1999,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "The project and location from which the revisions should be listed.",
+                      "description": "The project ID or project number from which the revisions should be listed.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1997,7 +2012,7 @@
                       "format": "int32"
                     },
                     "includeUninitialized": {
-                      "description": "Kubernetes-compatible parameter. Not used by GSE.",
+                      "description": "Kubernetes-compatible parameter. Not used by Cloud Run.",
                       "location": "query",
                       "type": "boolean"
                     },
@@ -2077,7 +2092,7 @@
                       "type": "string"
                     },
                     "orphanDependents": {
-                      "description": "Kubernetes-compatible attribute that specifies the cascade behavior on\ndelete. GSE only supports cascading behavior, so this must be false.\nThis attribute is deprecated, and might be replaced with PropagationPolicy\nSee https:\/\/github.com\/kubernetes\/kubernetes\/issues\/46659 for more info.",
+                      "description": "Kubernetes-compatible attribute that specifies the cascade behavior on\ndelete. Cloud Run only supports cascading behavior, so this must be false.\nThis attribute is deprecated, and might be replaced with PropagationPolicy\nSee https:\/\/github.com\/kubernetes\/kubernetes\/issues\/46659 for more info.",
                       "location": "query",
                       "type": "boolean"
                     }
@@ -2110,7 +2125,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The project and location from which the services should be listed.",
+                  "description": "The project ID or project number from which the services should be listed.",
                   "location": "path",
                   "required": true,
                   "pattern": "^namespaces\/[^\/]+$",
@@ -2123,7 +2138,7 @@
                   "format": "int32"
                 },
                 "includeUninitialized": {
-                  "description": "Kubernetes-compatible parameter. Not used by GSE.",
+                  "description": "Kubernetes-compatible parameter. Not used by Cloud Run.",
                   "location": "query",
                   "type": "boolean"
                 },
@@ -2196,7 +2211,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The project and location in which the service should be created, specified\nin the format `projects\/*\/locations\/*`.",
+                  "description": "The project ID or project number in which this service should be created.",
                   "location": "path",
                   "required": true,
                   "pattern": "^namespaces\/[^\/]+$",
@@ -2243,7 +2258,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Rpc to replace a service.\nOnly the metadata and spec are modifiable but after the Replace request,\nGoogle Serverless Engine will work to make the ServiceStatus match the\nrequested ServiceSpec.\nMay use metadata.resourceVersion to enforce update from last read for\nconcurrency control."
+              "description": "Rpc to replace a service.\nOnly the metadata and spec are modifiable but after the Replace request,\nCloud Run will work to make the ServiceStatus match the\nrequested ServiceSpec.\nMay use metadata.resourceVersion to enforce update from last read for\nconcurrency control."
             },
             "delete": {
               "id": "serverless.namespaces.services.delete",
@@ -2259,7 +2274,7 @@
                   "type": "string"
                 },
                 "orphanDependents": {
-                  "description": "Deprecated.\nKubernetes-compatible attribute that specifies the cascade behavior on\ndelete. GSE only supports cascading behavior, so this must be false.\nThis attribute is deprecated, and might be replaced with PropagationPolicy\nSee https:\/\/github.com\/kubernetes\/kubernetes\/issues\/46659 for more info.",
+                  "description": "Deprecated.\nKubernetes-compatible attribute that specifies the cascade behavior on\ndelete. Cloud Run only supports cascading behavior, so this must be false.\nThis attribute is deprecated, and might be replaced with PropagationPolicy\nSee https:\/\/github.com\/kubernetes\/kubernetes\/issues\/46659 for more info.",
                   "location": "query",
                   "type": "boolean"
                 }
@@ -2301,7 +2316,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Rpc to update a service.\nOnly the metadata and spec are modifiable but after the Update request,\nGoogle Serverless Engine will work to make the ServiceStatus match the\nrequested ServiceSpec.\nMay use metadata.resourceVersion to enforce update from last read for\nconcurrency control."
+              "description": "Rpc to update a service.\nOnly the metadata and spec are modifiable but after the Update request,\nCloud Run will work to make the ServiceStatus match the\nrequested ServiceSpec.\nMay use metadata.resourceVersion to enforce update from last read for\nconcurrency control."
             }
           }
         },
@@ -2314,7 +2329,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The project and location from which the routes should be listed.",
+                  "description": "The project ID or project number from which the routes should be listed.",
                   "location": "path",
                   "required": true,
                   "pattern": "^namespaces\/[^\/]+$",
@@ -2327,7 +2342,7 @@
                   "format": "int32"
                 },
                 "includeUninitialized": {
-                  "description": "Kubernetes-compatible parameter. Not used by GSE.",
+                  "description": "Kubernetes-compatible parameter. Not used by Cloud Run.",
                   "location": "query",
                   "type": "boolean"
                 },
@@ -2391,7 +2406,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Rpc to get information about a route.\nThis will cause the route to stop serving traffic."
+              "description": "Rpc to get information about a route."
             }
           }
         },
@@ -2404,7 +2419,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The project and location from which the configurations should be listed.",
+                  "description": "The project ID or project number from which the configurations should be\nlisted.",
                   "location": "path",
                   "required": true,
                   "pattern": "^namespaces\/[^\/]+$",
@@ -2417,7 +2432,7 @@
                   "format": "int32"
                 },
                 "includeUninitialized": {
-                  "description": "Kubernetes-compatible parameter. Not used by GSE.",
+                  "description": "Kubernetes-compatible parameter. Not used by Cloud Run.",
                   "location": "query",
                   "type": "boolean"
                 },
@@ -2494,7 +2509,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The project and location from which the revisions should be listed.",
+                  "description": "The project ID or project number from which the revisions should be listed.",
                   "location": "path",
                   "required": true,
                   "pattern": "^namespaces\/[^\/]+$",
@@ -2507,7 +2522,7 @@
                   "format": "int32"
                 },
                 "includeUninitialized": {
-                  "description": "Kubernetes-compatible parameter. Not used by GSE.",
+                  "description": "Kubernetes-compatible parameter. Not used by Cloud Run.",
                   "location": "query",
                   "type": "boolean"
                 },
@@ -2587,7 +2602,7 @@
                   "type": "string"
                 },
                 "orphanDependents": {
-                  "description": "Kubernetes-compatible attribute that specifies the cascade behavior on\ndelete. GSE only supports cascading behavior, so this must be false.\nThis attribute is deprecated, and might be replaced with PropagationPolicy\nSee https:\/\/github.com\/kubernetes\/kubernetes\/issues\/46659 for more info.",
+                  "description": "Kubernetes-compatible attribute that specifies the cascade behavior on\ndelete. Cloud Run only supports cascading behavior, so this must be false.\nThis attribute is deprecated, and might be replaced with PropagationPolicy\nSee https:\/\/github.com\/kubernetes\/kubernetes\/issues\/46659 for more info.",
                   "location": "query",
                   "type": "boolean"
                 }
@@ -2728,40 +2743,32 @@
             },
             "groups": {
               "resources": {
-                "serving": {
-                  "resources": {
-                    "knative": {
-                      "resources": {
-                        "dev": {
-                          "methods": {
-                            "list": {
-                              "id": "serverless.extensions.k8s.groups.serving.knative.dev.list",
-                              "path": "v1alpha1/extensions/k8s/groups/serving.knative.dev",
-                              "flatPath": "v1alpha1/extensions/k8s/groups/serving.knative.dev",
-                              "httpMethod": "GET",
-                              "parameters": {
-                                "timeout": {
-                                  "location": "query",
-                                  "type": "string"
-                                },
-                                "labelSelector": {
-                                  "location": "query",
-                                  "type": "string"
-                                }
-                              },
-                              "parameterOrder": [
-                              ],
-                              "response": {
-                                "$ref": "ApiResourceList"
-                              },
-                              "scopes": [
-                                "https://www.googleapis.com/auth/cloud-platform"
-                              ],
-                              "description": "Lists serverless v1alpha1 resources."
-                            }
-                          }
+                "servingknativedev": {
+                  "methods": {
+                    "list": {
+                      "id": "serverless.extensions.k8s.groups.servingknativedev.list",
+                      "path": "v1alpha1/extensions/k8s/groups/serving.knative.dev",
+                      "flatPath": "v1alpha1/extensions/k8s/groups/serving.knative.dev",
+                      "httpMethod": "GET",
+                      "parameters": {
+                        "timeout": {
+                          "location": "query",
+                          "type": "string"
+                        },
+                        "labelSelector": {
+                          "location": "query",
+                          "type": "string"
                         }
-                      }
+                      },
+                      "parameterOrder": [
+                      ],
+                      "response": {
+                        "$ref": "ApiResourceList"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Lists serverless v1alpha1 resources."
                     }
                   }
                 }

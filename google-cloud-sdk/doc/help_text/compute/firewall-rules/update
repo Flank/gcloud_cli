@@ -4,8 +4,8 @@ NAME
 SYNOPSIS
     gcloud compute firewall-rules update NAME
         [--allow=[PROTOCOL[:PORT[-PORT]],...]] [--description=DESCRIPTION]
-        [--destination-ranges=[CIDR_RANGE,...]] [--priority=PRIORITY]
-        [--rules=[PROTOCOL[:PORT[-PORT]],...]]
+        [--destination-ranges=[CIDR_RANGE,...]] [--disabled]
+        [--priority=PRIORITY] [--rules=[PROTOCOL[:PORT[-PORT]],...]]
         [--source-ranges=[CIDR_RANGE,...]]
         [--source-service-accounts=[EMAIL,...]] [--source-tags=[TAG,...]]
         [--target-service-accounts=[EMAIL,...]] [--target-tags=[TAG,...]]
@@ -70,6 +70,13 @@ FLAGS
         firewall. The following will clear the existing destination ranges:
 
             $ gcloud compute firewall-rules update MY-RULE --destination-ranges
+
+     --disabled
+        Disable a firewall rule and stop it from being enforced in the network.
+        If a firewall rule is disabled, the associated network behaves as if
+        the rule did not exist. To enable a disabled rule, use:
+
+            $ gcloud compute firewall-rules update MY-RULE --no-disabled
 
      --priority=PRIORITY
         This is an integer between 0 and 65535, both inclusive. When NOT
@@ -180,8 +187,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     These variants are also available:

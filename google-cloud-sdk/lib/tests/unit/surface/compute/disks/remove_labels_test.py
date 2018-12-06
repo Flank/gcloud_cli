@@ -159,6 +159,7 @@ class RemoveLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     self.AssertErrNotContains('georgia')
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
                           calliope_base.ReleaseTrack.BETA)
 class RemoveLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,

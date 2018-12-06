@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import os
 from googlecloudsdk.api_lib.dns import transaction_util
-from googlecloudsdk.calliope.exceptions import ToolException
 from tests.lib import test_case
 from tests.lib.surface.dns import base
 from tests.lib.surface.dns import util
@@ -32,11 +31,11 @@ class RecordSetsTransactionAbortTest(base.DnsMockTest):
 
   def testTransactionAbortBeforeStart(self):
     test_zone = util.GetManagedZones()[0]
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(transaction_util.TransactionFileNotFound) as context:
       self.Run(
           'dns record-sets transaction abort -z {0}'.format(test_zone.name))
       self.assertEqual(context.exception.message,
-                       'transaction not found at [{0}]'.format(
+                       'Transaction not found at [{0}]'.format(
                            transaction_util.DEFAULT_PATH))
 
   def testTransactionAbort(self):
@@ -53,11 +52,11 @@ class RecordSetsTransactionAbortBetaTest(base.DnsMockBetaTest):
 
   def testTransactionAbortBeforeStart(self):
     test_zone = util_beta.GetManagedZones()[0]
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(transaction_util.TransactionFileNotFound) as context:
       self.Run(
           'dns record-sets transaction abort -z {0}'.format(test_zone.name))
       self.assertEqual(context.exception.message,
-                       'transaction not found at [{0}]'.format(
+                       'Transaction not found at [{0}]'.format(
                            transaction_util.DEFAULT_PATH))
 
   def testTransactionAbort(self):

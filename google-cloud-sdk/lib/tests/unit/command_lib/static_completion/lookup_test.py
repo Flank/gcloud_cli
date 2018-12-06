@@ -140,7 +140,7 @@ class LookupCompletionTest(calliope_test_base.CalliopeTestBase):
       # one skips this branch, but it poisons sys.modules and hangs around for
       # the remaining tests. This mocks the subsequent tests to return the test
       # CLI tree generated above.
-      self.StartObjectPatch(lookup, '_LoadCompletionCliTree',
+      self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
                             return_value=self.root)
     self.StartObjectPatch(lookup, '_GetInstallationRootDir',
                           return_value=self.temp_path)
@@ -216,6 +216,11 @@ class LookupCompletionTest(calliope_test_base.CalliopeTestBase):
 
   def testFindCompletionsFlagValueCannotComplete(self):
     cmd_line = 'gcloud sdk xyzzy --exactly-one=on'
+    self.assertEqual([],
+                     lookup._FindCompletions(self.root, cmd_line))
+
+  def testFindCompletionsFlagValueGeneric(self):
+    cmd_line = 'gcloud sdk xyzzy --exactly-one='
     self.assertEqual([],
                      lookup._FindCompletions(self.root, cmd_line))
 

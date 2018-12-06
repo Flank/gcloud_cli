@@ -11,7 +11,7 @@ gcloud alpha container clusters upgrade \- upgrade the Kubernetes version of an 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container clusters upgrade\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-concurrent\-node\-count\fR=\fICONCURRENT_NODE_COUNT\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-master\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container clusters upgrade\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-concurrent\-node\-count\fR=\fICONCURRENT_NODE_COUNT\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-master\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-security\-profile\fR=\fISECURITY_PROFILE\fR\ \fB\-\-security\-profile\-runtime\-rules\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -117,6 +117,36 @@ Compute region (e.g. us\-central1) for the cluster.
 Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 \fBcompute/zone\fR property value for this command invocation.
 
+.RE
+.sp
+.TP 2m
+
+Flags for Security Profile:
+
+.RS 2m
+.TP 2m
+\fB\-\-security\-profile\fR=\fISECURITY_PROFILE\fR
+Name and version of the security profile to be applied to the cluster. If not
+specified, the current security profile settings are preserved. If the current
+security profile is not supported in the new cluster version, this option must
+be explicitly specified with a supported security profile, otherwise the
+operation will fail.
+
+Example:
+
+.RS 2m
+$ gcloud alpha container clusters upgrade example\-cluster \e
+    \-\-security\-profile=default\-1.0\-gke.1
+.RE
+
+.TP 2m
+\fB\-\-security\-profile\-runtime\-rules\fR
+Apply runtime rules in the specified security profile to the cluster. When
+enabled, a security profile controller and webhook are deployed on the cluster
+to enforce the runtime rules. If \-\-no\-security\-profile\-runtime\-rules is
+specified to disable this feature, only bootstrapping rules are applied, and no
+security profile controller or webhook are installed.
+
 
 .RE
 .RE
@@ -125,9 +155,9 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

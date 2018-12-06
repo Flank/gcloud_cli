@@ -11,8 +11,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -74,6 +75,11 @@ EXAMPLES
 
         $ gcloud beta dataproc workflow-templates instantiate my_template
 
+    To instantiate a workflow template from a file, run:
+
+        $ gcloud beta dataproc workflow-templates instantiate-from-file \
+            --file template.yaml
+
     To delete a workflow template, run:
 
         $ gcloud beta dataproc workflow-templates delete my_template
@@ -103,5 +109,8 @@ EXAMPLES
             --cluster-labels environment=prod
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc workflow-templates
 

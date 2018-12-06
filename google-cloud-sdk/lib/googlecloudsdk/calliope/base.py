@@ -287,6 +287,18 @@ class Argument(Action):
 
 COMMONLY_USED_FLAGS = 'COMMONLY USED'
 
+FLAGS_FILE_FLAG = Argument(
+    '--flags-file',
+    metavar='YAML_FILE',
+    default=None,
+    category=COMMONLY_USED_FLAGS,
+    help="""\
+        A YAML or JSON file that specifies a *--flag*:*value* dictionary.
+        Useful for specifying complex flag values with special characters
+        that work with any command interpreter. Additionally, each
+        *--flags-file* arg is replaced by its constituent flags. See
+        $ gcloud topic flags-file for more information.""")
+
 FLATTEN_FLAG = Argument(
     '--flatten',
     metavar='KEY',
@@ -376,6 +388,7 @@ URI_FLAG = Argument(
 
 class _Common(six.with_metaclass(abc.ABCMeta, object)):
   """Base class for Command and Group."""
+  category = None
   _cli_generator = None
   _is_hidden = False
   _is_unicode_supported = False
@@ -438,7 +451,7 @@ class _Common(six.with_metaclass(abc.ABCMeta, object)):
       The attribute value from obj for tracks.
     """
     for track in ReleaseTrack._ALL:  # pylint: disable=protected-access
-      if track not in cls._valid_release_tracks:
+      if track not in cls._valid_release_tracks:  # pylint: disable=unsupported-membership-test
         continue
       names = []
       names.append(attribute + '_' + track.id)
@@ -479,7 +492,6 @@ class Group(_Common):
   IS_COMMAND_GROUP = True
 
   _allow_py3 = True
-  _command_suggestions = {}
 
   def __init__(self):
     super(Group, self).__init__(is_group=True)
@@ -494,10 +506,6 @@ class Group(_Common):
           .Run() invocation.
     """
     pass
-
-  @classmethod
-  def CommandSuggestions(cls):
-    return cls._command_suggestions
 
 
 class Command(six.with_metaclass(abc.ABCMeta, _Common)):
@@ -688,29 +696,6 @@ def DisallowPython3(group_class):
   # pylint: disable=protected-access
   group_class._allow_py3 = False
   return group_class
-
-
-def CommandSuggestion(command, suggestion):
-  """Decorator for adding a suggestion when a command is mistyped.
-
-  This applies to base.Group classes. When a user tries to run the given
-  `command` that does not exist, `suggestion` will but suggested as a
-  "did you mean".
-
-  Args:
-    command: str, The name of the command (just the command itself not including
-      the group).
-    suggestion: str, The full command name to suggest (excluding the gcloud
-      prefix).
-
-  Returns:
-    The inner decorator.
-  """
-  def Inner(cmd_class):
-    # pylint: disable=protected-access
-    cmd_class._command_suggestions[command] = suggestion
-    return cmd_class
-  return Inner
 
 
 def UnicodeIsSupported(cmd_class):

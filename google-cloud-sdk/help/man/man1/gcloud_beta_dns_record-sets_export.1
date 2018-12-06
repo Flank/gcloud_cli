@@ -64,9 +64,9 @@ affects console output alone.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -89,8 +89,8 @@ $ gcloud beta dns record\-sets export pathto.zonefile \e
 Similarly, to import record\-sets into a BIND zone formatted zone file, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets export pathto.zonefile \e
-    \-\-zone\-file\-format \-\-zone examplezonename
+$ gcloud dns record\-sets import pathto.zonefile \-\-zone\-file\-format \e
+  \-\-zone examplezonename
 .RE
 
 

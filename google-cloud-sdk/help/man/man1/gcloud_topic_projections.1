@@ -378,14 +378,14 @@ message.
 
 .TP 2m
 \fBextract\fR(keys)
-Extract an ordered list of values from the resource for the specified keys.
+Extract a list of non\-empty values for the specified resource keys.
 
 The arguments are:
 
 .RS 2m
 .TP 2m
 \fB\f5keys\fR\fR
-The list of keys in the resource whose associated values will be included in the
+The list of keys in the resource whose non\-empty values will be included in the
 result.
 .RE
 .sp
@@ -404,6 +404,25 @@ An error message. If not specified then the resource is formatted as the error
 message.
 .RE
 .sp
+
+
+.TP 2m
+\fBfilter\fR(expression)
+Selects elements of r that match the filter expression.
+
+The arguments are:
+
+.RS 2m
+.TP 2m
+\fB\f5expression\fR\fR
+The filter expression to apply to r.
+.RE
+.sp
+
+For example:
+
+x.filter("key:val") selects elements of r that have 'key' fields containing
+\'val'.
 
 
 .TP 2m
@@ -426,6 +445,45 @@ For example:
 \f5x.firstof(bar_foo, barFoo, BarFoo, BAR_FOO)\fR
 Checks x.bar_foo, x.barFoo, x.BarFoo, and x.BAR_FOO in order for the first
 non\-empty value.
+
+
+.RE
+.sp
+.TP 2m
+\fBflatten\fR(show="", undefined="", separator=",")
+Formats nested dicts and/or lists into a compact comma separated list.
+
+The arguments are:
+
+.RS 2m
+.TP 2m
+\fB\f5show\fR\fR
+If show=\fBkeys\fR then list dict keys; if show=\fBvalues\fR then list dict
+values; otherwise list dict key=value pairs.
+.RE
+.sp
+.RS 2m
+.TP 2m
+\fB\f5undefined\fR\fR
+Return this if the resource is empty.
+.RE
+.sp
+.RS 2m
+.TP 2m
+\fB\f5separator\fR\fR
+The list item separator string.
+.RE
+.sp
+
+For example:
+
+.RS 2m
+.TP 2m
+\f5\-\-format="table(field.map(2).list().map().list().list()"\fR
+Expression with explicit flattening.
+.TP 2m
+\f5\-\-format="table(field.flatten()"\fR
+Equivalent expression using .flatten().
 
 
 .RE
@@ -635,12 +693,18 @@ For example:
 Applies foo() to each item in list_field and then list() to the resulting value
 to return a compact comma\-separated list.
 .TP 2m
+\f5list_field.*foo().list()\fR
+\f5*\fR is shorthand for map().
+.TP 2m
 \f5list_field.map().foo().map().bar()\fR
 Applies foo() to each item in list_field and then bar() to each item in the
 resulting list.
 .TP 2m
 \f5abc.xyz.map(2).foo()\fR
 Applies foo() to each item in xyz[] for all items in abc[].
+.TP 2m
+\f5abc.xyz.**foo()\fR
+\f5**\fR is shorthand for map(2).
 
 
 .RE

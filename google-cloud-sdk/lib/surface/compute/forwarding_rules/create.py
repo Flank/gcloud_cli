@@ -32,7 +32,11 @@ import six
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-def _Args(parser, include_beta, include_alpha=False, support_flex_port=False):
+def _Args(parser,
+          include_beta,
+          include_alpha=False,
+          support_flex_port=False,
+          support_global_access=False):
   """Argument parsing."""
   flags.AddUpdateArgs(parser, include_beta=include_beta,
                       include_alpha=include_alpha)
@@ -41,6 +45,10 @@ def _Args(parser, include_beta, include_alpha=False, support_flex_port=False):
   flags.AddPortsAndPortRange(parser, supports_flex_port=support_flex_port)
   flags.AddNetworkTier(
       parser, supports_network_tier_flag=True, for_update=False)
+
+  if support_global_access:
+    flags.AddAllowGlobalAccess(parser)
+
   if include_beta:
     parser.add_argument(
         '--service-label',
@@ -58,6 +66,8 @@ class Create(base.CreateCommand):
 
   FORWARDING_RULE_ARG = None
   _support_flex_port = False
+  _support_global_access = False
+  _support_network_in_global_request = False
 
   @classmethod
   def Args(cls, parser):
@@ -66,7 +76,8 @@ class Create(base.CreateCommand):
         parser,
         include_beta=False,
         include_alpha=False,
-        support_flex_port=cls._support_flex_port)
+        support_flex_port=cls._support_flex_port,
+        support_global_access=cls._support_global_access)
     flags.AddAddressesAndIPVersions(parser, required=False)
     cls.FORWARDING_RULE_ARG.AddArgument(parser, operation_type='create')
     parser.display_info.AddCacheUpdater(flags.ForwardingRulesCompleter)
@@ -114,7 +125,10 @@ class Create(base.CreateCommand):
     if not port_range:
       raise exceptions.ToolException(
           '[--ports] is required for global forwarding rules.')
-    target_ref = utils.GetGlobalTarget(resources, args)
+    target_ref = utils.GetGlobalTarget(
+        resources,
+        args,
+        include_alpha=(self.ReleaseTrack() == base.ReleaseTrack.ALPHA))
     protocol = self.ConstructProtocol(client.messages, args)
 
     if args.address is None or args.ip_version:
@@ -137,6 +151,13 @@ class Create(base.CreateCommand):
         ipVersion=ip_version,
         networkTier=_ConstructNetworkTier(client.messages, args),
         loadBalancingScheme=_GetLoadBalancingScheme(args, client.messages))
+
+    if self._support_network_in_global_request and args.network is not None:
+      forwarding_rule.network = flags.NETWORK_ARG_ALPHA.ResolveAsResource(
+          args, resources).SelfLink()
+
+    if self._support_global_access and args.IsSpecified('allow_global_access'):
+      forwarding_rule.allowGlobalAccess = args.allow_global_access
 
     request = client.messages.ComputeGlobalForwardingRulesInsertRequest(
         forwardingRule=forwarding_rule,
@@ -196,7 +217,8 @@ class Create(base.CreateCommand):
       if args.network is not None:
         forwarding_rule.network = flags.NETWORK_ARG.ResolveAsResource(
             args, resources).SelfLink()
-    elif (target_ref.Collection() == 'compute.regionTargetHttpProxies' and
+    elif ((target_ref.Collection() == 'compute.regionTargetHttpProxies' or
+           target_ref.Collection() == 'compute.regionTargetHttpsProxies') and
           args.load_balancing_scheme == 'INTERNAL'):
       forwarding_rule.ports = [str(p) for p in _GetPortList(range_list)]
       if args.subnet is not None:
@@ -213,12 +235,28 @@ class Create(base.CreateCommand):
           '--load-balancing-scheme',
           'Only target instances and backend services should be specified as '
           'a target for internal load balancing.')
+    elif args.load_balancing_scheme == 'INTERNAL_MANAGED':
+      forwarding_rule.portRange = (
+          _ResolvePortRange(args.port_range, range_list))
+      if args.subnet is not None:
+        if not args.subnet_region:
+          args.subnet_region = forwarding_rule_ref.region
+        forwarding_rule.subnetwork = flags.SUBNET_ARG.ResolveAsResource(
+            args, resources).SelfLink()
+      if args.network is not None:
+        forwarding_rule.network = flags.NETWORK_ARG.ResolveAsResource(
+            args, resources).SelfLink()
+      forwarding_rule.target = target_ref.SelfLink()
     else:
       forwarding_rule.portRange = (
           _ResolvePortRange(args.port_range, range_list))
       forwarding_rule.target = target_ref.SelfLink()
     if hasattr(args, 'service_label'):
       forwarding_rule.serviceLabel = args.service_label
+
+    if self._support_global_access and args.IsSpecified('allow_global_access'):
+      forwarding_rule.allowGlobalAccess = args.allow_global_access
+
     request = client.messages.ComputeForwardingRulesInsertRequest(
         forwardingRule=forwarding_rule,
         project=forwarding_rule_ref.project,
@@ -252,7 +290,9 @@ class Create(base.CreateCommand):
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(Create):
   """Create a forwarding rule to direct network traffic to a load balancer."""
-  _support_flex_port = False
+  _support_flex_port = True
+  _support_global_access = False
+  _support_network_in_global_request = False
 
   @classmethod
   def Args(cls, parser):
@@ -261,7 +301,8 @@ class CreateBeta(Create):
         parser,
         include_beta=True,
         include_alpha=False,
-        support_flex_port=cls._support_flex_port)
+        support_flex_port=cls._support_flex_port,
+        support_global_access=cls._support_global_access)
     flags.AddAddressesAndIPVersions(parser, required=False)
     cls.FORWARDING_RULE_ARG.AddArgument(parser, operation_type='create')
     parser.display_info.AddCacheUpdater(flags.ForwardingRulesCompleter)
@@ -274,6 +315,8 @@ class CreateBeta(Create):
 class CreateAlpha(CreateBeta):
   """Create a forwarding rule to direct network traffic to a load balancer."""
   _support_flex_port = True
+  _support_global_access = True
+  _support_network_in_global_request = True
 
   @classmethod
   def Args(cls, parser):
@@ -282,57 +325,11 @@ class CreateAlpha(CreateBeta):
         parser,
         include_beta=True,
         include_alpha=True,
-        support_flex_port=cls._support_flex_port)
+        support_flex_port=cls._support_flex_port,
+        support_global_access=cls._support_global_access)
     flags.AddAddressesAndIPVersions(parser, required=False, include_alpha=True)
     cls.FORWARDING_RULE_ARG.AddArgument(parser, operation_type='create')
     parser.display_info.AddCacheUpdater(flags.ForwardingRulesCompleter)
-
-  def _CreateGlobalRequests(self, client, resources, args, forwarding_rule_ref):
-    """Create a globally scoped request."""
-    ports_all_specified, range_list = _ExtractPortsAndAll(args.ports)
-    port_range = _ResolvePortRange(args.port_range, range_list)
-
-    if ports_all_specified:
-      raise exceptions.ToolException(
-          '[--ports] can not be specified to all for global forwarding rules.')
-
-    if not port_range:
-      raise exceptions.ToolException(
-          '[--ports] is required for global forwarding rules.')
-    target_ref = utils.GetGlobalTarget(resources, args, include_alpha=True)
-    protocol = self.ConstructProtocol(client.messages, args)
-
-    if args.address is None or args.ip_version:
-      ip_version = client.messages.ForwardingRule.IpVersionValueValuesEnum(
-          args.ip_version or 'IPV4')
-    else:
-      ip_version = None
-
-    network = None
-    if args.network is not None:
-      network = flags.NETWORK_ARG_ALPHA.ResolveAsResource(
-          args, resources).SelfLink()
-
-    address = self._ResolveAddress(resources, args,
-                                   compute_flags.compute_scope.ScopeEnum.GLOBAL,
-                                   forwarding_rule_ref)
-
-    forwarding_rule = client.messages.ForwardingRule(
-        description=args.description,
-        name=forwarding_rule_ref.Name(),
-        IPAddress=address,
-        IPProtocol=protocol,
-        portRange=port_range,
-        target=target_ref.SelfLink(),
-        ipVersion=ip_version,
-        networkTier=_ConstructNetworkTier(client.messages, args),
-        network=network,
-        loadBalancingScheme=_GetLoadBalancingScheme(args, client.messages))
-
-    request = client.messages.ComputeGlobalForwardingRulesInsertRequest(
-        forwardingRule=forwarding_rule, project=forwarding_rule_ref.project)
-
-    return [(client.apitools_client.globalForwardingRules, 'Insert', request)]
 
 
 Create.detailed_help = {
@@ -403,6 +400,7 @@ def _GetPortList(range_list):
 
 
 def _GetLoadBalancingScheme(args, messages):
+  """Get load balancing scheme."""
   if args.load_balancing_scheme == 'INTERNAL':
     return messages.ForwardingRule.LoadBalancingSchemeValueValuesEnum.INTERNAL
   elif args.load_balancing_scheme == 'EXTERNAL':
@@ -410,6 +408,9 @@ def _GetLoadBalancingScheme(args, messages):
   elif args.load_balancing_scheme == 'INTERNAL_SELF_MANAGED':
     return (messages.ForwardingRule.LoadBalancingSchemeValueValuesEnum.
             INTERNAL_SELF_MANAGED)
+  elif args.load_balancing_scheme == 'INTERNAL_MANAGED':
+    return (messages.ForwardingRule.LoadBalancingSchemeValueValuesEnum
+            .INTERNAL_MANAGED)
   return None
 
 

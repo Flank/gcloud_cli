@@ -23,7 +23,7 @@ import textwrap
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import yaml
 from tests.lib import cli_test_base
@@ -34,8 +34,8 @@ from tests.lib.surface.compute import test_resources
 
 
 @parameterized.parameters(
-    (base.ReleaseTrack.ALPHA, 'alpha'),
-    (base.ReleaseTrack.BETA, 'beta'))
+    (calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+    (calliope_base.ReleaseTrack.BETA, 'beta'))
 class SetIamPolicyTest(sdk_test_base.WithFakeAuth,
                        cli_test_base.CliTestBase,
                        parameterized.TestCase):
@@ -56,10 +56,10 @@ class SetIamPolicyTest(sdk_test_base.WithFakeAuth,
         self.messages)
     self.mock_client.images.SetIamPolicy.Expect(
         self.messages.ComputeImagesSetIamPolicyRequest(
-            resource='my-resource', project='fake-project',
+            resource='my-resource',
+            project='fake-project',
             globalSetPolicyRequest=self.messages.GlobalSetPolicyRequest(
-                bindings=policy.bindings,
-                etag=policy.etag)),
+                policy=policy)),
         response=policy)
     policy_file = self.Touch(
         self.temp_path, 'iam.json',

@@ -11,7 +11,7 @@ gcloud beta container node\-pools create \- create a node pool in a running clus
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -63,7 +63,7 @@ The cluster to add the node pool to. Overrides the default
 
 .TP 2m
 \fB\-\-disk\-size\fR=\fIDISK_SIZE\fR
-Size in GB for node VM boot disks. Defaults to 100GB.
+Size for node VM boot disks. Defaults to 100GB.
 
 .TP 2m
 \fB\-\-disk\-type\fR=\fIDISK_TYPE\fR
@@ -79,7 +79,8 @@ $ gcloud beta container node\-pools create node\-pool\-1 \e
     \-\-cluster=example\-cluster \-\-enable\-autorepair
 .RE
 
-Node autorepair is enabled by default for node pools using COS as a base image.
+Node autorepair is enabled by default for node pools using COS as a base image,
+use \-\-no\-enable\-autorepair to disable.
 
 See https://cloud.google.com/kubernetes\-engine/docs/how\-to/node\-auto\-repair
 for more info.
@@ -131,10 +132,10 @@ $ gcloud compute machine\-types list
 .RE
 
 You can also specify custom machine types with the string "custom\-CPUS\-RAM"
-where ``CPUS`` is the number of virtual CPUs and ``RAM`` is the amount of RAM in
-MiB.
+where \f5CPUS\fR is the number of virtual CPUs and \f5RAM\fR is the amount of
+RAM in MiB.
 
-For example, to create a node pool using custom machines with 2 vCPUs and 12 GiB
+For example, to create a node pool using custom machines with 2 vCPUs and 12 GB
 of RAM:
 
 .RS 2m
@@ -143,12 +144,77 @@ $ gcloud beta container node\-pools create high\-mem\-pool \e
 .RE
 
 .TP 2m
+\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR
+The max number of pods per node for this node pool.
+
+This flag sets the maximum number of pods that can be run at the same time on a
+node. This will override the value given with \-\-default\-max\-pods\-per\-node
+flag set at the cluster level.
+
+Must be used in conjunction with '\-\-enable\-ip\-alias'.
+
+.TP 2m
+\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
+Compute Engine metadata to be made available to the guest operating system
+running on nodes within the node pool.
+
+Each metadata entry is a key/value pair separated by an equals sign. Metadata
+keys must be unique and less than 128 bytes in length. Values must be less than
+or equal to 32,768 bytes in length. The total size of all keys and values must
+be less than 512 KB. Multiple arguments can be passed to this flag. For example:
+
+\f5\fI\-\-metadata key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR
+
+Additionally, the following keys are reserved for use by Kubernetes Engine:
+
+.RS 2m
+.IP "\(em" 2m
+\f5\fIcluster\-location\fR\fR
+.IP "\(em" 2m
+\f5\fIcluster\-name\fR\fR
+.IP "\(em" 2m
+\f5\fIcluster\-uid\fR\fR
+.IP "\(em" 2m
+\f5\fIconfigure\-sh\fR\fR
+.IP "\(em" 2m
+\f5\fIenable\-os\-login\fR\fR
+.IP "\(em" 2m
+\f5\fIgci\-update\-strategy\fR\fR
+.IP "\(em" 2m
+\f5\fIgci\-ensure\-gke\-docker\fR\fR
+.IP "\(em" 2m
+\f5\fIinstance\-template\fR\fR
+.IP "\(em" 2m
+\f5\fIkube\-env\fR\fR
+.IP "\(em" 2m
+\f5\fIstartup\-script\fR\fR
+.IP "\(em" 2m
+\f5\fIuser\-data\fR\fR
+
+.RE
+.RE
+.sp
+See also Compute Engine's documentation
+(https://cloud.google.com/compute/docs/storing\-retrieving\-metadata) on storing
+and retrieving instance metadata.
+
+.RS 2m
+.TP 2m
+\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]
+Same as \f5\fI\-\-metadata\fR\fR except that the value for the entry will be
+read from a local file.
+
+.TP 2m
 \fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR
 When specified, the nodes for the new node pool will be scheduled on host with
 specified CPU architecture or a newer one.
 
-Examples: $ gcloud beta container node\-pools create node\-pool\-1 \e
-\-\-cluster=example\-cluster \-\-min\-cpu\-platform=PLATFORM
+Examples:
+
+.RS 2m
+$ gcloud beta container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster \-\-min\-cpu\-platform=PLATFORM
+.RE
 
 To list available CPU platforms in given zone, run:
 
@@ -257,9 +323,10 @@ security improvements.
 .TP 2m
 \fBUNSPECIFIED\fR
 Chooses the default.
-
 .RE
 .sp
+
+
 .TP 2m
 
 Cluster autoscaling
@@ -343,12 +410,17 @@ Enabled by default, use \fB\-\-no\-enable\-cloud\-endpoints\fR to disable.
 \fB\-\-scopes\fR=[\fISCOPE\fR,...]; default="gke\-default"
 Specifies scopes for the node instances. Examples:
 
+.RS 2m
 $ gcloud beta container node\-pools create node\-pool\-1 \e
-\-\-cluster=example\-cluster \e
-\-\-scopes=https://www.googleapis.com/auth/devstorage.read_only
+    \-\-cluster=example\-cluster \e
+    \-\-scopes=https://www.googleapis.com/auth/devstorage.read_only
+.RE
 
+.RS 2m
 $ gcloud beta container node\-pools create node\-pool\-1 \e
-\-\-cluster=example\-cluster \e \-\-scopes=bigquery,storage\-rw,compute\-ro
+    \-\-cluster=example\-cluster \e
+    \-\-scopes=bigquery,storage\-rw,compute\-ro
+.RE
 
 Multiple SCOPEs can be specified, separated by commas. \f5logging\-write\fR
 and/or \f5monitoring\fR are added unless Cloud Logging and/or Cloud Monitoring
@@ -365,56 +437,55 @@ added (though storage\-ro, service\-control, and service\-management are all
 included in the default scopes. In a future release, this will be the default
 behavior.
 
-SCOPE can be either the full URI of the scope or an alias. Available aliases
-are:
+SCOPE can be either the full URI of the scope or an alias. \fBdefault\fR scopes
+are assigned to all instances. Available aliases are:
 
 
 .TS
-tab(,);
+tab(	);
 lB lB
 l l.
-Alias,URI
-bigquery,https://www.googleapis.com/auth/bigquery
-cloud\-platform,https://www.googleapis.com/auth/cloud\-platform
-cloud\-source\-repos,https://www.googleapis.com/auth/source.full_control
-cloud\-source\-repos\-ro,https://www.googleapis.com/auth/source.read_only
-compute\-ro,https://www.googleapis.com/auth/compute.readonly
-compute\-rw,https://www.googleapis.com/auth/compute
-datastore,https://www.googleapis.com/auth/datastore
-default,https://www.googleapis.com/auth/devstorage.read_only
-,https://www.googleapis.com/auth/logging.write
-,https://www.googleapis.com/auth/monitoring.write
-,https://www.googleapis.com/auth/pubsub
-,https://www.googleapis.com/auth/service.management.readonly
-,https://www.googleapis.com/auth/servicecontrol
-,https://www.googleapis.com/auth/trace.append
-gke\-default,https://www.googleapis.com/auth/devstorage.read_only
-,https://www.googleapis.com/auth/logging.write
-,https://www.googleapis.com/auth/monitoring
-,https://www.googleapis.com/auth/service.management.readonly
-,https://www.googleapis.com/auth/servicecontrol
-,https://www.googleapis.com/auth/trace.append
-logging\-write,https://www.googleapis.com/auth/logging.write
-monitoring,https://www.googleapis.com/auth/monitoring
-monitoring\-write,https://www.googleapis.com/auth/monitoring.write
-pubsub,https://www.googleapis.com/auth/pubsub
-service\-control,https://www.googleapis.com/auth/servicecontrol
-service\-management,https://www.googleapis.com/auth/service.management.readonly
-sql,https://www.googleapis.com/auth/sqlservice
-sql\-admin,https://www.googleapis.com/auth/sqlservice.admin
-storage\-full,https://www.googleapis.com/auth/devstorage.full_control
-storage\-ro,https://www.googleapis.com/auth/devstorage.read_only
-storage\-rw,https://www.googleapis.com/auth/devstorage.read_write
-taskqueue,https://www.googleapis.com/auth/taskqueue
-trace,https://www.googleapis.com/auth/trace.append
-userinfo\-email,https://www.googleapis.com/auth/userinfo.email
+Alias	URI
+bigquery	https://www.googleapis.com/auth/bigquery
+cloud-platform	https://www.googleapis.com/auth/cloud-platform
+cloud-source-repos	https://www.googleapis.com/auth/source.full_control
+cloud-source-repos-ro	https://www.googleapis.com/auth/source.read_only
+compute-ro	https://www.googleapis.com/auth/compute.readonly
+compute-rw	https://www.googleapis.com/auth/compute
+datastore	https://www.googleapis.com/auth/datastore
+default	https://www.googleapis.com/auth/devstorage.read_only
+	https://www.googleapis.com/auth/logging.write
+	https://www.googleapis.com/auth/monitoring.write
+	https://www.googleapis.com/auth/pubsub
+	https://www.googleapis.com/auth/service.management.readonly
+	https://www.googleapis.com/auth/servicecontrol
+	https://www.googleapis.com/auth/trace.append
+gke-default	https://www.googleapis.com/auth/devstorage.read_only
+	https://www.googleapis.com/auth/logging.write
+	https://www.googleapis.com/auth/monitoring
+	https://www.googleapis.com/auth/service.management.readonly
+	https://www.googleapis.com/auth/servicecontrol
+	https://www.googleapis.com/auth/trace.append
+logging-write	https://www.googleapis.com/auth/logging.write
+monitoring	https://www.googleapis.com/auth/monitoring
+monitoring-write	https://www.googleapis.com/auth/monitoring.write
+pubsub	https://www.googleapis.com/auth/pubsub
+service-control	https://www.googleapis.com/auth/servicecontrol
+service-management	https://www.googleapis.com/auth/service.management.readonly
+sql (deprecated)	https://www.googleapis.com/auth/sqlservice
+sql-admin	https://www.googleapis.com/auth/sqlservice.admin
+storage-full	https://www.googleapis.com/auth/devstorage.full_control
+storage-ro	https://www.googleapis.com/auth/devstorage.read_only
+storage-rw	https://www.googleapis.com/auth/devstorage.read_write
+taskqueue	https://www.googleapis.com/auth/taskqueue
+trace	https://www.googleapis.com/auth/trace.append
+userinfo-email	https://www.googleapis.com/auth/userinfo.email
 .TE
 
-
-DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice' account scope
+DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice account scope
 and \f5sql\fR alias do not provide SQL instance management capabilities and have
-been deprecated. Please, use 'https://www.googleapis.com/auth/sqlservice.admin'
-or \f5sql\-admin\fR to manage your Google SQL Service instances.
+been deprecated. Please, use https://www.googleapis.com/auth/sqlservice.admin or
+\f5sql\-admin\fR to manage your Google SQL Service instances.
 
 
 
@@ -426,9 +497,9 @@ or \f5sql\-admin\fR to manage your Google SQL Service instances.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

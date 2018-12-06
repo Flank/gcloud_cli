@@ -11,11 +11,15 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add an IAM policy binding to a node group.
 
      create
         (ALPHA) Creates a Google Compute Engine node group.
@@ -26,12 +30,21 @@ COMMANDS
      describe
         (ALPHA) Describes a Google Compute Engine node group.
 
+     get-iam-policy
+        (ALPHA) Get the IAM Policy for a Google Compute Engine node group.
+
      list
         (ALPHA) List Google Compute Engine node groups.
 
      list-nodes
         (ALPHA) List Google Compute Engine sole-tenant nodes present in a node
         group.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove an IAM policy binding from a node group.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for a Google Compute Engine node group.
 
      update
         (ALPHA) Updates a Google Compute Engine node group.

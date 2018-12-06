@@ -19,15 +19,19 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.bigtable import arguments
+from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
+from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.bigtable import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
+class ListCommandTestGA(base.BigtableV2TestBase, cli_test_base.CliTestBase,
+                        resource_completer_test_base.ResourceCompleterBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.cmd = 'bigtable instances list'
@@ -35,33 +39,64 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
     self.msg = self.msgs.BigtableadminProjectsInstancesListRequest(
         parent='projects/' + self.Project())
 
-  def testList(self, track):
-    self.track = track
+  def testList(self):
     self.svc.Expect(
         request=self.msg,
-        response=self.msgs.ListInstancesResponse(instances=[self.msgs.Instance(
-            name='projects/theprojects/instances/theinstance',
-            displayName='thedisplayname',
-            state=self.msgs.Instance.StateValueValuesEnum.READY)]))
+        response=self.msgs.ListInstancesResponse(instances=[
+            self.msgs.Instance(
+                name='projects/' + self.Project() + '/instances/theinstance',
+                displayName='thedisplayname',
+                state=self.msgs.Instance.StateValueValuesEnum.READY)
+        ]))
     self.Run(self.cmd)
     self.AssertOutputEquals('NAME         DISPLAY_NAME    STATE\n'
                             'theinstance  thedisplayname  READY\n')
 
-  def testErrorResponse(self, track):
-    self.track = track
+  def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc, self.msg):
       self.Run(self.cmd)
 
-  def testCompletion(self, track):
-    self.track = track
+  def testCompletion(self):
     self.svc.Expect(
         request=self.msg,
-        response=self.msgs.ListInstancesResponse(instances=[self.msgs.Instance(
-            name='projects/theprojects/instances/theinstance',
-            displayName='thedisplayname',
-            state=self.msgs.Instance.StateValueValuesEnum.READY)]))
-    self.RunCompletion('beta bigtable instances update t',
-                       ['theinstance\\ --project=theprojects'])
+        response=self.msgs.ListInstancesResponse(instances=[
+            self.msgs.Instance(
+                name='projects/' + self.Project() + '/instances/theinstance',
+                displayName='thedisplayname',
+                state=self.msgs.Instance.StateValueValuesEnum.READY)
+        ]))
+    self.RunCompletion('bigtable instances update t', ['theinstance'])
+
+  def testCompletionNoProject(self):
+    properties.VALUES.core.project.Set(None)
+    properties.PersistProperty(properties.VALUES.core.project, None,
+                               properties.Scope.USER)
+    self.svc.Expect(
+        request=self.msg,
+        response=self.msgs.ListInstancesResponse(instances=[
+            self.msgs.Instance(
+                name='projects/' + self.Project() + '/instances/theinstance',
+                displayName='thedisplayname',
+                state=self.msgs.Instance.StateValueValuesEnum.READY)
+        ]))
+    self.RunResourceCompleter(
+        arguments.GetInstanceResourceSpec(),
+        'instance',
+        args={'--instance': 'theinstance'},
+        projects=[self.Project()],
+        expected_completions=['theinstance --project=' + self.Project()])
+
+
+class ListCommandTestBeta(ListCommandTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ListCommandTestAlpha(ListCommandTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

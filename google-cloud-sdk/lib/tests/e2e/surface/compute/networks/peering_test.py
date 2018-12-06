@@ -139,6 +139,21 @@ class NetworkPeeringTestAlpha(NetworkPeeringTestBase):
     self.Run('compute networks describe {0}'.format(self.network_names[1]))
     self.AssertNewOutputContainsAll('state: ACTIVE', 'exportCustomRoutes: true',
                                     'importCustomRoutes: false')
+    # Update the peering in network 0.
+    self.Run('compute networks peerings update {0} --network {1} '
+             '--export-custom-routes --no-import-custom-routes'.format(
+                 self.peering_names[0], self.network_names[0]))
+    self.Run('compute networks peerings update {0} --network {1} '
+             '--no-export-custom-routes --import-custom-routes'.format(
+                 self.peering_names[1], self.network_names[1]))
+    # Verify route policies.
+    self.Run('compute networks describe {0}'.format(self.network_names[0]))
+    self.AssertNewOutputContainsAll('state: ACTIVE', 'exportCustomRoutes: true',
+                                    'importCustomRoutes: false')
+    self.Run('compute networks describe {0}'.format(self.network_names[1]))
+    self.AssertNewOutputContainsAll('state: ACTIVE',
+                                    'exportCustomRoutes: false',
+                                    'importCustomRoutes: true')
 
 
 if __name__ == '__main__':

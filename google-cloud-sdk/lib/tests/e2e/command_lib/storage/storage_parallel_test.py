@@ -38,6 +38,7 @@ from __future__ import unicode_literals
 import itertools
 
 from googlecloudsdk.api_lib.storage import storage_api
+from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.command_lib.storage import storage_parallel
 from googlecloudsdk.core.util import retry
 from tests.lib import e2e_base
@@ -70,9 +71,9 @@ class FewSmallFilesTest(e2e_base.WithServiceAuth):
     tasks = []
     name_generator = e2e_utils.GetResourceNameGenerator(prefix='storage-file')
     for remote_file in itertools.islice(name_generator, self.NUM_FILES):
-      task = storage_parallel.FileUploadTask(self.file_path,
-                                             bucket_ref.ToBucketUrl(),
-                                             remote_file)
+      task = storage_parallel.FileUploadTask(
+          self.file_path, storage_util.ObjectReference.FromBucketRef(
+              bucket_ref, remote_file))
       tasks.append(task)
     return tasks
 
@@ -88,7 +89,7 @@ class FewSmallFilesTest(e2e_base.WithServiceAuth):
                                              self.Project()) as bucket_ref:
       file_upload_tasks = self._MakeFileUploadTasks(bucket_ref)
       storage_parallel.UploadFiles(file_upload_tasks, num_threads)
-      object_names = [f.remote_path for f in file_upload_tasks]
+      object_names = [f.dest_obj_ref.object for f in file_upload_tasks]
       self._AssertFilesUploaded(bucket_ref, object_names)
 
   def test16Threads(self):

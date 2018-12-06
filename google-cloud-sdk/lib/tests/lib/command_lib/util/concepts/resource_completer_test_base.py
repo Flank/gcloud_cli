@@ -52,9 +52,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.protorpclite import messages
 from apitools.base.py.testing import mock as apitools_mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.concepts import completers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
@@ -63,6 +65,33 @@ from tests.lib import completer_test_base
 import mock
 
 _COMPLETER_MODULE_PATH = 'command_lib.util.concepts.completers.Completer'
+
+
+class ShelvesMessage(messages.Message):
+  """Fake shelves list response."""
+
+  class Shelf(messages.Message):
+    name = messages.StringField(1)
+
+  shelves = messages.MessageField('Shelf', 1, repeated=True)
+
+
+class BooksMessage(messages.Message):
+  """Fake books list response."""
+
+  class Book(messages.Message):
+    name = messages.StringField(1)
+
+  books = messages.MessageField('Book', 1, repeated=True)
+
+
+class ProjectsMessage(messages.Message):
+  """Fake projects list response."""
+
+  class Project(messages.Message):
+    projectId = messages.StringField(1)  # pylint: disable=invalid-name
+
+  projects = messages.MessageField('Project', 1, repeated=True)
 
 
 class ResourceCompleterBase(completer_test_base.CompleterBase):
@@ -79,6 +108,44 @@ class ResourceCompleterBase(completer_test_base.CompleterBase):
     self.projects_messages = core_apis.GetMessagesModule(
         'cloudresourcemanager', 'v1')
     self.StartPatch('time.sleep')
+
+  def _PatchProjectReturnType(self):
+    """Patch project resource method to have certain return type messages."""
+    projects_method = registry.GetMethod('cloudresourcemanager.projects',
+                                         'list')
+    self.StartObjectPatch(projects_method, 'GetResponseType',
+                          return_value=ProjectsMessage)
+
+  def _PatchBookReturnType(self):
+    """Patch book resource method to have certain return type messages."""
+    books_method = registry.GetMethod('example.projects.shelves.books', 'list')
+    self.StartObjectPatch(books_method, 'GetResponseType',
+                          return_value=BooksMessage)
+
+  def PatchBookResourceReturnTypes(self):
+    """Patch each resource method to have certain return type messages."""
+    self._PatchProjectReturnType()
+    shelves_method = registry.GetMethod('example.projects.shelves', 'list')
+    self.StartObjectPatch(shelves_method, 'GetResponseType',
+                          return_value=ShelvesMessage)
+    self._PatchBookReturnType()
+
+  def BuildBooksList(self, books):
+    """Helper function to build return message for fake books List method."""
+    return BooksMessage(
+        books=[BooksMessage.Book(name=book) for book in books])
+
+  def BuildShelvesList(self, shelves):
+    """Helper function to build return message for fake shelves List method."""
+    return ShelvesMessage(
+        shelves=[ShelvesMessage.Shelf(name=shelf) for shelf in shelves])
+
+  def BuildProjectsList(self, projects):
+    """Helper function to build return message for fake projects List method."""
+    return ProjectsMessage(
+        projects=[ProjectsMessage.Project(projectId=project)
+                  for project in projects]
+    )
 
   def AssertCommandArgResourceCompleter(self, command, arg):
     """Asserts that arg in command has a resource argument completer."""

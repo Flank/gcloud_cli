@@ -34,30 +34,29 @@ REQUIRED FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
-    The following command will add an IAM policy binding for the role of
-    'roles/compute.securityAdmin' for the user 'test-user@gmail.com' on an
-    image with identifier 'my-image'
+    To add an IAM policy binding for the role of 'roles/compute.securityAdmin'
+    for the user 'test-user@gmail.com' on an image with identifier 'my-image',
+    run:
 
         $ gcloud beta compute images add-iam-policy-binding my-image \
             --member='user:test-user@gmail.com' \
             --role='roles/compute.securityAdmin'
 
-    For a service account test-proj1@example.domain.com, the following command
-    will add an IAM policy binding for the role of
-    'roles/compute.securityAdmin' to the given service account:
+    To add an IAM policy binding for the role of 'roles/compute.securityAdmin'
+    to the service account 'test-proj1@example.domain.com', run:
 
         $ gcloud beta compute images add-iam-policy-binding \
             test-proj1@example.domain.com \
             --member='serviceAccount:test-proj1@example.domain.com' \
             --role='roles/compute.securityAdmin'
 
-    The following command will add an IAM policy binding for the role of
-    'roles/compute.securityAdmin' for all authenticated users on an image with
-    identifier 'my-image':
+    To add an IAM policy binding for the role of 'roles/compute.securityAdmin'
+    for all authenticated users on an image with identifier 'my-image', run:
 
         $ gcloud beta compute images add-iam-policy-binding my-image \
             --member='allAuthenticatedUsers' \

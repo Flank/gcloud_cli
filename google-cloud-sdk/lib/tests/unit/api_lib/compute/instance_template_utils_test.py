@@ -22,7 +22,7 @@ from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import constants
 from googlecloudsdk.api_lib.compute import instance_template_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import flags
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -36,7 +36,8 @@ class InstanceTemplateUtilsTest(cli_test_base.CliTestBase,
 
   def SetUp(self):
     self.messages = core_apis.GetMessagesModule('compute', 'v1')
-    self.compute_api = base_classes.ComputeApiHolder(base.ReleaseTrack.GA)
+    self.compute_api = base_classes.ComputeApiHolder(
+        calliope_base.ReleaseTrack.GA)
     self.scope_lister = flags.GetDefaultScopeLister(self.compute_api.client)
     self.resources = self.compute_api.resources
     self.region = 'us-central1'
@@ -416,7 +417,8 @@ class InstanceTemplateUtilsNetworkTierTest(cli_test_base.CliTestBase,
 
   def SetUp(self):
     self.messages = core_apis.GetMessagesModule('compute', 'alpha')
-    self.compute_api = base_classes.ComputeApiHolder(base.ReleaseTrack.ALPHA)
+    self.compute_api = base_classes.ComputeApiHolder(
+        calliope_base.ReleaseTrack.ALPHA)
     self.scope_lister = flags.GetDefaultScopeLister(self.compute_api.client)
     self.resources = self.compute_api.resources
     self.region = 'us-central1'

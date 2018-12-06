@@ -1178,6 +1178,35 @@ class ResourceProjectorAttrTest(test_case.Base):
    c : (2, UNORDERED, 'C', center, 3, False, [fun().iso()])
 """, actual)
 
+  def testPrintDefaultsSymbolsMapStar(self):
+
+    default_symbols = {
+        'fun': lambda x: 'Hello',
+        'map': lambda x: x,
+        }
+    defaults = resource_projection_spec.ProjectionSpec(symbols=default_symbols)
+    self.assertEqual(defaults.active, 0)
+
+    symbols = {
+        'iso': lambda x: 'T',
+        }
+    defaults = resource_projection_spec.ProjectionSpec(defaults=defaults,
+                                                       symbols=symbols)
+    projector = resource_projector.Compile(
+        '(a.*iso():label=Time, b.x:sort=1, c.fun().iso():align=center)',
+        defaults=defaults)
+    self.assertEqual(projector.Projection().active, 3)
+
+    buf = io.StringIO()
+    projector.Projection().Print(buf)
+    actual = buf.getvalue()
+    self.assertEqual("""\
+   a : (2, UNORDERED, 'Time', left, 3, False, [map(1).iso()])
+   b : (1, UNORDERED, None, left, None, None, None)
+     x : (2, 1, 'X', left, None, False, None)
+   c : (2, UNORDERED, 'C', center, 3, False, [fun().iso()])
+""", actual)
+
   def testPrintDefaultsNoSymbols(self):
 
     symbols = {
@@ -1262,6 +1291,7 @@ class ResourceProjectorAttrTest(test_case.Base):
     attr.reverse = False
     if sort is not None:
       attr.order = sort
+    attr.width = False
     attr.wrap = False
     return attr
 

@@ -16,8 +16,8 @@
 
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.sql import import_util
 from googlecloudsdk.api_lib.sql import operations
 from googlecloudsdk.api_lib.sql import validate
@@ -37,7 +37,7 @@ def AddBaseImportFlags(parser, filetype):
       ' the import is made. The URI is in the form gs://bucketName/fileName.'
       ' Compressed gzip files (.gz) are also supported.'
       .format(filetype=filetype))
-  flags.AddUser(parser, 'The PostgreSQL user for this import operation')
+  flags.AddUser(parser, 'PostgreSQL user for this import operation.')
 
 
 def RunImportCommand(args, client, import_context):
@@ -69,8 +69,8 @@ def RunImportCommand(args, client, import_context):
       collection='sql.instances')
 
   console_io.PromptContinue(
-      message='Data from [{0}] will be imported to [{1}].'.format(
-          args.uri, args.instance),
+      message='Data from [{uri}] will be imported to [{instance}].'.format(
+          uri=args.uri, instance=args.instance),
       default=True,
       cancel_on_no=True)
 

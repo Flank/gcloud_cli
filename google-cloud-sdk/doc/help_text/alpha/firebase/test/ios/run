@@ -5,9 +5,9 @@ NAME
 SYNOPSIS
     gcloud alpha firebase test ios run [ARGSPEC]
         [--device=DIMENSION=VALUE,[...]] [--test=XCTEST_ZIP]
-        [--timeout=TIMEOUT] [--xctestrun-file=XCTESTRUN_FILE] [--async]
-        [--record-video] [--results-bucket=RESULTS_BUCKET]
-        [--results-dir=RESULTS_DIR]
+        [--timeout=TIMEOUT] [--xcode-version=XCODE_VERSION]
+        [--xctestrun-file=XCTESTRUN_FILE] [--async] [--record-video]
+        [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME] [--filter=EXPRESSION]
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
         [GCLOUD_WIDE_FLAG ...]
@@ -70,6 +70,13 @@ COMMONLY USED FLAGS
         * --timeout 5m is 5 minutes
         * --timeout 200s is 200 seconds
         * --timeout 100 is 100 seconds
+
+     --xcode-version=XCODE_VERSION
+        The version of Xcode that should be used to run an XCTest. Defaults to
+        the latest Xcode version supported in Firebase Test Lab. This Xcode
+        version must be supported by all iOS versions selected in the test
+        matrix. The list of Xcode versions supported by each version of iOS can
+        be viewed by running $ gcloud alpha firebase test ios versions list.
 
      --xctestrun-file=XCTESTRUN_FILE
         The path to an .xctestrun file that will override any .xctestrun file
@@ -134,16 +141,17 @@ LIST COMMAND FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
-    To invoke an xctest test lasting up to five minutes against the default
-    device environment, run:
+    To invoke an XCTest lasting up to five minutes against the default device
+    environment, run:
 
         $ gcloud alpha firebase test ios run --test XCTEST_ZIP --timeout 5m
 
-    To invoke an xctest test against an iPad 5 running iOS 11.2, run:
+    To invoke an XCTest against an iPad 5 running iOS 11.2, run:
 
         $ gcloud alpha firebase test ios run --test XCTEST_ZIP \
             --device model=ipad5,version=11.2
@@ -155,6 +163,11 @@ EXAMPLES
               --device model=iphone7               \
             --device model=ipadmini4,version=11.2               \
             --device model=iphonese
+
+    To run your XCTest using a specific version of Xcode, say 9.4.1, run:
+
+        $ gcloud alpha firebase test ios run --test XCTEST_ZIP \
+            --xcode-version=9.4.1
 
     All test arguments for a given test may alternatively be stored in an
     argument group within a YAML-formatted argument file. The ARG_FILE may
@@ -175,5 +188,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud firebase test ios run
+        $ gcloud beta firebase test ios run
 

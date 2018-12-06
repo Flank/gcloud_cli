@@ -1,0 +1,1069 @@
+title: Creates a zonal MIG and replaces 20% of instances with a different type.
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instance-templates create $$template1$$ --machine-type n1-standard-1
+      --format 'text(name,properties.machineType)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+  - stdout: |
+      ---
+      name:                   $$template1$$
+      properties.machineType: n1-standard-1
+- execute:
+  - command: compute instance-templates create $$template2$$ --machine-type f1-micro
+      --format 'text(name,properties.machineType)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$].
+  - stdout: |
+      ---
+      name:                   $$template2$$
+      properties.machineType: f1-micro
+- execute:
+  - command: compute instance-groups managed create $$manager$$ --zone us-central1-f
+      --base-instance-name $$manager$$ --size 3 --template $$template1$$ --format
+      'text(name,region,targetSize)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$].
+  - stdout: |
+      ---
+      name:       $$manager$$
+      targetSize: 3
+- execute:
+  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+      600 --zone us-central1-f --no-user-output-enabled
+- execute:
+  - command: compute instances list --filter 'machineType:n1-standard-1 AND name:$$manager$$'
+      --format 'value(machineType)'
+  - stdout: |
+      n1-standard-1
+      n1-standard-1
+      n1-standard-1
+- execute:
+  - command: compute instance-groups managed rolling-action start-update $$manager$$
+      --type proactive --max-surge 100% --max-unavailable 100% --min-ready 1m --canary-version
+      template=$$template1$$,target-size=20% --version template=$$template2$$ --zone
+      us-central1-f --format=disable
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$].
+  - stderr: |+
+      WARNING: Some requests generated warnings:
+       - Instance template was ignored because it was overridden by versions.
+
+- execute:
+  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+      600 --zone us-central1-f --no-user-output-enabled
+- execute:
+  - command: compute instances list --filter 'machineType:f1-micro AND name:$$manager$$'
+      --format 'value(machineType)'
+  - stdout: |
+      f1-micro
+      f1-micro
+- execute:
+  - command: compute instances list --filter 'machineType:n1-standard-1 AND name:$$manager$$'
+      --format 'value(machineType)'
+  - stdout: |
+      n1-standard-1
+- execute:
+  - command: compute instance-groups managed delete $$manager$$ --zone us-central1-f
+  - prompt:
+    - message: |
+        The following instance group managers will be deleted:
+         - [$$manager$$] in [us-central1-f]
+    - input: y
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$].
+  - progress_tracker:
+    - message: Deleting Managed Instance Group
+    - status: SUCCESS
+- execute:
+  - command: compute instance-templates delete $$template1$$
+  - prompt:
+    - message: |
+        The following instance templates will be deleted:
+         - [$$template1$$]
+    - input: y
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+- execute:
+  - command: compute instance-templates delete $$template2$$
+  - prompt:
+    - message: |
+        The following instance templates will be deleted:
+         - [$$template2$$]
+    - input: y
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$].
+actions:
+
+- generate_resource_id:
+    reference: template1
+    prefix: mig-replacer-zonal
+- execute_command:
+    command: compute instance-templates create $$template1$$ --machine-type n1-standard-1
+      --format 'text(name,properties.machineType)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '794'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#image
+            id: '5153499327621135740'
+            creationTimestamp: '2018-10-11T14:41:40.342-07:00'
+            name: debian-9-stretch-v20181011
+            description: Debian, Debian GNU/Linux, 9 (stretch), amd64 built on 20181011
+            sourceType: RAW
+            rawDisk:
+              source: ''
+              containerType: TAR
+            status: READY
+            archiveSizeBytes: '9336957056'
+            diskSizeGb: '10'
+            licenses:
+            - https://www.googleapis.com/compute/beta/projects/debian-cloud/global/licenses/debian-9-stretch
+            family: debian-9
+            selfLink: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/debian-9-stretch-v20181011
+            labelFingerprint: 42WmSpB8rSM=
+            guestOsFeatures:
+            - type: VIRTIO_SCSI_MULTIQUEUE
+            licenseCodes:
+            - '1000205'
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: $$template1$$
+              properties:
+                canIpForward: false
+                disks:
+                - autoDelete: true
+                  boot: true
+                  initializeParams:
+                    sourceImage: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/family/debian-9
+                  mode: READ_WRITE
+                  type: PERSISTENT
+                machineType: n1-standard-1
+                metadata: {}
+                networkInterfaces:
+                - accessConfigs:
+                  - name: external-nat
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+                scheduling:
+                  automaticRestart: true
+                serviceAccounts:
+                - email: default
+                  scopes:
+                  - https://www.googleapis.com/auth/devstorage.read_only
+                  - https://www.googleapis.com/auth/logging.write
+                  - https://www.googleapis.com/auth/monitoring.write
+                  - https://www.googleapis.com/auth/pubsub
+                  - https://www.googleapis.com/auth/service.management.readonly
+                  - https://www.googleapis.com/auth/servicecontrol
+                  - https://www.googleapis.com/auth/trace.append
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '726'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '7039157482882879335'
+            name: operation-1542058375645-57a7e71b4074a-39d76457-725b429f
+            operationType: compute.instanceTemplates.insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+            targetId: '8554077192181796711'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-12T13:32:56.461-08:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/operation-1542058375645-57a7e71b4074a-39d76457-725b429f
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1844'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"_TCJgm8zUY6fef08CqXAU4uG7Kw=/sPA7JT04aLgJ52zKF2x1LdkEQVk="'
+            status: '200'
+          body:
+            kind: compute#instanceTemplate
+            id: '8554077192181796711'
+            creationTimestamp: '2018-11-12T13:32:56.371-08:00'
+            name: $$template1$$
+            description: ''
+            properties:
+              machineType: n1-standard-1
+              canIpForward: false
+              networkInterfaces:
+              - kind: compute#networkInterface
+                network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+                accessConfigs:
+                - kind: compute#accessConfig
+                  type: ONE_TO_ONE_NAT
+                  name: external-nat
+                  networkTier: PREMIUM
+              disks:
+              - kind: compute#attachedDisk
+                type: PERSISTENT
+                mode: READ_WRITE
+                deviceName: persistent-disk-0
+                index: 0
+                boot: true
+                initializeParams:
+                  sourceImage: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/family/debian-9
+                autoDelete: true
+              metadata:
+                kind: compute#metadata
+                fingerprint: 4_QxQ57NQak=
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+              scheduling:
+                onHostMaintenance: MIGRATE
+                automaticRestart: true
+                preemptible: false
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+    - expect_stdout: |
+        ---
+        name:                   $$template1$$
+        properties.machineType: n1-standard-1
+    - expect_exit:
+        code: 0
+
+
+- generate_resource_id:
+    reference: template2
+    prefix: mig-replacer-zonal
+- execute_command:
+    command: compute instance-templates create $$template2$$ --machine-type f1-micro
+      --format 'text(name,properties.machineType)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '794'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#image
+            id: '5153499327621135740'
+            creationTimestamp: '2018-10-11T14:41:40.342-07:00'
+            name: debian-9-stretch-v20181011
+            description: Debian, Debian GNU/Linux, 9 (stretch), amd64 built on 20181011
+            sourceType: RAW
+            rawDisk:
+              source: ''
+              containerType: TAR
+            status: READY
+            archiveSizeBytes: '9336957056'
+            diskSizeGb: '10'
+            licenses:
+            - https://www.googleapis.com/compute/beta/projects/debian-cloud/global/licenses/debian-9-stretch
+            family: debian-9
+            selfLink: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/debian-9-stretch-v20181011
+            labelFingerprint: 42WmSpB8rSM=
+            guestOsFeatures:
+            - type: VIRTIO_SCSI_MULTIQUEUE
+            licenseCodes:
+            - '1000205'
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: $$template2$$
+              properties:
+                canIpForward: false
+                disks:
+                - autoDelete: true
+                  boot: true
+                  initializeParams:
+                    sourceImage: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/family/debian-9
+                  mode: READ_WRITE
+                  type: PERSISTENT
+                machineType: f1-micro
+                metadata: {}
+                networkInterfaces:
+                - accessConfigs:
+                  - name: external-nat
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+                scheduling:
+                  automaticRestart: true
+                serviceAccounts:
+                - email: default
+                  scopes:
+                  - https://www.googleapis.com/auth/devstorage.read_only
+                  - https://www.googleapis.com/auth/logging.write
+                  - https://www.googleapis.com/auth/monitoring.write
+                  - https://www.googleapis.com/auth/pubsub
+                  - https://www.googleapis.com/auth/service.management.readonly
+                  - https://www.googleapis.com/auth/servicecontrol
+                  - https://www.googleapis.com/auth/trace.append
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '726'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '5354800072511213410'
+            name: operation-1542058381167-57a7e72084998-9ca0387a-aef97bc3
+            operationType: compute.instanceTemplates.insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$
+            targetId: '8240853271758262114'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-12T13:33:02.036-08:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/operation-1542058381167-57a7e72084998-9ca0387a-aef97bc3
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1839'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"7nw8lCOlDlxJWOjEXNVFMNnT-Go=/Wv6aPW5trd9q9keZPzNyOACzYdE="'
+            status: '200'
+          body:
+            kind: compute#instanceTemplate
+            id: '8240853271758262114'
+            creationTimestamp: '2018-11-12T13:33:01.994-08:00'
+            name: $$template2$$
+            description: ''
+            properties:
+              machineType: f1-micro
+              canIpForward: false
+              networkInterfaces:
+              - kind: compute#networkInterface
+                network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+                accessConfigs:
+                - kind: compute#accessConfig
+                  type: ONE_TO_ONE_NAT
+                  name: external-nat
+                  networkTier: PREMIUM
+              disks:
+              - kind: compute#attachedDisk
+                type: PERSISTENT
+                mode: READ_WRITE
+                deviceName: persistent-disk-0
+                index: 0
+                boot: true
+                initializeParams:
+                  sourceImage: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/family/debian-9
+                autoDelete: true
+              metadata:
+                kind: compute#metadata
+                fingerprint: 4_QxQ57NQak=
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+              scheduling:
+                onHostMaintenance: MIGRATE
+                automaticRestart: true
+                preemptible: false
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$
+    - expect_stdout: |
+        ---
+        name:                   $$template2$$
+        properties.machineType: f1-micro
+    - expect_exit:
+        code: 0
+
+
+- generate_resource_id:
+    reference: manager
+    prefix: mig-replacer-zonal
+- execute_command:
+    command: compute instance-groups managed create $$manager$$ --zone us-central1-f
+      --base-instance-name $$manager$$ --size 3 --template $$template1$$ --format
+      'text(name,region,targetSize)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              baseInstanceName: $$manager$$
+              instanceTemplate: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+              name: $$manager$$
+              targetSize: 3
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '871'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '2319617491258855289'
+            name: operation-1542058389666-57a7e7289f8d3-ed3ad666-b885bf3a
+            zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: compute.instanceGroupManagers.insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$
+            targetId: '6248061173095485305'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-12T13:33:10.792-08:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1542058389666-57a7e7289f8d3-ed3ad666-b885bf3a
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1743'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"vqGi-1ZJH03Ewu5IeVXT07-WMdE=/I2yYFHnQNyme5o1zNh6PnJHJ3Lc="'
+            status: '200'
+          body:
+            kind: compute#instanceGroupManager
+            id: '6248061173095485305'
+            creationTimestamp: '2018-11-12T13:33:10.727-08:00'
+            name: $$manager$$
+            zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+              targetSize:
+                calculated: 3
+            instanceGroup: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$manager$$
+            baseInstanceName: $$manager$$
+            fingerprint: VuDlPueTrZE=
+            currentActions:
+              none: 0
+              creating: 3
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            targetSize: 3
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '10732'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"5NcoTQtab5NRDdWM2z05wtUj3dY=/U79A3HOZwLsbPi0uNnKKcaweOAc="'
+            status: '200'
+          body:
+            kind: compute#instanceGroupList
+            id: projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups
+            items:
+            - kind: compute#instanceGroup
+              id: '3531971825594813975'
+              creationTimestamp: '2018-11-12T13:30:32.855-08:00'
+              name: compute-backend-ig-20181112-213031-xjyk
+              description: ''
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/compute-backend-ig-20181112-213031-xjyk
+              size: 1
+            - kind: compute#instanceGroup
+              id: '3026988941233639315'
+              creationTimestamp: '2018-11-12T13:32:44.261-08:00'
+              name: compute-backend-ig-20181112-213242-lbqh
+              description: ''
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/compute-backend-ig-20181112-213242-lbqh
+              size: 1
+            - kind: compute#instanceGroup
+              id: '194851883792486264'
+              creationTimestamp: '2018-11-12T13:33:11.582-08:00'
+              name: compute-backend-ig-20181112-213309-p8m2
+              description: ''
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/compute-backend-ig-20181112-213309-p8m2
+              size: 0
+            - kind: compute#instanceGroup
+              id: '3255953497459543980'
+              creationTimestamp: '2018-11-12T13:31:47.510-08:00'
+              name: gcloud-instance-groups-test-20181112-213144-dofh
+              description: ''
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/gcloud-instance-groups-test-20181112-213144-dofh
+              size: 0
+            - kind: compute#instanceGroup
+              id: '144612873942093680'
+              creationTimestamp: '2018-11-12T13:33:19.227-08:00'
+              name: gcloud-instance-groups-test-20181112-213318-d36e
+              description: ''
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/gcloud-instance-groups-test-20181112-213318-d36e
+              size: 0
+            - kind: compute#instanceGroup
+              id: '6193770419947065278'
+              creationTimestamp: '2018-11-12T13:32:01.191-08:00'
+              name: mig-instance-configs-zonal-20181112-213158-fgdw
+              description: "This instance group is controlled by Instance Group Manager\
+                \ 'mig-instance-configs-zonal-20181112-213158-fgdw'. To modify instances\
+                \ in this group, use the Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/mig-instance-configs-zonal-20181112-213158-fgdw
+              size: 0
+            - kind: compute#instanceGroup
+              id: '353806153811251102'
+              creationTimestamp: '2018-11-12T13:32:33.074-08:00'
+              name: mig-instance-configs-zonal-20181112-213232-s4ey
+              description: "This instance group is controlled by Instance Group Manager\
+                \ 'mig-instance-configs-zonal-20181112-213232-s4ey'. To modify instances\
+                \ in this group, use the Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/mig-instance-configs-zonal-20181112-213232-s4ey
+              size: 0
+            - kind: compute#instanceGroup
+              id: '3163524031723098008'
+              creationTimestamp: '2018-11-12T13:32:39.463-08:00'
+              name: mig-instance-configs-zonal-20181112-213238-gyj2
+              description: "This instance group is controlled by Instance Group Manager\
+                \ 'mig-instance-configs-zonal-20181112-213238-gyj2'. To modify instances\
+                \ in this group, use the Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/mig-instance-configs-zonal-20181112-213238-gyj2
+              size: 1
+            - kind: compute#instanceGroup
+              id: '8060819315135631230'
+              creationTimestamp: '2018-11-12T13:33:05.661-08:00'
+              name: mig-instance-configs-zonal-20181112-213303-ou3j
+              description: "This instance group is controlled by Instance Group Manager\
+                \ 'mig-instance-configs-zonal-20181112-213303-ou3j'. To modify instances\
+                \ in this group, use the Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/mig-instance-configs-zonal-20181112-213303-ou3j
+              size: 0
+            - kind: compute#instanceGroup
+              id: '6248061173095485305'
+              creationTimestamp: '2018-11-12T13:33:10.727-08:00'
+              name: $$manager$$
+              description: "This instance group is controlled by Instance Group Manager\
+                \ '$$manager$$'. To modify instances in this group, use the Instance\
+                \ Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$manager$$
+              size: 0
+            - kind: compute#instanceGroup
+              id: '4007670605024612240'
+              creationTimestamp: '2018-11-12T13:32:47.440-08:00'
+              name: mig-stateful-policy-zonal-20181112-213246-uvco
+              description: "This instance group is controlled by Instance Group Manager\
+                \ 'mig-stateful-policy-zonal-20181112-213246-uvco'. To modify instances\
+                \ in this group, use the Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/mig-stateful-policy-zonal-20181112-213246-uvco
+              size: 0
+            - kind: compute#instanceGroup
+              id: '4469915996400144649'
+              creationTimestamp: '2018-11-12T13:25:58.957-08:00'
+              name: mig-zonal-20181112-212556-t98n
+              description: "This instance group is controlled by Instance Group Manager\
+                \ 'mig-zonal-20181112-212556-t98n'. To modify instances in this group,\
+                \ use the Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/mig-zonal-20181112-212556-t98n
+              size: 2
+            - kind: compute#instanceGroup
+              id: '7141764255879286690'
+              creationTimestamp: '2018-11-12T13:31:57.922-08:00'
+              name: mig-zonal-20181112-213154-qh40
+              description: "This instance group is controlled by Instance Group Manager\
+                \ 'mig-zonal-20181112-213154-qh40'. To modify instances in this group,\
+                \ use the Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/mig-zonal-20181112-213154-qh40
+              size: 2
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/autoscalers?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '246'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"e044YiYGjkyLBJBIARTS7gcttNc=/WP1pcncKKjK8W2NF4jBDsD_zBlQ="'
+            status: '200'
+          body:
+            kind: compute#autoscalerList
+            id: projects/cloud-sdk-integration-testing/zones/us-central1-f/autoscalers
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/autoscalers
+    - expect_stdout: |
+        ---
+        name:       $$manager$$
+        targetSize: 3
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+      600 --zone us-central1-f --no-user-output-enabled
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    # There should be 3 instances in this MIG with the original machine type.
+    command: compute instances list --filter 'machineType:n1-standard-1 AND name:$$manager$$'
+      --format 'value(machineType)'
+    validation_only: true
+    events:
+    - expect_stdout: |
+        n1-standard-1
+        n1-standard-1
+        n1-standard-1
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute instance-groups managed rolling-action start-update $$manager$$
+      --type proactive --max-surge 100% --max-unavailable 100% --min-ready 1m --canary-version
+      template=$$template1$$,target-size=20% --version template=$$template2$$ --zone
+      us-central1-f --format=disable
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1743'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"NfXpBxxUzn6-CWLhKtsLDJOD7_c=/NcBaZYZr9cBRXrJSXQ2ZWNANaGs="'
+            status: '200'
+          body:
+            kind: compute#instanceGroupManager
+            id: '6248061173095485305'
+            creationTimestamp: '2018-11-12T13:33:10.727-08:00'
+            name: $$manager$$
+            zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+              targetSize:
+                calculated: 3
+            instanceGroup: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$manager$$
+            baseInstanceName: $$manager$$
+            fingerprint: VuDlPueTrZE=
+            currentActions:
+              none: 3
+              creating: 0
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            targetSize: 3
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              updatePolicy:
+                minimalAction: REPLACE
+                type: PROACTIVE
+              versions:
+              - instanceTemplate: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$
+              - targetSize:
+                  percent: 20
+                instanceTemplate: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '985'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '8009789640460750645'
+            name: operation-1542058457705-57a7e76982a28-267daf95-21232cff
+            zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: patch
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$
+            targetId: '6248061173095485305'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-12T13:34:18.658-08:00'
+            warnings:
+            - code: NOT_CRITICAL_ERROR
+              message: Instance template was ignored because it was overridden by
+                versions.
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1542058457705-57a7e76982a28-267daf95-21232cff
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1822'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"PwjH0xrvZy3xzgVWwbnEkkO_BsY=/GXudExOyqN5D8VeRkadNjHmV2L0="'
+            status: '200'
+          body:
+            kind: compute#instanceGroupManager
+            id: '6248061173095485305'
+            creationTimestamp: '2018-11-12T13:33:10.727-08:00'
+            name: $$manager$$
+            zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$
+              targetSize:
+                calculated: 2
+            - instanceTemplate: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+              targetSize:
+                percent: 20
+                calculated: 1
+            instanceGroup: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$manager$$
+            baseInstanceName: $$manager$$
+            fingerprint: Eav85xvwkY8=
+            currentActions:
+              none: 1
+              creating: 2
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 2
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            targetSize: 3
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$
+            updatePolicy:
+              type: PROACTIVE
+              minimalAction: REPLACE
+              maxSurge:
+                percent: 100
+                calculated: 3
+              maxUnavailable:
+                percent: 100
+                calculated: 3
+              minReadySec: 60
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+    - expect_stderr: |+
+        WARNING: Some requests generated warnings:
+         - Instance template was ignored because it was overridden by versions.
+
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+      600 --zone us-central1-f --no-user-output-enabled
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    # 2 instances should have changed machine type.
+    command: compute instances list --filter 'machineType:f1-micro AND name:$$manager$$'
+      --format 'value(machineType)'
+    validation_only: true
+    events:
+    - expect_stdout: |
+        f1-micro
+        f1-micro
+    - expect_exit:
+        code: 0
+- execute_command:
+    # 1 instance should have stayed the same.
+    command: compute instances list --filter 'machineType:n1-standard-1 AND name:$$manager$$'
+      --format 'value(machineType)'
+    validation_only: true
+    events:
+    - expect_stdout: |
+        n1-standard-1
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-groups managed delete $$manager$$ --zone us-central1-f
+    cleanup_for: manager
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following instance group managers will be deleted:
+           - [$$manager$$] in [us-central1-f]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/autoscalers?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '246'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"gVWJOAmBKPWo3AsTUYtJkEdkj30=/nSV3xU55ce565ksM3IiDtgdzsT8="'
+            status: '200'
+          body:
+            kind: compute#autoscalerList
+            id: projects/cloud-sdk-integration-testing/zones/us-central1-f/autoscalers
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/autoscalers
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '871'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '4879845791302437955'
+            name: operation-1542058667954-57a7e83204f53-d0e8e49d-040752d0
+            zone: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: compute.instanceGroupManagers.delete
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$
+            targetId: '6248061173095485305'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-12T13:37:48.464-08:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1542058667954-57a7e83204f53-d0e8e49d-040752d0
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$].
+    - expect_progress_tracker:
+        message: Deleting Managed Instance Group
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute instance-templates delete $$template1$$
+    cleanup_for: template1
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following instance templates will be deleted:
+           - [$$template1$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '700'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '2812391213821611385'
+            name: operation-1542058902121-57a7e91156a2a-35214ea4-0302caac
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+            targetId: '8554077192181796711'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-12T13:41:42.825-08:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/operation-1542058902121-57a7e91156a2a-35214ea4-0302caac
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute instance-templates delete $$template2$$
+    cleanup_for: template2
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following instance templates will be deleted:
+           - [$$template2$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '700'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '8732852448508792177'
+            name: operation-1542058909881-57a7e918bd2a9-451b0637-eb0b80ba
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$
+            targetId: '8240853271758262114'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-12T13:41:50.298-08:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/operation-1542058909881-57a7e918bd2a9-451b0637-eb0b80ba
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$].
+    - expect_exit:
+        code: 0

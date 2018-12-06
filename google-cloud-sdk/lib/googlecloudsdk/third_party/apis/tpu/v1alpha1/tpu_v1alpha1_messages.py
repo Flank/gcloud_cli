@@ -65,10 +65,12 @@ class ListNodesResponse(_messages.Message):
   Fields:
     nextPageToken: The next page token or empty if none.
     nodes: The listed nodes.
+    unreachable: Locations that could not be reached.
   """
 
   nextPageToken = _messages.StringField(1)
   nodes = _messages.MessageField('Node', 2, repeated=True)
+  unreachable = _messages.StringField(3, repeated=True)
 
 
 class ListOperationsResponse(_messages.Message):
@@ -236,6 +238,12 @@ class Node(_messages.Message):
     state: Output only. The current state for the TPU Node.
     tensorflowVersion: The version of Tensorflow running in the Node.
       Required.
+    useServiceNetworking: Whether the VPC peering for the node is set up
+      through Service Networking API. The VPC Peering should be set up before
+      provisioning the node. If this field is set, cidr_block field should not
+      be specified. If the network, that you want to peer the TPU Node to, is
+      Shared VPC networks, the node must be created with this this field
+      enabled.
   """
 
   class HealthValueValuesEnum(_messages.Enum):
@@ -270,6 +278,8 @@ class Node(_messages.Message):
       STARTING: TPU node is currently starting.
       PREEMPTED: TPU node has been preempted. Only applies to Preemptible TPU
         Nodes.
+      TERMINATED: TPU node has been terminated due to maintenance or has
+        reached the end of its life cycle (for preemptible nodes).
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -282,6 +292,7 @@ class Node(_messages.Message):
     STOPPING = 8
     STARTING = 9
     PREEMPTED = 10
+    TERMINATED = 11
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -323,6 +334,7 @@ class Node(_messages.Message):
   serviceAccount = _messages.StringField(14)
   state = _messages.EnumField('StateValueValuesEnum', 15)
   tensorflowVersion = _messages.StringField(16)
+  useServiceNetworking = _messages.BooleanField(17)
 
 
 class Operation(_messages.Message):

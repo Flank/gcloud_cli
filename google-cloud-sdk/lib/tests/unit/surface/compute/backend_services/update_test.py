@@ -23,6 +23,7 @@ import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute.backend_services import backend_services_utils
+from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -1932,9 +1933,8 @@ class WithCdnSignedUrlApiUpdateTest(UpdateTestBase):
   def testSetInvalidCacheMaxAge(self):
     """Tests updating backend service with an invalid cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: '
-        r'invalid-value'):
+        "argument --signed-url-cache-max-age: Failed to parse duration: "
+        "Duration unit 'invalid-value' must be preceded by a number"):
       self.RunUpdate("""
           backend-service-1 --signed-url-cache-max-age invalid-value
           """)
@@ -1942,11 +1942,125 @@ class WithCdnSignedUrlApiUpdateTest(UpdateTestBase):
   def testSetCacheMaxAgeNegative(self):
     """Tests updating backend service with a negative cache max age."""
     with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --signed-url-cache-max-age: given value must be of the form '
-        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: -1'):
+        'argument --signed-url-cache-max-age: value must be greater than or '
+        'equal to 0; received: -1'):
       self.RunUpdate("""
           backend-service-1 --signed-url-cache-max-age -1
           """)
+
+
+class SetSecurityPolicyTest(UpdateTestBase):
+
+  def SetUp(self):
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'v1')
+    self.my_policy = self.resources.Create(
+        'compute.securityPolicies',
+        securityPolicy='my-policy',
+        project='my-project')
+
+  def testSetSecurityPolicy(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._backend_services[0]],
+        [],
+    ])
+
+    self.RunUpdate(
+        'backend-service-1 --security-policy {}'.format(self.my_policy.Name()))
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'SetSecurityPolicy',
+          messages.ComputeBackendServicesSetSecurityPolicyRequest(
+              backendService='backend-service-1',
+              project='my-project',
+              securityPolicyReference=messages.SecurityPolicyReference(
+                  securityPolicy=self.my_policy.SelfLink())))],)
+
+  def testSetSecurityPolicyAndUpdateDescription(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._backend_services[0]],
+        [],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-1 --description "my new description" '
+                   '--security-policy {}'.format(self.my_policy.Name()))
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
+              backendService='backend-service-1',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  description='my new description',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-1'),
+                  timeoutSec=30),
+              project='my-project'))],
+        [(self.compute.backendServices, 'SetSecurityPolicy',
+          messages.ComputeBackendServicesSetSecurityPolicyRequest(
+              backendService='backend-service-1',
+              project='my-project',
+              securityPolicyReference=messages.SecurityPolicyReference(
+                  securityPolicy=self.my_policy.SelfLink())))],
+    )
+
+  def testClearSecurityPolicy(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._backend_services[0]],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-1 --security-policy ""')
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'SetSecurityPolicy',
+          messages.ComputeBackendServicesSetSecurityPolicyRequest(
+              backendService='backend-service-1',
+              project='my-project',
+              securityPolicyReference=messages.SecurityPolicyReference(
+                  securityPolicy=None)))],)
+
+  def testUriSupport(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._backend_services[0]],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-1 --security-policy {}'.format(
+        self.my_policy.SelfLink()))
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'SetSecurityPolicy',
+          messages.ComputeBackendServicesSetSecurityPolicyRequest(
+              backendService='backend-service-1',
+              project='my-project',
+              securityPolicyReference=messages.SecurityPolicyReference(
+                  securityPolicy=self.my_policy.SelfLink())))],)
 
 
 if __name__ == '__main__':

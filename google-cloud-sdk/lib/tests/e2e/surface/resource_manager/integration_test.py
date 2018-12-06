@@ -54,6 +54,7 @@ TEST_SUBFOLDER_B = messages.Folder(
     parent=TEST_TOP_LEVEL_FOLDER_NAME)
 
 
+# TODO(b/118760560) Before beta, add test for moving folder to current parent
 class FolderIntegrationTest(e2e_base.WithServiceAuth):
 
   messages = folders.FoldersMessages()

@@ -1,4 +1,4 @@
-# This Python file uses the following encoding: utf-8
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -657,7 +657,7 @@ class Markdown(DocumentRendererTestBase):
 
       ## SYNOPSIS
 
-      `gcloud compute images deprecate` _NAME_ [*--delete-in* _DELETE_IN_ | *--delete-on* _DELETE_ON_] [*--obsolete-in* _OBSOLETE_IN_ | *--obsolete-on* _OBSOLETE_ON_] [*--replacement* _REPLACEMENT_] *--state* _STATE_ [_GLOBAL-FLAG ..._]
+      `gcloud compute images deprecate` _NAME_ [*--delete-in* _DELETE_IN_ | *--delete-on* _DELETE_ON_] [*--obsolete-in* _OBSOLETE_IN_ | *--obsolete-on* _OBSOLETE_ON_] [*--replacement* _REPLACEMENT_] *--state* _STATE_ [_GCLOUD_WIDE_FLAG ..._]
 
       ## DESCRIPTION
 
@@ -685,7 +685,7 @@ class Markdown(DocumentRendererTestBase):
 
       ## SYNOPSIS
 
-      `gcloud compute instances create` _NAME_ [_NAME_ ...] [*--boot-disk-device-name* _BOOT_DISK_DEVICE_NAME_] [*--boot-disk-size* _BOOT_DISK_SIZE_] [*--boot-disk-type* _BOOT_DISK_TYPE_] [*--can-ip-forward*] [*--description* _DESCRIPTION_] [*--disk* [_PROPERTY_=_VALUE_,...]] [*--image* _IMAGE_ | _centos-6_ | _centos-7_ | _container-vm_ | _coreos_ | _debian-7_ | _debian-7-backports_ | _opensuse-13_ | _rhel-6_ | _rhel-7_ | _sles-11_ | _sles-12_ | _ubuntu-12-04_ | _ubuntu-14-04_ | _ubuntu-14-10_ | _ubuntu-15-04_ | _windows-2008-r2_ | _windows-2012-r2_] [*--image-project* _IMAGE_PROJECT_] [*--local-ssd* [_PROPERTY_=_VALUE_,...]] [*--machine-type* _MACHINE_TYPE_; default="n1-standard-1"] [*--maintenance-policy* _MAINTENANCE_POLICY_] [*--metadata* _KEY_=_VALUE_,[_KEY_=_VALUE_,...]] [*--metadata-from-file* _KEY_=_LOCAL_FILE_PATH_,[_KEY_=_LOCAL_FILE_PATH_,...]] [*--network* _NETWORK_; default="default"] [*--address* _ADDRESS_ | *--no-address*] [*--no-boot-disk-auto-delete*] [*--no-restart-on-failure*] [*--preemptible*] [*--no-scopes* | *--scopes* [_ACCOUNT_=]_SCOPE_,[[_ACCOUNT_=]_SCOPE_,...]] [*--tags* _TAG_,[_TAG_,...]] [*--zone* _ZONE_] [_GLOBAL-FLAG ..._]
+      `gcloud compute instances create` _NAME_ [_NAME_ ...] [*--boot-disk-device-name* _BOOT_DISK_DEVICE_NAME_] [*--boot-disk-size* _BOOT_DISK_SIZE_] [*--boot-disk-type* _BOOT_DISK_TYPE_] [*--can-ip-forward*] [*--description* _DESCRIPTION_] [*--disk* [_PROPERTY_=_VALUE_,...]] [*--image* _IMAGE_ | _centos-6_ | _centos-7_ | _container-vm_ | _coreos_ | _debian-7_ | _debian-7-backports_ | _opensuse-13_ | _rhel-6_ | _rhel-7_ | _sles-11_ | _sles-12_ | _ubuntu-12-04_ | _ubuntu-14-04_ | _ubuntu-14-10_ | _ubuntu-15-04_ | _windows-2008-r2_ | _windows-2012-r2_] [*--image-project* _IMAGE_PROJECT_] [*--local-ssd* [_PROPERTY_=_VALUE_,...]] [*--machine-type* _MACHINE_TYPE_; default="n1-standard-1"] [*--maintenance-policy* _MAINTENANCE_POLICY_] [*--metadata* _KEY_=_VALUE_,[_KEY_=_VALUE_,...]] [*--metadata-from-file* _KEY_=_LOCAL_FILE_PATH_,[_KEY_=_LOCAL_FILE_PATH_,...]] [*--network* _NETWORK_; default="default"] [*--address* _ADDRESS_ | *--no-address*] [*--no-boot-disk-auto-delete*] [*--no-restart-on-failure*] [*--preemptible*] [*--no-scopes* | *--scopes* [_ACCOUNT_=]_SCOPE_,[[_ACCOUNT_=]_SCOPE_,...]] [*--tags* _TAG_,[_TAG_,...]] [*--zone* _ZONE_] [_GCLOUD_WIDE_FLAG ..._]
 
       ## DESCRIPTION
 
@@ -713,6 +713,10 @@ class Markdown(DocumentRendererTestBase):
       ## SECTION
 
       Section prose about the gcloud component command.
+
+      ## GCLOUD WIDE FLAGS
+
+      These are available in all commands: --foo, --bar and --verbosity.
       """)
 
   TITLE_MARKDOWN = textwrap.dedent("""\
@@ -781,7 +785,7 @@ class UTF8(Markdown):
       """)
 
   def SetUp(self):
-    self.maxDiff = 2048  # pylint: disable=invalid-name
+    self.maxDiff = None  # pylint: disable=invalid-name
 
   def Run(self, style, term, markdown, expected=None, exception=None):
     os.environ['LC_ALL'] = 'en_US.UTF-8'
@@ -838,7 +842,7 @@ class Command(DocumentRendererTestBase, test_case.WithInput):
     # Ensure ascii embellishments.
     os.environ['TERM'] = 'dumb'
     os.environ['LC_ALL'] = 'C'
-    self.maxDiff = 2048  # pylint: disable=invalid-name
+    self.maxDiff = None  # pylint: disable=invalid-name
 
   def Run(self, argv, markdown, expected=None, exception=None):
     self.WriteInput(markdown)

@@ -20,25 +20,23 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.composer import base
 import six
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class EnvironmentsStorageDataListTest(base.StorageApiCallingUnitTest,
-                                      parameterized.TestCase):
+class EnvironmentsStorageDataListGATest(base.StorageApiCallingUnitTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
 
   def SetUp(self):
     # Disable user output to not exhaust the generator returned by
     # RunEnvironments
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def testDataList(self, track):
+  def testDataList(self):
     """Tests successful data listing."""
-    self.SetTrack(track)
     file_names = [
         'data/', 'data/file1.py', 'data/file2.py', 'data/folder',
         'data/file3.py'
@@ -58,6 +56,18 @@ class EnvironmentsStorageDataListTest(base.StorageApiCallingUnitTest,
         'storage', 'data', 'list', '--project', self.TEST_PROJECT, '--location',
         self.TEST_LOCATION, '--environment', self.TEST_ENVIRONMENT_ID)
     six.assertCountEqual(self, response.items, actual_responses)
+
+
+class EnvironmentsStorageDataListBetaTest(EnvironmentsStorageDataListGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+
+class EnvironmentsStorageDataListAlphaTest(EnvironmentsStorageDataListBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

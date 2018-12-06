@@ -33,6 +33,8 @@ from tests.lib import sdk_test_base
 from tests.lib.calliope import util as calliope_util
 from tests.lib.command_lib.util.apis import fake_messages as fm
 
+import mock
+
 
 class CompleterStub(object):
   pass
@@ -219,8 +221,11 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
 
     self.assertEqual(r.resource.group_help, 'group help')
     self.assertEqual(r.resource.removed_flags, ['zone'])
-    spec = r.resource._GenerateResourceSpec(
-        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    mock_resource = mock.MagicMock(
+        full_name='foo.projects.zones',
+        api_version='v1',
+        detailed_params=['projectsId', 'zonesId'])
+    spec = r.resource.GenerateResourceSpec(mock_resource)
 
     project_attr, zone_attr = spec.attributes[0], spec.attributes[1]
     self.assertEqual(project_attr.name, 'project')
@@ -399,11 +404,34 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
             'policy': 'MyOtherPolicy'
         },
         'set_iam_policy_request_path':
-            'setMyOtherIamPolicyRequest.myotherpolicy'
+            'setMyOtherIamPolicyRequest.myotherpolicy',
+        'enable_condition':
+            True
     })
     self.assertEqual(o.message_type_overrides['policy'], 'MyOtherPolicy')
     self.assertEqual(o.set_iam_policy_request_path,
                      'setMyOtherIamPolicyRequest.myotherpolicy')
+    self.assertTrue(o.enable_condition)
+
+  def testUpdateData(self):
+    o = yaml_command_schema.UpdateData({'mask_field': 'resource.updateMask'})
+    self.assertEqual(o.mask_field, 'resource.updateMask')
+    self.assertFalse(o.read_modify_update)
+
+    o = yaml_command_schema.UpdateData({'read_modify_update': True})
+    self.assertIsNone(o.mask_field)
+    self.assertTrue(o.read_modify_update)
+
+    o = yaml_command_schema.UpdateData({
+        'mask_field': 'resource.updateMask',
+        'read_modify_update': True
+    })
+    self.assertEqual(o.mask_field, 'resource.updateMask')
+    self.assertTrue(o.read_modify_update)
+
+    o = yaml_command_schema.UpdateData({})
+    self.assertIsNone(o.mask_field)
+    self.assertFalse(o.read_modify_update)
 
 
 class ArgGenParseTests(sdk_test_base.SdkBase, parameterized.TestCase):

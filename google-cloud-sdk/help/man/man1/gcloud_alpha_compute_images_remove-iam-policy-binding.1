@@ -70,17 +70,16 @@ The role to remove the member from.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-The following command will remove an IAM policy binding for the role of
-\'roles/compute.securityAdmin' for the user 'test\-user@gmail.com' on image with
-identifier 'my\-image'
+To remove an IAM policy binding for the role of 'roles/compute.securityAdmin'
+for the user 'test\-user@gmail.com' on image with identifier 'my\-image', run:
 
 .RS 2m
 $ gcloud alpha compute images remove\-iam\-policy\-binding my\-image \e
@@ -88,9 +87,8 @@ $ gcloud alpha compute images remove\-iam\-policy\-binding my\-image \e
     \-\-role='roles/compute.securityAdmin'
 .RE
 
-The following command will remove an IAM policy binding for the role of
-\'roles/compute.securityAdmin' from all authenticated users on image
-\'my\-image':
+To remove an IAM policy binding for the role of 'roles/compute.securityAdmin'
+from all authenticated users on image 'my\-image', run:
 
 .RS 2m
 $ gcloud alpha compute images remove\-iam\-policy\-binding my\-image \e

@@ -88,7 +88,7 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
   def testGetValue(self):
     collections = [
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
 
     parameter_info = self.SetUpBookParameterInfo(
         {'--book': 'examplebook',
@@ -102,7 +102,7 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
   def testGetValueIncomplete(self):
     collections = [
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
 
     parameter_info = self.SetUpBookParameterInfo(
         {'--shelf': 'exampleshelf',
@@ -122,7 +122,7 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
     properties.VALUES.core.project.Set(project_config)
     collections = [
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     parameter_info = self.SetUpBookParameterInfo(args)
 
     flag = parameter_info.GetFlag(parameter_name,
@@ -136,7 +136,7 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
   def testGetFlagBoolean(self, return_value, expected_flag):
     collections = [
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     parameter_info = self.SetUpBookParameterInfo({})
     self.StartObjectPatch(parameter_info, 'GetValue', return_value=return_value)
 
@@ -169,7 +169,7 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
         '--book',
         self.resource_spec,
         'a resource',
-        flag_name_overrides={'shelvesId': ''},
+        flag_name_overrides={'shelf': ''},
         prefixes=False)
     resource_info = concept_parsers.ConceptParser(
         [presentation_spec]).GetInfo(presentation_spec.name)
@@ -209,7 +209,7 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
   def testGetDest(self, parameter_name, prefix, expected_result):
     collections = [
         ('example.projects.shelves.books', True)]
-    self.MockGetListCreateMethods(*collections)
+    self.MockCRUDMethods(*collections)
     parameter_info = self.SetUpBookParameterInfo({})
 
     dest = parameter_info.GetDest(parameter_name, prefix=prefix)

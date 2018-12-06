@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """dlp job-triggers delete tests."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -27,6 +28,7 @@ from tests.lib.surface.dlp import base
 class DeleteTest(base.DlpUnitTestBase):
   """dlp job-triggers delete tests."""
 
+  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
   def testDelete(self, track):
     self.track = track

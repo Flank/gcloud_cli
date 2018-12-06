@@ -23,6 +23,7 @@ from containerregistry.client.v2_2 import docker_image
 from googlecloudsdk.api_lib.container.images import util
 from googlecloudsdk.api_lib.util import apis
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -67,7 +68,7 @@ class DescribeTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     mock_get_digest_from_name.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.NOT_FOUND
-        }), '')
+        }), ''.encode('utf8'))
     test_image = 'gcr.io/foo/goodimage:latest'
     with self.assertRaises(util.UserRecoverableV2Error):
       self.Describe(test_image)
@@ -78,7 +79,7 @@ class DescribeTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     mock_get_digest_from_name.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
             'status': six.moves.http_client.FORBIDDEN
-        }), '')
+        }), ''.encode('utf8'))
     test_image = 'gcr.io/foo/goodimage:latest'
     with self.assertRaises(util.UserRecoverableV2Error):
       self.Describe(test_image)
@@ -95,8 +96,9 @@ class DescribeTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.AssertErrContains(expected_message)
 
 
-class DescribeAlphaOldTest(cli_test_base.CliTestBase,
-                           sdk_test_base.WithFakeAuth):
+class DescribeAlphaAndBetaTest(cli_test_base.CliTestBase,
+                               sdk_test_base.WithFakeAuth,
+                               parameterized.TestCase):
 
   def SetUp(self):
     self._manifests = {}
@@ -110,17 +112,18 @@ class DescribeAlphaOldTest(cli_test_base.CliTestBase,
         'googlecloudsdk.api_lib.container.images.util.'
         'FetchOccurrencesForResource')
 
-  def Describe(self, image=_IMAGE_STR, args=None):
-    cmd = ['alpha', 'container', 'images', 'describe', image]
+  def Describe(self, track, image=_IMAGE_STR, args=None):
+    cmd = [track, 'container', 'images', 'describe', image]
     if args:
       cmd.extend(args)
     self.Run(cmd)
 
-  def testBuildDetailsContainerAnalysisOutput(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testBuildDetailsContainerAnalysisOutput(self, track):
     self.fetch_occurrence_mock.return_value = [
         _BuildDetails('025192e7-6c4f-4352-96cf-f5dd7724105f'),
     ]
-    self.Describe(args=['--show-build-details'])
+    self.Describe(track, args=['--show-build-details'])
     self.AssertOutputContains('fully_qualified_digest: ' + _IMAGE_STR)
 
     self.AssertOutputContains("""build_details_summary:
@@ -135,12 +138,13 @@ class DescribeAlphaOldTest(cli_test_base.CliTestBase,
 image_summary:
 """)
 
-  def testBaseImageContainerAnalysisOutput(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testBaseImageContainerAnalysisOutput(self, track):
     self.fetch_occurrence_mock.return_value = [
         _ImageBasis('https://gcr.io/foo', dist=13),
         _ImageBasis('https://gcr.io/bar', dist=17),
     ]
-    self.Describe(args=['--show-image-basis'])
+    self.Describe(track, args=['--show-image-basis'])
     self.AssertOutputContains('fully_qualified_digest: ' + _IMAGE_STR)
 
     self.AssertOutputContains("""image_basis_summary:
@@ -161,11 +165,12 @@ image_summary:
     kind: IMAGE_BASIS
 """)
 
-  def testBaseImageWithEmptyLayerInfoContainerAnalysisOutput(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testBaseImageWithEmptyLayerInfoContainerAnalysisOutput(self, track):
     self.fetch_occurrence_mock.return_value = [
         _EmptyImageBasis('https://gcr.io/foo', dist=13),
     ]
-    self.Describe(args=['--show-image-basis'])
+    self.Describe(track, args=['--show-image-basis'])
     self.AssertOutputContains('fully_qualified_digest: ' + _IMAGE_STR)
 
     self.AssertOutputContains("""image_basis_summary:
@@ -178,11 +183,12 @@ image_summary:
     kind: IMAGE_BASIS
 """)
 
-  def testOccurrenceFilter(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testOccurrenceFilter(self, track):
     self.fetch_occurrence_mock.return_value = [
         _EmptyImageBasis('https://gcr.io/foo', dist=13),
     ]
-    self.Describe(args=['--metadata-filter=kind = "IMAGE_BASIS"'])
+    self.Describe(track, args=['--metadata-filter=kind = "IMAGE_BASIS"'])
     self.AssertOutputContains('fully_qualified_digest: ' + _IMAGE_STR)
 
     self.AssertOutputContains("""image_basis_summary:
@@ -195,7 +201,8 @@ image_summary:
     kind: IMAGE_BASIS
 """)
 
-  def testVulnzCount(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testVulnzCount(self, track):
     messages = apis.GetMessagesModule('containeranalysis', 'v1alpha1')
     self.fetch_occurrence_mock.return_value = [
         _PackageVulnerability(
@@ -205,13 +212,14 @@ image_summary:
             messages.VulnerabilityDetails.SeverityValueValuesEnum.HIGH,
             'not_fixed', '2.0', fixed=False),
     ]
-    self.Describe(args=['--format=json', '--show-package-vulnerability'])
+    self.Describe(track, args=['--format=json', '--show-package-vulnerability'])
     self.AssertOutputContains('"total_vulnerability_found": 2')
     self.AssertOutputContains('"not_fixed_vulnerability_count": 1')
 
-  def testDescribeBadRepo(self):
+  @parameterized.parameters(('alpha'), ('beta'))
+  def testDescribeBadRepo(self, track):
     with self.assertRaises(util.InvalidImageNameError):
-      self.Describe('gcr.io/foo/badi$mage@sha256:dfdsfdfsf')
+      self.Describe(track, 'gcr.io/foo/badi$mage@sha256:dfdsfdfsf')
     self.AssertErrContains('Invalid repository: foo/badi$mage, acceptable '
                            'characters include')
 

@@ -35,13 +35,13 @@ POSITIONAL ARGUMENTS
      Notification Channel resource - Name of the Notification Channel to update
      This represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
-     attribute: provide the flag [channel] on the command line with a fully
-     specified name; provide the flag [--project] on the command line; set the
-     property [core/project]. This must be specified.
+     attribute: provide the argument [channel] on the command line with a fully
+     specified name; provide the argument [--project] on the command line; set
+     the property [core/project]. This must be specified.
 
        CHANNEL
-          The ID of the Notification Channel or a fully qualified identifier
-          for the Notification Channel.
+          ID of the Notification Channel or fully qualified identifier for the
+          Notification Channel.
 
 FLAGS
      At most one of these may be specified:
@@ -135,8 +135,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -22,7 +22,6 @@ import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import parser_errors
-from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -200,21 +199,6 @@ $ gcloud compute firewall-rules create <FIREWALL_NAME> --network my-network \
 
             """),
         normalize_space=True)
-
-  def testMode_deprecated(self):
-    expected = self.messages.Network(
-        name='my-network', autoCreateSubnetworks=False)
-    expected.routingConfig = self.messages.NetworkRoutingConfig()
-    expected.routingConfig.routingMode = (
-        self.messages.NetworkRoutingConfig.RoutingModeValueValuesEnum.REGIONAL)
-
-    self.make_requests.side_effect = iter([[expected]])
-
-    with self.assertRaisesRegex(
-        cli_test_base.MockArgumentError,
-        '`mode` has been removed. '
-        'Please use `subnet-mode` instead.'):
-      self.Run('compute networks create my-network --mode custom')
 
 
 class NetworksCreateBetaTest(NetworksCreateTest):

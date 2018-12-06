@@ -1,0 +1,1142 @@
+title: Tests setting up a backend service with internal load balancing.
+release_tracks: [BETA, GA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute health-checks create tcp $$hc$$ --format none
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+- execute:
+  - command: compute instances create $$instance$$ --zone us-central1-f --format none
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+- execute:
+  - command: compute instance-groups unmanaged create $$ig$$ --zone us-central1-f
+      --format none
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+- execute:
+  - command: compute backend-services create $$bs$$ --load-balancing-scheme=internal
+      --health-checks=$$hc$$ --protocol=TCP --timeout=30 --region us-central1 --format
+      'text(name,loadBalancingScheme,timeoutSec)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+  - stdout: |
+      ---
+      loadBalancingScheme: INTERNAL
+      name:                $$bs$$
+      timeoutSec:          30
+- execute:
+  - command: compute backend-services list --filter 'region:us-central1 AND name:$$bs$$'
+      --format 'text(name)'
+  - stdout: |
+      ---
+      name: $$bs$$
+- execute:
+  - command: compute backend-services describe $$bs$$ --format 'text(name,loadBalancingScheme,timeoutSec)'
+      --region us-central1
+  - stdout: |
+      loadBalancingScheme: INTERNAL
+      name:                $$bs$$
+      timeoutSec:          30
+- execute:
+  - command: compute instance-groups unmanaged add-instances $$ig$$ --instances $$instance$$
+      --zone us-central1-f
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+- execute:
+  - command: compute backend-services add-backend $$bs$$ --region us-central1 --instance-group
+      $$ig$$ --instance-group-zone us-central1-f --description initial-test-backend
+      --format 'text(name,backends[0].description,backends[0].group)'
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+  - stdout: |
+      ---
+      backends[0].description: initial-test-backend
+      backends[0].group:       https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+      name:                    $$bs$$
+- execute:
+  - command: compute backend-services update-backend $$bs$$ --region us-central1 --instance-group
+      $$ig$$ --instance-group-zone us-central1-f --description updated-test-backend
+      --format 'text(name,backends[0].description,backends[0].group)'
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+  - stdout: |
+      ---
+      backends[0].description: updated-test-backend
+      backends[0].group:       https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+      name:                    $$bs$$
+- execute:
+  - command: compute backend-services remove-backend $$bs$$ --region us-central1 --instance-group
+      $$ig$$ --instance-group-zone us-central1-f --format 'text(name,backends)'
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+  - stdout: |
+      ---
+      name: $$bs$$
+- execute:
+  - command: compute backend-services update $$bs$$ --region us-central1 --timeout=20
+      --format 'text(name,loadBalancingScheme,timeoutSec)'
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+  - stdout: |
+      ---
+      loadBalancingScheme: INTERNAL
+      name:                $$bs$$
+      timeoutSec:          20
+- execute:
+  - command: compute forwarding-rules create $$fr$$ --load-balancing-scheme internal
+      --backend-service $$bs$$ --ports 80-82,85 --network default --region us-central1
+      --format 'text(name,loadBalancingScheme,backendService)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$].
+  - stdout: |
+      ---
+      backendService:      https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+      loadBalancingScheme: INTERNAL
+      name:                $$fr$$
+- execute:
+  - command: compute forwarding-rules delete $$fr$$ --quiet --region us-central1
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$].
+- execute:
+  - command: compute backend-services delete $$bs$$ --quiet --region us-central1
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+- execute:
+  - command: compute instance-groups unmanaged delete $$ig$$ --quiet --zone us-central1-f
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+- execute:
+  - command: compute instances delete $$instance$$ --quiet --zone us-central1-f
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+- execute:
+  - command: compute health-checks delete $$hc$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+actions:
+
+
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
+
+- generate_resource_id:
+    reference: hc
+    prefix: compute-internal-lb-health-check
+- execute_command:
+    command: compute health-checks create tcp $$hc$$ --format none
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+    - expect_exit:
+        code: 0
+
+
+- generate_resource_id:
+    reference: instance
+    prefix: compute-internal-lb-instance
+- execute_command:
+    command: compute instances create $$instance$$ --zone us-central1-f --format none
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_exit:
+        code: 0
+
+
+- generate_resource_id:
+    reference: ig
+    prefix: compute-internal-lb-test-instance-group
+- execute_command:
+    command: compute instance-groups unmanaged create $$ig$$ --zone us-central1-f
+      --format none
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_exit:
+        code: 0
+
+
+- generate_resource_id:
+    reference: bs
+    prefix: compute-internal-lb-backend-service
+- execute_command:
+    command: compute backend-services create $$bs$$ --load-balancing-scheme=internal
+      --health-checks=$$hc$$ --protocol=TCP --timeout=30 --region us-central1 --format
+      'text(name,loadBalancingScheme,timeoutSec)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              healthChecks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+              loadBalancingScheme: INTERNAL
+              name: $$bs$$
+              protocol: TCP
+              timeoutSec: 30
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '848'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '5870500205943480382'
+            name: operation-1538514640390-577455a9f4772-e4f1bbed-da8887f8
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            targetId: '7253485598015381566'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-10-02T14:10:41.427-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514640390-577455a9f4772-e4f1bbed-da8887f8
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '877'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"jHyVV1ZKJP8Ej5zjZONIh_TCVik=/pJPqxw99KHVxymbd10N_gBXhFHY="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: 0Avy1e2iUJI=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - expect_stdout: |
+        ---
+        loadBalancingScheme: INTERNAL
+        name:                $$bs$$
+        timeoutSec:          30
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute backend-services list --filter 'region:us-central1 AND name:$$bs$$'
+      --format 'text(name)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/aggregated/backendServices?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '6090'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"yhRbYQXzF4o6Qs_vLnGYYgqS36U=/OHI1h11zEvEin7u_edwlm_H86U8="'
+            status: '200'
+          body:
+            kind: compute#backendServiceAggregatedList
+            id: projects/cloud-sdk-integration-testing/aggregated/backendServices
+            items:
+              global:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'global' on this page.
+                  data:
+                  - key: scope
+                    value: global
+              regions/us-central1:
+                backendServices:
+                - kind: compute#backendService
+                  id: '7253485598015381566'
+                  creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+                  name: $$bs$$
+                  description: ''
+                  selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+                  healthChecks:
+                  - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+                  timeoutSec: 30
+                  protocol: TCP
+                  fingerprint: 0Avy1e2iUJI=
+                  sessionAffinity: NONE
+                  region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+                  loadBalancingScheme: INTERNAL
+                  connectionDraining:
+                    drainingTimeoutSec: 0
+              regions/europe-west1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west1' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west1
+              regions/us-west1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-west1' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-west1
+              regions/asia-east1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-east1' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-east1
+              regions/us-east1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-east1' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-east1
+              regions/us-east2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-east2' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-east2
+              regions/asia-northeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-northeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-northeast1
+              regions/asia-southeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-southeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-southeast1
+              regions/us-east4:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-east4' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-east4
+              regions/australia-southeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/australia-southeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/australia-southeast1
+              regions/europe-west2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west2' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west2
+              regions/europe-west3:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west3' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west3
+              regions/southamerica-east1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/southamerica-east1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/southamerica-east1
+              regions/asia-south1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-south1' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-south1
+              regions/northamerica-northeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/northamerica-northeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/northamerica-northeast1
+              regions/europe-west4:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west4' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west4
+              regions/europe-north1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-north1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-north1
+              regions/us-west2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-west2' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-west2
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/aggregated/backendServices
+    - expect_stdout: |
+        ---
+        name: $$bs$$
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute backend-services describe $$bs$$ --format 'text(name,loadBalancingScheme,timeoutSec)'
+      --region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '877'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"XTrb4d5T-qyGJAKxxHytvCEXf9c=/zqg35cy8$$api-version$$sgPwOCj0LtZJeLEOM="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: 0Avy1e2iUJI=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - expect_stdout: |
+        loadBalancingScheme: INTERNAL
+        name:                $$bs$$
+        timeoutSec:          30
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute instance-groups unmanaged add-instances $$ig$$ --instances $$instance$$
+      --zone us-central1-f
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute backend-services add-backend $$bs$$ --region us-central1 --instance-group
+      $$ig$$ --instance-group-zone us-central1-f --description initial-test-backend
+      --format 'text(name,backends[0].description,backends[0].group)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '877'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"k2anln0mf8XN3svwRKojndDnTMc=/cXdzw28ARxrwxiXd0ncTSRE5-uk="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: 0Avy1e2iUJI=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: PUT
+          headers: {}
+          body:
+            json:
+              backends:
+              - description: initial-test-backend
+                group: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+              connectionDraining:
+                drainingTimeoutSec: 0
+              description: ''
+              healthChecks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+              kind: compute#backendService
+              loadBalancingScheme: INTERNAL
+              name: $$bs$$
+              protocol: TCP
+              region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+              sessionAffinity: NONE
+              timeoutSec: 30
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '848'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '6760578005616975922'
+            name: operation-1538514652484-577455b57d1a3-ae6c02e1-e2593ed3
+            operationType: update
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            targetId: '7253485598015381566'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-10-02T14:10:53.206-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514652484-577455b57d1a3-ae6c02e1-e2593ed3
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1167'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"uXetXxPw7TdDt5MPm5dacgkLDck=/_uHmqpVtjKn8-Cn0j1jrxCT4hx8="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            backends:
+            - description: initial-test-backend
+              group: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+              balancingMode: CONNECTION
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: FqZf4RRAE-k=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - expect_stdout: |
+        ---
+        backends[0].description: initial-test-backend
+        backends[0].group:       https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+        name:                    $$bs$$
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute backend-services update-backend $$bs$$ --region us-central1 --instance-group
+      $$ig$$ --instance-group-zone us-central1-f --description updated-test-backend
+      --format 'text(name,backends[0].description,backends[0].group)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1167'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"0ng8wveZPb2BcAhTDswelywnCDo=/gGNUr1ay5nPSTvzUdNN30tr7DB4="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            backends:
+            - description: initial-test-backend
+              group: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+              balancingMode: CONNECTION
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: FqZf4RRAE-k=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: PUT
+          headers: {}
+          body:
+            json:
+              backends:
+              - balancingMode: CONNECTION
+                description: updated-test-backend
+                group: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+              connectionDraining:
+                drainingTimeoutSec: 0
+              description: ''
+              healthChecks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+              kind: compute#backendService
+              loadBalancingScheme: INTERNAL
+              name: $$bs$$
+              protocol: TCP
+              region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+              sessionAffinity: NONE
+              timeoutSec: 30
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '848'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '6840595033047851029'
+            name: operation-1538514681158-577455d0d5971-019ef726-96217355
+            operationType: update
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            targetId: '7253485598015381566'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-10-02T14:11:22.077-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514681158-577455d0d5971-019ef726-96217355
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1167'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"uGKlvRWstyGX4MIPa5cLyR0vIaY=/jBq0LsfbPxlh0qIYp9tWES3ZdR4="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            backends:
+            - description: updated-test-backend
+              group: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+              balancingMode: CONNECTION
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: iYjd-GfyN4Q=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - expect_stdout: |
+        ---
+        backends[0].description: updated-test-backend
+        backends[0].group:       https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+        name:                    $$bs$$
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute backend-services remove-backend $$bs$$ --region us-central1 --instance-group
+      $$ig$$ --instance-group-zone us-central1-f --format 'text(name,backends)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1167'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"op66uE_5tVYgn3TAGOLdrJVvHik=/9hinAcJ6YQuKVjta55fOUSh-wcE="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            backends:
+            - description: updated-test-backend
+              group: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+              balancingMode: CONNECTION
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: iYjd-GfyN4Q=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: PUT
+          headers: {}
+          body:
+            json:
+              connectionDraining:
+                drainingTimeoutSec: 0
+              description: ''
+              healthChecks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+              kind: compute#backendService
+              loadBalancingScheme: INTERNAL
+              name: $$bs$$
+              protocol: TCP
+              region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+              sessionAffinity: NONE
+              timeoutSec: 30
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '848'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '5164541035704902131'
+            name: operation-1538514715296-577455f164101-55fbfdad-574ac920
+            operationType: update
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            targetId: '7253485598015381566'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-10-02T14:11:56.142-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514715296-577455f164101-55fbfdad-574ac920
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '877'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"hQQzl9GiQXpmTWZc05OcxlSEyWQ=/Ax1qIK5ZLVXQUk6GxAbXzv8tMIA="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: mu4Gf5QBFok=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - expect_stdout: |
+        ---
+        name: $$bs$$
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute backend-services update $$bs$$ --region us-central1 --timeout=20
+      --format 'text(name,loadBalancingScheme,timeoutSec)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '877'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"mzGR7boXmkvbrFikpFn9lIIjbz0=/S_QjDtrmzmIgX3JNT-Yzno2d214="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: mu4Gf5QBFok=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              loadBalancingScheme: INTERNAL
+              kind: compute#backendService
+              healthChecks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+              protocol: TCP
+              region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+              name: $$bs$$
+              timeoutSec: 20
+              sessionAffinity: NONE
+              description: ''
+              connectionDraining:
+                drainingTimeoutSec: 0
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '847'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '3480379845209121243'
+            name: operation-1538514739187-577456082cd38-49c02933-58b73c09
+            operationType: patch
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            targetId: '7253485598015381566'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-10-02T14:12:20.020-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514739187-577456082cd38-49c02933-58b73c09
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '877'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"H1qYuzhk2yXUyqV_9_xyREdZMFM=/-Iz1m4KRxeW1iOVNYm6IJRS7chU="'
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '7253485598015381566'
+            creationTimestamp: '2018-10-02T14:10:41.418-07:00'
+            name: $$bs$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            healthChecks:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            timeoutSec: 20
+            protocol: TCP
+            fingerprint: AwQhhLJ5FKg=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - expect_stdout: |
+        ---
+        loadBalancingScheme: INTERNAL
+        name:                $$bs$$
+        timeoutSec:          20
+    - expect_exit:
+        code: 0
+
+
+- generate_resource_id:
+    reference: fr
+    prefix: compute-internal-lb-forwarding-rule
+- execute_command:
+    command: compute forwarding-rules create $$fr$$ --load-balancing-scheme internal
+      --backend-service $$bs$$ --ports 80-82,85 --network default --region us-central1
+      --format 'text(name,loadBalancingScheme,backendService)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              backendService: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+              loadBalancingScheme: INTERNAL
+              name: $$fr$$
+              network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
+              ports:
+              - '80'
+              - '81'
+              - '82'
+              - '85'
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '848'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '6146607847923671507'
+            name: operation-1538514747706-577456104ca90-cfb8288c-f6d028c8
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$
+            targetId: '7437523851432321491'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-10-02T14:12:28.874-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514747706-577456104ca90-cfb8288c-f6d028c8
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '978'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"9rE0joPNowvQX4dN3MAjS2YJ3Hs=/V2wT3ENL-YG8jWT3GNBQU4FYdxE="'
+            status: '200'
+          body:
+            kind: compute#forwardingRule
+            id: '7437523851432321491'
+            creationTimestamp: '2018-10-02T14:12:28.861-07:00'
+            name: $$fr$$
+            description: ''
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            IPAddress: 10.240.0.20
+            IPProtocol: TCP
+            ports:
+            - '80'
+            - '81'
+            - '82'
+            - '85'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$
+            loadBalancingScheme: INTERNAL
+            network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
+            backendService: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            networkTier: PREMIUM
+    - expect_stdout: |
+        ---
+        backendService:      https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+        loadBalancingScheme: INTERNAL
+        name:                $$fr$$
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute forwarding-rules delete $$fr$$ --quiet --region us-central1
+    cleanup_for: fr
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute backend-services delete $$bs$$ --quiet --region us-central1
+    cleanup_for: bs
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '848'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '5961959846589653429'
+            name: operation-1538514778134-5774562d515f0-c3cc85c8-9ff619bf
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            targetId: '7253485598015381566'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-10-02T14:12:58.625-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514778134-5774562d515f0-c3cc85c8-9ff619bf
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute instance-groups unmanaged delete $$ig$$ --quiet --zone us-central1-f
+    cleanup_for: ig
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute instances delete $$instance$$ --quiet --zone us-central1-f
+    cleanup_for: instance
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute health-checks delete $$hc$$ --quiet
+    cleanup_for: hc
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+    - expect_exit:
+        code: 0

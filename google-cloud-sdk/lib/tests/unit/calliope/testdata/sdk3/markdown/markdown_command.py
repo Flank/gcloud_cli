@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.calliope import arg_parsers
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class Markdown(base.Command):
+class Markdown(calliope_base.Command):
   """Markdown command docstring index.
 
   Markdown command docstring description. This is a markdown test. If you
@@ -108,10 +108,10 @@ class Markdown(base.Command):
     parser.add_argument(
         '--y-common-flag',
         default='VALUE',
-        category=base.COMMONLY_USED_FLAGS,
+        category=calliope_base.COMMONLY_USED_FLAGS,
         help='Command common flag help.')
 
-    base.FILTER_FLAG.AddToParser(parser)
+    calliope_base.FILTER_FLAG.AddToParser(parser)
 
     parser.add_argument(
         '--value-flag',

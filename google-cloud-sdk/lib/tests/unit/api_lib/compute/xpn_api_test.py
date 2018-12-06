@@ -26,7 +26,7 @@ from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.compute import client_adapter
 from googlecloudsdk.api_lib.compute import xpn_api
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -45,7 +45,7 @@ class XpnApiTest(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi(_DEFAULT_API_VERSION)
-    self.xpn_client = xpn_api.GetXpnClient(base.ReleaseTrack.GA)
+    self.xpn_client = xpn_api.GetXpnClient(calliope_base.ReleaseTrack.GA)
 
   def _SetupMockXpnClient(self):
     self.mock_client = mock.Client(

@@ -19,7 +19,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firestore import admin_api
-from googlecloudsdk.api_lib.firestore import operations
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -36,7 +35,8 @@ class ImportTest(base.FirestoreCommandUnitTest):
         self.DatabaseResourceName(), input_uri)
 
     operation_name = 'import operation name'
-    mock_response = operations.GetMessages().GoogleLongrunningOperation(
+    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
     self.mock_firestore_v1beta1.projects_databases.ImportDocuments.Expect(
@@ -63,7 +63,8 @@ class ImportTest(base.FirestoreCommandUnitTest):
         self.DatabaseResourceName(), input_uri, collection_ids=collection_ids)
 
     operation_name = 'import operation name'
-    mock_response = operations.GetMessages().GoogleLongrunningOperation(
+    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
     self.mock_firestore_v1beta1.projects_databases.ImportDocuments.Expect(
@@ -99,7 +100,8 @@ class ImportTest(base.FirestoreCommandUnitTest):
         self.DatabaseResourceName(), expected_location)
 
     operation_name = 'import operation name'
-    mock_response = operations.GetMessages().GoogleLongrunningOperation(
+    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
     self.mock_firestore_v1beta1.projects_databases.ImportDocuments.Expect(

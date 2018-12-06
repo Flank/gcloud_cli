@@ -1,0 +1,75 @@
+title: compute disks snapshots scenario
+release_tracks: [GA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: compute/zone us-central1-f
+- execute:
+  - command: compute disks snapshot foo --snapshot-names my-snapshot
+  - progress_tracker:
+    - message: Creating snapshot(s) my-snapshot
+    - status: SUCCESS
+actions:
+- set_property:
+    compute/zone: us-central1-f
+- execute_command:
+    command: compute disks snapshot foo --snapshot-names my-snapshot
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/disks/foo/createSnapshot?alt=json&guestFlush=False
+          method: POST
+          body:
+            json:
+              name: my-snapshot
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "id": "2266218107062882988",
+              "insertTime": "2017-08-30T14:21:07.296-07:00",
+              "kind": "compute#operation",
+              "name": "operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248",
+              "operationType": "createSnapshot",
+              "progress": 0,
+              "selfLink": "https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/operations/operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248",
+              "status": "PENDING",
+              "targetId": "2603466420963290811",
+              "targetLink": "https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/disks/foo",
+              "user": "nmakeenkov@google.com",
+              "zone": "https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f"
+            }
+    - expect_progress_tracker:
+        message: Creating snapshot(s) my-snapshot
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/fake-project/global/snapshots/my-snapshot?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "creationTimestamp": "2017-08-30T14:21:07.637-07:00",
+              "diskSizeGb": "10",
+              "id": "6174441104344781484",
+              "kind": "compute#snapshot",
+              "labelFingerprint": "42WmSpB8rSM=",
+              "licenses": [
+                "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-8-jessie"
+              ],
+              "name": "t8noiqdm038v",
+              "selfLink": "https://www.googleapis.com/compute/v1/projects/fake-project/global/snapshots/t8noiqdm038v",
+              "sourceDisk": "https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/disks/foo",
+              "sourceDiskId": "2603466420963290811",
+              "status": "READY",
+              "storageBytes": "3807121",
+              "storageBytesStatus": "UP_TO_DATE"
+            }
+
+    - expect_exit:
+        code: 0

@@ -132,6 +132,14 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
     self.assertIn("'clone' is not a valid dimension",
                   six.text_type(ex_ctx.exception))
 
+  def testValidateXcodeVersion_InvalidValue(self):
+    catalog = fake_catalogs.FakeIosCatalog()
+    mgr = catalog_manager.IosCatalogManager(catalog)
+    with self.assertRaises(exceptions.XcodeVersionNotFoundError) as ex_ctx:
+      mgr.ValidateXcodeVersion('2.71828')
+    self.assertIn("'2.71828' is not a supported Xcode version",
+                  six.text_type(ex_ctx.exception))
+
 
 if __name__ == '__main__':
   test_case.main()

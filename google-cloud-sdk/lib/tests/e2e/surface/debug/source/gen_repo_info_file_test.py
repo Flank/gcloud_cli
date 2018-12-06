@@ -48,7 +48,6 @@ class GenRepoInfoFileTest(base.DebugTest):
     with self.assertRaises(properties.RequiredPropertyError):
       self.RunDebug(['snapshots', 'create', 'foo.bar:123'])
 
-  @test_case.Filters.SkipOnPy3('Relies on appengine code', 'b/109938420')
   @sdk_test_base.Filters.RunOnlyIfExecutablePresent('git')
   def testRepoInfo(self):
     git_dir = os.path.join(self.test_dir, 'git_dir')

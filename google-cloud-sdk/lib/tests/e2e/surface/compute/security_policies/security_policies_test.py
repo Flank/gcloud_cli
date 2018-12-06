@@ -34,10 +34,10 @@ def _UniqueName(name):
       prefix='compute-security-policy-test-' + name))
 
 
-class SecurityPoliciesTestAlpha(e2e_test_base.BaseTest):
+class SecurityPoliciesTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def RunCompute(self, *cmd):
     return self.Run(('compute',) + cmd)
@@ -103,10 +103,16 @@ class SecurityPoliciesTestAlpha(e2e_test_base.BaseTest):
       self.assertEqual(False, default_rule['preview'])
 
 
-class SecurityPoliciesTestBeta(SecurityPoliciesTestAlpha):
+class SecurityPoliciesTestBeta(SecurityPoliciesTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+
+class SecurityPoliciesTestAlpha(SecurityPoliciesTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   e2e_test_base.main()

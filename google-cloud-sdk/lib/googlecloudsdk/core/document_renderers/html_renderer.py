@@ -32,8 +32,6 @@ class HTMLRenderer(renderer.Renderer):
     _BULLET: A list of bullet type names indexed by list level modulo #bullets.
     _ESCAPE: Character element code name dict indexed by input character.
     _FONT_TAG: A list of font embellishment tag names indexed by font attribute.
-    _blank: True if the output already contains a blank line. Used to avoid
-      sequences of 2 or more blank lines in the output.
     _document_ids: The set of html ids unique in the current document.
     _example: True if currently rendering an example.
     _fill: The number of characters in the current output line.
@@ -42,7 +40,6 @@ class HTMLRenderer(renderer.Renderer):
     _paragraph: True if the output already contains a paragraph tag. Used to
       avoid sequences of 2 or more paragraph tags in the output.
     _pop: A list of list element closing tag names indexed by _level.
-    _table: The table element closing tag string, '' if not in a table.
     _section: Section heading but no section body yet.
   """
   _BULLET = ('disc', 'circle', 'square')
@@ -51,15 +48,14 @@ class HTMLRenderer(renderer.Renderer):
 
   def __init__(self, *args, **kwargs):
     super(HTMLRenderer, self).__init__(*args, **kwargs)
-    self._blank = True
     self._document_ids = set()
     self._example = False
     self._fill = 0
+    self._global_flags = False
     self._heading = ''
     self._level = 0
     self._paragraph = False
     self._pop = ['']
-    self._table = ''
     self._section = False
     self._Title()
     self._out.write("""\
@@ -123,7 +119,7 @@ class HTMLRenderer(renderer.Renderer):
         self._out.write('</code>\n')
       self._fill = 0
       self._out.write('\n')
-      self._blank = False
+      self.Content()
 
   def GetDocumentID(self, name):
     """Returns a unique document id for name."""
@@ -194,7 +190,7 @@ class HTMLRenderer(renderer.Renderer):
     Args:
       line: The example line.
     """
-    self._blank = True
+    self.Blank()
     if not self._example:
       self._example = True
       self._fill = 2
@@ -215,7 +211,10 @@ class HTMLRenderer(renderer.Renderer):
     if self._paragraph:
       self._paragraph = False
       self._out.write('<p>\n')
-    self._blank = True
+    self.Blank()
+    if self._global_flags:
+      self._global_flags = False
+      line = self.LinkGlobalFlags(line)
     for word in line.split():
       n = len(word)
       if self._fill + n >= self._width:
@@ -298,12 +297,14 @@ class HTMLRenderer(renderer.Renderer):
       self._out.write(self._heading)
     self._Heading(level, heading)
     self._section = True
+    if heading.endswith(' WIDE FLAGS'):
+      self._global_flags = True
 
   def Line(self):
     """Renders a paragraph separating line."""
     self._Flush()
-    if not self._blank:
-      self._blank = True
+    if not self.HaveBlank():
+      self.Blank()
       self._paragraph = True
 
   def Link(self, target, text):
@@ -329,6 +330,20 @@ class HTMLRenderer(renderer.Renderer):
       target = target[:-len(tail)]
     target = target.replace('/', '_') + '.html'
     return '<a href="{target}">{text}</a>'.format(target=target, text=text)
+
+  def LinkGlobalFlags(self, line):
+    """Add global flags links to line if any.
+
+    Args:
+      line: The text line.
+
+    Returns:
+      line with annoted global flag links.
+    """
+    return re.sub(
+        r'(--[-a-z]+)',
+        r'<a href="/#\1">\1</a>',
+        line)
 
   def List(self, level, definition=None, end=False):
     """Renders a bullet or definition list item.
@@ -398,6 +413,28 @@ class HTMLRenderer(renderer.Renderer):
     """
     self._out.write('<dl class="notopmargin"><dt class="hangingindent">'
                     '<span class="normalfont">\n')
+
+    # Add flag local links. NOTE: --no-foo defined under --foo.
+
+    line = re.sub('(<code>)([-a-z0-9]+)(</code>)',
+                  r'\1<a href="#\2">\2</a>\3',
+                  line)
+    line = re.sub('href="#--no-', 'href=#--', line)
+
+    # Add positional local links.
+
+    line = re.sub(r'([^[=]\[*<code><var>)([_A-Z0-9]+)(</var></code>)',
+                  r'\1<a href="#\2">\2</a>\3',
+                  line)
+
+    # Add self.command[0].upper() WIDE FLAGS local link.
+
+    root = self.command[0].upper()
+    line = re.sub(
+        '>{root}_WIDE_FLAG '.format(root=root),
+        '><a href="#{root}-WIDE-FLAGS">{root}_WIDE_FLAG</a> '.format(root=root),
+        line)
+
     nest = 0
     chars = collections.deque(line)
     while chars:
@@ -416,27 +453,43 @@ class HTMLRenderer(renderer.Renderer):
       self._out.write(c)
     self._out.write('\n</span></dt></dl>\n')
 
-  def Table(self, line):
-    """Renders a table line.
+  def Table(self, table, rows):
+    """Renders a table.
 
-    Nested tables are not supported. The first call on a new table is:
-      Table(attributes)
-    the intermediate calls add the heading and data lines and the last call is:
-      Table(None)
+    Nested tables are not supported.
 
     Args:
-      line: A CSV table data line.
+      table: renderer.TableAttributes object.
+      rows: A list of rows, each row is a list of column strings.
     """
-    if line is None:
-      self._table = ''
-      self._out.write('</table>\n</blockquote>\n')
-    elif not self._table:
-      self._table = 'th'
-      self._out.write('\n<blockquote>\n<table>\n')
-    else:
+
+    # Output the preamble.
+
+    self._out.write('\n<blockquote>\n<table>\n')
+
+    # Output the heading.
+
+    if table.heading:
       self._out.write('<tr>\n')
-      for col in line.split(','):
-        self._out.write('<%s align=left>%s</%s>\n' % (self._table, col,
-                                                      self._table))
+      for column in table.columns:
+        self._out.write('<th>{}</th>\n'.format(column.label or ''))
       self._out.write('</tr>\n')
-      self._table = 'td'
+
+    # Output the row data.
+
+    for row in rows:
+      self._out.write('<tr>\n')
+      for index, col in enumerate(row):
+        align = 'left'
+        width = ''
+        if index < len(table.columns):
+          column = table.columns[index]
+          align = column.align
+          if column.width:
+            width = ' width={}em'.format(column.width)
+        self._out.write('<td align={}{}>{}</td>\n'.format(align, width, col))
+      self._out.write('</tr>\n')
+
+    # Output the postamble.
+
+    self._out.write('</table>\n</blockquote>\n')

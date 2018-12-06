@@ -10,8 +10,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -29,7 +30,7 @@ COMMANDS
         (ALPHA) Import a Binary Authorization policy to the current project.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding to a Binary Authorization policy.
+        (ALPHA) Remove IAM policy binding of a Binary Authorization policy.
 
      set-iam-policy
         (ALPHA) Set the IAM policy for a Binary Authorization policy.

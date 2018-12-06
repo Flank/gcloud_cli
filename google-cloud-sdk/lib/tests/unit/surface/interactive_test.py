@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 import os
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.interactive import application
 from tests.lib import calliope_test_base
 
@@ -35,7 +35,7 @@ class InteractiveTest(calliope_test_base.CalliopeTestBase):
 
   def SetUp(self):
     self.metrics_environment = ''
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.StartObjectPatch(application, 'main', side_effect=self._MockMain)
 
   def testInteractiveSplash(self):
@@ -81,8 +81,8 @@ Welcome to the gcloud interactive shell environment.
             while, type gcloud compute and hit F7. This will display gcloud
             compute at subsequent prompts until the context is changed.
 
-            Hit ^C and F7 to clear the context, or edit a command line and/or
-            move the cursor and hit F7 to set a different context.
+            Hit ctrl-c and F7 to clear the context, or edit a command line
+            and/or move the cursor and hit F7 to set a different context.
 
          F8:web-help
             Opens a web browser tab/window to display the complete man page

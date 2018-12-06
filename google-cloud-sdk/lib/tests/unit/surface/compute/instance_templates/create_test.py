@@ -293,7 +293,8 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
       kwargs['errors'].append((404, 'Not Found'))
     self.make_requests.side_effect = MakeRequests
 
-    with self.AssertRaisesToolExceptionRegexp(
+    with self.AssertRaisesExceptionMatches(
+        utils.ImageNotFoundError,
         textwrap.dedent("""\
         Could not fetch image resource:
          - Not Found
@@ -2958,7 +2959,7 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
     self.Run(
         'compute instance-templates create template-create-disk '
         '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,image=debian-8,'
-        'image-project=debian-cloud')
+        'image-project=debian-cloud,description=testDescription')
 
     template = m.InstanceTemplate(
         name='template-create-disk',
@@ -2969,8 +2970,7 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
                     autoDelete=True,
                     boot=True,
                     initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,
-                    ),
+                        sourceImage=self._default_image,),
                     mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
                     type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
                 m.AttachedDisk(
@@ -2978,27 +2978,27 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
                     boot=False,
                     initializeParams=m.AttachedDiskInitializeParams(
                         diskName='disk-1',
+                        description='testDescription',
                         diskSizeGb=10,
                         sourceImage=(self.compute_uri +
                                      '/projects/debian-cloud/global/images'
                                      '/debian-8'),
                         diskType='SSD'),
                     mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
             machineType=_DEFAULT_MACHINE_TYPE,
             metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[self._default_access_config],
+                    network=self._default_network)
+            ],
             serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
             ],
             scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+        ))
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -3254,6 +3254,107 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
             scheduling=m.Scheduling(automaticRestart=True)
         )
     )
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates,
+          'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
+
+  def testLocalNVDIMM(self):
+    self.Run("""
+        compute instance-templates create template-1
+          --local-nvdimm ''
+        """)
+
+    m = self.messages
+    template = m.InstanceTemplate(
+        name='template-1',
+        properties=m.InstanceProperties(
+            canIpForward=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                m.AttachedDisk(
+                    autoDelete=True,
+                    initializeParams=(m.AttachedDiskInitializeParams(
+                        diskType='aep-nvdimm')),
+                    interface=m.AttachedDisk.InterfaceValueValuesEnum.NVDIMM,
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
+            ],
+            machineType=_DEFAULT_MACHINE_TYPE,
+            metadata=m.Metadata(),
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[self._default_access_config],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True),
+        ))
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates,
+          'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
+
+  def testLocalNVDIMMWithSize(self):
+    self.Run("""
+        compute instance-templates create template-1
+          --local-nvdimm size=3TB
+        """)
+
+    m = self.messages
+    template = m.InstanceTemplate(
+        name='template-1',
+        properties=m.InstanceProperties(
+            canIpForward=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                m.AttachedDisk(
+                    autoDelete=True,
+                    diskSizeGb=3072,
+                    initializeParams=(m.AttachedDiskInitializeParams(
+                        diskType='aep-nvdimm')),
+                    interface=m.AttachedDisk.InterfaceValueValuesEnum.NVDIMM,
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
+            ],
+            machineType=_DEFAULT_MACHINE_TYPE,
+            metadata=m.Metadata(),
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[self._default_access_config],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True),
+        ))
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -4557,16 +4658,19 @@ class InstanceTemplatesCreateWithNodeAffinity(test_base.BaseTest,
     self._CheckCreateRequests(node_affinities)
 
 
-class InstanceTemplatesCreateWithKmsTestAlpha(InstanceTemplatesCreateTest,
-                                              parameterized.TestCase):
+class InstanceTemplatesCreateWithKmsTestGa(InstanceTemplatesCreateTest,
+                                           parameterized.TestCase):
   GLOBAL_KMS_KEY = ('projects/key-project/locations/global/keyRings/my-ring/'
                     'cryptoKeys/my-key')
   GLOBAL_KMS_KEY_SAME_PROJECT = ('projects/my-project/locations/global/'
                                  'keyRings/my-ring/cryptoKeys/my-key')
 
+  def SetupApiAndTrack(self):
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
+
   def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SetupApiAndTrack()
 
     self.global_kms_key = self.messages.CustomerEncryptionKey(
         kmsKeyName=self.GLOBAL_KMS_KEY)
@@ -4743,16 +4847,20 @@ class InstanceTemplatesCreateWithKmsTestAlpha(InstanceTemplatesCreateTest,
 
 
 class InstanceTemplatesCreateWithKmsTestBeta(
-    InstanceTemplatesCreateWithKmsTestAlpha):
+    InstanceTemplatesCreateWithKmsTestGa):
 
-  def SetUp(self):
+  def SetupApiAndTrack(self):
     SetUp(self, 'beta')
     self.track = calliope_base.ReleaseTrack.BETA
 
-    self.global_kms_key = self.messages.CustomerEncryptionKey(
-        kmsKeyName=self.GLOBAL_KMS_KEY)
-    self.global_kms_key_in_same_project = self.messages.CustomerEncryptionKey(
-        kmsKeyName=self.GLOBAL_KMS_KEY_SAME_PROJECT)
+
+class InstanceTemplatesCreateWithKmsTestAlpha(
+    InstanceTemplatesCreateWithKmsTestGa):
+
+  def SetupApiAndTrack(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

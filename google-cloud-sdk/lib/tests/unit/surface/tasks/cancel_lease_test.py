@@ -28,7 +28,7 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.tasks import test_base
 
 
-class TasksCancelLeaseTest(test_base.CloudTasksTestBase):
+class TasksCancelLeaseTest(test_base.CloudTasksAlphaTestBase):
 
   def SetUp(self):
     self.location_id = 'us-central1'

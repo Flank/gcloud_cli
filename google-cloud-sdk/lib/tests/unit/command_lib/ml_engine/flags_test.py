@@ -21,7 +21,9 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.ml_engine import flags
 from tests.lib import completer_test_base
+from tests.lib import parameterized
 from tests.lib.surface.iam import unit_test_base
+from tests.lib.surface.ml_engine import base
 
 
 class CompletionTest(unit_test_base.BaseTest,
@@ -71,6 +73,47 @@ class CompletionTest(unit_test_base.BaseTest,
         },
     )
 
+
+class FlagsTest(base.MlGaPlatformTestBase, parameterized.TestCase):
+
+  def testEmptyAccelerator(self):
+    self.assertEqual(None, flags.ParseAcceleratorFlag(None))
+
+  @parameterized.parameters(
+      (0, dict([('count', 1), ('type', 'nvidia-tesla-k80')]), 1),
+      (1, dict([('count', 1), ('type', 'nvidia-tesla-p100')]), 1),
+      (2, dict([('count', 2), ('type', 'nvidia-tesla-v100')]), 2),
+      (3, dict([('count', 2), ('type', 'nvidia-tesla-p4')]), 2),
+      )
+  def testValidateAccelerator(self, index, accelerator, expected_count):
+    accelerator_msg = self.msgs.GoogleCloudMlV1AcceleratorConfig
+    accelerator_types = accelerator_msg.TypeValueValuesEnum
+    accelerator_type_list = [
+        accelerator_types.NVIDIA_TESLA_K80,
+        accelerator_types.NVIDIA_TESLA_P100,
+        accelerator_types.NVIDIA_TESLA_V100,
+        accelerator_types.NVIDIA_TESLA_P4]
+    expected_type = accelerator_type_list[index]
+    self.assertEqual(expected_type,
+                     flags.ParseAcceleratorFlag(accelerator).type)
+    self.assertEqual(expected_count,
+                     flags.ParseAcceleratorFlag(accelerator).count)
+
+  def testInvalidAcceleratorType(self):
+    with self.AssertRaisesExceptionMatches(
+        flags.ArgumentError, """\
+The type of the accelerator can only be one of the following: 'nvidia-tesla-k80', 'nvidia-tesla-p100', 'nvidia-tesla-v100' and 'nvidia-tesla-p4'.
+"""):
+      flags.ParseAcceleratorFlag(dict([('count', 1), ('type', 'o')]))
+
+  @parameterized.parameters(0, -1)
+  def testInvalidAcceleratorCount(self, invalid_count):
+    with self.AssertRaisesExceptionMatches(
+        flags.ArgumentError, """\
+The count of the accelerator must be greater than 0.
+"""):
+      flags.ParseAcceleratorFlag(
+          dict([('count', invalid_count), ('type', 'nvidia-tesla-k80')]))
 
 if __name__ == '__main__':
   completer_test_base.main()

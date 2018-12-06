@@ -23,7 +23,7 @@ import itertools
 import re
 
 from googlecloudsdk.api_lib.util import resource as resource_util
-from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
+from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.apis import resource_arg_schema
 from googlecloudsdk.command_lib.util.apis import yaml_command_schema_util as util
@@ -31,6 +31,8 @@ from googlecloudsdk.core import resources
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.command_lib.util.apis import base
+
+import mock
 
 
 class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
@@ -65,14 +67,17 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(r.removed_flags, ['zone'])
     self.assertEqual(r.is_positional, False)
 
-    spec = r._GenerateResourceSpec(
-        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    mock_resource = mock.MagicMock(
+        full_name='foo.projects.zones',
+        api_version='v1',
+        detailed_params=['projectsId', 'zonesId'])
+    spec = r.GenerateResourceSpec(mock_resource)
     project_attr, zone_attr = spec.attributes[0], spec.attributes[1]
     self.assertEqual(project_attr.name, 'project')
     self.assertEqual(project_attr.help_text, 'help1')
     self.assertEqual(
         project_attr.fallthroughs,
-        project_resource_args.PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
+        concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
     self.assertEqual(zone_attr.name, 'zone')
     self.assertEqual(zone_attr.help_text, 'help2')
     self.assertEqual(zone_attr.fallthroughs, [])
@@ -94,8 +99,11 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
             'removed_flags': ['zone'],
             'is_positional': False})
 
-    spec = r._GenerateResourceSpec(
-        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    mock_resource = mock.MagicMock(
+        full_name='foo.projects.zones',
+        api_version='v1',
+        detailed_params=['projectsId', 'zonesId'])
+    spec = r.GenerateResourceSpec(mock_resource)
     self.assertEqual('zones', spec.plural_name)
 
   def testResourceWithFlagNameOverride(self):
@@ -116,9 +124,11 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(arg_schema.group_help, 'group help')
     self.assertEqual(arg_schema.removed_flags, ['zone'])
     self.assertFalse(arg_schema.is_positional)
-
-    spec = arg_schema._GenerateResourceSpec(
-        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    spec = arg_schema.GenerateResourceSpec(
+        mock.MagicMock(
+            full_name='foo.projects.zones',
+            api_version='v1',
+            detailed_params=['projectsId', 'zonesId']))
     project_attr, zone_attr = spec.attributes[0], spec.attributes[1]
     self.assertEqual(project_attr.name, 'project')
     self.assertEqual(project_attr.help_text, 'help1')
@@ -142,14 +152,18 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
             'removed_flags': ['zone'],
             'is_positional': False})
 
-    spec = r._GenerateResourceSpec(
-        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    mock_resource = mock.MagicMock(
+        full_name='foo.projects.zones',
+        api_version='v1',
+        detailed_params=['projectsId', 'zonesId'])
+    spec = r.GenerateResourceSpec(mock_resource)
+
     project_attr = spec.attributes[0]
 
     # Should only use the project property one time.
     self.assertEqual(
         project_attr.fallthroughs,
-        project_resource_args.PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
+        concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
 
   def testResourceWithIgnoredProject(self):
     r = resource_arg_schema.YAMLResourceArgument.FromData(
@@ -163,8 +177,11 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
             'removed_flags': ['zone'],
             'is_positional': False})
 
-    spec = r._GenerateResourceSpec(
-        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    mock_resource = mock.MagicMock(
+        full_name='foo.projects.zones',
+        api_version='v1',
+        detailed_params=['projectsId', 'zonesId'])
+    spec = r.GenerateResourceSpec(mock_resource)
     project_attr = spec.attributes[0]
 
     self.assertEqual(project_attr.name, 'project')
@@ -172,7 +189,7 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
                      'The Cloud project for the {resource}.')
     self.assertEqual(
         project_attr.fallthroughs,
-        project_resource_args.PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
+        concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
 
   def testResourceWithCompleters(self):
     r = resource_arg_schema.YAMLResourceArgument.FromData(
@@ -193,8 +210,11 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
             'removed_flags': ['zone'],
             'is_positional': False})
 
-    spec = r._GenerateResourceSpec(
-        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    mock_resource = mock.MagicMock(
+        full_name='foo.projects.zones',
+        api_version='v1',
+        detailed_params=['projectsId', 'zonesId'])
+    spec = r.GenerateResourceSpec(mock_resource)
     self.assertFalse(spec.disable_auto_completers)
     zone_attr = spec.attributes[1]
     self.assertEqual('zoneField', zone_attr.completion_id_field)
@@ -218,33 +238,6 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
                             'attribute_name': 'zone',
                             'help': 'help2'}]},
               'removed_flags': ['asdf']})
-
-  @parameterized.parameters(True, False)
-  def testGenerateAttributesValidation(self, is_atomic):
-    with self.assertRaisesRegex(
-        resource_arg_schema.InvalidResourceArgumentLists,
-        r'Invalid resource arguments: Expected \[\[projectsId\], instancesId\],'
-        r' Found \[\]'):
-      resource_arg_schema._GenerateAttributes(['projectsId', 'instancesId'], [])
-
-    with self.assertRaisesRegex(
-        resource_arg_schema.InvalidResourceArgumentLists,
-        r'Invalid resource arguments: Expected \[\[projectsId\], instancesId\],'
-        r' Found \[junk\]'):
-      resource_arg_schema._GenerateAttributes(
-          ['projectsId', 'instancesId'],
-          [{'parameter_name': 'junk', 'attribute_name': 'junk', 'help': 'h'}])
-
-    with self.assertRaisesRegex(
-        resource_arg_schema.InvalidResourceArgumentLists,
-        r'Invalid resource arguments: Expected \[\[projectsId\], instancesId\],'
-        r' Found \[instancesId, extraId\]'):
-      resource_arg_schema._GenerateAttributes(
-          ['projectsId', 'instancesId'],
-          [{'parameter_name': 'instancesId', 'attribute_name': 'instance',
-            'help': 'h'},
-           {'parameter_name': 'extraId', 'attribute_name': 'extra',
-            'help': 'h'}])
 
   @parameterized.named_parameters(
       ('Flag', {'arg_name': 'other-zone'}, '--other-zone'),
@@ -289,23 +282,45 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
 class MultitypeTests(base.Base, parameterized.TestCase):
 
   def SetUp(self):
-    self._sub_resource_specs = [
-        {'name': 'zone', 'collection': 'foo.projects.zones',
-         'attributes': [
-             {'parameter_name': 'projectsId',
-              'attribute_name': 'project',
-              'help': 'help1'},
-             {'parameter_name': 'zonesId',
-              'attribute_name': 'zone',
-              'help': 'help2'}]},
-        {'name': 'region', 'collection': 'foo.projects.regions',
-         'attributes': [
-             {'parameter_name': 'projectsId',
-              'attribute_name': 'project',
-              'help': 'help1'},
-             {'parameter_name': 'regionsId',
-              'attribute_name': 'region',
-              'help': 'help3'}]}]
+    self._zone_spec = {
+        'name': 'zone', 'collection': 'foo.projects.zones',
+        'attributes': [
+            {'parameter_name': 'projectsId',
+             'attribute_name': 'project',
+             'help': 'help1'},
+            {'parameter_name': 'zonesId',
+             'attribute_name': 'zone',
+             'help': 'help2'}]}
+    self._region_spec = {
+        'name': 'region', 'collection': 'foo.projects.regions',
+        'attributes': [
+            {'parameter_name': 'projectsId',
+             'attribute_name': 'project',
+             'help': 'help1'},
+            {'parameter_name': 'regionsId',
+             'attribute_name': 'region',
+             'help': 'help3'}]}
+    self._instance_spec = {
+        'name': 'instance', 'collection': 'foo.projects.zones.instances',
+        'attributes': [
+            {'parameter_name': 'projectsId',
+             'attribute_name': 'project',
+             'help': 'help1'},
+            {'parameter_name': 'zonesId',
+             'attribute_name': 'zone',
+             'help': 'help2'},
+            {'parameter_name': 'instancesId',
+             'attribute_name': 'instance',
+             'help': 'help3'}]}
+    self._no_zone_instance_spec = {
+        'name': 'instance', 'collection': 'foo.projects.instances',
+        'attributes': [
+            {'parameter_name': 'projectsId',
+             'attribute_name': 'project',
+             'help': 'help1'},
+            {'parameter_name': 'instancesId',
+             'attribute_name': 'instance',
+             'help': 'help3'}]}
 
   @parameterized.named_parameters(
       ('Resource',
@@ -322,15 +337,15 @@ class MultitypeTests(base.Base, parameterized.TestCase):
     self.assertTrue(isinstance(resource_arg, expected_type))
 
   def testMultitypeResourceArg(self):
-    self.MockGetListCreateMethods(('foo.projects.zones', True),
-                                  ('foo.projects.regions', True))
+    self.MockCRUDMethods(('foo.projects.zones', True),
+                         ('foo.projects.regions', True))
     r = resource_arg_schema.YAMLMultitypeResourceArgument.FromData(
         {
             'name': 'location',
             'help_text': 'group help',
             'spec': {
                 'name': 'region-or-zone',
-                'resources': self._sub_resource_specs}})
+                'resources': [self._zone_spec, self._region_spec]}})
     self.assertEqual(r.group_help, 'group help')
     self.assertEqual(r.removed_flags, [])
     self.assertEqual(r.is_positional, True)
@@ -343,7 +358,7 @@ class MultitypeTests(base.Base, parameterized.TestCase):
     self.assertEqual(project_attr.help_text, 'help1')
     self.assertEqual(
         project_attr.fallthroughs,
-        project_resource_args.PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
+        concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
     self.assertEqual(zone_attr.name, 'zone')
     self.assertEqual(zone_attr.help_text, 'help2')
     self.assertEqual(zone_attr.fallthroughs, [])
@@ -352,9 +367,72 @@ class MultitypeTests(base.Base, parameterized.TestCase):
     self.assertEqual(region_attr.fallthroughs, [])
     self.assertTrue(spec.disable_auto_completers)
 
+  def testMultitypeResourceArg_ParentChild(self):
+    self.MockCRUDMethods(('foo.projects.zones', True),
+                         ('foo.projects.zones.instances', True))
+    r = resource_arg_schema.YAMLMultitypeResourceArgument.FromData(
+        {
+            'name': 'instance',
+            'help_text': 'group help',
+            'spec': {
+                'name': 'instance-or-zone',
+                'resources': [self._zone_spec, self._instance_spec]}})
+    self.assertEqual(r.group_help, 'group help')
+    self.assertEqual(r.removed_flags, [])
+    self.assertEqual(r.is_positional, True)
+
+    spec = r.GenerateResourceSpec()
+    project_attr, zone_attr, instance_attr = [spec.attributes[0],
+                                              spec.attributes[1],
+                                              spec.attributes[2]]
+    self.assertEqual(project_attr.name, 'project')
+    self.assertEqual(project_attr.help_text, 'help1')
+    self.assertEqual(
+        project_attr.fallthroughs,
+        concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
+    self.assertEqual(zone_attr.name, 'zone')
+    self.assertEqual(zone_attr.help_text, 'help2')
+    self.assertEqual(zone_attr.fallthroughs, [])
+    self.assertEqual(instance_attr.name, 'instance')
+    self.assertEqual(instance_attr.help_text, 'help3')
+    self.assertEqual(instance_attr.fallthroughs, [])
+    self.assertTrue(spec.disable_auto_completers)
+
+  def testMultitypeResourceArg_ExtraAttribute(self):
+    self.MockCRUDMethods(('foo.projects.zones.instances', True),
+                         ('foo.projects.instances', True))
+    r = resource_arg_schema.YAMLMultitypeResourceArgument.FromData(
+        {
+            'name': 'location',
+            'help_text': 'group help',
+            'spec': {
+                'name': 'region-or-zone',
+                'resources': [self._instance_spec,
+                              self._no_zone_instance_spec]}})
+    self.assertEqual(r.group_help, 'group help')
+    self.assertEqual(r.removed_flags, [])
+    self.assertEqual(r.is_positional, True)
+
+    spec = r.GenerateResourceSpec()
+    project_attr, zone_attr, instance_attr = [spec.attributes[0],
+                                              spec.attributes[1],
+                                              spec.attributes[2]]
+    self.assertEqual(project_attr.name, 'project')
+    self.assertEqual(project_attr.help_text, 'help1')
+    self.assertEqual(
+        project_attr.fallthroughs,
+        concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
+    self.assertEqual(zone_attr.name, 'zone')
+    self.assertEqual(zone_attr.help_text, 'help2')
+    self.assertEqual(zone_attr.fallthroughs, [])
+    self.assertEqual(instance_attr.name, 'instance')
+    self.assertEqual(instance_attr.help_text, 'help3')
+    self.assertEqual(instance_attr.fallthroughs, [])
+    self.assertTrue(spec.disable_auto_completers)
+
   def testMultitypeResourceArgOptions(self):
-    self.MockGetListCreateMethods(('foo.projects.zones', True),
-                                  ('foo.projects.regions', True))
+    self.MockCRUDMethods(('foo.projects.zones', True),
+                         ('foo.projects.regions', True))
     r = resource_arg_schema.YAMLMultitypeResourceArgument.FromData(
         {
             'name': 'location',
@@ -366,7 +444,7 @@ class MultitypeTests(base.Base, parameterized.TestCase):
             'spec': {
                 'name': 'region-or-zone',
                 'plural_name': 'regions-or-zones',
-                'resources': self._sub_resource_specs}})
+                'resources': [self._zone_spec, self._region_spec]}})
     self.assertEqual(r.group_help, 'group help')
     self.assertEqual(r.removed_flags, ['region'])
     self.assertEqual(r.is_positional, False)
@@ -375,8 +453,8 @@ class MultitypeTests(base.Base, parameterized.TestCase):
     self.assertEqual(r._plural_name, 'regions-or-zones')
 
   def testMultitypeResourceArgMismatchedCollection(self):
-    self.MockGetListCreateMethods(('foo.projects.zones', True),
-                                  ('foo.projects.regions', True))
+    self.MockCRUDMethods(('foo.projects.zones', True),
+                         ('foo.projects.regions', True))
     r = resource_arg_schema.YAMLMultitypeResourceArgument.FromData(
         {
             'name': 'location',
@@ -384,7 +462,7 @@ class MultitypeTests(base.Base, parameterized.TestCase):
             'help_text': 'group help',
             'spec': {
                 'name': 'region-or-zone',
-                'resources': self._sub_resource_specs}})
+                'resources': [self._zone_spec, self._region_spec]}})
     collection_info = resource_util.CollectionInfo(
         'bar', 'v1', '', '', 'projects.zones',
         'projects/{projectsId}/zones/{zonesId}',
@@ -402,7 +480,8 @@ class MultitypeTests(base.Base, parameterized.TestCase):
   def testFromDataWithDisplayNameHook(self):
     data = {'name': 'location',
             'help_text': 'group help',
-            'spec': {'name': 'zone', 'resources': self._sub_resource_specs},
+            'spec': {'name': 'zone',
+                     'resources': [self._zone_spec, self._region_spec]},
             'display_name_hook': 'path.to:Hook'}
     mock_hook = self.StartObjectPatch(util.Hook, 'FromPath',
                                       return_value='hook')
@@ -427,7 +506,7 @@ class CollectionValidationTests(base.Base, parameterized.TestCase):
       ]))
   def testGenerateAttributes(self, is_atomic, data):
     method, fields, success = data
-    self.MockGetListCreateMethods(('foo.projects.instances', is_atomic))
+    self.MockCRUDMethods(('foo.projects.instances', is_atomic))
     method = registry.GetMethod('foo.projects.instances', method)
 
     r = resource_arg_schema.YAMLResourceArgument(
@@ -435,18 +514,18 @@ class CollectionValidationTests(base.Base, parameterized.TestCase):
             'name': 'instance',
             'collection': method.resource_argument_collection.full_name,
             'attributes': [
-                {'parameter_name': f, 'attribute_name': f, 'help': 'h'}
+                {'parameter_name': f, 'attribute_name': f.lower(), 'help': 'h'}
                 for f in fields]
         },
         group_help='group_help')
     if success:
       r.GenerateResourceSpec(method.resource_argument_collection)
     else:
-      with self.assertRaises(resource_arg_schema.InvalidResourceArgumentLists):
+      with self.assertRaises(concepts.InvalidResourceArgumentLists):
         r.GenerateResourceSpec(method.resource_argument_collection)
 
   def testWithParentResource(self):
-    self.MockGetListCreateMethods(('foo.projects.instances', False))
+    self.MockCRUDMethods(('foo.projects.instances', False))
     method = registry.GetMethod('foo.projects.instances', 'create')
 
     r = resource_arg_schema.YAMLResourceArgument(
@@ -462,7 +541,7 @@ class CollectionValidationTests(base.Base, parameterized.TestCase):
     r.GenerateResourceSpec(method.resource_argument_collection)
 
   def testUnspecifiedCollection(self):
-    self.MockGetListCreateMethods(('foo.projects.instances', True))
+    self.MockCRUDMethods(('foo.projects.instances', True))
     r = resource_arg_schema.YAMLResourceArgument(
         {'name': 'instance', 'api_version': 'v1',
          'collection': 'foo.projects.instances', 'attributes': [
@@ -481,7 +560,7 @@ class CollectionValidationTests(base.Base, parameterized.TestCase):
     r.GenerateResourceSpec()
 
   def testCollectionErrors(self):
-    self.MockGetListCreateMethods(('foo.projects.instances', True))
+    self.MockCRUDMethods(('foo.projects.instances', True))
     method = registry.GetMethod('foo.projects.instances', 'get')
 
     r = resource_arg_schema.YAMLResourceArgument(

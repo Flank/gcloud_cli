@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+# -*- coding: utf-8 -*- #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,10 +25,14 @@ import time
 
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.console.style import mappings
+from googlecloudsdk.core.console.style import text
 from googlecloudsdk.core.util import files as file_utils
 from googlecloudsdk.core.util import times
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.core.console.style import style_test_base
 
 import mock
 
@@ -1279,6 +1282,151 @@ class FileOrStdoutTests(sdk_test_base.WithOutputCapture):
     path = os.path.join(self.temp_path, self.RandomFileName())
     file_utils.WriteBinaryFileContents(path, contents)
     self.assertEqual(file_utils.ReadBinaryFileContents(path), contents)
+
+
+class LogAcceptsTypedTextTest(style_test_base.StyleTestBase,
+                              parameterized.TestCase):
+  """Tests that the logger accepts TypedText as input."""
+
+  def _ClearAnsiCodesForWindows(self):
+    self.blue = ''
+    self.italics = ''
+    self.bold = ''
+    self.blue_italics = ''
+    self.blue_bold = ''
+    self.blue_bold_italics = ''
+    self.bold_italics = ''
+    self.reset = ''
+
+  def SetUp(self):
+    self.logs_dir = self.temp_path
+    self.StartObjectPatch(
+        mappings,
+        'GetStyleMappings',
+        return_value=style_test_base.STYLE_MAPPINGS_TESTING)
+    if self.IsOnWindows():
+      # TODO(b/113859499): Support colors on Windows.
+      self._ClearAnsiCodesForWindows()
+
+  def TearDown(self):
+    log.Reset()
+
+  @parameterized.parameters(
+      (log.debug, 'DEBUG'),
+      (log.info, 'INFO'),
+      (log.warning, 'WARNING'),
+      (log.error, 'ERROR'),
+      (log.critical, 'CRITICAL'),
+      (log.fatal, 'CRITICAL'))
+  def testLogFileContainsPlainText(self, log_method, log_level):
+    """Tests that all basic logging and logging levels work."""
+    log.SetVerbosity(logging.INFO)
+    log.SetUserOutputEnabled(True)
+    log.AddFileLogging(self.logs_dir)
+
+    blue_text = text.TypedText('blue -%s-', style_test_base.TestTextTypes.BLUE)
+    log_method(blue_text, 'text')
+
+    self.AssertLogContains(
+        '{} root blue -text-'.format(log_level), normalize_space=True)
+
+  @parameterized.parameters(
+      log.debug, log.info, log.warning, log.error, log.critical, log.fatal)
+  def testErrContainsColoredText(self, log_method):
+    """Tests that all basic logging and logging levels work."""
+    self.StartObjectPatch(log._ConsoleWriter, 'isatty').return_value = True
+    log.Reset()
+    log.SetVerbosity(logging.DEBUG)
+    log.SetUserOutputEnabled(True)
+
+    blue_text = text.TypedText('blue -%s-',
+                               style_test_base.TestTextTypes.BLUE_AND_BRACKETS)
+    log_method(blue_text, 'text')
+
+    self.AssertErrContains(self.blue + '[blue -text-]' + self.reset)
+
+  @parameterized.parameters(
+      log.debug, log.info, log.warning, log.error, log.critical, log.fatal)
+  def testTypedTextNotInStructuredErrors(self, log_method):
+    """Tests that all basic logging and logging levels work."""
+    properties.VALUES.core.show_structured_logs.Set('always')
+    self.StartObjectPatch(log._ConsoleWriter, 'isatty').return_value = True
+    log.Reset()
+    log.SetVerbosity(logging.DEBUG)
+    log.SetUserOutputEnabled(True)
+
+    blue_text = text.TypedText('blue',
+                               style_test_base.TestTextTypes.BLUE_AND_BRACKETS)
+    log_method(blue_text, exc_info=True)
+
+    self.AssertErrNotContains('\x1b[38;5;4m')  # Set blue foreground.
+    self.AssertErrNotContains('\x1b[39;0m')  # Reset graphics.
+    self.AssertErrContains('"[blue]"')
+
+  @parameterized.parameters(
+      (log.debug, 'DEBUG'),
+      (log.info, 'INFO'),
+      (log.warning, 'WARNING'),
+      (log.error, 'ERROR'),
+      (log.critical, 'CRITICAL'),
+      (log.fatal, 'CRITICAL'))
+  def testLogStarArgsCanBeTypedTextAndFileContainsPlainText(
+      self, log_method, log_level):
+    """Tests that all basic logging and logging levels work."""
+    log.SetVerbosity(logging.INFO)
+    log.SetUserOutputEnabled(True)
+    log.AddFileLogging(self.logs_dir)
+
+    blue_text = text.TypedText('blue -%s-', style_test_base.TestTextTypes.BLUE)
+    italics_text = text.TypedText(
+        'italics', style_test_base.TestTextTypes.ITALICS)
+    log_method(blue_text, italics_text)
+
+    self.AssertLogContains(
+        '{} root blue -italics-'.format(log_level), normalize_space=True)
+
+  @parameterized.parameters(
+      log.debug, log.info, log.warning, log.error, log.critical, log.fatal)
+  def testLogStarArgsCanBeTypedText(self, log_method):
+    """Tests that all basic logging and logging levels work."""
+    self.StartObjectPatch(log._ConsoleWriter, 'isatty').return_value = True
+    log.Reset()
+    log.SetVerbosity(logging.DEBUG)
+    log.SetUserOutputEnabled(True)
+
+    blue_text = text.TypedText('blue -%s-',
+                               style_test_base.TestTextTypes.BLUE_AND_BRACKETS)
+    italics_text = text.TypedText(
+        'italics', style_test_base.TestTextTypes.ITALICS)
+    log_method(blue_text, italics_text)
+
+    # TODO(b/113600762): Reset more selectively.
+    self.AssertErrContains(
+        '{blue}[blue -{italics}italics{reset}-]{reset}'.format(
+            blue=self.blue, italics=self.italics, reset=self.reset))
+
+  def testConsoleWriterWrite(self):
+    self.StartObjectPatch(log._ConsoleWriter, 'isatty').return_value = True
+    log.Reset()
+    blue_text = text.TypedText(
+        'blue', style_test_base.TestTextTypes.BLUE)
+    log.status.write(blue_text)
+
+    self.AssertErrContains(self.blue + 'blue' + self.reset)
+
+  def testConsoleWriterPrint(self):
+
+    self.StartObjectPatch(log._ConsoleWriter, 'isatty').return_value = True
+    log.Reset()
+    blue_text = text.TypedText(
+        'blue', style_test_base.TestTextTypes.BLUE)
+    italics_text = text.TypedText(
+        'italics', style_test_base.TestTextTypes.ITALICS)
+    log.status.Print(blue_text, italics_text)
+
+    self.AssertErrContains(
+        '{blue}blue{reset} {italics}italics{reset}'.format(
+            blue=self.blue, reset=self.reset, italics=self.italics))
 
 
 if __name__ == '__main__':

@@ -1,0 +1,911 @@
+title: metadata addition deletion scenario test
+release_tracks:
+- GA
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances create $$instance$$ --zone us-central1-f --format="value(id)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+  - stdout: |
+      $$instance-id$$
+- execute:
+  - command: compute instances describe $$instance$$ --zone us-central1-f --format="text(metadata)"
+  - stdout: |
+      metadata.fingerprint: 4_QxQ57NQak=
+      metadata.kind:        compute#metadata
+- execute:
+  - command: compute instances add-metadata $$instance$$ --zone us-central1-f --metadata="apple=a
+      day" --format="text(metadata)"
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+  - stdout: |
+      ---
+      metadata.fingerprint:    LEEnWmK6yr4=
+      metadata.items[0].key:   apple
+      metadata.items[0].value: a day
+      metadata.kind:           compute#metadata
+- execute:
+  - command: compute instances describe $$instance$$ --zone us-central1-f --format="text(metadata)"
+  - stdout: |
+      metadata.fingerprint:    LEEnWmK6yr4=
+      metadata.items[0].key:   apple
+      metadata.items[0].value: a day
+      metadata.kind:           compute#metadata
+- execute:
+  - command: compute instances remove-metadata $$instance$$ --zone us-central1-f --keys=apple
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+- execute:
+  - command: compute instances describe $$instance$$ --zone us-central1-f --format="text(metadata)"
+  - stdout: |
+      metadata.fingerprint: 4_QxQ57NQak=
+      metadata.kind:        compute#metadata
+- execute:
+  - command: compute instances delete $$instance$$ --zone us-central1-f
+  - prompt:
+    - message: |
+        The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
+         - [$$instance$$] in [us-central1-f]
+    - input: y
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+actions:
+- generate_resource_id:
+    reference: instance
+    prefix: gcloud-compute-test
+- execute_command:
+    command: compute instances create $$instance$$ --zone us-central1-f --format="value(id)"
+    events:
+    - api_call:
+        expect_request:
+          method: GET
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          body: null
+          headers: {}
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '510'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"YemTHGAicN3HXXYcwfDU1VbQHnE=/FiugraqmEN9iNVx1jOjYUR7piyc="'
+            status: '200'
+          body:
+            kind: compute#zone
+            id: '2004'
+            creationTimestamp: '1969-12-31T16:00:00.000-08:00'
+            name: us-central1-f
+            description: us-central1-f
+            status: UP
+            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            availableCpuPlatforms:
+            - Intel Skylake
+            - Intel Broadwell
+            - Intel Haswell
+            - Intel Ivy Bridge
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '166447'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"4N4j3n7LkaQKJHhq9MpUWT8-aFM=/HiAm2F5DuH_CsBvi7FRl0cQltaE="'
+            status: '200'
+          body:
+            kind: compute#project
+            id: '17966956004057981335'
+            creationTimestamp: '2014-09-30T07:55:22.502-07:00'
+            name: cloud-sdk-integration-testing
+            usageExportLocation:
+              bucketName: cloud-sdk-integration-test-usage
+              reportNamePrefix: ''
+            enabledFeatures:
+            - alpha-api
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing
+            defaultServiceAccount: 462803083913-compute@developer.gserviceaccount.com
+            xpnProjectStatus: UNSPECIFIED_XPN_PROJECT_STATUS
+            defaultNetworkTier: PREMIUM
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              canIpForward: false
+              deletionProtection: false
+              disks:
+              - autoDelete: true
+                boot: true
+                initializeParams:
+                  sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
+                mode: READ_WRITE
+                type: PERSISTENT
+              machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+              metadata: {}
+              name: $$instance$$
+              networkInterfaces:
+              - accessConfigs:
+                - name: external-nat
+                  type: ONE_TO_ONE_NAT
+                network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              scheduling:
+                automaticRestart: true
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '824'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '3299489270246345175'
+            name: operation-1536341812525-5754b73fd37c9-f9851cd7-fdc863a2
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetId: '7596357952563251674'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-09-07T10:36:56.908-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536341812525-5754b73fd37c9-f9851cd7-fdc863a2
+        poll_operation: true
+        expect_response:
+          extract_references:
+          - field: targetId
+            reference: instance-id
+          body:
+            json: {}
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2565'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"Pds1l1-M6JRSQ9LsFlvSpJlFIfM=/1mRCpqZ71hKzTXSw2MRUWV7bqeA="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '7596357952563251674'
+            creationTimestamp: '2018-09-07T10:36:56.291-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.125
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.239.213.42
+                networkTier: PREMIUM
+              fingerprint: PgAQklknV0k=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: 4_QxQ57NQak=
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - expect_stdout: |
+        $$instance-id$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances describe $$instance$$ --zone us-central1-f --format="text(metadata)"
+    events:
+    - api_call:
+        expect_request:
+          method: GET
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          body: null
+          headers: {}
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2565'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"beBca839lnx1J1DDVe15YKn8eIo=/4Pivt2tSe8uQ25C16O2CqJMs0jA="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '7596357952563251674'
+            creationTimestamp: '2018-09-07T10:36:56.291-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.125
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.239.213.42
+                networkTier: PREMIUM
+              fingerprint: PgAQklknV0k=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: 4_QxQ57NQak=
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - expect_stdout: |
+        metadata.fingerprint: 4_QxQ57NQak=
+        metadata.kind:        compute#metadata
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances add-metadata $$instance$$ --zone us-central1-f --metadata="apple=a
+      day" --format="text(metadata)"
+    events:
+    - api_call:
+        expect_request:
+          method: GET
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          body: null
+          headers: {}
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2565'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"vug7lyh9uBJybJjNL2ccfWuNrDQ=/oJDBAo0HZ3QkvF0zu-alNDF_PZI="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '7596357952563251674'
+            creationTimestamp: '2018-09-07T10:36:56.291-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.125
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.239.213.42
+                networkTier: PREMIUM
+              fingerprint: PgAQklknV0k=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: 4_QxQ57NQak=
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/setMetadata?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              fingerprint: 4_QxQ57NQak=
+              items:
+              - key: apple
+                value: a day
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '828'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '512076574841833892'
+            name: operation-1536341834885-5754b7552678b-355582d4-d04d7a84
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: setMetadata
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetId: '7596357952563251674'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-09-07T10:37:15.738-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536341834885-5754b7552678b-355582d4-d04d7a84
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2634'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"PpMymoliGKR1uoB56NWhtyS6uUw=/Hw4okIundv2iThSX55b3uoYfuWE="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '7596357952563251674'
+            creationTimestamp: '2018-09-07T10:36:56.291-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.125
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.239.213.42
+                networkTier: PREMIUM
+              fingerprint: PgAQklknV0k=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: LEEnWmK6yr4=
+              items:
+              - key: apple
+                value: a day
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - expect_stdout: |
+        ---
+        metadata.fingerprint:    LEEnWmK6yr4=
+        metadata.items[0].key:   apple
+        metadata.items[0].value: a day
+        metadata.kind:           compute#metadata
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances describe $$instance$$ --zone us-central1-f --format="text(metadata)"
+    events:
+    - api_call:
+        expect_request:
+          method: GET
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          body: null
+          headers: {}
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2634'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"cfQFfy59rvicexz_w3ceLMtyOnA=/fOXvBvXIabcW2kpAp4y9cNMkCEg="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '7596357952563251674'
+            creationTimestamp: '2018-09-07T10:36:56.291-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.125
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.239.213.42
+                networkTier: PREMIUM
+              fingerprint: PgAQklknV0k=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: LEEnWmK6yr4=
+              items:
+              - key: apple
+                value: a day
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - expect_stdout: |
+        metadata.fingerprint:    LEEnWmK6yr4=
+        metadata.items[0].key:   apple
+        metadata.items[0].value: a day
+        metadata.kind:           compute#metadata
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances remove-metadata $$instance$$ --zone us-central1-f --keys=apple
+    events:
+    - api_call:
+        expect_request:
+          method: GET
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          body: null
+          headers: {}
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2634'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"aT-80c-z9GRew76nuzW3-4PUotA=/J9n41CL_g5w5ZA5vwIzVM5vis0o="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '7596357952563251674'
+            creationTimestamp: '2018-09-07T10:36:56.291-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.125
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.239.213.42
+                networkTier: PREMIUM
+              fingerprint: PgAQklknV0k=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: LEEnWmK6yr4=
+              items:
+              - key: apple
+                value: a day
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/setMetadata?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              fingerprint: LEEnWmK6yr4=
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '829'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '2089660866306705842'
+            name: operation-1536341853521-5754b766ec468-fafcaa06-4d31477d
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: setMetadata
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetId: '7596357952563251674'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-09-07T10:37:33.939-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536341853521-5754b766ec468-fafcaa06-4d31477d
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2565'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"xkmQI_YTZ0nE21hNLEWrEc-vpkM=/45ASmbunsnKpmE2Bvl10Lzg0zxg="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '7596357952563251674'
+            creationTimestamp: '2018-09-07T10:36:56.291-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.125
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.239.213.42
+                networkTier: PREMIUM
+              fingerprint: PgAQklknV0k=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: 4_QxQ57NQak=
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances describe $$instance$$ --zone us-central1-f --format="text(metadata)"
+    events:
+    - api_call:
+        expect_request:
+          method: GET
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          body: null
+          headers: {}
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2565'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"KRbtN_7TZ5aYnXSm3wZ_u74P9a4=/ngK6CnRQ_F1KeCmO9pjHPKsqn6M="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '7596357952563251674'
+            creationTimestamp: '2018-09-07T10:36:56.291-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.125
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.239.213.42
+                networkTier: PREMIUM
+              fingerprint: PgAQklknV0k=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: 4_QxQ57NQak=
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - expect_stdout: |
+        metadata.fingerprint: 4_QxQ57NQak=
+        metadata.kind:        compute#metadata
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances delete $$instance$$ --zone us-central1-f
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
+           - [$$instance$$] in [us-central1-f]
+        user_input: y
+    - api_call:
+        expect_request:
+          method: DELETE
+          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          body: null
+          headers: {}
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '824'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '8725016881972316553'
+            name: operation-1536341862138-5754b76f24091-4243062a-ce2037f4
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetId: '7596357952563251674'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-09-07T10:37:42.547-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536341862138-5754b76f24091-4243062a-ce2037f4
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_exit:
+        code: 0
+    cleanup_for: instance

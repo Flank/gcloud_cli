@@ -22,7 +22,7 @@ from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -51,8 +51,8 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         'cloudresourcemanager', 'v1')
 
   def SetUpForTrack(self, track):
-    self.track = track
-    api_version = {base.ReleaseTrack.ALPHA: 'v1alpha'}[track]
+    api_version = {calliope_base.ReleaseTrack.ALPHA: 'v1beta',
+                   calliope_base.ReleaseTrack.BETA: 'v1beta'}[track]
     self.client = mock.Client(
         client_class=apis.GetClientClass(self._API_NAME, api_version))
     self.client.Mock()
@@ -106,19 +106,22 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       type_=None,
       policy='MY_POLICY'):
     if type_:
-      type_ = self.messages.AccessZone.ZoneTypeValueValuesEnum(type_)
-    return self.messages.AccessZone(
+      type_ = self.messages.ServicePerimeter.PerimeterTypeValueValuesEnum(type_)
+    status = self.messages.ServicePerimeterConfig(
         accessLevels=list(map(
             'accessPolicies/MY_POLICY/accessLevels/{}'.format, access_levels
         )),
-        description=description,
-        name='accessPolicies/MY_POLICY/accessZones/' + id_,
         resources=resources,
         restrictedServices=restricted_services,
         unrestrictedServices=unrestricted_services,
+        )
+    return self.messages.ServicePerimeter(
+        description=description,
+        name='accessPolicies/MY_POLICY/servicePerimeters/' + id_,
         title=title,
-        zoneType=type_
-    )
+        perimeterType=type_,
+        status=status
+        )
 
   def _ExpectListPolicies(self, organization_name, policies):
     if isinstance(policies, Exception):

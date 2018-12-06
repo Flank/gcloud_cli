@@ -90,5 +90,7 @@ class VpcAccessUnitTestBase(sdk_test_base.WithFakeAuth, _VpcAccessBase):
         api_version=self.api_version)
     self.connector_relative_name = self.connector_ref.RelativeName()
 
+    self.type_extended = self.messages.Connector.TypeValueValuesEnum.EXTENDED
+    self.type_basic = self.messages.Connector.TypeValueValuesEnum.BASIC
     self.network_id = 'my-network'
     self.ip_cidr_range = '10.132.0.0/28'

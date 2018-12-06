@@ -7,17 +7,22 @@ SYNOPSIS
         --ssl-certificates=SSL_CERTIFICATE,[...] --url-map=URL_MAP
         [--description=DESCRIPTION]
         [--quic-override=QUIC_OVERRIDE; default="NONE"]
-        [--ssl-policy=SSL_POLICY] [GCLOUD_WIDE_FLAG ...]
+        [--ssl-policy=SSL_POLICY] [--global | --region=REGION]
+        [--global-ssl-certificates
+          | --ssl-certificates-region=SSL_CERTIFICATES_REGION]
+        [--global-url-map | --url-map-region=URL_MAP_REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute target-https-proxies create is used to create
     target HTTPS proxies. A target HTTPS proxy is referenced by one or more
-    forwarding rules which define which packets the proxy is responsible for
-    routing. The target HTTPS proxy points to a URL map that defines the rules
-    for routing the requests. The URL map's job is to map URLs to backend
-    services which handle the actual requests. The target HTTPS proxy also
-    points to at most 10 SSL certificates used for server-side authentication.
-    The target HTTPS proxy can be associated with at most one SSL policy.
+    forwarding rules which specify the network traffic that the proxy is
+    responsible for routing. The target HTTPS proxy points to a URL map that
+    defines the rules for routing the requests. The URL map's job is to map
+    URLs to backend services which handle the actual requests. The target HTTPS
+    proxy also points to at most 10 SSL certificates used for server-side
+    authentication. The target HTTPS proxy can be associated with at most one
+    SSL policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -59,10 +64,70 @@ OPTIONAL FLAGS
         and the HTTPS proxy load balancer. The SSL policy must exist and cannot
         be deleted while referenced by a target HTTPS proxy.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the target HTTPS proxy is global.
+
+       --region=REGION
+          Region of the target HTTPS proxy to create. If not specified, you may
+          be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+     At most one of these may be specified:
+
+       --global-ssl-certificates
+          If set, the ssl certificates are global.
+
+       --ssl-certificates-region=SSL_CERTIFICATES_REGION
+          Region of the ssl certificates to operate on. If not specified, you
+          may be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+     At most one of these may be specified:
+
+       --global-url-map
+          If set, the url map is global.
+
+       --url-map-region=URL_MAP_REGION
+          Region of the url map to operate on. Overrides the default
+          compute/region property value for this command invocation.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

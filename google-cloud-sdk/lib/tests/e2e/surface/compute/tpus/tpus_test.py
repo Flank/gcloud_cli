@@ -64,8 +64,8 @@ class TpusTests(e2e_base.WithServiceAuth):
                "--network {network} "
                "--range '{cidr}' --accelerator-type 'v2-8' "
                "--description 'Test TF Node {name}' "
-               "--version '1.6'".format(zone=self.zone, name=tpu_id, cidr=cidr,
-                                        network=NETWORK))
+               "--version '1.11'".format(
+                   zone=self.zone, name=tpu_id, cidr=cidr, network=NETWORK))
     try:
       self.Run(command)
       yield tpu_id
@@ -87,7 +87,6 @@ class TpusTests(e2e_base.WithServiceAuth):
     self.assertIsNotNone(result)
     self.assertEqual(len(list(result)), 0)
 
-  @test_case.Filters.skip('Failing', 'b/110190382')
   def testWorkflow(self):
     """Test of Basic TPU CRUD Workflow."""
     with self._CreateTPU() as tpu_name:

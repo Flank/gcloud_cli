@@ -22,15 +22,11 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import util
 from googlecloudsdk.core.console import console_io
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsDeleteTest(base.CloudIotRegistryBase):
+class CredentialsDeleteTestGA(base.CloudIotRegistryBase):
 
   def SetUp(self):
     self.registry_credentials = [
@@ -38,8 +34,7 @@ class CredentialsDeleteTest(base.CloudIotRegistryBase):
         self._CreateRegistryCredential(self.OTHER_CERTIFICATE_CONTENTS)
     ]
 
-  def testDelete(self, track):
-    self.track = track
+  def testDelete(self):
     self.WriteInput('y')
     self._ExpectGet(self.registry_credentials)
     self._ExpectPatch(self.registry_credentials[1:])
@@ -58,8 +53,7 @@ class CredentialsDeleteTest(base.CloudIotRegistryBase):
     self.AssertLogContains('Deleted credential at index [0] for registry '
                            '[my-registry].')
 
-  def testDelete_BadIndex(self, track):
-    self.track = track
+  def testDelete_BadIndex(self):
     self._ExpectGet(self.registry_credentials)
 
     with self.AssertRaisesExceptionMatches(
@@ -72,8 +66,7 @@ class CredentialsDeleteTest(base.CloudIotRegistryBase):
           '    --registry my-registry '
           '    --region us-central1')
 
-  def testDelete_Cancel(self, track):
-    self.track = track
+  def testDelete_Cancel(self):
     self.WriteInput('n')
     credential = self._CreateRegistryCredential(self.CERTIFICATE_CONTENTS)
     self._ExpectGet([credential])
@@ -86,8 +79,7 @@ class CredentialsDeleteTest(base.CloudIotRegistryBase):
           '    --region us-central1')
     self.AssertErrContains('This will delete the following credential:')
 
-  def testDelete_RelativeName(self, track):
-    self.track = track
+  def testDelete_RelativeName(self):
     self.WriteInput('y')
     self._ExpectGet(self.registry_credentials)
     self._ExpectPatch(self.registry_credentials[1:])
@@ -105,6 +97,18 @@ class CredentialsDeleteTest(base.CloudIotRegistryBase):
     self.assertEqual(results, expected_registry)
     self.AssertErrContains('This will delete the following credential:')
     self.AssertErrContains(self.CERTIFICATE_CONTENTS.replace('\n', r'\\n'))
+
+
+class CredentialsDeleteTestBeta(CredentialsDeleteTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsDeleteTestAlpha(CredentialsDeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

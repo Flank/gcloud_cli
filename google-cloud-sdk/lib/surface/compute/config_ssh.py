@@ -259,6 +259,8 @@ class ConfigSSH(base.Command):
   flag is given, the generated key will have an empty passphrase).
   """
 
+  category = 'Tools'
+
   @staticmethod
   def Args(parser):
     """Set up arguments for this command.
@@ -314,7 +316,7 @@ class ConfigSSH(base.Command):
     ssh_helper.keys.EnsureKeysExist(args.force_key_file_overwrite,
                                     allow_passphrase=True)
 
-    ssh_config_file = os.path.expanduser(
+    ssh_config_file = files.ExpandHomeDir(
         args.ssh_config_file or ssh.PER_USER_SSH_CONFIG_FILE)
 
     instances = None

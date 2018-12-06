@@ -47,7 +47,7 @@ gcloud markdown - markdown group docstring index
 <dt>SYNOPSIS</dt>
 <dd class="sectionbody">
 <dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
-<code>gcloud markdown</code> <code><var>COMMAND</var></code> <nobr>[<code>--optional-flag</code> <code><var>OPTIONAL_FLAG</var></code>]</nobr> <code>--required-flag</code> <code><var>REQUIRED_FLAG</var></code> <nobr>[<code><var>GLOBAL-FLAG &hellip;</var></code>]</nobr>
+<code>gcloud markdown</code> <code><var><a href="#COMMAND">COMMAND</a></var></code> <nobr>[<code><a href="#--optional-flag">--optional-flag</a></code> <code><var><a href="#OPTIONAL_FLAG">OPTIONAL_FLAG</a></var></code>]</nobr> <code><a href="#--required-flag">--required-flag</a></code> <code><var><a href="#REQUIRED_FLAG">REQUIRED_FLAG</a></var></code> <nobr>[<code><var>GCLOUD-WIDE-FLAG &hellip;</var></code>]</nobr>
 </span></dt></dl>
 </dd>
 </section>
@@ -90,14 +90,14 @@ Last sub-item for now.
 </ul>
 </li>
 </ul>
-Did the end of list work? Also, format="csv" tables are recognized:
+Did the end of list work? Also, tables are recognized:
 
 <blockquote>
 <table>
 <tr>
-<th align=left>Alias</th>
-<th align=left>Project</th>
-<th align=left>Image Name</th>
+<th>Alias</th>
+<th>Project</th>
+<th>Image Name</th>
 </tr>
 <tr>
 <td align=left>a1a1a</td>
@@ -204,8 +204,8 @@ Required flag.
 </dd>
 </section>
 
-<section id="GLOBAL-FLAGS">
-<dt>GLOBAL FLAGS</dt>
+<section id="GCLOUD-WIDE-FLAGS">
+<dt>GCLOUD WIDE FLAGS</dt>
 <dd class="sectionbody">
 Run <code>$ <a href="/sdk/../reference/">gcloud</a> help</code> for a
 description of flags available to all commands.

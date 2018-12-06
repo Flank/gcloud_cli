@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud beta compute disks snapshot DISK_NAME [DISK_NAME ...] [--async]
         [--csek-key-file=FILE] [--description=DESCRIPTION] [--guest-flush]
         [--labels=[KEY=VALUE,...]] [--snapshot-names=SNAPSHOT_NAME,[...]]
-        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--storage-location=LOCATION] [--region=REGION | --zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute disks snapshot creates snapshots of persistent
@@ -60,7 +61,7 @@ FLAGS
 
      --snapshot-names=SNAPSHOT_NAME,[...]
         Names to assign to the created snapshots. Without this option, the name
-        of each snapshot will be a random 16-character hexadecimal number that
+        of each snapshot will be a random 12-character alphanumeric string that
         starts with a letter. The values of this option run parallel to the
         disks specified. For example,
 
@@ -68,6 +69,11 @@ FLAGS
 
         will result in my-disk-1 being snapshotted as snapshot-1, my-disk-2 as
         snapshot-2, and so on.
+
+     --storage-location=LOCATION
+        Google Cloud Storage location, either regional or multi-regional, where
+        snapshot content is to be stored. If absent, a nearby regional or
+        multi-regional location is chosen automatically.
 
      At most one of these may be specified:
 
@@ -114,8 +120,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To create a snapshot named snapshot-test of a persistent disk named test in

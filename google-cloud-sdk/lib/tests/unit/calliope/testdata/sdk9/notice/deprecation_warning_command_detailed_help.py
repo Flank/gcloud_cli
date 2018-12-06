@@ -19,12 +19,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 
 
-@base.Deprecate(is_removed=False, warning='My Custom Warning')
-class DeprecationWarningCommandWithDetailedHelp(base.Command):
+@calliope_base.Deprecate(is_removed=False, warning='My Custom Warning')
+class DeprecationWarningCommandWithDetailedHelp(calliope_base.Command):
   """A simple command to test deprecation with custom messages."""
   detailed_help = {
       'brief': 'Short help text',

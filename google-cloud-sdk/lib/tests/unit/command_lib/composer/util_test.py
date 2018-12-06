@@ -20,6 +20,8 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.container import api_adapter as gke_api_adapter
+from googlecloudsdk.api_lib.storage import storage_api
+from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import util as command_util
@@ -32,9 +34,10 @@ import mock
 import six
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
+class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
 
   def SetUp(self):
     self.field_mask_prefix = 'field.mask.prefix'
@@ -46,15 +49,13 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
     self.mock_gke_client.Mock()
     self.addCleanup(self.mock_gke_client.Unmock)
 
-  def testBuildPartialUpdate_Clear(self, track):
-    self.SetTrack(track)
+  def testBuildPartialUpdate_Clear(self):
     self._BuildPartialUpdateTestHelper(
         expected_field_mask=self.field_mask_prefix,
         expected_patch={},
         clear=True)
 
-  def testBuildPartialUpdate_Set(self, track):
-    self.SetTrack(track)
+  def testBuildPartialUpdate_Set(self):
     expected_field_mask = ','.join([
         '{}.{}'.format(self.field_mask_prefix, suffix) for suffix in ['a', 'b']
     ])
@@ -70,8 +71,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
             'b': '2'
         })
 
-  def testBuildPartialUpdate_Remove(self, track):
-    self.SetTrack(track)
+  def testBuildPartialUpdate_Remove(self):
     remove_keys = ['remove_me_too', 'to_be_removed']
     expected_field_mask = ','.join([
         '{}.{}'.format(self.field_mask_prefix, suffix) for suffix in remove_keys
@@ -82,8 +82,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         clear=False,
         remove_keys=remove_keys)
 
-  def testBuildPartialUpdate_RemoveWithDuplicate(self, track):
-    self.SetTrack(track)
+  def testBuildPartialUpdate_RemoveWithDuplicate(self):
     remove_keys = ['duplicated', 'remove_me_too']
     remove_keys_with_dupe = ['duplicated', 'duplicated', 'remove_me_too']
     expected_field_mask = ','.join([
@@ -95,8 +94,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         clear=False,
         remove_keys=remove_keys_with_dupe)
 
-  def testBuildPartialUpdate_ClearRemove(self, track):
-    self.SetTrack(track)
+  def testBuildPartialUpdate_ClearRemove(self):
     remove_keys = ['to_be_removed', 'remove_me_too']
     self._BuildPartialUpdateTestHelper(
         expected_field_mask=self.field_mask_prefix,
@@ -104,16 +102,14 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         clear=True,
         remove_keys=remove_keys)
 
-  def testBuildPartialUpdate_ClearSet(self, track):
-    self.SetTrack(track)
+  def testBuildPartialUpdate_ClearSet(self):
     self._BuildPartialUpdateTestHelper(
         expected_field_mask=self.field_mask_prefix,
         expected_patch={'thisis': 'set'},
         clear=True,
         set_entries={'thisis': 'set'})
 
-  def testBuildPartialUpdate_RemoveSet(self, track):
-    self.SetTrack(track)
+  def testBuildPartialUpdate_RemoveSet(self):
     remove_keys = ['ignored', 'notignored']
     expected_field_mask = ','.join([
         '{}.{}'.format(self.field_mask_prefix, suffix) for suffix in remove_keys
@@ -125,8 +121,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         remove_keys=remove_keys,
         set_entries={'ignored': 'not'})
 
-  def testBuildPartialUpdate_ClearRemoveSet(self, track):
-    self.SetTrack(track)
+  def testBuildPartialUpdate_ClearRemoveSet(self):
     self._BuildPartialUpdateTestHelper(
         expected_field_mask=self.field_mask_prefix,
         expected_patch={'ignored': 'not'},
@@ -134,8 +129,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         remove_keys=['ignored', 'notignored'],
         set_entries={'ignored': 'not'})
 
-  def testBuildPartialUpdate_AcceptsNoneRemoveSet(self, track):
-    self.SetTrack(track)
+  def testBuildPartialUpdate_AcceptsNoneRemoveSet(self):
     self._BuildPartialUpdateTestHelper(
         expected_field_mask=self.field_mask_prefix,
         expected_patch={},
@@ -143,13 +137,11 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         remove_keys=None,
         set_entries=None)
 
-  def testBuildFullMapUpdate_Clear(self, track):
-    self.SetTrack(track)
+  def testBuildFullMapUpdate_Clear(self):
     self._BuildFullMapUpdateTestHelper(
         initial_entries={'name': 'val'}, expected_patch={}, clear=True)
 
-  def testBuildFullMapUpdate_Set(self, track):
-    self.SetTrack(track)
+  def testBuildFullMapUpdate_Set(self):
     self._BuildFullMapUpdateTestHelper(
         initial_entries={},
         expected_patch={
@@ -162,8 +154,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
             'b': '2'
         })
 
-  def testBuildFullMapUpdate_Remove(self, track):
-    self.SetTrack(track)
+  def testBuildFullMapUpdate_Remove(self):
     remove_keys = ['remove_me_too', 'to_be_removed']
     self._BuildFullMapUpdateTestHelper(
         initial_entries={
@@ -174,8 +165,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         clear=False,
         remove_keys=remove_keys)
 
-  def testBuildFullMapUpdate_RemoveWithDuplicate(self, track):
-    self.SetTrack(track)
+  def testBuildFullMapUpdate_RemoveWithDuplicate(self):
     remove_keys_with_dupe = ['duplicated', 'duplicated', 'remove_me_too']
     self._BuildFullMapUpdateTestHelper(
         initial_entries={
@@ -186,8 +176,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         clear=False,
         remove_keys=remove_keys_with_dupe)
 
-  def testBuildFullMapUpdate_ClearRemove(self, track):
-    self.SetTrack(track)
+  def testBuildFullMapUpdate_ClearRemove(self):
     remove_keys = ['remove', 'remove_me_too']
     self._BuildFullMapUpdateTestHelper(
         initial_entries={
@@ -198,16 +187,14 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         clear=True,
         remove_keys=remove_keys)
 
-  def testBuildFullMapUpdate_ClearSet(self, track):
-    self.SetTrack(track)
+  def testBuildFullMapUpdate_ClearSet(self):
     self._BuildFullMapUpdateTestHelper(
         initial_entries={'remove': 'val'},
         expected_patch={'set': 'val'},
         clear=True,
         set_entries={'set': 'val'})
 
-  def testBuildFullMapUpdate_RemoveSet(self, track):
-    self.SetTrack(track)
+  def testBuildFullMapUpdate_RemoveSet(self):
     self._BuildFullMapUpdateTestHelper(
         initial_entries={
             'remove_and_update': 'val',
@@ -218,8 +205,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         remove_keys=['remove_and_update', 'remove'],
         set_entries={'remove_and_update': 'new_val'})
 
-  def testBuildFullMapUpdate_AcceptsNoneRemoveSet(self, track):
-    self.SetTrack(track)
+  def testBuildFullMapUpdate_AcceptsNoneRemoveSet(self):
     self._BuildFullMapUpdateTestHelper(
         initial_entries={},
         expected_patch={},
@@ -227,8 +213,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         remove_keys=None,
         set_entries=None)
 
-  def testBuildFullMapUpdate_OverridesInitialEntries(self, track):
-    self.SetTrack(track)
+  def testBuildFullMapUpdate_OverridesInitialEntries(self):
     self._BuildFullMapUpdateTestHelper(
         initial_entries={
             'to_keep': 'val',
@@ -247,15 +232,13 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
             'to_update': 'new_val'
         })
 
-  def testExtractGkeClusterLocationIdDefaultsToEnvLocation(self, track):
+  def testExtractGkeClusterLocationIdDefaultsToEnvLocation(self):
     """Tests that the environment config location takes precedence."""
-    self.SetTrack(track)
     config_zone = 'configZone'
     self._ExtractGkeClusterLocationIdHelper(
         config_zone, [(self.TEST_ENVIRONMENT_ID, 'listZone')], config_zone)
 
-  def testExtractGkeClusterLocationIdFallsBackToSingletonList(self, track):
-    self.SetTrack(track)
+  def testExtractGkeClusterLocationIdFallsBackToSingletonList(self):
     matching_zone = 'matchingZone'
     self._ExtractGkeClusterLocationIdHelper(
         None,
@@ -265,8 +248,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
          (self.TEST_GKE_CLUSTER + '2', 'badZone')],
         matching_zone)
 
-  def testExtractGkeClusterLocationIdFallsBackToFirstInList(self, track):
-    self.SetTrack(track)
+  def testExtractGkeClusterLocationIdFallsBackToFirstInList(self):
     matching_zone = 'matchingZone'
     self._ExtractGkeClusterLocationIdHelper(
         None,
@@ -311,9 +293,8 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testRunKubectlCommand_Success(self, track, exec_mock,
+  def testRunKubectlCommand_Success(self, exec_mock,
                                     tmp_kubeconfig_mock):
-    self.SetTrack(track)
     kubectl_args = ['exec', '-it', 'airflow-worker12345', 'bash']
     expected_args = [self.TEST_KUBECTL_PATH] + kubectl_args
 
@@ -328,9 +309,8 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testRunKubectlCommand_KubectlError(self, track, exec_mock,
+  def testRunKubectlCommand_KubectlError(self, exec_mock,
                                          tmp_kubeconfig_mock):
-    self.SetTrack(track)
     kubectl_args = ['exec', '-it', 'airflow-worker12345', 'bash']
 
     fake_exec = kubectl_util.FakeExec()
@@ -349,9 +329,8 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   def testRunKubectlCommandSearchesEntirePath(
-      self, track, exec_mock, tmp_kubeconfig_mock, config_paths_mock,
+      self, exec_mock, tmp_kubeconfig_mock, config_paths_mock,
       find_executable_mock):
-    self.SetTrack(track)
     kubectl_args = ['exec', '-it', 'airflow-worker12345', 'bash']
 
     fake_exec = kubectl_util.FakeExec()
@@ -376,8 +355,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testGetGkePod_Success(self, track, exec_mock, tmp_kubeconfig_mock):
-    self.SetTrack(track)
+  def testGetGkePod_Success(self, exec_mock, tmp_kubeconfig_mock):
     fake_exec = kubectl_util.FakeExec()
     exec_mock.side_effect = fake_exec
     tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
@@ -393,8 +371,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testGetGkePod_PodNotFound(self, track, exec_mock, tmp_kubeconfig_mock):
-    self.SetTrack(track)
+  def testGetGkePod_PodNotFound(self, exec_mock, tmp_kubeconfig_mock):
     fake_exec = kubectl_util.FakeExec()
     exec_mock.side_effect = fake_exec
     tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
@@ -409,8 +386,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testGetGkePod_PodNotRunning(self, track, exec_mock, tmp_kubeconfig_mock):
-    self.SetTrack(track)
+  def testGetGkePod_PodNotRunning(self, exec_mock, tmp_kubeconfig_mock):
     fake_exec = kubectl_util.FakeExec()
     exec_mock.side_effect = fake_exec
     tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
@@ -426,8 +402,7 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
-  def testGetGkePod_KubectlError(self, track, exec_mock, tmp_kubeconfig_mock):
-    self.SetTrack(track)
+  def testGetGkePod_KubectlError(self, exec_mock, tmp_kubeconfig_mock):
     fake_exec = kubectl_util.FakeExec()
     exec_mock.side_effect = fake_exec
     tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
@@ -440,90 +415,83 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
       command_util.GetGkePod('pod1')
     fake_exec.Verify()
 
-  def testParseRequirementsFileNoVersionMatch(self, track):
+  def testParseRequirementsFileNoVersionMatch(self):
     """Tests parsing pypi requirements without a version."""
-    self.SetTrack(track)
     requirements_file = self.Touch(self.root_path, contents='numpy')
     actual_entries = command_util.ParseRequirementsFile(requirements_file)
     self.assertEqual({'numpy': ''}, actual_entries)
 
-  def testParseRequirementsFileDuplicateKey(self, track):
+  def testParseRequirementsFileDuplicateKey(self):
     """Tests error when parsing pypi requirements with duplicate package."""
-    self.SetTrack(track)
     requirements_file = self.Touch(
         self.root_path, contents='package>0.1\npackage\n')
     with self.assertRaises(command_util.Error):
       command_util.ParseRequirementsFile(requirements_file)
 
-  def testParseRequirementsFileStripsLines(self, track):
+  def testParseRequirementsFileStripsLines(self):
     """Tests parsing requirements file with leading and trailing whitespace."""
-    self.SetTrack(track)
     requirements_file = self.Touch(
         self.root_path, contents=' package  \n package2[extra1]\t\n')
     actual_entries = command_util.ParseRequirementsFile(requirements_file)
     self.assertEqual({'package': '', 'package2': '[extra1]'}, actual_entries)
 
-  def testParseRequirementsFileIgnoreWhitespaceLines(self, track):
+  def testParseRequirementsFileIgnoreWhitespaceLines(self):
     """Tests parsing requirements file skips lines with only whitespace."""
-    self.SetTrack(track)
     requirements_file = self.Touch(
         self.root_path, contents='\n \npackage\n  \t\npackage2[extra1]\n \n')
     actual_entries = command_util.ParseRequirementsFile(requirements_file)
     self.assertEqual({'package': '', 'package2': '[extra1]'}, actual_entries)
 
-  def testSplitRequirementSpecifierNoPackage(self, track):
+  def testParseRequirementsFileInGcs(self):
+    """Tests parsing requirements file in GCS file path."""
+    requirements_file = 'gs://mybucket/pypi.txt'
+    read_object_mock = self.StartObjectPatch(
+        storage_api.StorageClient, 'ReadObject')
+    command_util.ParseRequirementsFile(requirements_file)
+    config_object = storage_util.ObjectReference.FromUrl(requirements_file)
+    read_object_mock.assert_called_once_with(config_object)
+
+  def testSplitRequirementSpecifierNoPackage(self):
     """Tests error splitting requirements specifier with no package name."""
-    self.SetTrack(track)
     with self.assertRaises(command_util.Error):
       command_util.SplitRequirementSpecifier('[extra1]==1')
 
-  def testSplitRequirementSpecifierPackageNameOnly(self, track):
+  def testSplitRequirementSpecifierPackageNameOnly(self):
     """Tests splitting requirements specifier with only package name."""
-    self.SetTrack(track)
     actual_entry = command_util.SplitRequirementSpecifier('package')
     self.assertEqual(('package', ''), actual_entry)
 
-  def testSplitRequirementSpecifierExtras(self, track):
+  def testSplitRequirementSpecifierExtras(self):
     """Tests splitting requirements specifier with extras."""
-    self.SetTrack(track)
     actual_entry = command_util.SplitRequirementSpecifier(
         'package[extra1,extra2]')
     self.assertEqual(('package', '[extra1,extra2]'), actual_entry)
 
-  def testSplitRequirementSpecifierExtrasWithWhitespace(self, track):
+  def testSplitRequirementSpecifierExtrasWithWhitespace(self):
     """Tests splitting requirements specifier with whitespace in version.
-
-    Args:
-      track: base.ReleaseTrack, the release track to use when testing Composer
-      commands.
     """
-    self.SetTrack(track)
     actual_entry = command_util.SplitRequirementSpecifier(
         'package[ extra1 , extra2 ]')
     self.assertEqual(('package', '[ extra1 , extra2 ]'), actual_entry)
 
-  def testSplitRequirementSpecifierVersion(self, track):
+  def testSplitRequirementSpecifierVersion(self):
     """Tests splitting requirements specifier with version."""
-    self.SetTrack(track)
     actual_entry = command_util.SplitRequirementSpecifier('package==1')
     self.assertEqual(('package', '==1'), actual_entry)
 
-  def testSplitRequirementSpecifierVersionWithWhitespace(self, track):
+  def testSplitRequirementSpecifierVersionWithWhitespace(self):
     """Tests splitting requirements specifier with whitespace in version."""
-    self.SetTrack(track)
     actual_entry = command_util.SplitRequirementSpecifier('package== 1')
     self.assertEqual(('package', '== 1'), actual_entry)
 
-  def testSplitRequirementSpecifierExtrasAndVersion(self, track):
+  def testSplitRequirementSpecifierExtrasAndVersion(self):
     """Tests splitting requirements specifier with extras and version."""
-    self.SetTrack(track)
     actual_entry = command_util.SplitRequirementSpecifier(
         'package[extra1,extra2]==1')
     self.assertEqual(('package', '[extra1,extra2]==1'), actual_entry)
 
-  def testSplitRequirementSpecifierStripsComponents(self, track):
+  def testSplitRequirementSpecifierStripsComponents(self):
     """Tests splitting requirements specifier strips package name and tail."""
-    self.SetTrack(track)
     actual_entry = command_util.SplitRequirementSpecifier(
         'package [ extra1, extra2 ] == 1 ')
     self.assertEqual(('package', '[ extra1, extra2 ] == 1'), actual_entry)
@@ -565,8 +533,8 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         remove_keys=remove_keys,
         set_entries=set_entries,
         field_mask_prefix=self.field_mask_prefix,
-        entry_cls=UtilTest._FakeEntry,
-        env_builder=UtilTest._FakePatchBuilder)
+        entry_cls=UtilGATest._FakeEntry,
+        env_builder=UtilGATest._FakePatchBuilder)
     self.assertEquals(expected_field_mask, actual_field_mask)
     self.assertEquals(expected_patch, actual_patch)
 
@@ -597,9 +565,15 @@ class UtilTest(base.KubectlShellingUnitTest, parameterized.TestCase):
         remove_keys=remove_keys,
         set_entries=set_entries,
         initial_entries=[
-            UtilTest._FakeEntry(key=key, value=value)
+            UtilGATest._FakeEntry(key=key, value=value)
             for key, value in six.iteritems(initial_entries or {})
         ],
-        entry_cls=UtilTest._FakeEntry,
-        env_builder=UtilTest._FakePatchBuilder)
+        entry_cls=UtilGATest._FakeEntry,
+        env_builder=UtilGATest._FakePatchBuilder)
     self.assertEquals(expected_patch, actual_patch)
+
+
+class UtilBetaTest(UtilGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)

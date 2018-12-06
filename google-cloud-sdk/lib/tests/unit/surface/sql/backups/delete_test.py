@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
+
 from __future__ import absolute_import
 from __future__ import division
-
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.apitools import http_error

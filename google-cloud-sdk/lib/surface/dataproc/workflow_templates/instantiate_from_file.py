@@ -21,16 +21,17 @@ from __future__ import unicode_literals
 import uuid
 
 from googlecloudsdk.api_lib.dataproc import dataproc as dp
-from googlecloudsdk.api_lib.dataproc import util
+from googlecloudsdk.api_lib.dataproc import util as dp_util
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.dataproc import flags
+from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.util import files
+from googlecloudsdk.core.console import console_io
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class InstantiateFromFile(base.CreateCommand):
   """Instantiate a workflow template from a file."""
 
@@ -50,12 +51,63 @@ class InstantiateFromFile(base.CreateCommand):
     msgs = dataproc.messages
 
     # Generate uuid for request.
+    request_id = uuid.uuid4().hex
+    regions_ref = dp_util.ParseRegion(dataproc)
+    # Read template from YAML file and validate it using a schema.
+    data = console_io.ReadFromFileOrStdin(args.file or '-', binary=False)
+    template = export_util.Import(message_type=msgs.WorkflowTemplate,
+                                  stream=data,
+                                  schema_path=export_util.GetSchemaPath(
+                                      'dataproc',
+                                      message_name='WorkflowTemplate'))
+
+    # Send instantiate inline request.
+    request = \
+      msgs.DataprocProjectsRegionsWorkflowTemplatesInstantiateInlineRequest(
+          requestId=request_id,
+          parent=regions_ref.RelativeName(),
+          workflowTemplate=template)
+    operation = \
+      dataproc.client.projects_regions_workflowTemplates.InstantiateInline(
+          request)
+    if args.async:
+      log.status.Print('Instantiating with operation [{0}].'.format(
+          operation.name))
+      return
+    operation = dp_util.WaitForWorkflowTemplateOperation(dataproc, operation)
+    return operation
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class InstantiateFromFileBeta(base.CreateCommand):
+  """Instantiate a workflow template from a file."""
+
+  @staticmethod
+  def Args(parser):
+    region_prop = properties.VALUES.dataproc.region
+    parser.add_argument(
+        '--region',
+        help=region_prop.help_text,
+        # Don't set default, because it would override users' property setting.
+        action=actions.StoreProperty(region_prop))
+    flags.AddFileFlag(parser, 'workflow template', 'run')
+    base.ASYNC_FLAG.AddToParser(parser)
+
+  def Run(self, args):
+    dataproc = dp.Dataproc(self.ReleaseTrack())
+    msgs = dataproc.messages
+
+    # Generate uuid for request.
     instance_id = uuid.uuid4().hex
-    regions_ref = util.ParseRegion(dataproc)
-    # Read template from YAML file.
-    with files.FileReader(args.file) as stream:
-      template = util.ReadYaml(
-          message_type=msgs.WorkflowTemplate, stream=stream)
+    regions_ref = dp_util.ParseRegion(dataproc)
+    # Read template from YAML file and validate it using a schema.
+    data = console_io.ReadFromFileOrStdin(args.file or '-', binary=False)
+    template = export_util.Import(message_type=msgs.WorkflowTemplate,
+                                  stream=data,
+                                  schema_path=export_util.GetSchemaPath(
+                                      'dataproc',
+                                      api_version='v1beta2',
+                                      message_name='WorkflowTemplate'))
 
     # Send instantiate inline request.
     request = \
@@ -70,5 +122,5 @@ class InstantiateFromFile(base.CreateCommand):
       log.status.Print('Instantiating with operation [{0}].'.format(
           operation.name))
       return
-    operation = util.WaitForWorkflowTemplateOperation(dataproc, operation)
+    operation = dp_util.WaitForWorkflowTemplateOperation(dataproc, operation)
     return operation

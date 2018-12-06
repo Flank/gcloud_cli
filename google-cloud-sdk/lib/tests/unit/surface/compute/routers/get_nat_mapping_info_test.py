@@ -15,7 +15,9 @@
 """Tests for the get-nat-mapping-info subcommand."""
 
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -23,10 +25,10 @@ from tests.lib import test_case
 from tests.lib.surface.compute import router_test_base
 
 
-class AlphaGetNatMappingInfoTest(router_test_base.RouterTestBase):
+class BetaGetNatMappingInfoTest(router_test_base.RouterTestBase):
 
   def SetUp(self):
-    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
+    self.SelectApi(calliope_base.ReleaseTrack.BETA, 'beta')
 
     self.mappings = [
         self.messages.VmEndpointNatMappings(
@@ -156,6 +158,12 @@ class AlphaGetNatMappingInfoTest(router_test_base.RouterTestBase):
           sourceAliasIpRange: ''
           sourceVirtualIp: 10.0.0.{3}
     """.format(index, str(64 * index), str(64 * index + 63), index))
+
+
+class AlphaGetNatMappingInfoTest(router_test_base.RouterTestBase):
+
+  def SetUp(self):
+    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
 
 
 if __name__ == '__main__':

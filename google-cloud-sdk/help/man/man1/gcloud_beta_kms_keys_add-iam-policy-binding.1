@@ -5,22 +5,20 @@
 
 .SH "NAME"
 .HP
-gcloud beta kms keys add\-iam\-policy\-binding \- add IAM policy binding to a key
+gcloud beta kms keys add\-iam\-policy\-binding \- add IAM policy binding for a kms key
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta kms keys add\-iam\-policy\-binding\fR \fIKEY\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta kms keys add\-iam\-policy\-binding\fR (\fIKEY\fR\ :\ \fB\-\-keyring\fR=\fIKEYRING\fR\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Adds IAM policy binding to the given key.
-
-See https://cloud.google.com/iam/docs/managing\-policies for details of policy
-role and member types.
+\fB(BETA)\fR Adds a policy binding to the IAM policy of a kms key. One binding
+consists of a member and a role.
 
 
 
@@ -28,10 +26,30 @@ role and member types.
 
 .RS 2m
 .TP 2m
+
+Key resource \- The key to add the IAM policy binding. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [key] on the command line
+with a fully specified name; provide the argument [\-\-project] on the command
+line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
 \fIKEY\fR
-Name of the key whose IAM policy to modify.
+ID of the key or fully qualified identifier for the key. This positional must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+The containing keyring.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the key.
 
 
+.RE
 .RE
 .sp
 
@@ -68,43 +86,36 @@ Define the role of the member.
 .RE
 .sp
 
-.SH "OPTIONAL FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-keyring\fR=\fIKEYRING\fR
-Key ring of the key.
-
-.TP 2m
-\fB\-\-location\fR=\fILOCATION\fR
-Location of the key.
-
-
-.RE
-.sp
-
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudkms/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/kms/
 
 
 
 .SH "EXAMPLES"
 
-The following command will add an IAM policy binding for the role of
-\'roles/editor' for the user 'test\-user@gmail.com' on the key \f5frodo\fR with
-the keyring \f5fellowship\fR and location \f5global\fR:
+To add an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on the key frodo with the keyring fellowship and
+location global, run:
 
 .RS 2m
 $ gcloud beta kms keys add\-iam\-policy\-binding frodo \e
-    \-\-keyring fellowship \e
-    \-\-location global \e
-    \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/editor'
+    \-\-keyring='fellowship' \-\-location='global' \e
+    \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
 .RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
 
 
 

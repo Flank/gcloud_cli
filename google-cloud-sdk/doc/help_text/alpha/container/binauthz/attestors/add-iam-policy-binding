@@ -1,26 +1,29 @@
 NAME
     gcloud alpha container binauthz attestors add-iam-policy-binding - add IAM
-        policy binding to an attestor
+        policy binding to a Binary Authorization attestor
 
 SYNOPSIS
     gcloud alpha container binauthz attestors add-iam-policy-binding ATTESTOR
-        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+        --member=MEMBER --role=ROLE
+        [--condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) See https://cloud.google.com/iam/docs/managing-policies for details
-    of policy role and member types.
+    (ALPHA) Add an IAM policy binding to the IAM policy of a Binary
+    Authorization attestor. One binding consists of a member, a role, and an
+    optional condition.
 
 POSITIONAL ARGUMENTS
-     Attestor resource - The attestor whose IAM policy will be modified. This
-     represents a Cloud resource. (NOTE) Some attributes are not given
-     arguments in this group but can be set in other ways. To set the [project]
-     attribute: provide the flag [ATTESTOR] on the command line with a fully
-     specified name; provide the flag [--project] on the command line; set the
-     property [core/project]. This must be specified.
+     Attestor resource - The Binary Authorization attestor for which to add IAM
+     policy binding to. This represents a Cloud resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument [attestor] on
+     the command line with a fully specified name; set the property
+     [core/project]; provide the argument [--project] on the command line. This
+     must be specified.
 
        ATTESTOR
-          The ID of the attestor or a fully qualified identifier for the
-          attestor.
+          ID of the attestor or fully qualified identifier for the attestor.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -40,20 +43,68 @@ REQUIRED FLAGS
      --role=ROLE
         Define the role of the member.
 
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be added. When condition is explicitly
+          specified as None (e.g. --condition=None), a binding without a
+          condition is added. When --condition is specified and is not a None
+          condition, --role cannot be a primitive role. Primitive roles are
+          roles/editor, roles/owner, and roles/viewer.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the binaryauthorization/v1alpha2 API. The full
+    documentation for this API can be found at:
+    https://cloud.google.com/binary-authorization/
 
 EXAMPLES
-    The following command will add an IAM policy binding for the role of
+    To add an IAM policy binding for the role of
     'roles/binaryauthorization.attestorsEditor' for the user
-    'test-user@gmail.com' on the attestor my_attestor:
+    'test-user@gmail.com' on attesttor 'my_attestor', run:
 
         $ gcloud alpha container binauthz attestors add-iam-policy-binding \
-            my_attestor \
-            --member='user:test-user@gmail.com' \
+            my_attestor --member='user:test-user@gmail.com' \
             --role='roles/binaryauthorization.attestorsEditor'
+
+    To add an IAM policy binding which expires at the end of the year 2018 for
+    the role of 'roles/binaryauthorization.attestorsEditor' and the user
+    'test-user@gmail.com' on attesttor 'my_attestor', run:
+
+        $ gcloud alpha container binauthz attestors add-iam-policy-binding \
+            my_attestor --member='user:test-user@gmail.com' \
+            --role='roles/binaryauthorization.attestorsEditor' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

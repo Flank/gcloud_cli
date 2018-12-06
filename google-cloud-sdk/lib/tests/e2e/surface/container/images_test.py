@@ -31,7 +31,7 @@ from tests.lib import test_case
 
 class ImagesTest(e2e_base.WithServiceAuth):
 
-  _CREATE_CMD = 'container builds submit {0} -q --tag={1}'
+  _CREATE_CMD = 'builds submit {0} -q --tag={1}'
 
   def SetUp(self):
     self._test_app = self.Resource('tests', 'e2e', 'surface', 'container',

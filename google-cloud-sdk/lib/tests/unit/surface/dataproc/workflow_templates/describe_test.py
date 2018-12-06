@@ -28,15 +28,9 @@ from tests.lib.surface.dataproc import unit_base
 class WorkflowTemplateDescribeUnitTest(unit_base.DataprocUnitTestBase,
                                        compute_base.BaseComputeUnitTest):
   """Tests for workflow template describe."""
-  pass
-
-
-class WorkflowTemplateDescribeUnitTestBeta(WorkflowTemplateDescribeUnitTest):
-
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
 
   def testDescribeWorkflowTemplates(self):
+    """Tests the describe command."""
     workflow_template = self.MakeWorkflowTemplate()
     self.ExpectGetWorkflowTemplate(
         name=workflow_template.name,
@@ -55,6 +49,12 @@ class WorkflowTemplateDescribeUnitTestBeta(WorkflowTemplateDescribeUnitTest):
     result = self.RunDataproc('workflow-templates describe {0} --version 2'.
                               format(self.WORKFLOW_TEMPLATE))
     self.AssertMessagesEqual(workflow_template, result)
+
+
+class WorkflowTemplateDescribeUnitTestBeta(WorkflowTemplateDescribeUnitTest):
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
 
 
 if __name__ == '__main__':

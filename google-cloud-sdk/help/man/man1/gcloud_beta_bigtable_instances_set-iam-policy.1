@@ -28,15 +28,15 @@ gcloud beta bigtable instances set\-iam\-policy \- set the IAM policy for a Clou
 
 Instance resource \- The instance to set the IAM policy for. This represents a
 Cloud resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: provide the flag
-[instance] on the command line with a fully specified name; provide the flag
+can be set in other ways. To set the [project] attribute: provide the argument
+[instance] on the command line with a fully specified name; provide the argument
 [\-\-project] on the command line; set the property [core/project]. This must be
 specified.
 
 .RS 2m
 .TP 2m
 \fIINSTANCE\fR
-The ID of the instance or a fully qualified identifier for the instance.
+ID of the instance or fully qualified identifier for the instance.
 
 .RE
 .sp
@@ -55,18 +55,19 @@ or YAML file conforming to the structure of a Policy
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud bigtable instances set\-iam\-policy
 $ gcloud alpha bigtable instances set\-iam\-policy
 .RE
 

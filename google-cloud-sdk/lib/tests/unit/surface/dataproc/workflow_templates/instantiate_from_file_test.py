@@ -12,18 +12,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Test of the 'workflow-template run' command."""
+"""Test of the 'workflow-templates instantiate-from-file' command."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import os
 import textwrap
 import uuid
 
 from googlecloudsdk import calliope
 
-from googlecloudsdk.api_lib.dataproc import util
+from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 from tests.lib.surface.dataproc import compute_base
@@ -32,7 +34,7 @@ from tests.lib.surface.dataproc import unit_base
 
 class WorkflowTemplatesInstantiateFromFileUnitTest(
     unit_base.DataprocUnitTestBase, compute_base.BaseComputeUnitTest):
-  """Tests for dataproc workflow template run."""
+  """Tests for dataproc workflow-templates instantiate-from-file."""
 
   def SetUp(self):
     self.frozen_uuid = uuid.uuid4()
@@ -50,14 +52,13 @@ class WorkflowTemplatesInstantiateFromFileUnitTest(
     if not (response or exception):
       response = self.MakeOperation()
     client = self.mock_client
-    client.projects_regions_workflowTemplates.InstantiateInline.Expect(
-        self.messages.
+    request = self.messages.\
         DataprocProjectsRegionsWorkflowTemplatesInstantiateInlineRequest(
-            instanceId=self.frozen_uuid.hex,
+            requestId=self.frozen_uuid.hex,
             parent=parent,
-            workflowTemplate=workflow_template),
-        response=response,
-        exception=exception)
+            workflowTemplate=workflow_template)
+    client.projects_regions_workflowTemplates.InstantiateInline.Expect(
+        request, response=response, exception=exception)
 
   def ExpectWorkflowTemplatesInstantiateInlineCalls(self,
                                                     workflow_template=None,
@@ -72,26 +73,25 @@ class WorkflowTemplatesInstantiateFromFileUnitTest(
         response=response,
         exception=exception)
     # Initial get operation returns pending
-    self.ExpectGetOperation(self.MakeOperation(state='RUNNING'))
+    self.ExpectGetOperation(self.MakeOperation(
+        metadata=collections.OrderedDict([('state', 'RUNNING')])))
     # Second get operation returns done
     self.ExpectGetOperation(
-        operation=self.MakeCompletedOperation(error=error, state='DONE'))
-
-
-class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
-    WorkflowTemplatesInstantiateFromFileUnitTest):
-
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+        operation=self.MakeCompletedOperation(
+            error=error,
+            metadata=collections.OrderedDict([('state', 'DONE')])))
 
   def testInstantiateFromFileWorkflowTemplates(self):
     workflow_template = self.MakeWorkflowTemplate()
+    workflow_template.id = None
+    workflow_template.name = None
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=workflow_template, stream=stream)
+      export_util.Export(message=workflow_template, stream=stream)
     self.ExpectWorkflowTemplatesInstantiateInlineCalls(
         workflow_template=workflow_template)
-    done = self.MakeCompletedOperation(state='DONE')
+    done = self.MakeCompletedOperation(
+        metadata=collections.OrderedDict([('state', 'DONE')]))
     result = self.RunDataproc(
         'workflow-templates instantiate-from-file --file {0}'.format(file_name))
     self.AssertMessagesEqual(done, result)
@@ -105,9 +105,11 @@ class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
 
   def testInstantiateFromFileWorkflowTemplatesAsync(self):
     workflow_template = self.MakeWorkflowTemplate()
+    workflow_template.id = None
+    workflow_template.name = None
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=workflow_template, stream=stream)
+      export_util.Export(message=workflow_template, stream=stream)
     self.ExpectWorkflowTemplatesInstantiateInline(
         workflow_template=workflow_template)
     self.RunDataproc(
@@ -120,14 +122,16 @@ class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
   def testInstantiateFromFileWorkflowTemplatesWithRegion(self):
     properties.VALUES.dataproc.region.Set('us-test1')
     parent = self.WorkflowTemplateParentName(region='us-test1')
-    template_name = self.WorkflowTemplateName(region='us-test1')
-    workflow_template = self.MakeWorkflowTemplate(name=template_name)
+    workflow_template = self.MakeWorkflowTemplate()
+    workflow_template.id = None
+    workflow_template.name = None
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      util.WriteYaml(message=workflow_template, stream=stream)
+      export_util.Export(message=workflow_template, stream=stream)
     self.ExpectWorkflowTemplatesInstantiateInlineCalls(
         workflow_template=workflow_template, parent=parent)
-    done = self.MakeCompletedOperation(state='DONE')
+    done = self.MakeCompletedOperation(
+        metadata=collections.OrderedDict([('state', 'DONE')]))
     result = self.RunDataproc(
         'workflow-templates instantiate-from-file --file {0}'.format(file_name))
     self.AssertMessagesEqual(done, result)
@@ -138,3 +142,30 @@ class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
       WorkflowTemplate RUNNING
       WorkflowTemplate DONE
         """.format(self.OperationName())))
+
+
+class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
+    WorkflowTemplatesInstantiateFromFileUnitTest):
+
+  def ExpectWorkflowTemplatesInstantiateInline(self,
+                                               parent=None,
+                                               workflow_template=None,
+                                               response=None,
+                                               exception=None):
+    if not parent:
+      parent = self.WorkflowTemplateParentName()
+    if not workflow_template:
+      workflow_template = self.MakeWorkflowTemplate()
+    if not (response or exception):
+      response = self.MakeOperation()
+    client = self.mock_client
+    request = self.messages.\
+      DataprocProjectsRegionsWorkflowTemplatesInstantiateInlineRequest(
+          instanceId=self.frozen_uuid.hex,
+          parent=parent,
+          workflowTemplate=workflow_template)
+    client.projects_regions_workflowTemplates.InstantiateInline.Expect(
+        request, response=response, exception=exception)
+
+  def SetUp(self):
+    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)

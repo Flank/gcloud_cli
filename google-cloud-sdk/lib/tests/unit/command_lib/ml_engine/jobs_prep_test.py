@@ -505,7 +505,7 @@ def _FakeUploadFiles(paths, bucket, gs_prefix=None):
   uploaded_files = []
   for _, remote_path in paths:
     uploaded_files.append(
-        '/'.join([f for f in [bucket.ToBucketUrl(), gs_prefix, 'DEADBEEF',
+        '/'.join([f for f in [bucket.ToUrl(), gs_prefix, 'DEADBEEF',
                               remote_path] if f]))
   return uploaded_files
 
@@ -526,8 +526,8 @@ class UploadPythonPackagesTest(base.MlBetaPlatformTestBase):
         jobs_prep, 'BuildPackages', side_effect=_FakeBuildPackages)
     self.upload_mock = self.StartObjectPatch(uploads, 'UploadFiles',
                                              side_effect=_FakeUploadFiles)
-    self.bucket_ref = storage_util.BucketReference.FromBucketUrl('gs://bucket/')
-    self.staging_location = storage_util.ObjectReference(
+    self.bucket_ref = storage_util.BucketReference.FromUrl('gs://bucket/')
+    self.staging_location = storage_util.ObjectReference.FromBucketRef(
         self.bucket_ref, 'job_name')
 
   def testUploadPythonPackages_NoPackagesGiven(self):
@@ -560,7 +560,8 @@ class UploadPythonPackagesTest(base.MlBetaPlatformTestBase):
         ])
 
   def testUploadPythonPackages_EmptyStagingLocation(self):
-    staging_location = storage_util.ObjectReference(self.bucket_ref, '')
+    staging_location = storage_util.ObjectReference.FromBucketRef(
+        self.bucket_ref, '')
     packages = [os.path.join('path', 'to', 'package.tar.gz'), 'package2.whl']
 
     storage_paths = jobs_prep.UploadPythonPackages(
@@ -650,7 +651,7 @@ class GetStagingLocationTest(test_case.TestCase):
   """Tests for jobs_prep.GetStagingLocation."""
 
   def SetUp(self):
-    self.staging_bucket = storage_util.BucketReference.FromBucketUrl(
+    self.staging_bucket = storage_util.BucketReference.FromUrl(
         'gs://staging-bucket/')
     self.job_dir = storage_util.ObjectReference.FromUrl(
         'gs://job-bucket/job-dir/')

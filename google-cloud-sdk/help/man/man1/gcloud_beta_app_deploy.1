@@ -11,7 +11,7 @@ gcloud beta app deploy \- deploy the local code and/or configuration of your app
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta app deploy\fR [\fIDEPLOYABLES\fR\ ...] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-image\-url\fR=\fIIMAGE_URL\fR] [\fB\-\-no\-promote\fR] [\fB\-\-no\-stop\-previous\-version\fR] [\fB\-\-version\fR=\fIVERSION\fR,\ \fB\-v\fR\ \fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta app deploy\fR [\fIDEPLOYABLES\fR\ ...] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-no\-cache\fR] [\fB\-\-image\-url\fR=\fIIMAGE_URL\fR] [\fB\-\-no\-promote\fR] [\fB\-\-no\-stop\-previous\-version\fR] [\fB\-\-version\fR=\fIVERSION\fR,\ \fB\-v\fR\ \fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -55,6 +55,11 @@ deployment. If this argument is not specified, the application's default code
 bucket is used.
 
 .TP 2m
+\fB\-\-no\-cache\fR
+Skip caching mechanisms involved in the deployment process, in particular do not
+use cached dependencies during the build step.
+
+.TP 2m
 \fB\-\-image\-url\fR=\fIIMAGE_URL\fR
 Deploy with a specific Docker image. Docker url must be from one of the valid
 gcr hostnames.
@@ -84,9 +89,9 @@ you do not specify a version, one will be generated for you.
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 

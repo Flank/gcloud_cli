@@ -19,9 +19,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
+
 from apitools.base.py import encoding
 
-from googlecloudsdk.api_lib.compute import constants as compute_constants
 from googlecloudsdk.api_lib.compute import utils as api_utils
 from googlecloudsdk.api_lib.dataproc import compute_helpers
 from googlecloudsdk.api_lib.dataproc import constants
@@ -29,6 +30,7 @@ from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.instances import flags as instances_flags
 from googlecloudsdk.command_lib.dataproc import flags
 from googlecloudsdk.command_lib.util.args import labels_util
@@ -37,18 +39,24 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import times
 
 
-def ArgsForClusterRef(parser, beta=False):
+GENERATED_LABEL_PREFIX = 'goog-dataproc-'
+
+
+# beta is unused but still useful when we add new beta features
+def ArgsForClusterRef(parser, beta=False, include_deprecated=True): \
+    # pylint: disable=unused-argument
   """Register flags for creating a dataproc cluster.
 
   Args:
     parser: The argparse.ArgParser to configure with dataproc cluster arguments.
     beta: whether or not this is a beta command (may affect flag visibility)
+    include_deprecated: whether deprecated flags should be included
   """
   labels_util.AddCreateLabelsFlags(parser)
   instances_flags.AddTagsArgs(parser)
   # 30m is backend timeout + 5m for safety buffer.
   flags.AddTimeoutFlag(parser, default='35m')
-  flags.AddZoneFlag(parser)
+  flags.AddZoneFlag(parser, short_flags=include_deprecated)
 
   parser.add_argument(
       '--metadata',
@@ -134,6 +142,13 @@ def ArgsForClusterRef(parser, beta=False):
       type=int,
       help='The number of local SSDs to attach to the master in a cluster.')
   parser.add_argument(
+      '--num-preemptible-worker-local-ssds',
+      type=int,
+      help="""\
+      The number of local SSDs to attach to each preemptible worker in
+      a cluster.
+      """)
+  parser.add_argument(
       '--initialization-actions',
       type=arg_parsers.ArgList(min_length=1),
       metavar='CLOUD_STORAGE_URI',
@@ -155,12 +170,10 @@ def ArgsForClusterRef(parser, beta=False):
       help="""\
       The number of master nodes in the cluster.
 
-      [format="csv",options="header"]
-      |========
-      Number of Masters,Cluster Mode
-      1,Standard
-      3,High Availability
-      |========
+      Number of Masters | Cluster Mode
+      --- | ---
+      1 | Standard
+      3 | High Availability
       """)
   parser.add_argument(
       '--properties',
@@ -175,23 +188,21 @@ Properties are mapped to configuration files by specifying a prefix, such as
 "core:io.serializations". The following are supported prefixes and their
 mappings:
 
-[format="csv",options="header"]
-|========
-Prefix,File,Purpose of file
-capacity-scheduler,capacity-scheduler.xml,Hadoop YARN Capacity Scheduler configuration
-core,core-site.xml,Hadoop general configuration
-distcp,distcp-default.xml,Hadoop Distributed Copy configuration
-hadoop-env,hadoop-env.sh,Hadoop specific environment variables
-hdfs,hdfs-site.xml,Hadoop HDFS configuration
-hive,hive-site.xml,Hive configuration
-mapred,mapred-site.xml,Hadoop MapReduce configuration
-mapred-env,mapred-env.sh,Hadoop MapReduce specific environment variables
-pig,pig.properties,Pig configuration
-spark,spark-defaults.conf,Spark configuration
-spark-env,spark-env.sh,Spark specific environment variables
-yarn,yarn-site.xml,Hadoop YARN configuration
-yarn-env,yarn-env.sh,Hadoop YARN specific environment variables
-|========
+Prefix | File | Purpose of file
+--- | --- | ---
+capacity-scheduler | capacity-scheduler.xml | Hadoop YARN Capacity Scheduler configuration
+core | core-site.xml | Hadoop general configuration
+distcp | distcp-default.xml | Hadoop Distributed Copy configuration
+hadoop-env | hadoop-env.sh | Hadoop specific environment variables
+hdfs | hdfs-site.xml | Hadoop HDFS configuration
+hive | hive-site.xml | Hive configuration
+mapred | mapred-site.xml | Hadoop MapReduce configuration
+mapred-env | mapred-env.sh | Hadoop MapReduce specific environment variables
+pig | pig.properties | Pig configuration
+spark | spark-defaults.conf | Spark configuration
+spark-env | spark-env.sh | Spark specific environment variables
+yarn | yarn-site.xml | Hadoop YARN configuration
+yarn-env | yarn-env.sh | Hadoop YARN specific environment variables
 
 See https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties
 for more information.
@@ -216,37 +227,80 @@ Examples:
 The following *minimum scopes* are necessary for the cluster to function
 properly and are always added, even if not explicitly specified:
 
-[format="csv"]
-|========
-{minimum_scopes}
-|========
+  {minimum_scopes}
 
 If the `--scopes` flag is not specified, the following *default scopes*
 are also included:
 
-[format="csv"]
-|========
-{additional_scopes}
-|========
+  {additional_scopes}
 
 If you want to enable all scopes use the 'cloud-platform' scope.
 
-SCOPE can be either the full URI of the scope or an alias.
-Available aliases are:
-
-[format="csv",options="header"]
-|========
-Alias,URI
-{aliases}
-|========
-
-{scope_deprecation_msg}
+{scopes_help}
 """.format(
-    minimum_scopes='\n'.join(constants.MINIMUM_SCOPE_URIS),
-    additional_scopes='\n'.join(constants.ADDITIONAL_DEFAULT_SCOPE_URIS),
-    aliases=compute_helpers.SCOPE_ALIASES_FOR_HELP,
-    scope_deprecation_msg=compute_constants.DEPRECATED_SCOPES_MESSAGES))
+    minimum_scopes='\n  '.join(constants.MINIMUM_SCOPE_URIS),
+    additional_scopes='\n  '.join(constants.ADDITIONAL_DEFAULT_SCOPE_URIS),
+    scopes_help=compute_helpers.SCOPES_HELP))
 
+  if include_deprecated:
+    _AddDiskArgsDeprecated(parser)
+  else:
+    _AddDiskArgs(parser)
+
+  # --no-address is an exception to the no negative-flag style guildline to be
+  # consistent with gcloud compute instances create --no-address
+  parser.add_argument(
+      '--no-address',
+      action='store_true',
+      help="""\
+      If provided, the instances in the cluster will not be assigned external
+      IP addresses.
+
+      If omitted the instances in the cluster will each be assigned an
+      ephemeral external IP address.
+
+      Note: Dataproc VMs need access to the Dataproc API. This can be achieved
+      without external IP addresses using Private Google Access
+      (https://cloud.google.com/compute/docs/private-google-access).
+      """)
+
+  boot_disk_type_detailed_help = """\
+      The type of the boot disk. The value must be ``pd-standard'' or
+      ``pd-ssd''.
+      """
+  parser.add_argument(
+      '--master-boot-disk-type', help=boot_disk_type_detailed_help)
+  parser.add_argument(
+      '--worker-boot-disk-type', help=boot_disk_type_detailed_help)
+  parser.add_argument(
+      '--preemptible-worker-boot-disk-type', help=boot_disk_type_detailed_help)
+
+
+def _AddDiskArgs(parser):
+  """Adds disk related args to the parser."""
+  boot_disk_size_detailed_help = """\
+      The size of the boot disk. The value must be a
+      whole number followed by a size unit of ``KB'' for kilobyte, ``MB''
+      for megabyte, ``GB'' for gigabyte, or ``TB'' for terabyte. For example,
+      ``10GB'' will produce a 10 gigabyte disk. The minimum size a boot disk
+      can have is 10 GB. Disk size must be a multiple of 1 GB.
+      """
+  parser.add_argument(
+      '--master-boot-disk-size',
+      type=arg_parsers.BinarySize(lower_bound='10GB'),
+      help=boot_disk_size_detailed_help)
+  parser.add_argument(
+      '--worker-boot-disk-size',
+      type=arg_parsers.BinarySize(lower_bound='10GB'),
+      help=boot_disk_size_detailed_help)
+  parser.add_argument(
+      '--preemptible-worker-boot-disk-size',
+      type=arg_parsers.BinarySize(lower_bound='10GB'),
+      help=boot_disk_size_detailed_help)
+
+
+def _AddDiskArgsDeprecated(parser):
+  """Adds deprecated disk related args to the parser."""
   master_boot_disk_size = parser.add_mutually_exclusive_group()
   worker_boot_disk_size = parser.add_mutually_exclusive_group()
 
@@ -290,34 +344,78 @@ Alias,URI
       type=arg_parsers.BinarySize(lower_bound='10GB'),
       help=boot_disk_size_detailed_help)
 
-  # Args that are visible only in Beta track
+
+def BetaArgsForClusterRef(parser):
+  """Register beta-only flags for creating a Dataproc cluster."""
+  flags.AddComponentFlag(parser)
+  flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.BETA)
+
   parser.add_argument(
-      '--no-address',
-      action='store_true',
+      '--max-idle',
+      type=arg_parsers.Duration(),
       help="""\
-      If provided, the instances in the cluster will not be assigned external
-      IP addresses.
+        The duration before cluster is auto-deleted after last job completes,
+        such as "2h" or "1d".
+        See $ gcloud topic datetimes for information on duration formats.
+        """)
 
-      Note: Dataproc VMs need access to the Dataproc API. This can be achieved
-      without external IP addresses using Private Google Access
-      (https://cloud.google.com/compute/docs/private-google-access).
-      """,
-      hidden=not beta)
+  auto_delete_group = parser.add_mutually_exclusive_group()
+  auto_delete_group.add_argument(
+      '--max-age',
+      type=arg_parsers.Duration(),
+      help="""\
+        The lifespan of the cluster before it is auto-deleted, such as
+        "2h" or "1d".
+        See $ gcloud topic datetimes for information on duration formats.
+        """)
 
-  boot_disk_type_detailed_help = """\
-      The type of the boot disk. The value must be ``pd-standard'' or
-      ``pd-ssd''.
+  auto_delete_group.add_argument(
+      '--expiration-time',
+      type=arg_parsers.Datetime.Parse,
+      help="""\
+        The time when cluster will be auto-deleted, such as
+        "2017-08-29T18:52:51.142Z." See $ gcloud topic datetimes for
+        information on time formats.
+        """)
+
+  for instance_type in ('master', 'worker'):
+    help_msg = """\
+      Attaches accelerators (e.g. GPUs) to the {instance_type}
+      instance(s).
+      """.format(instance_type=instance_type)
+    if instance_type == 'worker':
+      help_msg += """
+      Note:
+      No accelerators will be attached to preemptible workers, because
+      preemptible VMs do not support accelerators.
       """
-  parser.add_argument(
-      '--master-boot-disk-type', help=boot_disk_type_detailed_help)
-  parser.add_argument(
-      '--worker-boot-disk-type', help=boot_disk_type_detailed_help)
-  parser.add_argument(
-      '--preemptible-worker-boot-disk-type',
-      help=boot_disk_type_detailed_help)
+    help_msg += """
+      *type*::: The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla
+      K80) of accelerator to attach to the instances. Use 'gcloud compute
+      accelerator-types list' to learn about all available accelerator
+      types.
+
+      *count*::: The number of pieces of the accelerator to attach to each
+      of the instances. The default value is 1.
+      """
+    parser.add_argument(
+        '--{0}-accelerator'.format(instance_type),
+        type=arg_parsers.ArgDict(spec={
+            'type': str,
+            'count': int,
+        }),
+        metavar='type=TYPE,[count=COUNT]',
+        help=help_msg)
+
+  AddAllocationAffinityGroup(parser)
 
 
-def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
+def GetClusterConfig(args,
+                     dataproc,
+                     project_id,
+                     compute_resources,
+                     beta=False,
+                     include_deprecated=True):
   """Get dataproc cluster configuration.
 
   Args:
@@ -326,6 +424,7 @@ def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
     project_id: Dataproc project ID
     compute_resources: compute resource for cluster
     beta: use BETA only features
+    include_deprecated: whether to include deprecated args
 
   Returns:
     cluster_config: Dataproc cluster configuration
@@ -373,11 +472,17 @@ def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
   software_config = dataproc.messages.SoftwareConfig(
       imageVersion=args.image_version)
 
-  master_boot_disk_size_gb = args.master_boot_disk_size_gb
+  if include_deprecated:
+    master_boot_disk_size_gb = args.master_boot_disk_size_gb
+  else:
+    master_boot_disk_size_gb = None
   if args.master_boot_disk_size:
     master_boot_disk_size_gb = (api_utils.BytesToGb(args.master_boot_disk_size))
 
-  worker_boot_disk_size_gb = args.worker_boot_disk_size_gb
+  if include_deprecated:
+    worker_boot_disk_size_gb = args.worker_boot_disk_size_gb
+  else:
+    worker_boot_disk_size_gb = None
   if args.worker_boot_disk_size:
     worker_boot_disk_size_gb = (api_utils.BytesToGb(args.worker_boot_disk_size))
 
@@ -391,8 +496,15 @@ def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
     args.properties[constants.ALLOW_ZERO_WORKERS_PROPERTY] = 'true'
 
   if args.properties:
-    software_config.properties = encoding.DictToMessage(
+    software_config.properties = encoding.DictToAdditionalPropertyMessage(
         args.properties, dataproc.messages.SoftwareConfig.PropertiesValue)
+
+  if beta:
+    if args.components:
+      software_config_cls = dataproc.messages.SoftwareConfig
+      software_config.optionalComponents.extend(list(map(
+          software_config_cls.OptionalComponentsValueListEntryValuesEnum,
+          args.components)))
 
   gce_cluster_config = dataproc.messages.GceClusterConfig(
       networkUri=network_ref and network_ref.SelfLink(),
@@ -402,12 +514,17 @@ def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
       serviceAccountScopes=expanded_scopes,
       zoneUri=properties.VALUES.compute.zone.GetOrFail())
 
+  if beta:
+    allocation_affinity = GetAllocationAffinity(args, dataproc)
+    gce_cluster_config.allocationAffinity = allocation_affinity
+
   if args.tags:
     gce_cluster_config.tags = args.tags
 
   if args.metadata:
-    flat_metadata = dict((k, v) for d in args.metadata for k, v in d.items())
-    gce_cluster_config.metadata = encoding.DictToMessage(
+    flat_metadata = collections.OrderedDict(
+        [(k, v) for d in args.metadata for k, v in d.items()])
+    gce_cluster_config.metadata = encoding.DictToAdditionalPropertyMessage(
         flat_metadata, dataproc.messages.GceClusterConfig.MetadataValue)
 
   master_accelerators = []
@@ -433,7 +550,7 @@ def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
           accelerators=master_accelerators,
           diskConfig=GetDiskConfig(
               dataproc,
-              args.master_boot_disk_type if beta else None,
+              args.master_boot_disk_type,
               master_boot_disk_size_gb,
               args.num_master_local_ssds
           )),
@@ -444,7 +561,7 @@ def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
           accelerators=worker_accelerators,
           diskConfig=GetDiskConfig(
               dataproc,
-              args.worker_boot_disk_type if beta else None,
+              args.worker_boot_disk_type,
               worker_boot_disk_size_gb,
               args.num_worker_local_ssds,
           )),
@@ -472,7 +589,7 @@ def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
     if changed_config:
       cluster_config.lifecycleConfig = lifecycle_config
 
-  if beta and hasattr(args.CONCEPTS, 'kms_key'):
+  if hasattr(args.CONCEPTS, 'kms_key'):
     kms_ref = args.CONCEPTS.kms_key.Parse()
     if kms_ref:
       encryption_config = dataproc.messages.EncryptionConfig()
@@ -492,16 +609,17 @@ def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
   # future pVMs configuration at creation time.
   if (args.num_preemptible_workers is not None or
       preemptible_worker_boot_disk_size_gb is not None or
-      (beta and (args.preemptible_worker_boot_disk_type is not None or
-                 args.worker_min_cpu_platform is not None))):
+      args.preemptible_worker_boot_disk_type is not None or
+      args.num_preemptible_worker_local_ssds is not None or
+      (beta and args.worker_min_cpu_platform is not None)):
     cluster_config.secondaryWorkerConfig = (
         dataproc.messages.InstanceGroupConfig(
             numInstances=args.num_preemptible_workers,
             diskConfig=GetDiskConfig(
                 dataproc,
-                args.preemptible_worker_boot_disk_type if beta else None,
+                args.preemptible_worker_boot_disk_type,
                 preemptible_worker_boot_disk_size_gb,
-                None,
+                args.num_preemptible_worker_local_ssds,
             )))
     if beta and args.worker_min_cpu_platform:
       cluster_config.secondaryWorkerConfig.minCpuPlatform = (
@@ -587,3 +705,90 @@ def CreateCluster(dataproc, cluster, is_async, timeout):
     if operation.details:
       log.error('Details:\n' + operation.details)
   return cluster
+
+
+def DeleteGeneratedLabels(cluster, dataproc):
+  """Filter out Dataproc-generated cluster labels.
+
+  Args:
+    cluster: Cluster to filter
+    dataproc: Dataproc object that contains client, messages, and resources
+  """
+  # Filter out Dataproc-generated labels.
+  if cluster.labels:
+    labels = encoding.MessageToPyValue(cluster.labels)
+    labels_to_delete = []
+    for label in labels:
+      if label.startswith(GENERATED_LABEL_PREFIX):
+        labels_to_delete.append(label)
+    for label in labels_to_delete:
+      del labels[label]
+    if not labels:
+      cluster.labels = None
+    else:
+      cluster.labels = encoding.DictToAdditionalPropertyMessage(
+          labels, dataproc.messages.Cluster.LabelsValue)
+
+
+def AddAllocationAffinityGroup(parser):
+  """Adds the argument group to handle allocation affinity configurations."""
+  group = parser.add_group(help='Manage the configuration of desired'
+                                'allocation which this instance could'
+                                'take capacity from.'
+                          )
+  group.add_argument(
+      '--allocation-affinity',
+      choices=['any', 'none', 'specific'],
+      default='any',
+      hidden=True,
+      help="""
+Specifies the configuration of desired allocation which this instance could
+take capacity from. Choices are 'any', 'none' and 'specific', default is 'any'.
+""")
+  group.add_argument(
+      '--allocation-label',
+      type=arg_parsers.ArgDict(spec={
+          'key': str,
+          'value': str,
+      }),
+      hidden=True,
+      help="""
+The key and values of the label of the allocation resource. Required if the
+value of `--allocation-affinity` is `specific`.
+
+*key*::: The label key of allocation resource.
+
+*value*::: The label value of allocation resource.
+""")
+
+
+def GetAllocationAffinity(args, client):
+  """Returns the message of allocation affinity for the instance."""
+  if not args.IsSpecified('allocation_affinity'):
+    return None
+
+  type_msgs = (client.messages.
+               AllocationAffinity.ConsumeAllocationTypeValueValuesEnum)
+
+  if args.allocation_affinity == 'none':
+    allocation_type = type_msgs.NO_ALLOCATION
+    allocation_key = None
+    allocation_values = []
+  elif args.allocation_affinity == 'specific':
+    allocation_type = type_msgs.SPECIFIC_ALLOCATION
+    # Currently, the key is fixed and the value is the name of the allocation.
+    # The value being a repeated field is reserved for future use when user
+    # can specify more than one allocation names from which the Vm can take
+    # capacity from.
+    allocation_key = args.allocation_label.get('key', None)
+    allocation_values = [args.allocation_label.get('value', None)]
+  else:
+    allocation_type = type_msgs.ANY_ALLOCATION
+    allocation_key = None
+    allocation_values = []
+
+  return client.messages.AllocationAffinity(
+      consumeAllocationType=allocation_type,
+      key=allocation_key,
+      values=allocation_values)
+

@@ -93,7 +93,8 @@ def ExecuteJarTool(java_bin, jar_dir, jar_name, classname, flags=None, *args):
   """
   flags = flags or []
   jar_path = _FullPath(jar_dir, jar_name)
-  java_args = ['-cp', jar_path] + flags + [classname] + list(args)
+  classname_arg = [classname] if classname else []
+  java_args = ['-cp', jar_path] + flags + classname_arg + list(args)
   _ExecuteTool(
       execution_utils.ArgsForExecutableTool(java_bin, *java_args))
 

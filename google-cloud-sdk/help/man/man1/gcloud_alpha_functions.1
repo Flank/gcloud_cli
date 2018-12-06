@@ -24,9 +24,9 @@ gcloud alpha functions \- manage Google Cloud Functions
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
 
 
 
@@ -58,6 +58,10 @@ Function.
 
 .RS 2m
 .TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Add an IAM policy binding for a Google Cloud Function.
+
+.TP 2m
 \fBcall\fR
 \fB(ALPHA)\fR Trigger execution of a Google Cloud Function.
 
@@ -74,8 +78,20 @@ Function.
 \fB(ALPHA)\fR Display details of a Google Cloud Function.
 
 .TP 2m
+\fBget\-iam\-policy\fR
+\fB(ALPHA)\fR Get IAM policy for a Google Cloud Function.
+
+.TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List Google Cloud Functions.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Removes an IAM policy binding from a Google Cloud Function.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(ALPHA)\fR Sets IAM policy for a Google Cloud Function.
 
 
 .RE

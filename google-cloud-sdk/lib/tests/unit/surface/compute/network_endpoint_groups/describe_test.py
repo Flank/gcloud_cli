@@ -13,13 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the network-endpoint-groups describe subcommand."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
 import textwrap
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -28,7 +29,7 @@ from tests.lib.surface.compute import test_resources
 class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):

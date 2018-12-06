@@ -117,12 +117,16 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
   class SelfLink1(object):
 
     def __init__(self):
+      # common_typos_disable
       self.selfLink = 'https://oo/selfLink'  # pylint: disable=invalid-name
+      # common_typos_enable
 
   class SelfLink2(object):
 
     def __init__(self):
+      # common_typos_disable
       self.SelfLink = 'https://oo/SelfLink'  # pylint: disable=invalid-name
+      # common_typos_enable
 
   def SetUp(self):
     self._resource = [
@@ -132,7 +136,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
             'list': [1, 2, 3, 4],
             'res': self.Resolution1(100, 200),
             'size': 1024 * (1024 * 1024 * 1024 + 123),
-            'selfLink': 'https://oo/uri',
+            'selfLink': 'https://oo/uri',  # NOTYPO
             'status': 'PASS',
             'value': None,
             },
@@ -142,7 +146,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
             'list': ['a', 'b', 'c', 'd'],
             'res': self.Resolution2(100, 200),
             'size': 1024 * (1024 * 1024 + 123),
-            'selfLink': 'https://oo/uri',
+            'selfLink': 'https://oo/uri',  # NOTYPO
             'status': 'OK',
             'value': 0,
             },
@@ -152,7 +156,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
             'list': [1, 'b', 3, 'd'],
             'res': self.Resolution3(100, 200),
             'size': 1024 * (1024 + 123),
-            'selfLink': 'https://oo/uri',
+            'selfLink': 'https://oo/uri',  # NOTYPO
             'status': 'FAIL',
             'value': True,
             },
@@ -162,7 +166,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
             'list': [1, 2, 3, 4],
             'res': self.Resolution4(100, 200),
             'size': 1024 + 123,
-            'selfLink': 'https://oo/uri',
+            'selfLink': 'https://oo/uri',  # NOTYPO
             'status': 'ERROR',
             'value': [],
             },
@@ -172,7 +176,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
             'list': [1, 2, 3, 4],
             'res': self.Resolution5(100, 200),
             'size': 123,
-            'selfLink': 'https://oo/uri',
+            'selfLink': 'https://oo/uri',  # NOTYPO
             'status': 'WARNING',
             'value': [1],
             },
@@ -182,7 +186,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
             'list': [1, 2, 3, 4],
             'res': self.Resolution6(100, 200),
             'size': 0,
-            'selfLink': 'https://oo/uri',
+            'selfLink': 'https://oo/uri',  # NOTYPO
             'status': 'UNKNOWN',
             'value': '',
             },
@@ -208,6 +212,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
 
   def testTableTransform(self):
     self.Print()
+    # common_typos_disable
     self.AssertOutputEquals(textwrap.dedent("""\
     PATH         TIME  LIST     RESOLUTION  SIZE       URI             VALUE
     base.suffix  T     1,2,3,4  100 x 200   1.0 TiB    https://oo/uri  empty
@@ -217,6 +222,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
     base.suffix  T     1,2,3,4  100 x 200   123 bytes  https://oo/uri  set
                  T     1,2,3,4  unknown     -          https://oo/uri  empty
         """))
+    # common_typos_enable
 
   def testTableTransformResolution(self):
     self.Print(projection='(res.resolution(undefined=unknown):label="X x Y")')
@@ -252,17 +258,17 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
                'green=PASS|OK):label=STATUS)')
     self.AssertOutputEquals(textwrap.dedent("""\
     STATUS
-    \x1b[32mPASS\x1b[39;0m
-    \x1b[32mOK\x1b[39;0m
-    \x1b[31;1mFAIL\x1b[39;0m
-    \x1b[31;1mERROR\x1b[39;0m
+    \x1b[32mPASS   \x1b[39;0m
+    \x1b[32mOK     \x1b[39;0m
+    \x1b[31;1mFAIL   \x1b[39;0m
+    \x1b[31;1mERROR  \x1b[39;0m
     \x1b[33;1mWARNING\x1b[39;0m
     UNKNOWN
         """))
 
   def testJsonDefaultTransforms(self):
     self.Print(style='json')
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.AssertOutputEquals(textwrap.dedent("""\
         [
           {
@@ -319,6 +325,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
   def testJsonDefaultTransformsNoProjection(self):
     self.Print(style='json', projection=' ')
     self.maxDiff = None
+    # common_typos_disable
     self.AssertOutputEquals(textwrap.dedent("""\
         [
           {
@@ -433,6 +440,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
           }
         ]
         """))
+    # common_typos_enable
 
   def testJsonDefaultNoTransforms(self):
     self.Print(style='json[no-transforms]')
@@ -599,6 +607,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
   def testJsonSomeAlwaysTransform(self):
     self.Print(style='table', attr=':(list.always().list()) json')
     self.maxDiff = None
+    # common_typos_disable
     self.AssertOutputEquals(textwrap.dedent("""\
         [
           {
@@ -683,6 +692,7 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
           }
         ]
         """))
+    # common_typos_enable
 
   def testTableTransformFormat(self):
     self.Print(projection='(list.format("{0} => {1}", [0], [1]):label=STATE)')
@@ -708,8 +718,28 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
         0,0,0,0
         """))
 
+  def testTableTransformMapStar(self):
+    self.Print(projection='(list.*len().list())')
+    self.AssertOutputEquals(textwrap.dedent("""\
+        LIST
+        0,0,0,0
+        1,1,1,1
+        0,1,0,1
+        0,0,0,0
+        0,0,0,0
+        0,0,0,0
+        """))
+
   def testTableTransformMapNestedList(self):
     self.Print(projection='(abc[].def[].ghi[].map().list())',
+               resource=_RESOURCE_NESTED_LIST)
+    self.AssertOutputMatches(textwrap.dedent("""\
+        GHI
+        \\[u?'\\[1, 2],\\[3, 4]', u?'\\[5, 6],\\[7, 8]']
+        """))
+
+  def testTableTransformMapNestedListStar(self):
+    self.Print(projection='(abc[].def[].ghi[].*list())',
                resource=_RESOURCE_NESTED_LIST)
     self.AssertOutputMatches(textwrap.dedent("""\
         GHI
@@ -740,8 +770,24 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
         \\[u?'1,2', u?'3,4', u?'5,6', u?'7,8']
         """))
 
+  def testTableTransformMapNestedList2Star(self):
+    self.Print(projection='(abc[].def[].ghi[].**list())',
+               resource=_RESOURCE_NESTED_LIST)
+    self.AssertOutputMatches(textwrap.dedent("""\
+        GHI
+        \\[u?'1,2', u?'3,4', u?'5,6', u?'7,8']
+        """))
+
   def testTableTransformMapNestedList3(self):
     self.Print(projection='(abc[].def[].ghi[].map(3).list())',
+               resource=_RESOURCE_NESTED_LIST)
+    self.AssertOutputEquals(textwrap.dedent("""\
+        GHI
+        [1, 2, 3, 4, 5, 6, 7, 8]
+        """))
+
+  def testTableTransformMapNestedList3Star(self):
+    self.Print(projection='(abc[].def[].ghi[].***list())',
                resource=_RESOURCE_NESTED_LIST)
     self.AssertOutputEquals(textwrap.dedent("""\
         GHI
@@ -756,8 +802,24 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
         [1, 2, 3, 4, 5, 6, 7, 8]
         """))
 
+  def testTableTransformMapNestedList3StarImplicitSlice(self):
+    self.Print(projection='(abc.def.ghi.***list())',
+               resource=_RESOURCE_NESTED_LIST)
+    self.AssertOutputEquals(textwrap.dedent("""\
+        GHI
+        [1, 2, 3, 4, 5, 6, 7, 8]
+        """))
+
   def testTableTransformMapNestedList4(self):
     self.Print(projection='(abc[].def[].ghi[].map(4).list())',
+               resource=_RESOURCE_NESTED_LIST)
+    self.AssertOutputEquals(textwrap.dedent("""\
+        GHI
+        [1, 2, 3, 4, 5, 6, 7, 8]
+        """))
+
+  def testTableTransformMapNestedList4Star(self):
+    self.Print(projection='(abc[].def[].ghi[].****list())',
                resource=_RESOURCE_NESTED_LIST)
     self.AssertOutputEquals(textwrap.dedent("""\
         GHI
@@ -767,18 +829,22 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
   def testTableTransformSelfLink1(self):
     resource = [self.SelfLink1()]
     self.Print(resource=resource)
+    # common_typos_disable
     self.AssertOutputEquals(textwrap.dedent("""\
         PATH  TIME  LIST  RESOLUTION  SIZE  URI                  VALUE
               T           unknown     -     https://oo/selfLink  empty
         """))
+    # common_typos_enable
 
   def testTableTransformSelfLink2(self):
     resource = [self.SelfLink2()]
     self.Print(resource=resource)
+    # common_typos_disable
     self.AssertOutputEquals(textwrap.dedent("""\
         PATH  TIME  LIST  RESOLUTION  SIZE  URI                  VALUE
               T           unknown     -     https://oo/SelfLink  empty
         """))
+    # common_typos_enable
 
   def testTableTransformYesNoDefault(self):
     self.Print(projection='(value.yesno())')

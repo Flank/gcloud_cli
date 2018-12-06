@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import exceptions as gcloud_exceptions
 from googlecloudsdk.command_lib.iam import iam_util
 from tests.lib import cli_test_base
 from tests.lib import test_case
@@ -75,6 +76,14 @@ class CreateTest(unit_test_base.BaseTest):
                '--iam-account {0} {1}'.format(service_account, tmp_file))
     except cli_test_base.MockArgumentError:
       self.fail('create should accept unique ids for service accounts.')
+
+  def testCreateServiceAccountKeyInvalidOutputFile(self):
+    service_account = self.sample_unique_id
+    not_a_file = self.Touch(self.temp_path) + 'test/'
+
+    with self.assertRaises(gcloud_exceptions.BadFileException):
+      self.Run('iam service-accounts keys create --key-file-type json '
+               '--iam-account {0} {1}'.format(service_account, not_a_file))
 
 if __name__ == '__main__':
   test_case.main()

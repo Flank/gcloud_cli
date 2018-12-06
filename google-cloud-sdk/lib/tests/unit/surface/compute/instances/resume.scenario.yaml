@@ -1,0 +1,299 @@
+title: compute instances resume scenario
+release_tracks: [ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances resume z1 z2 z3 --zone us-central1-a
+  - progress_tracker:
+    - message: Resuming instance(s) z1, z2, z3
+    - status: SUCCESS
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1].
+      Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2].
+      Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3].
+actions:
+- execute_command:
+    command: compute instances resume z1 z2 z3 --zone us-central1-a
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1/resume?alt=json
+          method: POST
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            endTime: '2017-11-27T15:06:39.912-08:00'
+            id: '4854361710216160400'
+            insertTime: '2017-11-27T15:06:39.911-08:00'
+            kind: compute#operation
+            name: operation-1511823999663-55efef4767b99-eb031282-db3dd830
+            operationType: resume
+            progress: 100
+            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b99-eb031282-db3dd830
+            startTime: '2017-11-27T15:06:39.912-08:00'
+            status: DONE
+            targetId: '6870764064443804325'
+            targetLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3
+            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2/resume?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            endTime: '2017-11-27T15:06:39.894-08:00'
+            id: '2683586536174331024'
+            insertTime: '2017-11-27T15:06:39.893-08:00'
+            kind: compute#operation
+            name: operation-1511823999663-55efef4767b9a-e0394411-41385d04
+            operationType: resume
+            progress: 100
+            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9a-e0394411-41385d04
+            startTime: '2017-11-27T15:06:39.894-08:00'
+            status: DONE
+            targetId: '9119179864806599333'
+            targetLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2
+            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3/resume?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            endTime: '2017-11-27T15:06:39.895-08:00'
+            id: '6382822107074602128'
+            insertTime: '2017-11-27T15:06:39.894-08:00'
+            kind: compute#operation
+            name: operation-1511823999663-55efef4767b9b-c4f08f18-aa57175d
+            operationType: resume
+            progress: 100
+            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9b-c4f08f18-aa57175d
+            startTime: '2017-11-27T15:06:39.895-08:00'
+            status: DONE
+            targetId: '7014533340148607708'
+            targetLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1
+            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+    - expect_progress_tracker:
+        message: Resuming instance(s) z1, z2, z3
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            canIpForward: false
+            cpuPlatform: Intel Haswell
+            creationTimestamp: '2017-11-27T14:40:11.706-08:00'
+            deletionProtection: false
+            disks:
+            - autoDelete: true
+              boot: true
+              deviceName: persistent-disk-0
+              diskSizeGb: '10'
+              index: 0
+              interface: SCSI
+              kind: compute#attachedDisk
+              licenses:
+              - https://www.googleapis.com/compute/alpha/projects/bct-staging-functional/global/licenses/debian-9-stretch
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/disks/z3
+              type: PERSISTENT
+            id: '6870764064443804325'
+            kind: compute#instance
+            labelFingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/machineTypes/n1-standard-1
+            metadata:
+              fingerprint: Tewg-kYB2-A=
+              kind: compute#metadata
+            name: z3
+            networkInterfaces:
+            - accessConfigs:
+              - kind: compute#accessConfig
+                name: external-nat
+                natIP: 70.32.154.224
+                networkTier: PREMIUM
+                type: ONE_TO_ONE_NAT
+              fingerprint: xlxv_Fq8vKg=
+              kind: compute#networkInterface
+              name: nic0
+              network: https://www.googleapis.com/compute/alpha/projects/fake-project/global/networks/default
+              networkIP: 10.240.0.9
+            scheduling:
+              automaticRestart: true
+              onHostMaintenance: MIGRATE
+              preemptible: false
+            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3
+            serviceAccounts:
+            - email: 341306109951-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            startRestricted: false
+            status: RUNNING
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            canIpForward: false
+            cpuPlatform: Intel Haswell
+            creationTimestamp: '2017-11-27T14:40:11.681-08:00'
+            deletionProtection: false
+            disks:
+            - autoDelete: true
+              boot: true
+              deviceName: persistent-disk-0
+              diskSizeGb: '10'
+              index: 0
+              interface: SCSI
+              kind: compute#attachedDisk
+              licenses:
+              - https://www.googleapis.com/compute/alpha/projects/bct-staging-functional/global/licenses/debian-9-stretch
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/disks/z2
+              type: PERSISTENT
+            id: '9119179864806599333'
+            kind: compute#instance
+            labelFingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/machineTypes/n1-standard-1
+            metadata:
+              fingerprint: Tewg-kYB2-A=
+              kind: compute#metadata
+            name: z2
+            networkInterfaces:
+            - accessConfigs:
+              - kind: compute#accessConfig
+                name: external-nat
+                natIP: 108.170.195.164
+                networkTier: PREMIUM
+                type: ONE_TO_ONE_NAT
+              fingerprint: fWuziu8Nyhw=
+              kind: compute#networkInterface
+              name: nic0
+              network: https://www.googleapis.com/compute/alpha/projects/fake-project/global/networks/default
+              networkIP: 10.240.0.7
+            scheduling:
+              automaticRestart: true
+              onHostMaintenance: MIGRATE
+              preemptible: false
+            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2
+            serviceAccounts:
+            - email: 341306109951-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            startRestricted: false
+            status: RUNNING
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            canIpForward: false
+            cpuPlatform: Intel Haswell
+            creationTimestamp: '2017-11-27T14:39:48.394-08:00'
+            deletionProtection: false
+            disks:
+            - autoDelete: true
+              boot: true
+              deviceName: persistent-disk-0
+              diskSizeGb: '10'
+              index: 0
+              interface: SCSI
+              kind: compute#attachedDisk
+              licenses:
+              - https://www.googleapis.com/compute/alpha/projects/bct-staging-functional/global/licenses/debian-9-stretch
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/disks/z1
+              type: PERSISTENT
+            id: '7014533340148607708'
+            kind: compute#instance
+            labelFingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/machineTypes/n1-standard-1
+            metadata:
+              fingerprint: Tewg-kYB2-A=
+              kind: compute#metadata
+            name: z1
+            networkInterfaces:
+            - accessConfigs:
+              - kind: compute#accessConfig
+                name: external-nat
+                natIP: 74.125.65.192
+                networkTier: PREMIUM
+                type: ONE_TO_ONE_NAT
+              fingerprint: Wz2n9or72sI=
+              kind: compute#networkInterface
+              name: nic0
+              network: https://www.googleapis.com/compute/alpha/projects/fake-project/global/networks/default
+              networkIP: 10.240.0.5
+            scheduling:
+              automaticRestart: true
+              onHostMaintenance: MIGRATE
+              preemptible: false
+            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1
+            serviceAccounts:
+            - email: 341306109951-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            startRestricted: false
+            status: RUNNING
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1].
+        Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2].
+        Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3].
+    - expect_exit:
+        code: 0

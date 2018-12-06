@@ -481,7 +481,7 @@ class PropertyValidatorTests(sdk_test_base.SdkBase, parameterized.TestCase):
 
   def testBadTimeouts(self):
     """Test properties.CloudBuildTimeoutValidator."""
-    dur_regexp = (r'could not convert string to float')
+    dur_regexp = "Duration unit 'x1123' must be preceded by a number."
     with self.assertRaisesRegex(times.DurationSyntaxError, dur_regexp):
       properties.VALUES.app.cloud_build_timeout.Set('x1123')
 

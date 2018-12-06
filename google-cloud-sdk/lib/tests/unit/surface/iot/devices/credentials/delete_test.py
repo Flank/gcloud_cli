@@ -22,18 +22,16 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import util
 from googlecloudsdk.core.console import console_io
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CredentialsDeleteTest(base.CloudIotBase):
+class CredentialsDeleteTestGA(base.CloudIotBase):
 
-  def testDelete(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testDelete(self):
     self.WriteInput('y')
     device_credentials = [
         self.messages.DeviceCredential(expirationTime='2016-01-01T00:00Z'),
@@ -56,8 +54,7 @@ class CredentialsDeleteTest(base.CloudIotBase):
     self.AssertErrContains('2016')
     self.AssertLogContains('Deleted credentials for device [my-device].')
 
-  def testDelete_BadIndex(self, track):
-    self.track = track
+  def testDelete_BadIndex(self):
     device_credentials = [
         self.messages.DeviceCredential(expirationTime='2016-01-01T00:00Z'),
         self.messages.DeviceCredential(expirationTime='2017-01-01T00:00Z'),
@@ -74,8 +71,7 @@ class CredentialsDeleteTest(base.CloudIotBase):
           '    --registry my-registry '
           '    --region us-central1')
 
-  def testDelete_Cancel(self, track):
-    self.track = track
+  def testDelete_Cancel(self):
     self.WriteInput('n')
     credential = self.messages.DeviceCredential()
     self._ExpectGet([credential])
@@ -89,8 +85,7 @@ class CredentialsDeleteTest(base.CloudIotBase):
           '    --region us-central1')
     self.AssertErrContains('This will delete the following credential:')
 
-  def testDelete_RelativeName(self, track):
-    self.track = track
+  def testDelete_RelativeName(self):
     self.WriteInput('y')
     device_credentials = [
         self.messages.DeviceCredential(expirationTime='2016-01-01T00:00Z'),
@@ -113,6 +108,18 @@ class CredentialsDeleteTest(base.CloudIotBase):
     self.assertEqual(results, expected_device)
     self.AssertErrContains('This will delete the following credential:')
     self.AssertErrContains('2016')
+
+
+class CredentialsDeleteTestBeta(CredentialsDeleteTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CredentialsDeleteTestAlpha(CredentialsDeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

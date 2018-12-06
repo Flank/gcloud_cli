@@ -11,8 +11,9 @@ DESCRIPTION
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 GROUPS
     GROUP is one of the following:
@@ -66,11 +67,18 @@ COMMANDS
      detach-disk
         (ALPHA) Detach disks from Compute Engine virtual machine instances.
 
+     get-guest-attributes
+        (ALPHA) Get the Guest Attributes for a compute instance.
+
      get-iam-policy
         (ALPHA) Get the IAM policy for a Google Compute Engine instance.
 
      get-serial-port-output
         (ALPHA) Read output from a virtual machine instance's serial port.
+
+     get-shielded-vm-identity
+        (ALPHA) Get the Shielded-VM identity for a Google Compute Engine
+        instance.
 
      list
         (ALPHA) List Google Compute Engine instances.

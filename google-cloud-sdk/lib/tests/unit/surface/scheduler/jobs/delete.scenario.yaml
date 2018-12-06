@@ -1,0 +1,90 @@
+title: Jobs Delete Test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: scheduler jobs delete my-job
+  - prompt:
+    - message: You are about to delete job [my-job]
+    - input: y
+  - stderr: |
+      Deleted job [my-job].
+- execute:
+  - command: scheduler jobs delete projects/fake-project/locations/us-central1/jobs/my-job
+  - prompt:
+    - message: You are about to delete job [my-job]
+    - input: y
+  - stderr: |
+      Deleted job [my-job].
+- execute:
+  - command: scheduler jobs delete projects/fake-project/locations/us-central1/jobs/my-job
+  - prompt:
+    - message: You are about to delete job [my-job]
+    - input: n
+  - error: '1: Aborted by user.'
+actions:
+- execute_command:
+    label: test delete base case
+    command: scheduler jobs delete my-job
+    events:
+    - api_call:
+        expect_request:
+          uri: https://appengine.googleapis.com/v1/apps/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            dispatchRules: []
+            locationId: us-central1
+            name: apps/fake-project
+    - expect_prompt_continue:
+        message: You are about to delete job [my-job]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted job [my-job].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: test delete relativename
+    command: scheduler jobs delete projects/fake-project/locations/us-central1/jobs/my-job
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete job [my-job]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted job [my-job].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: test delete cancelled
+    command: scheduler jobs delete projects/fake-project/locations/us-central1/jobs/my-job
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete job [my-job]
+        user_input: n
+    - expect_exit:
+        code: 1
+        message: Aborted by user.

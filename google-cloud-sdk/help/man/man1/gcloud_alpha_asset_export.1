@@ -1,0 +1,85 @@
+
+.TH "GCLOUD_ALPHA_ASSET_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha asset export \- export the cloud assets to Google Cloud Storage
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha asset export\fR \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR [\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]] [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Export the cloud assets to Google Cloud Storage.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR
+Google Cloud Storage URI where the results will go. URI must start with "gs://".
+For example, "gs://bucket_name/object_name"
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]
+A list of asset types (i.e., "google.compute.Disk") to take a snapshot. If
+specified and non\-empty, only assets matching the specified types will be
+returned.
+
+.TP 2m
+\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR
+Asset content type. If specified, only content matching the specified type will
+be returned. Otherwise, no content but the asset name will be returned. Choices
+are \f5resource\fR, \f5iam\-policy\fR. Specifying \f5resource\fR will export
+resource metadata, and specifying \f5iam\-policy\fR will export IAM policy set
+on assets. \fICONTENT_TYPE\fR must be one of: \fBresource\fR, \fBiam\-policy\fR.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+The ID of the organization which is the root asset.
+
+.TP 2m
+\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR
+Timestamp to take a snapshot on assets. This could only be a current or past
+time. If not specified, the current time will be used. Due to delays in resource
+data collection and indexing, there is a volatile window during which running
+the same query at different time may return different results. See $ gcloud
+topic datetimes for information on time formats.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

@@ -149,6 +149,16 @@ examples use the first form to make intentions clear. The \fB=\fR form also has
 a diagnostic bonus: it is an error to specify a value for a Boolean flag.
 
 
+.SH "Complex Flag Values"
+
+Complex flag values that contain command interpreter special characters may be
+difficult to specify on the command line. The
+\fB\-\-flags\-file\fR=\fIYAML\-FILE\fR flag solves this problem by allowing
+command line flags to be specified in a YAML/JSON file. String, numeric, list
+and dict flag values are specified using YAML/JSON notation and quoting rules.
+See $ gcloud topic flags\-file for more information.
+
+
 .SH "Output"
 
 The standard output is for explicit information requested by the command.

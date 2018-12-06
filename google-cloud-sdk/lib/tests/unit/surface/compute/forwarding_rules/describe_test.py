@@ -34,6 +34,11 @@ def SetUp(test_obj, api_version):
     test_obj._forwarding_rules = test_resources.FORWARDING_RULES_V1
     test_obj._global_forwarding_rules = (
         test_resources.GLOBAL_FORWARDING_RULES_V1)
+  elif api_version == 'beta':
+    test_obj._forwarding_rules = test_resources.FORWARDING_RULES_BETA
+    test_obj._global_forwarding_rules = (
+        test_resources.GLOBAL_FORWARDING_RULES_BETA)
+    test_obj.track = calliope_base.ReleaseTrack.BETA
   elif api_version == 'alpha':
     test_obj._forwarding_rules = test_resources.FORWARDING_RULES_ALPHA
     test_obj._global_forwarding_rules = (
@@ -190,13 +195,13 @@ class ForwardingRulesDescribeTest(test_base.BaseTest,
           """.format(uri=self.compute_uri))
 
 
-class ForwardingRulesDescribeAlphaTest(ForwardingRulesDescribeTest):
+class ForwardingRulesDescribeBetaTest(ForwardingRulesDescribeTest):
 
   def SetUp(self):
-    SetUp(self, 'alpha')
+    SetUp(self, 'beta')
 
   def _MakeForwardingRuleWithFlexPort(self):
-    prefix = 'https://www.googleapis.com/compute/alpha'
+    prefix = 'https://www.googleapis.com/compute/'+self.api
     return self.messages.ForwardingRule(
         name='forwarding-rule-flex-port',
         IPAddress='162.222.178.84',
@@ -231,7 +236,7 @@ class ForwardingRulesDescribeAlphaTest(ForwardingRulesDescribeTest):
             IPAddress: 162.222.178.84
             IPProtocol: TCP
             allPorts: true
-            backendService: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/backendServices/bs-1
+            backendService: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/backendServices/bs-1
             loadBalancingScheme: INTERNAL
             name: forwarding-rule-flex-port
             region: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1

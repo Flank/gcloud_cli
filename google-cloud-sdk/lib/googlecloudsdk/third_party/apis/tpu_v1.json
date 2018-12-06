@@ -263,6 +263,13 @@
         "nextPageToken": {
           "description": "The next page token or empty if none.",
           "type": "string"
+        },
+        "unreachable": {
+          "description": "Locations that could not be reached.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -304,7 +311,8 @@
             "7 - Reserved. Was SUSPENDED.\nTPU node is stopped.",
             "TPU node is currently stopping.",
             "TPU node is currently starting.",
-            "TPU node has been preempted. Only applies to Preemptible TPU Nodes."
+            "TPU node has been preempted. Only applies to Preemptible TPU Nodes.",
+            "TPU node has been terminated due to maintenance or has reached the end of\nits life cycle (for preemptible nodes)."
           ],
           "type": "string",
           "enum": [
@@ -318,7 +326,8 @@
             "STOPPED",
             "STOPPING",
             "STARTING",
-            "PREEMPTED"
+            "PREEMPTED",
+            "TERMINATED"
           ]
         },
         "healthDescription": {

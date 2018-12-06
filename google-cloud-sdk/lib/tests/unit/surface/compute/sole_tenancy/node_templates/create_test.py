@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.py import encoding
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -42,13 +43,16 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
         affinity_labels, self.messages.NodeTemplate.NodeAffinityLabelsValue,
         sort_items=True)
 
-  def testCreate_AllOptionsWithNodeType(self):
+  def _CreateBaseNodeTemplateMessage(self):
     affinity_labels = {'environment': 'prod', 'grouping': 'frontend'}
-    template = self.messages.NodeTemplate(
-        description='Awesome Template',
+    return self.messages.NodeTemplate(
         name='my-template',
-        nodeAffinityLabels=self._CreateAffinityLabelsMessage(affinity_labels),
-        nodeType='n1-node-96-624')
+        nodeAffinityLabels=self._CreateAffinityLabelsMessage(affinity_labels))
+
+  def testCreate_AllOptionsWithNodeType(self):
+    template = self._CreateBaseNodeTemplateMessage()
+    template.description = 'Awesome Template'
+    template.nodeType = 'n1-node-96-624'
     request = self._ExpectCreate(template)
 
     result = self.Run(
@@ -61,12 +65,10 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
     self.assertEqual(result, template)
 
   def testCreate_AllOptionsWithNodeRequirements(self):
-    affinity_labels = {'environment': 'prod', 'grouping': 'frontend'}
-    template = self.messages.NodeTemplate(
-        description='Awesome Template',
-        name='my-template',
-        nodeAffinityLabels=self._CreateAffinityLabelsMessage(affinity_labels),
-        nodeTypeFlexibility=self.messages.NodeTemplateNodeTypeFlexibility(
+    template = self._CreateBaseNodeTemplateMessage()
+    template.description = 'Awesome Template'
+    template.nodeTypeFlexibility = (
+        self.messages.NodeTemplateNodeTypeFlexibility(
             cpus='64', localSsd='512', memory='any'))
     request = self._ExpectCreate(template)
 
@@ -92,11 +94,9 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
       ('OmittingLocalSSD', 'vCPU=64,memory=128MB', '64', None, '128'))
   def testCreate_NodeRequirements(self, node_requirements, cpus, local_ssd,
                                   memory):
-    affinity_labels = {'environment': 'prod', 'grouping': 'frontend'}
-    template = self.messages.NodeTemplate(
-        name='my-template',
-        nodeAffinityLabels=self._CreateAffinityLabelsMessage(affinity_labels),
-        nodeTypeFlexibility=self.messages.NodeTemplateNodeTypeFlexibility(
+    template = self._CreateBaseNodeTemplateMessage()
+    template.nodeTypeFlexibility = (
+        self.messages.NodeTemplateNodeTypeFlexibility(
             cpus=cpus, localSsd=local_ssd, memory=memory))
     request = self._ExpectCreate(template)
 
@@ -132,6 +132,47 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
           '--region {}'.format(self.region))
     self.AssertErrContains('--node-requirements')
     self.AssertErrContains('--node-type')
+
+
+class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateTest):
+
+  def SetUp(self):
+    self.region = 'us-central1'
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+
+  def _CreateBaseNodeTemplateMessage(self):
+    affinity_labels = {'environment': 'prod', 'grouping': 'frontend'}
+    server_binding = (self.messages.ServerBinding.TypeValueValuesEnum
+                      .RESTART_NODE_ON_ANY_SERVER)
+    return self.messages.NodeTemplate(
+        name='my-template',
+        nodeAffinityLabels=self._CreateAffinityLabelsMessage(affinity_labels),
+        serverBinding=self.messages.ServerBinding(type=server_binding))
+
+  @parameterized.named_parameters(
+      ('DefaultSpecified', '--server-binding restart-node-on-any-server',
+       'RESTART_NODE_ON_ANY_SERVER'),
+      ('Default', '', 'RESTART_NODE_ON_ANY_SERVER'),
+      ('MinimalServersSpecified',
+       '--server-binding restart-node-on-minimal-servers',
+       'RESTART_NODE_ON_MINIMAL_SERVERS'))
+  def testCreate_ServerBinding(self, cmd_line_flag, expected_server_binding):
+    server_binding = self.messages.ServerBinding.TypeValueValuesEnum(
+        expected_server_binding)
+    template = self._CreateBaseNodeTemplateMessage()
+    template.nodeType = 'n1-node-96-624'
+    template.serverBinding = self.messages.ServerBinding(type=server_binding)
+    request = self._ExpectCreate(template)
+
+    result = self.Run(
+        'compute sole-tenancy node-templates create my-template '
+        '--node-affinity-labels environment=prod,grouping=frontend '
+        '--node-type n1-node-96-624 '
+        '{0} --region {1}'.format(cmd_line_flag, self.region))
+
+    self.CheckRequests([(self.compute.nodeTemplates, 'Insert', request)])
+    self.assertEqual(result, template)
 
 
 if __name__ == '__main__':

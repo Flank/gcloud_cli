@@ -21,17 +21,16 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util import http_encoding
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class ConfigsUpdateTest(base.CloudIotBase):
+class ConfigsUpdateTestGA(base.CloudIotBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _ExpectModifyConfig(self, data, version=None):
     service = self.client.projects_locations_registries_devices
@@ -56,8 +55,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
         )
     )
 
-  def testUpdate_ConfigFlagRequired(self, track):
-    self.track = track
+  def testUpdate_ConfigFlagRequired(self):
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of (--config-data | --config-file) must be specified.'):
       self.Run(
@@ -66,8 +64,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
           '    --registry my-registry '
           '    --region us-central1')
 
-  def testUpdate_ConfigFlagsExclusive(self, track):
-    self.track = track
+  def testUpdate_ConfigFlagsExclusive(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --config-data: Exactly one of (--config-data | '
         '--config-file) must be specified.'):
@@ -79,8 +76,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
           '    --config-data foo '
           '    --config-file bar')
 
-  def testUpdate(self, track):
-    self.track = track
+  def testUpdate(self):
     self._ExpectModifyConfig(http_encoding.Encode('abcd'))
 
     result = self.Run(
@@ -97,8 +93,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
     self.assertEqual(result, expected_config)
     self.AssertLogContains('Updated configuration for device [my-device].')
 
-  def testUpdate_EmptyData(self, track):
-    self.track = track
+  def testUpdate_EmptyData(self):
     self._ExpectModifyConfig(http_encoding.Encode(''))
 
     result = self.Run(
@@ -114,8 +109,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
     )
     self.assertEqual(result, expected_config)
 
-  def testUpdate_FromFile(self, track):
-    self.track = track
+  def testUpdate_FromFile(self):
     data = bytes(range(256))
     self._ExpectModifyConfig(data)
     data_file = self.Touch(self.temp_path, 'data', contents=data)
@@ -133,8 +127,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
     )
     self.assertEqual(result, expected_config)
 
-  def testUpdate_Version(self, track):
-    self.track = track
+  def testUpdate_Version(self):
     self._ExpectModifyConfig(http_encoding.Encode('abcd'), version=10)
 
     result = self.Run(
@@ -151,8 +144,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
     )
     self.assertEqual(result, expected_config)
 
-  def testUpdate_RelativeName(self, track):
-    self.track = track
+  def testUpdate_RelativeName(self):
     self._ExpectModifyConfig(http_encoding.Encode('abcd'))
 
     device_name = ('projects/{}/'
@@ -169,6 +161,18 @@ class ConfigsUpdateTest(base.CloudIotBase):
         version=1
     )
     self.assertEqual(result, expected_config)
+
+
+class ConfigsUpdateTestBeta(ConfigsUpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ConfigsUpdateTestAlpha(ConfigsUpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ manual_scaling:
   instances: 1
 inbound_services:
 - warmup
-threadsafe: True
+threadsafe: true
 resources:
   memory_gb: 3.75
   cpu: 1
@@ -16,19 +16,19 @@ env_variables:
 beta_settings:
   'java_quickstart': 'true'
 health_check:
-  enable_health_check: True
+  enable_health_check: true
 api_version: '1.0'
 handlers:
 - url: (/_ah/queue/__deferred__)
   static_files: __static__\1
   upload: __NOT_USED__
-  require_matching_file: True
+  require_matching_file: true
   login: admin
   secure: optional
 - url: (/.*)
   static_files: __static__\1
   upload: __NOT_USED__
-  require_matching_file: True
+  require_matching_file: true
   login: required
   secure: optional
 - url: /

@@ -20,25 +20,23 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.composer import base
 import six
 
 
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class EnvironmentsStorageDagsListTest(base.StorageApiCallingUnitTest,
-                                      parameterized.TestCase):
+class EnvironmentsStorageDagsListGATest(base.StorageApiCallingUnitTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.GA)
 
   def SetUp(self):
     # Disable user output to not exhaust the generator returned by
     # RunEnvironments
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def testDagsList(self, track):
+  def testDagsList(self):
     """Tests successful DAG listing."""
-    self.SetTrack(track)
     file_names = [
         'dags/', 'dags/file1.py', 'dags/file2.py', 'dags/folder',
         'dags/file3.py'
@@ -58,6 +56,18 @@ class EnvironmentsStorageDagsListTest(base.StorageApiCallingUnitTest,
         'storage', 'dags', 'list', '--project', self.TEST_PROJECT, '--location',
         self.TEST_LOCATION, '--environment', self.TEST_ENVIRONMENT_ID)
     six.assertCountEqual(self, response.items, actual_responses)
+
+
+class EnvironmentsStorageDagsListBetaTest(EnvironmentsStorageDagsListGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+
+class EnvironmentsStorageDagsListAlphaTest(EnvironmentsStorageDagsListBetaTest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

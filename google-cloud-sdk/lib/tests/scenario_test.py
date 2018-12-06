@@ -28,6 +28,7 @@ import os
 import sys
 
 from tests.lib import e2e_base
+from tests.lib import func_code_util
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib.scenario import scenario_finder
@@ -35,12 +36,12 @@ from tests.lib.scenario import session
 from tests.lib.scenario import test_base
 from tests.lib.scenario import updates
 
-
 SCENARIO_PREFIXES = os.environ.get(
     'CLOUDSDK_SCENARIO_TESTING_PREFIXES', '').split(' ')
 EXECUTION_MODE = session.ExecutionMode[
     os.environ.get('CLOUDSDK_SCENARIO_TESTING_EXECUTION_MODE') or 'REMOTE']
 UPDATE_MODES = updates.Mode.FromEnv()
+DEBUG = bool(os.environ.get('CLOUDSDK_SCENARIO_TESTING_DEBUG'))
 
 
 # Uncomment these lines to override the values.
@@ -91,14 +92,14 @@ class _GlobalDataHolder(object):
     # Unit tests always run as LOCAL no matter what mode is requested.
     return self._TestParams(self.unit_scenarios)
 
-  def TestParamsE2EAsUnit(self):
+  def TestParamsE2ELocal(self):
     # If LOCAL is requested, run all e2e tests as LOCAL tests.
     if EXECUTION_MODE == session.ExecutionMode.LOCAL:
       return self._TestParams(self.e2e_scenarios)
     # Otherwise they will be run as REMOTE tests instead.
     return []
 
-  def TestParamsE2E(self):
+  def TestParamsE2ERemote(self):
     # If REMOTE is requested, run all e2e tests as REMOTE tests.
     if EXECUTION_MODE == session.ExecutionMode.REMOTE:
       return self._TestParams(self.e2e_scenarios)
@@ -118,47 +119,56 @@ class _GlobalDataHolder(object):
 DATA = _GlobalDataHolder()
 
 
+def AddScenarioTestMethodToTestClass(
+    test_class, testname, scenario_path, track):
+  """Adds a test method for running the specified scenario test to a test class.
+
+  Args:
+    test_class: The test class to add the test to.
+    testname: The name of the method to add.
+    scenario_path: The path to the scenario to test.
+    track: The gcloud release track to run the scenario on.
+  """
+  def Test(self):
+    self.RunScenario(
+        scenario_path, track, self.EXECUTION_MODE, UPDATE_MODES, DEBUG)
+
+  func_code_util.set_func_code_location(Test, scenario_path, 1)
+  setattr(test_class, 'test_{}'.format(testname), Test)
+
+
 class Unit(test_base.ScenarioTestBase,
            sdk_test_base.WithFakeAuth,
            parameterized.TestCase):
   """Unit tests all go here (unit tests cannot be run as REMOTE)."""
+  EXECUTION_MODE = session.ExecutionMode.LOCAL
 
-  @parameterized.named_parameters(
-      DATA.TestParamsUnit() or [('_NoOp', None, None)])
-  def test(self, spec_path, track):
-    if spec_path:
-      self.RunScenario(spec_path, track, session.ExecutionMode.LOCAL,
-                       UPDATE_MODES)
+for testcase in DATA.TestParamsUnit():
+  AddScenarioTestMethodToTestClass(Unit, *testcase)
 
 
 class E2ELocal(test_base.ScenarioTestBase,
                sdk_test_base.WithFakeAuth,
                parameterized.TestCase):
   """Tests that can be run REMOTE go here when LOCAL mode is requested."""
+  EXECUTION_MODE = session.ExecutionMode.LOCAL
 
   def Project(self):
     # pylint:disable=protected-access
     return e2e_base._TEST_CONFIG['property_overrides']['project']
 
-  @parameterized.named_parameters(
-      DATA.TestParamsE2EAsUnit() or [('_NoOp', None, None)])
-  def test(self, spec_path, track):
-    if spec_path:
-      self.RunScenario(spec_path, track, session.ExecutionMode.LOCAL,
-                       UPDATE_MODES)
+for testcase in DATA.TestParamsE2ELocal():
+  AddScenarioTestMethodToTestClass(E2ELocal, *testcase)
 
 
 class E2ERemote(test_base.ScenarioTestBase,
                 e2e_base.WithServiceAuth,
                 parameterized.TestCase):
   """Tests that can be run REMOTE go here when REMOTE mode is requested."""
+  EXECUTION_MODE = session.ExecutionMode.REMOTE
 
-  @parameterized.named_parameters(
-      DATA.TestParamsE2E() or [('_NoOp', None, None)])
-  def test(self, spec_path, track):
-    if spec_path:
-      self.RunScenario(spec_path, track, session.ExecutionMode.REMOTE,
-                       UPDATE_MODES)
+for testcase in DATA.TestParamsE2ERemote():
+  AddScenarioTestMethodToTestClass(E2ERemote, *testcase)
 
 
 if __name__ == '__main__':

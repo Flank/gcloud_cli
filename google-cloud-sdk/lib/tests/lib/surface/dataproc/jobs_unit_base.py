@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import copy
 
 from apitools.base.py import encoding
@@ -66,6 +67,7 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
   JOB_ARGS = ['foo', '--bar', 'baz']
 
   SCRIPT_URI = 'gs://test-bucket/test/path/foo.script'
+  R_SCRIPT_URI = 'gs://test-bucket/test/path/foo.R'
   DRIVER_URI = 'gs://test-bucket/test/path/driveroutput'
   JAR_URIS = [
       'gs://test-bucket/test/path/jar1',
@@ -76,13 +78,13 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
   FILE_URIS = ['gs://bucket/object1', 'gs://bucket/object2']
   PYFILE_URIS = ['gs://bucket/file1.py', 'gs://bucket/file2.py']
 
-  PARAMS = {
-      'foo': 'bar',
-      'var': 'value'}
+  PARAMS = collections.OrderedDict([
+      ('foo', 'bar'),
+      ('var', 'value')])
 
-  PROPERTIES = {
-      'foo': 'bar',
-      'some.key': 'some.value'}
+  PROPERTIES = collections.OrderedDict([
+      ('foo', 'bar'),
+      ('some.key', 'some.value')])
 
   SECOND_ATTEMPT_JOB_OUTPUT_LINES = [
       "Oops let's try that again.\n"
@@ -105,10 +107,14 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
 
   @property
   def LOG_CONFIG(self):
-    return self.messages.LoggingConfig(driverLogLevels=encoding.DictToMessage({
-        'root': 'INFO',
-        'com.example': 'DEBUG'
-    }, self.messages.LoggingConfig.DriverLogLevelsValue))
+    value_enum = (self.messages.LoggingConfig.DriverLogLevelsValue.
+                  AdditionalProperty.ValueValueValuesEnum)
+    return self.messages.LoggingConfig(
+        driverLogLevels=encoding.DictToAdditionalPropertyMessage(
+            collections.OrderedDict([
+                ('root', value_enum.INFO),
+                ('com.example', value_enum.DEBUG)]),
+            self.messages.LoggingConfig.DriverLogLevelsValue))
 
   @property
   def HADOOP_JOB(self):
@@ -116,7 +122,7 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
         mainClass=self.CLASS,
         args=self.JOB_ARGS,
         loggingConfig=self.LOG_CONFIG,
-        properties=encoding.DictToMessage(
+        properties=encoding.DictToAdditionalPropertyMessage(
             self.PROPERTIES, self.messages.HadoopJob.PropertiesValue))
 
   @property
@@ -125,7 +131,7 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
         mainClass=self.CLASS,
         args=self.JOB_ARGS,
         loggingConfig=self.LOG_CONFIG,
-        properties=encoding.DictToMessage(
+        properties=encoding.DictToAdditionalPropertyMessage(
             self.PROPERTIES, self.messages.SparkJob.PropertiesValue))
 
   @property
@@ -135,7 +141,7 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
         args=self.JOB_ARGS,
         jarFileUris=self.JAR_URIS,
         loggingConfig=self.LOG_CONFIG,
-        properties=encoding.DictToMessage(
+        properties=encoding.DictToAdditionalPropertyMessage(
             self.PROPERTIES, self.messages.PySparkJob.PropertiesValue))
 
   @property
@@ -143,9 +149,9 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
     return self.messages.HiveJob(
         continueOnFailure=False,
         queryFileUri=self.SCRIPT_URI,
-        scriptVariables=encoding.DictToMessage(
+        scriptVariables=encoding.DictToAdditionalPropertyMessage(
             self.PARAMS, self.messages.HiveJob.ScriptVariablesValue),
-        properties=encoding.DictToMessage(
+        properties=encoding.DictToAdditionalPropertyMessage(
             self.PROPERTIES, self.messages.HiveJob.PropertiesValue))
 
   @property
@@ -153,7 +159,7 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
     return self.messages.SparkSqlJob(
         queryFileUri=self.SCRIPT_URI,
         loggingConfig=self.LOG_CONFIG,
-        properties=encoding.DictToMessage(
+        properties=encoding.DictToAdditionalPropertyMessage(
             self.PROPERTIES, self.messages.SparkSqlJob.PropertiesValue))
 
   @property
@@ -162,10 +168,19 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
         continueOnFailure=False,
         queryFileUri=self.SCRIPT_URI,
         loggingConfig=self.LOG_CONFIG,
-        scriptVariables=encoding.DictToMessage(
+        scriptVariables=encoding.DictToAdditionalPropertyMessage(
             self.PARAMS, self.messages.PigJob.ScriptVariablesValue),
-        properties=encoding.DictToMessage(self.PROPERTIES,
-                                          self.messages.PigJob.PropertiesValue))
+        properties=encoding.DictToAdditionalPropertyMessage(
+            self.PROPERTIES, self.messages.PigJob.PropertiesValue))
+
+  @property
+  def SPARK_R_JOB(self):
+    return self.messages.SparkRJob(
+        mainRFileUri=self.R_SCRIPT_URI,
+        args=self.JOB_ARGS,
+        loggingConfig=self.LOG_CONFIG,
+        properties=encoding.DictToMessage(
+            self.PROPERTIES, self.messages.SparkRJob.PropertiesValue))
 
   def SetUp(self):
     # Set 0s sleep intervals in waiters.

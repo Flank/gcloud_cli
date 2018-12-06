@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups managed describe subcommand."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -21,11 +22,13 @@ import textwrap
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from googlecloudsdk.core.util import encoding
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_resources
+from mock import patch
 
 API_VERSION = 'v1'
 messages = core_apis.GetMessagesModule('compute', API_VERSION)
@@ -238,6 +241,14 @@ class ManagedInstanceGroupsDescribeTest(
     self.AssertErrContains('zone-1')
     self.AssertErrContains('zone-2')
     self.AssertErrContains('region-1')
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidCollectionPath(self):
+    with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
+      self.Run('compute instance-groups managed describe group-1 --zone zone-1')
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -18,10 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-class LongHelp(base.Command):
+class LongHelp(calliope_base.Command):
   """A test command with long help."""
 
   detailed_help = {

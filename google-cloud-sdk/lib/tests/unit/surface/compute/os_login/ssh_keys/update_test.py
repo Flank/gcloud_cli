@@ -46,24 +46,24 @@ class UpdateTest(test_base.OsloginBaseTest):
             name='users/user@google.com'),
         response=self.profiles['profile_with_keys'])
 
+    key = self.messages.SshPublicKey(
+        expirationTimeUsec=1500000010000001,
+        fingerprint=None,
+        key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ')
     self.mock_oslogin_client.users_sshPublicKeys.Patch.Expect(
         request=self.messages.OsloginUsersSshPublicKeysPatchRequest(
             name='users/user@google.com/sshPublicKeys/qwertyuiop',
-            sshPublicKey=self.messages.SshPublicKey(
-                expirationTimeUsec=1500000010000001,
-                fingerprint=None,
-                key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
-            ),
+            sshPublicKey=key,
             updateMask='expirationTimeUsec',
         ),
-        response=self.profiles['profile_with_keys'])
+        response=key)
 
     response = self.Run("""
         compute os-login ssh-keys update --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
             --ttl 10s
         """)
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response, key)
 
   def testWithTtlMinutes(self, track):
     self._RunSetUp(track)
@@ -74,24 +74,24 @@ class UpdateTest(test_base.OsloginBaseTest):
             name='users/user@google.com'),
         response=self.profiles['profile_with_keys'])
 
+    key = self.messages.SshPublicKey(
+        expirationTimeUsec=1500000600000001,
+        fingerprint=None,
+        key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ')
     self.mock_oslogin_client.users_sshPublicKeys.Patch.Expect(
         request=self.messages.OsloginUsersSshPublicKeysPatchRequest(
             name='users/user@google.com/sshPublicKeys/qwertyuiop',
-            sshPublicKey=self.messages.SshPublicKey(
-                expirationTimeUsec=1500000600000001,
-                fingerprint=None,
-                key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
-            ),
+            sshPublicKey=key,
             updateMask='expirationTimeUsec',
         ),
-        response=self.profiles['profile_with_keys'])
+        response=key)
 
     response = self.Run("""
         compute os-login ssh-keys update --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
             --ttl 10m
         """)
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response, key)
 
   def testWithTtlHours(self, track):
     self._RunSetUp(track)
@@ -102,24 +102,24 @@ class UpdateTest(test_base.OsloginBaseTest):
             name='users/user@google.com'),
         response=self.profiles['profile_with_keys'])
 
+    key = self.messages.SshPublicKey(
+        expirationTimeUsec=1500036000000001,
+        fingerprint=None,
+        key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ')
     self.mock_oslogin_client.users_sshPublicKeys.Patch.Expect(
         request=self.messages.OsloginUsersSshPublicKeysPatchRequest(
             name='users/user@google.com/sshPublicKeys/qwertyuiop',
-            sshPublicKey=self.messages.SshPublicKey(
-                expirationTimeUsec=1500036000000001,
-                fingerprint=None,
-                key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
-            ),
+            sshPublicKey=key,
             updateMask='expirationTimeUsec',
         ),
-        response=self.profiles['profile_with_keys'])
+        response=key)
 
     response = self.Run("""
         compute os-login ssh-keys update --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
             --ttl 10h
         """)
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response, key)
 
   def testWithTtlDays(self, track):
     self._RunSetUp(track)
@@ -130,24 +130,24 @@ class UpdateTest(test_base.OsloginBaseTest):
             name='users/user@google.com'),
         response=self.profiles['profile_with_keys'])
 
+    key = self.messages.SshPublicKey(
+        expirationTimeUsec=1500864000000001,
+        fingerprint=None,
+        key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ')
     self.mock_oslogin_client.users_sshPublicKeys.Patch.Expect(
         request=self.messages.OsloginUsersSshPublicKeysPatchRequest(
             name='users/user@google.com/sshPublicKeys/qwertyuiop',
-            sshPublicKey=self.messages.SshPublicKey(
-                expirationTimeUsec=1500864000000001,
-                fingerprint=None,
-                key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
-            ),
+            sshPublicKey=key,
             updateMask='expirationTimeUsec',
         ),
-        response=self.profiles['profile_with_keys'])
+        response=key)
 
     response = self.Run("""
         compute os-login ssh-keys update --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
             --ttl 10d
         """)
 
-    self.assertEqual(response, self.profiles['profile_with_keys'])
+    self.assertEqual(response, key)
 
   def testWithInvalidKey(self, track):
     self._RunSetUp(track)

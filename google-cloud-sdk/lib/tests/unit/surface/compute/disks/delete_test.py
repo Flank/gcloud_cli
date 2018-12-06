@@ -19,7 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
@@ -131,8 +131,9 @@ class DisksDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
                        ['disk-1', 'disk-2', 'disk-3'])
 
 
-@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
-                          (base.ReleaseTrack.BETA, 'beta'))
+# TODO(b/117336602) Stop using parameterized for track parameterization.
+@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                          (calliope_base.ReleaseTrack.BETA, 'beta'))
 class RegionalDisksDeleteTest(test_base.BaseTest, parameterized.TestCase):
 
   def testDefaultOptionsWithSingleDisk(self, track, api_version):

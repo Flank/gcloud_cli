@@ -79,6 +79,7 @@ The ... must be one of ... line should be in this paragraph. _CHOICE_ must be on
 *bar*::: Choice description for bar.
 *foo*::: Choice description for foo.
 *none*::: Choice description for none.
+:::
 +
 
 *--choices-dict-arg-list*=[_CHOICE_,...]; default="none"::
@@ -88,6 +89,7 @@ The ... must be one of ... line should be in this paragraph. _CHOICE_ must be on
 *bar*::: Choice description for bar.
 *foo*::: Choice description for foo.
 *none*::: Choice description for none.
+:::
 +
 
 *--choices-dict-bloviate*=_CHOICE_; default="none"::
@@ -103,6 +105,7 @@ _CHOICE_ must be one of:
 *bar*::: Choice description for bar.
 *foo*::: Choice description for foo.
 *none*::: Choice description for none.
+:::
 +
 
 *--choices-dict-only-one-choice-yes-we-really-do-this*=_CHOICE_; default="this-is-it"::
@@ -110,6 +113,7 @@ _CHOICE_ must be one of:
 Automaticallly fess up to only one choice. _CHOICE_ must be (currently only one value is supported):
 +
 *this-is-it*::: You have no choice in this matter.
+:::
 +
 
 *--choices-list*=_CHOICE_; default="none"::
@@ -186,7 +190,7 @@ flag interacts with other flags that are applied in this order: *--flatten*,
 
 ## GCLOUD WIDE FLAGS
 
-These flags are available to all commands: --configuration, --flatten, --format, --help, --log-http, --top-group-flag, --user-output-enabled, --verbosity.
+These flags are available to all commands: --configuration, --flags-file, --flatten, --format, --help, --log-http, --top-group-flag, --user-output-enabled, --verbosity.
 Run *$ link:gcloud[gcloud] help* for details.
 
 

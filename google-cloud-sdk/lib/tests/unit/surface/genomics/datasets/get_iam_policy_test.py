@@ -26,6 +26,7 @@ from tests.lib.surface.genomics import base
 from tests.lib.surface.genomics import test_data
 
 
+# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA,))
 class GetIamPolicyTest(base.GenomicsUnitTest, test_case.WithOutputCapture):
 

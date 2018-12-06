@@ -27,7 +27,7 @@ from tests.lib.surface.iam import e2e_test_base
 # enabled on the current project.
 class RolesTest(e2e_test_base.CustomRolesBaseTest):
 
-  @test_case.Filters.skip('Failing', 'b/112686576')
+  @test_case.Filters.skip('Failing', 'b/116627522')
   def testRoles(self):
     self.SetRole()
     self.SetPermissions('buckets')
@@ -43,6 +43,7 @@ class RolesTest(e2e_test_base.CustomRolesBaseTest):
     self.DeleteRole()
     self.UndeleteRole()
 
+  @test_case.Filters.skip('Failing', 'b/116627522')
   def testListTestablePermissions(self):
     self.SetPermissions('buckets')
     self.ClearOutputs()

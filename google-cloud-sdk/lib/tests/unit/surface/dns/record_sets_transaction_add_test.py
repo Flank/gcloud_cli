@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import os
 import shutil
 from googlecloudsdk.api_lib.dns import transaction_util
-from googlecloudsdk.calliope.exceptions import ToolException
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.dns import base
@@ -50,14 +49,14 @@ class RecordSetsTransactionAddTest(base.DnsMockTest):
   def testTransactionAddBeforeStart(self):
     test_zone = util.GetManagedZones()[0]
     test_record = util.GetRecordSets()[0]
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(transaction_util.TransactionFileNotFound) as context:
       self.Run(
           'dns record-sets transaction add -z {0} --name {1} --ttl {2} --type '
           '{3} {4}'.format(test_zone.name, test_record.name,
                            test_record.ttl, test_record.type,
                            test_record.rrdatas[0]))
       self.assertEqual(context.exception.message,
-                       'transaction not found at [{0}]'.format(
+                       'Transaction not found at [{0}]'.format(
                            transaction_util.DEFAULT_PATH))
 
   def testTransactionAddUnsupportedType(self):
@@ -66,7 +65,7 @@ class RecordSetsTransactionAddTest(base.DnsMockTest):
 
     test_zone = util.GetManagedZones()[0]
     test_record = util.GetMGRecord()
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(transaction_util.UnsupportedRecordType) as context:
       self.Run(
           'dns record-sets transaction add -z {0} --name {1} --ttl {2} --type '
           '{3} {4}'.format(test_zone.name, test_record.name,
@@ -74,7 +73,7 @@ class RecordSetsTransactionAddTest(base.DnsMockTest):
                            test_record.rrdatas[0]))
       self.assertEqual(
           context.exception.message,
-          'unsupported record-set type [{0}]'.format(test_record.type))
+          'Unsupported record-set type [{0}]'.format(test_record.type))
 
   def _RunTestRaisesCorruptedTransactionFileError(self):
     test_zone = util.GetManagedZones()[0]
@@ -149,7 +148,7 @@ class RecordSetsTransactionAddBetaTest(base.DnsMockBetaTest):
 
   def SetUp(self):
     self.initial_transaction = sdk_test_base.SdkBase.Resource(
-        'tests', 'unit', 'surface', 'dns', 'test_data', 'v2beta1',
+        'tests', 'unit', 'surface', 'dns', 'test_data', 'v1beta2',
         'zone.com-initial-transaction.yaml')
 
   def TearDown(self):
@@ -161,14 +160,14 @@ class RecordSetsTransactionAddBetaTest(base.DnsMockBetaTest):
   def testTransactionAddBeforeStart(self):
     test_zone = util_beta.GetManagedZones()[0]
     test_record = util_beta.GetRecordSets()[0]
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(transaction_util.TransactionFileNotFound) as context:
       self.Run(
           'dns record-sets transaction add -z {0} --name {1} --ttl {2} --type '
           '{3} {4}'.format(test_zone.name, test_record.name,
                            test_record.ttl, test_record.type,
                            test_record.rrdatas[0]))
       self.assertEqual(context.exception.message,
-                       'transaction not found at [{0}]'.format(
+                       'Transaction not found at [{0}]'.format(
                            transaction_util.DEFAULT_PATH))
 
   def testTransactionAddUnsupportedType(self):
@@ -177,7 +176,7 @@ class RecordSetsTransactionAddBetaTest(base.DnsMockBetaTest):
 
     test_zone = util_beta.GetManagedZones()[0]
     test_record = util_beta.GetMGRecord()
-    with self.assertRaises(ToolException) as context:
+    with self.assertRaises(transaction_util.UnsupportedRecordType) as context:
       self.Run(
           'dns record-sets transaction add -z {0} --name {1} --ttl {2} --type '
           '{3} {4}'.format(test_zone.name, test_record.name,
@@ -185,7 +184,7 @@ class RecordSetsTransactionAddBetaTest(base.DnsMockBetaTest):
                            test_record.rrdatas[0]))
       self.assertEqual(
           context.exception.message,
-          'unsupported record-set type [{0}]'.format(test_record.type))
+          'Unsupported record-set type [{0}]'.format(test_record.type))
 
   def _RunTestRaisesCorruptedTransactionFileError(self):
     test_zone = util_beta.GetManagedZones()[0]

@@ -8,10 +8,9 @@ SYNOPSIS
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) (DEPRECATED) Create a Google Compute Engine interconnect
-    attachment.
+    (ALPHA) (REMOVED) Create a Google Compute Engine interconnect attachment.
 
-        `create` is deprecated. Please use `gcloud compute interconnects attachments dedicated create` instead.
+        `create` has been removed. Please use `gcloud compute interconnects attachments dedicated create` instead.
 
     gcloud alpha compute interconnects attachments create is used to create
     interconnect attachments. An interconnect attachment is what binds the
@@ -55,16 +54,15 @@ OPTIONAL FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. If this
-    command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
-
-        $ gcloud compute interconnects attachments create
-        $ gcloud beta compute interconnects attachments create
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
 

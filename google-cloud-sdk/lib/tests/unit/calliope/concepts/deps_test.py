@@ -186,8 +186,8 @@ class DepsTest(concepts_test_base.ConceptsTestBase,
     regex = re.escape(
         'Failed to find attribute [project]. The attribute can be set in the '
         'following ways: \n'
-        '- provide the flag [--myresource-project] on the command line\n'
-        '- provide the flag [--project] on the command line\n'
+        '- provide the argument [--myresource-project] on the command line\n'
+        '- provide the argument [--project] on the command line\n'
         '- set the property [core/project]')
     with self.assertRaisesRegex(deps.AttributeNotFoundError, regex):
       deps.Get('project', fallthroughs_map, parsed_args=parsed_args)
@@ -215,7 +215,7 @@ class DepsTest(concepts_test_base.ConceptsTestBase,
     regex = re.escape(
         'Failed to find attribute [zone]. The attribute can be set in the '
         'following ways: \n'
-        '- provide the flag [--myresource-zone] on the command line\n'
+        '- provide the argument [--myresource-zone] on the command line\n'
         '- set the property [compute/zone]\n'
         '- custom hint')
     with self.assertRaisesRegex(deps.AttributeNotFoundError, regex):

@@ -5,12 +5,11 @@ NAME
 SYNOPSIS
     gcloud beta tasks queues create-app-engine-queue QUEUE
         [--max-attempts=MAX_ATTEMPTS] [--max-backoff=MAX_BACKOFF]
-        [--max-concurrent-tasks=MAX_CONCURRENT_TASKS]
+        [--max-concurrent-dispatches=MAX_CONCURRENT_DISPATCHES]
+        [--max-dispatches-per-second=MAX_DISPATCHES_PER_SECOND]
         [--max-doublings=MAX_DOUBLINGS]
-        [--max-retry-duration=MAX_RETRY_DURATION]
-        [--max-tasks-dispatched-per-second=MAX_TASKS_DISPATCHED_PER_SECOND]
-        [--min-backoff=MIN_BACKOFF] [--routing-override=KEY:VALUE,[...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--max-retry-duration=MAX_RETRY_DURATION] [--min-backoff=MIN_BACKOFF]
+        [--routing-override=KEY:VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) An App Engine queue is a push queue sent to an App Engine endpoint.
@@ -34,11 +33,14 @@ FLAGS
         The maximum amount of time to wait before retrying a task after it
         fails. Must be a string that ends in 's', such as "5s".
 
-     --max-concurrent-tasks=MAX_CONCURRENT_TASKS
+     --max-concurrent-dispatches=MAX_CONCURRENT_DISPATCHES
         The maximum number of concurrent tasks that Cloud Tasks allows to be
         dispatched for this queue. After this threshold has been reached, Cloud
         Tasks stops dispatching tasks until the number of outstanding requests
         decreases.
+
+     --max-dispatches-per-second=MAX_DISPATCHES_PER_SECOND
+        The maximum rate at which tasks are dispatched from this queue.
 
      --max-doublings=MAX_DOUBLINGS
         The time between retries will double maxDoublings times.
@@ -62,9 +64,6 @@ FLAGS
 
         Must be a string that ends in 's', such as "5s".
 
-     --max-tasks-dispatched-per-second=MAX_TASKS_DISPATCHED_PER_SECOND
-        The maximum rate at which tasks are dispatched from this queue.
-
      --min-backoff=MIN_BACKOFF
         The minimum amount of time to wait before retrying a task after it
         fails. Must be a string that ends in 's', such as "5s".
@@ -78,8 +77,9 @@ FLAGS
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 NOTES
     This command is currently in BETA and may change without notice. This

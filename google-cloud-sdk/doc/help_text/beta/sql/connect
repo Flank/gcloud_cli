@@ -3,10 +3,12 @@ NAME
 
 SYNOPSIS
     gcloud beta sql connect INSTANCE [--database=DATABASE, -d DATABASE]
-        [--user=USER, -u USER] [GCLOUD_WIDE_FLAG ...]
+        [--port=PORT; default=9470] [--user=USER, -u USER]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Connects to a Cloud SQL instance.
+    (BETA) Connects to Cloud SQL V2 instances through the Cloud SQL Proxy.
+    Connects to Cloud SQL V1 instances directly.
 
 POSITIONAL ARGUMENTS
      INSTANCE
@@ -16,13 +18,18 @@ FLAGS
      --database=DATABASE, -d DATABASE
         The PostgreSQL database to connect to.
 
+     --port=PORT; default=9470
+        Port number that gcloud will use to connect to the Cloud SQL Proxy
+        through localhost.
+
      --user=USER, -u USER
         Cloud SQL instance user to connect as.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
-    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
-    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
 
 EXAMPLES
     To connect to a Cloud SQL instance, run:
