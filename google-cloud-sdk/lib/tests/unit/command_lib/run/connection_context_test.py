@@ -90,6 +90,12 @@ class TLSSupportCheckTest(test_case.TestCase):
     ssl.PROTOCOL_TLS = 2
     connection_context._CheckTLSSupport()
 
+  def testFailBadSSL(self):
+    self.StartObjectPatch(ssl, 'OPENSSL_VERSION', new='OpenSSL 0.9.8zh')
+    # Make sure we ask for SSL >1.0
+    with self.assertRaisesRegex(serverless_exceptions.NoTLSError, '>1\\.0'):
+      connection_context._CheckTLSSupport()
+
   def testFail(self):
     if hasattr(ssl, 'PROTOCOL_TLS'):
       del ssl.PROTOCOL_TLS

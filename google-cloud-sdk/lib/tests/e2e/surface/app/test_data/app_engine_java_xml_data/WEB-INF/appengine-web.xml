@@ -20,5 +20,6 @@
     <enable-jar-classes>false</enable-jar-classes>
     <enable-jar-splitting>true</enable-jar-splitting>
   </staging>
+  <runtime>java8</runtime>
 </appengine-web-app>
 <!-- [END config] -->

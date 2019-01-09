@@ -413,16 +413,6 @@ class FirewallRulesCreateTest(test_base.BaseTest):
         disabled=True,
         sourceRanges=[])
 
-
-class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
-
-  def SetUp(self):
-    self.api_version = 'beta'
-    self.SelectApi(self.api_version)
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
-
   def testEnableLogging(self):
     self.Run("""
         compute firewall-rules create firewall-1
@@ -435,9 +425,19 @@ class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
             self.messages.Firewall.AllowedValueListEntry(IPProtocol='123')
         ],
         name='firewall-1',
-        enableLogging=True,
+        logConfig=self.messages.FirewallLogConfig(enable=True),
         direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
         sourceRanges=[])
+
+
+class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
+
+  def SetUp(self):
+    self.api_version = 'beta'
+    self.SelectApi(self.api_version)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
 
 
 class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):

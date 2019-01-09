@@ -1,0 +1,56 @@
+title: remote-build-execution worker-pools list test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: remote-build-execution worker-pools list --instance=default_instance
+  - stdout: |
+      ---
+      name: projects/fake-project/instances/default_instance/workerpools/pool1
+      state: RUNNING
+      workerConfig:
+        diskSizeGb: '200'
+        diskType: pd-standard
+        machineType: n1-standard-2
+      workerCount: '3'
+
+actions:
+- execute_command:
+    command: remote-build-execution worker-pools list --instance=default_instance
+    events:
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/fake-project/instances/default_instance/workerpools?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "workerPools": [
+                {
+                  "name": "projects/fake-project/instances/default_instance/workerpools/pool1",
+                  "workerConfig": {
+                    "machineType": "n1-standard-2",
+                    "diskType": "pd-standard",
+                    "diskSizeGb": "200"
+                  },
+                  "workerCount": "3",
+                  "state": "RUNNING"
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        ---
+        name: projects/fake-project/instances/default_instance/workerpools/pool1
+        state: RUNNING
+        workerConfig:
+          diskSizeGb: '200'
+          diskType: pd-standard
+          machineType: n1-standard-2
+        workerCount: '3'
+    - expect_exit:
+        code: 0

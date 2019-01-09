@@ -1,0 +1,825 @@
+title: Configure and update AutoHealingPolicies for Managed Instance Group
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instance-templates create $$my-template$$ --machine-type n1-standard-1
+      --format 'value(name)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$].
+  - stdout: |
+      $$my-template$$
+- execute:
+  - command: compute health-checks create tcp $$my-health-check$$ --global --format
+      'value(name)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$].
+  - stdout: |
+      $$my-health-check$$
+- execute:
+  - command: compute http-health-checks create $$my-http-health-check$$ --format 'value(name)'
+      --port 12345 --request-path /healthz
+  - stderr: |
+      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$].
+  - stdout: |
+      $$my-http-health-check$$
+- execute:
+  - command: compute https-health-checks create $$my-https-health-check$$ --format
+      'value(name)' --port 12345 --request-path /healthz
+  - stderr: |
+      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$].
+  - stdout: |
+      $$my-https-health-check$$
+- execute:
+  - command: compute instance-groups managed create $$my-mig$$ --zone us-central1-f
+      --size 0 --template $$my-template$$ --format 'value(name)'
+  - stderr: |
+      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+  - stdout: |
+      $$my-mig$$
+- execute:
+  - command: compute instance-groups managed update $$my-mig$$ --zone us-central1-f
+      --http-health-check $$my-http-health-check$$ --initial-delay 10m --format disable
+  - stderr: |
+      WARNING: HttpHealthCheck is deprecated. Use --health-check instead.
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+- execute:
+  - command: compute instance-groups managed update $$my-mig$$ --zone us-central1-f
+      --https-health-check $$my-https-health-check$$ --initial-delay 15m --format
+      disable
+  - stderr: |
+      WARNING: HttpsHealthCheck is deprecated. Use --health-check instead.
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+- execute:
+  - command: compute instance-groups managed update $$my-mig$$ --zone us-central1-f
+      --health-check $$my-health-check$$ --format disable
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+- execute:
+  - command: compute instance-groups managed update $$my-mig$$ --zone us-central1-f
+      --clear-autohealing --format disable
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+- execute:
+  - command: compute -q instance-groups managed delete $$my-mig$$ --zone us-central1-f
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+  - progress_tracker:
+    - message: Deleting Managed Instance Group
+    - status: SUCCESS
+- execute:
+  - command: compute -q instance-templates delete $$my-template$$
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$].
+- execute:
+  - command: compute -q http-health-checks delete $$my-http-health-check$$
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$].
+- execute:
+  - command: compute -q https-health-checks delete $$my-https-health-check$$
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$].
+- execute:
+  - command: compute -q health-checks delete $$my-health-check$$ --global
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$].
+actions:
+
+- generate_resource_id:
+    reference: my-template
+    prefix: managed-instance-group-auto-healing
+- execute_command:
+    command: compute instance-templates create $$my-template$$ --machine-type n1-standard-1
+      --format 'value(name)'
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$].
+    - expect_stdout: |
+        $$my-template$$
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: my-health-check
+    prefix: managed-instance-group-auto-healing
+- execute_command:
+    command: compute health-checks create tcp $$my-health-check$$ --global --format
+      'value(name)'
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$].
+    - expect_stdout: |
+        $$my-health-check$$
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: my-http-health-check
+    prefix: managed-instance-group-auto-healing
+- execute_command:
+    command: compute http-health-checks create $$my-http-health-check$$ --format 'value(name)'
+      --port 12345 --request-path /healthz
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$].
+    - expect_stdout: |
+        $$my-http-health-check$$
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: my-https-health-check
+    prefix: managed-instance-group-auto-healing
+- execute_command:
+    command: compute https-health-checks create $$my-https-health-check$$ --format
+      'value(name)' --port 12345 --request-path /healthz
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$].
+    - expect_stdout: |
+        $$my-https-health-check$$
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: my-mig
+    prefix: managed-instance-group-auto-healing
+- execute_command:
+    command: compute instance-groups managed create $$my-mig$$ --zone us-central1-f
+      --size 0 --template $$my-template$$ --format 'value(name)'
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+    - expect_stdout: |
+        $$my-mig$$
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-groups managed update $$my-mig$$ --zone us-central1-f
+      --http-health-check $$my-http-health-check$$ --initial-delay 10m --format disable
+    events:
+    - expect_stderr: |
+        WARNING: HttpHealthCheck is deprecated. Use --health-check instead.
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: pEB7w9OFjauL3hchN86C60_g7io=/eS2R6l9Lyrurtf8g1GS0fP64OqY=
+            status: '200'
+          body:
+            id: '6888865929928062962'
+            creationTimestamp: '2018-12-07T06:52:13.202-08:00'
+            name: $$my-mig$$
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+              targetSize:
+                calculated: 0
+            instanceGroup: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$my-mig$$
+            baseInstanceName: managed-instance-group-auto-healing-20181207-145211-xe
+            fingerprint: -BDHR6uBLWM=
+            currentActions:
+              none: 0
+              creating: 0
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            status:
+              isStable: true
+            targetSize: 0
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+            kind: compute#instanceGroupManager
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              autoHealingPolicies:
+              - healthCheck: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$
+                initialDelaySec: 600
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '1935060975823042496'
+            name: operation-1544194348388-57c6fc3998fc3-2f6f3cbf-abc15bf1
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: patch
+            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            targetId: '6888865929928062962'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-12-07T06:52:31.909-08:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1544194348388-57c6fc3998fc3-2f6f3cbf-abc15bf1
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: jRaxJXM4C4-DTjr3INcH3wmYRWo=/F05gz302b3DHZosWWx0yhLiTRIg=
+            status: '200'
+          body:
+            id: '6888865929928062962'
+            creationTimestamp: '2018-12-07T06:52:13.202-08:00'
+            name: $$my-mig$$
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+              targetSize:
+                calculated: 0
+            instanceGroup: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$my-mig$$
+            baseInstanceName: managed-instance-group-auto-healing-20181207-145211-xe
+            fingerprint: k-BKkqrh2GY=
+            currentActions:
+              none: 0
+              creating: 0
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            status:
+              isStable: true
+            targetSize: 0
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            autoHealingPolicies:
+            - healthCheck: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$
+              initialDelaySec: 600
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+            kind: compute#instanceGroupManager
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-groups managed update $$my-mig$$ --zone us-central1-f
+      --https-health-check $$my-https-health-check$$ --initial-delay 15m --format
+      disable
+    events:
+    - expect_stderr: |
+        WARNING: HttpsHealthCheck is deprecated. Use --health-check instead.
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: obZgDJRFx7emcPCswa6zkiTiaPM=/uK1xF7PSumRODinGiwoJ9PtgHE4=
+            status: '200'
+          body:
+            id: '6888865929928062962'
+            creationTimestamp: '2018-12-07T06:52:13.202-08:00'
+            name: $$my-mig$$
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+              targetSize:
+                calculated: 0
+            instanceGroup: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$my-mig$$
+            baseInstanceName: managed-instance-group-auto-healing-20181207-145211-xe
+            fingerprint: k-BKkqrh2GY=
+            currentActions:
+              none: 0
+              creating: 0
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            status:
+              isStable: true
+            targetSize: 0
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            autoHealingPolicies:
+            - healthCheck: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$
+              initialDelaySec: 600
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+            kind: compute#instanceGroupManager
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              autoHealingPolicies:
+              - healthCheck: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$
+                initialDelaySec: 900
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '463445742437480353'
+            name: operation-1544194380690-57c6fc5867588-7fa96d3a-b0a4a77e
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: patch
+            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            targetId: '6888865929928062962'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-12-07T06:53:02.147-08:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1544194380690-57c6fc5867588-7fa96d3a-b0a4a77e
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: tUEmsB480aPNocC-ahfZ_r6S74g=/BC6vW8Z413IcOhZ-Hy5t637DTcU=
+            status: '200'
+          body:
+            id: '6888865929928062962'
+            creationTimestamp: '2018-12-07T06:52:13.202-08:00'
+            name: $$my-mig$$
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+              targetSize:
+                calculated: 0
+            instanceGroup: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$my-mig$$
+            baseInstanceName: managed-instance-group-auto-healing-20181207-145211-xe
+            fingerprint: vODPjS9LQv0=
+            currentActions:
+              none: 0
+              creating: 0
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            status:
+              isStable: true
+            targetSize: 0
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            autoHealingPolicies:
+            - healthCheck: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$
+              initialDelaySec: 900
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+            kind: compute#instanceGroupManager
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-groups managed update $$my-mig$$ --zone us-central1-f
+      --health-check $$my-health-check$$ --format disable
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: jWeFw83Wzq3Vi-fZe0th2pLNntA=/_nZISgtZ570h-OC-eyhYgaI1jrg=
+            status: '200'
+          body:
+            id: '6888865929928062962'
+            creationTimestamp: '2018-12-07T06:52:13.202-08:00'
+            name: $$my-mig$$
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+              targetSize:
+                calculated: 0
+            instanceGroup: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$my-mig$$
+            baseInstanceName: managed-instance-group-auto-healing-20181207-145211-xe
+            fingerprint: vODPjS9LQv0=
+            currentActions:
+              none: 0
+              creating: 0
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            status:
+              isStable: true
+            targetSize: 0
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            autoHealingPolicies:
+            - healthCheck: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$
+              initialDelaySec: 900
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+            kind: compute#instanceGroupManager
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              autoHealingPolicies:
+              - healthCheck: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$
+                initialDelaySec: 900    # Initial delay currently set on MIG.
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '6707567363134797724'
+            name: operation-1544194416371-57c6fc7a6e6ae-87efa376-7db74b5c
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: patch
+            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            targetId: '6888865929928062962'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-12-07T06:53:39.807-08:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1544194416371-57c6fc7a6e6ae-87efa376-7db74b5c
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: SXejhNUeG3NvsAURiplFqg0wx8k=/_x5ZIzWEkYGQ06Yoy7Jp0l_mi1A=
+            status: '200'
+          body:
+            id: '6888865929928062962'
+            creationTimestamp: '2018-12-07T06:52:13.202-08:00'
+            name: $$my-mig$$
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+              targetSize:
+                calculated: 0
+            instanceGroup: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$my-mig$$
+            baseInstanceName: managed-instance-group-auto-healing-20181207-145211-xe
+            fingerprint: CNRoWPZWDt8=
+            currentActions:
+              none: 0
+              creating: 0
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            status:
+              isStable: true
+            targetSize: 0
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            autoHealingPolicies:
+            - healthCheck: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$
+              initialDelaySec: 900
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+            kind: compute#instanceGroupManager
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-groups managed update $$my-mig$$ --zone us-central1-f
+      --clear-autohealing --format disable
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: 9UzoyU2ixQ30siAWJOxnC-GnYEg=/W98I27pFt8jemdoiU0pqxWo7b2s=
+            status: '200'
+          body:
+            id: '6888865929928062962'
+            creationTimestamp: '2018-12-07T06:52:13.202-08:00'
+            name: $$my-mig$$
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+              targetSize:
+                calculated: 0
+            instanceGroup: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$my-mig$$
+            baseInstanceName: managed-instance-group-auto-healing-20181207-145211-xe
+            fingerprint: CNRoWPZWDt8=
+            currentActions:
+              none: 0
+              creating: 0
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            status:
+              isStable: true
+            targetSize: 0
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            autoHealingPolicies:
+            - healthCheck: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$
+              initialDelaySec: 900
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+            kind: compute#instanceGroupManager
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              autoHealingPolicies: [{}]
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '7937407346851395447'
+            name: operation-1544194454592-57c6fc9ee1a8b-85c8af19-9a0e5a34
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: patch
+            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            targetId: '6888865929928062962'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-12-07T06:54:16.072-08:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1544194454592-57c6fc9ee1a8b-85c8af19-9a0e5a34
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: v-OiNptbxqTQLPPgWMetlY8NvbY=/uDJt-uc58iJmnx2jkWAueIzwYt0=
+            status: '200'
+          body:
+            id: '6888865929928062962'
+            creationTimestamp: '2018-12-07T06:52:13.202-08:00'
+            name: $$my-mig$$
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+            versions:
+            - instanceTemplate: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+              targetSize:
+                calculated: 0
+            instanceGroup: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$my-mig$$
+            baseInstanceName: managed-instance-group-auto-healing-20181207-145211-xe
+            fingerprint: -BDHR6uBLWM=
+            currentActions:
+              none: 0
+              creating: 0
+              creatingWithoutRetries: 0
+              verifying: 0
+              recreating: 0
+              deleting: 0
+              abandoning: 0
+              restarting: 0
+              refreshing: 0
+            pendingActions:
+              creating: 0
+              deleting: 0
+              recreating: 0
+              restarting: 0
+            status:
+              isStable: true
+            targetSize: 0
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$
+            updatePolicy:
+              type: OPPORTUNISTIC
+              minimalAction: REPLACE
+              maxSurge:
+                fixed: 1
+                calculated: 1
+              maxUnavailable:
+                fixed: 1
+                calculated: 1
+              minReadySec: 0
+            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+            kind: compute#instanceGroupManager
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute -q instance-groups managed delete $$my-mig$$ --zone us-central1-f
+    cleanup_for: my-mig
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$my-mig$$].
+    - expect_progress_tracker:
+        message: Deleting Managed Instance Group
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute -q instance-templates delete $$my-template$$
+    cleanup_for: my-template
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute -q http-health-checks delete $$my-http-health-check$$
+    cleanup_for: my-http-health-check
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute -q https-health-checks delete $$my-https-health-check$$
+    cleanup_for: my-https-health-check
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute -q health-checks delete $$my-health-check$$ --global
+    cleanup_for: my-health-check
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$].
+    - expect_exit:
+        code: 0

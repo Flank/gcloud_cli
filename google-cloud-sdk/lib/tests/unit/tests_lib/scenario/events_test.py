@@ -389,6 +389,33 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
       self.assertEqual(0, len(failures))
       self.assertFalse('poll_operation' in backing_data['api_call'])
 
+  def testApiCallPollOperationForcesOperationHandling(self):
+    backing_data = {
+        'api_call': {
+            'poll_operation': True,
+            'expect_request': {
+                'uri': 'https://example.com',
+                'method': 'GET',
+                'body': None,
+            },
+            'return_response': {
+                'body': {'name': 'foo/bar/my-op'},
+            }
+        }
+    }
+    rrr = reference_resolver.ResourceReferenceResolver()
+    e = events.ApiCallEvent.FromData(backing_data)
+    headers, body = e.GetResponsePayload()
+    failures = e.HandleResponse(
+        headers, body,
+        resource_ref_resolver=rrr,
+        generate_extras=True)
+
+    self.assertEqual(0, len(failures))
+    self.assertEqual(rrr._extracted_ids,
+                     {'operation': 'foo/bar/my-op',
+                      'operation-basename': 'my-op'})
+
   def testApiCallEventNoAddRefExtraction(self):
     backing_data = {
         'api_call': {

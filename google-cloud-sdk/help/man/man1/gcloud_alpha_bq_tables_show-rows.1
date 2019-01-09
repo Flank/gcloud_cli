@@ -1,0 +1,103 @@
+
+.TH "GCLOUD_ALPHA_BQ_TABLES_SHOW\-ROWS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha bq tables show\-rows \- display selected rows in a specified table or view
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha bq tables show\-rows\fR (\fB\-\-table\fR=\fITABLE\fR\ :\ \fB\-\-dataset\fR=\fIDATASET\fR) [\fB\-\-limit\fR=\fILIMIT\fR;\ default=100] [\fB\-\-start\fR=\fISTART\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Display selected rows in a specified table or view.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Table resource \- The BigQuery table you want to fetch rows from. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [\-\-table] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-table\fR=\fITABLE\fR
+ID of the table or fully qualified identifier for the table. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-dataset\fR=\fIDATASET\fR
+The id of the BigQuery dataset.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR; default=100
+How many rows to return in the result.
+
+.TP 2m
+\fB\-\-start\fR=\fISTART\fR
+First row to return in the result.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBbigquery/v2\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/bigquery/
+
+
+
+.SH "EXAMPLES"
+
+The following command displays 150 rows of \f5my\-table\fR in \f5my\-dataset\fR
+starting from row 10:
+
+.RS 2m
+$ gcloud alpha bq tables show\-rows  \e
+    \-\-table \e
+    /projects/myproject/datasets/my\-dataset/tables/my\-table \e
+    \-\-limit 150 \-\-start 10
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

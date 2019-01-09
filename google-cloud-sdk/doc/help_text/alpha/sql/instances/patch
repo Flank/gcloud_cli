@@ -121,7 +121,11 @@ FLAGS
         be omitted.
 
      --network=NETWORK
-        Network in the current project that the instance will be part of.
+        Network in the current project that the instance will be part of. To
+        specify using a network with a shared VPC, use the full URL of the
+        network. For an example host project, 'testproject', and shared
+        network, 'testsharednetwork', this would be of the
+        form:--network=projects/testproject/global/networks/testsharednetwork
 
      --pricing-plan=PRICING_PLAN, -p PRICING_PLAN
         First Generation instances only. The pricing plan for this instance.
@@ -161,8 +165,8 @@ FLAGS
         restarted.
 
      --update-labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to update. If a label exists its value
-        is modified, otherwise a new label is created.
+        List of label KEY=VALUE pairs to update. If a label exists its value is
+        modified, otherwise a new label is created.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -212,7 +216,7 @@ FLAGS
      At most one of these may be specified:
 
        --clear-labels
-          Removes all labels. If --update-labels is also specified then
+          Remove all labels. If --update-labels is also specified then
           --clear-labels is applied first.
 
           For example, to remove all labels:
@@ -225,7 +229,7 @@ FLAGS
                 --update-labels foo=bar,baz=qux
 
        --remove-labels=[KEY,...]
-          A list of label keys to remove. If a label does not exist it is
+          List of label keys to remove. If a label does not exist it is
           silently ignored.
 
      At most one of these may be specified:

@@ -263,10 +263,11 @@ definitions:
 
     expect_prompt_response:
       additionalProperties: false
-      required: [message]
+      required: [message, user_input]
       properties:
         # TODO(b/110364447): Implement choices.
         message: {type: string}
+        user_input: {type: string}
 
     expect_prompt_choice:
       additionalProperties: false
@@ -367,6 +368,7 @@ definitions:
     properties:
       reference: {type: string}
       prefix: {type: string}
+      delimiter: {type: string}
       # If set to true, you don't have to register a cleanup rule for this
       # resource. You should only use this for resoruces that can't actually
       # be deleted (but that you still give a name to) like jobs.
@@ -420,6 +422,26 @@ definitions:
       stdout: {$ref: "#/definitions/value_types/complex"}
       # If given, the stderr of the command must match this value to continue.
       stderr: {$ref: "#/definitions/value_types/complex"}
+
+  # Execute a system binary.
+  # Binaries are executed as a black box (as opposed to `execute_command` which
+  # intercepts API calls. Any binary that is executed will do whatever it does
+  # in both LOCAL and REMOTE mode.
+  execute_binary:
+    additionalProperties: false
+    required: [args]
+    properties:
+      # The arguments of the command line to run, the first is the binary.
+      args:
+        type: array
+        items: {type: string}
+      # The number of seconds to wait before killing the process (default 60).
+      timeout: {type: number}
+      # Input to pass to the binary.
+      stdin: {type: string}
+      expect_stdout: {$ref: "#/definitions/events/expect_stdout"}
+      expect_stderr: {$ref: "#/definitions/events/expect_stderr"}
+      expect_exit_code: {type: number}
 
   # Executes a gcloud command and allows you to make various assertions about
   # the operations the command performs.
@@ -600,27 +622,36 @@ properties:
       oneOf:
       - required: [set_property]
         not_required: [write_file, load_resource, generate_resource_id,
-                       define_reference, execute_command_until, execute_command]
+                       define_reference, execute_command_until, execute_binary,
+                       execute_command]
       - required: [write_file]
         not_required: [set_property, load_resource, generate_resource_id,
-                       define_reference, execute_command_until, execute_command]
+                       define_reference, execute_command_until, execute_binary,
+                       execute_command]
       - required: [load_resource]
         not_required: [set_property, write_file, generate_resource_id,
-                       define_reference, execute_command_until, execute_command]
+                       define_reference, execute_command_until, execute_binary,
+                       execute_command]
       - required: [generate_resource_id]
         not_required: [set_property, write_file, load_resource,
-                       define_reference, execute_command_until, execute_command]
+                       define_reference, execute_command_until, execute_binary,
+                       execute_command]
       - required: [define_reference]
         not_required: [set_property, write_file, load_resource,
                        generate_resource_id, execute_command_until,
-                       execute_command]
+                       execute_binary, execute_command]
       - required: [execute_command_until]
         not_required: [set_property, write_file, load_resource,
-                       generate_resource_id, define_reference, execute_command]
+                       generate_resource_id, define_reference, execute_binary,
+                       execute_command]
+      - required: [execute_binary]
+        not_required: [set_property, write_file, load_resource,
+                       generate_resource_id, define_reference,
+                       execute_command_until, execute_command]
       - required: [execute_command]
         not_required: [set_property, write_file, load_resource,
                        generate_resource_id, define_reference,
-                       execute_command_until]
+                       execute_command_until, execute_binary]
       properties:
         set_property: {$ref: "#/definitions/set_property"}
         write_file: {$ref: "#/definitions/write_file"}
@@ -628,4 +659,5 @@ properties:
         generate_resource_id: {$ref: "#/definitions/generate_resource_id"}
         define_reference: {$ref: "#/definitions/define_reference"}
         execute_command_until: {$ref: "#/definitions/execute_command_until"}
+        execute_binary: {$ref: "#/definitions/execute_binary"}
         execute_command: {$ref: "#/definitions/execute_command"}

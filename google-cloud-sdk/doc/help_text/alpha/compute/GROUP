@@ -115,9 +115,6 @@ GROUPS
      resource-policies
         (ALPHA) Manage Google Compute Engine Resource Policies.
 
-     rolling-updates
-        (ALPHA) (DEPRECATED) Manage updates in a managed instance group.
-
      routers
         (ALPHA) List, create, and delete Google Compute Engine routers.
 
@@ -207,9 +204,7 @@ COMMANDS
         (ALPHA) SSH into a virtual machine instance.
 
      start-iap-tunnel
-        (ALPHA) Starts a tunnel to the Cloud Identity-Aware Proxy through which
-        another process can create a connection (eg. SSH, RDP) to a Google
-        Compute Engine instance.
+        (ALPHA) Starts an IAP TCP Fordwarding tunnel over WebSocket connection.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

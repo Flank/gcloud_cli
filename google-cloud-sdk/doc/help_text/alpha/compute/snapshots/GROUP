@@ -36,7 +36,7 @@ COMMANDS
         (ALPHA) List Google Compute Engine snapshots.
 
      remove-iam-policy-binding
-        (ALPHA) Remove a policy binding from a Google Compute Engine snapshot.
+        (ALPHA) Remove IAM policy binding of a Google Compute Engine snapshot.
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine snapshots.

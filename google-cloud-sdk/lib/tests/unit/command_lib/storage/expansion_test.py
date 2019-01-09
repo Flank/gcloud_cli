@@ -52,60 +52,59 @@ class LocalExpansionTest(sdk_test_base.SdkBase, parameterized.TestCase):
     self.Touch(os.path.join(self.root_path, dir_path), filename, makedirs=True)
 
   @parameterized.named_parameters([
-      ('DirNoExpansion', 'dir1', {'dir1/'}),
-      ('SubDirNoExpansion', 'dir1/sub1', {'dir1/sub1/'}),
-      ('FileNoExpansion', 'dir1/sub1/a.txt', {'dir1/sub1/a.txt'}),
-      ('NonExistingNoExpansion', 'dir1/sub1/asdf', set()),
+      ('DirNoExpansion', 'dir1', [], ['dir1/']),
+      ('SubDirNoExpansion', 'dir1/sub1', [], ['dir1/sub1/']),
+      ('FileNoExpansion', 'dir1/sub1/a.txt', ['dir1/sub1/a.txt'], []),
+      ('NonExistingNoExpansion', 'dir1/sub1/asdf', [], []),
       ('EndOnlyWildcard', 'dir1/sub1/*',
-       {'dir1/sub1/a.txt', 'dir1/sub1/aab.txt'}),
+       ['dir1/sub1/a.txt', 'dir1/sub1/aab.txt'], []),
       ('EndMultipleWildcard', 'dir1/sub1/*b*',
-       {'dir1/sub1/aab.txt'}),
+       ['dir1/sub1/aab.txt'], []),
       ('EndRecursive', 'dir1/sub1/**',
-       {'dir1/sub1/a.txt', 'dir1/sub1/aab.txt'}),
+       ['dir1/sub1/a.txt', 'dir1/sub1/aab.txt'], []),
       ('EndRecursiveHigher', 'dir1/**',
-       {'dir1/sub1/a.txt', 'dir1/sub1/aab.txt',
-        'dir1/sub2/aaaa.txt', 'dir1/sub2/c.txt',
-        'dir1/sub1/', 'dir1/sub2/'}),
-      ('MiddleRecursive', '**/sub1',
-       {'dir1/sub1/', 'dir2/sub1/', 'dir3/deeper/sub1/'}),
-      ('MiddleNotRecursive', '*/sub1',
-       {'dir1/sub1/', 'dir2/sub1/'}),
+       ['dir1/sub1/a.txt', 'dir1/sub1/aab.txt',
+        'dir1/sub2/aaaa.txt', 'dir1/sub2/c.txt'], []),
+      ('MiddleRecursive', '**/sub1', [],
+       ['dir1/sub1/', 'dir2/sub1/', 'dir3/deeper/sub1/']),
+      ('MiddleNotRecursive', '*/sub1', [],
+       ['dir1/sub1/', 'dir2/sub1/']),
       ('MiddleEndRecursive', '**/sub1/**',
-       {'dir1/sub1/a.txt', 'dir1/sub1/aab.txt',
+       ['dir1/sub1/a.txt', 'dir1/sub1/aab.txt',
         'dir2/sub1/aaaaaa.txt', 'dir2/sub1/d.txt',
-        'dir3/deeper/sub1/a.txt'}),
+        'dir3/deeper/sub1/a.txt'], []),
       ('MiddleNotRecursiveEndRecursive', '*/sub1/**',
-       {'dir1/sub1/a.txt', 'dir1/sub1/aab.txt',
-        'dir2/sub1/aaaaaa.txt', 'dir2/sub1/d.txt'}),
+       ['dir1/sub1/a.txt', 'dir1/sub1/aab.txt',
+        'dir2/sub1/aaaaaa.txt', 'dir2/sub1/d.txt'], []),
       ('SingleChar', 'dir1/sub?/?.txt',
-       {'dir1/sub1/a.txt', 'dir1/sub2/c.txt'}),
+       ['dir1/sub1/a.txt', 'dir1/sub2/c.txt'], []),
       ('CharRange', '**/[a-b].txt',
-       {'dir1/sub1/a.txt', 'dir3/deeper/sub1/a.txt',
-        'dir3/deeper/sub2/b.txt'}),
+       ['dir1/sub1/a.txt', 'dir3/deeper/sub1/a.txt',
+        'dir3/deeper/sub2/b.txt'], []),
       ('Root', '**/[a-b].txt',
-       {'dir1/sub1/a.txt', 'dir3/deeper/sub1/a.txt',
-        'dir3/deeper/sub2/b.txt'}),
-      ('WrongDoubleStar', 'd**/[a-b].txt', set()),
+       ['dir1/sub1/a.txt', 'dir3/deeper/sub1/a.txt',
+        'dir3/deeper/sub2/b.txt'], []),
+      ('WrongDoubleStar', 'd**/[a-b].txt', [], []),
       ('StarDoubleStar', 'd*/**/[a-b].txt',
-       {'dir1/sub1/a.txt', 'dir3/deeper/sub1/a.txt',
-        'dir3/deeper/sub2/b.txt'}),
-      ('DoubleSlash', 'dir1//sub*/a.txt', {'dir1/sub1/a.txt',}),
-      ('Dot', 'dir1/./sub*/a.txt', {'dir1/sub1/a.txt'}),
+       ['dir1/sub1/a.txt', 'dir3/deeper/sub1/a.txt',
+        'dir3/deeper/sub2/b.txt'], []),
+      ('DoubleSlash', 'dir1//sub*/a.txt', ['dir1/sub1/a.txt'], []),
+      ('Dot', 'dir1/./sub*/a.txt', ['dir1/sub1/a.txt'], []),
       ('DotDot', 'dir1/../dir2/**/?.txt',
-       {'dir2/sub1/d.txt', 'dir2/sub2/e.txt'}),
+       ['dir2/sub1/d.txt', 'dir2/sub2/e.txt'], []),
   ])
-  def testGlob(self, pattern, expected):
-    for include_directories in [True, False]:
-      actual = self.expander.ExpandPath(
-          os.path.join(self.root_path, pattern),
-          include_directories=include_directories)
-      processed_expected = set(expected)
-      if not include_directories:
-        processed_expected = {p for p in processed_expected
-                              if not p.endswith('/')}
-      processed_expected = {os.path.join(self.root_path, p.replace('/', os.sep))
-                            for p in processed_expected}
-      self.assertEqual(actual, processed_expected)
+  def testGlob(self, pattern, expected_files, expected_dirs):
+    processed_pattern = pattern.replace('/', os.sep)
+    (actual_files, actual_dirs) = self.expander.ExpandPath(
+        os.path.join(self.root_path, processed_pattern))
+    processed_expected_files = {
+        os.path.join(self.root_path, p.replace('/', os.sep))
+        for p in expected_files}
+    processed_expected_dirs = {
+        os.path.join(self.root_path, p.replace('/', os.sep))
+        for p in expected_dirs}
+    self.assertEqual(actual_files, processed_expected_files)
+    self.assertEqual(actual_dirs, processed_expected_dirs)
 
 
 class GcsExpansionTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
@@ -182,77 +181,69 @@ class GcsExpansionTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
     self.assertEqual(self.expander.IsDir('gs://bucket3'), False)
 
   @parameterized.named_parameters([
-      ('DirNoExpansion', 'gs://bucket1/dir1', {'gs://bucket1/dir1/'}),
-      ('SubDirNoExpansion', 'gs://bucket1/dir1/sub1',
-       {'gs://bucket1/dir1/sub1/'}),
+      ('DirNoExpansion', 'gs://bucket1/dir1', [], ['gs://bucket1/dir1/']),
+      ('SubDirNoExpansion', 'gs://bucket1/dir1/sub1', [],
+       ['gs://bucket1/dir1/sub1/']),
       ('FileNoExpansion', 'gs://bucket1/dir1/sub1/a.txt',
-       {'gs://bucket1/dir1/sub1/a.txt'}),
-      ('NonExistingNoExpansion', 'gs://bucket1/dir1/sub1/asdf', set()),
+       ['gs://bucket1/dir1/sub1/a.txt'], []),
+      ('NonExistingNoExpansion', 'gs://bucket1/dir1/sub1/asdf', [], []),
       ('EndOnlyWildcard', 'gs://bucket1/dir1/sub1/*',
-       {'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt'}),
+       ['gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt'], []),
       ('EndMultipleWildcard', 'gs://bucket1/dir1/sub1/*b*',
-       {'gs://bucket1/dir1/sub1/aab.txt'}),
+       ['gs://bucket1/dir1/sub1/aab.txt'], []),
       ('EndRecursive', 'gs://bucket1/dir1/sub1/**',
-       {'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt'}),
+       ['gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt'], []),
       ('EndRecursiveHigher', 'gs://bucket1/dir1/**',
-       {'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt',
-        'gs://bucket1/dir1/sub2/aaaa.txt', 'gs://bucket1/dir1/sub2/c.txt',
-        'gs://bucket1/dir1/sub1/', 'gs://bucket1/dir1/sub2/'}),
+       ['gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt',
+        'gs://bucket1/dir1/sub2/aaaa.txt', 'gs://bucket1/dir1/sub2/c.txt'], []),
       ('EndRecursiveAfterBucket', 'gs://bucket1/**',
-       {'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt',
+       ['gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt',
         'gs://bucket1/dir1/sub2/aaaa.txt', 'gs://bucket1/dir1/sub2/c.txt',
-        'gs://bucket1/dir1/sub1/', 'gs://bucket1/dir1/sub2/',
         'gs://bucket1/dir2/sub1/aaaaaa.txt', 'gs://bucket1/dir2/sub1/d.txt',
         'gs://bucket1/dir2/sub2/aaaaaaaa.txt', 'gs://bucket1/dir2/sub2/e.txt',
         'gs://bucket1/dir3/deeper/sub1/a.txt',
-        'gs://bucket1/dir3/deeper/sub2/b.txt',
-        'gs://bucket1/dir1/', 'gs://bucket1/dir2/sub2/', 'gs://bucket1/dir3/',
-        'gs://bucket1/dir2/sub1/', 'gs://bucket1/dir3/deeper/',
-        'gs://bucket1/dir3/deeper/sub1/', 'gs://bucket1/dir3/deeper/sub2/',
-        'gs://bucket1/dir2/'}),
-      ('MiddleRecursive', 'gs://bucket1/**/sub1',
-       {'gs://bucket1/dir1/sub1/', 'gs://bucket1/dir2/sub1/',
-        'gs://bucket1/dir3/deeper/sub1/'}),
-      ('MiddleNotRecursive', 'gs://bucket1/*/sub1',
-       {'gs://bucket1/dir1/sub1/', 'gs://bucket1/dir2/sub1/'}),
+        'gs://bucket1/dir3/deeper/sub2/b.txt'], []),
+      ('MiddleRecursive', 'gs://bucket1/**/sub1', [],
+       ['gs://bucket1/dir1/sub1/', 'gs://bucket1/dir2/sub1/',
+        'gs://bucket1/dir3/deeper/sub1/']),
+      ('MiddleNotRecursive', 'gs://bucket1/*/sub1', [],
+       ['gs://bucket1/dir1/sub1/', 'gs://bucket1/dir2/sub1/']),
       ('MiddleEndRecursive', 'gs://bucket1/**/sub1/**',
-       {'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt',
+       ['gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt',
         'gs://bucket1/dir2/sub1/aaaaaa.txt', 'gs://bucket1/dir2/sub1/d.txt',
-        'gs://bucket1/dir3/deeper/sub1/a.txt'}),
+        'gs://bucket1/dir3/deeper/sub1/a.txt'], []),
       ('MiddleNotRecursiveEndRecursive', 'gs://bucket1/*/sub1/**',
-       {'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt',
-        'gs://bucket1/dir2/sub1/aaaaaa.txt', 'gs://bucket1/dir2/sub1/d.txt'}),
+       ['gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt',
+        'gs://bucket1/dir2/sub1/aaaaaa.txt', 'gs://bucket1/dir2/sub1/d.txt'],
+       []),
       ('SingleChar', 'gs://bucket1/dir1/sub?/?.txt',
-       {'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub2/c.txt'}),
+       ['gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub2/c.txt'], []),
       ('CharRange', 'gs://bucket1/**/[a-b].txt',
-       {'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir3/deeper/sub1/a.txt',
-        'gs://bucket1/dir3/deeper/sub2/b.txt'}),
+       ['gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir3/deeper/sub1/a.txt',
+        'gs://bucket1/dir3/deeper/sub2/b.txt'], []),
       ('DoubleSlash', 'gs://bucket1/dir1//sub*/a.txt',
-       {'gs://bucket1/dir1/sub1/a.txt'}),
+       ['gs://bucket1/dir1/sub1/a.txt'], []),
       # '.' and '..' are valid identifiers in GCS so this should be an exact
       # match only.
-      ('Dot', 'gs://bucket1/dir1/./sub*/a.txt', set()),
-      ('DotDot', 'gs://bucket1/dir1/../sub*/a.txt', set()),
+      ('Dot', 'gs://bucket1/dir1/./sub*/a.txt', [], []),
+      ('DotDot', 'gs://bucket1/dir1/../sub*/a.txt', [], []),
   ])
-  def testGlob(self, pattern, expected):
+  def testGlob(self, pattern, expected_files, expected_dirs):
     self.client.objects.List.Expect(
         self.messages.StorageObjectsListRequest(bucket='bucket1'),
         self.bucket1_resp)
-    for include_directories in [True, False]:
-      actual = self.expander.ExpandPath(pattern,
-                                        include_directories=include_directories)
-      self.assertEqual(
-          actual,
-          {p for p in expected if include_directories or not p.endswith('/')})
+    (actual_files, actual_dirs) = self.expander.ExpandPath(pattern)
+    self.assertEqual(actual_files, set(expected_files))
+    self.assertEqual(actual_dirs, set(expected_dirs))
 
   @parameterized.named_parameters([
       ('Root', 'gs://**/[a-b].txt',
-       {'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir3/deeper/sub1/a.txt',
+       ['gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir3/deeper/sub1/a.txt',
         'gs://bucket1/dir3/deeper/sub2/b.txt', 'gs://bucket2/dir1/sub1/a.txt',
         'gs://bucket2/dir3/deeper/sub1/a.txt',
-        'gs://bucket2/dir3/deeper/sub2/b.txt'}),
+        'gs://bucket2/dir3/deeper/sub2/b.txt'], []),
   ])
-  def testGlobBuckets(self, pattern, expected):
+  def testGlobBuckets(self, pattern, expected_files, expected_dirs):
     self.client.buckets.List.Expect(
         self.messages.StorageBucketsListRequest(project=self.project),
         self.buckets_response)
@@ -262,8 +253,25 @@ class GcsExpansionTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
     self.client.objects.List.Expect(
         self.messages.StorageObjectsListRequest(bucket='bucket2'),
         self.bucket1_resp)
-    actual = self.expander.ExpandPath(pattern)
-    self.assertEqual(actual, expected)
+    (actual_files, actual_dirs) = self.expander.ExpandPath(pattern)
+    self.assertEqual(actual_files, set(expected_files))
+    self.assertEqual(actual_dirs, set(expected_dirs))
+
+  def testObjectDetails(self):
+    self.client.objects.List.Expect(
+        self.messages.StorageObjectsListRequest(bucket='bucket1'),
+        self.bucket1_resp)
+    # Just load the object details.
+    self.expander.ExpandPath('gs://bucket1/**')
+    details = self.expander.GetSortedObjectDetails(
+        {'gs://bucket1/dir1/sub2/aaaa.txt', 'gs://bucket1/dir1/sub1/a.txt',
+         'gs://bucket1/dir1/sub1', 'gs://bucket1/dir1/sub1/aab.txt',
+         'gs://bucket1/dir1/sub2'})
+    self.assertEqual(
+        ['gs://bucket1/dir1/sub1/', 'gs://bucket1/dir1/sub2/',
+         'gs://bucket1/dir1/sub1/a.txt', 'gs://bucket1/dir1/sub1/aab.txt',
+         'gs://bucket1/dir1/sub2/aaaa.txt'],
+        [d['path'] for d in details])
 
 
 if __name__ == '__main__':

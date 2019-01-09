@@ -28,11 +28,13 @@ class ConceptArgsTestBase(concepts_test_base.GenericConceptsTestBase):
 
   def SetUp(self):
     self.string_concept = concepts.String(
-        name='c', help_text='help')
+        name='c', help_text='String concept help.')
     self.fallthrough_concept = concepts.String(
-        name='c', help_text='help', fallthroughs=[self.fallthrough])
-    self.group_arg_concept = test_concepts.DoubleFooBar(help_text='help')
+        name='c', help_text='String concept with fallthrough help.',
+        fallthroughs=[self.fallthrough])
+    self.group_arg_concept = test_concepts.MakeDoubleFooBar(
+        'baz', 'Group concept help.')
     self.integer_concept = concepts.Integer(
-        name='int', help_text='help')
+        name='int', help_text='Integer concept help.')
     self.day_of_week_concept = concepts.DayOfWeek(
-        name='foo-day', help_text='help')
+        name='foo-day', help_text='Day of Week concept help.')

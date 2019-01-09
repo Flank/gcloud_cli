@@ -46,21 +46,35 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
         project=self.project_name,
         zone=self.zone_name)
 
-  def _getPatchRequestStub(self, stateful_policy=None):
+  def _getPatchRequestStub(self,
+                           stateful_policy=None,
+                           autohealing_policies=None):
+    igm_resource = self.messages.InstanceGroupManager()
+    if stateful_policy is not None:
+      igm_resource.statefulPolicy = stateful_policy
+    if autohealing_policies is not None:
+      igm_resource.autoHealingPolicies = autohealing_policies
     return self.messages.ComputeInstanceGroupManagersPatchRequest(
         instanceGroupManager=self.igm_name,
-        instanceGroupManagerResource=(
-            self.messages.InstanceGroupManager(statefulPolicy=stateful_policy)),
+        instanceGroupManagerResource=igm_resource,
         project=self.project_name,
         zone=self.zone_name)
 
-  def _getUpdateRequestStub(self, stateful_policy=None):
-    return self.messages.ComputeInstanceGroupManagersUpdateRequest(
-        instanceGroupManager=self.igm_name,
-        instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+  def _getUpdateRequestStub(self,
+                            stateful_policy=None,
+                            autohealing_policies=None):
+    igm_resource = (
+        self.messages.InstanceGroupManager(
             name=self.igm_name,
             zone=self.zone_name,
-            statefulPolicy=stateful_policy)),
+            # Update can be only send when we need to modify StatefulPolicy
+            # so it's always set.
+            statefulPolicy=stateful_policy))
+    if autohealing_policies is not None:
+      igm_resource.autoHealingPolicies = autohealing_policies
+    return self.messages.ComputeInstanceGroupManagersUpdateRequest(
+        instanceGroupManager=self.igm_name,
+        instanceGroupManagerResource=igm_resource,
         project=self.project_name,
         zone=self.zone_name)
 
@@ -74,26 +88,73 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
           ])
     return self.messages.StatefulPolicy(preservedResources=preserved_resources)
 
-  def _checkGetAndPatchRequests(self, disks):
-    self.CheckRequests([(self.compute.instanceGroupManagers, 'Get',
-                         self._getGetRequestStub())],
-                       [(self.compute.instanceGroupManagers, 'Patch',
-                         self._getPatchRequestStub(
-                             self._getStatefulPolicyWithDisks(disks)))])
+  def _getAutohealingPolicy(self, health_check, initial_delay):
+    return self.messages.InstanceGroupManagerAutoHealingPolicy(
+        healthCheck=health_check, initialDelaySec=initial_delay)
 
-  def _checkGetAndUpdateRequests(self, with_empty_stateful_policy=False):
+  def _checkGetAndPatchRequests(self,
+                                disks=None,
+                                health_check=None,
+                                initial_delay=None,
+                                clear_autohealing=False):
+    autohealing_policies = None
+    if clear_autohealing or \
+        health_check is not None or initial_delay is not None:
+      autohealing_policies = [
+          self.messages.InstanceGroupManagerAutoHealingPolicy()
+      ]
+      if health_check:
+        autohealing_policies[0].healthCheck = health_check
+      if initial_delay:
+        autohealing_policies[0].initialDelaySec = initial_delay
+
+    stateful_policy = None
+    if disks is not None:
+      stateful_policy = self._getStatefulPolicyWithDisks(disks)
+
+    self.CheckRequests([
+        (self.compute.instanceGroupManagers, 'Get', self._getGetRequestStub())
+    ], [(self.compute.instanceGroupManagers, 'Patch',
+         self._getPatchRequestStub(stateful_policy, autohealing_policies))])
+
+  def _checkGetAndUpdateRequests(self,
+                                 with_empty_stateful_policy=False,
+                                 health_check=None,
+                                 initial_delay=None):
     stateful_policy = None
     if with_empty_stateful_policy:
       stateful_policy = self._getStatefulPolicyWithDisks()
-    self.CheckRequests([(self.compute.instanceGroupManagers, 'Get',
-                         self._getGetRequestStub())],
-                       [(self.compute.instanceGroupManagers, 'Update',
-                         self._getUpdateRequestStub(stateful_policy))])
+    autohealing_policies = None
+    if health_check is not None or initial_delay is not None:
+      autohealing_policies = [
+          self.messages.InstanceGroupManagerAutoHealingPolicy()
+      ]
+      if health_check:
+        autohealing_policies[0].healthCheck = health_check
+      if initial_delay:
+        autohealing_policies[0].initialDelaySec = initial_delay
+
+    self.CheckRequests([
+        (self.compute.instanceGroupManagers, 'Get', self._getGetRequestStub())
+    ], [(self.compute.instanceGroupManagers, 'Update',
+         self._getUpdateRequestStub(stateful_policy, autohealing_policies))])
 
   def _setInitialIgmNoStatefulPolicy(self):
     igm = self.messages.InstanceGroupManager(
         name='group-1',
         zone=self.zone_name,
+    )
+    self.make_requests.side_effect = iter([[
+        igm,
+    ], []])
+
+  def _setInitialIgmWithAutohealingPolicy(self, health_check, initial_delay):
+    igm = self.messages.InstanceGroupManager(
+        name='group-1',
+        zone=self.zone_name,
+        autoHealingPolicies=[
+            self._getAutohealingPolicy(health_check, initial_delay)
+        ],
     )
     self.make_requests.side_effect = iter([[
         igm,
@@ -345,6 +406,133 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
       self.Run("""compute instance-groups managed update group-1 --{} {}"""
                .format(*self.scope_params))
 
+  def testUpdateWithHealthCheck(self):
+    self._setInitialIgmNoStatefulPolicy()
+
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --health-check health-check-1
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(health_check=health_check_uri)
+
+  def testUpdateWithHttpHealthCheck(self):
+    self._setInitialIgmNoStatefulPolicy()
+
+    health_check_uri = (
+        '{0}/projects/my-project/global/httpHealthChecks/health-check-1'.format(
+            self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --http-health-check health-check-1
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(health_check=health_check_uri)
+
+  def testUpdateWithHttpsHealthCheck(self):
+    self._setInitialIgmNoStatefulPolicy()
+
+    health_check_uri = (
+        '{0}/projects/my-project/global/httpsHealthChecks/health-check-1'
+        .format(self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --https-health-check health-check-1
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(health_check=health_check_uri)
+
+  def testUpdateWithTwoHealthChecks(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --http-health-check: At most one of --health-check | '
+        '--http-health-check | --https-health-check may be specified.'):
+      self.Run("""
+          compute instance-groups managed set-autohealing group-1
+            --{} {}
+            --http-health-check health-check-1
+            --https-health-check health-check-2
+          """.format(*self.scope_params))
+
+  def testUpdateWithInitialDelay_patchSemantics(self):
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
+
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --initial-delay 10m
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(
+        health_check=health_check_uri, initial_delay=10 * 60)
+
+  def testUpdateWithHealthCheck_patchSemantics(self):
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
+
+    health_check_uri2 = (
+        '{0}/projects/my-project/global/healthChecks/health-check-2'.format(
+            self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --health-check health-check-2
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(
+        health_check=health_check_uri2, initial_delay=120)
+
+  def testUpdateWithClearAutohealing(self):
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
+
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --clear-autohealing
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(clear_autohealing=True)
+
+  def testUpdateWithHealthCheckAndStatefulDisk(self):
+    self._setInitialIgmNoStatefulPolicy()
+
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --health-check health-check-1
+        --add-stateful-disks disk-1
+        """.format(*self.scope_params))
+    self._checkGetAndPatchRequests(
+        disks=['disk-1'], health_check=health_check_uri)
+
+  def testUpdateWithHealthCheckAndNoStatefulNames(self):
+    health_check_uri = (
+        '{0}/projects/my-project/global/healthChecks/health-check-1'.format(
+            self.compute_uri))
+    self._setInitialIgmWithAutohealingPolicy(health_check_uri, 120)
+
+    health_check_uri2 = (
+        '{0}/projects/my-project/global/healthChecks/health-check-2'.format(
+            self.compute_uri))
+    self.Run("""
+        compute instance-groups managed update group-1
+        --{} {}
+        --health-check health-check-2
+        --no-stateful-names
+        """.format(*self.scope_params))
+    self._checkGetAndUpdateRequests(
+        health_check=health_check_uri2, initial_delay=120)
+
 
 class InstanceGroupManagersUpdateRegionalTest(
     InstanceGroupManagersUpdateZonalTest):
@@ -364,45 +552,96 @@ class InstanceGroupManagersUpdateRegionalTest(
         project=self.project_name,
         region=self.region_name)
 
-  def _getPatchRequestStub(self, stateful_policy=None, update_policy=None):
+  def _getPatchRequestStub(self,
+                           stateful_policy=None,
+                           update_policy=None,
+                           autohealing_policies=None):
+    igm_resource = self.messages.InstanceGroupManager(
+        updatePolicy=update_policy)
+    if stateful_policy is not None:
+      igm_resource.statefulPolicy = stateful_policy
+    if autohealing_policies is not None:
+      igm_resource.autoHealingPolicies = autohealing_policies
     return self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
         instanceGroupManager=self.igm_name,
-        instanceGroupManagerResource=(self.messages.InstanceGroupManager(
-            statefulPolicy=stateful_policy, updatePolicy=update_policy)),
+        instanceGroupManagerResource=igm_resource,
         project=self.project_name,
         region=self.region_name)
 
-  def _getUpdateRequestStub(self, stateful_policy=None, update_policy=None):
-    return self.messages.ComputeRegionInstanceGroupManagersUpdateRequest(
-        instanceGroupManager=self.igm_name,
-        instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+  def _getUpdateRequestStub(self,
+                            stateful_policy=None,
+                            update_policy=None,
+                            autohealing_policies=None):
+    igm_resource = (
+        self.messages.InstanceGroupManager(
             name=self.igm_name,
             region=self.region_name,
+            # Update can be only send when we need to modify StatefulPolicy
+            # so it's always set.
             statefulPolicy=stateful_policy,
-            updatePolicy=update_policy)),
+            updatePolicy=update_policy))
+    if autohealing_policies is not None:
+      igm_resource.autoHealingPolicies = autohealing_policies
+
+    return self.messages.ComputeRegionInstanceGroupManagersUpdateRequest(
+        instanceGroupManager=self.igm_name,
+        instanceGroupManagerResource=igm_resource,
         project=self.project_name,
         region=self.region_name)
 
-  def _checkGetAndPatchRequests(self, disks, update_policy=None):
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'Get',
-          self._getGetRequestStub())],
-        [(self.compute.regionInstanceGroupManagers, 'Patch',
-          self._getPatchRequestStub(
-              stateful_policy=self._getStatefulPolicyWithDisks(disks),
-              update_policy=update_policy))])
+  def _checkGetAndPatchRequests(self,
+                                disks=None,
+                                update_policy=None,
+                                health_check=None,
+                                initial_delay=None,
+                                clear_autohealing=False):
+    autohealing_policies = None
+    if clear_autohealing or \
+        health_check is not None or initial_delay is not None:
+      autohealing_policies = [
+          self.messages.InstanceGroupManagerAutoHealingPolicy()
+      ]
+      if health_check:
+        autohealing_policies[0].healthCheck = health_check
+      if initial_delay:
+        autohealing_policies[0].initialDelaySec = initial_delay
+
+    stateful_policy = None
+    if disks is not None:
+      stateful_policy = self._getStatefulPolicyWithDisks(disks)
+
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Get',
+                         self._getGetRequestStub())],
+                       [(self.compute.regionInstanceGroupManagers, 'Patch',
+                         self._getPatchRequestStub(
+                             stateful_policy=stateful_policy,
+                             update_policy=update_policy,
+                             autohealing_policies=autohealing_policies))])
 
   def _checkGetAndUpdateRequests(self,
                                  with_empty_stateful_policy=False,
-                                 update_policy=None):
+                                 update_policy=None,
+                                 health_check=None,
+                                 initial_delay=None):
     stateful_policy = None
     if with_empty_stateful_policy:
       stateful_policy = self._getStatefulPolicyWithDisks()
+    autohealing_policies = None
+    if health_check is not None or initial_delay is not None:
+      autohealing_policies = [
+          self.messages.InstanceGroupManagerAutoHealingPolicy()
+      ]
+      if health_check:
+        autohealing_policies[0].healthCheck = health_check
+      if initial_delay:
+        autohealing_policies[0].initialDelaySec = initial_delay
+
     self.CheckRequests(
         [(self.compute.regionInstanceGroupManagers, 'Get',
           self._getGetRequestStub())],
         [(self.compute.regionInstanceGroupManagers, 'Update',
-          self._getUpdateRequestStub(stateful_policy, update_policy))])
+          self._getUpdateRequestStub(stateful_policy, update_policy,
+                                     autohealing_policies))])
 
   def _setInitialIgmNoStatefulPolicy(self):
     igm = self.messages.InstanceGroupManager(
@@ -418,6 +657,18 @@ class InstanceGroupManagersUpdateRegionalTest(
         name='group-1',
         region=self.region_name,
         statefulPolicy=self._getStatefulPolicyWithDisks(list(disks)),
+    )
+    self.make_requests.side_effect = iter([[
+        igm,
+    ], []])
+
+  def _setInitialIgmWithAutohealingPolicy(self, health_check, initial_delay):
+    igm = self.messages.InstanceGroupManager(
+        name='group-1',
+        region=self.region_name,
+        autoHealingPolicies=[
+            self._getAutohealingPolicy(health_check, initial_delay)
+        ],
     )
     self.make_requests.side_effect = iter([[
         igm,

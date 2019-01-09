@@ -25,6 +25,9 @@ GROUPS
      cli-trees
         CLI trees manager.
 
+     flag-coverage-tree
+        Cloud meta introspection commands.
+
      resources
         Cloud SDK resource parser test commands.
 

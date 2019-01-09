@@ -11,7 +11,7 @@ gcloud compute addresses create \- reserve IP addresses
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute addresses create\fR [\fINAME\fR\ ...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-addresses\fR=\fIADDRESS\fR,[\fIADDRESS\fR,...]\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute addresses create\fR [\fINAME\fR\ ...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-prefix\-length\fR=\fIPREFIX_LENGTH\fR] [\fB\-\-purpose\fR=\fIPURPOSE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-addresses\fR=\fIADDRESS\fR,[\fIADDRESS\fR,...]\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -21,7 +21,7 @@ gcloud compute addresses create \- reserve IP addresses
 addresses. Once an IP address is reserved, it will be associated with the
 project until it is released using 'gcloud compute addresses delete'. Ephemeral
 IP addresses that are in use by resources in the project can be reserved using
-the \f5\-\-addresses\fR flag.
+the '\-\-addresses' flag.
 
 
 
@@ -44,10 +44,29 @@ Names of the addresses to create.
 An optional textual description for the addresses.
 
 .TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+If specified, the network resource in which the address(es) should be reserved.
+
+This is only available for global internal address, which represents an internal
+IP range reservation from within the network.
+
+.TP 2m
 \fB\-\-network\-tier\fR=\fINETWORK_TIER\fR
 The network tier to assign to the reserved IP addresses.
 \f5\fINETWORK_TIER\fR\fR must be one of: \f5PREMIUM\fR, \f5STANDARD\fR. The
 default value is \f5PREMIUM\fR.
+
+.TP 2m
+\fB\-\-prefix\-length\fR=\fIPREFIX_LENGTH\fR
+The prefix length of the IP range. It must be a value between 8 and 30
+inclusive. If not present, it means the address field is a single IP address.
+
+This field is not applicable to external addresses.
+
+.TP 2m
+\fB\-\-purpose\fR=\fIPURPOSE\fR
+The purpose of the address resource. This field is not applicable to external
+addresses. \fIPURPOSE\fR must be one of: \fBVPC_PEERING\fR, \fBGCE_ENDPOINT\fR.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
@@ -118,7 +137,7 @@ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To reserve three IP addresses in the \f5us\-central1\fR region, run:
+To reserve three IP addresses in the 'us\-central1' region, run:
 
 .RS 2m
 $ gcloud compute addresses create ADDRESS\-1 ADDRESS\-2 ADDRESS\-3 \e
@@ -126,7 +145,7 @@ $ gcloud compute addresses create ADDRESS\-1 ADDRESS\-2 ADDRESS\-3 \e
 .RE
 
 To reserve ephemeral IP addresses 162.222.181.198 and 23.251.146.189 which are
-being used by virtual machine instances in the \f5us\-central1\fR region, run:
+being used by virtual machine instances in the 'us\-central1' region, run:
 
 .RS 2m
 $ gcloud compute addresses create \e
@@ -135,12 +154,30 @@ $ gcloud compute addresses create \e
 
 In the above invocation, the two addresses will be assigned random names.
 
-To reserve an IP address from the subnet \f5\fIdefault\fR\fR in the
-\f5\fIus\-central1\fR\fR region, run:
+To reserve an IP address from the subnet 'default' in the 'us\-central1' region,
+run:
 
 .RS 2m
 $ gcloud compute addresses create SUBNET\-ADDRESS\-1 \e
     \-\-region us\-central1 \-\-subnet default
+.RE
+
+To reserve an IP range 10.110.0.0/16 from the network 'default' for VPC_PEERING,
+run:
+
+.RS 2m
+$ gcloud compute addresses create IP\-RANGE\-1 \-\-global \e
+    \-\-addresses 10.110.0.0 \-\-prefix\-length 16
+\-\-purpose VPC_PEERING \-\-network default
+.RE
+
+To reserve any IP range with prefix length 16 from the network 'default' for
+VPC_PEERING, run:
+
+.RS 2m
+$ gcloud compute addresses create IP\-RANGE\-1 \-\-global \e
+    \-\-prefix\-length 16 \-\-purpose VPC_PEERING
+\-\-network default
 .RE
 
 

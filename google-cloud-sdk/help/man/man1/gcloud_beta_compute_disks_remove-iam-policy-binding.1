@@ -5,20 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute disks remove\-iam\-policy\-binding \- remove IAM policy binding for a disk
+gcloud beta compute disks remove\-iam\-policy\-binding \- remove IAM policy binding of a Google Compute Engine disk
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute disks remove\-iam\-policy\-binding\fR \fIDISK_NAME\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute disks remove\-iam\-policy\-binding\fR (\fIDISK\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR \fBgcloud beta compute disks remove\-iam\-policy\-binding\fR
-removes an IAM policy binding from a Google Compute Engine disk's access policy.
+\fB(BETA)\fR Remove an IAM policy binding of a Google Compute Engine disk.
 
 
 
@@ -26,10 +25,26 @@ removes an IAM policy binding from a Google Compute Engine disk's access policy.
 
 .RS 2m
 .TP 2m
-\fIDISK_NAME\fR
-Name of the disk to remove the IAM policy binding from.
+
+Disk resource \- The disk for which to remove IAM policy binding from. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [disk] on the
+command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDISK\fR
+ID of the disk or fully qualified identifier for the disk. This positional must
+be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The name of the Google Compute Engine zone.
 
 
+.RE
 .RE
 .sp
 
@@ -66,41 +81,6 @@ The role to remove the member from.
 .RE
 .sp
 
-.SH "OPTIONAL FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-zone\fR=\fIZONE\fR
-Zone of the disk to remove the IAM policy binding from. If not specified and the
-\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
-zone.
-
-To avoid prompting when this flag is omitted, you can set the
-\f5\fIcompute/zone\fR\fR property:
-
-.RS 2m
-$ gcloud config set compute/zone ZONE
-.RE
-
-A list of zones can be fetched by running:
-
-.RS 2m
-$ gcloud compute zones list
-.RE
-
-To unset the property, run:
-
-.RS 2m
-$ gcloud config unset compute/zone
-.RE
-
-Alternatively, the zone can be stored in the environment variable
-\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
-
-
-.RE
-.sp
-
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
@@ -110,23 +90,22 @@ gcloud help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/beta\fR API. The full documentation for this
+API can be found at:
+https://developers.google.com/compute/docs/reference/latest/
+
+
+
 .SH "EXAMPLES"
 
 To remove an IAM policy binding for the role of 'roles/compute.securityAdmin'
-for the user 'test\-user@gmail.com' on disk with identifier 'my\-disk', run:
+for the user 'test\-user@gmail.com' with disk 'my\-disk' and zone 'ZONE', run:
 
 .RS 2m
 $ gcloud beta compute disks remove\-iam\-policy\-binding my\-disk \e
-    \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/compute.securityAdmin'
-.RE
-
-To remove an IAM policy binding for the role of 'roles/compute.securityAdmin'
-from all authenticated users on disk 'my\-disk', run:
-
-.RS 2m
-$ gcloud beta compute disks remove\-iam\-policy\-binding my\-disk \e
-    \-\-member='allAuthenticatedUsers' \e
+    \-\-zone='ZONE' \-\-member='user:test\-user@gmail.com' \e
     \-\-role='roles/compute.securityAdmin'
 .RE
 

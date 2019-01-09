@@ -36,7 +36,7 @@ class DescribeTest(base.ServerlessSurfaceBase,
         self.mock_serverless_client, 'us-central1.fake-project')
     self.fake_revision.name = '12345'
     self.fake_revision.metadata.creationTimestamp = '2018/01/01 00:00:00'
-    self.fake_revision.labels[revision.AUTHOR_LABEL] = 'Tom'
+    self.fake_revision.annotations[revision.AUTHOR_ANNOTATION] = 'Tom'
     self.fake_revision.labels[build_template.VERSION_LABEL] = '8.0'
     self.fake_revision.labels[build_template.LANGUAGE_LABEL] = 'Node'
     self.fake_revision.spec.container.env = [

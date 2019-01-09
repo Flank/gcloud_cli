@@ -3,19 +3,23 @@ NAME
         binding for an organization
 
 SYNOPSIS
-    gcloud alpha organizations remove-iam-policy-binding ORGANIZATION_ID
+    gcloud alpha organizations remove-iam-policy-binding ORGANIZATION
         --member=MEMBER --role=ROLE
         [--all | --condition=[KEY=VALUE,...]
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Removes a policy binding to the IAM policy of an organization,
+    (ALPHA) Removes a policy binding from the IAM policy of an organization,
     given an organization ID and the binding. One binding consists of a member,
     a role, and an optional condition.
 
 POSITIONAL ARGUMENTS
-     ORGANIZATION_ID
-        ID for the organization whose IAM binding you want to remove.
+     Organization resource - The organization to remove the IAM policy binding.
+     This represents a Cloud resource. This must be specified.
+
+       ORGANIZATION
+          ID of the organization or fully qualified identifier for the
+          organization.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -74,21 +78,25 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+API REFERENCE
+    This command uses the cloudresourcemanager/v1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/resource-manager
+
 EXAMPLES
     To remove an IAM policy binding for the role of 'roles/editor' for the user
     'test-user@gmail.com' on organization with identifier
     'example-organization-id-1', run:
 
         $ gcloud alpha organizations remove-iam-policy-binding \
-            example-organization-id-1 --member='user:test-user@gmail.com' \
-            --role='roles/editor'
+          example-organization-id-1 --member='user:test-user@gmail.com' \
+          --role='roles/editor'
 
     To remove an IAM policy binding for the role of 'roles/editor' from all
     authenticated users on organization 'example-organization-id-1', run:
 
         $ gcloud alpha organizations remove-iam-policy-binding \
-            example-organization-id-1 --member='allAuthenticatedUsers' \
-            --role='roles/editor'
+          example-organization-id-1 --member='allAuthenticatedUsers' \
+          --role='roles/editor'
 
     To remove an IAM policy binding with a condition of
     expression='request.time < timestamp("2019-01-01T00:00:00Z")',
@@ -98,10 +106,10 @@ EXAMPLES
     'example-organization-id-1', run:
 
         $ gcloud alpha organizations remove-iam-policy-binding \
-            example-organization-id-1 --member='user:test-user@gmail.com' \
-            --role='roles/browser' \
-            --condition='expression=request.time <
-         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+          example-organization-id-1 --member='user:test-user@gmail.com' \
+          --role='roles/browser' \
+          --condition='expression=request.time <
+        timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
         tion=Expires at midnight on 2018-12-31'
 
     To remove all IAM policy bindings regardless of the condition for the role
@@ -109,8 +117,8 @@ EXAMPLES
     with identifier 'example-organization-id-1', run:
 
         $ gcloud alpha organizations remove-iam-policy-binding \
-            example-organization-id-1 --member='user:test-user@gmail.com' \
-            --role='roles/browser' --all
+          example-organization-id-1 --member='user:test-user@gmail.com' \
+          --role='roles/browser' --all
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

@@ -1,0 +1,103 @@
+
+.TH "GCLOUD_BETA_COMPUTE_START\-IAP\-TUNNEL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute start\-iap\-tunnel \- starts an IAP TCP Fordwarding tunnel over WebSocket connection
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute start\-iap\-tunnel\fR \fIINSTANCE_NAME\fR \fIINSTANCE_PORT\fR [\fB\-\-local\-host\-port\fR=\fILOCAL_HOST_PORT\fR;\ default="localhost:0"] [\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR;\ default="nic0"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Starts a tunnel to the Cloud Identity\-Aware Proxy through which
+another process can create a connection (eg. SSH, RDP) to a Google Compute
+Engine instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIINSTANCE_NAME\fR
+Name of the instance to operate on.
+
+.TP 2m
+\fIINSTANCE_PORT\fR
+The name or number of the instance's port to connect to.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-local\-host\-port\fR=\fILOCAL_HOST_PORT\fR; default="localhost:0"
+Host:port to which the proxy should be bound.
+
+.TP 2m
+\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR; default="nic0"
+Specifies the name of the instance network interface to connect to. If this is
+not provided, then "nic0" is used as the default.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the instance to operate on. If not specified, you may be prompted to
+select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
+resources in your project. If the zone cannot be determined, you will then be
+prompted with all Google Cloud Platform zones.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute start\-iap\-tunnel
+.RE
+

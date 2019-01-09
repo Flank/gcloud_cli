@@ -87,7 +87,8 @@ FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
      --session-affinity=SESSION_AFFINITY; default="NONE"
-        The type of session affinity to use. SESSION_AFFINITY must be one of:
+        The type of TCP session affinity to use. Not supported for UDP.
+        SESSION_AFFINITY must be one of:
 
          CLIENT_IP
             Route requests to instances based on the hash of the client's IP

@@ -17,10 +17,7 @@ gcloud beta compute snapshots add\-iam\-policy\-binding \- add IAM policy bindin
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Adds IAM policy binding to the given snapshot.
-
-See https://cloud.google.com/iam/docs/managing\-policies for details of policy
-role and member types.
+\fB(BETA)\fR Add an IAM policy binding to a Google Compute Engine snapshot.
 
 
 
@@ -28,10 +25,21 @@ role and member types.
 
 .RS 2m
 .TP 2m
+
+Snapshot resource \- The snapshot for which to add IAM policy binding to. This
+represents a Cloud resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [snapshot_name] on the command line with a fully specified name;
+set the property [core/project]; provide the argument [\-\-project] on the
+command line. This must be specified.
+
+.RS 2m
+.TP 2m
 \fISNAPSHOT_NAME\fR
-Name of the snapshot to operate on.
+ID of the snapshot or fully qualified identifier for the snapshot.
 
 
+.RE
 .RE
 .sp
 
@@ -77,17 +85,27 @@ gcloud help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/beta\fR API. The full documentation for this
+API can be found at:
+https://developers.google.com/compute/docs/reference/latest/
+
+
+
 .SH "EXAMPLES"
 
-The following command will add an IAM policy binding for the role of
-\'roles/editor' for the user 'test\-user@gmail.com' on the snapshot
-\f5my_snapshot\fR:
+To add an IAM policy binding for the role of 'roles/compute.securityAdmin' for
+the user 'test\-user@gmail.com' with snapshot 'my\-snapshot', run:
 
 .RS 2m
-$ gcloud beta compute snapshots add\-iam\-policy\-binding my_snapshot \e
+$ gcloud beta compute snapshots add\-iam\-policy\-binding my\-snapshot \e
     \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/editor'
+    \-\-role='roles/compute.securityAdmin'
 .RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
 
 
 

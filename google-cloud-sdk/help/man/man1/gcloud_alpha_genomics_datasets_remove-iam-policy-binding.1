@@ -5,20 +5,20 @@
 
 .SH "NAME"
 .HP
-gcloud alpha genomics datasets remove\-iam\-policy\-binding \- remove IAM policy binding for a dataset
+gcloud alpha genomics datasets remove\-iam\-policy\-binding \- remove IAM policy binding of a genomics dataset
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha genomics datasets remove\-iam\-policy\-binding\fR \fIID\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha genomics datasets remove\-iam\-policy\-binding\fR \fIDATASET\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-all\fR\ |\ \fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR This command removes a policy binding to the IAM policy of a
-dataset, given a dataset ID and the binding.
+\fB(ALPHA)\fR Remove an IAM policy binding from the IAM policy of a genomics
+dataset. One binding consists of a member, a role, and an optional condition.
 
 
 
@@ -26,10 +26,17 @@ dataset, given a dataset ID and the binding.
 
 .RS 2m
 .TP 2m
-\fIID\fR
-The ID of the dataset.
+
+Dataset resource \- The genomics dataset for which to add IAM policy binding to.
+This represents a Cloud resource. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDATASET\fR
+ID of the dataset or fully qualified identifier for the dataset.
 
 
+.RE
 .RE
 .sp
 
@@ -66,6 +73,52 @@ The role to remove the member from.
 .RE
 .sp
 
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-all\fR
+Remove all bindings with this role and member, irrespective of any conditions.
+
+.TP 2m
+\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+
+Condition of the binding to be removed. When condition is explicitly specified
+as \f5None\fR (e.g. \-\-condition=None), it matches a binding without a
+condition. Otherwise, only the binding with a condition which exactly matches
+the specified condition (including the optional description) will be removed.
+
+.TP 2m
+\fBexpression\fR
+(Required) Expression of the condition which evaluates to True or False. This
+uses a subset of Common Expression Language syntax.
+
+.TP 2m
+\fBtitle\fR
+(Required) Title for the expression, i.e. a short string describing its purpose.
+
+.TP 2m
+\fBdescription\fR
+(Optional) Description for the expression. This is a longer text which describes
+the expression.
+
+NOTE: An unsatisfied condition will not allow access via this binding.
+
+.TP 2m
+\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR
+Path to a local JSON or YAML file that defines the condition. To see available
+fields, see the help for \f5\-\-condition\fR.
+
+
+.RE
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-configuration,
@@ -75,22 +128,44 @@ gcloud help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBgenomics/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/genomics
+
+
+
 .SH "EXAMPLES"
 
 To remove an IAM policy binding for the role of 'roles/editor' for the user
-\'test\-user@gmail.com' on dataset with identifier '1000', run:
+\'test\-user@gmail.com' on dataset 'my\-dataset', run:
 
 .RS 2m
-$ gcloud alpha genomics datasets remove\-iam\-policy\-binding 1000 \e
-    \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
+$ gcloud alpha genomics datasets remove\-iam\-policy\-binding \e
+    my\-dataset \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor'
 .RE
 
-To remove an IAM policy binding for the role of 'roles/editor' from all
-authenticated users on dataset '1000', run:
+To remove an IAM policy binding for the role of 'roles/editor' for all
+authenticated users on a dataset 'my\-dataset', run:
 
 .RS 2m
-$ gcloud alpha genomics datasets remove\-iam\-policy\-binding 1000 \e
-    \-\-member='allAuthenticatedUsers' \-\-role='roles/editor'
+$ gcloud alpha genomics datasets remove\-iam\-policy\-binding \e
+    my\-dataset \-\-member='allAuthenticatedUsers' \e
+    \-\-role='roles/editor'
+.RE
+
+To remove an IAM policy binding which expires at the end of the year 2018 for
+the role of 'roles/genomics.admin' and the user 'test\-user@gmail.com' on
+dataset 'my\-dataset', run:
+
+.RS 2m
+$ gcloud alpha genomics datasets remove\-iam\-policy\-binding \e
+    my\-dataset \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/genomics.admin' \e
+    \-\-condition='expression=request.time <
+ timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+tion=Expires at midnight on 2018\-12\-31'
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy

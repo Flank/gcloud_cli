@@ -1,18 +1,30 @@
 NAME
     gcloud beta compute disks add-iam-policy-binding - add IAM policy binding
-        for a disk
+        to a Google Compute Engine disk
 
 SYNOPSIS
-    gcloud beta compute disks add-iam-policy-binding DISK_NAME --member=MEMBER
-        --role=ROLE [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta compute disks add-iam-policy-binding (DISK : --zone=ZONE)
+        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute disks add-iam-policy-binding adds an IAM policy
-    binding to a Google Compute Engine disk's access policy.
+    (BETA) Add an IAM policy binding to a Google Compute Engine disk.
 
 POSITIONAL ARGUMENTS
-     DISK_NAME
-        Name of the disk to add the IAM policy binding to.
+     Disk resource - The disk for which to add IAM policy binding to. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [disk] on the command line with a fully specified name; set the
+     property [core/project]; provide the argument [--project] on the command
+     line. This must be specified.
+
+       DISK
+          ID of the disk or fully qualified identifier for the disk. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --zone=ZONE
+          The name of the Google Compute Engine zone.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -32,56 +44,24 @@ REQUIRED FLAGS
      --role=ROLE
         Define the role of the member.
 
-OPTIONAL FLAGS
-     --zone=ZONE
-        Zone of the disk to add the IAM policy binding to. If not specified and
-        the compute/zone property isn't set, you may be prompted to select a
-        zone.
-
-        To avoid prompting when this flag is omitted, you can set the
-        compute/zone property:
-
-            $ gcloud config set compute/zone ZONE
-
-        A list of zones can be fetched by running:
-
-            $ gcloud compute zones list
-
-        To unset the property, run:
-
-            $ gcloud config unset compute/zone
-
-        Alternatively, the zone can be stored in the environment variable
-        CLOUDSDK_COMPUTE_ZONE.
-
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+API REFERENCE
+    This command uses the compute/beta API. The full documentation for this API
+    can be found at:
+    https://developers.google.com/compute/docs/reference/latest/
+
 EXAMPLES
     To add an IAM policy binding for the role of 'roles/compute.securityAdmin'
-    for the user 'test-user@gmail.com' on a disk with identifier 'my-disk',
+    for the user 'test-user@gmail.com' with disk 'my-disk' and zone 'ZONE',
     run:
 
         $ gcloud beta compute disks add-iam-policy-binding my-disk \
-            --member='user:test-user@gmail.com' \
-            --role='roles/compute.securityAdmin'
-
-    To add an IAM policy binding for the role of 'roles/compute.securityAdmin'
-    to the service account 'test-proj1@example.domain.com', run:
-
-        $ gcloud beta compute disks add-iam-policy-binding \
-            test-proj1@example.domain.com \
-            --member='serviceAccount:test-proj1@example.domain.com' \
-            --role='roles/compute.securityAdmin'
-
-    To add an IAM policy binding for the role of 'roles/compute.securityAdmin'
-    for all authenticated users on a disk with identifier 'my-disk', run:
-
-        $ gcloud beta compute disks add-iam-policy-binding my-disk \
-            --member='allAuthenticatedUsers' \
+            --zone='ZONE' --member='user:test-user@gmail.com' \
             --role='roles/compute.securityAdmin'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of

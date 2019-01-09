@@ -1,0 +1,204 @@
+skip: !!omap
+- bug: b/121252529
+- reason: Failing
+title: Update, describe, and list single-field index settings
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/project das-fs-us-c-gcloud
+- execute:
+  - command: firestore indexes fields update myfield --collection-group $$my-collection-group$$
+      --index order=ascending --index array-config=contains --async
+  - stderr: |
+      Request issued for: [myfield]
+      Check operation [$$operation-basename$$] for status.
+      Updated field [myfield].
+  - stdout: |
+      metadata:
+        '@type': type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata
+        field: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield
+        indexConfigDeltas:
+        - changeType: REMOVE
+          index:
+            fields:
+            - fieldPath: myfield
+              order: DESCENDING
+            queryScope: COLLECTION
+        startTime: '2018-12-12T22:20:45.109Z'
+        state: INITIALIZING
+      name: $$operation$$
+- execute:
+  - command: firestore indexes fields describe myfield --collection-group $$my-collection-group$$
+  - stdout: |
+      +---------+----------------------------+
+      |  FIELD  |      COLLECTION_GROUP      |
+      +---------+----------------------------+
+      | myfield | $$my-collection-group$$ |
+      +---------+----------------------------+
+          +---------------------------------------------------------------------------------------+
+          |                                     ANCESTOR_FIELD                                    |
+          +---------------------------------------------------------------------------------------+
+          | projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/__default__/fields/* |
+          +---------------------------------------------------------------------------------------+
+          +---------------------------------------------------+
+          |                      INDEXES                      |
+          +-----------+--------------+-------------+----------+
+          |   ORDER   | ARRAY_CONFIG | QUERY_SCOPE |  STATE   |
+          +-----------+--------------+-------------+----------+
+          | ASCENDING |              | COLLECTION  | CREATING |
+          |           | CONTAINS     | COLLECTION  | CREATING |
+          +-----------+--------------+-------------+----------+
+- execute:
+  - command: firestore indexes fields list --collection-group $$my-collection-group$$
+  - stdout: |
+      ---
+      name: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield
+actions:
+- set_property:
+    # Cloud Datastore and Cloud Firestore indexes can't coexist in the same project, so we have to
+    # use this one as opposed to the usual cloud-sdk-integration-tests
+    core/project: das-fs-us-c-gcloud
+- generate_resource_id:
+    # Note that this test doesn't actually create or delete a collection group; it just uses the
+    # generated name as a workspace of sorts to prevent overlapping test invocations from
+    # interfering with each other. (Thankfully this works even if there's no data in that collection
+    # group!)
+    reference: my-collection-group
+    prefix: group
+    requires_cleanup: false
+- execute_command:
+    command: firestore indexes fields update myfield --collection-group $$my-collection-group$$
+      --index order=ascending --index array-config=contains --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield?alt=json&updateMask=indexConfig
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              indexConfig:
+                indexes:
+                - fields:
+                  - order: ASCENDING
+                  queryScope: COLLECTION
+                - fields:
+                  - arrayConfig: CONTAINS
+                  queryScope: COLLECTION
+              name: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '762'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/das-fs-us-c-gcloud/databases/(default)/operations/AyAxODI5ZjQwMjJhNTktY2M5OS05NGE0LTNjOTQtMzNiODg1NDIkGnRsdWFmZWQHEjFyaC1yZXhlZG5pLW5pbWRhEQpEEg
+            metadata:
+              '@type': type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata
+              startTime: '2018-12-12T22:20:45.109Z'
+              field: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield
+              indexConfigDeltas:
+              - changeType: REMOVE
+                index:
+                  queryScope: COLLECTION
+                  fields:
+                  - fieldPath: myfield
+                    order: DESCENDING
+              state: INITIALIZING
+        poll_operation: true
+    - expect_stderr: |
+        Request issued for: [myfield]
+        Check operation [$$operation-basename$$] for status.
+        Updated field [myfield].
+    - expect_stdout:
+        matches: .*name\:\sprojects/das-fs-us-c-gcloud/databases/\(default\)/operations/$$operation-basename$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: firestore indexes fields describe myfield --collection-group $$my-collection-group$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '694'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield
+            indexConfig:
+              indexes:
+              - queryScope: COLLECTION
+                fields:
+                - fieldPath: myfield
+                  order: ASCENDING
+                state: CREATING
+              - queryScope: COLLECTION
+                fields:
+                - fieldPath: myfield
+                  arrayConfig: CONTAINS
+                state: CREATING
+              ancestorField: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/__default__/fields/*
+    - expect_stdout: |
+        +---------+----------------------------+
+        |  FIELD  |      COLLECTION_GROUP      |
+        +---------+----------------------------+
+        | myfield | $$my-collection-group$$ |
+        +---------+----------------------------+
+            +---------------------------------------------------------------------------------------+
+            |                                     ANCESTOR_FIELD                                    |
+            +---------------------------------------------------------------------------------------+
+            | projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/__default__/fields/* |
+            +---------------------------------------------------------------------------------------+
+            +---------------------------------------------------+
+            |                      INDEXES                      |
+            +-----------+--------------+-------------+----------+
+            |   ORDER   | ARRAY_CONFIG | QUERY_SCOPE |  STATE   |
+            +-----------+--------------+-------------+----------+
+            | ASCENDING |              | COLLECTION  | CREATING |
+            |           | CONTAINS     | COLLECTION  | CREATING |
+            +-----------+--------------+-------------+----------+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: firestore indexes fields list --collection-group $$my-collection-group$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields?alt=json&filter=indexConfig.usesAncestorConfig%3Afalse
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '828'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            fields:
+            - name: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield
+              indexConfig:
+                indexes:
+                - queryScope: COLLECTION
+                  fields:
+                  - fieldPath: myfield
+                    order: ASCENDING
+                  state: CREATING
+                - queryScope: COLLECTION
+                  fields:
+                  - fieldPath: myfield
+                    arrayConfig: CONTAINS
+                  state: CREATING
+                ancestorField: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/__default__/fields/*
+    - expect_stdout: |
+        ---
+        name: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield
+    - expect_exit:
+        code: 0

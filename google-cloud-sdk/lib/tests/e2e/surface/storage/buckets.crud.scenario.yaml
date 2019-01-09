@@ -1,0 +1,1121 @@
+title: Test basic bucket operations
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: storage buckets create $$bucket$$ --format "text(name,location,storageClass,versioning.enabled,billing.requesterPays)"
+  - stderr: |
+      Created bucket [$$bucket$$].
+  - stdout: |
+      billing.requesterPays: False
+      location:              US
+      name:                  $$bucket$$
+      storageClass:          STANDARD
+      versioning.enabled:    False
+- execute:
+  - command: storage buckets describe $$bucket$$ --format "text(name,location,storageClass,versioning.enabled,billing.requesterPays)"
+  - stdout: |
+      billing.requesterPays: False
+      location:              US
+      name:                  $$bucket$$
+      storageClass:          STANDARD
+      versioning.enabled:    False
+- execute:
+  - command: storage buckets update $$bucket$$ --requester-pays --versioning --format
+      "text(name,location,storageClass,versioning.enabled,billing.requesterPays)"
+  - stderr: |
+      Updated bucket [$$bucket$$].
+  - stdout: |
+      billing.requesterPays: True
+      location:              US
+      name:                  $$bucket$$
+      storageClass:          STANDARD
+      versioning.enabled:    True
+- execute:
+  - command: storage buckets list --filter "name:$$bucket$$" --format "text(name,location,storageClass)"
+  - stdout: |
+      ---
+      location:     US
+      name:         $$bucket$$
+      storageClass: STANDARD
+- execute:
+  - command: storage buckets delete $$bucket$$
+  - prompt:
+    - message: You are about to delete bucket [$$bucket$$]
+    - input: y
+  - stderr: |
+      Deleted bucket [$$bucket$$].
+
+
+actions:
+
+- generate_resource_id:
+    reference: bucket
+    prefix: storage-bucket
+- execute_command:
+    command: storage buckets create $$bucket$$ --format "text(name,location,storageClass,versioning.enabled,billing.requesterPays)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b?alt=json&project=cloud-sdk-integration-testing
+          method: POST
+          headers: {}
+          body:
+            json:
+              billing:
+                requesterPays: false
+              name: $$bucket$$
+              versioning:
+                enabled: false
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '581'
+            content-type: application/json; charset=UTF-8
+            etag: CAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UorIaeAdY1JZVRCwXaFyDfIHxIJwarEs7iwVBm25bCgUNG_79FMPwn64MTly-dSYQ-ho3Ky78yIMDk8MOiXHfvpb3UPDQ
+          body:
+            kind: storage#bucket
+            id: $$bucket$$
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+            projectNumber: '462803083913'
+            name: $$bucket$$
+            timeCreated: '2018-12-04T18:13:58.731Z'
+            updated: '2018-12-04T18:13:58.731Z'
+            metageneration: '1'
+            iamConfiguration:
+              bucketPolicyOnly:
+                enabled: false
+            location: US
+            versioning:
+              enabled: false
+            storageClass: STANDARD
+            billing:
+              requesterPays: false
+            etag: CAE=
+    - expect_stderr: |
+        Created bucket [$$bucket$$].
+    - expect_stdout: |
+        billing.requesterPays: False
+        location:              US
+        name:                  $$bucket$$
+        storageClass:          STANDARD
+        versioning.enabled:    False
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: storage buckets describe $$bucket$$ --format "text(name,location,storageClass,versioning.enabled,billing.requesterPays)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '581'
+            content-type: application/json; charset=UTF-8
+            etag: CAE=
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Uq3XkAQ6MruuZuxyBNkZGBLsEO8kWrqLyYO9ZlkPGJpkvQLbHEBGOycbChP0vKqUbxqKCZDZC9Zs7jSVTIqyxrOoJ9p5w
+          body:
+            kind: storage#bucket
+            id: $$bucket$$
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+            projectNumber: '462803083913'
+            name: $$bucket$$
+            timeCreated: '2018-12-04T18:13:58.731Z'
+            updated: '2018-12-04T18:13:58.731Z'
+            metageneration: '1'
+            iamConfiguration:
+              bucketPolicyOnly:
+                enabled: false
+            location: US
+            versioning:
+              enabled: false
+            storageClass: STANDARD
+            billing:
+              requesterPays: false
+            etag: CAE=
+    - expect_stdout: |
+        billing.requesterPays: False
+        location:              US
+        name:                  $$bucket$$
+        storageClass:          STANDARD
+        versioning.enabled:    False
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: storage buckets update $$bucket$$ --requester-pays --versioning --format
+      "text(name,location,storageClass,versioning.enabled,billing.requesterPays)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              billing:
+                requesterPays: true
+              versioning:
+                enabled: true
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '2754'
+            content-type: application/json; charset=UTF-8
+            etag: CAI=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UqXSDu7QkVltY8Hm-v7g_qxeS3ilY9xKskVMBqeEqTxjjgqwH32noGP_QVs4rZ5QUrREqEyzqtRmZx_KWIK19_q0v4msg
+          body:
+            kind: storage#bucket
+            id: $$bucket$$
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+            projectNumber: '462803083913'
+            name: $$bucket$$
+            timeCreated: '2018-12-04T18:13:58.731Z'
+            updated: '2018-12-04T18:14:00.113Z'
+            metageneration: '2'
+            acl:
+            - kind: storage#bucketAccessControl
+              id: $$bucket$$/project-owners-462803083913
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/acl/project-owners-462803083913
+              bucket: $$bucket$$
+              entity: project-owners-462803083913
+              role: OWNER
+              projectTeam:
+                projectNumber: '462803083913'
+                team: owners
+              etag: CAI=
+            - kind: storage#bucketAccessControl
+              id: $$bucket$$/project-editors-462803083913
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/acl/project-editors-462803083913
+              bucket: $$bucket$$
+              entity: project-editors-462803083913
+              role: OWNER
+              projectTeam:
+                projectNumber: '462803083913'
+                team: editors
+              etag: CAI=
+            - kind: storage#bucketAccessControl
+              id: $$bucket$$/project-viewers-462803083913
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/acl/project-viewers-462803083913
+              bucket: $$bucket$$
+              entity: project-viewers-462803083913
+              role: READER
+              projectTeam:
+                projectNumber: '462803083913'
+                team: viewers
+              etag: CAI=
+            defaultObjectAcl:
+            - kind: storage#objectAccessControl
+              entity: project-owners-462803083913
+              role: OWNER
+              projectTeam:
+                projectNumber: '462803083913'
+                team: owners
+              etag: CAI=
+            - kind: storage#objectAccessControl
+              entity: project-editors-462803083913
+              role: OWNER
+              projectTeam:
+                projectNumber: '462803083913'
+                team: editors
+              etag: CAI=
+            - kind: storage#objectAccessControl
+              entity: project-viewers-462803083913
+              role: READER
+              projectTeam:
+                projectNumber: '462803083913'
+                team: viewers
+              etag: CAI=
+            iamConfiguration:
+              bucketPolicyOnly:
+                enabled: false
+            owner:
+              entity: project-owners-462803083913
+            location: US
+            versioning:
+              enabled: true
+            storageClass: STANDARD
+            billing:
+              requesterPays: true
+            etag: CAI=
+    - expect_stderr: |
+        Updated bucket [$$bucket$$].
+    - expect_stdout: |
+        billing.requesterPays: True
+        location:              US
+        name:                  $$bucket$$
+        storageClass:          STANDARD
+        versioning.enabled:    True
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: storage buckets list --filter "name:$$bucket$$" --format "text(name,location,storageClass)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b?alt=json&maxResults=1000&project=cloud-sdk-integration-testing
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '31068'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Uqu8PvQZUEABJnEu7vhH3uiGW-Ga3HD5H5BUCEp8cNuEoU_DkI-i6pNb2lxQH3J11ScLVvPJJdSlsofhP6m5cZtP5mU1Q
+          body:
+            kind: storage#buckets
+            items:
+            - kind: storage#bucket
+              id: artifacts.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://www.googleapis.com/storage/v1/b/artifacts.cloud-sdk-integration-testing.appspot.com
+              projectNumber: '462803083913'
+              name: artifacts.cloud-sdk-integration-testing.appspot.com
+              timeCreated: '2015-12-02T17:39:08.044Z'
+              updated: '2017-07-25T19:40:49.392Z'
+              metageneration: '2'
+              location: US
+              storageClass: STANDARD
+              etag: CAI=
+            - kind: storage#bucket
+              id: cloud-sdk-integration-test-usage
+              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-test-usage
+              projectNumber: '462803083913'
+              name: cloud-sdk-integration-test-usage
+              timeCreated: '2016-12-03T22:56:36.589Z'
+              updated: '2016-12-03T22:56:46.138Z'
+              metageneration: '2'
+              location: US-EAST1
+              storageClass: REGIONAL
+              etag: CAI=
+            - kind: storage#bucket
+              id: cloud-sdk-integration-testing
+              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing
+              projectNumber: '462803083913'
+              name: cloud-sdk-integration-testing
+              timeCreated: '2017-06-01T00:26:51.643Z'
+              updated: '2017-06-01T00:26:51.643Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: cloud-sdk-integration-testing-app-staging
+              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-app-staging
+              projectNumber: '462803083913'
+              name: cloud-sdk-integration-testing-app-staging
+              timeCreated: '2015-05-13T19:09:02.758Z'
+              updated: '2015-05-13T19:11:54.656Z'
+              metageneration: '2'
+              location: US
+              lifecycle:
+                rule:
+                - action:
+                    type: Delete
+                  condition:
+                    age: 1
+              storageClass: STANDARD
+              etag: CAI=
+            - kind: storage#bucket
+              id: cloud-sdk-integration-testing-daisy-bkt
+              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-daisy-bkt
+              projectNumber: '462803083913'
+              name: cloud-sdk-integration-testing-daisy-bkt
+              timeCreated: '2018-03-22T23:41:22.474Z'
+              updated: '2018-03-22T23:41:22.474Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: cloud-sdk-integration-testing-deployment-logs
+              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-deployment-logs
+              projectNumber: '462803083913'
+              name: cloud-sdk-integration-testing-deployment-logs
+              timeCreated: '2015-06-12T18:14:14.588Z'
+              updated: '2015-06-12T18:14:14.588Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: cloud-sdk-integration-testing-ml
+              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-ml
+              projectNumber: '462803083913'
+              name: cloud-sdk-integration-testing-ml
+              timeCreated: '2016-08-23T18:49:37.168Z'
+              updated: '2017-02-27T14:39:03.584Z'
+              metageneration: '5'
+              location: US
+              storageClass: STANDARD
+              etag: CAU=
+            - kind: storage#bucket
+              id: cloud-sdk-integration-testing.appspot.com
+              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing.appspot.com
+              projectNumber: '462803083913'
+              name: cloud-sdk-integration-testing.appspot.com
+              timeCreated: '2016-01-27T10:22:30.846Z'
+              updated: '2016-01-27T10:22:30.846Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: cloud-sdk-integration-testing_cloudbuild
+              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing_cloudbuild
+              projectNumber: '462803083913'
+              name: cloud-sdk-integration-testing_cloudbuild
+              timeCreated: '2016-06-30T22:08:30.379Z'
+              updated: '2016-06-30T22:08:30.379Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: cloud-sdk-testing
+              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-testing
+              projectNumber: '462803083913'
+              name: cloud-sdk-testing
+              timeCreated: '2016-03-01T20:37:41.778Z'
+              updated: '2018-09-04T08:15:52.288Z'
+              metageneration: '33'
+              location: US
+              storageClass: STANDARD
+              etag: CCE=
+            - kind: storage#bucket
+              id: cloudsdkbuild
+              selfLink: https://www.googleapis.com/storage/v1/b/cloudsdkbuild
+              projectNumber: '462803083913'
+              name: cloudsdkbuild
+              timeCreated: '2015-05-08T17:26:42.045Z'
+              updated: '2016-03-01T01:53:51.231Z'
+              metageneration: '34'
+              location: US
+              storageClass: STANDARD
+              etag: CCI=
+            - kind: storage#bucket
+              id: compute-backend-test-gcs-bucket-20181204-181359-337e
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-backend-test-gcs-bucket-20181204-181359-337e
+              projectNumber: '462803083913'
+              name: compute-backend-test-gcs-bucket-20181204-181359-337e
+              timeCreated: '2018-12-04T18:14:00.196Z'
+              updated: '2018-12-04T18:14:00.196Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: compute-https-lb-test-gcs-bucket-20181204-180940-qvvw
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-180940-qvvw
+              projectNumber: '462803083913'
+              name: compute-https-lb-test-gcs-bucket-20181204-180940-qvvw
+              timeCreated: '2018-12-04T18:09:41.197Z'
+              updated: '2018-12-04T18:09:41.197Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: compute-https-lb-test-gcs-bucket-20181204-181002-00cm
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181002-00cm
+              projectNumber: '462803083913'
+              name: compute-https-lb-test-gcs-bucket-20181204-181002-00cm
+              timeCreated: '2018-12-04T18:10:02.693Z'
+              updated: '2018-12-04T18:10:02.693Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: compute-https-lb-test-gcs-bucket-20181204-181003-bxcm
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181003-bxcm
+              projectNumber: '462803083913'
+              name: compute-https-lb-test-gcs-bucket-20181204-181003-bxcm
+              timeCreated: '2018-12-04T18:10:03.896Z'
+              updated: '2018-12-04T18:10:03.896Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: compute-https-lb-test-gcs-bucket-20181204-181101-k0yo
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181101-k0yo
+              projectNumber: '462803083913'
+              name: compute-https-lb-test-gcs-bucket-20181204-181101-k0yo
+              timeCreated: '2018-12-04T18:11:01.620Z'
+              updated: '2018-12-04T18:11:01.620Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: compute-https-lb-test-gcs-bucket-20181204-181153-w1zq
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181153-w1zq
+              projectNumber: '462803083913'
+              name: compute-https-lb-test-gcs-bucket-20181204-181153-w1zq
+              timeCreated: '2018-12-04T18:11:56.195Z'
+              updated: '2018-12-04T18:11:56.195Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: compute-https-lb-test-gcs-bucket-20181204-181158-qbwt
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181158-qbwt
+              projectNumber: '462803083913'
+              name: compute-https-lb-test-gcs-bucket-20181204-181158-qbwt
+              timeCreated: '2018-12-04T18:11:59.196Z'
+              updated: '2018-12-04T18:11:59.196Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: compute-https-lb-test-gcs-bucket-20181204-181209-dc31
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181209-dc31
+              projectNumber: '462803083913'
+              name: compute-https-lb-test-gcs-bucket-20181204-181209-dc31
+              timeCreated: '2018-12-04T18:12:10.338Z'
+              updated: '2018-12-04T18:12:10.338Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: compute-https-lb-test-gcs-bucket-20181204-181216-x27l
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181216-x27l
+              projectNumber: '462803083913'
+              name: compute-https-lb-test-gcs-bucket-20181204-181216-x27l
+              timeCreated: '2018-12-04T18:12:17.298Z'
+              updated: '2018-12-04T18:12:17.298Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: compute-https-lb-test-gcs-bucket-20181204-181301-8ygv
+              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181301-8ygv
+              projectNumber: '462803083913'
+              name: compute-https-lb-test-gcs-bucket-20181204-181301-8ygv
+              timeCreated: '2018-12-04T18:13:01.712Z'
+              updated: '2018-12-04T18:13:01.712Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: dataproc-a63ced4c-fa87-4bea-94a5-4d2f8fbbd783-us
+              selfLink: https://www.googleapis.com/storage/v1/b/dataproc-a63ced4c-fa87-4bea-94a5-4d2f8fbbd783-us
+              projectNumber: '462803083913'
+              name: dataproc-a63ced4c-fa87-4bea-94a5-4d2f8fbbd783-us
+              timeCreated: '2015-09-09T23:12:27.571Z'
+              updated: '2015-09-09T23:12:27.571Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: dataproc-f8710048-79ac-41cb-a9df-f3591df3c32b-us
+              selfLink: https://www.googleapis.com/storage/v1/b/dataproc-f8710048-79ac-41cb-a9df-f3591df3c32b-us
+              projectNumber: '462803083913'
+              name: dataproc-f8710048-79ac-41cb-a9df-f3591df3c32b-us
+              timeCreated: '2018-08-02T20:34:12.263Z'
+              updated: '2018-08-02T20:34:12.263Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: do-not-delete-genomics-pipelines-test
+              selfLink: https://www.googleapis.com/storage/v1/b/do-not-delete-genomics-pipelines-test
+              projectNumber: '462803083913'
+              name: do-not-delete-genomics-pipelines-test
+              timeCreated: '2016-03-18T20:51:55.838Z'
+              updated: '2016-05-20T16:51:16.844Z'
+              metageneration: '2'
+              location: US
+              lifecycle:
+                rule:
+                - action:
+                    type: Delete
+                  condition:
+                    age: 5
+              storageClass: STANDARD
+              etag: CAI=
+            - kind: storage#bucket
+              id: do-not-delete-genomics-pipelines-test-inputs
+              selfLink: https://www.googleapis.com/storage/v1/b/do-not-delete-genomics-pipelines-test-inputs
+              projectNumber: '462803083913'
+              name: do-not-delete-genomics-pipelines-test-inputs
+              timeCreated: '2017-03-29T14:33:06.515Z'
+              updated: '2017-03-29T14:33:06.515Z'
+              metageneration: '1'
+              location: US
+              storageClass: MULTI_REGIONAL
+              etag: CAE=
+            - kind: storage#bucket
+              id: do-not-delete-integration-test
+              selfLink: https://www.googleapis.com/storage/v1/b/do-not-delete-integration-test
+              projectNumber: '462803083913'
+              name: do-not-delete-integration-test
+              timeCreated: '2015-03-10T20:27:48.719Z'
+              updated: '2015-03-10T20:27:48.719Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: do-not-delete-ml-video-test
+              selfLink: https://www.googleapis.com/storage/v1/b/do-not-delete-ml-video-test
+              projectNumber: '462803083913'
+              name: do-not-delete-ml-video-test
+              timeCreated: '2017-06-07T18:44:33.099Z'
+              updated: '2017-06-07T18:44:33.099Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: e2e-functions-do-not-delete
+              selfLink: https://www.googleapis.com/storage/v1/b/e2e-functions-do-not-delete
+              projectNumber: '462803083913'
+              name: e2e-functions-do-not-delete
+              timeCreated: '2018-01-03T17:34:55.297Z'
+              updated: '2018-01-03T17:44:08.151Z'
+              metageneration: '2'
+              location: US
+              storageClass: MULTI_REGIONAL
+              etag: CAI=
+            - kind: storage#bucket
+              id: e2e-input-functions
+              selfLink: https://www.googleapis.com/storage/v1/b/e2e-input-functions
+              projectNumber: '462803083913'
+              name: e2e-input-functions
+              timeCreated: '2017-01-27T10:59:02.335Z'
+              updated: '2018-12-04T18:12:52.133Z'
+              metageneration: '273996'
+              location: US
+              storageClass: MULTI_REGIONAL
+              etag: CMzcEA==
+            - kind: storage#bucket
+              id: gaedeptest-20181204-171357-xcy9bucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-171357-xcy9bucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-171357-xcy9bucket
+              timeCreated: '2018-12-04T17:14:00.763Z'
+              updated: '2018-12-04T17:14:00.763Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-171500-7rv4bucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-171500-7rv4bucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-171500-7rv4bucket
+              timeCreated: '2018-12-04T17:15:01.993Z'
+              updated: '2018-12-04T17:15:01.993Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-172141-3dr1bucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-172141-3dr1bucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-172141-3dr1bucket
+              timeCreated: '2018-12-04T17:21:43.588Z'
+              updated: '2018-12-04T17:21:43.588Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-172936-yqbhbucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-172936-yqbhbucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-172936-yqbhbucket
+              timeCreated: '2018-12-04T17:29:41.098Z'
+              updated: '2018-12-04T17:29:41.098Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-173605-o3habucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-173605-o3habucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-173605-o3habucket
+              timeCreated: '2018-12-04T17:36:09.564Z'
+              updated: '2018-12-04T17:36:09.564Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-173721-aqthbucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-173721-aqthbucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-173721-aqthbucket
+              timeCreated: '2018-12-04T17:37:22.801Z'
+              updated: '2018-12-04T17:37:22.801Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-174712-5ys1bucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-174712-5ys1bucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-174712-5ys1bucket
+              timeCreated: '2018-12-04T17:47:16.417Z'
+              updated: '2018-12-04T17:47:16.417Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-181100-srgbbucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181100-srgbbucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-181100-srgbbucket
+              timeCreated: '2018-12-04T18:11:01.339Z'
+              updated: '2018-12-04T18:11:01.339Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-181226-e71ubucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181226-e71ubucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-181226-e71ubucket
+              timeCreated: '2018-12-04T18:12:30.497Z'
+              updated: '2018-12-04T18:12:30.497Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-181304-6ho0bucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181304-6ho0bucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-181304-6ho0bucket
+              timeCreated: '2018-12-04T18:13:05.796Z'
+              updated: '2018-12-04T18:13:05.796Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-181315-4bjmbucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181315-4bjmbucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-181315-4bjmbucket
+              timeCreated: '2018-12-04T18:13:16.896Z'
+              updated: '2018-12-04T18:13:16.896Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-181318-sma8bucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181318-sma8bucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-181318-sma8bucket
+              timeCreated: '2018-12-04T18:13:19.598Z'
+              updated: '2018-12-04T18:13:19.598Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gaedeptest-20181204-181341-73nibucket
+              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181341-73nibucket
+              projectNumber: '462803083913'
+              name: gaedeptest-20181204-181341-73nibucket
+              timeCreated: '2018-12-04T18:13:46.505Z'
+              updated: '2018-12-04T18:13:46.505Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: gcloud-export-test-temp
+              selfLink: https://www.googleapis.com/storage/v1/b/gcloud-export-test-temp
+              projectNumber: '462803083913'
+              name: gcloud-export-test-temp
+              timeCreated: '2015-10-30T18:54:43.174Z'
+              updated: '2015-10-30T18:57:07.429Z'
+              metageneration: '2'
+              location: US
+              lifecycle:
+                rule:
+                - action:
+                    type: Delete
+                  condition:
+                    age: 1
+              storageClass: STANDARD
+              etag: CAI=
+            - kind: storage#bucket
+              id: gcloud-ml-productsearch-test
+              selfLink: https://www.googleapis.com/storage/v1/b/gcloud-ml-productsearch-test
+              projectNumber: '462803083913'
+              name: gcloud-ml-productsearch-test
+              timeCreated: '2017-11-29T00:12:15.247Z'
+              updated: '2017-11-29T00:12:15.247Z'
+              metageneration: '1'
+              location: US
+              storageClass: MULTI_REGIONAL
+              etag: CAE=
+            - kind: storage#bucket
+              id: gcloud-test-integration-test
+              selfLink: https://www.googleapis.com/storage/v1/b/gcloud-test-integration-test
+              projectNumber: '462803083913'
+              name: gcloud-test-integration-test
+              timeCreated: '2015-06-06T00:24:44.543Z'
+              updated: '2015-12-10T18:54:47.555Z'
+              metageneration: '3'
+              location: US
+              storageClass: STANDARD
+              etag: CAM=
+            - kind: storage#bucket
+              id: hbchai
+              selfLink: https://www.googleapis.com/storage/v1/b/hbchai
+              projectNumber: '462803083913'
+              name: hbchai
+              timeCreated: '2016-02-11T17:38:57.346Z'
+              updated: '2016-02-11T17:38:57.346Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: liuvictor-test
+              selfLink: https://www.googleapis.com/storage/v1/b/liuvictor-test
+              projectNumber: '462803083913'
+              name: liuvictor-test
+              timeCreated: '2017-04-04T15:48:54.510Z'
+              updated: '2017-04-04T15:48:54.510Z'
+              metageneration: '1'
+              location: US
+              storageClass: NEARLINE
+              etag: CAE=
+            - kind: storage#bucket
+              id: magimaster-bucket
+              selfLink: https://www.googleapis.com/storage/v1/b/magimaster-bucket
+              projectNumber: '462803083913'
+              name: magimaster-bucket
+              timeCreated: '2016-03-09T21:30:02.667Z'
+              updated: '2016-03-09T21:30:02.667Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: staging.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://www.googleapis.com/storage/v1/b/staging.cloud-sdk-integration-testing.appspot.com
+              projectNumber: '462803083913'
+              name: staging.cloud-sdk-integration-testing.appspot.com
+              timeCreated: '2015-10-04T18:21:21.632Z'
+              updated: '2015-12-09T20:06:28.642Z'
+              metageneration: '8'
+              location: US
+              lifecycle:
+                rule:
+                - action:
+                    type: Delete
+                  condition:
+                    age: 15
+              storageClass: STANDARD
+              etag: CAg=
+            - kind: storage#bucket
+              id: stephenmw-test
+              selfLink: https://www.googleapis.com/storage/v1/b/stephenmw-test
+              projectNumber: '462803083913'
+              name: stephenmw-test
+              timeCreated: '2015-11-13T22:48:54.099Z'
+              updated: '2015-11-13T22:48:54.099Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: $$bucket$$
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+              projectNumber: '462803083913'
+              name: $$bucket$$
+              timeCreated: '2018-12-04T18:13:58.731Z'
+              updated: '2018-12-04T18:14:00.113Z'
+              metageneration: '2'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              versioning:
+                enabled: true
+              storageClass: STANDARD
+              billing:
+                requesterPays: true
+              etag: CAI=
+            - kind: storage#bucket
+              id: test-lab-9m4rph26ch1z2-ifqcbfj9jm2js
+              selfLink: https://www.googleapis.com/storage/v1/b/test-lab-9m4rph26ch1z2-ifqcbfj9jm2js
+              projectNumber: '462803083913'
+              name: test-lab-9m4rph26ch1z2-ifqcbfj9jm2js
+              timeCreated: '2016-03-29T23:29:53.122Z'
+              updated: '2016-03-29T23:29:53.122Z'
+              metageneration: '1'
+              location: US
+              lifecycle:
+                rule:
+                - action:
+                    type: Delete
+                  condition:
+                    age: 90
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: test-lab-cloud-sdk-integration-testing
+              selfLink: https://www.googleapis.com/storage/v1/b/test-lab-cloud-sdk-integration-testing
+              projectNumber: '462803083913'
+              name: test-lab-cloud-sdk-integration-testing
+              timeCreated: '2015-06-11T17:47:36.061Z'
+              updated: '2015-12-10T18:57:58.831Z'
+              metageneration: '4'
+              location: US
+              lifecycle:
+                rule:
+                - action:
+                    type: Delete
+                  condition:
+                    age: 21
+              storageClass: STANDARD
+              etag: CAQ=
+            - kind: storage#bucket
+              id: us-central1-composer-enviro-5306f81c-bucket
+              selfLink: https://www.googleapis.com/storage/v1/b/us-central1-composer-enviro-5306f81c-bucket
+              projectNumber: '462803083913'
+              name: us-central1-composer-enviro-5306f81c-bucket
+              timeCreated: '2018-01-12T17:39:20.418Z'
+              updated: '2018-01-12T17:39:28.741Z'
+              metageneration: '2'
+              location: US
+              labels:
+                goog-composer-environment: composer-environment2
+                goog-composer-location: us-central1
+              storageClass: STANDARD
+              etag: CAI=
+            - kind: storage#bucket
+              id: us-central1-composer-enviro-f1a6ba1a-bucket
+              selfLink: https://www.googleapis.com/storage/v1/b/us-central1-composer-enviro-f1a6ba1a-bucket
+              projectNumber: '462803083913'
+              name: us-central1-composer-enviro-f1a6ba1a-bucket
+              timeCreated: '2018-01-12T17:26:31.310Z'
+              updated: '2018-01-12T17:26:37.435Z'
+              metageneration: '2'
+              location: US
+              labels:
+                goog-composer-environment: composer-environment1
+                goog-composer-location: us-central1
+              storageClass: STANDARD
+              etag: CAI=
+            - kind: storage#bucket
+              id: us.artifacts.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://www.googleapis.com/storage/v1/b/us.artifacts.cloud-sdk-integration-testing.appspot.com
+              projectNumber: '462803083913'
+              name: us.artifacts.cloud-sdk-integration-testing.appspot.com
+              timeCreated: '2016-03-26T02:30:04.828Z'
+              updated: '2016-03-26T02:30:04.828Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: vm-config.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://www.googleapis.com/storage/v1/b/vm-config.cloud-sdk-integration-testing.appspot.com
+              projectNumber: '462803083913'
+              name: vm-config.cloud-sdk-integration-testing.appspot.com
+              timeCreated: '2015-04-02T22:57:14.558Z'
+              updated: '2016-01-25T20:24:09.892Z'
+              metageneration: '2'
+              location: US
+              storageClass: STANDARD
+              etag: CAI=
+            - kind: storage#bucket
+              id: vm-containers.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://www.googleapis.com/storage/v1/b/vm-containers.cloud-sdk-integration-testing.appspot.com
+              projectNumber: '462803083913'
+              name: vm-containers.cloud-sdk-integration-testing.appspot.com
+              timeCreated: '2015-04-02T22:57:16.748Z'
+              updated: '2015-04-02T22:57:17.426Z'
+              metageneration: '2'
+              location: US
+              storageClass: STANDARD
+              etag: CAI=
+            - kind: storage#bucket
+              id: wfaris-ml-speech-test
+              selfLink: https://www.googleapis.com/storage/v1/b/wfaris-ml-speech-test
+              projectNumber: '462803083913'
+              name: wfaris-ml-speech-test
+              timeCreated: '2018-04-13T15:06:53.330Z'
+              updated: '2018-04-13T15:06:53.330Z'
+              metageneration: '1'
+              iamConfiguration:
+                bucketPolicyOnly:
+                  enabled: false
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+            - kind: storage#bucket
+              id: zjn-upload-test
+              selfLink: https://www.googleapis.com/storage/v1/b/zjn-upload-test
+              projectNumber: '462803083913'
+              name: zjn-upload-test
+              timeCreated: '2016-10-19T21:46:00.268Z'
+              updated: '2016-10-19T21:46:00.268Z'
+              metageneration: '1'
+              location: US
+              storageClass: STANDARD
+              etag: CAE=
+    - expect_stdout: |
+        ---
+        location:     US
+        name:         $$bucket$$
+        storageClass: STANDARD
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: storage buckets delete $$bucket$$
+    cleanup_for: bucket
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete bucket [$$bucket$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Uo8CN-FG01mPWGsIvWovIgxxAZzPxAYQ4f-avmTj3CX6knRzwFVtDmLxF5pFZWcBIKyZABhadltklVRbWiYyoi7L80EwA
+          body: ''
+    - expect_stderr: |
+        Deleted bucket [$$bucket$$].
+    - expect_exit:
+        code: 0

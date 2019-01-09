@@ -3,16 +3,11 @@ NAME
         for a given operation name
 
 SYNOPSIS
-    gcloud beta endpoints operations describe OPERATION [--full]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud beta endpoints operations describe OPERATION [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) This command will return information about an operation given the
     name of that operation.
-
-    The amount of information inside an operation can be very large, so by
-    default, only a summary is returned. If you want the entire operation
-    resource, you can include the --full flag.
 
     Note that the operations/ prefix of the operation name is optional and may
     be omitted.
@@ -20,11 +15,6 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      OPERATION
         The name of the operation to describe.
-
-FLAGS
-     --full
-        Print the entire operation resource, which could be large. By default,
-        a summary will be printed instead.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -38,11 +28,6 @@ EXAMPLES
 
         $ gcloud beta endpoints operations describe \
             serviceConfigs.my-service.1
-
-    To get the full operation resource, run:
-
-        $ gcloud beta endpoints operations describe \
-            serviceConfigs.my-service.1 --full
 
 NOTES
     This command is currently in BETA and may change without notice. These

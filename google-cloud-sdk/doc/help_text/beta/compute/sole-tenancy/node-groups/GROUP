@@ -18,7 +18,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add an IAM policy binding to a node group.
+        (BETA) Add IAM policy binding to a Google Compute Engine node group.
 
      create
         (BETA) Creates a Google Compute Engine node group.
@@ -40,7 +40,7 @@ COMMANDS
         group.
 
      remove-iam-policy-binding
-        (BETA) Remove an IAM policy binding from a node group.
+        (BETA) Remove IAM policy binding of a Google Compute Engine node group.
 
      set-iam-policy
         (BETA) Set the IAM policy for a Google Compute Engine node group.

@@ -23,6 +23,7 @@ import argparse
 
 from googlecloudsdk.calliope import cli
 from googlecloudsdk.calliope import parser_errors
+from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -38,6 +39,9 @@ class SpecifiedArgsTest(cli_test_base.CliTestBase):
 
   def SetUp(self):
     self.parser = calliope_test_util.ArgumentParser()
+
+  def testNoneSpecified(self):
+    self.parser.parse_args()
 
   def testSpecifiedArgs(self):
     self.parser.add_argument(
@@ -190,6 +194,20 @@ class SpecifiedArgsTest(cli_test_base.CliTestBase):
     with self.AssertRaisesArgumentErrorMatches(
         'argument HOST: Must be specified.'):
       self.parser.parse_args(['--project', 'proj', '--', 'echo', 'hey'])
+
+
+class OriginalArgsTest(cli_test_base.CliTestBase):
+
+  def SetUp(self):
+    command = calliope_test_util.MockCommand('test')
+    self.parser = parser_extensions.ArgumentParser(calliope_command=command)
+
+  def testOriginalArgsSetAndCleared(self):
+    original_args = ['original', 'args']
+    self.parser._SaveOriginalArgs(original_args)
+    self.assertEqual(original_args, self.parser._args)
+    self.parser._ClearOriginalArgs()
+    self.assertEqual(None, self.parser._args)
 
 
 class SpecifiedGroupsTest(cli_test_base.CliTestBase, parameterized.TestCase):

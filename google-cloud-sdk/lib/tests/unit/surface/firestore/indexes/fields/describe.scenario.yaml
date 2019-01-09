@@ -1,0 +1,327 @@
+title: cloud firestore single-field describe test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      firestore indexes fields describe timestamp --collection-group=Events
+  - stdout: |
+      +-----------+------------------+
+      |   FIELD   | COLLECTION_GROUP |
+      +-----------+------------------+
+      | timestamp | Events           |
+      +-----------+------------------+
+          +---------------------------------------------------------------------------------+
+          |                                  ANCESTOR_FIELD                                 |
+          +---------------------------------------------------------------------------------+
+          | projects/fake-project/databases/(default)/collectionGroups/__default__/fields/* |
+          +---------------------------------------------------------------------------------+
+          +------------------------------------------------+
+          |                    INDEXES                     |
+          +-----------+--------------+-------------+-------+
+          |   ORDER   | ARRAY_CONFIG | QUERY_SCOPE | STATE |
+          +-----------+--------------+-------------+-------+
+          |           | CONTAINS     | COLLECTION  | READY |
+          | ASCENDING |              | COLLECTION  | READY |
+          +-----------+--------------+-------------+-------+
+- execute:
+  - label: Database-wide default field index settings
+  - command: |
+      firestore indexes fields describe
+  - stdout: |
+      +-------+------------------+
+      | FIELD | COLLECTION_GROUP |
+      +-------+------------------+
+      | *     | __default__      |
+      +-------+------------------+
+          +----------------+
+          | ANCESTOR_FIELD |
+          +----------------+
+          |                |
+          +----------------+
+          +-------------------------------------------------+
+          |                     INDEXES                     |
+          +------------+--------------+-------------+-------+
+          |   ORDER    | ARRAY_CONFIG | QUERY_SCOPE | STATE |
+          +------------+--------------+-------------+-------+
+          | ASCENDING  |              | COLLECTION  | READY |
+          | DESCENDING |              | COLLECTION  | READY |
+          |            | CONTAINS     | COLLECTION  | READY |
+          +------------+--------------+-------------+-------+
+- execute:
+  - label: Collection group wide index settings
+  - command: |
+      firestore indexes fields describe --collection-group=Events
+  - stdout: |
+      +-------+------------------+
+      | FIELD | COLLECTION_GROUP |
+      +-------+------------------+
+      | *     | Events           |
+      +-------+------------------+
+          +---------------------------------------------------------------------------------+
+          |                                  ANCESTOR_FIELD                                 |
+          +---------------------------------------------------------------------------------+
+          | projects/fake-project/databases/(default)/collectionGroups/__default__/fields/* |
+          +---------------------------------------------------------------------------------+
+          +--------------------------------------------+
+          |                  INDEXES                   |
+          +-------+--------------+-------------+-------+
+          | ORDER | ARRAY_CONFIG | QUERY_SCOPE | STATE |
+          +-------+--------------+-------------+-------+
+          |       | CONTAINS     | COLLECTION  | READY |
+          +-------+--------------+-------------+-------+
+- execute:
+  - label: Field with all indexes disabled
+  - command: |
+      firestore indexes fields describe user_id --collection-group=Events
+  - stdout: |
+      +---------+------------------+
+      |  FIELD  | COLLECTION_GROUP |
+      +---------+------------------+
+      | user_id | Events           |
+      +---------+------------------+
+          +---------------------------------------------------------------------------------+
+          |                                  ANCESTOR_FIELD                                 |
+          +---------------------------------------------------------------------------------+
+          | projects/fake-project/databases/(default)/collectionGroups/__default__/fields/* |
+          +---------------------------------------------------------------------------------+
+          +--------------------------------------------+
+          |                  INDEXES                   |
+          +-------+--------------+-------------+-------+
+          | ORDER | ARRAY_CONFIG | QUERY_SCOPE | STATE |
+          +-------+--------------+-------------+-------+
+          |       |              |             |       |
+          +-------+--------------+-------------+-------+
+actions:
+- execute_command:
+    command: |
+      firestore indexes fields describe timestamp --collection-group=Events
+    events:
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+              "indexConfig": {
+                "indexes": [
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "timestamp",
+                        "arrayConfig": "CONTAINS"
+                      }
+                    ],
+                    "state": "READY"
+                  },
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "timestamp",
+                        "order": "ASCENDING"
+                      }
+                    ],
+                    "state": "READY"
+                  }
+                ],
+                "ancestorField": "projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*"
+              }
+            }
+    - expect_stdout: |
+        +-----------+------------------+
+        |   FIELD   | COLLECTION_GROUP |
+        +-----------+------------------+
+        | timestamp | Events           |
+        +-----------+------------------+
+            +---------------------------------------------------------------------------------+
+            |                                  ANCESTOR_FIELD                                 |
+            +---------------------------------------------------------------------------------+
+            | projects/fake-project/databases/(default)/collectionGroups/__default__/fields/* |
+            +---------------------------------------------------------------------------------+
+            +------------------------------------------------+
+            |                    INDEXES                     |
+            +-----------+--------------+-------------+-------+
+            |   ORDER   | ARRAY_CONFIG | QUERY_SCOPE | STATE |
+            +-----------+--------------+-------------+-------+
+            |           | CONTAINS     | COLLECTION  | READY |
+            | ASCENDING |              | COLLECTION  | READY |
+            +-----------+--------------+-------------+-------+
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Database-wide default field index settings
+    command: |
+      firestore indexes fields describe
+    events:
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*",
+              "indexConfig": {
+                "indexes": [
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "*",
+                        "order": "ASCENDING"
+                      }
+                    ],
+                    "state": "READY"
+                  },
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "*",
+                        "order": "DESCENDING"
+                      }
+                    ],
+                    "state": "READY"
+                  },
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "*",
+                        "arrayConfig": "CONTAINS"
+                      }
+                    ],
+                    "state": "READY"
+                  }
+                ]
+              }
+            }
+    - expect_stdout: |
+        +-------+------------------+
+        | FIELD | COLLECTION_GROUP |
+        +-------+------------------+
+        | *     | __default__      |
+        +-------+------------------+
+            +----------------+
+            | ANCESTOR_FIELD |
+            +----------------+
+            |                |
+            +----------------+
+            +-------------------------------------------------+
+            |                     INDEXES                     |
+            +------------+--------------+-------------+-------+
+            |   ORDER    | ARRAY_CONFIG | QUERY_SCOPE | STATE |
+            +------------+--------------+-------------+-------+
+            | ASCENDING  |              | COLLECTION  | READY |
+            | DESCENDING |              | COLLECTION  | READY |
+            |            | CONTAINS     | COLLECTION  | READY |
+            +------------+--------------+-------------+-------+
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Collection group wide index settings
+    command: |
+      firestore indexes fields describe --collection-group=Events
+    events:
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/*?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/*",
+              "indexConfig": {
+                "indexes": [
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "*",
+                        "arrayConfig": "CONTAINS"
+                      }
+                    ],
+                    "state": "READY"
+                  }
+                ],
+                "usesAncestorConfig": true,
+                "ancestorField": "projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*"
+              }
+            }
+    - expect_stdout: |
+        +-------+------------------+
+        | FIELD | COLLECTION_GROUP |
+        +-------+------------------+
+        | *     | Events           |
+        +-------+------------------+
+            +---------------------------------------------------------------------------------+
+            |                                  ANCESTOR_FIELD                                 |
+            +---------------------------------------------------------------------------------+
+            | projects/fake-project/databases/(default)/collectionGroups/__default__/fields/* |
+            +---------------------------------------------------------------------------------+
+            +--------------------------------------------+
+            |                  INDEXES                   |
+            +-------+--------------+-------------+-------+
+            | ORDER | ARRAY_CONFIG | QUERY_SCOPE | STATE |
+            +-------+--------------+-------------+-------+
+            |       | CONTAINS     | COLLECTION  | READY |
+            +-------+--------------+-------------+-------+
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Field with all indexes disabled
+    command: |
+      firestore indexes fields describe user_id --collection-group=Events
+    events:
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/user_id?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/user_id",
+              "indexConfig": {
+                "ancestorField": "projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*"
+              }
+            }
+    - expect_stdout: |
+        +---------+------------------+
+        |  FIELD  | COLLECTION_GROUP |
+        +---------+------------------+
+        | user_id | Events           |
+        +---------+------------------+
+            +---------------------------------------------------------------------------------+
+            |                                  ANCESTOR_FIELD                                 |
+            +---------------------------------------------------------------------------------+
+            | projects/fake-project/databases/(default)/collectionGroups/__default__/fields/* |
+            +---------------------------------------------------------------------------------+
+            +--------------------------------------------+
+            |                  INDEXES                   |
+            +-------+--------------+-------------+-------+
+            | ORDER | ARRAY_CONFIG | QUERY_SCOPE | STATE |
+            +-------+--------------+-------------+-------+
+            |       |              |             |       |
+            +-------+--------------+-------------+-------+
+    - expect_exit:
+        code: 0

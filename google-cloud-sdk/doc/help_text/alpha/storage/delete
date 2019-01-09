@@ -1,0 +1,88 @@
+NAME
+    gcloud alpha storage delete - delete Cloud Storage objects and buckets
+
+SYNOPSIS
+    gcloud alpha storage delete PATH [PATH ...] [--recursive]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha storage delete lets you delete Cloud Storage objects
+    and buckets. You can specify one or more paths (including wildcards) and
+    all matching objects and buckets will be deleted.
+
+POSITIONAL ARGUMENTS
+     PATH [PATH ...]
+        The path of objects and directories to delete. The path must begin with
+        gs:// and may or may not contain wildcard characters.
+
+FLAGS
+     --recursive
+        Recursively delete the contents of any directories that match the path
+        expression.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To delete an object, run:
+
+        $ *gcloud alpha storage delete* gs://mybucket/a.txt
+
+    To delete all objects in a directory, run:
+
+        $ *gcloud alpha storage delete* gs://mybucket/remote-dir/*
+
+    The above command will delete all objects under remote-dir/ but not its
+    sub-directories.
+
+    To delete a directory and all its objects and subdirectories, run:
+
+        $ *gcloud alpha storage delete* --recursive gs://mybucket/remote-dir
+        $ *gcloud alpha storage delete* gs://mybucket/remote-dir/**
+
+    To delete all objects and subdirectories of a directory, without deleting
+    the directory itself, run:
+
+        $ *gcloud alpha storage delete* \
+            --recursive gs://mybucket/remote-dir/*
+
+        or
+
+        $ *gcloud alpha storage delete* gs://mybucket/remote-dir/**
+
+    To delete all objects and directories in a bucket without deleting the
+    bucket itself, run:
+
+        $ *gcloud alpha storage delete* gs://mybucket/**
+
+    To delete all text files in a bucket or a directory, run:
+
+        $ *gcloud alpha storage delete* gs://mybucket/*.txt
+        $ *gcloud alpha storage delete* gs://mybucket/remote-dir/*.txt
+
+    To go beyond directory boundary and delete all text files in a bucket or a
+    directory, run:
+
+        $ *gcloud alpha storage delete* gs://mybucket/**/*.txt
+        $ *gcloud alpha storage delete* gs://mybucket/remote-dir/**/*.txt
+
+    To delete a bucket, run:
+
+        $ *gcloud alpha storage delete* gs://mybucket
+
+    You can use wildcards in bucket names. To delete all buckets with prefix of
+    my, run:
+
+        $ *gcloud alpha storage delete* --recursive gs://my*
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

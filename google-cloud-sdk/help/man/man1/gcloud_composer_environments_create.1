@@ -11,7 +11,7 @@ gcloud composer environments create \- create and initialize a Cloud Composer en
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -107,6 +107,23 @@ The number of nodes to create to run the environment.
 The set of Google API scopes to be made available on all of the node VMs.
 Defaults to ['https://www.googleapis.com/auth/cloud\-platform']. Cannot be
 updated.
+
+.TP 2m
+\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
+The Python version to be used within the created environment. Supplied value
+should represent the desired major Python version. Cannot be updated.
+\fIPYTHON_VERSION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fB2\fR
+Created environment will use Python 2
+.TP 2m
+\fB3\fR
+Created environment will use Python 3
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR

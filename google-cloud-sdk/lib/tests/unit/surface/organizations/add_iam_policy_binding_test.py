@@ -22,13 +22,14 @@ from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.command_lib.iam import iam_util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.organizations import testbase
 
 
-class OrganizationsAddIamPolicyBindingTest(testbase.OrganizationsUnitTestBase):
+class OrganizationsAddIamPolicyBindingGA(testbase.OrganizationsUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   messages = testbase.OrganizationsUnitTestBase.messages
 
@@ -83,7 +84,7 @@ class OrganizationsAddIamPolicyBindingTest(testbase.OrganizationsUnitTestBase):
   def ExpectedGetRequest(self):
     return self.messages.CloudresourcemanagerOrganizationsGetIamPolicyRequest(
         organizationsId=self.TEST_ORGANIZATION.name[len('organizations/'):],
-        getIamPolicyRequest=self.messages.GetIamPolicyRequest())
+        getIamPolicyRequest=None)
 
   def SetupGetIamPolicyFailure(self, exception):
     self.mock_client.organizations.GetIamPolicy.Expect(
@@ -98,138 +99,17 @@ class OrganizationsAddIamPolicyBindingTest(testbase.OrganizationsUnitTestBase):
         '--member={0}'.format(self.NEW_USER))
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
-class OrganizationsAddIamPolicyBindingWithConditionTest(
-    testbase.OrganizationsUnitTestBase):
+class OrganizationsAddIamPolicyBindingBeta(OrganizationsAddIamPolicyBindingGA):
 
-  def SetUp(self):
-    self.messages = testbase.OrganizationsUnitTestBase.messages
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
-    self.start_policy = self.messages.Policy(
-        bindings=[
-            self.messages.Binding(
-                members=['user:test@gmail.com'],
-                role='roles/non-primitive',
-                condition=self.messages.Expr(
-                    expression='expr', title='title', description='descr')),
-        ],
-        etag=b'someUniqueEtag',
-        version=1)
-    self.test_org_id = self.TEST_ORGANIZATION.name[len('organizations/'):]
 
-  def testPromptForExistingCondition(self, track):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    new_role = 'roles/another-non-primitive'
-    new_user = 'user:owner@google.com'
-    start_policy = copy.deepcopy(self.start_policy)
-    new_policy = copy.deepcopy(start_policy)
-    new_condition = self.messages.Expr(
-        expression='expr', title='title', description='descr')
-    new_policy.bindings.append(
-        self.messages.Binding(
-            members=['user:owner@google.com'],
-            role='roles/another-non-primitive',
-            condition=new_condition))
-    self.WriteInput('1')
-    self.mock_client.organizations.GetIamPolicy.Expect(
-        self.ExpectedGetRequest(), copy.deepcopy(self.start_policy))
-    self.mock_client.organizations.SetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerOrganizationsSetIamPolicyRequest(
-            organizationsId=self.test_org_id,
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=new_policy)), new_policy)
+class OrganizationsAddIamPolicyBindingAlpha(
+    OrganizationsAddIamPolicyBindingBeta):
 
-    response = self.RunAddIamPolicyBinding(
-        self.test_org_id,
-        '--role={0}'.format(new_role),
-        '--member={0}'.format(new_user),
-        track=track)
-    self.assertEqual(response, new_policy)
-    self.AssertErrContains('The policy contains bindings with conditions')
-
-  def testPromptForNewCondition(self, track):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    new_role = 'roles/another-non-primitive'
-    new_user = 'user:owner@google.com'
-    start_policy = copy.deepcopy(self.start_policy)
-    new_policy = copy.deepcopy(start_policy)
-    new_condition = self.messages.Expr(
-        expression='expr', title='title', description='descr')
-    new_policy.bindings.append(
-        self.messages.Binding(
-            members=['user:owner@google.com'],
-            role='roles/another-non-primitive',
-            condition=new_condition))
-    self.WriteInput('3')
-    self.WriteInput('expression=expr,title=title,description=descr')
-    self.mock_client.organizations.GetIamPolicy.Expect(
-        self.ExpectedGetRequest(), copy.deepcopy(start_policy))
-    self.mock_client.organizations.SetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerOrganizationsSetIamPolicyRequest(
-            organizationsId=self.test_org_id,
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=new_policy)), new_policy)
-
-    response = self.RunAddIamPolicyBinding(
-        self.test_org_id,
-        '--role={0}'.format(new_role),
-        '--member={0}'.format(new_user),
-        track=track)
-    self.assertEqual(response, new_policy)
-    self.AssertErrContains('The policy contains bindings with conditions')
-    self.AssertErrContains('Condition is either `None`')
-
-  def testPromptForNewCondition_Condition_And_PrimitiveRole(self, track):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    new_role = 'roles/editor'
-    new_user = 'user:owner@google.com'
-    start_policy = self.start_policy
-    self.WriteInput('3')
-    self.WriteInput('expression=expr,title=title,description=descr')
-    self.mock_client.organizations.GetIamPolicy.Expect(
-        self.ExpectedGetRequest(), start_policy)
-
-    with self.AssertRaisesExceptionRegexp(
-        iam_util.IamPolicyBindingInvalidError,
-        '.*Binding with a condition and a primitive role is not allowed.*'):
-      self.RunAddIamPolicyBinding(
-          self.test_org_id,
-          '--role={0}'.format(new_role),
-          '--member={0}'.format(new_user),
-          track=track)
-
-  def testPromptForCondition_CannotPrompt(self, track):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=False)
-    new_role = 'roles/another-non-primitive'
-    new_user = 'user:owner@google.com'
-    start_policy = self.start_policy
-    self.mock_client.organizations.GetIamPolicy.Expect(
-        self.ExpectedGetRequest(), start_policy)
-
-    with self.AssertRaisesExceptionRegexp(
-        iam_util.IamPolicyBindingIncompleteError,
-        '.*Adding a binding without specifying a condition to a policy.*'):
-      self.RunAddIamPolicyBinding(
-          self.test_org_id,
-          '--role={0}'.format(new_role),
-          '--member={0}'.format(new_user),
-          track=track)
-
-  def ExpectedGetRequest(self):
-    return self.messages.CloudresourcemanagerOrganizationsGetIamPolicyRequest(
-        organizationsId=self.TEST_ORGANIZATION.name[len('organizations/'):],
-        getIamPolicyRequest=self.messages.GetIamPolicyRequest())
-
-  def RunAddIamPolicyBinding(self, *args, **kwargs):
-    command = ['organizations', 'add-iam-policy-binding']
-    command.extend(args)
-    track = kwargs.get('track')
-    return self.Run(command, track=track)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

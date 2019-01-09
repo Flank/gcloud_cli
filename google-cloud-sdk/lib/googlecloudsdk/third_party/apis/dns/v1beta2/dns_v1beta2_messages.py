@@ -15,7 +15,9 @@ class Change(_messages.Message):
   r"""An atomic update to a collection of ResourceRecordSets.
 
   Enums:
-    StatusValueValuesEnum: Status of the operation (output only).
+    StatusValueValuesEnum: Status of the operation (output only). A status of
+      "done" means that the request to update the authoritative servers has
+      been sent, but the servers might not be updated yet.
 
   Fields:
     additions: Which ResourceRecordSets to add?
@@ -28,11 +30,15 @@ class Change(_messages.Message):
       "dns#change".
     startTime: The time that this operation was started by the server (output
       only). This is in RFC3339 text format.
-    status: Status of the operation (output only).
+    status: Status of the operation (output only). A status of "done" means
+      that the request to update the authoritative servers has been sent, but
+      the servers might not be updated yet.
   """
 
   class StatusValueValuesEnum(_messages.Enum):
-    r"""Status of the operation (output only).
+    r"""Status of the operation (output only). A status of "done" means that
+    the request to update the authoritative servers has been sent, but the
+    servers might not be updated yet.
 
     Values:
       done: <no description>
@@ -717,7 +723,8 @@ class ManagedZone(_messages.Message):
 
   Enums:
     VisibilityValueValuesEnum: The zone's visibility: public zones are exposed
-      to the Internet, while private zones are visible only to GCP resources.
+      to the Internet, while private zones are visible only to Virtual Private
+      Cloud resources.
 
   Messages:
     LabelsValue: User labels.
@@ -747,15 +754,16 @@ class ManagedZone(_messages.Message):
       the same ManagedZones. Most users will leave this field unset.
     nameServers: Delegate your managed_zone to these virtual name servers;
       defined by the server (output only)
-    privateVisibilityConfig: For privately visible zones, the set of GCP
-      resources that the zone is visible from.
+    privateVisibilityConfig: For privately visible zones, the set of Virtual
+      Private Cloud resources that the zone is visible from.
     visibility: The zone's visibility: public zones are exposed to the
-      Internet, while private zones are visible only to GCP resources.
+      Internet, while private zones are visible only to Virtual Private Cloud
+      resources.
   """
 
   class VisibilityValueValuesEnum(_messages.Enum):
     r"""The zone's visibility: public zones are exposed to the Internet, while
-    private zones are visible only to GCP resources.
+    private zones are visible only to Virtual Private Cloud resources.
 
     Values:
       private: <no description>
@@ -911,7 +919,7 @@ class ManagedZonePrivateVisibilityConfig(_messages.Message):
   Fields:
     kind: Identifies what kind of resource this is. Value: the fixed string
       "dns#managedZonePrivateVisibilityConfig".
-    networks: The list of GCE private network IDs that can see this zone.
+    networks: The list of VPC networks that can see this zone.
   """
 
   kind = _messages.StringField(1, default=u'dns#managedZonePrivateVisibilityConfig')
@@ -924,9 +932,9 @@ class ManagedZonePrivateVisibilityConfigNetwork(_messages.Message):
   Fields:
     kind: Identifies what kind of resource this is. Value: the fixed string
       "dns#managedZonePrivateVisibilityConfigNetwork".
-    networkUrl: The fully qualified URL of the GCE private network to bind to.
-      This should be formatted like https://www.googleapis.com/compute/v1/proj
-      ects/{project}/global/networks/{network}
+    networkUrl: The fully qualified URL of the VPC network to bind to. This
+      should be formatted like https://www.googleapis.com/compute/v1/projects/
+      {project}/global/networks/{network}
   """
 
   kind = _messages.StringField(1, default=u'dns#managedZonePrivateVisibilityConfigNetwork')
@@ -965,7 +973,9 @@ class Operation(_messages.Message):
 
   Enums:
     StatusValueValuesEnum: Status of the operation. Can be one of the
-      following: "PENDING" or "DONE" (output only).
+      following: "PENDING" or "DONE" (output only). A status of "DONE" means
+      that the request to update the authoritative servers has been sent, but
+      the servers might not be updated yet.
 
   Fields:
     dnsKeyContext: Only populated if the operation targeted a DnsKey (output
@@ -979,7 +989,9 @@ class Operation(_messages.Message):
     startTime: The time that this operation was started by the server. This is
       in RFC3339 text format (output only).
     status: Status of the operation. Can be one of the following: "PENDING" or
-      "DONE" (output only).
+      "DONE" (output only). A status of "DONE" means that the request to
+      update the authoritative servers has been sent, but the servers might
+      not be updated yet.
     type: Type of the operation. Operations include insert, update, and delete
       (output only).
     user: User who requested the operation, for example: user@example.com.
@@ -991,7 +1003,9 @@ class Operation(_messages.Message):
 
   class StatusValueValuesEnum(_messages.Enum):
     r"""Status of the operation. Can be one of the following: "PENDING" or
-    "DONE" (output only).
+    "DONE" (output only). A status of "DONE" means that the request to update
+    the authoritative servers has been sent, but the servers might not be
+    updated yet.
 
     Values:
       done: <no description>
@@ -1083,8 +1097,8 @@ class PoliciesUpdateResponse(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""A policy is a collection of rules applied to one or more networks that
-  specify forwarding behavior for that network.
+  r"""A policy is a collection of DNS rules applied to one or more Virtual
+  Private Cloud resources.
 
   Fields:
     alternativeNameServerConfig: Sets an alternative name server for the
@@ -1151,9 +1165,9 @@ class PolicyNetwork(_messages.Message):
   Fields:
     kind: Identifies what kind of resource this is. Value: the fixed string
       "dns#policyNetwork".
-    networkUrl: The fully qualified URL of the GCE private network to bind to.
-      This should be formatted like https://www.googleapis.com/compute/v1/proj
-      ects/{project}/global/networks/{network}
+    networkUrl: The fully qualified URL of the VPC network to bind to. This
+      should be formatted like https://www.googleapis.com/compute/v1/projects/
+      {project}/global/networks/{network}
   """
 
   kind = _messages.StringField(1, default=u'dns#policyNetwork')

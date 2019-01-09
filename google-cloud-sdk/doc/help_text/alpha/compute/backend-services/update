@@ -96,8 +96,9 @@ FLAGS
 
      --health-checks=HEALTH_CHECK,[...]
         Specifies a list of health check objects for checking the health of the
-        backend service. Health checks need not be for the same protocol as
-        that of the backend service.
+        backend service. Currently at most one health check can be specified.
+        Health checks need not be for the same protocol as that of the backend
+        service.
 
      --http-health-checks=HTTP_HEALTH_CHECK,[...]
         Specifies a list of legacy HTTP health check objects for checking the
@@ -139,7 +140,8 @@ FLAGS
         number associated with the name may differ between instances. If you do
         not specify this flag, your instance groups must have a service named
         http configured. See also gcloud compute instance-groups
-        set-named-ports --help.
+        set-named-ports --help. The port-name parameter cannot be set if the
+        load-balancing-scheme is INTERNAL.
 
      --protocol=PROTOCOL
         Protocol for incoming requests.
@@ -148,13 +150,14 @@ FLAGS
         TCP, UDP.
 
         If the load-balancing-scheme is EXTERNAL, the protocol must be one of:
-        HTTP, HTTPS, HTTP2, SSL, TCP, UDP.
+        HTTP, HTTPS, HTTP2, SSL, TCP.
 
      --security-policy=SECURITY_POLICY
         The security policy that will be set for this backend service.
 
      --session-affinity=SESSION_AFFINITY
-        The type of session affinity to use. SESSION_AFFINITY must be one of:
+        The type of TCP session affinity to use. Not supported for UDP.
+        SESSION_AFFINITY must be one of:
 
          CLIENT_IP
             Route requests to instances based on the hash of the client's IP

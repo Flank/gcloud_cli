@@ -494,8 +494,9 @@ FLAGS
               2) Google Compute Engine Public IPs if `--enable-private-nodes` is not
               specified.
 
-          When disabled, public internet (0.0.0.0/0) is allowed to connect to
-          Kubernetes master through HTTPS.
+          Use --no-enable-master-authorized-networks to disable. When disabled,
+          public internet (0.0.0.0/0) is allowed to connect to Kubernetes
+          master through HTTPS.
 
        --master-authorized-networks=NETWORK,[NETWORK,...]
           The list of CIDR blocks (up to 20) that are allowed to connect to

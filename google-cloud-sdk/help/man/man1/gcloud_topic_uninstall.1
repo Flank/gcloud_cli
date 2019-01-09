@@ -1,0 +1,55 @@
+
+.TH "GCLOUD_TOPIC_UNINSTALL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud topic uninstall \- supplementary help for uninstalling Cloud SDK
+
+
+
+.SH "DESCRIPTION"
+
+
+.SH "Uninstalling Google Cloud SDK"
+
+Note: For installations completed using an OS package (such as \f5apt\-get\fR,
+\f5yum\fR, etc.), uninstall Cloud SDK via the OS package manager.
+
+To completely remove Cloud SDK, follow these instructions:
+
+.RS 2m
+.IP "\(bu" 2m
+Locate your installation directory by running:
+.RE
+.sp
+
+.RS 2m
+$ gcloud info \-\-format='value(installation.sdk_root)'
+.RE
+
+.RS 2m
+.IP "\(bu" 2m
+Locate your user config directory (typically \f5~/.config/gcloud\fR on MacOS and
+Linux) by running:
+.RE
+.sp
+
+.RS 2m
+$ gcloud info \-\-format='value(config.paths.global_config_dir)'
+.RE
+
+.RS 2m
+.IP "\(bu" 2m
+Delete both these directories.
+.RE
+.sp
+
+.RS 2m
+.IP "\(bu" 2m
+Additionally, remove lines sourcing \f5completion.bash.inc\fR and
+\f5paths.bash.inc\fR in your \f5.bashrc\fR or equivalent shell init file, if you
+added them during installation.
+.RE
+.sp

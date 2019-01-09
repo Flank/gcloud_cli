@@ -1,14 +1,17 @@
 NAME
     gcloud alpha compute sole-tenancy node-groups remove-iam-policy-binding -
-        remove an IAM policy binding from a node group
+        remove IAM policy binding of a Google Compute Engine node group
 
 SYNOPSIS
     gcloud alpha compute sole-tenancy node-groups remove-iam-policy-binding
         (NODE_GROUP : --zone=ZONE) --member=MEMBER --role=ROLE
-        [GCLOUD_WIDE_FLAG ...]
+        [--all | --condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Remove an IAM policy binding from a node group.
+    (ALPHA) Remove an IAM policy binding from the IAM policy of a Google
+    Compute Engine node group. One binding consists of a member, a role, and an
+    optional condition.
 
 POSITIONAL ARGUMENTS
      Node group resource - The node group for which to remove IAM policy
@@ -45,6 +48,39 @@ REQUIRED FLAGS
      --role=ROLE
         The role to remove the member from.
 
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --all
+          Remove all bindings with this role and member, irrespective of any
+          conditions.
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be removed. When condition is explicitly
+          specified as None (e.g. --condition=None), it matches a binding
+          without a condition. Otherwise, only the binding with a condition
+          which exactly matches the specified condition (including the optional
+          description) will be removed.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
@@ -57,21 +93,25 @@ API REFERENCE
     https://developers.google.com/compute/docs/reference/latest/
 
 EXAMPLES
-    The following command will remove an IAM policy binding for the role of
-    'roles/compute.admin' for the user 'test-user@gmail.com' on node group with
-    identifier 'my-node-group'
+    To remove an IAM policy binding for the role of 'roles/compute.admin' for
+    the user 'test-user@gmail.com' with node group 'my-node-group' and zone
+    'ZONE', run:
 
         $ gcloud alpha compute sole-tenancy node-groups \
-            remove-iam-policy-binding my-node-group \
+            remove-iam-policy-binding my-node-group --zone='ZONE' \
             --member='user:test-user@gmail.com' --role='roles/compute.admin'
 
-    The following command will remove an IAM policy binding for the role of
-    'roles/compute.admin' from all authenticated users on node group
-    'my-node-group':
+    To remove an IAM policy binding which expires at the end of the year 2018
+    for the role of 'roles/compute.admin' and the user 'test-user@gmail.com'
+    with node group 'my-node-group' and zone 'ZONE', run:
 
         $ gcloud alpha compute sole-tenancy node-groups \
-            remove-iam-policy-binding my-node-group \
-            --member='allAuthenticatedUsers' --role='roles/compute.admin'
+            remove-iam-policy-binding my-node-group --zone='ZONE' \
+            --member='user:test-user@gmail.com' \
+            --role='roles/compute.admin' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

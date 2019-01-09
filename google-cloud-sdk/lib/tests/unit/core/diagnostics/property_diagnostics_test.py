@@ -56,22 +56,73 @@ class HiddenPropertiesCheckerTests(diagnostics_test_base.DiagnosticTestBase):
                         'CLOUDSDK_CORE_CHECK_GCE_METADATA': None,
                         'CLOUDSDK_CORE_SHOULD_PROMPT_TO_ENABLE_API': None})
 
-  def testIgnoreInternalProperty(self):
-    self.StartEnvPatch({'CLOUDSDK_METRICS_COMMAND_NAME': 'MOCK'})
-    hidden_properties_checker = property_diagnostics.HiddenPropertiesChecker()
+  def testIgnoreWhitelistedProperty(self):
+    self.StartEnvPatch({'CLOUDSDK_CORE_ENABLE_GRI': 'MOCK'})
+    self.StartPropertyPatch(property_diagnostics.HiddenPropertiesChecker,
+                            '_WHITELIST',
+                            return_value={'core/enable_gri'})
+    hidden_prop_checker = property_diagnostics.HiddenPropertiesChecker(False)
 
     expected_result = check_base.Result(passed=True,
                                         message='Hidden Property Check passed.')
-    actual_result, actual_fixer = hidden_properties_checker.Check()
+    actual_result, actual_fixer = hidden_prop_checker.Check()
+    self.AssertResultEqual(expected_result, actual_result)
+    self.assertIsNone(actual_fixer)
+
+  def testIgnoreUserWhitelistedProperty(self):
+    self.StartEnvPatch({'CLOUDSDK_CORE_ENABLE_GRI': 'MOCK',
+                        'CLOUDSDK_DIAGNOSTICS_HIDDEN_PROPERTY_WHITELIST':
+                            'core/enable_gri'})
+    hidden_prop_checker = property_diagnostics.HiddenPropertiesChecker(False)
+
+    expected_result = check_base.Result(passed=True,
+                                        message='Hidden Property Check passed.')
+    actual_result, actual_fixer = hidden_prop_checker.Check()
+    self.AssertResultEqual(expected_result, actual_result)
+    self.assertIsNone(actual_fixer)
+
+  def testIgnoreWhitelist(self):
+    self.StartEnvPatch({'CLOUDSDK_CORE_ENABLE_GRI': 'MOCK',
+                        'CLOUDSDK_DIAGNOSTICS_HIDDEN_PROPERTY_WHITELIST':
+                            'core/enable_gri'})
+    hidden_prop_checker = property_diagnostics.HiddenPropertiesChecker(True)
+
+    expected_result = CheckFailResult(['core/enable_gri'])
+    actual_result, actual_fixer = hidden_prop_checker.Check()
+    self.AssertResultEqual(expected_result, actual_result)
+    self.assertIsNone(actual_fixer)
+
+  def testIgnoreWhitelistAlwaysIgnore_WHITELIST(self):
+    self.StartEnvPatch({'CLOUDSDK_CORE_ENABLE_GRI': 'MOCK',
+                        'CLOUDSDK_DIAGNOSTICS_HIDDEN_PROPERTY_WHITELIST':
+                        'core/enable_gri'})
+    self.StartPropertyPatch(property_diagnostics.HiddenPropertiesChecker,
+                            '_WHITELIST',
+                            return_value={'core/enable_gri'})
+    hidden_prop_checker = property_diagnostics.HiddenPropertiesChecker(True)
+
+    expected_result = check_base.Result(passed=True,
+                                        message='Hidden Property Check passed.')
+    actual_result, actual_fixer = hidden_prop_checker.Check()
+    self.AssertResultEqual(expected_result, actual_result)
+    self.assertIsNone(actual_fixer)
+
+  def testIgnoreInternalProperty(self):
+    self.StartEnvPatch({'CLOUDSDK_METRICS_COMMAND_NAME': 'MOCK'})
+    hidden_prop_checker = property_diagnostics.HiddenPropertiesChecker(False)
+
+    expected_result = check_base.Result(passed=True,
+                                        message='Hidden Property Check passed.')
+    actual_result, actual_fixer = hidden_prop_checker.Check()
     self.AssertResultEqual(expected_result, actual_result)
     self.assertIsNone(actual_fixer)
 
   def testWarnEnvironmentProperty(self):
     self.StartEnvPatch({'CLOUDSDK_CORE_ENABLE_GRI': 'True'})
-    hidden_properties_checker = property_diagnostics.HiddenPropertiesChecker()
+    hidden_prop_checker = property_diagnostics.HiddenPropertiesChecker(False)
 
-    expected_result = CheckFailResult(['enable_gri'])
-    actual_result, actual_fixer = hidden_properties_checker.Check()
+    expected_result = CheckFailResult(['core/enable_gri'])
+    actual_result, actual_fixer = hidden_prop_checker.Check()
     self.AssertResultEqual(expected_result, actual_result)
     self.assertIsNone(actual_fixer)
 
@@ -80,10 +131,10 @@ class HiddenPropertiesCheckerTests(diagnostics_test_base.DiagnosticTestBase):
                             return_value=self.temp_path)
     prop = properties.VALUES.core.enable_gri
     properties.PersistProperty(prop, 'True', properties.Scope.USER)
-    hidden_properties_checker = property_diagnostics.HiddenPropertiesChecker()
+    hidden_prop_checker = property_diagnostics.HiddenPropertiesChecker(False)
 
-    expected_result = CheckFailResult(['enable_gri'])
-    actual_result, actual_fixer = hidden_properties_checker.Check()
+    expected_result = CheckFailResult(['core/enable_gri'])
+    actual_result, actual_fixer = hidden_prop_checker.Check()
     self.AssertResultEqual(expected_result, actual_result)
     self.assertIsNone(actual_fixer)
 
@@ -92,10 +143,10 @@ class HiddenPropertiesCheckerTests(diagnostics_test_base.DiagnosticTestBase):
                             return_value=self.temp_path)
     prop = properties.VALUES.core.enable_gri
     properties.PersistProperty(prop, 'True', properties.Scope.INSTALLATION)
-    hidden_properties_checker = property_diagnostics.HiddenPropertiesChecker()
+    hidden_prop_checker = property_diagnostics.HiddenPropertiesChecker(False)
 
-    expected_result = CheckFailResult(['enable_gri'])
-    actual_result, actual_fixer = hidden_properties_checker.Check()
+    expected_result = CheckFailResult(['core/enable_gri'])
+    actual_result, actual_fixer = hidden_prop_checker.Check()
     self.AssertResultEqual(expected_result, actual_result)
     self.assertIsNone(actual_fixer)
 

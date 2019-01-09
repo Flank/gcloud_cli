@@ -18,8 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import contextlib
-
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import e2e_utils
@@ -38,48 +36,6 @@ class ResourcePoliciesTest(e2e_test_base.BaseTest):
   def _GetResourceName():
     return next(e2e_utils.GetResourceNameGenerator(
         prefix='gcloud-compute-test'))
-
-  @contextlib.contextmanager
-  def _CreateInstance(self):
-    instance_name = self._GetResourceName()
-    try:
-      self.Run('compute instances create {0} --zone {1}'
-               .format(instance_name, self.zone))
-      self.Run('compute instances list')
-      self.AssertNewOutputContains(instance_name)
-      yield instance_name
-    finally:
-      self.Run('compute instances delete {0} --zone {1} --quiet'.format(
-          instance_name, self.zone))
-
-  @contextlib.contextmanager
-  def _CreateVmMaintenancePolicy(self):
-    policy_name = self._GetResourceName()
-    try:
-      self.Run('compute resource-policies create-vm-maintenance {0} '
-               '--region {1} --start-time 04:00Z --daily-window'.format(
-                   policy_name, self.region))
-      self.Run('compute resource-policies list')
-      self.AssertNewOutputContains(policy_name)
-      yield policy_name
-    finally:
-      self.Run('compute resource-policies delete {0} --region {1} '
-               '--quiet'.format(policy_name, self.region))
-
-  def _TestAddPolicyAndDescribeInstance(self, instance_name, policy_name):
-    self.Run('compute instances add-resource-policies {0} --zone {1} '
-             '--resource-policies {2}'.format(
-                 instance_name, self.zone, policy_name))
-    self.Run('compute instances describe {0} --zone {1}'
-             .format(instance_name, self.zone))
-    self.AssertNewOutputContains(
-        'https://www.googleapis.com/compute/alpha/projects/{0}/regions/{1}/'
-        'resourcePolicies/{2}'.format(self.Project(), self.region, policy_name))
-
-  def testResourcePolicy(self):
-    with self._CreateVmMaintenancePolicy() as policy_name:
-      with self._CreateInstance() as instance_name:
-        self._TestAddPolicyAndDescribeInstance(instance_name, policy_name)
 
   def testCreateBackupSchedulePolicy(self):
     policy_name = self._GetResourceName()

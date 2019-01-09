@@ -1,18 +1,23 @@
 NAME
     gcloud alpha genomics datasets add-iam-policy-binding - add IAM policy
-        binding for a dataset
+        binding to a genomics dataset
 
 SYNOPSIS
-    gcloud alpha genomics datasets add-iam-policy-binding ID --member=MEMBER
-        --role=ROLE [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha genomics datasets add-iam-policy-binding DATASET
+        --member=MEMBER --role=ROLE
+        [--condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) This command adds a policy binding to the IAM policy of a dataset,
-    given a dataset ID and the binding.
+    (ALPHA) Add an IAM policy binding to the IAM policy of a genomics dataset.
+    One binding consists of a member, a role, and an optional condition.
 
 POSITIONAL ARGUMENTS
-     ID
-        The ID of the dataset.
+     Dataset resource - The genomics dataset for which to add IAM policy
+     binding to. This represents a Cloud resource. This must be specified.
+
+       DATASET
+          ID of the dataset or fully qualified identifier for the dataset.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -32,17 +37,50 @@ REQUIRED FLAGS
      --role=ROLE
         Define the role of the member.
 
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be added. When condition is explicitly
+          specified as None (e.g. --condition=None), a binding without a
+          condition is added. When --condition is specified and is not a None
+          condition, --role cannot be a primitive role. Primitive roles are
+          roles/editor, roles/owner, and roles/viewer.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+API REFERENCE
+    This command uses the genomics/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/genomics
+
 EXAMPLES
     To add an IAM policy binding for the role of 'roles/editor' for the user
-    'test-user@gmail.com' on a dataset with identifier '1000', run:
+    'test-user@gmail.com' on dataset 'my-dataset', run:
 
-        $ gcloud alpha genomics datasets add-iam-policy-binding 1000 \
+        $ gcloud alpha genomics datasets add-iam-policy-binding my-dataset \
             --member='user:test-user@gmail.com' --role='roles/editor'
 
     To add an IAM policy binding for the role of 'roles/editor' to the service
@@ -54,10 +92,21 @@ EXAMPLES
             --role='roles/editor'
 
     To add an IAM policy binding for the role of 'roles/editor' for all
-    authenticated users on a dataset with identifier '1000', run:
+    authenticated users on a dataset 'my-dataset', run:
 
-        $ gcloud alpha genomics datasets add-iam-policy-binding 1000 \
+        $ gcloud alpha genomics datasets add-iam-policy-binding my-dataset \
             --member='allAuthenticatedUsers' --role='roles/editor'
+
+    To add an IAM policy binding which expires at the end of the year 2018 for
+    the role of 'roles/genomics.admin' and the user 'test-user@gmail.com' on
+    dataset 'my-dataset', run:
+
+        $ gcloud alpha genomics datasets add-iam-policy-binding my-dataset \
+            --member='user:test-user@gmail.com' \
+            --role='roles/genomics.admin' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

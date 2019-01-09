@@ -11,13 +11,19 @@ gcloud alpha builds submit \- submit a build using Google Cloud Build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-no\-cache\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR Submit a build using Google Cloud Build.
+
+When the \f5builds/use_kaniko\fR property is \f5True\fR, builds submitted with
+\f5\-\-tag\fR will use Kaniko (https://github.com/GoogleContainerTools/kaniko)
+to execute builds. Kaniko executes directives in a Dockerfile, with remote layer
+caching for faster builds. By default, Kaniko will cache layers for 6 hours. To
+override this, set the \f5builds/kaniko_cache_ttl\fR property.
 
 
 
@@ -56,6 +62,14 @@ Specify that no source should be uploaded with this build.
 \fB\-\-async\fR
 Display information about the operation in progress, without waiting for the
 operation to complete.
+
+.TP 2m
+\fB\-\-no\-cache\fR
+If set, disable layer caching when building with Kaniko.
+
+This has the same effect as setting the builds/kaniko_cache_ttl property to 0
+for this build. This can be useful in cases where Dockerfile builds are
+non\-deterministic and a non\-deterministic result should not be cached.
 
 .TP 2m
 \fB\-\-disk\-size\fR=\fIDISK_SIZE\fR

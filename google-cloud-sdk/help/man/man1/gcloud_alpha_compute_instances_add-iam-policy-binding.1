@@ -5,20 +5,21 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute instances add\-iam\-policy\-binding \- add IAM policy binding for an instance
+gcloud alpha compute instances add\-iam\-policy\-binding \- add IAM policy binding to a Google Compute Engine instance
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances add\-iam\-policy\-binding\fR \fIINSTANCE_NAME\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances add\-iam\-policy\-binding\fR (\fIINSTANCE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute instances add\-iam\-policy\-binding\fR
-adds an IAM policy binding to a Google Compute Engine instance's access policy.
+\fB(ALPHA)\fR Add an IAM policy binding to the IAM policy of a Google Compute
+Engine instance. One binding consists of a member, a role, and an optional
+condition.
 
 
 
@@ -26,10 +27,27 @@ adds an IAM policy binding to a Google Compute Engine instance's access policy.
 
 .RS 2m
 .TP 2m
-\fIINSTANCE_NAME\fR
-Name of the instance to add the IAM policy binding to.
+
+Instance resource \- The instance for which to add IAM policy binding to. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [instance] on
+the command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The name of the Google Compute Engine zone.
 
 
+.RE
 .RE
 .sp
 
@@ -70,35 +88,42 @@ Define the role of the member.
 
 .RS 2m
 .TP 2m
-\fB\-\-zone\fR=\fIZONE\fR
-Zone of the instance to add the IAM policy binding to. If not specified, you may
-be prompted to select a zone. \f5gcloud\fR will attempt to identify the zone by
-searching for resources in your project. If the zone cannot be determined, you
-will then be prompted with all Google Cloud Platform zones.
 
-To avoid prompting when this flag is omitted, you can set the
-\f5\fIcompute/zone\fR\fR property:
+At most one of these may be specified:
 
 .RS 2m
-$ gcloud config set compute/zone ZONE
+.TP 2m
+\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+
+Condition of the binding to be added. When condition is explicitly specified as
+\f5None\fR (e.g. \-\-condition=None), a binding without a condition is added.
+When \-\-condition is specified and is not a \f5None\fR condition,
+\f5\-\-role\fR cannot be a primitive role. Primitive roles are
+\f5roles/editor\fR, \f5roles/owner\fR, and \f5roles/viewer\fR.
+
+.TP 2m
+\fBexpression\fR
+(Required) Expression of the condition which evaluates to True or False. This
+uses a subset of Common Expression Language syntax.
+
+.TP 2m
+\fBtitle\fR
+(Required) Title for the expression, i.e. a short string describing its purpose.
+
+.TP 2m
+\fBdescription\fR
+(Optional) Description for the expression. This is a longer text which describes
+the expression.
+
+NOTE: An unsatisfied condition will not allow access via this binding.
+
+.TP 2m
+\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR
+Path to a local JSON or YAML file that defines the condition. To see available
+fields, see the help for \f5\-\-condition\fR.
+
+
 .RE
-
-A list of zones can be fetched by running:
-
-.RS 2m
-$ gcloud compute zones list
-.RE
-
-To unset the property, run:
-
-.RS 2m
-$ gcloud config unset compute/zone
-.RE
-
-Alternatively, the zone can be stored in the environment variable
-\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
-
-
 .RE
 .sp
 
@@ -111,35 +136,37 @@ gcloud help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/alpha\fR API. The full documentation for this
+API can be found at:
+https://developers.google.com/compute/docs/reference/latest/
+
+
+
 .SH "EXAMPLES"
 
 To add an IAM policy binding for the role of 'roles/compute.securityAdmin' for
-the user 'test\-user@gmail.com' on an instance with identifier 'my\-instance',
+the user 'test\-user@gmail.com' with instance 'my\-instance' and zone 'ZONE',
 run:
 
 .RS 2m
 $ gcloud alpha compute instances add\-iam\-policy\-binding \e
-    my\-instance \-\-member='user:test\-user@gmail.com' \e
+    my\-instance \-\-zone='ZONE' \-\-member='user:test\-user@gmail.com' \e
     \-\-role='roles/compute.securityAdmin'
 .RE
 
-To add an IAM policy binding for the role of 'roles/compute.securityAdmin' to
-the service account 'test\-proj1@example.domain.com', run:
+To add an IAM policy binding which expires at the end of the year 2018 for the
+role of 'roles/compute.securityAdmin' and the user 'test\-user@gmail.com' with
+instance 'my\-instance' and zone 'ZONE', run:
 
 .RS 2m
 $ gcloud alpha compute instances add\-iam\-policy\-binding \e
-    test\-proj1@example.domain.com \e
-    \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
-    \-\-role='roles/compute.securityAdmin'
-.RE
-
-To add an IAM policy binding for the role of 'roles/compute.securityAdmin' for
-all authenticated users on an instance with identifier 'my\-instance', run:
-
-.RS 2m
-$ gcloud alpha compute instances add\-iam\-policy\-binding \e
-    my\-instance \-\-member='allAuthenticatedUsers' \e
-    \-\-role='roles/compute.securityAdmin'
+    my\-instance \-\-zone='ZONE' \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/compute.securityAdmin' \e
+    \-\-condition='expression=request.time <
+ timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+tion=Expires at midnight on 2018\-12\-31'
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy

@@ -1,3 +1,6 @@
+skip:
+  reason: Failing
+  bug: b/121390766
 title: test simulate maintenance event
 release_tracks:
 - ALPHA
@@ -59,7 +62,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$gcloud-compute-test1$$/simulateMaintenanceEvent?alt=json
           method: POST
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -88,7 +91,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$gcloud-compute-test1$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0

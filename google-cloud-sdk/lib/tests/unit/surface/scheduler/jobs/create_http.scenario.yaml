@@ -34,7 +34,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://appengine.googleapis.com/v1/apps/fake-project?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
@@ -42,9 +42,11 @@ actions:
           headers:
             status: '200'
           body:
-            dispatchRules: []
-            locationId: us-central1
-            name: apps/fake-project
+            locations:
+            - name: projects/fake-project/locations/us-central1
+              locationId: us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
           uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json

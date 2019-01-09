@@ -1,0 +1,158 @@
+
+.TH "GCLOUD_ALPHA_BUILDS_WORKER\-POOLS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha builds worker\-pools update \- update a workerpool used by Google Cloud Build
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha builds worker\-pools update\fR ([[\fIWORKER_POOL\fR\ :\ \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ \fB\-\-add\-regions\fR=[\fIREGION\fR,...]\ \fB\-\-clear\-regions\fR\ \fB\-\-remove\-regions\fR=[\fIREGION\fR,...]\ \fB\-\-worker\-disk\-size\fR=\fIWORKER_DISK_SIZE\fR\ \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR\ \fB\-\-worker\-tag\fR=\fIWORKER_TAG\fR\ \fB\-\-worker\-network\-name\fR=\fIWORKER_NETWORK_NAME\fR\ \fB\-\-worker\-network\-project\fR=\fIWORKER_NETWORK_PROJECT\fR\ \fB\-\-worker\-network\-subnet\fR=\fIWORKER_NETWORK_SUBNET\fR]]] \fB\-\-config\-from\-file\fR=\fICONFIG_FROM_FILE\fR)\ [\fIGCLOUD_WIDE_FLAG ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update a worker pool used by Google Cloud Build.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+Command\-line flags to configure the WorkerPool:
+
+.RS 2m
+.TP 2m
+\fIWORKER_POOL\fR
+The WorkerPool to update. This positional must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR
+Total number of workers to be created across all requested regions.
+
+.TP 2m
+
+Update the Cloud region or regions in which the Workerpool is located. To
+overwrite regions, use \-\-clear\-regions followed by \-\-add\-regions in the
+same command. Choices: us\-central1, us\-west1, us\-east1, and us\-east4.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-regions\fR=[\fIREGION\fR,...]
+Add regions, separated by comma.
+
+.TP 2m
+\fB\-\-clear\-regions\fR
+Remove all regions.
+
+.TP 2m
+\fB\-\-remove\-regions\fR=[\fIREGION\fR,...]
+Remove regions, separated by comma.
+
+.RE
+.sp
+.TP 2m
+
+Configuration to be used for creating workers in the WorkerPool:
+
+.RS 2m
+.TP 2m
+\fB\-\-worker\-disk\-size\fR=\fIWORKER_DISK_SIZE\fR
+Size of the disk attached to the worker.
+
+If not given, Cloud Build will use a standard disk size.
+\f5\-\-worker\-disk\-size\fR is overridden if you specify a different disk size
+using \f5\-\-disk\-size\fR during \f5gcloud builds submit\fR.
+
+.TP 2m
+\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR
+Machine Type of the worker, such as n1\-standard\-1.
+
+See https://cloud.google.com/compute/docs/machine\-types.
+
+If left blank, Cloud Build will use a standard unspecified machine to create the
+worker pool.
+
+\f5\-\-worker\-machine\-type\fR is overridden if you specify a different machine
+type using \f5\-\-machine\-type\fR during \f5gcloud builds submit\fR.
+
+.TP 2m
+\fB\-\-worker\-tag\fR=\fIWORKER_TAG\fR
+The tag applied to the worker, and the same tag used by the firewall rule.
+
+It is used to identify the Cloud Build workers among other VMs. The default
+value for tag is \f5worker\fR.
+
+.TP 2m
+
+The network definition used to create the worker. If all of these flags are
+unused, the workers will be created in the WorkerPool's project on the default
+network. You cannot specify just one of these flags: it is all or none. However,
+you can set them to the empty string in order to use the default settings.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-worker\-network\-name\fR=\fIWORKER_NETWORK_NAME\fR
+Network on which the workers are created.
+
+\f5default\fR network is used if empty string.
+
+.TP 2m
+\fB\-\-worker\-network\-project\fR=\fIWORKER_NETWORK_PROJECT\fR
+ID of the project containing the given network and subnet.
+
+The workerpool's project is used if empty string.
+
+.TP 2m
+\fB\-\-worker\-network\-subnet\fR=\fIWORKER_NETWORK_SUBNET\fR
+Subnet on which the workers are created.
+
+\f5default\fR subnet is used if empty string.
+
+.RE
+.RE
+.RE
+.sp
+.TP 2m
+\fB\-\-config\-from\-file\fR=\fICONFIG_FROM_FILE\fR
+A file that contains updates to the configuration for the WorkerPool.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

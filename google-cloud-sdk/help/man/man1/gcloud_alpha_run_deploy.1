@@ -135,43 +135,24 @@ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To deploy an app to the service my\-backend, navigate to the app's source
-directory, and run:
+To deploy a container to the service \f5my\-backend\fR on Cloud Run:
 
 .RS 2m
-$ gcloud alpha run deploy my\-backend
-.RE
-
-To deploy a function named my_func, defined in ./index.js:
-
-.RS 2m
-$ gcloud alpha run deploy my_func \-\-function
-.RE
-
-To deploy a container, run:
-
-.RS 2m
-$ gcloud alpha run deploy my\-custom\-app \-\-image gcr.io/my/image
+$ gcloud alpha run deploy my\-backend \-\-image gcr.io/my/image
 .RE
 
 You may also omit the service name. Then a prompt will be displayed with a
 suggested default value:
 
 .RS 2m
-$ gcloud alpha run deploy
+$ gcloud alpha run deploy \-\-image gcr.io/my/image
 .RE
 
-The first time you deploy, gcloud will ask for a destination region, and will
-offer to save it as a default. To view the current default, run:
+To deploy to Cloud Run on Kubernetes Engine, you need to specify a cluster:
 
 .RS 2m
-$ gcloud config get\-value run/region
-.RE
-
-To override the default region, you may use the \-\-region flag:
-
-.RS 2m
-$ gcloud alpha run deploy \-\-region us\-east
+$ gcloud alpha run deploy \-\-image gcr.io/my/image \e
+  \-\-cluster my\-cluster
 .RE
 
 

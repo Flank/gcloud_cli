@@ -28,7 +28,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        Add IAM policy binding for a organization.
+        Add IAM policy binding for an organization.
 
      describe
         Show metadata for an organization.
@@ -40,7 +40,7 @@ COMMANDS
         List organizations accessible by the active account.
 
      remove-iam-policy-binding
-        Remove IAM policy binding for a organization.
+        Remove IAM policy binding for an organization.
 
      set-iam-policy
         Set IAM policy for an organization.

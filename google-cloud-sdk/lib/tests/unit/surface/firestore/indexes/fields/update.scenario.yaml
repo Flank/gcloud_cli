@@ -1,0 +1,598 @@
+title: cloud firestore single-field update test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: single --index, order only
+  - command: |
+      firestore indexes fields update timestamp --collection-group=Events --index order=ascending
+  - stderr: |
+      Request issued for: [timestamp]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated field [timestamp].
+  - stdout: |
+      indexConfig:
+        ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+        indexes:
+        - fields:
+          - fieldPath: timestamp
+            order: ASCENDING
+          queryScope: COLLECTION
+          state: READY
+      name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+- execute:
+  - label: single --index, array-config only
+  - command: |
+      firestore indexes fields update timestamp --collection-group=Events --index
+      array-config=contains
+  - stderr: |
+      Request issued for: [timestamp]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated field [timestamp].
+  - stdout: |
+      indexConfig:
+        ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+        indexes:
+        - fields:
+          - arrayConfig: CONTAINS
+            fieldPath: timestamp
+          queryScope: COLLECTION
+          state: READY
+      name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+- execute:
+  - label: multiple --index, order and array-config
+  - command: |
+      firestore indexes fields update timestamp --collection-group=Events --index order=descending
+      --index array-config=contains
+  - stderr: |
+      Request issued for: [timestamp]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated field [timestamp].
+  - stdout: |
+      indexConfig:
+        ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+        indexes:
+        - fields:
+          - fieldPath: timestamp
+            order: ASCENDING
+          queryScope: COLLECTION
+          state: CREATING
+        - fields:
+          - arrayConfig: CONTAINS
+            fieldPath: timestamp
+          queryScope: COLLECTION
+          state: READY
+      name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+- execute:
+  - label: invalid --index, order and array-config both specified
+  - command: |
+      firestore indexes fields update timestamp --collection-group=Events --index
+      array-config=contains,order=ascending
+  - error: "1: Invalid value for [--index]: Exactly one of 'order' or 'array-config'\
+      \ must be specified for each --index flag provided."
+- execute:
+  - label: invalid --index, invalid order
+  - command: |
+      firestore indexes fields update timestamp --collection-group=Events --index order=badorder
+  - stderr: '.*Invalid choice: badorder\. Valid choices are: \[ascending, descending\]\..*$'
+  - error: '1: argument --index: Invalid choice: badorder. Valid choices are: [ascending,
+      descending].'
+- execute:
+  - label: invalid --index, invalid array-config
+  - command: |
+      firestore indexes fields update timestamp --collection-group=Events --index
+      array-config=badarrayconfig
+  - stderr: '.*Invalid choice: badarrayconfig\. Valid choices are: \[contains\]\..*$'
+  - error: '1: argument --index: Invalid choice: badarrayconfig. Valid choices are:
+      [contains].'
+- execute:
+  - label: disable indexes
+  - command: |
+      firestore indexes fields update timestamp --collection-group=Events --disable-indexes
+  - stderr: |
+      Request issued for: [timestamp]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated field [timestamp].
+  - stdout: |
+      indexConfig:
+        ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+      name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+- execute:
+  - label: clear exemption
+  - command: |
+      firestore indexes fields update timestamp --collection-group=Events --clear-exemption
+  - stderr: |
+      Request issued for: [timestamp]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated field [timestamp].
+  - stdout: |
+      indexConfig:
+        ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+        indexes:
+        - fields:
+          - fieldPath: timestamp
+            order: ASCENDING
+          queryScope: COLLECTION
+          state: CREATING
+        - fields:
+          - fieldPath: timestamp
+            order: DESCENDING
+          queryScope: COLLECTION
+          state: CREATING
+        - fields:
+          - arrayConfig: CONTAINS
+            fieldPath: timestamp
+          queryScope: COLLECTION
+          state: CREATING
+        reverting: true
+      name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+actions:
+- execute_command:
+    label: single --index, order only
+    command: |
+      firestore indexes fields update timestamp --collection-group=Events --index order=ascending
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              indexConfig:
+                indexes:
+                - fields:
+                  - order: ASCENDING
+                  queryScope: COLLECTION
+              name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/operations/AyAxZTM4YmZjM2FiYjYtOTJlYS00ZGE0LWFjNjMtNGMzYzcxODUkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
+              "metadata": {
+                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "startTime": "2018-12-11T23:59:35.092Z",
+                "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+                "state": "INITIALIZING"
+              }
+            }
+    - expect_stderr: |
+        Request issued for: [timestamp]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+              "indexConfig": {
+                "indexes": [
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "timestamp",
+                        "order": "ASCENDING"
+                      }
+                    ],
+                    "state": "READY"
+                  }
+                ],
+                "ancestorField": "projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*"
+              }
+            }
+        repeatable: true
+    - expect_stderr: |
+        Updated field [timestamp].
+    - expect_stdout: |
+        indexConfig:
+          ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+          indexes:
+          - fields:
+            - fieldPath: timestamp
+              order: ASCENDING
+            queryScope: COLLECTION
+            state: READY
+        name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: single --index, array-config only
+    command: |
+      firestore indexes fields update timestamp --collection-group=Events --index
+      array-config=contains
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              indexConfig:
+                indexes:
+                - fields:
+                  - arrayConfig: CONTAINS
+                  queryScope: COLLECTION
+              name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/operations/AyA1MDNiZjA1NGFhN2ItMzk3OC1lMjk0LTU1OTktNjllYmY3YmQkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
+              "metadata": {
+                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "startTime": "2018-12-12T17:11:49.966Z",
+                "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+                "state": "INITIALIZING"
+              }
+            }
+    - expect_stderr: |
+        Request issued for: [timestamp]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+              "indexConfig": {
+                "indexes": [
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "timestamp",
+                        "arrayConfig": "CONTAINS"
+                      }
+                    ],
+                    "state": "READY"
+                  }
+                ],
+                "ancestorField": "projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*"
+              }
+            }
+    - expect_stderr: |
+        Updated field [timestamp].
+    - expect_stdout: |
+        indexConfig:
+          ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+          indexes:
+          - fields:
+            - arrayConfig: CONTAINS
+              fieldPath: timestamp
+            queryScope: COLLECTION
+            state: READY
+        name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: multiple --index, order and array-config
+    command: |
+      firestore indexes fields update timestamp --collection-group=Events --index order=descending
+      --index array-config=contains
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              indexConfig:
+                indexes:
+                - fields:
+                  - order: DESCENDING
+                  queryScope: COLLECTION
+                - fields:
+                  - arrayConfig: CONTAINS
+                  queryScope: COLLECTION
+              name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/operations/AyA2ODMxM2JkNTZiMzYtZTAyOS03NTU0LTlhZWQtYjFhMjYyOWEkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
+              "metadata": {
+                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "startTime": "2018-12-12T17:22:29.699Z",
+                "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+                "state": "INITIALIZING"
+              }
+            }
+    - expect_stderr: |
+        Request issued for: [timestamp]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+              "indexConfig": {
+                "indexes": [
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "timestamp",
+                        "order": "ASCENDING"
+                      }
+                    ],
+                    "state": "CREATING"
+                  },
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "timestamp",
+                        "arrayConfig": "CONTAINS"
+                      }
+                    ],
+                    "state": "READY"
+                  }
+                ],
+                "ancestorField": "projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*"
+              }
+            }
+    - expect_stderr: |
+        Updated field [timestamp].
+    - expect_stdout: |
+        indexConfig:
+          ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+          indexes:
+          - fields:
+            - fieldPath: timestamp
+              order: ASCENDING
+            queryScope: COLLECTION
+            state: CREATING
+          - fields:
+            - arrayConfig: CONTAINS
+              fieldPath: timestamp
+            queryScope: COLLECTION
+            state: READY
+        name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: invalid --index, order and array-config both specified
+    command: |
+      firestore indexes fields update timestamp --collection-group=Events --index
+      array-config=contains,order=ascending
+    events:
+    - expect_exit:
+        code: 1
+        message: "Invalid value for [--index]: Exactly one of 'order' or 'array-config'\
+          \ must be specified for each --index flag provided."
+- execute_command:
+    label: invalid --index, invalid order
+    command: |
+      firestore indexes fields update timestamp --collection-group=Events --index order=badorder
+    events:
+    - expect_stderr:
+        matches: '.*Invalid choice: badorder\. Valid choices are: \[ascending, descending\]\..*'
+    - expect_exit:
+        code: 1
+        message: 'argument --index: Invalid choice: badorder. Valid choices are: [ascending,
+          descending].'
+- execute_command:
+    label: invalid --index, invalid array-config
+    command: |
+      firestore indexes fields update timestamp --collection-group=Events --index
+      array-config=badarrayconfig
+    events:
+    - expect_stderr:
+        matches: '.*Invalid choice: badarrayconfig\. Valid choices are: \[contains\]\..*'
+    - expect_exit:
+        code: 1
+        message: 'argument --index: Invalid choice: badarrayconfig. Valid choices
+          are: [contains].'
+- execute_command:
+    label: disable indexes
+    command: |
+      firestore indexes fields update timestamp --collection-group=Events --disable-indexes
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              indexConfig: {}
+              name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/operations/AyA1N2MxNTc3NTc3YjMtYzU5Yi0yZGQ0LTkzNDUtMWRkM2M1ZDQkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
+              "metadata": {
+                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "startTime": "2018-12-12T17:44:31.376Z",
+                "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+                "state": "INITIALIZING"
+              }
+            }
+    - expect_stderr: |
+        Request issued for: [timestamp]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+              "indexConfig": {
+                "ancestorField": "projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*"
+              }
+            }
+    - expect_stderr: |
+        Updated field [timestamp].
+    - expect_stdout: |
+        indexConfig:
+          ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+        name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: clear exemption
+    command: |
+      firestore indexes fields update timestamp --collection-group=Events --clear-exemption
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/operations/AyA5YmM5ZTNkMmIzZTItMjllYi0zMjI0LTE5YjgtMGIwOWQ0NTAkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
+              "metadata": {
+                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "startTime": "2018-12-12T17:47:39.206Z",
+                "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+                "state": "INITIALIZING"
+              }
+            }
+    - expect_stderr: |
+        Request issued for: [timestamp]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
+              "indexConfig": {
+                "indexes": [
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "timestamp",
+                        "order": "ASCENDING"
+                      }
+                    ],
+                    "state": "CREATING"
+                  },
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "timestamp",
+                        "order": "DESCENDING"
+                      }
+                    ],
+                    "state": "CREATING"
+                  },
+                  {
+                    "queryScope": "COLLECTION",
+                    "fields": [
+                      {
+                        "fieldPath": "timestamp",
+                        "arrayConfig": "CONTAINS"
+                      }
+                    ],
+                    "state": "CREATING"
+                  }
+                ],
+                "ancestorField": "projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*",
+                "reverting": true
+              }
+            }
+    - expect_stderr: |
+        Updated field [timestamp].
+    - expect_stdout: |
+        indexConfig:
+          ancestorField: projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*
+          indexes:
+          - fields:
+            - fieldPath: timestamp
+              order: ASCENDING
+            queryScope: COLLECTION
+            state: CREATING
+          - fields:
+            - fieldPath: timestamp
+              order: DESCENDING
+            queryScope: COLLECTION
+            state: CREATING
+          - fields:
+            - arrayConfig: CONTAINS
+              fieldPath: timestamp
+            queryScope: COLLECTION
+            state: CREATING
+          reverting: true
+        name: projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp
+    - expect_exit:
+        code: 0

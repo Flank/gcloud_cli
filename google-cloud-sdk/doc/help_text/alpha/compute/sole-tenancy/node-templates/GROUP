@@ -22,7 +22,8 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) Add an IAM policy binding to a node template.
+        (ALPHA) Add IAM policy binding to a Google Compute Engine node
+        template.
 
      create
         (ALPHA) Creates a Google Compute Engine node template.
@@ -40,7 +41,8 @@ COMMANDS
         (ALPHA) List Google Compute Engine node templates.
 
      remove-iam-policy-binding
-        (ALPHA) Remove an IAM policy binding from a node template.
+        (ALPHA) Remove IAM policy binding of a Google Compute Engine node
+        template.
 
      set-iam-policy
         (ALPHA) Set the IAM policy for a Google Compute Engine node template.

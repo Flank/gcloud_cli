@@ -292,7 +292,7 @@ def _GetReadyToUseMessage(account, project, zone=None, region=None):
       '* Run `gcloud --help` to see the Cloud Platform services you can '
       'interact with. And run `gcloud help COMMAND` to get help on any '
       'gcloud command.',
-      '* Run `gcloud topic -h` to learn about advanced features of the SDK '
+      '* Run `gcloud topic --help` to learn about advanced features of the SDK '
       'like arg files and output formatting',
       ''
   ])

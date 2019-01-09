@@ -60,6 +60,51 @@ def MakeRepeatMock(num_tries):
   return RepeatMock
 
 
+class TasksTest(sdk_test_base.SdkBase):
+  """Tests that an individual task works correctly."""
+  _TEST_BUCKET = 'my-bucket'
+
+  def SetUp(self):
+    # Use single threads for unit tests; e2e tests will test (and benchmark)
+    # actual use of parallel operations.
+    self.get_pool_mock = self.StartObjectPatch(
+        parallel, 'GetPool', return_value=parallel.DummyPool())
+    self.storage_client_mock = mock.Mock(storage_api.StorageClient)
+    self.StartObjectPatch(storage_api, 'StorageClient',
+                          return_value=self.storage_client_mock)
+
+  def testUpload(self):
+    self.upload_mock = self.storage_client_mock.CopyFileToGCS
+    local = '/some/file'
+    remote = storage_util.ObjectReference(self._TEST_BUCKET, 'remote/obj')
+    task = storage_parallel.FileUploadTask(local, remote)
+    storage_parallel.ExecuteTasks([task])
+    self.upload_mock.assert_called_once_with(local, remote)
+
+  def testDownload(self):
+    self.download_mock = self.storage_client_mock.CopyFileFromGCS
+    local = '/some/file'
+    remote = storage_util.ObjectReference(self._TEST_BUCKET, 'remote/obj')
+    task = storage_parallel.FileDownloadTask(remote, local)
+    storage_parallel.ExecuteTasks([task])
+    self.download_mock.assert_called_once_with(remote, local)
+
+  def testCopy(self):
+    self.copy_mock = self.storage_client_mock.Copy
+    remote1 = storage_util.ObjectReference(self._TEST_BUCKET, 'remote/obj1')
+    remote2 = storage_util.ObjectReference(self._TEST_BUCKET, 'remote/obj2')
+    task = storage_parallel.FileRemoteCopyTask(remote1, remote2)
+    storage_parallel.ExecuteTasks([task])
+    self.copy_mock.assert_called_once_with(remote1, remote2)
+
+  def testDelete(self):
+    self.delete_mock = self.storage_client_mock.DeleteObject
+    remote = storage_util.ObjectReference(self._TEST_BUCKET, 'remote/obj')
+    task = storage_parallel.ObjectDeleteTask(remote)
+    storage_parallel.ExecuteTasks([task])
+    self.delete_mock.assert_called_once_with(remote)
+
+
 class ParallelUploadTestBase(sdk_test_base.WithOutputCapture):
 
   _TEST_BUCKET = 'my-bucket'

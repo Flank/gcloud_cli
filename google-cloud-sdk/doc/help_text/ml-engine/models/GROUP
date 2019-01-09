@@ -42,7 +42,7 @@ COMMANDS
         List existing Cloud ML Engine models.
 
      remove-iam-policy-binding
-        Remove a policy binding from a model.
+        Remove IAM policy binding from a ML model.
 
      set-iam-policy
         Set the IAM policy for a model.

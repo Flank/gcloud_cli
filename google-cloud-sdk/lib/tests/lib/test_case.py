@@ -53,6 +53,10 @@ from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.util import encoding as enc
 from googlecloudsdk.core.util import files as files_util
+# TODO(b/121133803): This needs to be imported before any test starts because
+# we mock out Thread in the base test case here and if the import happens after
+# the mock, things don't work.
+from googlecloudsdk.core.util import parallel  # pylint: disable=unused-import
 from googlecloudsdk.core.util import pkg_resources
 from googlecloudsdk.core.util import platforms
 

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute instance\-templates remove\-iam\-policy\-binding \- remove an IAM policy binding from an instance template
+gcloud beta compute instance\-templates remove\-iam\-policy\-binding \- remove IAM policy binding of a Google Compute Engine instance template
 
 
 
@@ -17,7 +17,8 @@ gcloud beta compute instance\-templates remove\-iam\-policy\-binding \- remove a
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Remove an IAM policy binding from an instance template.
+\fB(BETA)\fR Remove an IAM policy binding of a Google Compute Engine instance
+template.
 
 
 
@@ -96,24 +97,13 @@ https://developers.google.com/compute/docs/reference/latest/
 
 .SH "EXAMPLES"
 
-The following command will remove an IAM policy binding for the role of
-\'roles/compute.admin' for the user 'test\-user@gmail.com' on instance template
-with identifier 'my\-template'
+To remove an IAM policy binding for the role of 'roles/compute.admin' for the
+user 'test\-user@gmail.com' with instance template 'my\-template', run:
 
 .RS 2m
 $ gcloud beta compute instance\-templates remove\-iam\-policy\-binding \e
     my\-template \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/compute.admin'
-.RE
-
-The following command will remove an IAM policy binding for the role of
-\'roles/compute.admin' from all authenticated users on instance template
-\'my\-template':
-
-.RS 2m
-$ gcloud beta compute instance\-templates remove\-iam\-policy\-binding \e
-    my\-template \-\-member='allAuthenticatedUsers' \e
-    \-\-role='roles/compute.admin'
+    \-\-role='roles/editor'
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy

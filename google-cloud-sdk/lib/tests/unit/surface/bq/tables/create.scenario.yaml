@@ -1,0 +1,646 @@
+title: Create a BigQuery Table
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Required Params (base case)
+  - command: bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+  - stderr: |
+      Created table [my_table].
+- execute:
+  - label: With Description
+  - command: bq tables create --dataset my_dataset my_table --description 'My New
+      Table'
+  - stderr: |
+      Created table [my_table].
+- execute:
+  - label: With Expiration
+  - command: bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --expiration 2w
+  - stderr: |
+      Created table [my_table].
+- execute:
+  - label: As View
+  - command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_view
+      --view 'SELECT field1, field3 FROM `fake-project.my_dataset.other_table`'
+  - stderr: |
+      Created table [my_view].
+- execute:
+  - label: As view with LegacySQL
+  - command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_view
+      --view 'SELECT field1, field2 FROM [fake-project:my_dataset.other_table]'
+      --use-legacy-sql
+  - stderr: |
+      Created table [my_view].
+- execute:
+  - label: With in-line schema
+  - command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --schema=name=string,value=float
+  - stderr: |
+      Created table [my_table].
+- execute:
+  - label: With schema file
+  - command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --schema-file schema.json
+  - stderr: |
+      Created table [my_table].
+- execute:
+  - label: With bad schema file
+  - command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --schema-file bad_schema.json
+  - error: "1: Error parsing schema file, invalid field definition [u'name']"
+- execute:
+  - label: With all optional args
+  - command: |-
+      bq tables create my_table --dataset my_dataset --description 'My New Table'
+      --view 'SELECT field1, field2 FROM SELECT field1, field2 FROM [fake-project:my_dataset.other_table]'
+      --use-legacy-sql
+      --expiration 2w
+  - stderr: |
+      Created table [my_table].
+- execute:
+  - label: Required Params with overwrite flag.
+  - command: bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --overwrite
+  - stderr: |
+      Created table [my_table].
+actions:
+- write_file:
+    path: schema.json
+    contents: |
+      {
+        "schema":[
+        {
+          "name":"field1",
+          "type":"STRING"
+        },
+        {
+          "name":"field2",
+          "type":"FLOAT"
+        },
+        {
+          "name":"field3",
+          "type":"boolean"
+        }
+        ]
+      }
+- write_file:
+    path: bad_schema.json
+    contents: |
+      {
+        "schema":[
+        {
+          "type":"STRING"
+        },
+        {
+          "name":"field2",
+          "type":"FLOAT"
+        },
+        {
+          "name":"field3",
+          "type":"boolean"
+        }
+        ]
+      }
+
+- execute_command:
+    label: Required Params (base case)
+    command: bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              tableReference:
+                tableId: my_table
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+              "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+                "tableId": "my_table"
+              },
+              "numBytes": "0",
+              "numLongTermBytes": "0",
+              "numRows": "0",
+              "creationTime": "1544035966999",
+              "lastModifiedTime": "1544035967040",
+              "type": "TABLE",
+              "location": "US"
+            }
+    - expect_stderr: |
+        Created table [my_table].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: With Description
+    command: bq tables create --dataset my_dataset my_table --description 'My New
+      Table'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              description: My New Table
+              tableReference:
+                tableId: my_table
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+              "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+                "tableId": "my_table"
+              },
+              "description": "My New Table",
+              "numBytes": "0",
+              "numLongTermBytes": "0",
+              "numRows": "0",
+              "creationTime": "1544035966999",
+              "lastModifiedTime": "1544035967040",
+              "type": "TABLE",
+              "location": "US"
+            }
+    - expect_stderr: |
+        Created table [my_table].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: With Expiration
+    command: bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --expiration 2w
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables?alt=json
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: '.*\"expirationTime\": \"\d+\",.*'
+            json:
+              tableReference:
+                tableId: my_table
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+              "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+                "tableId": "my_table"
+              },
+              "numBytes": "0",
+              "numLongTermBytes": "0",
+              "numRows": "0",
+              "creationTime": "1544045094848",
+              "expirationTime": "1545254694000",
+              "lastModifiedTime": "1544045094913",
+              "type": "TABLE",
+              "location": "US"
+            }
+    - expect_stderr: |
+        Created table [my_table].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: As View
+    command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_view
+      --view 'SELECT field1, field3 FROM `fake-project.my_dataset.other_table`'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              tableReference:
+                tableId: my_view
+              view:
+                query: SELECT field1, field3 FROM `fake-project.my_dataset.other_table`
+                useLegacySql: false
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_view",
+             "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+              "tableId": "my_view"
+             },
+             "schema": {
+              "fields": [
+               {
+                "name": "field1",
+                "type": "STRING",
+                "mode": "NULLABLE"
+               },
+               {
+                "name": "field3",
+                "type": "BOOLEAN",
+                "mode": "NULLABLE"
+               }
+              ]
+             },
+             "numBytes": "0",
+             "numLongTermBytes": "0",
+             "numRows": "0",
+             "creationTime": "1544041912598",
+             "lastModifiedTime": "1544041912709",
+             "type": "VIEW",
+             "view": {
+              "query": "SELECT name, value FROM `fake-project.my_dataset.other_table`",
+              "useLegacySql": false
+             },
+             "location": "US"
+            }
+    - expect_stderr: |
+        Created table [my_view].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: As view with LegacySQL
+    command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_view
+      --view 'SELECT field1, field2 FROM [fake-project:my_dataset.other_table]'
+      --use-legacy-sql
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              tableReference:
+                tableId: my_view
+              view:
+                query: SELECT field1, field2 FROM [fake-project:my_dataset.other_table]
+                useLegacySql: true
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_view",
+             "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+              "tableId": "my_view"
+             },
+              "schema": {
+                "fields": [
+                {
+                  "name": "field1",
+                  "type": "STRING",
+                  "mode": "NULLABLE"
+                },
+                {
+                  "name": "field2",
+                  "type": "FLOAT",
+                  "mode": "NULLABLE"
+                }
+                ]
+              },
+              "numBytes": "0",
+              "numLongTermBytes": "0",
+              "numRows": "0",
+              "creationTime": "1544045853262",
+              "lastModifiedTime": "1544045853408",
+              "type": "VIEW",
+              "view": {
+                "query": "SELECT field1, field2 FROM SELECT field1, field2 FROM [fake-project:my_dataset.other_table]",
+                "useLegacySql": true
+              },
+              "location": "US"
+            }
+    - expect_stderr: |
+        Created table [my_view].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: With in-line schema
+    command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --schema=name=string,value=float
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              schema:
+                fields:
+                - name: name
+                  type: string
+                - name: value
+                  type: float
+              tableReference:
+                tableId: my_table
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+              "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+                "tableId": "my_table"
+              },
+             "schema": {
+              "fields": [
+               {
+                "name": "name",
+                "type": "STRING"
+               },
+               {
+                "name": "value",
+                "type": "FLOAT"
+               }
+              ]
+             },
+             "numBytes": "0",
+             "numLongTermBytes": "0",
+             "numRows": "0",
+             "creationTime": "1544035966999",
+             "lastModifiedTime": "1544035967040",
+             "type": "TABLE",
+             "location": "US"
+            }
+    - expect_stderr: |
+        Created table [my_table].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: With schema file
+    command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --schema-file schema.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              schema:
+                fields:
+                - mode: NULLABLE
+                  name: field1
+                  type: STRING
+                - mode: NULLABLE
+                  name: field2
+                  type: FLOAT
+                - mode: NULLABLE
+                  name: field3
+                  type: boolean
+              tableReference:
+                tableId: my_table
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+              "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+                "tableId": "my_table"
+              },
+             "schema": {
+              "fields": [
+               {
+                "name": "field1",
+                "type": "STRING",
+                "mode": "NULLABLE"
+               },
+               {
+                "name": "field2",
+                "type": "FLOAT",
+                "mode": "NULLABLE"
+               },
+               {
+                "name": "field3",
+                "type": "BOOLEAN",
+                "mode": "NULLABLE"
+               }
+              ]
+             },
+             "numBytes": "0",
+             "numLongTermBytes": "0",
+             "numRows": "0",
+             "creationTime": "1544039432337",
+             "lastModifiedTime": "1544039432380",
+             "type": "TABLE",
+             "location": "US"
+            }
+    - expect_stderr: |
+        Created table [my_table].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: With bad schema file
+    command: |-
+      bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --schema-file bad_schema.json
+    events:
+    - expect_exit:
+        code: 1
+        message:
+          matches: 'Error parsing schema file, invalid field definition .*name.*'
+- execute_command:
+    label: With all optional args
+    command: |-
+      bq tables create my_table --dataset my_dataset --description 'My New Table'
+      --view 'SELECT field1, field2 FROM SELECT field1, field2 FROM [fake-project:my_dataset.other_table]'
+      --use-legacy-sql
+      --expiration 2w
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables?alt=json
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: '.*\"expirationTime\": \"\d+\",.*'
+            json:
+              description: My New Table
+              tableReference:
+                tableId: my_table
+              view:
+                query: SELECT field1, field2 FROM SELECT field1, field2 FROM [fake-project:my_dataset.other_table]
+                useLegacySql: true
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+             "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+              "tableId": "my_table"
+             },
+              "schema": {
+                "fields": [
+                {
+                  "name": "field1",
+                  "type": "STRING",
+                  "mode": "NULLABLE"
+                },
+                {
+                  "name": "field2",
+                  "type": "FLOAT",
+                  "mode": "NULLABLE"
+                }
+                ]
+              },
+              "description": "My New Table",
+              "numBytes": "0",
+              "numLongTermBytes": "0",
+              "numRows": "0",
+              "creationTime": "1544045853262",
+              "expirationTime": "1545254694000",
+              "lastModifiedTime": "1544045853408",
+              "type": "VIEW",
+              "view": {
+                "query": "SELECT field1, field2 FROM SELECT field1, field2 FROM [fake-project:my_dataset.other_table]",
+                "useLegacySql": true
+              },
+              "location": "US"
+            }
+    - expect_stderr: |
+        Created table [my_table].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Required Params with overwrite flag.
+    command: bq tables create projects/fake-project/datasets/my_dataset/tables/my_table
+      --overwrite
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+              "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+                "tableId": "my_table"
+              },
+              "numBytes": "0",
+              "numLongTermBytes": "0",
+              "numRows": "0",
+              "creationTime": "1544035966999",
+              "lastModifiedTime": "1544035967040",
+              "type": "TABLE",
+              "location": "US"
+            }
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              tableReference:
+                tableId: my_table
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+              "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+                "tableId": "my_table"
+              },
+              "numBytes": "0",
+              "numLongTermBytes": "0",
+              "numRows": "0",
+              "creationTime": "1544035966999",
+              "lastModifiedTime": "1544035967040",
+              "type": "TABLE",
+              "location": "US"
+            }
+    - expect_stderr: |
+        Created table [my_table].
+    - expect_exit:
+        code: 0

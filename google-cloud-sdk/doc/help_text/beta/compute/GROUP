@@ -191,6 +191,9 @@ COMMANDS
      ssh
         (BETA) SSH into a virtual machine instance.
 
+     start-iap-tunnel
+        (BETA) Starts an IAP TCP Fordwarding tunnel over WebSocket connection.
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

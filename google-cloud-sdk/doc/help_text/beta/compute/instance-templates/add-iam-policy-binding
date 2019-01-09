@@ -1,22 +1,23 @@
 NAME
-    gcloud beta compute instance-templates add-iam-policy-binding - add an IAM
-        policy binding to an instance template
+    gcloud beta compute instance-templates add-iam-policy-binding - add IAM
+        policy binding to a Google Compute Engine instance template
 
 SYNOPSIS
     gcloud beta compute instance-templates add-iam-policy-binding
         INSTANCE_TEMPLATE --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Add an IAM policy binding to an instance template.
+    (BETA) Add an IAM policy binding to a Google Compute Engine instance
+    template.
 
 POSITIONAL ARGUMENTS
-     Instance template resource - The instance template to which to add an IAM
-     policy binding. This represents a Cloud resource. (NOTE) Some attributes
-     are not given arguments in this group but can be set in other ways. To set
-     the [project] attribute: provide the argument [instance_template] on the
-     command line with a fully specified name; set the property [core/project];
-     provide the argument [--project] on the command line. This must be
-     specified.
+     Instance template resource - The instance template for which to add IAM
+     policy binding to. This represents a Cloud resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument
+     [instance_template] on the command line with a fully specified name; set
+     the property [core/project]; provide the argument [--project] on the
+     command line. This must be specified.
 
        INSTANCE_TEMPLATE
           ID of the instance_template or fully qualified identifier for the
@@ -52,29 +53,11 @@ API REFERENCE
     https://developers.google.com/compute/docs/reference/latest/
 
 EXAMPLES
-    The following command will add an IAM policy binding for the role of
-    'roles/compute.admin' for the user 'test-user@gmail.com' on an instance
-    template with identifier 'my-template':
+    To add an IAM policy binding for the role of 'roles/compute.admin' for the
+    user 'test-user@gmail.com' with instance template 'my-template', run:
 
         $ gcloud beta compute instance-templates add-iam-policy-binding \
             my-template --member='user:test-user@gmail.com' \
-            --role='roles/compute.admin'
-
-    For a service account test-proj1@example.domain.com, the following command
-    will add an IAM policy binding for the role of 'roles/compute.admin' to the
-    given service account:
-
-        $ gcloud beta compute instance-templates add-iam-policy-binding \
-            test-proj1@example.domain.com \
-            --member='serviceAccount:test-proj1@example.domain.com' \
-            --role='roles/compute.admin'
-
-    The following command will add an IAM policy binding for the role of
-    'roles/compute.admin' for all authenticated users on an instance template
-    with identifier 'my-template':
-
-        $ gcloud beta compute instance-templates add-iam-policy-binding \
-            my-template --member='allAuthenticatedUsers' \
             --role='roles/compute.admin'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of

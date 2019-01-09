@@ -1,7 +1,6 @@
 NAME
-    gcloud alpha compute start-iap-tunnel - starts a tunnel to the Cloud
-        Identity-Aware Proxy through which another process can create a
-        connection (eg. SSH, RDP) to a Google Compute Engine instance
+    gcloud alpha compute start-iap-tunnel - starts an IAP TCP Fordwarding
+        tunnel over WebSocket connection
 
 SYNOPSIS
     gcloud alpha compute start-iap-tunnel INSTANCE_NAME INSTANCE_PORT
@@ -63,5 +62,7 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta compute start-iap-tunnel
 

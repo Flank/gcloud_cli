@@ -30,7 +30,7 @@ COMMANDS
         configuration.
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding for an instance.
+        (ALPHA) Add IAM policy binding to a Google Compute Engine instance.
 
      add-labels
         (ALPHA) Add labels to Google Compute Engine virtual machine instances.
@@ -88,7 +88,7 @@ COMMANDS
         zones.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding for an instance.
+        (ALPHA) Remove IAM policy binding of a Google Compute Engine instance.
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine virtual machine

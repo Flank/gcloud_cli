@@ -1,0 +1,3143 @@
+title: IntegrationTest
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: deployment-manager deployments create $$dm_single_vm_with_labels$$ --config
+      vm.yaml --labels key1=val1,key2=val2 --format "text(resources[0].name,resources[1].name)"
+  - stderr: The fingerprint of the deployment is.*$
+  - progress_tracker:
+    - message: Waiting for create [$$operation-basename$$]
+    - status: SUCCESS
+  - stderr: .*Create operation.*completed.*$
+  - stdout: |
+      resources[0].name: datadisk-$$dm_single_vm_with_labels$$
+      resources[1].name: vm-$$dm_single_vm_with_labels$$
+- execute:
+  - command: deployment-manager deployments describe $$dm_single_vm_with_labels$$
+      --format "text(deployment.name,deployment.labels)"
+  - stdout: |
+      deployment.labels[0].key:   key1
+      deployment.labels[0].value: val1
+      deployment.labels[1].key:   key2
+      deployment.labels[1].value: val2
+      deployment.name:            $$dm_single_vm_with_labels$$
+- execute:
+  - command: deployment-manager deployments update $$dm_single_vm_with_labels$$ --update-labels
+      key1=updated --remove-labels key2 --format "text(name)"
+  - stderr: |
+      Update deployment metadata completed successfully.
+  - stdout: .*$
+- execute:
+  - command: deployment-manager deployments describe $$dm_single_vm_with_labels$$
+      --format text(name,labels)
+  - stdout: |
+      : {}
+- execute:
+  - command: deployment-manager deployments update $$dm_single_vm_with_labels$$ --update-labels
+      key1=updated --preview
+  - error: '1: ResponseError: code=412, message=Cannot preview a deployment metadata
+      change with a PATCH request.'
+- execute:
+  - command: deployment-manager deployments update $$dm_single_vm_with_labels$$ --config
+      vm.yaml --update-labels key1=preview --preview --format "text(resources[0].name,resources[1].name)"
+  - stderr: The fingerprint of the deployment is.*$
+  - progress_tracker:
+    - message: Waiting for update [$$operation$$]
+    - status: SUCCESS
+  - stderr: |
+      Update operation $$operation$$ completed successfully.
+  - stdout: |
+      resources[0].name: datadisk-$$dm_single_vm_with_labels$$
+      resources[1].name: vm-$$dm_single_vm_with_labels$$
+- execute:
+  - command: deployment-manager deployments update $$dm_single_vm_with_labels$$ --update-labels
+      key1=updated
+  - error: '1: ResponseError: code=412, message=Cannot do a deployment metadata PATCH
+      for a deployment in states PREVIEWING, UPDATING, or CANCELING. This deployment
+      is in state PREVIEWING.'
+- execute:
+  - command: |
+      deployment-manager deployments update $$dm_single_vm_with_labels$$
+      --format "text(resources[0].name,resources[1].name)"
+  - stderr: The fingerprint of the deployment is.*$
+  - progress_tracker:
+    - message: Waiting for update [$$operation$$]
+    - status: SUCCESS
+  - stderr: |
+      Update operation $$operation$$ completed successfully.
+  - stdout: |
+      resources[0].name: datadisk-$$dm_single_vm_with_labels$$
+      resources[1].name: vm-$$dm_single_vm_with_labels$$
+- execute:
+  - command: deployment-manager deployments describe $$dm_single_vm_with_labels$$
+      --format text(name,labels)
+  - stdout: |
+      : {}
+- execute:
+  - command: deployment-manager deployments delete -q --async $$dm_single_vm_with_labels$$
+actions:
+- generate_resource_id:
+    reference: dm_single_vm_with_labels
+    prefix: deploymentmanager
+- write_file:
+    path: expanded_vm.yaml
+    contents: |
+      # Copyright 2015 Google Inc. All rights reserved.
+      #
+      # Licensed under the Apache License, Version 2.0 (the "License");
+      # you may not use this file except in compliance with the License.
+      # You may obtain a copy of the License at
+      #
+      #     http://www.apache.org/licenses/LICENSE-2.0
+      #
+      # Unless required by applicable law or agreed to in writing, software
+      # distributed under the License is distributed on an "AS IS" BASIS,
+      # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      # See the License for the specific language governing permissions and
+      # limitations under the License.
+
+      resources:
+      - name: datadisk-dm-20181128-171723-r1ei
+        properties:
+          sizeGb: 100
+          type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+          zone: us-central1-f
+        type: compute.v1.disk
+      - name: vm-dm-20181128-171723-r1ei
+        properties:
+          disks:
+          - autoDelete: true
+            boot: true
+            deviceName: boot
+            initializeParams:
+              diskName: disk-dm-20181128-171723-r1ei
+              sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+            type: PERSISTENT
+          - autoDelete: true
+            deviceName: datadisk-dm-20181128-171723-r1ei
+            source: $(ref.datadisk-dm-20181128-171723-r1ei.selfLink)
+            type: PERSISTENT
+          machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+          metadata:
+            items:
+            - key: startup-script
+              value: |
+                #!/bin/bash
+                python -m SimpleHTTPServer 8080
+          networkInterfaces:
+          - accessConfigs:
+            - name: External NAT
+              type: ONE_TO_ONE_NAT
+            network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+          zone: us-central1-f
+        type: compute.v1.instance
+- write_file:
+    path: with_output.jinja.schema
+    contents: |
+      info:
+        title: sth
+
+
+      properties:
+        zone:
+          type: string
+          description: GCP zone
+
+      outputs:
+        databaseIp:
+          type: string
+          description: Internal IP address for load balancer.
+- write_file:
+    path: vm_glob.yaml
+    contents: |
+      # Copyright 2015 Google Inc. All rights reserved.
+      #
+      # Licensed under the Apache License, Version 2.0 (the "License");
+      # you may not use this file except in compliance with the License.
+      # You may obtain a copy of the License at
+      #
+      #     http://www.apache.org/licenses/LICENSE-2.0
+      #
+      # Unless required by applicable law or agreed to in writing, software
+      # distributed under the License is distributed on an "AS IS" BASIS,
+      # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      # See the License for the specific language governing permissions and
+      # limitations under the License.
+
+      imports:
+      - path: vm*.jinja
+
+      resources:
+      - name: vm_template
+        type: vm_template.jinja
+        properties:
+          zone: us-central1-f
+- write_file:
+    path: with_output.jinja
+    contents: |
+      {#
+      Copyright 2016 Google Inc. All rights reserved.
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+      #}
+
+      {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+      # Creates a Persistent Disk
+      # Creates an instance that attaches that Persistent Disk as a data disk
+      resources:
+      - type: compute.v1.disk
+        name: {{ DATADISK }}
+        properties:
+          zone: {{ properties["zone"] }}
+          sizeGb: 100
+          # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+          type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+      - type: compute.v1.instance
+        name: vm-{{ env["deployment"] }}
+        properties:
+          zone: {{ properties["zone"] }}
+          machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+          metadata:
+            items:
+            # For more ways to use startup scripts on an instance, see:
+            #   https://cloud.google.com/compute/docs/startupscript
+            - key: startup-script
+              value: |
+                #!/bin/bash
+                python -m SimpleHTTPServer 8080
+          disks:
+          - deviceName: boot
+            type: PERSISTENT
+            boot: true
+            autoDelete: true
+            initializeParams:
+              diskName: disk-{{ env["deployment"] }}
+              sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+          # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+          # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+          # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+          - deviceName: {{ DATADISK }}
+            type: PERSISTENT
+            source: $(ref.{{ DATADISK }}.selfLink)
+            autoDelete: true
+
+          networkInterfaces:
+          - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+            # Access Config required to give the instance a public IP address
+            accessConfigs:
+            - name: External NAT
+              type: ONE_TO_ONE_NAT
+
+      outputs:
+      - name: databaseIp
+        value: $(ref.vm-{{ env["deployment"] }}.networkInterfaces[0].accessConfigs[0].natIP)
+      - name: zone
+        value: {{ properties['zone'] }}
+      - name: databasePort
+        value: 88
+- write_file:
+    path: vm.yaml
+    contents: |
+      # Copyright 2015 Google Inc. All rights reserved.
+      #
+      # Licensed under the Apache License, Version 2.0 (the "License");
+      # you may not use this file except in compliance with the License.
+      # You may obtain a copy of the License at
+      #
+      #     http://www.apache.org/licenses/LICENSE-2.0
+      #
+      # Unless required by applicable law or agreed to in writing, software
+      # distributed under the License is distributed on an "AS IS" BASIS,
+      # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      # See the License for the specific language governing permissions and
+      # limitations under the License.
+
+      imports:
+      - path: vm_template.jinja
+
+      resources:
+      - name: vm_template
+        type: vm_template.jinja
+        properties:
+          zone: us-central1-f
+- write_file:
+    path: vm_template.jinja
+    contents: |
+      # Copyright 2015 Google Inc. All Rights Reserved.
+      {#
+      Copyright 2015 Google Inc. All rights reserved.
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+      #}
+
+      {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+      # Creates a Persistent Disk
+      # Creates an instance that attaches that Persistent Disk as a data disk
+      resources:
+      - type: compute.v1.disk
+        name: {{ DATADISK }}
+        properties:
+          zone: {{ properties["zone"] }}
+          sizeGb: 100
+          # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+          type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+      - type: compute.v1.instance
+        name: vm-{{ env["deployment"] }}
+        properties:
+          zone: {{ properties["zone"] }}
+          machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+          metadata:
+            items:
+            # For more ways to use startup scripts on an instance, see:
+            #   https://cloud.google.com/compute/docs/startupscript
+            - key: startup-script
+              value: |
+                #!/bin/bash
+                python -m SimpleHTTPServer 8080
+          disks:
+          - deviceName: boot
+            type: PERSISTENT
+            boot: true
+            autoDelete: true
+            initializeParams:
+              diskName: disk-{{ env["deployment"] }}
+              sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+          # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+          # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+          # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+          - deviceName: {{ DATADISK }}
+            type: PERSISTENT
+            source: $(ref.{{ DATADISK }}.selfLink)
+            autoDelete: true
+
+          networkInterfaces:
+          - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+            # Access Config required to give the instance a public IP address
+            accessConfigs:
+            - name: External NAT
+              type: ONE_TO_ONE_NAT
+- execute_command:
+    # testSingleVmWithLabels
+    command: deployment-manager deployments create $$dm_single_vm_with_labels$$ --config
+      vm.yaml --labels key1=val1,key2=val2 --format "text(resources[0].name,resources[1].name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments?alt=json&createPolicy=CREATE_OR_ACQUIRE&preview=False
+          method: POST
+          headers: {}
+          body:
+            json:
+              labels:
+              - key: key1
+                value: val1
+              - key: key2
+                value: val2
+              name: $$dm_single_vm_with_labels$$
+              target:
+                config:
+                  content: |
+                    # Copyright 2015 Google Inc. All rights reserved.
+                    #
+                    # Licensed under the Apache License, Version 2.0 (the "License");
+                    # you may not use this file except in compliance with the License.
+                    # You may obtain a copy of the License at
+                    #
+                    #     http://www.apache.org/licenses/LICENSE-2.0
+                    #
+                    # Unless required by applicable law or agreed to in writing, software
+                    # distributed under the License is distributed on an "AS IS" BASIS,
+                    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                    # See the License for the specific language governing permissions and
+                    # limitations under the License.
+
+                    imports:
+                    - path: vm_template.jinja
+
+                    resources:
+                    - name: vm_template
+                      type: vm_template.jinja
+                      properties:
+                        zone: us-central1-f
+                imports:
+                - content: |
+                    # Copyright 2015 Google Inc. All Rights Reserved.
+                    {#
+                    Copyright 2015 Google Inc. All rights reserved.
+                    Licensed under the Apache License, Version 2.0 (the "License");
+                    you may not use this file except in compliance with the License.
+                    You may obtain a copy of the License at
+
+                        http://www.apache.org/licenses/LICENSE-2.0
+
+                    Unless required by applicable law or agreed to in writing, software
+                    distributed under the License is distributed on an "AS IS" BASIS,
+                    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                    See the License for the specific language governing permissions and
+                    limitations under the License.
+                    #}
+
+                    {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+                    # Creates a Persistent Disk
+                    # Creates an instance that attaches that Persistent Disk as a data disk
+                    resources:
+                    - type: compute.v1.disk
+                      name: {{ DATADISK }}
+                      properties:
+                        zone: {{ properties["zone"] }}
+                        sizeGb: 100
+                        # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+                        type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+                    - type: compute.v1.instance
+                      name: vm-{{ env["deployment"] }}
+                      properties:
+                        zone: {{ properties["zone"] }}
+                        machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+                        metadata:
+                          items:
+                          # For more ways to use startup scripts on an instance, see:
+                          #   https://cloud.google.com/compute/docs/startupscript
+                          - key: startup-script
+                            value: |
+                              #!/bin/bash
+                              python -m SimpleHTTPServer 8080
+                        disks:
+                        - deviceName: boot
+                          type: PERSISTENT
+                          boot: true
+                          autoDelete: true
+                          initializeParams:
+                            diskName: disk-{{ env["deployment"] }}
+                            sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+                        # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+                        # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+                        # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+                        - deviceName: {{ DATADISK }}
+                          type: PERSISTENT
+                          source: $(ref.{{ DATADISK }}.selfLink)
+                          autoDelete: true
+
+                        networkInterfaces:
+                        - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+                          # Access Config required to give the instance a public IP address
+                          accessConfigs:
+                          - name: External NAT
+                            type: ONE_TO_ONE_NAT
+                  name: vm_template.jinja
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '719'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/gpwJzMqx897NRAQe5-97RbvRdOA"'
+            pragma: no-cache
+            status: '200'
+          body:
+            kind: deploymentmanager#operation
+            id: '1079407781453457328'
+            name: operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+            operationType: insert
+            targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            targetId: '3875938219980974000'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-28T10:07:27.682-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+        poll_operation: true
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        expect_response:
+          extract_references:
+          - reference: manifest
+            field: update.manifest
+          - reference: fingerprint
+            field: fingerprint
+          body:
+            json: {}
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1412'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/MXi-xqez3p_h2GOnDJpvnD6hvA4"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            operation:
+              kind: deploymentmanager#operation
+              id: '1079407781453457328'
+              name: operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+              operationType: insert
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: PENDING
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 0
+              insertTime: '2018-11-28T10:07:27.682-08:00'
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+            fingerprint: 0ehQWWJ5D57If3i529fJ9g==
+            update:
+              manifest: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$/manifests/manifest-1543428447490
+              labels:
+              - key: key1
+                value: val1
+              - key: key2
+                value: val2
+    - expect_stderr:
+        matches: The fingerprint of the deployment is.*
+    - expect_progress_tracker:
+        message: Waiting for create [$$operation$$]
+        status: SUCCESS
+    - expect_stderr:
+        matches: .*Create operation.*completed.*
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$/resources?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '4156'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/Eikcnbr7lNOFDDcM9jJ92hzS17A"'
+            status: '200'
+          body:
+            resources:
+            - id: '9128002900169287564'
+              insertTime: '2018-11-28T10:07:31.642-08:00'
+              updateTime: '2018-11-28T10:07:40.039-08:00'
+              name: datadisk-$$dm_single_vm_with_labels$$
+              type: compute.v1.disk
+              manifest: $$manifest$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+              properties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+              finalProperties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+            - id: '3067142650614474636'
+              insertTime: '2018-11-28T10:07:31.693-08:00'
+              updateTime: '2018-11-28T10:08:30.318-08:00'
+              name: vm-$$dm_single_vm_with_labels$$
+              type: compute.v1.instance
+              manifest: $$manifest$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/vm-$$dm_single_vm_with_labels$$
+              properties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              finalProperties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '2053'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/YZNNp18AsOx1EKhxjyrgkKJGaLQ"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            operation:
+              kind: deploymentmanager#operation
+              id: '1079407781453457328'
+              name: operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+              operationType: insert
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:07:27.682-08:00'
+              startTime: '2018-11-28T10:07:28.069-08:00'
+              endTime: '2018-11-28T10:08:30.890-08:00'
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+            fingerprint: $$fingerprint$$
+            manifest: $$manifest$$
+            labels:
+            - key: key1
+              value: val1
+            - key: key2
+              value: val2
+    - api_call:
+        expect_request:
+          uri: $$manifest$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '5709'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/cvFXvWXO-2r6WFP3dTPW0VQfmks"'
+            status: '200'
+          body:
+            id: '1240672005143095216'
+            selfLink: $$manifest$$
+            insertTime: '2018-11-28T10:07:27.646-08:00'
+            name: manifest-1543428447490
+            config:
+              content: |
+                # Copyright 2015 Google Inc. All rights reserved.
+                #
+                # Licensed under the Apache License, Version 2.0 (the "License");
+                # you may not use this file except in compliance with the License.
+                # You may obtain a copy of the License at
+                #
+                #     http://www.apache.org/licenses/LICENSE-2.0
+                #
+                # Unless required by applicable law or agreed to in writing, software
+                # distributed under the License is distributed on an "AS IS" BASIS,
+                # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                # See the License for the specific language governing permissions and
+                # limitations under the License.
+
+                imports:
+                - path: vm_template.jinja
+
+                resources:
+                - name: vm_template
+                  type: vm_template.jinja
+                  properties:
+                    zone: us-central1-f
+            imports:
+            - name: vm_template.jinja
+              content: |
+                # Copyright 2015 Google Inc. All Rights Reserved.
+                {#
+                Copyright 2015 Google Inc. All rights reserved.
+                Licensed under the Apache License, Version 2.0 (the "License");
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at
+
+                    http://www.apache.org/licenses/LICENSE-2.0
+
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+                #}
+
+                {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+                # Creates a Persistent Disk
+                # Creates an instance that attaches that Persistent Disk as a data disk
+                resources:
+                - type: compute.v1.disk
+                  name: {{ DATADISK }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    sizeGb: 100
+                    # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+                    type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+                - type: compute.v1.instance
+                  name: vm-{{ env["deployment"] }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+                    metadata:
+                      items:
+                      # For more ways to use startup scripts on an instance, see:
+                      #   https://cloud.google.com/compute/docs/startupscript
+                      - key: startup-script
+                        value: |
+                          #!/bin/bash
+                          python -m SimpleHTTPServer 8080
+                    disks:
+                    - deviceName: boot
+                      type: PERSISTENT
+                      boot: true
+                      autoDelete: true
+                      initializeParams:
+                        diskName: disk-{{ env["deployment"] }}
+                        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+                    # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+                    # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+                    # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+                    - deviceName: {{ DATADISK }}
+                      type: PERSISTENT
+                      source: $(ref.{{ DATADISK }}.selfLink)
+                      autoDelete: true
+
+                    networkInterfaces:
+                    - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+                      # Access Config required to give the instance a public IP address
+                      accessConfigs:
+                      - name: External NAT
+                        type: ONE_TO_ONE_NAT
+            expandedConfig: |
+              resources:
+              - name: datadisk-$$dm_single_vm_with_labels$$
+                properties:
+                  sizeGb: 100
+                  type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                  zone: us-central1-f
+                type: compute.v1.disk
+              - name: vm-$$dm_single_vm_with_labels$$
+                properties:
+                  disks:
+                  - autoDelete: true
+                    boot: true
+                    deviceName: boot
+                    initializeParams:
+                      diskName: disk-$$dm_single_vm_with_labels$$
+                      sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                    type: PERSISTENT
+                  - autoDelete: true
+                    deviceName: datadisk-$$dm_single_vm_with_labels$$
+                    source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                    type: PERSISTENT
+                  machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                  metadata:
+                    items:
+                    - key: startup-script
+                      value: |
+                        #!/bin/bash
+                        python -m SimpleHTTPServer 8080
+                  networkInterfaces:
+                  - accessConfigs:
+                    - name: External NAT
+                      type: ONE_TO_ONE_NAT
+                    network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                  zone: us-central1-f
+                type: compute.v1.instance
+                metadata:
+                  dependsOn:
+                  - datadisk-$$dm_single_vm_with_labels$$
+            layout: |
+              resources:
+              - name: vm_template
+                properties:
+                  zone: us-central1-f
+                resources:
+                - name: datadisk-$$dm_single_vm_with_labels$$
+                  type: compute.v1.disk
+                - name: vm-$$dm_single_vm_with_labels$$
+                  type: compute.v1.instance
+                type: vm_template.jinja
+    - expect_stdout: |
+        resources[0].name: datadisk-$$dm_single_vm_with_labels$$
+        resources[1].name: vm-$$dm_single_vm_with_labels$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    # testSingleVmWithLabels
+    command: deployment-manager deployments describe $$dm_single_vm_with_labels$$
+      --format "text(deployment.name,deployment.labels)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '2053'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/YZNNp18AsOx1EKhxjyrgkKJGaLQ"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            operation:
+              kind: deploymentmanager#operation
+              id: '1079407781453457328'
+              name: operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+              operationType: insert
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:07:27.682-08:00'
+              startTime: '2018-11-28T10:07:28.069-08:00'
+              endTime: '2018-11-28T10:08:30.890-08:00'
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+            fingerprint: $$fingerprint$$
+            manifest: $$manifest$$
+            labels:
+            - key: key1
+              value: val1
+            - key: key2
+              value: val2
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$/resources?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '4156'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/vUl2yukibl-igL4d0uBxC7QVXJ8"'
+            status: '200'
+          body:
+            resources:
+            - id: '9128002900169287564'
+              insertTime: '2018-11-28T10:07:31.642-08:00'
+              updateTime: '2018-11-28T10:07:40.039-08:00'
+              name: datadisk-$$dm_single_vm_with_labels$$
+              type: compute.v1.disk
+              manifest: $$manifest$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+              properties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+              finalProperties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+            - id: '3067142650614474636'
+              insertTime: '2018-11-28T10:07:31.693-08:00'
+              updateTime: '2018-11-28T10:08:30.318-08:00'
+              name: vm-$$dm_single_vm_with_labels$$
+              type: compute.v1.instance
+              manifest: $$manifest$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/vm-$$dm_single_vm_with_labels$$
+              properties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              finalProperties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+    - api_call:
+        expect_request:
+          uri: $$manifest$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '5709'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/cvFXvWXO-2r6WFP3dTPW0VQfmks"'
+            status: '200'
+          body:
+            id: '1240672005143095216'
+            selfLink: $$manifest$$
+            insertTime: '2018-11-28T10:07:27.646-08:00'
+            name: manifest-1543428447490
+            config:
+              content: |
+                # Copyright 2015 Google Inc. All rights reserved.
+                #
+                # Licensed under the Apache License, Version 2.0 (the "License");
+                # you may not use this file except in compliance with the License.
+                # You may obtain a copy of the License at
+                #
+                #     http://www.apache.org/licenses/LICENSE-2.0
+                #
+                # Unless required by applicable law or agreed to in writing, software
+                # distributed under the License is distributed on an "AS IS" BASIS,
+                # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                # See the License for the specific language governing permissions and
+                # limitations under the License.
+
+                imports:
+                - path: vm_template.jinja
+
+                resources:
+                - name: vm_template
+                  type: vm_template.jinja
+                  properties:
+                    zone: us-central1-f
+            imports:
+            - name: vm_template.jinja
+              content: |
+                # Copyright 2015 Google Inc. All Rights Reserved.
+                {#
+                Copyright 2015 Google Inc. All rights reserved.
+                Licensed under the Apache License, Version 2.0 (the "License");
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at
+
+                    http://www.apache.org/licenses/LICENSE-2.0
+
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+                #}
+
+                {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+                # Creates a Persistent Disk
+                # Creates an instance that attaches that Persistent Disk as a data disk
+                resources:
+                - type: compute.v1.disk
+                  name: {{ DATADISK }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    sizeGb: 100
+                    # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+                    type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+                - type: compute.v1.instance
+                  name: vm-{{ env["deployment"] }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+                    metadata:
+                      items:
+                      # For more ways to use startup scripts on an instance, see:
+                      #   https://cloud.google.com/compute/docs/startupscript
+                      - key: startup-script
+                        value: |
+                          #!/bin/bash
+                          python -m SimpleHTTPServer 8080
+                    disks:
+                    - deviceName: boot
+                      type: PERSISTENT
+                      boot: true
+                      autoDelete: true
+                      initializeParams:
+                        diskName: disk-{{ env["deployment"] }}
+                        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+                    # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+                    # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+                    # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+                    - deviceName: {{ DATADISK }}
+                      type: PERSISTENT
+                      source: $(ref.{{ DATADISK }}.selfLink)
+                      autoDelete: true
+
+                    networkInterfaces:
+                    - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+                      # Access Config required to give the instance a public IP address
+                      accessConfigs:
+                      - name: External NAT
+                        type: ONE_TO_ONE_NAT
+            expandedConfig: |
+              resources:
+              - name: datadisk-$$dm_single_vm_with_labels$$
+                properties:
+                  sizeGb: 100
+                  type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                  zone: us-central1-f
+                type: compute.v1.disk
+              - name: vm-$$dm_single_vm_with_labels$$
+                properties:
+                  disks:
+                  - autoDelete: true
+                    boot: true
+                    deviceName: boot
+                    initializeParams:
+                      diskName: disk-$$dm_single_vm_with_labels$$
+                      sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                    type: PERSISTENT
+                  - autoDelete: true
+                    deviceName: datadisk-$$dm_single_vm_with_labels$$
+                    source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                    type: PERSISTENT
+                  machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                  metadata:
+                    items:
+                    - key: startup-script
+                      value: |
+                        #!/bin/bash
+                        python -m SimpleHTTPServer 8080
+                  networkInterfaces:
+                  - accessConfigs:
+                    - name: External NAT
+                      type: ONE_TO_ONE_NAT
+                    network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                  zone: us-central1-f
+                type: compute.v1.instance
+                metadata:
+                  dependsOn:
+                  - datadisk-$$dm_single_vm_with_labels$$
+            layout: |
+              resources:
+              - name: vm_template
+                properties:
+                  zone: us-central1-f
+                resources:
+                - name: datadisk-$$dm_single_vm_with_labels$$
+                  type: compute.v1.disk
+                - name: vm-$$dm_single_vm_with_labels$$
+                  type: compute.v1.instance
+                type: vm_template.jinja
+    - expect_stdout: |
+        deployment.labels[0].key:   key1
+        deployment.labels[0].value: val1
+        deployment.labels[1].key:   key2
+        deployment.labels[1].value: val2
+        deployment.name:            $$dm_single_vm_with_labels$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    # testSingleVmWithLabels
+    command: deployment-manager deployments update $$dm_single_vm_with_labels$$ --update-labels
+      key1=updated --remove-labels key2 --format "text(name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '2053'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/YZNNp18AsOx1EKhxjyrgkKJGaLQ"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            operation:
+              kind: deploymentmanager#operation
+              id: '1079407781453457328'
+              name: operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+              operationType: insert
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:07:27.682-08:00'
+              startTime: '2018-11-28T10:07:28.069-08:00'
+              endTime: '2018-11-28T10:08:30.890-08:00'
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+            fingerprint: $$fingerprint$$
+            manifest: $$manifest$$
+            labels:
+            - key: key1
+              value: val1
+            - key: key2
+              value: val2
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json&createPolicy=CREATE_OR_ACQUIRE&deletePolicy=DELETE&preview=False
+          method: PUT
+          headers: {}
+          body:
+            json:
+              fingerprint: $$fingerprint$$
+              labels:
+              - key: key1
+                value: updated
+              name: $$dm_single_vm_with_labels$$
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '810'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/A9R94KZA4u6618k--SLev5OK1bQ"'
+            pragma: no-cache
+            status: '200'
+          body:
+            kind: deploymentmanager#operation
+            id: '1595981751754385229'
+            name: operation-1543428514599-57bbd74595058-28772326-f86bd5d1
+            operationType: update
+            targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            targetId: '3875938219980974000'
+            status: DONE
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 100
+            insertTime: '2018-11-28T10:08:34.698-08:00'
+            startTime: '2018-11-28T10:08:34.700-08:00'
+            endTime: '2018-11-28T10:08:34.700-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428514599-57bbd74595058-28772326-f86bd5d1
+        poll_operation: true
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        expect_response:
+          extract_references:
+          - reference: fingerprint2
+            field: fingerprint
+          body:
+            json: {}
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '2030'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/lQOxvzEt878C_8jxxqBto8pb5gk"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '1079407781453457328'
+              name: operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+              operationType: insert
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:07:27.682-08:00'
+              startTime: '2018-11-28T10:07:28.069-08:00'
+              endTime: '2018-11-28T10:08:30.890-08:00'
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+            fingerprint: PRq5qsbp6JWdLkaIYfFv_g==
+            manifest: $$manifest$$
+            labels:
+            - key: key1
+              value: updated
+    - expect_stderr: |
+        Update deployment metadata completed successfully.
+    - expect_stdout:
+        matches: .*
+    - expect_exit:
+        code: 0
+- execute_command:
+    # testSingleVmWithLabels
+    command: deployment-manager deployments describe $$dm_single_vm_with_labels$$
+      --format text(name,labels)
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '2030'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/lQOxvzEt878C_8jxxqBto8pb5gk"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '1079407781453457328'
+              name: operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+              operationType: insert
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:07:27.682-08:00'
+              startTime: '2018-11-28T10:07:28.069-08:00'
+              endTime: '2018-11-28T10:08:30.890-08:00'
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+            fingerprint: $$fingerprint2$$
+            manifest: $$manifest$$
+            labels:
+            - key: key1
+              value: updated
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$/resources?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '4156'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/vUl2yukibl-igL4d0uBxC7QVXJ8"'
+            status: '200'
+          body:
+            resources:
+            - id: '9128002900169287564'
+              insertTime: '2018-11-28T10:07:31.642-08:00'
+              updateTime: '2018-11-28T10:07:40.039-08:00'
+              name: datadisk-$$dm_single_vm_with_labels$$
+              type: compute.v1.disk
+              manifest: $$manifest$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+              properties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+              finalProperties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+            - id: '3067142650614474636'
+              insertTime: '2018-11-28T10:07:31.693-08:00'
+              updateTime: '2018-11-28T10:08:30.318-08:00'
+              name: vm-$$dm_single_vm_with_labels$$
+              type: compute.v1.instance
+              manifest: $$manifest$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/vm-$$dm_single_vm_with_labels$$
+              properties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              finalProperties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+    - api_call:
+        expect_request:
+          uri: $$manifest$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '5709'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/cvFXvWXO-2r6WFP3dTPW0VQfmks"'
+            status: '200'
+          body:
+            id: '1240672005143095216'
+            selfLink: $$manifest$$
+            insertTime: '2018-11-28T10:07:27.646-08:00'
+            name: manifest-1543428447490
+            config:
+              content: |
+                # Copyright 2015 Google Inc. All rights reserved.
+                #
+                # Licensed under the Apache License, Version 2.0 (the "License");
+                # you may not use this file except in compliance with the License.
+                # You may obtain a copy of the License at
+                #
+                #     http://www.apache.org/licenses/LICENSE-2.0
+                #
+                # Unless required by applicable law or agreed to in writing, software
+                # distributed under the License is distributed on an "AS IS" BASIS,
+                # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                # See the License for the specific language governing permissions and
+                # limitations under the License.
+
+                imports:
+                - path: vm_template.jinja
+
+                resources:
+                - name: vm_template
+                  type: vm_template.jinja
+                  properties:
+                    zone: us-central1-f
+            imports:
+            - name: vm_template.jinja
+              content: |
+                # Copyright 2015 Google Inc. All Rights Reserved.
+                {#
+                Copyright 2015 Google Inc. All rights reserved.
+                Licensed under the Apache License, Version 2.0 (the "License");
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at
+
+                    http://www.apache.org/licenses/LICENSE-2.0
+
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+                #}
+
+                {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+                # Creates a Persistent Disk
+                # Creates an instance that attaches that Persistent Disk as a data disk
+                resources:
+                - type: compute.v1.disk
+                  name: {{ DATADISK }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    sizeGb: 100
+                    # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+                    type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+                - type: compute.v1.instance
+                  name: vm-{{ env["deployment"] }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+                    metadata:
+                      items:
+                      # For more ways to use startup scripts on an instance, see:
+                      #   https://cloud.google.com/compute/docs/startupscript
+                      - key: startup-script
+                        value: |
+                          #!/bin/bash
+                          python -m SimpleHTTPServer 8080
+                    disks:
+                    - deviceName: boot
+                      type: PERSISTENT
+                      boot: true
+                      autoDelete: true
+                      initializeParams:
+                        diskName: disk-{{ env["deployment"] }}
+                        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+                    # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+                    # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+                    # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+                    - deviceName: {{ DATADISK }}
+                      type: PERSISTENT
+                      source: $(ref.{{ DATADISK }}.selfLink)
+                      autoDelete: true
+
+                    networkInterfaces:
+                    - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+                      # Access Config required to give the instance a public IP address
+                      accessConfigs:
+                      - name: External NAT
+                        type: ONE_TO_ONE_NAT
+            expandedConfig: |
+              resources:
+              - name: datadisk-$$dm_single_vm_with_labels$$
+                properties:
+                  sizeGb: 100
+                  type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                  zone: us-central1-f
+                type: compute.v1.disk
+              - name: vm-$$dm_single_vm_with_labels$$
+                properties:
+                  disks:
+                  - autoDelete: true
+                    boot: true
+                    deviceName: boot
+                    initializeParams:
+                      diskName: disk-$$dm_single_vm_with_labels$$
+                      sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                    type: PERSISTENT
+                  - autoDelete: true
+                    deviceName: datadisk-$$dm_single_vm_with_labels$$
+                    source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                    type: PERSISTENT
+                  machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                  metadata:
+                    items:
+                    - key: startup-script
+                      value: |
+                        #!/bin/bash
+                        python -m SimpleHTTPServer 8080
+                  networkInterfaces:
+                  - accessConfigs:
+                    - name: External NAT
+                      type: ONE_TO_ONE_NAT
+                    network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                  zone: us-central1-f
+                type: compute.v1.instance
+                metadata:
+                  dependsOn:
+                  - datadisk-$$dm_single_vm_with_labels$$
+            layout: |
+              resources:
+              - name: vm_template
+                properties:
+                  zone: us-central1-f
+                resources:
+                - name: datadisk-$$dm_single_vm_with_labels$$
+                  type: compute.v1.disk
+                - name: vm-$$dm_single_vm_with_labels$$
+                  type: compute.v1.instance
+                type: vm_template.jinja
+    - expect_stdout: |
+        : {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    # testSingleVmWithLabels
+    command: deployment-manager deployments update $$dm_single_vm_with_labels$$ --update-labels
+      key1=updated --preview
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '2030'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/lQOxvzEt878C_8jxxqBto8pb5gk"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '1079407781453457328'
+              name: operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+              operationType: insert
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:07:27.682-08:00'
+              startTime: '2018-11-28T10:07:28.069-08:00'
+              endTime: '2018-11-28T10:08:30.890-08:00'
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+            fingerprint: $$fingerprint2$$
+            manifest: $$manifest$$
+            labels:
+            - key: key1
+              value: updated
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json&createPolicy=CREATE_OR_ACQUIRE&deletePolicy=DELETE&preview=True
+          method: PUT
+          headers: {}
+          body:
+            json:
+              description: ''
+              fingerprint: $$fingerprint2$$
+              labels:
+              - key: key1
+                value: updated
+              name: $$dm_single_vm_with_labels$$
+        return_response:
+          headers:
+            cache-control: private, max-age=0
+            content-length: '3439'
+            content-type: application/json; charset=UTF-8
+            status: '412'
+          body:
+            error:
+              errors:
+              - domain: global
+                reason: conditionNotMet
+                message: Cannot preview a deployment metadata change with a PATCH
+                  request.
+                locationType: header
+                location: If-Match
+                debugInfo: |
+                  com.google.api.server.core.Fault: ImmutableErrorDefinition{base=PRECONDITION_FAILED, category=USER_ERROR, cause=null, debugInfo=null, domain=global, extendedHelp=null, httpHeaders={}, httpStatus=preconditionFailed, internalReason=Reason{arguments={}, cause=null, code=gdata.CoreErrorDomain.CONDITION_NOT_MET, createdByBackend=true, debugMessage=null, errorProtoCode=CONDITION_NOT_MET, errorProtoDomain=gdata.CoreErrorDomain, filteredMessage=null, location=null, message=Cannot preview a deployment metadata change with a PATCH request., unnamedArguments=[Cannot preview a deployment metadata change with a PATCH request.]}, location=headers.If-Match, message=Cannot preview a deployment metadata change with a PATCH request., reason=conditionNotMet, rpcCode=412} Cannot preview a deployment metadata change with a PATCH request.
+                  	at com.google.api.server.core.ErrorCollector.toFault(ErrorCollector.java:54)
+                  	at com.google.api.server.rest.adapter.rosy.RosyErrorConverter.toFault(RosyErrorConverter.java:67)
+                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:258)
+                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:238)
+                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                  	at com.google.api.server.thread.ThreadTrackers$ThreadTrackingRunnable.run(ThreadTrackers.java:126)
+                  	at com.google.tracing.TraceContext$TraceContextRunnable.runInContext(TraceContext.java:453)
+                  	at com.google.api.server.server.CommonModule$ContextCarryingExecutorService$1.runInContext(CommonModule.java:824)
+                  	at com.google.tracing.TraceContext$TraceContextRunnable$1.run(TraceContext.java:460)
+                  	at io.grpc.Context.run(Context.java:565)
+                  	at com.google.tracing.CurrentContext.runInContext(CurrentContext.java:166)
+                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContextNoUnref(TraceContext.java:319)
+                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContext(TraceContext.java:311)
+                  	at com.google.tracing.TraceContext$TraceContextRunnable.run(TraceContext.java:457)
+                  	at com.google.gse.internal.DispatchQueueImpl$WorkerThread.run(DispatchQueueImpl.java:403)
+              code: 412
+              message: Cannot preview a deployment metadata change with a PATCH request.
+    - expect_exit:
+        code: 1
+        message: 'ResponseError: code=412, message=Cannot preview a deployment metadata
+          change with a PATCH request.'
+- execute_command:
+    # testSingleVmWithLabels
+    command: deployment-manager deployments update $$dm_single_vm_with_labels$$ --config
+      vm.yaml --update-labels key1=preview --preview --format "text(resources[0].name,resources[1].name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '2030'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/lQOxvzEt878C_8jxxqBto8pb5gk"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '1079407781453457328'
+              name: operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+              operationType: insert
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:07:27.682-08:00'
+              startTime: '2018-11-28T10:07:28.069-08:00'
+              endTime: '2018-11-28T10:08:30.890-08:00'
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428447301-57bbd70566d89-4f77d218-62b9fb76
+            fingerprint: $$fingerprint2$$
+            manifest: $$manifest$$
+            labels:
+            - key: key1
+              value: updated
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json&createPolicy=CREATE_OR_ACQUIRE&deletePolicy=DELETE&preview=True
+          method: PUT
+          headers: {}
+          body:
+            json:
+              description: ''
+              fingerprint: $$fingerprint2$$
+              labels:
+              - key: key1
+                value: preview
+              name: $$dm_single_vm_with_labels$$
+              target:
+                config:
+                  content: |
+                    # Copyright 2015 Google Inc. All rights reserved.
+                    #
+                    # Licensed under the Apache License, Version 2.0 (the "License");
+                    # you may not use this file except in compliance with the License.
+                    # You may obtain a copy of the License at
+                    #
+                    #     http://www.apache.org/licenses/LICENSE-2.0
+                    #
+                    # Unless required by applicable law or agreed to in writing, software
+                    # distributed under the License is distributed on an "AS IS" BASIS,
+                    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                    # See the License for the specific language governing permissions and
+                    # limitations under the License.
+
+                    imports:
+                    - path: vm_template.jinja
+
+                    resources:
+                    - name: vm_template
+                      type: vm_template.jinja
+                      properties:
+                        zone: us-central1-f
+                imports:
+                - content: |
+                    # Copyright 2015 Google Inc. All Rights Reserved.
+                    {#
+                    Copyright 2015 Google Inc. All rights reserved.
+                    Licensed under the Apache License, Version 2.0 (the "License");
+                    you may not use this file except in compliance with the License.
+                    You may obtain a copy of the License at
+
+                        http://www.apache.org/licenses/LICENSE-2.0
+
+                    Unless required by applicable law or agreed to in writing, software
+                    distributed under the License is distributed on an "AS IS" BASIS,
+                    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                    See the License for the specific language governing permissions and
+                    limitations under the License.
+                    #}
+
+                    {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+                    # Creates a Persistent Disk
+                    # Creates an instance that attaches that Persistent Disk as a data disk
+                    resources:
+                    - type: compute.v1.disk
+                      name: {{ DATADISK }}
+                      properties:
+                        zone: {{ properties["zone"] }}
+                        sizeGb: 100
+                        # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+                        type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+                    - type: compute.v1.instance
+                      name: vm-{{ env["deployment"] }}
+                      properties:
+                        zone: {{ properties["zone"] }}
+                        machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+                        metadata:
+                          items:
+                          # For more ways to use startup scripts on an instance, see:
+                          #   https://cloud.google.com/compute/docs/startupscript
+                          - key: startup-script
+                            value: |
+                              #!/bin/bash
+                              python -m SimpleHTTPServer 8080
+                        disks:
+                        - deviceName: boot
+                          type: PERSISTENT
+                          boot: true
+                          autoDelete: true
+                          initializeParams:
+                            diskName: disk-{{ env["deployment"] }}
+                            sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+                        # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+                        # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+                        # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+                        - deviceName: {{ DATADISK }}
+                          type: PERSISTENT
+                          source: $(ref.{{ DATADISK }}.selfLink)
+                          autoDelete: true
+
+                        networkInterfaces:
+                        - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+                          # Access Config required to give the instance a public IP address
+                          accessConfigs:
+                          - name: External NAT
+                            type: ONE_TO_ONE_NAT
+                  name: vm_template.jinja
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '719'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/JQpVu8afgx4vdzKYjp_-LEmodlU"'
+            pragma: no-cache
+            status: '200'
+          body:
+            kind: deploymentmanager#operation
+            id: '997095660938553162'
+            name: operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+            operationType: preview
+            targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            targetId: '3875938219980974000'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-28T10:08:37.762-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+        poll_operation: true
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        expect_response:
+          extract_references:
+          - reference: manifest2
+            field: update.manifest
+          - reference: fingerprint3
+            field: fingerprint
+          body:
+            json: {}
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1713'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/jB59Ysq0fIIGo-SC5s7o6nhfNcA"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '997095660938553162'
+              name: operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+              operationType: preview
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: RUNNING
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 0
+              insertTime: '2018-11-28T10:08:37.762-08:00'
+              startTime: '2018-11-28T10:08:38.021-08:00'
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+            fingerprint: p7akotlXFzL53Z5hxcTQcQ==
+            manifest: $$manifest$$
+            update:
+              manifest: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$/manifests/manifest-1543428517684
+              labels:
+              - key: key1
+                value: preview
+              description: ''
+            labels:
+            - key: key1
+              value: updated
+    - expect_stderr:
+        matches: The fingerprint of the deployment is.*
+    - expect_progress_tracker:
+        message: Waiting for update [$$operation$$]
+        status: SUCCESS
+    - expect_stderr: |
+        Update operation $$operation$$ completed successfully.
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$/resources?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '4156'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/VueZanbyNJeY_ZT4indEC6bpT2Q"'
+            status: '200'
+          body:
+            resources:
+            - id: '9128002900169287564'
+              insertTime: '2018-11-28T10:07:31.642-08:00'
+              updateTime: '2018-11-28T10:08:45.305-08:00'
+              name: datadisk-$$dm_single_vm_with_labels$$
+              type: compute.v1.disk
+              manifest: $$manifest$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+              properties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+              finalProperties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+            - id: '3067142650614474636'
+              insertTime: '2018-11-28T10:07:31.693-08:00'
+              updateTime: '2018-11-28T10:08:45.334-08:00'
+              name: vm-$$dm_single_vm_with_labels$$
+              type: compute.v1.instance
+              manifest: $$manifest$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/vm-$$dm_single_vm_with_labels$$
+              properties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              finalProperties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              warnings:
+              - code: EXTERNAL_API_WARNING
+                message: The resource 'projects/debian-cloud/global/images/debian-7-wheezy-v20140619'
+                  is deprecated. A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+                data:
+                - key: resource_name
+                  value: projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                - key: replacement_suggestion
+                  value: A suggested replacement is 'projects/debian-cloud/global/images/debian-7-wheezy-v20140718'.
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1758'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/4KPIUeDY8U1-gufMaEAwQNUfpG8"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '997095660938553162'
+              name: operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+              operationType: preview
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:08:37.762-08:00'
+              startTime: '2018-11-28T10:08:38.021-08:00'
+              endTime: '2018-11-28T10:08:46.624-08:00'
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+            fingerprint: $$fingerprint3$$
+            manifest: $$manifest$$
+            update:
+              manifest: $$manifest2$$
+              labels:
+              - key: key1
+                value: preview
+              description: ''
+            labels:
+            - key: key1
+              value: updated
+    - api_call:
+        expect_request:
+          uri: $$manifest2$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '5709'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/9J67fVm2cMeAXTIC1FG8u_4hFrY"'
+            status: '200'
+          body:
+            id: '4188821412058982218'
+            selfLink: $$manifest2$$
+            insertTime: '2018-11-28T10:08:37.761-08:00'
+            name: manifest-1543428517684
+            config:
+              content: |
+                # Copyright 2015 Google Inc. All rights reserved.
+                #
+                # Licensed under the Apache License, Version 2.0 (the "License");
+                # you may not use this file except in compliance with the License.
+                # You may obtain a copy of the License at
+                #
+                #     http://www.apache.org/licenses/LICENSE-2.0
+                #
+                # Unless required by applicable law or agreed to in writing, software
+                # distributed under the License is distributed on an "AS IS" BASIS,
+                # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                # See the License for the specific language governing permissions and
+                # limitations under the License.
+
+                imports:
+                - path: vm_template.jinja
+
+                resources:
+                - name: vm_template
+                  type: vm_template.jinja
+                  properties:
+                    zone: us-central1-f
+            imports:
+            - name: vm_template.jinja
+              content: |
+                # Copyright 2015 Google Inc. All Rights Reserved.
+                {#
+                Copyright 2015 Google Inc. All rights reserved.
+                Licensed under the Apache License, Version 2.0 (the "License");
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at
+
+                    http://www.apache.org/licenses/LICENSE-2.0
+
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+                #}
+
+                {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+                # Creates a Persistent Disk
+                # Creates an instance that attaches that Persistent Disk as a data disk
+                resources:
+                - type: compute.v1.disk
+                  name: {{ DATADISK }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    sizeGb: 100
+                    # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+                    type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+                - type: compute.v1.instance
+                  name: vm-{{ env["deployment"] }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+                    metadata:
+                      items:
+                      # For more ways to use startup scripts on an instance, see:
+                      #   https://cloud.google.com/compute/docs/startupscript
+                      - key: startup-script
+                        value: |
+                          #!/bin/bash
+                          python -m SimpleHTTPServer 8080
+                    disks:
+                    - deviceName: boot
+                      type: PERSISTENT
+                      boot: true
+                      autoDelete: true
+                      initializeParams:
+                        diskName: disk-{{ env["deployment"] }}
+                        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+                    # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+                    # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+                    # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+                    - deviceName: {{ DATADISK }}
+                      type: PERSISTENT
+                      source: $(ref.{{ DATADISK }}.selfLink)
+                      autoDelete: true
+
+                    networkInterfaces:
+                    - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+                      # Access Config required to give the instance a public IP address
+                      accessConfigs:
+                      - name: External NAT
+                        type: ONE_TO_ONE_NAT
+            expandedConfig: |
+              resources:
+              - name: datadisk-$$dm_single_vm_with_labels$$
+                properties:
+                  sizeGb: 100
+                  type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                  zone: us-central1-f
+                type: compute.v1.disk
+              - name: vm-$$dm_single_vm_with_labels$$
+                properties:
+                  disks:
+                  - autoDelete: true
+                    boot: true
+                    deviceName: boot
+                    initializeParams:
+                      diskName: disk-$$dm_single_vm_with_labels$$
+                      sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                    type: PERSISTENT
+                  - autoDelete: true
+                    deviceName: datadisk-$$dm_single_vm_with_labels$$
+                    source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                    type: PERSISTENT
+                  machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                  metadata:
+                    items:
+                    - key: startup-script
+                      value: |
+                        #!/bin/bash
+                        python -m SimpleHTTPServer 8080
+                  networkInterfaces:
+                  - accessConfigs:
+                    - name: External NAT
+                      type: ONE_TO_ONE_NAT
+                    network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                  zone: us-central1-f
+                type: compute.v1.instance
+                metadata:
+                  dependsOn:
+                  - datadisk-$$dm_single_vm_with_labels$$
+            layout: |
+              resources:
+              - name: vm_template
+                properties:
+                  zone: us-central1-f
+                resources:
+                - name: datadisk-$$dm_single_vm_with_labels$$
+                  type: compute.v1.disk
+                - name: vm-$$dm_single_vm_with_labels$$
+                  type: compute.v1.instance
+                type: vm_template.jinja
+    - expect_stdout: |
+        resources[0].name: datadisk-$$dm_single_vm_with_labels$$
+        resources[1].name: vm-$$dm_single_vm_with_labels$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    # testSingleVmWithLabels
+    command: deployment-manager deployments update $$dm_single_vm_with_labels$$ --update-labels
+      key1=updated
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1758'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/4KPIUeDY8U1-gufMaEAwQNUfpG8"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '997095660938553162'
+              name: operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+              operationType: preview
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:08:37.762-08:00'
+              startTime: '2018-11-28T10:08:38.021-08:00'
+              endTime: '2018-11-28T10:08:46.624-08:00'
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+            fingerprint: $$fingerprint3$$
+            manifest: $$manifest$$
+            update:
+              manifest: $$manifest2$$
+              labels:
+              - key: key1
+                value: preview
+              description: ''
+            labels:
+            - key: key1
+              value: updated
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json&createPolicy=CREATE_OR_ACQUIRE&deletePolicy=DELETE&preview=False
+          method: PUT
+          headers: {}
+          body:
+            json:
+              description: ''
+              fingerprint: $$fingerprint3$$
+              labels:
+              - key: key1
+                value: updated
+              name: $$dm_single_vm_with_labels$$
+        return_response:
+          headers:
+            cache-control: private, max-age=0
+            content-length: '3889'
+            content-type: application/json; charset=UTF-8
+            status: '412'
+          body:
+            error:
+              errors:
+              - domain: global
+                reason: conditionNotMet
+                message: Cannot do a deployment metadata PATCH for a deployment in
+                  states PREVIEWING, UPDATING, or CANCELING. This deployment is in
+                  state PREVIEWING.
+                locationType: header
+                location: If-Match
+                debugInfo: |
+                  com.google.api.server.core.Fault: ImmutableErrorDefinition{base=PRECONDITION_FAILED, category=USER_ERROR, cause=null, debugInfo=null, domain=global, extendedHelp=null, httpHeaders={}, httpStatus=preconditionFailed, internalReason=Reason{arguments={}, cause=null, code=gdata.CoreErrorDomain.CONDITION_NOT_MET, createdByBackend=true, debugMessage=null, errorProtoCode=CONDITION_NOT_MET, errorProtoDomain=gdata.CoreErrorDomain, filteredMessage=null, location=null, message=Cannot do a deployment metadata PATCH for a deployment in states PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING., unnamedArguments=[Cannot do a deployment metadata PATCH for a deployment in states PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING.]}, location=headers.If-Match, message=Cannot do a deployment metadata PATCH for a deployment in states PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING., reason=conditionNotMet, rpcCode=412} Cannot do a deployment metadata PATCH for a deployment in states PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING.
+                  	at com.google.api.server.core.ErrorCollector.toFault(ErrorCollector.java:54)
+                  	at com.google.api.server.rest.adapter.rosy.RosyErrorConverter.toFault(RosyErrorConverter.java:67)
+                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:258)
+                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:238)
+                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                  	at com.google.api.server.thread.ThreadTrackers$ThreadTrackingRunnable.run(ThreadTrackers.java:126)
+                  	at com.google.tracing.TraceContext$TraceContextRunnable.runInContext(TraceContext.java:453)
+                  	at com.google.api.server.server.CommonModule$ContextCarryingExecutorService$1.runInContext(CommonModule.java:824)
+                  	at com.google.tracing.TraceContext$TraceContextRunnable$1.run(TraceContext.java:460)
+                  	at io.grpc.Context.run(Context.java:565)
+                  	at com.google.tracing.CurrentContext.runInContext(CurrentContext.java:166)
+                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContextNoUnref(TraceContext.java:319)
+                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContext(TraceContext.java:311)
+                  	at com.google.tracing.TraceContext$TraceContextRunnable.run(TraceContext.java:457)
+                  	at com.google.gse.internal.DispatchQueueImpl$WorkerThread.run(DispatchQueueImpl.java:403)
+              code: 412
+              message: Cannot do a deployment metadata PATCH for a deployment in states
+                PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING.
+    - expect_exit:
+        code: 1
+        message: 'ResponseError: code=412, message=Cannot do a deployment metadata
+          PATCH for a deployment in states PREVIEWING, UPDATING, or CANCELING. This
+          deployment is in state PREVIEWING.'
+- execute_command:
+    # testSingleVmWithLabels
+    command: |
+      deployment-manager deployments update $$dm_single_vm_with_labels$$
+      --format "text(resources[0].name,resources[1].name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1758'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/x9tYz4-yLKEwA0EBcPCZdEGw_B8"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '997095660938553162'
+              name: operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+              operationType: preview
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:08:37.762-08:00'
+              startTime: '2018-11-28T10:08:38.021-08:00'
+              endTime: '2018-11-28T10:08:46.624-08:00'
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428517519-57bbd7485de99-4ffa2373-a1ad7527
+            fingerprint: $$fingerprint3$$
+            manifest: $$manifest$$
+            update:
+              manifest: $$manifest2$$
+              labels:
+              - key: key1
+                value: preview
+              description: ''
+            labels:
+            - key: key1
+              value: updated
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json&createPolicy=CREATE_OR_ACQUIRE&deletePolicy=DELETE&preview=False
+          method: PUT
+          headers: {}
+          body:
+            json:
+              description: ''
+              fingerprint: $$fingerprint3$$
+              labels:
+              - key: key1
+                value: updated
+              name: $$dm_single_vm_with_labels$$
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '719'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/0vdYqmOjVNY7Nfs7FjXzS0kQG4g"'
+            pragma: no-cache
+            status: '200'
+          body:
+            kind: deploymentmanager#operation
+            id: '3943866142834255709'
+            name: operation-1543428529977-57bbd7543f6ab-1dfdded0-795fc5c8
+            operationType: update
+            targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            targetId: '3875938219980974000'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-28T10:08:50.264-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428529977-57bbd7543f6ab-1dfdded0-795fc5c8
+        poll_operation: true
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1665'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/vmNHa__sEuPHBMmptKrAEs59gfc"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '3943866142834255709'
+              name: operation-1543428529977-57bbd7543f6ab-1dfdded0-795fc5c8
+              operationType: update
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: PENDING
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 0
+              insertTime: '2018-11-28T10:08:50.264-08:00'
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428529977-57bbd7543f6ab-1dfdded0-795fc5c8
+            fingerprint: YvvT-e0exMrTbqQ4oug6pQ==
+            manifest: $$manifest$$
+            update:
+              manifest: $$manifest2$$
+              labels:
+              - key: key1
+                value: preview
+              description: ''
+            labels:
+            - key: key1
+              value: updated
+    - expect_stderr:
+        matches: The fingerprint of the deployment is.*
+    - expect_progress_tracker:
+        message: Waiting for update [$$operation$$]
+        status: SUCCESS
+    - expect_stderr: |
+        Update operation $$operation$$ completed successfully.
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$/resources?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '3565'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/xYxczU-B3wcTO2DstD20SXRLsRg"'
+            status: '200'
+          body:
+            resources:
+            - id: '9128002900169287564'
+              insertTime: '2018-11-28T10:07:31.642-08:00'
+              updateTime: '2018-11-28T10:09:02.953-08:00'
+              name: datadisk-$$dm_single_vm_with_labels$$
+              type: compute.v1.disk
+              manifest: $$manifest2$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+              properties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+              finalProperties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+            - id: '3067142650614474636'
+              insertTime: '2018-11-28T10:07:31.693-08:00'
+              updateTime: '2018-11-28T10:09:07.584-08:00'
+              name: vm-$$dm_single_vm_with_labels$$
+              type: compute.v1.instance
+              manifest: $$manifest2$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/vm-$$dm_single_vm_with_labels$$
+              properties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              finalProperties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1455'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/TomTcZd1UbTjw2QIPedzNBJRJW8"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '3943866142834255709'
+              name: operation-1543428529977-57bbd7543f6ab-1dfdded0-795fc5c8
+              operationType: update
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:08:50.264-08:00'
+              startTime: '2018-11-28T10:08:51.181-08:00'
+              endTime: '2018-11-28T10:09:08.967-08:00'
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428529977-57bbd7543f6ab-1dfdded0-795fc5c8
+            fingerprint: YvvT-e0exMrTbqQ4oug6pQ==
+            manifest: $$manifest2$$
+            labels:
+            - key: key1
+              value: preview
+    - api_call:
+        expect_request:
+          uri: $$manifest2$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '5709'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/9J67fVm2cMeAXTIC1FG8u_4hFrY"'
+            status: '200'
+          body:
+            id: '4188821412058982218'
+            selfLink: $$manifest2$$
+            insertTime: '2018-11-28T10:08:37.761-08:00'
+            name: manifest-1543428517684
+            config:
+              content: |
+                # Copyright 2015 Google Inc. All rights reserved.
+                #
+                # Licensed under the Apache License, Version 2.0 (the "License");
+                # you may not use this file except in compliance with the License.
+                # You may obtain a copy of the License at
+                #
+                #     http://www.apache.org/licenses/LICENSE-2.0
+                #
+                # Unless required by applicable law or agreed to in writing, software
+                # distributed under the License is distributed on an "AS IS" BASIS,
+                # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                # See the License for the specific language governing permissions and
+                # limitations under the License.
+
+                imports:
+                - path: vm_template.jinja
+
+                resources:
+                - name: vm_template
+                  type: vm_template.jinja
+                  properties:
+                    zone: us-central1-f
+            imports:
+            - name: vm_template.jinja
+              content: |
+                # Copyright 2015 Google Inc. All Rights Reserved.
+                {#
+                Copyright 2015 Google Inc. All rights reserved.
+                Licensed under the Apache License, Version 2.0 (the "License");
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at
+
+                    http://www.apache.org/licenses/LICENSE-2.0
+
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+                #}
+
+                {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+                # Creates a Persistent Disk
+                # Creates an instance that attaches that Persistent Disk as a data disk
+                resources:
+                - type: compute.v1.disk
+                  name: {{ DATADISK }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    sizeGb: 100
+                    # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+                    type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+                - type: compute.v1.instance
+                  name: vm-{{ env["deployment"] }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+                    metadata:
+                      items:
+                      # For more ways to use startup scripts on an instance, see:
+                      #   https://cloud.google.com/compute/docs/startupscript
+                      - key: startup-script
+                        value: |
+                          #!/bin/bash
+                          python -m SimpleHTTPServer 8080
+                    disks:
+                    - deviceName: boot
+                      type: PERSISTENT
+                      boot: true
+                      autoDelete: true
+                      initializeParams:
+                        diskName: disk-{{ env["deployment"] }}
+                        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+                    # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+                    # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+                    # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+                    - deviceName: {{ DATADISK }}
+                      type: PERSISTENT
+                      source: $(ref.{{ DATADISK }}.selfLink)
+                      autoDelete: true
+
+                    networkInterfaces:
+                    - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+                      # Access Config required to give the instance a public IP address
+                      accessConfigs:
+                      - name: External NAT
+                        type: ONE_TO_ONE_NAT
+            expandedConfig: |
+              resources:
+              - name: datadisk-$$dm_single_vm_with_labels$$
+                properties:
+                  sizeGb: 100
+                  type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                  zone: us-central1-f
+                type: compute.v1.disk
+              - name: vm-$$dm_single_vm_with_labels$$
+                properties:
+                  disks:
+                  - autoDelete: true
+                    boot: true
+                    deviceName: boot
+                    initializeParams:
+                      diskName: disk-$$dm_single_vm_with_labels$$
+                      sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                    type: PERSISTENT
+                  - autoDelete: true
+                    deviceName: datadisk-$$dm_single_vm_with_labels$$
+                    source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                    type: PERSISTENT
+                  machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                  metadata:
+                    items:
+                    - key: startup-script
+                      value: |
+                        #!/bin/bash
+                        python -m SimpleHTTPServer 8080
+                  networkInterfaces:
+                  - accessConfigs:
+                    - name: External NAT
+                      type: ONE_TO_ONE_NAT
+                    network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                  zone: us-central1-f
+                type: compute.v1.instance
+                metadata:
+                  dependsOn:
+                  - datadisk-$$dm_single_vm_with_labels$$
+            layout: |
+              resources:
+              - name: vm_template
+                properties:
+                  zone: us-central1-f
+                resources:
+                - name: datadisk-$$dm_single_vm_with_labels$$
+                  type: compute.v1.disk
+                - name: vm-$$dm_single_vm_with_labels$$
+                  type: compute.v1.instance
+                type: vm_template.jinja
+    - expect_stdout: |
+        resources[0].name: datadisk-$$dm_single_vm_with_labels$$
+        resources[1].name: vm-$$dm_single_vm_with_labels$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    # testSingleVmWithLabels
+    command: deployment-manager deployments describe $$dm_single_vm_with_labels$$
+      --format text(name,labels)
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1455'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/TomTcZd1UbTjw2QIPedzNBJRJW8"'
+            status: '200'
+          body:
+            id: '3875938219980974000'
+            insertTime: '2018-11-28T10:07:27.478-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            name: $$dm_single_vm_with_labels$$
+            description: ''
+            operation:
+              kind: deploymentmanager#operation
+              id: '3943866142834255709'
+              name: operation-1543428529977-57bbd7543f6ab-1dfdded0-795fc5c8
+              operationType: update
+              targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+              targetId: '3875938219980974000'
+              status: DONE
+              user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              progress: 100
+              insertTime: '2018-11-28T10:08:50.264-08:00'
+              startTime: '2018-11-28T10:08:51.181-08:00'
+              endTime: '2018-11-28T10:09:08.967-08:00'
+              selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428529977-57bbd7543f6ab-1dfdded0-795fc5c8
+            fingerprint: YvvT-e0exMrTbqQ4oug6pQ==
+            manifest: $$manifest2$$
+            labels:
+            - key: key1
+              value: preview
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$/resources?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '3565'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/hF7KAkOmh2fPd7ZPqzZPHlwS-04"'
+            status: '200'
+          body:
+            resources:
+            - id: '9128002900169287564'
+              insertTime: '2018-11-28T10:07:31.642-08:00'
+              updateTime: '2018-11-28T10:09:02.953-08:00'
+              name: datadisk-$$dm_single_vm_with_labels$$
+              type: compute.v1.disk
+              manifest: $$manifest2$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+              properties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+              finalProperties: |
+                sizeGb: 100
+                type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                zone: us-central1-f
+            - id: '3067142650614474636'
+              insertTime: '2018-11-28T10:07:31.693-08:00'
+              updateTime: '2018-11-28T10:09:07.584-08:00'
+              name: vm-$$dm_single_vm_with_labels$$
+              type: compute.v1.instance
+              manifest: $$manifest2$$
+              url: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/vm-$$dm_single_vm_with_labels$$
+              properties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+              finalProperties: |
+                disks:
+                - autoDelete: true
+                  boot: true
+                  deviceName: boot
+                  initializeParams:
+                    diskName: disk-$$dm_single_vm_with_labels$$
+                    sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                  type: PERSISTENT
+                - autoDelete: true
+                  deviceName: datadisk-$$dm_single_vm_with_labels$$
+                  source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/datadisk-$$dm_single_vm_with_labels$$
+                  type: PERSISTENT
+                machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                metadata:
+                  items:
+                  - key: startup-script
+                    value: |
+                      #!/bin/bash
+                      python -m SimpleHTTPServer 8080
+                networkInterfaces:
+                - accessConfigs:
+                  - name: External NAT
+                    type: ONE_TO_ONE_NAT
+                  network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                zone: us-central1-f
+    - api_call:
+        expect_request:
+          uri: $$manifest2$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '5709'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/9J67fVm2cMeAXTIC1FG8u_4hFrY"'
+            status: '200'
+          body:
+            id: '4188821412058982218'
+            selfLink: $$manifest2$$
+            insertTime: '2018-11-28T10:08:37.761-08:00'
+            name: manifest-1543428517684
+            config:
+              content: |
+                # Copyright 2015 Google Inc. All rights reserved.
+                #
+                # Licensed under the Apache License, Version 2.0 (the "License");
+                # you may not use this file except in compliance with the License.
+                # You may obtain a copy of the License at
+                #
+                #     http://www.apache.org/licenses/LICENSE-2.0
+                #
+                # Unless required by applicable law or agreed to in writing, software
+                # distributed under the License is distributed on an "AS IS" BASIS,
+                # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                # See the License for the specific language governing permissions and
+                # limitations under the License.
+
+                imports:
+                - path: vm_template.jinja
+
+                resources:
+                - name: vm_template
+                  type: vm_template.jinja
+                  properties:
+                    zone: us-central1-f
+            imports:
+            - name: vm_template.jinja
+              content: |
+                # Copyright 2015 Google Inc. All Rights Reserved.
+                {#
+                Copyright 2015 Google Inc. All rights reserved.
+                Licensed under the Apache License, Version 2.0 (the "License");
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at
+
+                    http://www.apache.org/licenses/LICENSE-2.0
+
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+                #}
+
+                {% set DATADISK = "datadisk-" + env["deployment"] %}
+
+                # Creates a Persistent Disk
+                # Creates an instance that attaches that Persistent Disk as a data disk
+                resources:
+                - type: compute.v1.disk
+                  name: {{ DATADISK }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    sizeGb: 100
+                    # Disk type is a full URI.  Example uses pd-standard, but pd-ssd can be used as well
+                    type: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+
+                - type: compute.v1.instance
+                  name: vm-{{ env["deployment"] }}
+                  properties:
+                    zone: {{ properties["zone"] }}
+                    machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/f1-micro
+                    metadata:
+                      items:
+                      # For more ways to use startup scripts on an instance, see:
+                      #   https://cloud.google.com/compute/docs/startupscript
+                      - key: startup-script
+                        value: |
+                          #!/bin/bash
+                          python -m SimpleHTTPServer 8080
+                    disks:
+                    - deviceName: boot
+                      type: PERSISTENT
+                      boot: true
+                      autoDelete: true
+                      initializeParams:
+                        diskName: disk-{{ env["deployment"] }}
+                        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+
+                    # Specify the data disk to mount, note the deviceName can be anything, but by convention is typically set
+                    # to the same name.  This is the value is used in /dev/disk/by-id/google-<deviceName>.
+                    # If not set, it will be /dev/disk/by-id/google-persisent-disk-<number>.
+                    - deviceName: {{ DATADISK }}
+                      type: PERSISTENT
+                      source: $(ref.{{ DATADISK }}.selfLink)
+                      autoDelete: true
+
+                    networkInterfaces:
+                    - network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/default
+                      # Access Config required to give the instance a public IP address
+                      accessConfigs:
+                      - name: External NAT
+                        type: ONE_TO_ONE_NAT
+            expandedConfig: |
+              resources:
+              - name: datadisk-$$dm_single_vm_with_labels$$
+                properties:
+                  sizeGb: 100
+                  type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+                  zone: us-central1-f
+                type: compute.v1.disk
+              - name: vm-$$dm_single_vm_with_labels$$
+                properties:
+                  disks:
+                  - autoDelete: true
+                    boot: true
+                    deviceName: boot
+                    initializeParams:
+                      diskName: disk-$$dm_single_vm_with_labels$$
+                      sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20140619
+                    type: PERSISTENT
+                  - autoDelete: true
+                    deviceName: datadisk-$$dm_single_vm_with_labels$$
+                    source: $(ref.datadisk-$$dm_single_vm_with_labels$$.selfLink)
+                    type: PERSISTENT
+                  machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/f1-micro
+                  metadata:
+                    items:
+                    - key: startup-script
+                      value: |
+                        #!/bin/bash
+                        python -m SimpleHTTPServer 8080
+                  networkInterfaces:
+                  - accessConfigs:
+                    - name: External NAT
+                      type: ONE_TO_ONE_NAT
+                    network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                  zone: us-central1-f
+                type: compute.v1.instance
+                metadata:
+                  dependsOn:
+                  - datadisk-$$dm_single_vm_with_labels$$
+            layout: |
+              resources:
+              - name: vm_template
+                properties:
+                  zone: us-central1-f
+                resources:
+                - name: datadisk-$$dm_single_vm_with_labels$$
+                  type: compute.v1.disk
+                - name: vm-$$dm_single_vm_with_labels$$
+                  type: compute.v1.instance
+                type: vm_template.jinja
+    - expect_stdout: |
+        : {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    # testSingleVmWithLabels
+    cleanup_for: dm_single_vm_with_labels
+    command: deployment-manager deployments delete -q --async $$dm_single_vm_with_labels$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$?alt=json&deletePolicy=DELETE
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '719'
+            content-type: application/json; charset=UTF-8
+            etag: '"Vxh6o-OFZqLzeHY8wNpu0tRDqhI/PgBVBxNPnr0BSF8YsLnCyLabYb4"'
+            pragma: no-cache
+            status: '200'
+          body:
+            kind: deploymentmanager#operation
+            id: '2807411873552754472'
+            name: operation-1543428551049-57bbd76857f2b-e339eb58-ad2427f8
+            operationType: delete
+            targetLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/deployments/$$dm_single_vm_with_labels$$
+            targetId: '3875938219980974000'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-11-28T10:09:11.256-08:00'
+            selfLink: https://www.googleapis.com/deploymentmanager/v2/projects/cloud-sdk-integration-testing/global/operations/operation-1543428551049-57bbd76857f2b-e339eb58-ad2427f8
+        poll_operation: true
+    - expect_exit:
+        code: 0

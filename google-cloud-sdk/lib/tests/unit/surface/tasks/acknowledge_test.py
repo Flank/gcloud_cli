@@ -63,7 +63,7 @@ class TasksAcknowledgeTest(test_base.CloudTasksAlphaTestBase):
         'tasks acknowledge {} --queue {} --schedule-time {}'.format(
             self.task_id, self.queue_id, self.schedule_time))
 
-    self.resolve_loc_mock.assert_called_once_with()
+    self.resolve_loc_mock.assert_called_once_with(parsers.ParseProject())
 
   def testAcknowledge_Location(self):
     location_id = 'us-central2'

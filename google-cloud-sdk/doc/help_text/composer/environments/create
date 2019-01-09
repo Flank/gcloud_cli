@@ -8,8 +8,8 @@ SYNOPSIS
         [--disk-size=DISK_SIZE; default="100GB"]
         [--env-variables=[NAME=VALUE,...]] [--labels=[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE] [--node-count=NODE_COUNT]
-        [--oauth-scopes=[SCOPE,...]] [--service-account=SERVICE_ACCOUNT]
-        [--tags=[TAG,...]] [--zone=ZONE]
+        [--oauth-scopes=[SCOPE,...]] [--python-version=PYTHON_VERSION]
+        [--service-account=SERVICE_ACCOUNT] [--tags=[TAG,...]] [--zone=ZONE]
         [--network=NETWORK : --subnetwork=SUBNETWORK] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -79,6 +79,16 @@ FLAGS
         The set of Google API scopes to be made available on all of the node
         VMs. Defaults to ['https://www.googleapis.com/auth/cloud-platform'].
         Cannot be updated.
+
+     --python-version=PYTHON_VERSION
+        The Python version to be used within the created environment. Supplied
+        value should represent the desired major Python version. Cannot be
+        updated. PYTHON_VERSION must be one of:
+
+         2
+            Created environment will use Python 2
+         3
+            Created environment will use Python 3
 
      --service-account=SERVICE_ACCOUNT
         The Google Cloud Platform service account to be used by the node VMs.

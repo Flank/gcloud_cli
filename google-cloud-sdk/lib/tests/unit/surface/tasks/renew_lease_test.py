@@ -64,7 +64,7 @@ class TasksRenewLeaseTest(test_base.CloudTasksAlphaTestBase):
                                                    self.schedule_time, 20))
 
     self.assertEqual(expected, actual)
-    self.resolve_loc_mock.assert_called_once_with()
+    self.resolve_loc_mock.assert_called_once_with(parsers.ParseProject())
 
   def testRenewLease_RelativeName(self):
     task_name = ('projects/other-project/locations/us-central1/queues/my-queue'

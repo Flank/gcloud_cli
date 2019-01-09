@@ -168,8 +168,16 @@ AVAILABLE PROPERTIES
             alternate project.
 
      builds
+         kaniko_cache_ttl
+            TTL, in hours, of cached layers when using Kaniko. If zero, layer
+            caching is disabled.
+
          timeout
             Timeout, in seconds, to wait for builds to complete.
+
+         use_kaniko
+            If True, kaniko will be used to build images described by a
+            Dockerfile, instead of docker build.
 
      component_manager
          additional_repositories

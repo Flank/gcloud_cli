@@ -35,6 +35,7 @@ from googlecloudsdk.core.resource import resource_projector
 from googlecloudsdk.core.util import retry
 from tests.lib import completer_test_base
 from tests.lib import mock_matchers
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -42,6 +43,9 @@ from tests.lib.surface.compute import test_resources
 
 import mock
 import six
+
+_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY = 'with_external_ip_address'
+_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY = 'without_external_ip_address'
 
 MESSAGES = apis.GetMessagesModule('compute', 'v1')
 
@@ -184,8 +188,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -229,8 +232,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command without options and identity_file
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=None,
         extra_flags=[],
         tty=None,
@@ -277,8 +279,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -326,8 +327,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=['-p', '1234'],
         tty=None,
@@ -479,8 +479,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # Polling
     self.poller_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHPoller),
-        remote,
-        port='22',
+        remote=remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
@@ -493,8 +492,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        remote,
-        port='22',
+        remote=remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -543,8 +541,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=['-vvv', '-o', 'HostName=\'23.251.133.75\'', '-o',
                      'User=me'],
@@ -590,8 +587,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -636,8 +632,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -681,8 +676,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=['-vvv', '-o', 'HostName=\'23.251.133.75\'', '-o',
                      'User=me'],
@@ -734,8 +728,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=['-vvv', '-o', 'HostName=\'23.251.133.75\'', '-o',
                      'User=me'],
@@ -796,8 +789,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=True,
@@ -844,8 +836,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -889,8 +880,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=None,
         extra_flags=[],
         tty=True,
@@ -941,8 +931,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # Polling
     self.poller_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHPoller),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
@@ -955,8 +944,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -1939,8 +1927,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2017,8 +2004,7 @@ class SSHImplementationArgsTest(sdk_test_base.BundledBase,
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2061,8 +2047,7 @@ class SSHImplementationArgsTest(sdk_test_base.BundledBase,
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2156,8 +2141,7 @@ class SSHInstanceProjectOverrideTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2195,8 +2179,7 @@ class SSHInstanceProjectOverrideTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2236,7 +2219,7 @@ class SSHPrivateIpTest(test_base.BaseSSHTest):
         [
             mock.call(
                 mock_matchers.TypeMatcher(ssh.SSHCommand),
-                self.remote,
+                remote=self.remote,
                 identity_file=self.private_key_file,
                 options=dict(self.options, HostKeyAlias='compute.22222'),
                 remote_command=[
@@ -2245,8 +2228,7 @@ class SSHPrivateIpTest(test_base.BaseSSHTest):
                     'Google" -q` = 22222 ] || exit 23']),
             mock.call(
                 mock_matchers.TypeMatcher(ssh.SSHCommand),
-                self.remote,
-                port='22',
+                remote=self.remote,
                 identity_file=self.private_key_file,
                 extra_flags=[],
                 tty=None,
@@ -2343,7 +2325,7 @@ class SSHPrivateIpTest(test_base.BaseSSHTest):
         [
             mock.call(
                 mock_matchers.TypeMatcher(ssh.SSHCommand),
-                self.remote,
+                remote=self.remote,
                 identity_file=self.private_key_file,
                 options=dict(self.options, HostKeyAlias='compute.22222'),
                 remote_command=[
@@ -2352,8 +2334,7 @@ class SSHPrivateIpTest(test_base.BaseSSHTest):
                     'Google" -q` = 22222 ] || exit 23']),
             mock.call(
                 mock_matchers.TypeMatcher(ssh.SSHCommand),
-                self.remote,
-                port='22',
+                remote=self.remote,
                 identity_file=self.private_key_file,
                 options=dict(self.options, HostKeyAlias='compute.22222'),
                 remote_command=None,
@@ -2414,8 +2395,7 @@ class SSHOsloginTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2467,8 +2447,7 @@ class SSHOsloginTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2520,8 +2499,7 @@ class SSHOsloginTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2572,8 +2550,7 @@ class SSHOsloginTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2637,8 +2614,7 @@ class SSHOsloginTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2688,8 +2664,7 @@ class SSHOsloginTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        self.remote,
-        port='22',
+        remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
@@ -2702,47 +2677,72 @@ class SSHOsloginTest(test_base.BaseSSHTest):
         self.env, force_connect=True)
 
 
-class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
+class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
+                                  parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
-    self.instance = self.messages.Instance(
-        id=11111,
-        name='instance-1',
-        networkInterfaces=[
-            self.messages.NetworkInterface(
-                name='nic0',
-                accessConfigs=[
-                    self.messages.AccessConfig(natIP='23.251.133.1'),
-                ],
-            ),
-        ],
-        status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
-        selfLink=(
-            'https://www.googleapis.com/compute/{}/projects/my-project/'
-            'zones/zone-1/instances/instance-1').format(self.track.prefix),
-        zone=('https://www.googleapis.com/compute/{}/projects/my-project/'
-              'zones/zone-1').format(self.track.prefix))
+    self.instances = {
+        _INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY: self.messages.Instance(
+            id=11111,
+            name='instance-1',
+            networkInterfaces=[
+                self.messages.NetworkInterface(
+                    name='nic0',
+                    networkIP='10.240.0.52',
+                    accessConfigs=[
+                        self.messages.AccessConfig(natIP='23.251.133.1'),
+                    ],
+                ),
+            ],
+            status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
+            selfLink=(
+                'https://www.googleapis.com/compute/{}/projects/my-project/'
+                'zones/zone-1/instances/instance-1').format(self.track.prefix),
+            zone=('https://www.googleapis.com/compute/{}/projects/my-project/'
+                  'zones/zone-1').format(self.track.prefix)),
+        _INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY: self.messages.Instance(
+            id=22222,
+            name='instance-2',
+            networkInterfaces=[
+                self.messages.NetworkInterface(
+                    name='nic0',
+                    networkIP='10.240.0.53',
+                ),
+            ],
+            status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
+            selfLink=(
+                'https://www.googleapis.com/compute/{}/projects/my-project/'
+                'zones/zone-1/instances/instance-2').format(self.track.prefix),
+            zone=('https://www.googleapis.com/compute/{}/projects/my-project/'
+                  'zones/zone-1').format(self.track.prefix)),
+    }
 
+  @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY,),
+                            (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY,))
   @mock.patch.object(iap_tunnel, 'IapTunnelConnectionHelper', autospec=True)
-  def testSimpleCase(self, helper_cls_mock):
+  def testSimpleCase(self, test_instance_key, helper_cls_mock):
     helper_mock = mock.MagicMock()
     helper_mock.GetLocalPort.return_value = 8822
     helper_cls_mock.return_value = helper_mock
 
+    test_instance = self.instances[test_instance_key]
     self.make_requests.side_effect = iter([
-        [self.instance],
+        [test_instance],
         [self.project_resource],
     ])
 
-    self.Run('compute ssh instance-1 --zone zone-1 --tunnel-through-iap')
+    self.Run('compute ssh {} --zone zone-1 --tunnel-through-iap'.format(
+        test_instance.name))
 
     self.CheckRequests(
         [(self.compute.instances,
           'Get',
           self.messages.ComputeInstancesGetRequest(
-              instance='instance-1',
+              instance=test_instance.name,
               project='my-project',
               zone='zone-1'))],
         [(self.compute.projects,
@@ -2753,7 +2753,7 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
 
     # IAP Tunnel Connection Helpers
     helper_cls_mock.assert_called_once_with(
-        mock.ANY, 'my-project', 'zone-1', 'instance-1', 'nic0', 22)
+        mock.ANY, 'my-project', 'zone-1', test_instance.name, 'nic0', 22)
     helper_mock.StartListener.assert_called_once_with()
     helper_mock.StopListener.assert_called_once_with()
 
@@ -2767,12 +2767,13 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        ssh.Remote.FromArg('me@localhost'),
+        remote=ssh.Remote.FromArg('me@localhost'),
         port='8822',
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
-        options=dict(self.options, HostKeyAlias='compute.11111'),
+        options=dict(self.options,
+                     HostKeyAlias='compute.%s' % test_instance.id),
         remote_command=None,
         remainder=[])
 
@@ -2780,27 +2781,31 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
         mock_matchers.TypeMatcher(ssh.SSHCommand),
         self.env, force_connect=True)
 
+  @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY,),
+                            (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY,))
   @mock.patch.object(iap_tunnel, 'IapTunnelConnectionHelper', autospec=True)
-  def testWithAlternateUser(self, helper_cls_mock):
+  def testWithAlternateUser(self, test_instance_key, helper_cls_mock):
     helper_mock = mock.MagicMock()
     helper_mock.GetLocalPort.return_value = 8822
     helper_poller_mock = mock.MagicMock()
     helper_poller_mock.GetLocalPort.return_value = 9922
     helper_cls_mock.side_effect = [helper_mock, helper_poller_mock]
 
+    test_instance = self.instances[test_instance_key]
     self.make_requests.side_effect = iter([
-        [self.instance],
+        [test_instance],
         [self.project_resource_without_metadata],
         [],
     ])
 
-    self.Run('compute ssh hapoo@instance-1 --zone zone-1 --tunnel-through-iap')
+    self.Run('compute ssh hapoo@{} --zone zone-1 --tunnel-through-iap'.format(
+        test_instance.name))
 
     self.CheckRequests(
         [(self.compute.instances,
           'Get',
           self.messages.ComputeInstancesGetRequest(
-              instance='instance-1',
+              instance=test_instance.name,
               project='my-project',
               zone='zone-1'))],
         [(self.compute.projects,
@@ -2836,12 +2841,13 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
     remote = ssh.Remote.FromArg('hapoo@localhost')
     self.poller_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHPoller),
-        remote,
+        remote=remote,
         port='9922',
         identity_file=self.private_key_file,
         extra_flags=[],
         max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options,
+                     HostKeyAlias='compute.%s' % test_instance.id))
 
     self.poller_poll.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHPoller),
@@ -2850,12 +2856,13 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
     # SSH Command
     self.ssh_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHCommand),
-        remote,
+        remote=remote,
         port='8822',
         identity_file=self.private_key_file,
         extra_flags=[],
         tty=None,
-        options=dict(self.options, HostKeyAlias='compute.11111'),
+        options=dict(self.options,
+                     HostKeyAlias='compute.%s' % test_instance.id),
         remote_command=None,
         remainder=[])
 
@@ -2865,8 +2872,10 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
 
     self.AssertErrContains('Updating project ssh metadata')
 
+  @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY,),
+                            (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY,))
   @mock.patch.object(iap_tunnel, 'IapTunnelConnectionHelper', autospec=True)
-  def testWithPollingTimeout(self, helper_cls_mock):
+  def testWithPollingTimeout(self, test_instance_key, helper_cls_mock):
     helper_mock = mock.MagicMock()
     helper_mock.GetLocalPort.return_value = 8822
     helper_poller_mock = mock.MagicMock()
@@ -2876,8 +2885,9 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
     # Polling the instance leads to an unreachable instance.
     self.poller_poll.side_effect = retry.WaitException('msg', 'last', 'state')
 
+    test_instance = self.instances[test_instance_key]
     self.make_requests.side_effect = iter([
-        [self.instance],
+        [test_instance],
         [self.project_resource_without_metadata],
         [],
     ])
@@ -2889,14 +2899,14 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
         'Try running this command again.  If you still cannot connect, '
         'verify that the firewall and instance are set to accept '
         'ssh traffic.'):
-      self.Run('compute ssh hapoo@instance-1 --zone zone-1 '
-               '--tunnel-through-iap')
+      self.Run('compute ssh hapoo@{} --zone zone-1 --tunnel-through-iap'.format(
+          test_instance.name))
 
     self.CheckRequests(
         [(self.compute.instances,
           'Get',
           self.messages.ComputeInstancesGetRequest(
-              instance='instance-1',
+              instance=test_instance.name,
               project='my-project',
               zone='zone-1'))],
         [(self.compute.projects,
@@ -2932,12 +2942,13 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
     remote = ssh.Remote.FromArg('hapoo@localhost')
     self.poller_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHPoller),
-        remote,
+        remote=remote,
         port='9922',
         identity_file=self.private_key_file,
         extra_flags=[],
         max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options,
+                     HostKeyAlias='compute.%s' % test_instance.id))
     self.poller_poll.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHPoller),
         self.env, force_connect=True)
@@ -2945,6 +2956,12 @@ class SSHTunnelThroughIapTest(test_base.BaseSSHTest):
     self.ssh_run.assert_not_called()
 
     self.AssertErrContains('Updating project ssh metadata')
+
+
+class SSHTunnelThroughIapTestAlpha(SSHTunnelThroughIapTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

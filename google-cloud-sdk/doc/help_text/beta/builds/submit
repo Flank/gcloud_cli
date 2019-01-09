@@ -2,7 +2,7 @@ NAME
     gcloud beta builds submit - submit a build using Google Cloud Build
 
 SYNOPSIS
-    gcloud beta builds submit [[SOURCE] --no-source] [--async]
+    gcloud beta builds submit [[SOURCE] --no-source] [--async] [--no-cache]
         [--disk-size=DISK_SIZE] [--gcs-log-dir=GCS_LOG_DIR]
         [--gcs-source-staging-dir=GCS_SOURCE_STAGING_DIR]
         [--machine-type=MACHINE_TYPE] [--substitutions=[KEY=VALUE,...]]
@@ -12,6 +12,12 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) Submit a build using Google Cloud Build.
+
+    When the builds/use_kaniko property is True, builds submitted with --tag
+    will use Kaniko (https://github.com/GoogleContainerTools/kaniko) to execute
+    builds. Kaniko executes directives in a Dockerfile, with remote layer
+    caching for faster builds. By default, Kaniko will cache layers for 6
+    hours. To override this, set the builds/kaniko_cache_ttl property.
 
 POSITIONAL ARGUMENTS
      At most one of these may be specified:
@@ -33,6 +39,14 @@ FLAGS
      --async
         Display information about the operation in progress, without waiting
         for the operation to complete.
+
+     --no-cache
+        If set, disable layer caching when building with Kaniko.
+
+        This has the same effect as setting the builds/kaniko_cache_ttl
+        property to 0 for this build. This can be useful in cases where
+        Dockerfile builds are non-deterministic and a non-deterministic result
+        should not be cached.
 
      --disk-size=DISK_SIZE
         Machine disk size (GB) to run the build.

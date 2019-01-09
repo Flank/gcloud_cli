@@ -83,32 +83,19 @@ GCLOUD WIDE FLAGS
     details.
 
 EXAMPLES
-    To deploy an app to the service my-backend, navigate to the app's source
-    directory, and run:
+    To deploy a container to the service my-backend on Cloud Run:
 
-        $ gcloud alpha run deploy my-backend
-
-    To deploy a function named my_func, defined in ./index.js:
-
-        $ gcloud alpha run deploy my_func --function
-
-    To deploy a container, run:
-
-        $ gcloud alpha run deploy my-custom-app --image gcr.io/my/image
+        $ gcloud alpha run deploy my-backend --image gcr.io/my/image
 
     You may also omit the service name. Then a prompt will be displayed with a
     suggested default value:
 
-        $ gcloud alpha run deploy
+        $ gcloud alpha run deploy --image gcr.io/my/image
 
-    The first time you deploy, gcloud will ask for a destination region, and
-    will offer to save it as a default. To view the current default, run:
+    To deploy to Cloud Run on Kubernetes Engine, you need to specify a cluster:
 
-        $ gcloud config get-value run/region
-
-    To override the default region, you may use the --region flag:
-
-        $ gcloud alpha run deploy --region us-east
+        $ gcloud alpha run deploy --image gcr.io/my/image \
+          --cluster my-cluster
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -39,6 +39,9 @@ class TestConcept(base.Concept):
   def BuildHelpText(self):
     pass
 
+  def IsArgRequired(self):
+    pass
+
 
 class BaseTest(test_case.TestCase,
                parameterized.TestCase):

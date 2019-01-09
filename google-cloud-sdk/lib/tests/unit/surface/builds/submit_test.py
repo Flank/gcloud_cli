@@ -169,7 +169,9 @@ class CreateTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         steps=[
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/kaniko-project/executor:latest',
-                args=['--destination', 'gcr.io/my-project/image'],
+                args=['--destination', 'gcr.io/my-project/image',
+                      '--cache', 'true',
+                      '--cache-ttl', '6h'],
             ),
         ])
     b_out = self.cloudbuild_v1_messages.Build(
@@ -189,7 +191,197 @@ class CreateTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         steps=[
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/kaniko-project/executor:latest',
-                args=['--destination', 'gcr.io/my-project/image'],
+                args=['--destination', 'gcr.io/my-project/image',
+                      '--cache', 'true',
+                      '--cache-ttl', '6h'],
+            ),
+        ])
+    self.ExpectMessagesForSimpleBuild(b_in, b_out)
+
+    self._Run(
+        ['builds', 'submit',
+         'gs://bucket/object.zip', '--tag=gcr.io/my-project/image', '--async'])
+    self.AssertErrContains("""\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""", normalize_space=True)
+    self.AssertOutputContains("""\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename), normalize_space=True)
+    self.AssertErrContains('Logs are available at')
+    self.AssertErrContains('mockLogURL')
+    self.AssertErrNotContains('Logs can be found in the Cloud Console')
+
+  def testSubmitUseKanikoCacheTTL(self):
+    properties.VALUES.builds.use_kaniko.Set(True)
+    properties.VALUES.builds.kaniko_cache_ttl.Set(1)
+
+    b_in = self.cloudbuild_v1_messages.Build(
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            ),
+        ),
+        steps=[
+            self.cloudbuild_v1_messages.BuildStep(
+                name='gcr.io/kaniko-project/executor:latest',
+                args=['--destination', 'gcr.io/my-project/image',
+                      '--cache', 'true',
+                      '--cache-ttl', '1h'],
+            ),
+        ])
+    b_out = self.cloudbuild_v1_messages.Build(
+        createTime='2016-03-31T19:12:32.838111Z',
+        id='123-456-789',
+        projectId='my-project',
+        status=self._statuses.QUEUED,
+        logsBucket='gs://my-project_cloudbuild/logs',
+        logUrl='mockLogURL',
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            ),
+        ),
+        steps=[
+            self.cloudbuild_v1_messages.BuildStep(
+                name='gcr.io/kaniko-project/executor:latest',
+                args=['--destination', 'gcr.io/my-project/image',
+                      '--cache', 'true',
+                      '--cache-ttl', '1h'],
+            ),
+        ])
+    self.ExpectMessagesForSimpleBuild(b_in, b_out)
+
+    self._Run(
+        ['builds', 'submit',
+         'gs://bucket/object.zip', '--tag=gcr.io/my-project/image', '--async'])
+    self.AssertErrContains("""\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""", normalize_space=True)
+    self.AssertOutputContains("""\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename), normalize_space=True)
+    self.AssertErrContains('Logs are available at')
+    self.AssertErrContains('mockLogURL')
+    self.AssertErrNotContains('Logs can be found in the Cloud Console')
+
+  def testSubmitNoCacheWithConfig(self):
+    properties.VALUES.builds.use_kaniko.Set(True)
+    config_path = self.Touch('.', 'config.yaml')
+    with self.assertRaises(c_exceptions.ConflictingArgumentsException):
+      self._Run(
+          ['builds', 'submit', 'gs://bucket/object.zip',
+           '--config', config_path, '--no-cache'])
+
+  def testSubmitNoCacheWithoutKaniko(self):
+    properties.VALUES.builds.use_kaniko.Set(False)
+    with self.assertRaises(c_exceptions.InvalidArgumentException):
+      self._Run(
+          ['builds', 'submit', 'gs://bucket/object.zip',
+           '--tag=gcr.io/my-project/image', '--no-cache'])
+
+  def testSubmitNoCache(self):
+    properties.VALUES.builds.use_kaniko.Set(True)
+
+    b_in = self.cloudbuild_v1_messages.Build(
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            ),
+        ),
+        steps=[
+            self.cloudbuild_v1_messages.BuildStep(
+                name='gcr.io/kaniko-project/executor:latest',
+                args=['--destination', 'gcr.io/my-project/image',
+                      '--cache', 'true',
+                      '--cache-ttl', '0h'],
+            ),
+        ])
+    b_out = self.cloudbuild_v1_messages.Build(
+        createTime='2016-03-31T19:12:32.838111Z',
+        id='123-456-789',
+        projectId='my-project',
+        status=self._statuses.QUEUED,
+        logsBucket='gs://my-project_cloudbuild/logs',
+        logUrl='mockLogURL',
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            ),
+        ),
+        steps=[
+            self.cloudbuild_v1_messages.BuildStep(
+                name='gcr.io/kaniko-project/executor:latest',
+                args=['--destination', 'gcr.io/my-project/image',
+                      '--cache', 'true',
+                      '--cache-ttl', '0h'],
+            ),
+        ])
+    self.ExpectMessagesForSimpleBuild(b_in, b_out)
+
+    self._Run(
+        ['builds', 'submit', 'gs://bucket/object.zip', '--async',
+         '--tag=gcr.io/my-project/image', '--no-cache'])
+    self.AssertErrContains("""\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""", normalize_space=True)
+    self.AssertOutputContains("""\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename), normalize_space=True)
+    self.AssertErrContains('Logs are available at')
+    self.AssertErrContains('mockLogURL')
+    self.AssertErrNotContains('Logs can be found in the Cloud Console')
+
+  def testSubmitUseKanikoOverrideImage(self):
+    properties.VALUES.builds.use_kaniko.Set(True)
+    properties.VALUES.builds.kaniko_image.Set('gcr.io/some-other/kaniko-image')
+
+    b_in = self.cloudbuild_v1_messages.Build(
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            ),
+        ),
+        steps=[
+            self.cloudbuild_v1_messages.BuildStep(
+                name='gcr.io/some-other/kaniko-image',
+                args=['--destination', 'gcr.io/my-project/image',
+                      '--cache', 'true',
+                      '--cache-ttl', '6h'],
+            ),
+        ])
+    b_out = self.cloudbuild_v1_messages.Build(
+        createTime='2016-03-31T19:12:32.838111Z',
+        id='123-456-789',
+        projectId='my-project',
+        status=self._statuses.QUEUED,
+        logsBucket='gs://my-project_cloudbuild/logs',
+        logUrl='mockLogURL',
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            ),
+        ),
+        steps=[
+            self.cloudbuild_v1_messages.BuildStep(
+                name='gcr.io/some-other/kaniko-image',
+                args=['--destination', 'gcr.io/my-project/image',
+                      '--cache', 'true',
+                      '--cache-ttl', '6h'],
             ),
         ])
     self.ExpectMessagesForSimpleBuild(b_in, b_out)

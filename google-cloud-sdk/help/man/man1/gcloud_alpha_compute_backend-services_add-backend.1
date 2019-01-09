@@ -179,30 +179,30 @@ Defines the strategy for balancing load. \fIBALANCING_MODE\fR must be one of:
 .RS 2m
 .TP 2m
 \fBCONNECTION\fR
-Spreads load based on how many concurrent connections the group can handle.
-There are two ways to specify max connections: \fB\-\-max\-connections\fR which
-defines the max number of connections for the whole group or
-\fB\-\-max\-connections\-per\-instance**\-\-max\-max\-per\-endpoint\fR, which
-defines the max number of connections on a per\-instance basis. Available for
-all services.
+Spreads load based on how many concurrent connections the backend can handle.
+This balancing mode is only available to backend services that use SSL, TCP, or
+UDP protocols. For backend services with \-\-load\-balancing\-scheme EXTERNAL,
+you must specify exactly one of these additional parameters:
+\f5\-\-max\-connections\fR, \f5\-\-max\-connections\-per\-instance\fR, or
+\f5\-\-max\-connections\-per\-endpoint\fR. For backend services with
+\-\-load\-balancing\-scheme INTERNAL, you must omit all of these parameters.
 .TP 2m
 \fBRATE\fR
-Spreads load based on how many requests per second (RPS) the group can handle.
-There are two ways to specify max RPS: \fB\-\-max\-rate\fR which defines the max
-RPS for the whole group or
-\fB\-\-max\-rate\-per\-instance\fR/\fB\-\-max\-rate\-per\-endpoint\fR, which
-defines the max RPS on a per\-instance basis. Available only for HTTP\-based
-protocols.
+Spreads load based on how many HTTP requests per second (RPS) the backend can
+handle. This balancing mode is only available to backend services that use HTTP,
+HTTPS, or HTTP/2 protocols. You must specify exactly one of these additional
+parameters: \f5\-\-max\-rate\fR, \f5\-\-max\-rate\-per\-instance\fR,
+or\f5\-\-max\-rate\-per\-endpoint\fR.
 .TP 2m
 \fBUTILIZATION\fR
-Relies on the CPU utilization of the instances in the group when balancing load.
-Use \fB\-\-max\-utilization\fR to set a maximum target CPU utilization for each
-instance. Use \fB\-\-max\-rate\-per\-instance\fR or \fB\-\-max\-rate\fR to
-optionally limit based on RPS in addition to CPU. You can optionally also limit
-based on connections (for TCP/SSL) in addition to CPU by setting
-\fB\-\-max\-connections\fR or \fB\-\-max\-connections\-per\-instance\fR.
-Available for all services without \fB\-\-load\-balancing\-scheme INTERNAL\fR.
-This is incompatible with \-\-network\-endpoint\-group.
+Spreads load based on the CPU utilization of instances in a backend instance
+group. This balancing mode is only available to backend services with
+\-\-load\-balancing\-scheme EXTERNAL and instance group backends. There is no
+restriction on the backend service protocol. The following additional parameters
+may be specified: \f5\-\-max\-utilization\fR, \f5\-\-max\-rate\fR,
+\f5\-\-max\-rate\-per\-instance\fR, \f5\-\-max\-connections\fR,
+\f5\-\-max\-connections\-per\-instance\fR. For valid combinations, see
+\f5\-\-max\-utilization\fR below.
 .RE
 .sp
 
@@ -228,10 +228,64 @@ flag
 
 .TP 2m
 \fB\-\-max\-utilization\fR=\fIMAX_UTILIZATION\fR
-The maximum average CPU utilization of the backend service. Acceptable values
-are \f50.0\fR (0%) through \f51.0\fR (100%). This flag can only be provided when
-the balancing mode is \fBUTILIZATION\fR.
+Defines the maximum target for average CPU utilization of the backend instance
+in the backend instance group. Acceptable values are 0.0 (0%) through 1.0
+(100%). Available for all backend service protocols, with
+\-\-balancing\-mode=UTILIZATION.
 
+For backend services that use SSL, TCP, or UDP protocols, you may specify either
+\f5\-\-max\-connections\fR or \f5\-\-max\-connections\-per\-instance\fR, either
+by themselves or one in conjunction with \f5\-\-max\-utilization\fR. In other
+words, the following configuration options are supported:
+.RS 2m
+.IP "\(em" 2m
+no additional parameter
+.IP "\(em" 2m
+just \f5\-\-max\-utilization\fR
+.IP "\(em" 2m
+just \f5\-\-max\-connections\fR
+.IP "\(em" 2m
+just \f5\-\-max\-connections\-per\-instance\fR
+.IP "\(em" 2m
+both \f5\-\-max\-utilization\fR and \f5\-\-max\-connections\fR
+.IP "\(em" 2m
+both \f5\-\-max\-utilization\fR and \f5\-\-max\-connections\-per\-instance\fR
+
+.RE
+.RE
+.sp
+The meanings for \f5\-\-max\-connections\fR and
+\f5\-\-max\-connections\-per\-instance\fR are the same as for
+\-\-balancing\-mode=CONNECTION. If one is used in conjunction with
+\f5\-\-max\-utilization\fR, instances are considered at capacity when either
+maximum utilization or maximum connections is reached.
+
+For backend services that use HTTP, HTTPS, or HTTP/2 protocols, you may specify
+either \f5\-\-max\-rate\fR or \f5\-\-max\-rate\-per\-instance\fR, either by
+themselves or one in conjunction with \f5\-\-max\-utilization\fR. In other
+words, the following configuration options are supported:
+.RS 2m
+.IP "\(bu" 2m
+no additional parameter
+.IP "\(bu" 2m
+just \f5\-\-max\-utilization\fR
+.IP "\(bu" 2m
+just \f5\-\-max\-rate\fR
+.IP "\(bu" 2m
+just \f5\-\-max\-rate\-per\-instance\fR
+.IP "\(bu" 2m
+both \f5\-\-max\-utilization\fR and \f5\-\-max\-rate\fR
+.IP "\(bu" 2m
+both \f5\-\-max\-utilization\fR and \f5\-\-max\-rate\-per\-instance\fR
+
+.RE
+.sp
+The meanings for \f5\-\-max\-rate\fR and \f5\-\-max\-rate\-per\-instance\fR are
+the same as for \-\-balancing\-mode=RATE. If one is used in conjunction with
+\f5\-\-max\-utilization\fR, instances are considered at capacity when
+\fBeither\fR maximum utilization or the maximum rate is reached.
+
+.RS 2m
 .TP 2m
 
 At most one of these may be specified:
@@ -260,21 +314,26 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-max\-connections\fR=\fIMAX_CONNECTIONS\fR
-Maximum concurrent connections that the group can handle. Valid only for TCP/SSL
-connections.
+Maximum concurrent connections that the backend can handle. Valid for instance
+group and network endpoint group backends.
 
 .TP 2m
 \fB\-\-max\-connections\-per\-endpoint\fR=\fIMAX_CONNECTIONS_PER_ENDPOINT\fR
-Valid only for \f5\-\-network\-endpoint\-group\fR. The maximum number of
-simultaneous connections that a single network endpoint can handle. This is used
-to calculate the capacity of the group. Balancing mode must be set to CONNECTION
-and one of \-\-max\-connections, \-\-max\-connections\-per\-instance, or
-\-\-max\-connections\-per\-endpoint must be set.
+Only valid for network endpoint group backends. Defines a maximum number of
+connections per endpoint if all endpoints are healthy. When one or more
+endpoints are unhealthy, an effective maximum number of connections per healthy
+endpoint is calculated by multiplying MAX_CONNECTIONS_PER_ENDPOINT by the number
+of endpoints in the network endpoint group, then dividing by the number of
+healthy endpoints.
 
 .TP 2m
 \fB\-\-max\-connections\-per\-instance\fR=\fIMAX_CONNECTIONS_PER_INSTANCE\fR
-The maximum concurrent connections per instance. Valid only for TCP/SSL
-connections.
+Only valid for instance group backends. Defines a maximum number of concurrent
+connections per instance if all instances in the instance group are healthy.
+When one or more instances are unhealthy, an effective maximum number of
+connections per healthy instance is calculated by multiplying
+MAX_CONNECTIONS_PER_INSTANCE by the number of instances in the instance group,
+then dividing by the number of healthy instances.
 
 .RE
 .sp
@@ -285,36 +344,28 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-max\-rate\fR=\fIMAX_RATE\fR
-Maximum number of requests per second that can be sent to the instance group.
-Must not be used with Autoscaled Managed Instance Groups. \f5\-\-max\-rate\fR
-and \f5\-\-max\-rate\-per\-instance\fR are mutually exclusive. However, one of
-them can be set even if \f5\-\-balancing\-mode\fR is set to \f5UTILIZATION\fR.
-If either \f5\-\-max\-rate\fR or \f5\-\-max\-rate\-per\-instance\fR is set and
-\f5\-\-balancing\-mode\fR is set to \f5RATE\fR, then only that value is
-considered when judging capacity. If either \f5\-\-max\-rate\fR or
-\f5\-\-max\-rate\-per\-instance\fR is set and \f5\-\-balancing\-mode\fR is set
-to \f5UTILIZATION\fR, then instances are judged to be at capacity when either
-the \f5UTILIZATION\fR or \f5RATE\fR value is reached.
+Maximum number of HTTP requests per second (RPS) that the backend can handle.
+Valid for instance group and network endpoint group backends. Must not be
+defined if the backend is a managed instance group using autoscaling based on
+load balancing.
 
 .TP 2m
 \fB\-\-max\-rate\-per\-endpoint\fR=\fIMAX_RATE_PER_ENDPOINT\fR
-Valid only for \f5\-\-network\-endpoint\-group\fR. This is used to calculate the
-capacity of the group. Can be used in any balancing mode except
-\f5UTILIZATION\fR. Maximum number of requests per second that can be sent to
-each endpoint in the network endpoint group.
+Only valid for network endpoint group backends. Defines a maximum number of HTTP
+requests per second (RPS) per endpoint if all endpoints are healthy. When one or
+more endpoints are unhealthy, an effective maximum rate per healthy endpoint is
+calculated by multiplying MAX_RATE_PER_ENDPOINT by the number of endpoints in
+the network endpoint group, then dividing by the number of healthy endpoints.
 
 .TP 2m
 \fB\-\-max\-rate\-per\-instance\fR=\fIMAX_RATE_PER_INSTANCE\fR
-Maximum number of requests per second that can be sent to each instance in the
-instance group. \f5\-\-max\-rate\fR and \f5\-\-max\-rate\-per\-instance\fR are
-mutually exclusive. However, one of them can be set even if
-\f5\-\-balancing\-mode\fR is set to \f5UTILIZATION\fR. If either
-\f5\-\-max\-rate\fR or \f5\-\-max\-rate\-per\-instance\fR is set and
-\f5\-\-balancing\-mode\fR is set to \f5RATE\fR, then only that value is
-considered when judging capacity. If either \f5\-\-max\-rate\fR or
-\f5\-\-max\-rate\-per\-instance\fR is set and \f5\-\-balancing\-mode\fR is set
-to \f5UTILIZATION\fR, then instances are judged to be at capacity when either
-the \f5UTILIZATION\fR or \f5RATE\fR value is reached.
+Only valid for instance group backends. Defines a maximum number of HTTP
+requests per second (RPS) per instance if all instances in the instance group
+are healthy. When one or more instances are unhealthy, an effective maximum RPS
+per healthy instance is calculated by multiplying MAX_RATE_PER_INSTANCE by the
+number of instances in the instance group, then dividing by the number of
+healthy instances. This parameter is compatible with managed instance group
+backends that use autoscaling based on load balancing.
 
 
 .RE

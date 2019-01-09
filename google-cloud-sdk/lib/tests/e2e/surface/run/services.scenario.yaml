@@ -1,5 +1,8 @@
 title: serverless services deploy, describe and delete.
 release_tracks: [ALPHA]
+skip:
+  reason: server message has been changed
+  bug: b/120772035
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

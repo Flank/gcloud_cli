@@ -1,0 +1,108 @@
+
+.TH "GCLOUD_ALPHA_BQ_TABLES_INSERT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha bq tables insert \- insert records specified into an existing table
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha bq tables insert\fR (\fITABLE\fR\ :\ \fB\-\-dataset\fR=\fIDATASET\fR) \fB\-\-data\fR=\fIDATA\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Insert records specified into an existing table.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Table resource \- The BigQuery table you want to insert data into. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [table] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fITABLE\fR
+ID of the table or fully qualified identifier for the table. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-dataset\fR=\fIDATASET\fR
+The id of the BigQuery dataset.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-data\fR=\fIDATA\fR
+The file containing the newline\-delimited array of JSON objects representing
+rows to insert.
+
+.RS 2m
+.IP "\(em" 2m
+For example: [ {"string_col": "value1", "bool_col": false}, {"string_col":
+"value2", "bool_col": true}, {"string_col": "value3", "bool_col": false},
+{"string_col": "value4", "bool_col": true}, {"string_col": "value5", "bool_col":
+false}, ]
+.RE
+.RE
+.sp
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBbigquery/v2\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/bigquery/
+
+
+
+.SH "EXAMPLES"
+
+The following command inserts rows from \f5data_file.json\fR into
+\f5my\-table\fR in \f5my\-dataset\fR:
+
+.RS 2m
+$ gcloud alpha bq tables insert \e
+    \-\-table \e
+    /projects/myproject/datasets/my\-dataset/tables/my\-table \e
+    \-\-data data_file.json
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

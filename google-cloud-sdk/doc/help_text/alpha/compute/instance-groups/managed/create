@@ -105,12 +105,16 @@ OPTIONAL FLAGS
           Name of the health check to operate on.
 
        --http-health-check=HTTP_HEALTH_CHECK
-          Specifies the HTTP health check object used for autohealing instances
-          in this group.
+          (DEPRECATED) Specifies the HTTP health check object used for
+          autohealing instances in this group.
+
+          HttpHealthCheck is deprecated. Use --health-check instead.
 
        --https-health-check=HTTPS_HEALTH_CHECK
-          Specifies the HTTPS health check object used for autohealing
-          instances in this group.
+          (DEPRECATED) Specifies the HTTPS health check object used for
+          autohealing instances in this group.
+
+          HttpsHealthCheck is deprecated. Use --health-check instead.
 
      At most one of these may be specified:
 

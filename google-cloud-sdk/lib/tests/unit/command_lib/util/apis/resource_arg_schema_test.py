@@ -584,6 +584,19 @@ class CollectionValidationTests(base.Base, parameterized.TestCase):
         r'\[instance\]. Expected \[v1\], found \[foo\]'):
       r.GenerateResourceSpec(method.collection)
 
+  def testCollectionOverride(self):
+    self.MockCRUDMethods(('foo.projects.instances', True),
+                         ('bar.instances', True))
+    method = registry.GetMethod('foo.projects.instances', 'get')
+
+    r = resource_arg_schema.YAMLResourceArgument(
+        {'name': 'instance', 'collection': 'bar.instances',
+         'attributes': [
+             {'parameter_name': 'instancesId', 'attribute_name': 'instance',
+              'help': 'h'}]},
+        group_help='group_help', override_resource_collection=True)
+
+    r.GenerateResourceSpec(method.collection)
 
 if __name__ == '__main__':
   sdk_test_base.main()

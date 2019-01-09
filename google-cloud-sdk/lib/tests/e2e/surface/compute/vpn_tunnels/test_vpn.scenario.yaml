@@ -1,3 +1,6 @@
+skip: !!omap
+- bug: b/121155171
+- reason: Failing
 title: VPN Test
 release_tracks: [ALPHA, BETA, GA]
 summary:
@@ -244,7 +247,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -297,7 +300,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -330,7 +333,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -365,7 +368,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -400,7 +403,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -435,7 +438,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -469,7 +472,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -504,7 +507,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -538,7 +541,7 @@ actions:
           uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0

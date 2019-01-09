@@ -12,8 +12,8 @@ DESCRIPTION
     (BETA) gcloud beta compute addresses create is used to reserve one or more
     IP addresses. Once an IP address is reserved, it will be associated with
     the project until it is released using 'gcloud compute addresses delete'.
-    Ephemeral IP addresses that are in use by resources in the project, can be
-    reserved using the --addresses flag.
+    Ephemeral IP addresses that are in use by resources in the project can be
+    reserved using the '--addresses' flag.
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -92,34 +92,35 @@ GCLOUD WIDE FLAGS
     details.
 
 EXAMPLES
-    To reserve three IP addresses in the us-central1 region, run:
+    To reserve three IP addresses in the 'us-central1' region, run:
 
         $ gcloud beta compute addresses create ADDRESS-1 ADDRESS-2 \
             ADDRESS-3 --region us-central1
 
     To reserve ephemeral IP addresses 162.222.181.198 and 23.251.146.189 which
-    are being used by virtual machine instances in the us-central1 region, run:
+    are being used by virtual machine instances in the 'us-central1' region,
+    run:
 
         $ gcloud beta compute addresses create \
             --addresses 162.222.181.198,23.251.146.189 --region us-central1
 
     In the above invocation, the two addresses will be assigned random names.
 
-    To reserve an IP address from the subnet default in the us-central1 region,
-    run:
+    To reserve an IP address from the subnet 'default' in the 'us-central1'
+    region, run:
 
         $ gcloud beta compute addresses create SUBNET-ADDRESS-1 \
             --region us-central1 --subnet default
 
-    To reserve an IP range 10.110.0.0/16 from the network default for
+    To reserve an IP range 10.110.0.0/16 from the network 'default' for
     VPC_PEERING, run:
 
         $ gcloud beta compute addresses create IP-RANGE-1 --global \
             --addresses 10.110.0.0 --prefix-length 16
         --purpose VPC_PEERING --network default
 
-    To reserve any IP range with prefix length 16 from the network default for
-    VPC_PEERING, run:
+    To reserve any IP range with prefix length 16 from the network 'default'
+    for VPC_PEERING, run:
 
         $ gcloud beta compute addresses create IP-RANGE-1 --global \
             --prefix-length 16 --purpose VPC_PEERING

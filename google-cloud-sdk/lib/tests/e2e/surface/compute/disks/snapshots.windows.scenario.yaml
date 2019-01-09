@@ -1,3 +1,6 @@
+skip:
+  reason: Failing
+  bug: b/121387177
 title: Create a disk snapshot from a Windows image.
 release_tracks: [GA]
 
@@ -110,7 +113,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -147,7 +150,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0

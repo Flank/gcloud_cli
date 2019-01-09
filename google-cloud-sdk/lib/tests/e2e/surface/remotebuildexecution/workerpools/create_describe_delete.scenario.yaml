@@ -1,0 +1,172 @@
+title: Create, describe, then delete a workerpool
+release_tracks: [ALPHA]
+skip:
+  reason: failing
+  bug: b/121028606
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      remote-build-execution worker-pools create $$test-workerpool$$ --instance=default_instance --worker-count=2
+  - stderr: |
+      Create request issued for: [$$test-workerpool$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created workerpool [$$test-workerpool$$].
+- execute:
+  - command: |
+      remote-build-execution worker-pools describe $$test-workerpool$$ --instance=default_instance
+  - stdout: |
+      name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
+      state: RUNNING
+      workerConfig:
+        diskSizeGb: '200'
+        diskType: pd-standard
+        machineType: n1-standard-2
+        reserved: true
+      workerCount: '2'
+- execute:
+  - command: |
+      remote-build-execution worker-pools delete $$test-workerpool$$ --instance=default_instance --quiet
+  - stderr: |
+      Delete request issued for: [$$test-workerpool$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted workerpool [$$test-workerpool$$].
+actions:
+- generate_resource_id:
+    reference: test-workerpool
+    prefix: workerpool
+
+- execute_command:
+    command: |
+      remote-build-execution worker-pools create $$test-workerpool$$ --instance=default_instance --worker-count=2
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances/default_instance/workerpools?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              parent: projects/cloud-sdk-integration-testing/instances/default_instance
+              poolId: $$test-workerpool$$
+              workerPool:
+                workerConfig:
+                  diskSizeGb: '200'
+                  diskType: pd-standard
+                  machineType: n1-standard-2
+                workerCount: '2'
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '389'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/operations/EAMakgFwcm9qZWN0cy9jbG91ZC1zZGstaW50ZWdyYXRpb24tdGVzdGluZy9pbnN0YW5jZXMvZGVmYXVsdF9pbnN0YW5jZS93b3JrZXJwb29scy93b3JrZXJwb29sLTIwMTgxMjA2LTE4NDk0NS0ybnlrIDc1Y2JkZThlLWEwYWUtNGJmMi05MDYzLWZiOGIwOWRjZjQyNSIcV29ya2VyUG9vbHMuQ3JlYXRlV29ya2VyUG9vbA==
+            metadata:
+              '@type': type.googleapis.com/google.protobuf.Empty
+    - expect_stderr: |
+        Create request issued for: [$$test-workerpool$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '308'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
+            workerConfig:
+              machineType: n1-standard-2
+              diskType: pd-standard
+              diskSizeGb: '200'
+              reserved: true
+            workerCount: '2'
+            state: RUNNING
+        repeatable: true
+    - expect_stderr: |
+        Created workerpool [$$test-workerpool$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      remote-build-execution worker-pools describe $$test-workerpool$$ --instance=default_instance
+    events:
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '308'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
+            workerConfig:
+              machineType: n1-standard-2
+              diskType: pd-standard
+              diskSizeGb: '200'
+              reserved: true
+            workerCount: '2'
+            state: RUNNING
+    - expect_stdout: |
+        name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
+        state: RUNNING
+        workerConfig:
+          diskSizeGb: '200'
+          diskType: pd-standard
+          machineType: n1-standard-2
+          reserved: true
+        workerCount: '2'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      remote-build-execution worker-pools delete $$test-workerpool$$ --instance=default_instance --quiet
+    cleanup_for: test-workerpool
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '337'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/operations/EAMabXByb2plY3RzL2Nsb3VkLXNkay1pbnRlZ3JhdGlvbi10ZXN0aW5nL2luc3RhbmNlcy9kZWZhdWx0X2luc3RhbmNlL3dvcmtlcnBvb2xzL3dvcmtlcnBvb2wtMjAxODEyMDYtMTg0OTQ1LTJueWsiHFdvcmtlclBvb2xzLkRlbGV0ZVdvcmtlclBvb2w=
+            metadata:
+              '@type': type.googleapis.com/google.protobuf.Empty
+    - expect_stderr: |
+        Delete request issued for: [$$test-workerpool$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted workerpool [$$test-workerpool$$].
+    - expect_exit:
+        code: 0

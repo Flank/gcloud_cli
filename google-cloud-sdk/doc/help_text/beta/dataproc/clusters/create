@@ -285,9 +285,13 @@ FLAGS
         The Google Cloud IAM service account to be authenticated as.
 
      --tags=TAG,[TAG,...]
-        Specifies a list of tags to apply to the instances for identifying the
-        instances to which network firewall rules will apply. See gcloud
-        compute firewall-rules create(1) for more details.
+        Specifies a list of tags to apply to the instance. These tags allow
+        network firewall rules and routes to be applied to specified VM
+        instances. See gcloud compute firewall-rules create(1) for more
+        details.
+
+        To read more about configuring network tags, read this guide:
+        https://cloud.google.com/vpc/docs/add-remove-network-tags
 
         To list instances with their respective status and tags, run:
 

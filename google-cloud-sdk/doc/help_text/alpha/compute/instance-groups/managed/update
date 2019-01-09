@@ -7,32 +7,34 @@ SYNOPSIS
         [--add-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
         [--instance-redistribution-type=TYPE]
         [--remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
-        [--stateful-names] [--region=REGION | --zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--stateful-names]
+        [--clear-autohealing
+          | --initial-delay=INITIAL_DELAY --health-check=HEALTH_CHECK
+          | --http-health-check=HTTP_HEALTH_CHECK
+          | --https-health-check=HTTPS_HEALTH_CHECK]
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute instance-groups managed update allows to
-    update StatefulPolicy for a managed instance group. Stateful Policy defines
-    what stateful resources should be preserved for the group. When instances
-    in the group are removed or recreated, those stateful properties are always
-    applied to them. This command allows to change the preserved resources by
-    adding more disks or removing existing disks and to turn on and off
-    preserving instance names.
+    (ALPHA) gcloud alpha compute instance-groups managed update allows you to
+    specify or modify the StatefulPolicy and AutoHealingPolicy for an existing
+    managed instance group.
 
-    Example:
+    Stateful Policy defines what stateful resources should be preserved for the
+    group. When instances in the group are removed or recreated, those stateful
+    properties are always applied to them. This command allows you to change
+    the preserved resources by adding more disks or removing existing disks and
+    allows you to turn on and off preserving instance names.
 
-        $ gcloud alpha compute instance-groups managed update \
-            example-group --add-stateful-disks my-disk-1,my-disk-2 \
-        --remove-stateful-disks my-disk-0
+    When updating the AutoHealingPolicy, you may specify the health check,
+    initial delay, or both. If the field is unspecified, its value won't be
+    modified. If --health-check is specified, the health check will be used to
+    monitor the health of your application. Whenever the health check signal
+    for the instance becomes UNHEALTHY, the autohealing action (RECREATE) on an
+    instance will be performed.
 
-    will for each instance mark disk my-disk-0 as not stateful and disks
-    my-disk-1 and my-disk-2 as stateful. That means that disks my-disk-1 and
-    my-disk-2 will be preserved when the instances get recreated or restarted,
-    while disk my-disk-0 will not be preserved anymore.
-
-    When there are any disks marked as stateful, the instances automatically
-    will be assigned stateful names as well. You cannot turn off stateful names
-    without marking all disks as non-stateful.
+    If no health check is specified, the instance autohealing will be triggered
+    by the instance status only (i.e. the autohealing action (RECREATE) on an
+    instance will be performed if instance.status is not RUNNING).
 
 POSITIONAL ARGUMENTS
      NAME
@@ -74,6 +76,34 @@ FLAGS
         Enable stateful names of instances. Whenever instances with those names
         are restarted or recreated, they will have the same names as before.
         Use --no-stateful-names to disable stateful names.
+
+     At most one of these may be specified:
+
+       --clear-autohealing
+          Clears all autohealing policy fields for the managed instance group.
+
+       --initial-delay=INITIAL_DELAY
+          Specifies the length of the period during which the instance is known
+          to be initializing and should not be autohealed even if unhealthy.
+          This value cannot be greater than 1 hour. See $ gcloud topic
+          datetimes for information on duration formats.
+
+       At most one of these may be specified:
+
+         --health-check=HEALTH_CHECK
+            Name of the health check to operate on.
+
+         --http-health-check=HTTP_HEALTH_CHECK
+            (DEPRECATED) Specifies the HTTP health check object used for
+            autohealing instances in this group.
+
+            HttpHealthCheck is deprecated. Use --health-check instead.
+
+         --https-health-check=HTTPS_HEALTH_CHECK
+            (DEPRECATED) Specifies the HTTPS health check object used for
+            autohealing instances in this group.
+
+            HttpsHealthCheck is deprecated. Use --health-check instead.
 
      At most one of these may be specified:
 

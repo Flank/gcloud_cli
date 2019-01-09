@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute networks peerings create NAME --network=NETWORK
-        --peer-network=PEER_NETWORK [--auto-create-routes]
+        --peer-network=PEER_NETWORK [--async] [--auto-create-routes]
         [--export-custom-routes] [--import-custom-routes]
         [--peer-project=PEER_PROJECT] [GCLOUD_WIDE_FLAG ...]
 
@@ -24,9 +24,17 @@ REQUIRED FLAGS
         The name of the network to be peered with the current network.
 
 OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
      --auto-create-routes
-        If set, will automatically create routes for the network peering. Note
-        that a backend error will be returned if this is not set.
+        (DEPRECATED) If set, will automatically create routes for the network
+        peering. Flag auto-create-routes is deprecated. Peer network subnet
+        routes are always created in a network when peered.
+
+        Flag --auto-create-routes is deprecated and will be removed in a future
+        release.
 
      --export-custom-routes
         If set, the network will export custom routes to peer network. Use

@@ -1040,16 +1040,17 @@ class IntegrationTestBase(
     jsonoutput = encoding.MessageToJson(output)
     clusters = json.loads(jsonoutput)
     for cluster in clusters:
-      createtime = cluster['createTime']
-      dt1 = parser.parse(createtime)
-      dt2 = dt1 + leaked_cluster_min_age
-      dt3 = datetime.datetime.utcnow().replace(tzinfo=tz.tzutc())  # pylint: disable=g-tzinfo-replace
-      if dt2 < dt3:
-        self.Run(
-            'container clusters delete {0} {1} -q --async'.format(
-                cluster['name'], self._GetLocationFlag(location)),
-            track=track)
-        log.status.Print('Deleting a leaked cluster: %s', cluster['name'])
+      if cluster['status'] != 'PROVISIONING':
+        createtime = cluster['createTime']
+        createtime = parser.parse(createtime)
+        max_cluster_life_time = createtime + leaked_cluster_min_age
+        now = datetime.datetime.utcnow().replace(tzinfo=tz.tzutc())  # pylint: disable=g-tzinfo-replace
+        if max_cluster_life_time < now:
+          self.Run(
+              'container clusters delete {0} {1} -q --async'.format(
+                  cluster['name'], self._GetLocationFlag(location)),
+              track=track)
+          log.status.Print('Deleting a leaked cluster: %s', cluster['name'])
 
 
 class ClustersTestBase(UnitTestBase):

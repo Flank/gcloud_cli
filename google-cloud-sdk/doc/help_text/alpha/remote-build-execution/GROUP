@@ -1,0 +1,32 @@
+NAME
+    gcloud alpha remote-build-execution - manage Remote Build Execution
+
+SYNOPSIS
+    gcloud alpha remote-build-execution GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Implementation for commands for Remote Build Execution Admin API
+    integration.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     instances
+        (ALPHA) Manage Remote Build Execution Instances.
+
+     worker-pools
+        (ALPHA) Manage Remote Build Execution Worker Pools.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

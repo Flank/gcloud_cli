@@ -11,7 +11,7 @@ gcloud beta compute images import \- import an image into Google Compute Engine
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute images import\fR \fIIMAGE_NAME\fR (\fB\-\-data\-disk\fR\ |\ \fB\-\-os\fR=\fIOS\fR) (\fB\-\-source\-file\fR=\fISOURCE_FILE\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR) [\fB\-\-async\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute images import\fR \fIIMAGE_NAME\fR (\fB\-\-data\-disk\fR\ |\ \fB\-\-os\fR=\fIOS\fR) (\fB\-\-source\-file\fR=\fISOURCE_FILE\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR) [\fB\-\-async\fR] [\fB\-\-no\-guest\-environment\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -108,10 +108,28 @@ Display information about the operation in progress, without waiting for the
 operation to complete.
 
 .TP 2m
+\fB\-\-no\-guest\-environment\fR
+Google Guest Environment will not be installed on the image.
+
+.TP 2m
 \fB\-\-log\-location\fR=\fILOG_LOCATION\fR
 Directory in Google Cloud Storage to hold build logs. If not set,
 \f5gs://<project num>.cloudbuild\-logs.googleusercontent.com/\fR will be created
 and used.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+Name of the network in your project to use for the image import. The network
+must have access to Google Cloud Storage. If not specified, the network named
+\f5default\fR is used.
+
+.TP 2m
+\fB\-\-subnet\fR=\fISUBNET\fR
+Name of the subnetwork in your project to use for the image import. If the
+network resource is in legacy mode, do not provide this property. If the network
+is in auto subnet mode, providing the subnetwork is optional. If the network is
+in custom subnet mode, then this field should be specified. Region or zone
+should be specified if this field is specified.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="2h"

@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha firestore indexes - manage indexes for Cloud Firestore
+
+SYNOPSIS
+    gcloud alpha firestore indexes GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage indexes for Cloud Firestore.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     composite
+        (ALPHA) Manage composite indexes for Cloud Firestore.
+
+     fields
+        (ALPHA) Manage single-field indexes for Cloud Firestore.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta firestore indexes
+

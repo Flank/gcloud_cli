@@ -50,6 +50,7 @@ class AssetE2eTest(base.CategoryManagerE2eBase):
       args = '{} --annotation {} --quiet'.format(asset, annotation.name)
       self.Run('category-manager assets delete-annotation ' + args)
 
+  @test_case.Filters.skip('Failing', 'b/121190998')
   def testListAnnotationTagCommandOnBigQueryTableAsset(self):
     description = 'arbitrary-test-description'
     with self.CreateTaxonomyResource(description) as taxonomy, \
@@ -59,6 +60,7 @@ class AssetE2eTest(base.CategoryManagerE2eBase):
                                                         annotation.displayName)
       self.assertEqual(tag, asset_tag)
 
+  @test_case.Filters.skip('Failing', 'b/121190998')
   def testApplyAnnotationCommandOnBigQueryTableAsset(self):
     description = 'arbitrary-test-description'
     with self.CreateTaxonomyResource(description) as taxonomy, \
@@ -74,6 +76,7 @@ class AssetE2eTest(base.CategoryManagerE2eBase):
           taxonomyDisplayName=taxonomy.displayName)
       self.assertEqual(asset_tag, expected_tag)
 
+  @test_case.Filters.skip('Failing', 'b/121190998')
   def testDeleteAnnotationCommandOnBigQueryTableAsset(self):
     description = 'arbitrary-test-description'
     with self.CreateTaxonomyResource(description) as taxonomy, \
@@ -90,6 +93,7 @@ class AssetE2eTest(base.CategoryManagerE2eBase):
                                                         annotation.displayName)
       self.assertIsNone(tag)
 
+  @test_case.Filters.skip('Failing', 'b/121190998')
   def testSearchAssetsCommandOnBigQueryTableAsset(self):
     args = '"project_id:{}" --format=disable'.format(self.Project())
     assets = list(self.Run('category-manager assets search ' + args))

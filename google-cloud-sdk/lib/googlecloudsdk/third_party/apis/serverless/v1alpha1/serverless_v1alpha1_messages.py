@@ -13,6 +13,16 @@ from apitools.base.py import extra_types
 package = 'serverless'
 
 
+class Addressable(_messages.Message):
+  r"""Information for connecting over HTTP(s).
+
+  Fields:
+    hostname: A string attribute.
+  """
+
+  hostname = _messages.StringField(1)
+
+
 class ApiGroup(_messages.Message):
   r"""An API group.
 
@@ -620,12 +630,14 @@ class ListConfigurationsResponse(_messages.Message):
     items: List of Configurations.
     kind: The kind of this resource, in this case "ConfigurationList".
     metadata: Metadata associated with this Configuration list.
+    unreachable: Locations that could not be reached.
   """
 
   apiVersion = _messages.StringField(1)
   items = _messages.MessageField('Configuration', 2, repeated=True)
   kind = _messages.StringField(3)
   metadata = _messages.MessageField('ListMeta', 4)
+  unreachable = _messages.StringField(5, repeated=True)
 
 
 class ListMeta(_messages.Message):
@@ -665,12 +677,14 @@ class ListRevisionsResponse(_messages.Message):
     items: List of Revisions.
     kind: The kind of this resource, in this case "RevisionList".
     metadata: Metadata associated with this revision list.
+    unreachable: Locations that could not be reached.
   """
 
   apiVersion = _messages.StringField(1)
   items = _messages.MessageField('Revision', 2, repeated=True)
   kind = _messages.StringField(3)
   metadata = _messages.MessageField('ListMeta', 4)
+  unreachable = _messages.StringField(5, repeated=True)
 
 
 class ListRoutesResponse(_messages.Message):
@@ -681,12 +695,14 @@ class ListRoutesResponse(_messages.Message):
     items: List of Routes.
     kind: The kind of this resource, in this case always "RouteList".
     metadata: Metadata associated with this Route list.
+    unreachable: Locations that could not be reached.
   """
 
   apiVersion = _messages.StringField(1)
   items = _messages.MessageField('Route', 2, repeated=True)
   kind = _messages.StringField(3)
   metadata = _messages.MessageField('ListMeta', 4)
+  unreachable = _messages.StringField(5, repeated=True)
 
 
 class ListServicesResponse(_messages.Message):
@@ -697,12 +713,14 @@ class ListServicesResponse(_messages.Message):
     items: List of Services.
     kind: The kind of this resource, in this case "ServiceList".
     metadata: Metadata associated with this Service list.
+    unreachable: Locations that could not be reached.
   """
 
   apiVersion = _messages.StringField(1)
   items = _messages.MessageField('Service', 2, repeated=True)
   kind = _messages.StringField(3)
   metadata = _messages.MessageField('ListMeta', 4)
+  unreachable = _messages.StringField(5, repeated=True)
 
 
 class LocalObjectReference(_messages.Message):
@@ -991,23 +1009,73 @@ class ResourceRequirements(_messages.Message):
 
   Messages:
     LimitsValue: Limits describes the maximum amount of compute resources
-      allowed.
+      allowed. This field is deprecated in favor of limits_in_map.
+    LimitsInMapValue: Limits describes the maximum amount of compute resources
+      allowed. This is a temporary field created to migrate away from the
+      map<string, Quantity> limits field. This is done to become compliant
+      with k8s style API.
     RequestsValue: Requests describes the minimum amount of compute resources
       required. If Requests is omitted for a container, it defaults to Limits
       if that is explicitly specified, otherwise to an implementation-defined
-      value.
+      value. This field is deprecated in favor of requests_in_map.
+    RequestsInMapValue: Requests describes the minimum amount of compute
+      resources required. If Requests is omitted for a container, it defaults
+      to Limits if that is explicitly specified, otherwise to an
+      implementation-defined value. This is a temporary field created to
+      migrate away from the map<string, Quantity> requests field. This is done
+      to become compliant with k8s style API.
 
   Fields:
     limits: Limits describes the maximum amount of compute resources allowed.
+      This field is deprecated in favor of limits_in_map.
+    limitsInMap: Limits describes the maximum amount of compute resources
+      allowed. This is a temporary field created to migrate away from the
+      map<string, Quantity> limits field. This is done to become compliant
+      with k8s style API.
     requests: Requests describes the minimum amount of compute resources
       required. If Requests is omitted for a container, it defaults to Limits
       if that is explicitly specified, otherwise to an implementation-defined
-      value.
+      value. This field is deprecated in favor of requests_in_map.
+    requestsInMap: Requests describes the minimum amount of compute resources
+      required. If Requests is omitted for a container, it defaults to Limits
+      if that is explicitly specified, otherwise to an implementation-defined
+      value. This is a temporary field created to migrate away from the
+      map<string, Quantity> requests field. This is done to become compliant
+      with k8s style API.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
+  class LimitsInMapValue(_messages.Message):
+    r"""Limits describes the maximum amount of compute resources allowed. This
+    is a temporary field created to migrate away from the map<string,
+    Quantity> limits field. This is done to become compliant with k8s style
+    API.
+
+    Messages:
+      AdditionalProperty: An additional property for a LimitsInMapValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type LimitsInMapValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LimitsInMapValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A Quantity attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('Quantity', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
   class LimitsValue(_messages.Message):
-    r"""Limits describes the maximum amount of compute resources allowed.
+    r"""Limits describes the maximum amount of compute resources allowed. This
+    field is deprecated in favor of limits_in_map.
 
     Messages:
       AdditionalProperty: An additional property for a LimitsValue object.
@@ -1030,10 +1098,41 @@ class ResourceRequirements(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   @encoding.MapUnrecognizedFields('additionalProperties')
+  class RequestsInMapValue(_messages.Message):
+    r"""Requests describes the minimum amount of compute resources required.
+    If Requests is omitted for a container, it defaults to Limits if that is
+    explicitly specified, otherwise to an implementation-defined value. This
+    is a temporary field created to migrate away from the map<string,
+    Quantity> requests field. This is done to become compliant with k8s style
+    API.
+
+    Messages:
+      AdditionalProperty: An additional property for a RequestsInMapValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type RequestsInMapValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a RequestsInMapValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A Quantity attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('Quantity', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
   class RequestsValue(_messages.Message):
     r"""Requests describes the minimum amount of compute resources required.
     If Requests is omitted for a container, it defaults to Limits if that is
-    explicitly specified, otherwise to an implementation-defined value.
+    explicitly specified, otherwise to an implementation-defined value. This
+    field is deprecated in favor of requests_in_map.
 
     Messages:
       AdditionalProperty: An additional property for a RequestsValue object.
@@ -1056,7 +1155,9 @@ class ResourceRequirements(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   limits = _messages.MessageField('LimitsValue', 1)
-  requests = _messages.MessageField('RequestsValue', 2)
+  limitsInMap = _messages.MessageField('LimitsInMapValue', 2)
+  requests = _messages.MessageField('RequestsValue', 3)
+  requestsInMap = _messages.MessageField('RequestsInMapValue', 4)
 
 
 class Revision(_messages.Message):
@@ -1144,6 +1245,8 @@ class RevisionSpec(_messages.Message):
       Kubernetes resources should be in for this Revision. Users must not
       specify this when creating a revision. It is expected that the system
       will manipulate this based on routability and load.
+    timeoutSeconds: TimeoutSeconds holds the max duration the instance is
+      allowed for responding to a request. (not used by Cloud Run)
   """
 
   class ServingStateValueValuesEnum(_messages.Enum):
@@ -1177,6 +1280,7 @@ class RevisionSpec(_messages.Message):
   generation = _messages.IntegerField(4, variant=_messages.Variant.INT32)
   serviceAccountName = _messages.StringField(5)
   servingState = _messages.EnumField('ServingStateValueValuesEnum', 6)
+  timeoutSeconds = _messages.IntegerField(7, variant=_messages.Variant.INT32)
 
 
 class RevisionStatus(_messages.Message):
@@ -1300,6 +1404,8 @@ class RouteStatus(_messages.Message):
   controller).
 
   Fields:
+    address: Similar to domain, information on where the service is available
+      on HTTP.
     conditions: Conditions communicates information about ongoing/complete
       reconciliation processes that bring the "spec" inline with the observed
       state of the world.
@@ -1319,11 +1425,12 @@ class RouteStatus(_messages.Message):
       last observed.
   """
 
-  conditions = _messages.MessageField('RouteCondition', 1, repeated=True)
-  domain = _messages.StringField(2)
-  domainInternal = _messages.StringField(3)
-  observedGeneration = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  traffic = _messages.MessageField('TrafficTarget', 5, repeated=True)
+  address = _messages.MessageField('Addressable', 1)
+  conditions = _messages.MessageField('RouteCondition', 2, repeated=True)
+  domain = _messages.StringField(3)
+  domainInternal = _messages.StringField(4)
+  observedGeneration = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  traffic = _messages.MessageField('TrafficTarget', 6, repeated=True)
 
 
 class SELinuxOptions(_messages.Message):
@@ -2045,6 +2152,8 @@ class ServiceStatus(_messages.Message):
   r"""The current state of the Service. Output only.
 
   Fields:
+    address: Similar to domain, information on where the service is available
+      on HTTP.
     conditions: Array of observed ServiceCondition, indicating the current
       state of the Service.
     domain: The top-level domain from the underlying Route.
@@ -2064,12 +2173,13 @@ class ServiceStatus(_messages.Message):
       this will hold the LatestReadyRevisionName that was last observed.
   """
 
-  conditions = _messages.MessageField('ServiceCondition', 1, repeated=True)
-  domain = _messages.StringField(2)
-  latestCreatedRevisionName = _messages.StringField(3)
-  latestReadyRevisionName = _messages.StringField(4)
-  observedGeneration = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  traffic = _messages.MessageField('TrafficTarget', 6, repeated=True)
+  address = _messages.MessageField('Addressable', 1)
+  conditions = _messages.MessageField('ServiceCondition', 2, repeated=True)
+  domain = _messages.StringField(3)
+  latestCreatedRevisionName = _messages.StringField(4)
+  latestReadyRevisionName = _messages.StringField(5)
+  observedGeneration = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  traffic = _messages.MessageField('TrafficTarget', 7, repeated=True)
 
 
 class StandardQueryParameters(_messages.Message):

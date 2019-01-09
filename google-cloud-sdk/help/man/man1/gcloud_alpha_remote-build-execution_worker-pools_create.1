@@ -1,0 +1,134 @@
+
+.TH "GCLOUD_ALPHA_REMOTE\-BUILD\-EXECUTION_WORKER\-POOLS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha remote\-build\-execution worker\-pools create \- create a worker pool in the specified instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha remote\-build\-execution worker\-pools create\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default=200] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-2"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a worker pool in the specified instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Workerpool resource \- Arguments and flags specifying the worker pool you want
+to create. The arguments in this group can be used to specify the attributes of
+this resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[workerpool] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fIWORKERPOOL\fR
+ID of the workerpool or fully qualified identifier for the workerpool. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+Instance name.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR
+Number of workers that should be in the worker pool.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR; default=200
+Size of the disk, in Gb, for each worker. Defaults to 200Gb.
+
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR; default="n1\-standard\-2"
+Type of VM to use for each worker. To get a list of valid machine types, use the
+following command:
+
+$ gcloud compute machine\-types list
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBremotebuildexecution/v1alpha\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/remote\-build\-execution/docs/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a worker pool called 'pool1' in the instance
+called 'default_instance' with 25 workers configured with default machine type
+(n1\-standard\-2) and disk size (200Gb):
+
+.RS 2m
+$ gcloud alpha remote\-build\-execution worker\-pools create pool1 \e
+    \-\-instance=default_instance \-\-worker\-count=25
+.RE
+
+The following command creates a worker pool called 'heftypool' in the instance
+called 'default_instance' with 5 workers configured with 64 cores and 2000Gb
+disks:
+
+.RS 2m
+$ gcloud alpha remote\-build\-execution worker\-pools create \e
+    heftypool \-\-instance=default_instance \-\-worker\-count=5 \e
+    \-\-disk\-size=2000 \-\-machine\-type=n1\-standard\-64
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 import json
 import re
+import subprocess
 import sys
 
 from apitools.base.py import encoding
@@ -226,6 +227,17 @@ class Interceptor(sdk_test_base.SdkBase):
 
     self.StartObjectPatch(e2e_utils, 'GetResourceNameGenerator', autospec=True,
                           side_effect=InterceptResourceNameGenerator)
+
+    original_popen = subprocess.Popen
+    def InterceptPopen(*args, **kwargs):
+      if not (isinstance(args[0], six.string_types) and
+              args[0].startswith('uname')):
+        # Python runs uname on startup and we don't want to capture that.
+        Interceptor.SCENARIO_DATA['actions'].append({
+            'execute_binary': OrderedDict([('args', args[0])])})
+      return  original_popen.__call__(*args, **kwargs)
+    self.StartObjectPatch(subprocess, 'Popen', autospec=True,
+                          side_effect=InterceptPopen)
 
   def _StartNewCommandExecution(self):
     if self.current_action:

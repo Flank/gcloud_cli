@@ -12,7 +12,8 @@ DESCRIPTION
         configuration, including the Google Cloud Platform account, project and
         directory paths for logs.
 
-      o gcloud info --run-diagnostics checks network connectivity.
+      o gcloud info --run-diagnostics checks network connectivity and hidden
+        properties.
 
       o gcloud info --show-log prints the contents of the most recent log
         file.

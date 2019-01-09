@@ -23,6 +23,7 @@ Adds the options:
   --exclude-module-prefixes: Excludes tests that match the given prefixes
   --no-unit-tests: Excludes all unit tests (those in tests.unit)
   --no-integration-tests: Excludes e2e tests (those in tests.e2e)
+  --order-file: Path to a file containing the order in which to run the tests.
   --random: Shuffle tests before running
   --no-random: Disable randomization
   --random-seed: Specify a random seed for test shuffling
@@ -30,6 +31,7 @@ Adds the options:
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
@@ -58,6 +60,7 @@ def pytest_addoption(parser):
       '--no-integration-tests', dest='no_integration', action='store_true')
   parser.addoption('--no-unit-tests', dest='no_unit', action='store_true')
   parser.addoption('--random', dest='random', action='store_true')
+  parser.addoption('--order-file', dest='order_file')
   parser.addoption('--no-random', dest='random', action='store_false')
   parser.addoption('--random-seed', dest='random_seed', type=int)
 
@@ -211,6 +214,10 @@ def _nodeid_to_module_path(nodeid):
   return module_path
 
 
+def _test_name(item):
+  return '.'.join([item.cls.__module__, item.cls.__name__, item.name])
+
+
 @pytest.hookimpl(trylast=True)
 def pytest_collection_modifyitems(config, items):
   """Hook to modify collected items list."""
@@ -245,6 +252,20 @@ def pytest_collection_modifyitems(config, items):
       n = rnd.randint(0, i)
       item = items.pop(n)
       items.append(item)
+
+  # Sort the tests based on a file if provided. If `--random` was specified,
+  # tests are already shuffled, so tests without an order provided will be in
+  # random order, in the unknown test location.
+
+  # Unknown tests shouldn't be run first, but also shouldn't be run last, in
+  # case they are very slow. Run them after the 50 slowest tests.
+  unknown_test_priority = 50.5
+  order_file = config.getoption('order_file')
+  if order_file:
+    order_file_lines = open(order_file).read().strip().split()
+    order = {line: i for i, line in enumerate(order_file_lines)}
+    items.sort(
+        key=lambda item: order.get(_test_name(item), unknown_test_priority))
 
 
 def _is_master_slave(config):

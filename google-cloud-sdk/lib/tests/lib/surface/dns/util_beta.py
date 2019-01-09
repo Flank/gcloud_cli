@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.dns import util as dns_util
+from googlecloudsdk.core import resources
 from tests.lib.surface.dns import util
 
 
@@ -62,6 +63,53 @@ def ParseManagedZoneForwardingConfig(target_servers=None):
   ]
 
   return messages.ManagedZoneForwardingConfig(targetNameServers=target_servers)
+
+
+def GetPolicies(num=3, name_server_config=None, forwarding=False,
+                networks=None):
+  m = GetMessages()
+  return [
+      m.Policy(
+          alternativeNameServerConfig=name_server_config,
+          description="My policy {}".format(i),
+          enableInboundForwarding=forwarding,
+          name="mypolicy{}".format(i),
+          networks=GetPolicyNetworks(networks)) for i in range(num)
+  ]
+
+
+def GetAltNameServerConfig(target_servers=None):
+  """Get ForwardingConfig Message."""
+  if not target_servers:
+    return None
+
+  m = GetMessages()
+  if target_servers == [""]:
+    return None
+
+  target_servers = [
+      m.PolicyAlternativeNameServerConfigTargetNameServer(ipv4Address=name)
+      for name in target_servers
+  ]
+
+  return m.PolicyAlternativeNameServerConfig(targetNameServers=target_servers)
+
+
+def GetNetworkURI(network, project):
+  registry = resources.REGISTRY.Clone()
+  registry.RegisterApiByName("compute", "v1")
+  network_ref = registry.Parse(
+      network, params={"project": project}, collection="compute.networks")
+  return network_ref.SelfLink()
+
+
+def GetPolicyNetworks(urls, project="fake-project"):
+  m = GetMessages()
+  if urls == [""]:
+    return []
+  return [
+      m.PolicyNetwork(networkUrl=GetNetworkURI(url, project)) for url in urls
+  ]
 
 
 def GetManagedZones():

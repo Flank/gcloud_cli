@@ -18,49 +18,77 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class InterconnectsDiagnosticsTest(
-    parameterized.TestCase, test_base.BaseTest):
+class InterconnectsDiagnosticsGaTest(test_base.BaseTest):
 
-  def SelectApiVersion(self, track, api_version):
-    self.track = track
-    self.SelectApi(api_version)
-    self.api_version = api_version
+  def Project(self):
+    return 'my-project'
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
+    self.api_version = 'v1'
+    self.v1_messages = core_apis.GetMessagesModule('compute', self.api_version)
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', self.api_version)
-    self.compute_message = getattr(self, 'compute_' + api_version)
+    self.message_version = self.compute_v1
 
-  def testSimpleCase(self, track, api_version):
-    self.SelectApiVersion(track, api_version)
+  def testSimpleCase(self):
     self.make_requests.side_effect = [[self.messages.InterconnectDiagnostics()]]
     self.Run("""
         compute interconnects get-diagnostics my-interconnect1
         """)
     self.CheckRequests(
-        [(self.compute_message.interconnects, 'GetDiagnostics',
+        [(self.message_version.interconnects, 'GetDiagnostics',
           self.messages.ComputeInterconnectsGetDiagnosticsRequest(
               project='my-project', interconnect='my-interconnect1'))],)
 
-  def testWithUrl(self, track, api_version):
-    self.SelectApiVersion(track, api_version)
+  def testWithUrl(self):
     self.make_requests.side_effect = [[self.messages.InterconnectDiagnostics()]]
     self.Run('compute interconnects get-diagnostics https://www.googleapis.com/'
-             'compute/' + api_version +
+             'compute/' + self.api_version +
              '/projects/my-project/global/interconnects/'
              'my-interconnect1')
     self.CheckRequests(
-        [(self.compute_message.interconnects, 'GetDiagnostics',
+        [(self.message_version.interconnects, 'GetDiagnostics',
           self.messages.ComputeInterconnectsGetDiagnosticsRequest(
               project='my-project', interconnect='my-interconnect1'))],)
+
+
+class InterconnectsDiagnosticsBetaTest(InterconnectsDiagnosticsGaTest):
+
+  def Project(self):
+    return 'my-project'
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.api_version = 'beta'
+    self.v1_messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', self.api_version)
+    self.message_version = self.compute_beta
+
+
+class InterconnectsDiagnosticsAlphaTest(InterconnectsDiagnosticsBetaTest):
+
+  def Project(self):
+    return 'my-project'
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.api_version = 'alpha'
+    self.v1_messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', self.api_version)
+    self.message_version = self.compute_alpha
 
 
 if __name__ == '__main__':

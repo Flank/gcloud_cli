@@ -158,7 +158,7 @@ class PropertiesTests(sdk_test_base.SdkBase):
     self.assertEqual(False, prop.GetBool(required=True))
 
   def testCoreBooleanPropertyGetIntRequired(self):
-    regex = (r'The property \[core.log_http\] must have an integer value: '
+    regex = (r'The property \[core/log_http\] must have an integer value: '
              r'\[False\]')
     prop = properties.VALUES.core.log_http
     with self.assertRaisesRegex(properties.InvalidValueError, regex):
@@ -200,7 +200,7 @@ class PropertiesTests(sdk_test_base.SdkBase):
     self.assertEqual(True, prop.GetBool(required=True))
 
   def testHiddenBooleanPropertyGetIntRequired(self):
-    regex = (r'The property \[app.promote_by_default\] must have an integer '
+    regex = (r'The property \[app/promote_by_default\] must have an integer '
              r'value: \[True\]')
     prop = properties.VALUES.app.promote_by_default
     with self.assertRaisesRegex(properties.InvalidValueError, regex):

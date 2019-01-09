@@ -24,14 +24,20 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 import six
 
 
-class ImagesCreateTest(test_base.BaseTest):
+class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
 
   def testAllFlags(self):
     self.Run("""
@@ -183,8 +189,8 @@ class ImagesCreateTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute images create my-image
-          --source-disk https://www.googleapis.com/compute/v1/projects/my-project/zones/central2-b/disks/my-disk
-        """)
+          --source-disk https://www.googleapis.com/compute/{}/projects/my-project/zones/central2-b/disks/my-disk
+        """.format(self.api_version))
 
     self.CheckRequests(
         [(self.compute.images,
@@ -458,44 +464,6 @@ class ImagesCreateTest(test_base.BaseTest):
               project='my-project'))],
     )
 
-
-class ImagesCreateCsekBetaTest(test_base.BaseTest):
-  """Tests for CSEK features only available in beta."""
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def testCreateImageFromDiskCsekEncryptedRsaWrapped(self):
-    private_key_fname = self.WriteKeyFile(include_rsa_encrypted=True)
-
-    self.Run("""
-        compute images create my-image
-          --source-disk wrappedkeydisk --source-disk-zone central2-a
-          --csek-key-file={0} --no-require-csek-key-create
-        """.format(private_key_fname))
-    self.CheckRequests(
-        [(self.compute.images,
-          'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              image=self.messages.Image(
-                  name='my-image',
-                  sourceDisk=(self.compute_uri + '/projects/my-project'
-                              + '/zones/central2-a/disks/wrappedkeydisk'),
-                  sourceDiskEncryptionKey=self.messages.CustomerEncryptionKey(
-                      rsaEncryptedKey=test_base.SAMPLE_WRAPPED_CSEK_KEY),
-                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
-              project='my-project'))],
-    )
-
-
-class ImagesCreateGuestOsFeaturesTest(test_base.BaseTest):
-  """Tests for GuestOsFeatures available in the v1 API."""
-
-  def SetUp(self):
-    self.SelectApi('v1')
-    self.track = calliope_base.ReleaseTrack.GA
-
   def testCreateGuestImageWithOsFeatures(self):
     self.Run("""
         compute images create my-image --description nifty
@@ -578,221 +546,6 @@ class ImagesCreateGuestOsFeaturesTest(test_base.BaseTest):
 
     self.assertEqual(enums, choices)
 
-
-class ImagesCreateGuestOsFeaturesBetaTest(test_base.BaseTest):
-  """Tests for GuestOsFeatures available in beta."""
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def testCreateGuestImageWithOsFeatures(self):
-    self.Run("""
-        compute images create my-image --description nifty
-          --source-uri gs://31dd/source-image
-          --guest-os-features WINDOWS,VIRTIO_SCSI_MULTIQUEUE
-        """)
-
-    windows_type = self.messages.GuestOsFeature.TypeValueValuesEnum('WINDOWS')
-    vsm_type = self.messages.GuestOsFeature.TypeValueValuesEnum(
-        'VIRTIO_SCSI_MULTIQUEUE')
-
-    self.CheckRequests(
-        [(self.compute.images,
-          'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              image=self.messages.Image(
-                  name='my-image',
-                  description='nifty',
-                  guestOsFeatures=[
-                      self.messages.GuestOsFeature(type=windows_type),
-                      self.messages.GuestOsFeature(type=vsm_type),
-                  ],
-                  rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
-                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
-              project='my-project'))],
-    )
-
-  def testCreateGuestImageWithLowerCaseOsFeatures(self):
-    self.Run("""
-        compute images create my-image --description nifty
-          --source-uri gs://31dd/source-image
-          --guest-os-features windows,virtio_scsi_multiqueue
-        """)
-
-    windows_type = self.messages.GuestOsFeature.TypeValueValuesEnum('WINDOWS')
-    vsm_type = self.messages.GuestOsFeature.TypeValueValuesEnum(
-        'VIRTIO_SCSI_MULTIQUEUE')
-
-    self.CheckRequests(
-        [(self.compute.images,
-          'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              image=self.messages.Image(
-                  name='my-image',
-                  description='nifty',
-                  guestOsFeatures=[
-                      self.messages.GuestOsFeature(type=windows_type),
-                      self.messages.GuestOsFeature(type=vsm_type),
-                  ],
-                  rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
-                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
-              project='my-project'))],
-    )
-
-  def testCreateWithUnknownOsFeature(self):
-    with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --guest-os-features: BAD_FEATURE must be one of \['):
-      self.Run("""
-          compute images create my-image
-            --source-uri gs://31dd/source-image
-            --guest-os-features BAD_FEATURE
-          """)
-
-    self.CheckRequests()
-
-  def testCheckGuestOsFeaturesEnum(self):
-    enums = list(
-        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
-    enums.remove('FEATURE_TYPE_UNSPECIFIED')
-    enums.sort()
-
-    choices = list(image_utils.GUEST_OS_FEATURES_BETA)
-    choices.sort()
-
-    self.assertEqual(enums, choices)
-
-
-class ImagesCreateGuestOsFeaturesAlphaTest(test_base.BaseTest):
-  """Tests for GuestOsFeatures currently available in alpha."""
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testCreateGuestImageWithOsFeatures(self):
-    self.Run("""
-        compute images create my-image --description nifty
-          --source-uri gs://31dd/source-image
-          --guest-os-features WINDOWS,VIRTIO_SCSI_MULTIQUEUE
-        """)
-
-    windows_type = self.messages.GuestOsFeature.TypeValueValuesEnum('WINDOWS')
-    vsm_type = self.messages.GuestOsFeature.TypeValueValuesEnum(
-        'VIRTIO_SCSI_MULTIQUEUE')
-
-    self.CheckRequests(
-        [(self.compute.images,
-          'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              image=self.messages.Image(
-                  name='my-image',
-                  description='nifty',
-                  guestOsFeatures=[
-                      self.messages.GuestOsFeature(type=windows_type),
-                      self.messages.GuestOsFeature(type=vsm_type),
-                  ],
-                  rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
-                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
-              project='my-project'))],
-    )
-
-  def testCreateGuestImageWithLowerCaseOsFeatures(self):
-    self.Run("""
-        compute images create my-image --description nifty
-          --source-uri gs://31dd/source-image
-          --guest-os-features windows,virtio_scsi_multiqueue
-        """)
-
-    windows_type = self.messages.GuestOsFeature.TypeValueValuesEnum('WINDOWS')
-    vsm_type = self.messages.GuestOsFeature.TypeValueValuesEnum(
-        'VIRTIO_SCSI_MULTIQUEUE')
-
-    self.CheckRequests(
-        [(self.compute.images,
-          'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              image=self.messages.Image(
-                  name='my-image',
-                  description='nifty',
-                  guestOsFeatures=[
-                      self.messages.GuestOsFeature(type=windows_type),
-                      self.messages.GuestOsFeature(type=vsm_type),
-                  ],
-                  rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
-                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
-              project='my-project'))],
-    )
-
-  def testCreateWithUnknownOsFeature(self):
-    with self.AssertRaisesArgumentErrorRegexp(
-        r'argument --guest-os-features: BAD_FEATURE must be one of \['):
-      self.Run("""
-          compute images create my-image
-            --source-uri gs://31dd/source-image
-            --guest-os-features BAD_FEATURE
-          """)
-
-    self.CheckRequests()
-
-  def testCheckGuestOsFeaturesEnum(self):
-    enums = list(
-        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
-    enums.remove('FEATURE_TYPE_UNSPECIFIED')
-    enums.sort()
-
-    choices = list(image_utils.GUEST_OS_FEATURES_ALPHA)
-    choices.sort()
-
-    self.assertEqual(enums, choices)
-
-
-class ImagesCreateWithForceCreateFlagTest(
-    sdk_test_base.WithLogCapture, test_base.BaseTest):
-  """Test the --force-create flag (deprecated) for image creation."""
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def testForceImageCreationFromDisk(self):
-    self.Run("""
-        compute images create my-image
-          --source-disk my-disk --source-disk-zone us-central1-a
-          --force-create
-        """)
-
-    self.CheckRequests(
-        [(self.compute.images,
-          'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              forceCreate=True,
-              image=self.messages.Image(
-                  name='my-image',
-                  sourceDisk=(self.compute_uri + '/projects/'
-                              'my-project/zones/us-central1-a/disks/my-disk'),
-                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
-              project='my-project'))],
-    )
-    self.AssertLogContains(
-        'Flag force-create is deprecated. Use --force instead.')
-
-
-class ImagesCreateWithForceFlagTest(test_base.BaseTest):
-  """Test the --force flag for image creation."""
-
-  def SetUp(self):
-    self.SelectApi('v1')
-    self.track = calliope_base.ReleaseTrack.GA
-
   def testForceImageCreationFromDisk(self):
     self.Run("""
         compute images create my-image
@@ -812,14 +565,6 @@ class ImagesCreateWithForceFlagTest(test_base.BaseTest):
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
-
-
-class ImagesCreateWithLabelsTest(test_base.BaseTest):
-  """Test creation of images with labels."""
-
-  def SetUp(self):
-    self.SelectApi('v1')
-    self.track = calliope_base.ReleaseTrack.GA
 
   def testCreateWithLabels(self):
     m = self.messages
@@ -859,10 +604,6 @@ class ImagesCreateWithLabelsTest(test_base.BaseTest):
             --source-disk-zone us-central1-a
             --labels inv@lid-key=inv@l!d-value
           """)
-
-
-class ImagesCreateImageCloningTest(test_base.BaseTest):
-  """Test cloning of images."""
 
   def testCreateWithSourceImage(self):
     m = self.messages
@@ -1016,98 +757,7 @@ class ImagesCreateImageCloningTest(test_base.BaseTest):
             --source-uri gs://31dd/source-image
           """)
 
-
-class ImagesCreateImageFromSnapshotTest(test_base.BaseTest):
-  """Test creating images from snapshots."""
-
-  def testCreateWithSourceSnapshot(self):
-    m = self.messages
-    source_snapshot = m.Snapshot(
-        name='orig-snapshot',
-        selfLink=('https://www.googleapis.com/compute/alpha/projects/'
-                  'my-project/global/snapshots/orig-snapshot'))
-    self.make_requests.side_effect = iter([
-        [source_snapshot],
-        [],
-    ])
-
-    self.Run("""
-        compute images create dest-image
-          --source-snapshot orig-snapshot
-        """)
-
-    self.CheckRequests(
-        [(self.compute.images, 'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              image=m.Image(
-                  name='dest-image',
-                  sourceSnapshot=(self.compute_uri + '/projects/'
-                                  'my-project/global/snapshots/orig-snapshot'),
-                  sourceType=m.Image.SourceTypeValueValuesEnum.RAW),
-              project='my-project'))],)
-
-  def testCreateImage_NoSnapshotSource(self):
-    """Ensure an error is raised if no source for image is given."""
-    with self.AssertRaisesArgumentErrorMatches(
-        'Exactly one of (--source-disk | --source-image | '
-        '--source-image-family | --source-snapshot | --source-uri) '
-        'must be specified.'):
-      self.Run("""compute images create my-image""")
-
-  def testCreateParametersAreMutuallyExclusiveImageSnapshot(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'Exactly one of (--source-disk | --source-image | '
-        '--source-image-family | --source-snapshot | --source-uri) '
-        'must be specified.'):
-      self.Run("""
-          compute images create my-image
-            --source-snapshot orig-snapshot
-            --source-image my-image
-          """)
-
-  def testCreateParametersAreMutuallyExclusiveDiskSnapshot(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'Exactly one of (--source-disk | --source-image | '
-        '--source-image-family | --source-snapshot | --source-uri) '
-        'must be specified.'):
-      self.Run("""
-          compute images create my-image
-            --source-snapshot orig-snapshot
-            --source-disk my-disk --source-disk-zone us-central1-a
-          """)
-
-  def testCreateParametersAreMutuallyExclusiveSnapshotImageFamily(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'Exactly one of (--source-disk | --source-image | '
-        '--source-image-family | --source-snapshot | --source-uri) '
-        'must be specified.'):
-      self.Run("""
-          compute images create my-image
-            --source-snapshot orig-snapshot
-            --source-image-family image-family
-          """)
-
-  def testCreateParametersAreMutuallyExclusiveUriSnapshot(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'Exactly one of (--source-disk | --source-image | '
-        '--source-image-family | --source-snapshot | --source-uri) '
-        'must be specified.'):
-      self.Run("""
-          compute images create my-image
-            --source-snapshot orig-snapshot
-            --source-uri gs://31dd/source-image
-          """)
-
-
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'),
-                          (calliope_base.ReleaseTrack.GA, 'v1'))
-class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
-
-  def testKmsKeyWithKeyNameArgsOk(self, track, api_version):
-    self.track = track
-    self.SelectApi(api_version)
+  def testKmsKeyWithKeyNameArgsOk(self):
     self.Run("""
         compute images create my-image --source-uri gs://31dd/source-image \
             --kms-key=projects/key-project/locations/global/keyRings/ring/cryptoKeys/image-key
@@ -1130,9 +780,7 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               project='my-project'))],
     )
 
-  def testKmsKeyWithKeyPartArgsOk(self, track, api_version):
-    self.track = track
-    self.SelectApi(api_version)
+  def testKmsKeyWithKeyPartArgsOk(self):
     self.Run("""
         compute images create my-image --source-uri gs://31dd/source-image \
             --kms-project=key-project --kms-location=global \
@@ -1156,9 +804,7 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               project='my-project'))],
     )
 
-  def testKmsKeyWithoutProjectOk(self, track, api_version):
-    self.track = track
-    self.SelectApi(api_version)
+  def testKmsKeyWithoutProjectOk(self):
     self.Run("""
         compute images create my-image --source-uri gs://31dd/source-image \
             --kms-location=global \
@@ -1182,9 +828,7 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               project='my-project'))],
     )
 
-  def testMissingLocation(self, track, api_version):
-    self.track = track
-    self.SelectApi(api_version)
+  def testMissingLocation(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         'KMS cryptokey resource was not fully specified.'):
@@ -1193,9 +837,7 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               --kms-keyring=ring --kms-key=key
           """)
 
-  def testMissingKeyRing(self, track, api_version):
-    self.track = track
-    self.SelectApi(api_version)
+  def testMissingKeyRing(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         'KMS cryptokey resource was not fully specified.'):
@@ -1205,9 +847,7 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               --kms-key=key
           """)
 
-  def testMissingKey(self, track, api_version):
-    self.track = track
-    self.SelectApi(api_version)
+  def testMissingKey(self):
     with self.AssertRaisesArgumentError():
       self.Run("""
           compute images create my-image --source-uri gs://31dd/source-image \
@@ -1215,9 +855,7 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               --kms-keyring=ring
           """)
 
-  def testConflictKmsKeyNameWithCsekKeyFile(self, track, api_version):
-    self.track = track
-    self.SelectApi(api_version)
+  def testConflictKmsKeyNameWithCsekKeyFile(self):
     self.WriteInput(self.GetKeyFileContent())
     with self.assertRaises(exceptions.ConflictingArgumentsException):
       self.Run("""
@@ -1225,6 +863,256 @@ class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
               --kms-key=projects/key-project/locations/global/keyRings/ring/cryptoKeys/key \
               --csek-key-file -
           """)
+
+
+class ImagesCreateBetaTest(ImagesCreateTest):
+  """Tests for features only available in beta."""
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
+
+  # CSEK Features
+  def testCreateImageFromDiskCsekEncryptedRsaWrapped(self):
+    private_key_fname = self.WriteKeyFile(include_rsa_encrypted=True)
+
+    self.Run("""
+        compute images create my-image
+          --source-disk wrappedkeydisk --source-disk-zone central2-a
+          --csek-key-file={0} --no-require-csek-key-create
+        """.format(private_key_fname))
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  sourceDisk=(self.compute_uri + '/projects/my-project'
+                              + '/zones/central2-a/disks/wrappedkeydisk'),
+                  sourceDiskEncryptionKey=self.messages.CustomerEncryptionKey(
+                      rsaEncryptedKey=test_base.SAMPLE_WRAPPED_CSEK_KEY),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
+              project='my-project'))],
+    )
+
+  # Guest OS Features
+  def testCreateGuestImageWithOsFeatures(self):
+    self.Run("""
+        compute images create my-image --description nifty
+          --source-uri gs://31dd/source-image
+          --guest-os-features WINDOWS,VIRTIO_SCSI_MULTIQUEUE
+        """)
+
+    windows_type = self.messages.GuestOsFeature.TypeValueValuesEnum('WINDOWS')
+    vsm_type = self.messages.GuestOsFeature.TypeValueValuesEnum(
+        'VIRTIO_SCSI_MULTIQUEUE')
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  description='nifty',
+                  guestOsFeatures=[
+                      self.messages.GuestOsFeature(type=windows_type),
+                      self.messages.GuestOsFeature(type=vsm_type),
+                  ],
+                  rawDisk=self.messages.Image.RawDiskValue(
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
+              project='my-project'))],
+    )
+
+  def testCreateGuestImageWithLowerCaseOsFeatures(self):
+    self.Run("""
+        compute images create my-image --description nifty
+          --source-uri gs://31dd/source-image
+          --guest-os-features windows,virtio_scsi_multiqueue
+        """)
+
+    windows_type = self.messages.GuestOsFeature.TypeValueValuesEnum('WINDOWS')
+    vsm_type = self.messages.GuestOsFeature.TypeValueValuesEnum(
+        'VIRTIO_SCSI_MULTIQUEUE')
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  description='nifty',
+                  guestOsFeatures=[
+                      self.messages.GuestOsFeature(type=windows_type),
+                      self.messages.GuestOsFeature(type=vsm_type),
+                  ],
+                  rawDisk=self.messages.Image.RawDiskValue(
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
+              project='my-project'))],
+    )
+
+  def testCreateWithUnknownOsFeature(self):
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --guest-os-features: BAD_FEATURE must be one of \['):
+      self.Run("""
+          compute images create my-image
+            --source-uri gs://31dd/source-image
+            --guest-os-features BAD_FEATURE
+          """)
+
+    self.CheckRequests()
+
+  def testCheckGuestOsFeaturesEnum(self):
+    enums = list(
+        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
+    enums.remove('FEATURE_TYPE_UNSPECIFIED')
+    enums.sort()
+
+    choices = list(image_utils.GUEST_OS_FEATURES_BETA)
+    choices.sort()
+
+    self.assertEqual(enums, choices)
+
+  def testForceImageCreationFromDisk(self):
+    self.Run("""
+        compute images create my-image
+          --source-disk my-disk --source-disk-zone us-central1-a
+          --force-create
+        """)
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              forceCreate=True,
+              image=self.messages.Image(
+                  name='my-image',
+                  sourceDisk=(self.compute_uri + '/projects/'
+                              'my-project/zones/us-central1-a/disks/my-disk'),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
+              project='my-project'))],
+    )
+    self.AssertLogContains(
+        'Flag force-create is deprecated. Use --force instead.')
+
+
+class ImagesCreateAlphaTest(ImagesCreateBetaTest):
+  """Tests for GuestOsFeatures currently available in alpha."""
+
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
+
+  # Guest OS Features
+  def testCreateGuestImageWithOsFeatures(self):
+    self.Run("""
+        compute images create my-image --description nifty
+          --source-uri gs://31dd/source-image
+          --guest-os-features WINDOWS,VIRTIO_SCSI_MULTIQUEUE
+        """)
+
+    windows_type = self.messages.GuestOsFeature.TypeValueValuesEnum('WINDOWS')
+    vsm_type = self.messages.GuestOsFeature.TypeValueValuesEnum(
+        'VIRTIO_SCSI_MULTIQUEUE')
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  description='nifty',
+                  guestOsFeatures=[
+                      self.messages.GuestOsFeature(type=windows_type),
+                      self.messages.GuestOsFeature(type=vsm_type),
+                  ],
+                  rawDisk=self.messages.Image.RawDiskValue(
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
+              project='my-project'))],
+    )
+
+  def testCreateGuestImageWithLowerCaseOsFeatures(self):
+    self.Run("""
+        compute images create my-image --description nifty
+          --source-uri gs://31dd/source-image
+          --guest-os-features windows,virtio_scsi_multiqueue
+        """)
+
+    windows_type = self.messages.GuestOsFeature.TypeValueValuesEnum('WINDOWS')
+    vsm_type = self.messages.GuestOsFeature.TypeValueValuesEnum(
+        'VIRTIO_SCSI_MULTIQUEUE')
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  description='nifty',
+                  guestOsFeatures=[
+                      self.messages.GuestOsFeature(type=windows_type),
+                      self.messages.GuestOsFeature(type=vsm_type),
+                  ],
+                  rawDisk=self.messages.Image.RawDiskValue(
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
+              project='my-project'))],
+    )
+
+  def testCreateWithUnknownOsFeature(self):
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --guest-os-features: BAD_FEATURE must be one of \['):
+      self.Run("""
+          compute images create my-image
+            --source-uri gs://31dd/source-image
+            --guest-os-features BAD_FEATURE
+          """)
+
+    self.CheckRequests()
+
+  def testCheckGuestOsFeaturesEnum(self):
+    enums = list(
+        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
+    enums.remove('FEATURE_TYPE_UNSPECIFIED')
+    enums.sort()
+
+    choices = list(image_utils.GUEST_OS_FEATURES_ALPHA)
+    choices.sort()
+
+    self.assertEqual(enums, choices)
+
+  def testStorageLocation(self):
+    self.Run("""
+        compute images create my-image
+          --source-uri gs://31dd/source-image
+          --storage-location us-central1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  rawDisk=self.messages.Image.RawDiskValue(
+                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
+                      'source-image'),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW,
+                  storageLocations=['us-central1']),
+              project='my-project'))],
+    )
 
 
 if __name__ == '__main__':

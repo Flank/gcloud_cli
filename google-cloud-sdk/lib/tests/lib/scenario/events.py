@@ -172,10 +172,14 @@ class ExitEvent(Event):
   def Handle(self, exc):
     code = getattr(exc, 'exit_code', 1) if exc else 0
     message = six.text_type(exc) if exc else None
+    return self.HandleReturnCode(code, message)
+
+  def HandleReturnCode(self, return_code, message=None):
     failures = []
     failures.extend(
-        self._code_assertion.Check(self._update_context.ForKey('code'), code))
-    if self._message_assertion or failures:
+        self._code_assertion.Check(
+            self._update_context.ForKey('code'), return_code))
+    if self._message_assertion or (failures and message):
       msg_assertion = self._message_assertion or assertions.EqualsAssertion('')
       failures.extend(
           msg_assertion.Check(self._update_context.ForKey('message'), message))
@@ -451,7 +455,8 @@ class ApiCallEvent(Event):
       failures.extend(
           self._GenerateOperationPolling(resource_ref_resolver, headers, body))
     elif self._poll_operation and not dry_run:
-      op = Operation.FromResponse(headers, body)
+      op = Operation.FromResponse(headers, body,
+                                  force_operation=self._poll_operation)
       self._ExtractOperationPollingName(resource_ref_resolver, op)
 
     if self._response_assertion:
@@ -471,7 +476,8 @@ class ApiCallEvent(Event):
       # If explicitly disabled, don't treat this as an operation no matter what.
       return []
 
-    op = Operation.FromResponse(headers, response_body)
+    op = Operation.FromResponse(headers, response_body,
+                                force_operation=self._poll_operation)
     if not op or resource_ref_resolver.IsExtractedIdCurrent('operation',
                                                             op.name):
       # Not an operation response at all.
@@ -510,7 +516,8 @@ class ApiCallEvent(Event):
     Returns:
       [Failure], The failures to update the spec and inject the new block or [].
     """
-    op = Operation.FromResponse(None, response_body)
+    op = Operation.FromResponse(None, response_body,
+                                force_operation=self._poll_operation)
     if not op:
       # Not an operation response at all.
       return []
@@ -569,7 +576,7 @@ class Operation(object):
   }
 
   @classmethod
-  def FromResponse(cls, headers, body):
+  def FromResponse(cls, headers, body, force_operation=False):
     """Construct an Operation from an API response."""
     try:
       json_data = json.loads(body)
@@ -586,7 +593,7 @@ class Operation(object):
       return _OldOperation(name, headers, json_data)
 
     t = (json_data.get('metadata') or {}).get('@type') or ''
-    if 'done' in json_data or 'operation' in t.lower():
+    if force_operation or 'done' in json_data or 'operation' in t.lower():
       return _NewOperation(name, headers, json_data)
 
     return None
@@ -869,6 +876,7 @@ class HTTPAssertion(object):
     if not body:
       body = None
 
+    body = _Decode(body)
     json_data = None
     try:
       json_data = json.loads(body, object_pairs_hook=OrderedDict)

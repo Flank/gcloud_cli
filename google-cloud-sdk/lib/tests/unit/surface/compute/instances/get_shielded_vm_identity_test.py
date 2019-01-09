@@ -42,12 +42,12 @@ class GetShieldedVmIdentityTest(test_base.BaseTest):
     m = self.messages
     self.make_requests.side_effect = iter([
         [
-            m.ShieldedInstanceIdentity(
-                encryptionKey=m.ShieldedInstanceIdentityEntry(
+            m.ShieldedVmIdentity(
+                encryptionKey=m.ShieldedVmIdentityEntry(
                     ekCert='ENC-CERT',
                     ekPub='ENC-PUB'),
                 kind='compute#shieldedVmIdentity',
-                signingKey=m.ShieldedInstanceIdentityEntry(
+                signingKey=m.ShieldedVmIdentityEntry(
                     ekCert='SIGN-CERT',
                     ekPub='SIGN-PUB'),
             ),

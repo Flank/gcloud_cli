@@ -1,0 +1,72 @@
+title: Describe a BigQuery table
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: bq tables describe projects/fake-project/datasets/my_dataset/tables/my_table
+  - stdout: |
+      creationTime: '1544035966999'
+      etag: HWw8vcYm6Eu38ZO0c5dY/Q==
+      id: fake-project:my_dataset.my_table
+      kind: bigquery#table
+      lastModifiedTime: '1544035967040'
+      location: US
+      numBytes: '0'
+      numLongTermBytes: '0'
+      numRows: '0'
+      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table
+      tableReference:
+        datasetId: my_dataset
+        projectId: fake-project
+        tableId: my_table
+      type: TABLE
+actions:
+- execute_command:
+    command: bq tables describe projects/fake-project/datasets/my_dataset/tables/my_table
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
+              "id": "fake-project:my_dataset.my_table",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+              "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "my_dataset",
+                "tableId": "my_table"
+              },
+              "numBytes": "0",
+              "numLongTermBytes": "0",
+              "numRows": "0",
+              "creationTime": "1544035966999",
+              "lastModifiedTime": "1544035967040",
+              "type": "TABLE",
+              "location": "US"
+            }
+    - expect_stdout: |
+        creationTime: '1544035966999'
+        etag: HWw8vcYm6Eu38ZO0c5dY/Q==
+        id: fake-project:my_dataset.my_table
+        kind: bigquery#table
+        lastModifiedTime: '1544035967040'
+        location: US
+        numBytes: '0'
+        numLongTermBytes: '0'
+        numRows: '0'
+        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table
+        tableReference:
+          datasetId: my_dataset
+          projectId: fake-project
+          tableId: my_table
+        type: TABLE
+    - expect_exit:
+        code: 0

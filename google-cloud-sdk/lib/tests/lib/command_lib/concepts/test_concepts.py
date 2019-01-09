@@ -20,88 +20,31 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope.concepts import deps as deps_lib
-from googlecloudsdk.command_lib.concepts import base
-from googlecloudsdk.command_lib.concepts import names
 from googlecloudsdk.command_lib.concepts.all_concepts import concepts
 from googlecloudsdk.core import properties
 
 
-class FooBar(object):
-  """Result of FooBarArg.Parse()."""
-
-  def __init__(self, foo, bar):
-    self.foo = foo
-    self.bar = bar
-
-
-class FooBarArg(base.Concept):
+def MakeFooBar(name, help_text, prefixes=False):
   """A group arg with two attributes."""
+  foo = concepts.SimpleArg(
+      name='foo', key='foo', help_text='A foo',
+      fallthroughs=[
+          deps_lib.PropertyFallthrough(properties.VALUES.core.project)
+      ])
+  bar = concepts.SimpleArg(name='bar', key='bar', help_text='A bar')
 
-  def __init__(self, name='foo-bar', prefixes=False, **kwargs):
-    self.prefixes = prefixes
-    super(FooBarArg, self).__init__(name, **kwargs)
-
-  def Attribute(self):
-    return base.AttributeGroup(
-        concept=self,
-        attributes=[
-            concepts.SimpleArg(
-                name=self._GetSubConceptName('foo'),
-                key='foo', help_text='A foo',
-                fallthroughs=[
-                    deps_lib.PropertyFallthrough(
-                        properties.VALUES.core.project)]
-                ).Attribute(),
-            concepts.SimpleArg(
-                name=self._GetSubConceptName('bar'),
-                key='bar', help_text='A bar').Attribute()],
-        help=self.BuildHelpText())
-
-  def Parse(self, dependencies):
-    return FooBar(dependencies.foo, dependencies.bar)
-
-  def _GetSubConceptName(self, attribute_name):
-    if self.prefixes:
-      return names.ConvertToNamespaceName(self.name + '_' + attribute_name)
-    return attribute_name
-
-  def BuildHelpText(self):
-    return '{} This is a foobar concept.'.format(self.help_text)
-
-  def GetPresentationName(self):
-    return names.ConvertToNamespaceName(self.name)
+  foobar = concepts.GroupArg(name, prefixes=prefixes, help_text=help_text)
+  foobar.AddConcept(foo)
+  foobar.AddConcept(bar)
+  return foobar
 
 
-class Baz(object):
-  """Result of DoubleFooBar.Parse()."""
-
-  def __init__(self, first_foobar, second_foobar):
-    self.first = first_foobar
-    self.second = second_foobar
-
-
-class DoubleFooBar(base.Concept):
+def MakeDoubleFooBar(name, help_text):
   """A concept with two nested group concepts."""
+  first = MakeFooBar('first', 'The first foobar.', prefixes=True)
+  second = MakeFooBar('second', 'The second foobar.', prefixes=True)
 
-  def __init__(self, name='baz', **kwargs):  # pylint: disable=useless-super-delegation
-    super(DoubleFooBar, self).__init__(name, **kwargs)
-
-  def Attribute(self):
-    return base.AttributeGroup(
-        concept=self,
-        attributes=[
-            FooBarArg(name='first', help_text='the first foobar',
-                      prefixes=True).Attribute(),
-            FooBarArg(name='second', help_text='the second foobar',
-                      prefixes=True).Attribute()],
-        help=self.BuildHelpText())
-
-  def BuildHelpText(self):
-    return '{} This is a concept with two group concepts inside it!'.format(
-        self.help_text)
-
-  def Parse(self, dependencies):
-    return Baz(dependencies.first, dependencies.second)
-
-  def GetPresentationName(self):
-    return names.ConvertToNamespaceName(self.name)
+  group = concepts.GroupArg(name, help_text=help_text)
+  group.AddConcept(first)
+  group.AddConcept(second)
+  return group

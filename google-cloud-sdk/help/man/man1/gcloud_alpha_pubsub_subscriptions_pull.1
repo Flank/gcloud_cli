@@ -23,6 +23,10 @@ subscription, if there are any messages enqueued.
 By default, this command returns only one message from the subscription. Use the
 \f5\-\-limit\fR flag to specify the max messages to return.
 
+Please note that this command is not guaranteed to return all the messages in
+your backlog or the maximum specified in the \-\-limit argument. Receiving fewer
+messages than available occasionally is normal.
+
 
 
 .SH "POSITIONAL ARGUMENTS"

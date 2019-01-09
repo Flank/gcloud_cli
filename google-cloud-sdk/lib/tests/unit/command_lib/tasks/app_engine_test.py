@@ -25,6 +25,7 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.app import create_util
 from googlecloudsdk.command_lib.tasks import app as tasks_app_command_lib
 from googlecloudsdk.command_lib.tasks import constants
+from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -44,48 +45,71 @@ class ResolveAppLocationTestBase(test_base.CloudTasksTestBase):
     self.addCleanup(self.app_engine_apitools_mock_client.Unmock)
     self.app_engine_messages = apis.GetMessagesModule('appengine',
                                                       app_engine_api_version)
-    self.app_id = self.Project()
-    self.app_name = 'apps/{0}'.format(self.app_id)
+    self.app_resource_name = 'apps/{0}'.format(self.Project())
+    self.project_ref = resources.REGISTRY.Parse(
+        self.Project(), collection=constants.PROJECTS_COLLECTION)
 
     self.StartPatch('time.sleep')
+
+  def _LocationMessage(self, messages, location_id):
+    return messages.Location(
+        labels=messages.Location.LabelsValue(
+            additionalProperties=[
+                messages.Location.LabelsValue.AdditionalProperty(
+                    key='cloud.googleapis.com/region', value=location_id)]),
+        metadata=messages.Location.MetadataValue())
 
 
 class ResolveExistingAppLocationTests(ResolveAppLocationTestBase):
 
   def testResolveLocation(self):
-    self.app_engine_apitools_mock_client.apps.Get.Expect(
-        self.app_engine_messages.AppengineAppsGetRequest(name=self.app_name),
-        self.app_engine_messages.Application(name=self.app_name,
-                                             locationId='us-central1'))
+    self.locations_service.List.Expect(
+        self.messages.CloudtasksProjectsLocationsListRequest(
+            name=self.project_ref.RelativeName(), pageSize=2),
+        response=self.messages.ListLocationsResponse(
+            locations=[self._LocationMessage(self.messages, 'us-central1')]))
 
-    actual_location = tasks_app_command_lib.ResolveAppLocation()
+    actual_location = tasks_app_command_lib.ResolveAppLocation(
+        self.project_ref)
     expected_location = 'us-central1'
     self.assertEqual(actual_location, expected_location)
 
-  def testResolveLocation_MultiRegional(self):
-    self.app_engine_apitools_mock_client.apps.Get.Expect(
-        self.app_engine_messages.AppengineAppsGetRequest(name=self.app_name),
-        self.app_engine_messages.Application(name=self.app_name,
-                                             locationId='us-central'))
+  def testResolveMultipleLocation(self):
+    self.locations_service.List.Expect(
+        self.messages.CloudtasksProjectsLocationsListRequest(
+            name=self.project_ref.RelativeName(), pageSize=2),
+        response=self.messages.ListLocationsResponse(
+            locations=[self._LocationMessage(self.messages, 'us-central1'),
+                       self._LocationMessage(self.messages, 'us-east1'),]))
 
-    actual_location = tasks_app_command_lib.ResolveAppLocation()
-    expected_location = constants.CLOUD_MULTIREGION_TO_REGION_MAP['us-central']
-    self.assertEqual(actual_location, expected_location)
+    with self.assertRaises(tasks_app_command_lib.RegionResolvingError):
+      tasks_app_command_lib.ResolveAppLocation(self.project_ref)
 
 
 class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
                                          test_case.WithInput):
 
   def SetUp(self):
-    self.app_engine_apitools_mock_client.apps.Get.Expect(
-        self.app_engine_messages.AppengineAppsGetRequest(name=self.app_name),
+    self.locations_service.List.Expect(
+        self.messages.CloudtasksProjectsLocationsListRequest(
+            name=self.project_ref.RelativeName(), pageSize=2),
         exception=http_error.MakeHttpError(code=404))
     self.StartObjectPatch(console_io, 'CanPrompt', return_value=True)
 
+  def _ExpectAppEngineListLocationsRequest(self):
+    self.app_engine_apitools_mock_client.apps_locations.List.Expect(
+        self.app_engine_messages.AppengineAppsLocationsListRequest(
+            name=self.app_resource_name,
+            pageSize=100),
+        self.app_engine_messages.ListLocationsResponse(
+            locations=[
+                self._LocationMessage(self.app_engine_messages, 'us-central'),
+                self._LocationMessage(self.app_engine_messages, 'us-east1'),]))
+
   def _ExpectCreateAppRequest(self):
-    app_msg = self.app_engine_messages.Application(id=self.app_id,
+    app_msg = self.app_engine_messages.Application(id=self.Project(),
                                                    locationId='us-central')
-    op_name = app_api_test_util.AppOperationName(self.app_id)
+    op_name = app_api_test_util.AppOperationName(self.Project())
     intermediate_response = self.app_engine_messages.Operation(name=op_name)
     final_response = self.app_engine_messages.Operation(
         name=op_name,
@@ -102,15 +126,17 @@ class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
         num_retries=2)
 
   def testResolveLocation_CreateApp(self):
+    self._ExpectAppEngineListLocationsRequest()
     self.WriteInput('y')  # Would you like to create one (Y/n)?
     self.WriteInput('1')  # [1] us-central   (supports standard and flexible)
     self._ExpectCreateAppRequest()
-    self.app_engine_apitools_mock_client.apps.Get.Expect(
-        self.app_engine_messages.AppengineAppsGetRequest(name=self.app_name),
-        self.app_engine_messages.Application(name=self.app_name,
-                                             locationId='us-central1'))
+    self.locations_service.List.Expect(
+        self.messages.CloudtasksProjectsLocationsListRequest(
+            name=self.project_ref.RelativeName(), pageSize=2),
+        response=self.messages.ListLocationsResponse(
+            locations=[self._LocationMessage(self.messages, 'us-central1')]))
 
-    actual_location = tasks_app_command_lib.ResolveAppLocation()
+    actual_location = tasks_app_command_lib.ResolveAppLocation(self.project_ref)
     expected_location = 'us-central1'
     self.assertEqual(actual_location, expected_location)
 
@@ -118,18 +144,19 @@ class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
     self.WriteInput('n')  # Would you like to create one (Y/n)?
 
     with self.assertRaises(tasks_app_command_lib.RegionResolvingError):
-      tasks_app_command_lib.ResolveAppLocation()
+      tasks_app_command_lib.ResolveAppLocation(self.project_ref)
 
   def testResolveLocation_CreateApp_RaceCollision(self):
+    self._ExpectAppEngineListLocationsRequest()
     self.WriteInput('y')  # Would you like to create one (Y/n)?
     self.WriteInput('1')  # [1] us-central   (supports standard and flexible)
     self.app_engine_apitools_mock_client.apps.Create.Expect(
-        self.app_engine_messages.Application(id=self.app_id,
+        self.app_engine_messages.Application(id=self.Project(),
                                              locationId='us-central'),
         exception=http_error.MakeHttpError(code=409))
 
     with self.assertRaises(create_util.AppAlreadyExistsError):
-      tasks_app_command_lib.ResolveAppLocation()
+      tasks_app_command_lib.ResolveAppLocation(self.project_ref)
 
 
 if __name__ == '__main__':

@@ -230,15 +230,6 @@ class ImagesExportTestBeta(ImagesExportTestGA):
     self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
-    self.regionalized = False
-
-
-class ImagesExportTestAlpha(ImagesExportTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def SetUp(self):
     self.regionalized = True
     self.creates_bucket_if_cloudbuild_disabled = True
 
@@ -309,6 +300,12 @@ class ImagesExportTestAlpha(ImagesExportTestBeta):
     self.AssertOutputContains("""\
         [image-export] output
         """, normalize_space=True)
+
+
+class ImagesExportTestAlpha(ImagesExportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

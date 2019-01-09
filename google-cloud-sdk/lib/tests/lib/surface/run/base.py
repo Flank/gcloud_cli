@@ -50,7 +50,7 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase):
   def _NamespaceRef(self, region='us-central1', project='fake-project'):
     return self._registry.Parse(project, collection='serverless.namespaces')
 
-  def _RevisionRef(self, name, region='us-central1', project='fake-project'):
+  def _RevisionRef(self, name, project='fake-project'):
     return self._registry.Parse(
         name,
         params={'namespacesId': project},

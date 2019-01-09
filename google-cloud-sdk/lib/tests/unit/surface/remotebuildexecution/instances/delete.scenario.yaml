@@ -1,0 +1,69 @@
+title: remote-build-execution instances delete test
+release_tracks: [ALPHA]
+summary:
+
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      remote-build-execution instances delete new_instance
+  - prompt:
+    - message: You are about to delete instance [new_instance]
+    - input: y
+  - stderr: |
+      Delete request issued for: [new_instance]
+  - progress_tracker:
+    - message: Waiting for operation [delete_operation_id] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted instance [new_instance].
+actions:
+- execute_command:
+    command: |
+      remote-build-execution instances delete new_instance
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete instance [new_instance]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/fake-project/instances/new_instance?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/operations/delete_operation_id",
+              "metadata": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_stderr: |
+        Delete request issued for: [new_instance]
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/fake-project/operations/delete_operation_id?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/rbe-msavigny-dev-008/operations/delete_operation_id",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+
+    - expect_progress_tracker:
+        message: Waiting for operation [delete_operation_id] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted instance [new_instance].
+    - expect_exit:
+        code: 0

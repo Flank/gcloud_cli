@@ -1157,11 +1157,16 @@ class UnicodeSupportedTest(util.WithTestTool,
       self.cli.Execute(['sdk7', 'Ṳᾔḯ¢◎ⅾℯ'])
     self.AssertErrContains("""\
 ERROR: (test.sdk7) Invalid choice: 'Ṳᾔḯ¢◎ⅾℯ'.
-Usage: test sdk7 [optional flags] <group>
-  group may be           describers | sdk
+Maybe you meant:
+  gcloud sdk7 sdk flags-file
+  gcloud sdk7 sdk supported certainly
+  gcloud sdk7 sdk unsupported no
+  gcloud sdk7 sdk unsupported yes
 
-For detailed information on this command and its flags, run:
-  test sdk7 --help
+Showing 4 out of 7 suggestions.
+
+To search the help text of gcloud commands, run:
+  gcloud help -- SEARCH_TERMS
 """)
 
 
@@ -2480,7 +2485,7 @@ class SuggestTest(util.WithTestTool,
     self.StartObjectPatch(lookup, 'LoadCompletionCliTree',
                           return_value=self.root)
 
-  def testSuggest(self):
+  def testSuggestSimple(self):
     commands_mock = self.StartObjectPatch(metrics, 'Commands')
     errors_mock = self.StartObjectPatch(metrics, 'Error')
 
@@ -2506,6 +2511,44 @@ class SuggestTest(util.WithTestTool,
     self.assertEqual(expected, commands_kwargs['error_extra_info'])
     self.assertEqual(0, self.known_error_handler.call_count)
 
+  def testSuggest(self):
+    commands_mock = self.StartObjectPatch(metrics, 'Commands')
+    errors_mock = self.StartObjectPatch(metrics, 'Error')
+
+    with self.AssertRaisesArgumentErrorMatches(
+        "Invalid choice: 'subcommands'."):
+      self.cli.Execute(['subcommands', 'nested'])
+
+    self.AssertErrContains("""\
+Maybe you meant:
+  gcloud sdk3 nested
+  gcloud newstylegroup subcommand
+  gcloud sdk2 nested-groups
+
+Showing 3 out of 5 suggestions.
+
+To search the help text of gcloud commands, run:
+  gcloud help -- SEARCH_TERMS
+""")
+    self.assertEqual(2, commands_mock.call_count)
+    self.assertEqual(2, errors_mock.call_count)
+    _, commands_kwargs = commands_mock.call_args_list[0]
+    self.assertIn('UnknownCommandError',
+                  six.text_type(commands_kwargs['error']))
+    expected = ({'suggestions': ['mutex-command'], 'total_suggestions': 1,
+                 'total_unrecognized': 1})
+    expected = {
+        'suggestions': [
+            'gcloud sdk3 nested',
+            'gcloud newstylegroup subcommand',
+            'gcloud sdk2 nested-groups'
+        ],
+        'total_suggestions': 3,
+        'total_unrecognized': 1,
+    }
+    self.assertEqual(expected, commands_kwargs['error_extra_info'])
+    self.assertEqual(0, self.known_error_handler.call_count)
+
   def testSuggestSynonym(self):
     commands_mock = self.StartObjectPatch(metrics, 'Commands')
     errors_mock = self.StartObjectPatch(metrics, 'Error')
@@ -2518,7 +2561,8 @@ class SuggestTest(util.WithTestTool,
 Maybe you meant:
   gcloud sdk7 describers describe
   gcloud sdk7 describers legacy-describe
-  gcloud cfg get
+
+Showing 2 out of 3 suggestions.
 
 To search the help text of gcloud commands, run:
   gcloud help -- SEARCH_TERMS
@@ -2532,21 +2576,27 @@ To search the help text of gcloud commands, run:
         'suggestions': [
             'gcloud sdk7 describers describe',
             'gcloud sdk7 describers legacy-describe',
-            'gcloud cfg get',
         ],
-        'total_suggestions': 3,
+        'total_suggestions': 2,
         'total_unrecognized': 1,
     }
     self.assertEqual(expected, commands_kwargs['error_extra_info'])
     self.assertEqual(0, self.known_error_handler.call_count)
 
   def testUsage(self):
+    # Expect regular usage text when no suggestions are possible.
     with self.AssertRaisesArgumentErrorMatches(
-        "Invalid choice: 'sdk1'."):
-      self.cli.Execute('sdk1 cfg'.split())
-    self.AssertErrContains(
-        'Maybe you meant:\n  gcloud sdk11 sdk')
-
+        "Invalid choice: 'random'."):
+      self.cli.Execute(['random'])
+    self.AssertErrContains("""\
+Usage: test [optional flags] <group | command>
+  group may be           beta | broken-sdk | cfg | compound-group |
+                         newstylegroup | sdk11 | sdk2 | sdk3 | sdk7
+  command may be         command1 | dict-list | exceptioncommand | exit2 |
+                         help | implementation-args | loggingcommand |
+                         mutex-command | newstylecommand | recommand |
+                         requiredargcommand | simple-command | unsetprop
+""")
 
 if __name__ == '__main__':
   test_case.main()

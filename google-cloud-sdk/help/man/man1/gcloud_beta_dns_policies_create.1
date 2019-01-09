@@ -1,0 +1,117 @@
+
+.TH "GCLOUD_BETA_DNS_POLICIES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta dns policies create \- creates a new Cloud DNS policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta dns policies create\fR \fIPOLICY\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-networks\fR=[\fIURL\fR,...] [\fB\-\-alternative\-name\-servers\fR=[\fIIP_ADDRESS\fR,...]] [\fB\-\-enable\-inbound\-forwarding\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Creates a new Cloud DNS policy.
+
+.SH "EXAMPLES"
+
+To create a new policy with minimal arguments, run:
+
+.RS 2m
+$ gcloud beta dns policies create mypolicy \e
+\-\-description 'My new policy test policy 5' \e
+\-\-networks=''
+.RE
+
+To create a new policy with all optional arguments, run:
+
+.RS 2m
+$ gcloud beta dns policies create mypolicy \e
+\-\-description 'My new policy test policy 5' \e
+\-\-networks network1,network2 \e
+\-\-alternative\-name\-servers 192.168.1.1,192.168.1.2
+\-\-enable\-inbound\-forwarding
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Policy resource \- The name of the policy you want to create. This represents a
+Cloud resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[policy] on the command line with a fully specified name; provide the argument
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fIPOLICY\fR
+ID of the policy or fully qualified identifier for the policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A description of the policy.
+
+.TP 2m
+\fB\-\-networks\fR=[\fIURL\fR,...]
+The comma separated list of network names to associate with the policy.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-alternative\-name\-servers\fR=[\fIIP_ADDRESS\fR,...]
+List of alternative name servers to forward to. Must be a comma separated list
+of IPv4 addresses.
+
+.TP 2m
+\fB\-\-enable\-inbound\-forwarding\fR
+Specifies whether to allow networks bound to this policy to receive DNS queries
+sent by VMs or applications over VPN connections. Defaults to False.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdns/v1beta2\fR API. The full documentation for this API
+can be found at: https://developers.google.com/cloud\-dns
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

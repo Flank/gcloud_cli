@@ -222,5 +222,31 @@ class TestingErrorReporting(cli_test_base.CliTestBase):
     self.AssertErrContains('gcloud info --run-diagnostics')
 
 
+class TestingInvalidCACerts(cli_test_base.CliTestBase):
+
+  def SetUp(self):
+    self.report_error_mock = self.StartObjectPatch(
+        crash_handling, 'ReportError')
+
+  def testInvalidCaCerts(self):
+    msg = 'certificate verify failed'
+    crash_handling.HandleGcloudCrash(Exception(msg))
+    self.report_error_mock.assert_called_once()
+    self.AssertErrContains('gcloud crashed')
+    self.AssertErrContains('gcloud\'s default CA certificates failed to verify '
+                           'your connection, which can happen if you are behind'
+                           ' a proxy or firewall.')
+    self.AssertErrContains('To use a custom CA certificates file, please run '
+                           'the following command:')
+    self.AssertErrContains('  gcloud config set core/custom_ca_certs_file '
+                           '/path/to/ca_certs')
+    self.AssertErrContains('If you would like to report this issue, please run '
+                           'the following command:')
+    self.AssertErrContains('gcloud feedback')
+    self.AssertErrContains('To check gcloud for common problems, please run '
+                           'the following command:')
+    self.AssertErrContains('gcloud info --run-diagnostics')
+
+
 if __name__ == '__main__':
   test_case.main()

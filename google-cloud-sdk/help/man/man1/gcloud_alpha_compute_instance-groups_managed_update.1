@@ -11,36 +11,32 @@ gcloud alpha compute instance\-groups managed update \- update Google Compute En
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-add\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-names\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-add\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-names\fR] [\fB\-\-clear\-autohealing\fR\ |\ \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR\ \fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute instance\-groups managed update\fR allows
-to update StatefulPolicy for a managed instance group. Stateful Policy defines
-what stateful resources should be preserved for the group. When instances in the
-group are removed or recreated, those stateful properties are always applied to
-them. This command allows to change the preserved resources by adding more disks
-or removing existing disks and to turn on and off preserving instance names.
+you to specify or modify the StatefulPolicy and AutoHealingPolicy for an
+existing managed instance group.
 
-Example:
+Stateful Policy defines what stateful resources should be preserved for the
+group. When instances in the group are removed or recreated, those stateful
+properties are always applied to them. This command allows you to change the
+preserved resources by adding more disks or removing existing disks and allows
+you to turn on and off preserving instance names.
 
-.RS 2m
-$ gcloud alpha compute instance\-groups managed update \e
-    example\-group \-\-add\-stateful\-disks my\-disk\-1,my\-disk\-2 \e
-\-\-remove\-stateful\-disks my\-disk\-0
-.RE
+When updating the AutoHealingPolicy, you may specify the health check, initial
+delay, or both. If the field is unspecified, its value won't be modified. If
+\f5\-\-health\-check\fR is specified, the health check will be used to monitor
+the health of your application. Whenever the health check signal for the
+instance becomes \f5UNHEALTHY\fR, the autohealing action (\f5RECREATE\fR) on an
+instance will be performed.
 
-will for each instance mark disk \f5my\-disk\-0\fR as not stateful and disks
-\f5my\-disk\-1\fR and \f5my\-disk\-2\fR as stateful. That means that disks
-\f5my\-disk\-1\fR and \f5my\-disk\-2\fR will be preserved when the instances get
-recreated or restarted, while disk \f5my\-disk\-0\fR will not be preserved
-anymore.
-
-When there are any disks marked as stateful, the instances automatically will be
-assigned stateful names as well. You cannot turn off stateful names without
-marking all disks as non\-stateful.
+If no health check is specified, the instance autohealing will be triggered by
+the instance status only (i.e. the autohealing action (\f5RECREATE\fR) on an
+instance will be performed if \f5instance.status\fR is not \f5RUNNING\fR).
 
 
 
@@ -103,6 +99,48 @@ Enable stateful names of instances. Whenever instances with those names are
 restarted or recreated, they will have the same names as before. Use
 \-\-no\-stateful\-names to disable stateful names.
 
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-autohealing\fR
+Clears all autohealing policy fields for the managed instance group.
+
+.TP 2m
+\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR
+Specifies the length of the period during which the instance is known to be
+initializing and should not be autohealed even if unhealthy. This value cannot
+be greater than 1 hour. See $ gcloud topic datetimes for information on duration
+formats.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR
+Name of the health check to operate on.
+
+.TP 2m
+\fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR
+(DEPRECATED) Specifies the HTTP health check object used for autohealing
+instances in this group.
+
+HttpHealthCheck is deprecated. Use \-\-health\-check instead.
+
+.TP 2m
+\fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR
+(DEPRECATED) Specifies the HTTPS health check object used for autohealing
+instances in this group.
+
+HttpsHealthCheck is deprecated. Use \-\-health\-check instead.
+
+.RE
+.RE
+.sp
 .TP 2m
 
 At most one of these may be specified:

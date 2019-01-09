@@ -11,7 +11,7 @@ gcloud alpha compute ssh \- SSH into a virtual machine instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute ssh\fR [\fIUSER\fR@]\fIINSTANCE\fR [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-container\fR=\fICONTAINER\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-internal\-ip\fR] [\fB\-\-plain\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-tunnel\-through\-iap\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fISSH_ARGS\fR\ ...]
+\f5gcloud alpha compute ssh\fR [\fIUSER\fR@]\fIINSTANCE\fR [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-container\fR=\fICONTAINER\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-internal\-ip\fR\ |\ \fB\-\-tunnel\-through\-iap\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fISSH_ARGS\fR\ ...]
 
 
 
@@ -102,19 +102,6 @@ If disabled, the files associated with a broken SSH key will not be regenerated
 and will fail in both interactive and non\-interactive environments.
 
 .TP 2m
-\fB\-\-internal\-ip\fR
-Connect to instances using their internal IP addresses rather than their
-external IP addresses. Use this to connect from one instance to another on the
-same VPC network, over a VPN connection, or between two peered VPC networks.
-
-For this connection to work, you must configure your networks and firewall to
-allow SSH connections to the internal IP address of the instance to which you
-want to connect.
-
-To learn how to use this flag, see
-https://cloud.google.com/compute/docs/instances/connecting\-advanced#sshbetweeninstances.
-
-.TP 2m
 \fB\-\-plain\fR
 Suppress the automatic addition of \fBssh(1)\fR/\fBscp(1)\fR flags. This flag is
 useful if you want to take care of authentication yourself or use specific
@@ -149,10 +136,6 @@ instance, and will be set to 'yes' for all subsequent connections.
 \fISTRICT_HOST_KEY_CHECKING\fR must be one of: \fByes\fR, \fBno\fR, \fBask\fR.
 
 .TP 2m
-\fB\-\-tunnel\-through\-iap\fR
-Tunnel the ssh connection through the Cloud Identity\-Aware Proxy.
-
-.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 Zone of the instance to connect to. If not specified and the
 \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
@@ -180,7 +163,30 @@ $ gcloud config unset compute/zone
 Alternatively, the zone can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
+.TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-internal\-ip\fR
+Connect to instances using their internal IP addresses rather than their
+external IP addresses. Use this to connect from one instance to another on the
+same VPC network, over a VPN connection, or between two peered VPC networks.
+
+For this connection to work, you must configure your networks and firewall to
+allow SSH connections to the internal IP address of the instance to which you
+want to connect.
+
+To learn how to use this flag, see
+https://cloud.google.com/compute/docs/instances/connecting\-advanced#sshbetweeninstances.
+
+.TP 2m
+\fB\-\-tunnel\-through\-iap\fR
+Tunnel the ssh connection through the Cloud Identity\-Aware Proxy.
+
+
+.RE
 .RE
 .sp
 

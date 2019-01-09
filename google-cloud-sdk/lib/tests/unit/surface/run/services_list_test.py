@@ -37,7 +37,7 @@ class ServicesListTest(base.ServerlessSurfaceBase):
       s.status.conditions = [self.serverless_messages.ServiceCondition(
           type='Ready',
           status=six.text_type(bool(i%2)))]
-      s.annotations[k8s_object.REGION_ANNOTATION] = 'us-central1'
+      s.labels[k8s_object.REGION_LABEL] = 'us-central1'
       s.status.latestCreatedRevisionName = '{}.{}'.format(s.name, i)
       if i:
         s.status.latestReadyRevisionName = '{}.{}'.format(s.name, i%2)

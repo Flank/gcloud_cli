@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha builds worker-pools - manage worker pools for Google Cloud
+        Build
+
+SYNOPSIS
+    gcloud alpha builds worker-pools COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage worker pools for Google Cloud Build.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a worker pool for use by Google Cloud Build.
+
+     delete
+        (ALPHA) Delete a worker pool from Google Cloud Build.
+
+     describe
+        (ALPHA) Describe a worker pool used by Google Cloud Build.
+
+     list
+        (ALPHA) List all worker pools in a Google Cloud project.
+
+     update
+        (ALPHA) Update a workerpool used by Google Cloud Build.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

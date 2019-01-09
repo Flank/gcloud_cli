@@ -73,4 +73,4 @@ class InstancesSSHTestBase(instances_base.InstancesTestBase):
   def _AssertPopulateCalled(self):
     self.populate_public_key.assert_called_once_with(
         mock_matchers.TypeMatcher(appengine_api_client.AppengineApiClient),
-        'default', 'v1', 'i2', self.public_key)
+        'default', 'v1', 'i2', self.public_key, self.track)

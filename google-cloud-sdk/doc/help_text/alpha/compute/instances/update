@@ -4,8 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute instances update INSTANCE_NAME
-        [--[no-]deletion-protection] [--min-cpu-platform=PLATFORM]
-        [--[no-]shielded-vm-integrity-monitoring]
+        [--[no-]deletion-protection] [--[no-]enable-display-device]
+        [--min-cpu-platform=PLATFORM] [--[no-]shielded-vm-integrity-monitoring]
         [--shielded-vm-learn-integrity-policy] [--[no-]shielded-vm-secure-boot]
         [--[no-]shielded-vm-vtpm] [--update-labels=[KEY=VALUE,...]]
         [--zone=ZONE] [--clear-labels | --remove-labels=[KEY,...]]
@@ -38,6 +38,11 @@ FLAGS
      --[no-]deletion-protection
         Enables deletion protection for the instance. Use --deletion-protection
         to enable and --no-deletion-protection to disable.
+
+     --[no-]enable-display-device
+        Enable a display device for instances using a Windows image. Use
+        --enable-display-device to enable and --no-enable-display-device to
+        disable.
 
      --min-cpu-platform=PLATFORM
         When specified, the VM will be scheduled on host with specified CPU
@@ -85,8 +90,8 @@ FLAGS
         enable and --no-shielded-vm-vtpm to disable.
 
      --update-labels=[KEY=VALUE,...]
-        A list of label KEY=VALUE pairs to update. If a label exists its value
-        is modified, otherwise a new label is created.
+        List of label KEY=VALUE pairs to update. If a label exists its value is
+        modified, otherwise a new label is created.
 
         Keys must start with a lowercase character and contain only hyphens
         (-), underscores (_), lowercase characters, and numbers. Values must
@@ -118,7 +123,7 @@ FLAGS
      At most one of these may be specified:
 
        --clear-labels
-          Removes all labels. If --update-labels is also specified then
+          Remove all labels. If --update-labels is also specified then
           --clear-labels is applied first.
 
           For example, to remove all labels:
@@ -131,7 +136,7 @@ FLAGS
                 --update-labels foo=bar,baz=qux
 
        --remove-labels=[KEY,...]
-          A list of label keys to remove. If a label does not exist it is
+          List of label keys to remove. If a label does not exist it is
           silently ignored.
 
 GCLOUD WIDE FLAGS

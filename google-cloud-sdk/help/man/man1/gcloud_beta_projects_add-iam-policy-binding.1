@@ -91,18 +91,17 @@ for this API can be found at: https://cloud.google.com/resource\-manager
 
 .SH "EXAMPLES"
 
-The following command will add an IAM policy binding for the role of
-\'roles/editor' for the user 'test\-user@gmail.com' on a project with identifier
-\'example\-project\-id\-1':
+To add an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on a project with identifier 'example\-project\-id\-1',
+run:
 
 .RS 2m
 $ gcloud beta projects add\-iam\-policy\-binding example\-project\-id\-1 \e
     \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
 .RE
 
-For a service account test\-proj1@example.domain.com, the following command will
-add an IAM policy binding for the role of 'roles/editor' to the given service
-account:
+To add an IAM policy binding for the role of 'roles/editor' to the service
+account 'test\-proj1@example.domain.com', run:
 
 .RS 2m
 $ gcloud beta projects add\-iam\-policy\-binding \e
@@ -111,9 +110,8 @@ $ gcloud beta projects add\-iam\-policy\-binding \e
     \-\-role='roles/editor'
 .RE
 
-The following command will add an IAM policy binding for the role of
-\'roles/editor' for all authenticated users on a project with identifier
-\'example\-project\-id\-1':
+To add an IAM policy binding for the role of 'roles/editor' for all
+authenticated users on a project with identifier 'example\-project\-id\-1', run:
 
 .RS 2m
 $ gcloud beta projects add\-iam\-policy\-binding example\-project\-id\-1 \e

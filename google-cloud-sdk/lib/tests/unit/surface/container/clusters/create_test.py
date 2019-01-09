@@ -2438,6 +2438,29 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
     self.AssertRaisesExceptionMatches(expected_err, expected_msg, self.Run,
                                       command)
 
+  def testEnablePrivateIPv6Access(self):
+    cluster_kwargs = {
+        'enableKubernetesAlpha': True,
+        'management': self.messages.NodeManagement(autoRepair=True),
+    }
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    expected_cluster.networkConfig = (
+        self.messages.NetworkConfig(enablePrivateIpv6Access=True))
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-kubernetes-alpha '
+        '--enable-private-ipv6-access '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
 
 if __name__ == '__main__':
   test_case.main()

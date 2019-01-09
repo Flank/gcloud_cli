@@ -340,8 +340,9 @@ def HealthCheckArgument(required=False, include_alpha=False):
       if include_alpha else None,
       short_help="""\
       Specifies a list of health check objects for checking the health of
-      the backend service. Health checks need not be for the same protocol
-      as that of the backend service.
+      the backend service. Currently at most one health check can be specified.
+      Health checks need not be for the same protocol as that of the backend
+      service.
       """,
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
       if include_alpha else None)
@@ -456,7 +457,7 @@ def AddSessionAffinity(parser, target_pools=False, hidden=False):
             'port will go to the same VM in the backend while that VM remains '
             'healthy.'),
     })
-  help_str = 'The type of session affinity to use.'
+  help_str = 'The type of TCP session affinity to use. Not supported for UDP.'
   parser.add_argument(
       '--session-affinity',
       choices=choices,
@@ -528,6 +529,8 @@ def AddPortName(parser):
       this flag, your instance groups must have a service named ``http''
       configured. See also
       `gcloud compute instance-groups set-named-ports --help`.
+      The ``port-name'' parameter cannot be set if the
+      load-balancing-scheme is INTERNAL.
       """)
 
 
@@ -543,7 +546,7 @@ def AddProtocol(parser, default='HTTP'):
       `TCP`, `UDP`.
 
       If the load-balancing-scheme is `EXTERNAL`, the protocol must be one of:
-      `HTTP`, `HTTPS`, `HTTP2`, `SSL`, `TCP`, `UDP`.
+      `HTTP`, `HTTPS`, `HTTP2`, `SSL`, `TCP`.
       """
   )
 

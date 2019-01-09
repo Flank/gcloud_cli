@@ -57,3 +57,6 @@ TOPICS
 
      startup
         Supplementary help for gcloud startup options.
+
+     uninstall
+        Supplementary help for uninstalling Cloud SDK.

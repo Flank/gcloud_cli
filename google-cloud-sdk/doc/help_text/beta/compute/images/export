@@ -5,7 +5,7 @@ SYNOPSIS
     gcloud beta compute images export --destination-uri=DESTINATION_URI
         (--image=IMAGE | --image-family=IMAGE_FAMILY) [--async]
         [--export-format=EXPORT_FORMAT] [--image-project=IMAGE_PROJECT]
-        [--log-location=LOG_LOCATION] [--network=NETWORK]
+        [--log-location=LOG_LOCATION] [--network=NETWORK] [--subnet=SUBNET]
         [--timeout=TIMEOUT; default="2h"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -61,6 +61,13 @@ OPTIONAL FLAGS
         The name of the network in your project to use for the image export.
         The network must have access to Google Cloud Storage. If not specified,
         the network named default is used.
+
+     --subnet=SUBNET
+        Name of the subnetwork in your project to use for the image export. If
+        the network resource is in legacy mode, do not provide this property.
+        If the network is in auto subnet mode, providing the subnetwork is
+        optional. If the network is in custom subnet mode, then this field
+        should be specified.
 
      --timeout=TIMEOUT; default="2h"
         Maximum time a build can last before it is failed as "TIMEOUT". For

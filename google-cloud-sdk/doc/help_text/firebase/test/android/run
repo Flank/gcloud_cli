@@ -64,7 +64,8 @@ POSITIONAL ARGUMENTS
 COMMONLY USED FLAGS
      --app=APP
         The path to the application binary file. The path may be in the local
-        filesystem or in Google Cloud Storage using gs:// notation.
+        filesystem or in Google Cloud Storage using gs:// notation. Android App
+        Bundles are specified as .aab, all other files are assumed to be APKs.
 
      --device=DIMENSION=VALUE,[...]
         A list of DIMENSION=VALUE pairs which specify a target device to test
@@ -363,6 +364,11 @@ EXAMPLES
             --device model=Nexus4,version=19 \
             --device model=Nexus4,version=21 \
             --device model=NexusLowRes,version=25
+
+    To invoke a robo test on an Android App Bundle, pass the .aab file using
+    the --app flag.
+
+        $ gcloud firebase test android run --app bundle.aab
 
     You may also use the legacy dimension flags (deprecated) to specify which
     devices to use. Firebase Test Lab will run tests against every possible

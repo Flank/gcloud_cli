@@ -65,7 +65,7 @@ class TasksDeleteTest(test_base.CloudTasksTestBase,
                                                           self.queue_id))
 
     self.assertIsNone(actual)
-    self.resolve_loc_mock.assert_called_once_with()
+    self.resolve_loc_mock.assert_called_once_with(parsers.ParseProject())
     self.AssertLogContains('Deleted task [my-task].')
 
   def testDelete_RelativeName(self):

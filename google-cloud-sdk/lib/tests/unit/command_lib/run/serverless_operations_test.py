@@ -65,6 +65,200 @@ _FAKE_APP_ENGINE_JSON = {
 }
 
 
+_Cond = collections.namedtuple(
+    '_Cond', ['type', 'status', 'message', 'reason'])
+
+
+class _FakeResource(object):
+
+  def __init__(self, conditions):
+    self.conditions = conditions
+
+
+class ConditionPollerTest(test_case.TestCase):
+  """Tests for the ConditionPoller class itself.
+
+  Mostly to be sure we update the progress tracker right.
+  """
+
+  def _ResourceGetter(self):
+    """Use self.conditions_series as a basis for a series of FakeResources."""
+    return _FakeResource(next(self.conditions_series))
+
+  def _ResetMockTracker(self, mocked_tracker):
+    """Reset the mock of all relevant methods on the mocked tracker."""
+    mocked_tracker.StartStage.reset_mock()
+    mocked_tracker.CompleteStage.reset_mock()
+    mocked_tracker.FailStage.reset_mock()
+    mocked_tracker.UpdateHeaderMessage.reset_mock()
+
+  def testTwoConditionsSuccess(self):
+    """Test the normal path of going from unknown to done, no deps."""
+    tracker = unittest_mock.Mock()
+    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    # Condition one goes to True immediately.
+    # Condition two goes from Unknown to True, along with Ready
+    self.conditions_series = iter([
+        condition.Conditions([
+            _Cond('Ready', 'Unknown', 'Not yet', ''),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'Unknown', 'Not yet', ''),
+        ], ready_condition='Ready'),
+        condition.Conditions([
+            _Cond('Ready', 'True', None, None),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'True', None, None),
+        ], ready_condition='Ready')])
+    poller = serverless_operations.ConditionPoller(
+        self._ResourceGetter, tracker, stages)
+    tracker.StartStage.assert_any_call('stage_one')
+    tracker.StartStage.assert_any_call('stage_two')
+    self.assertEqual(tracker.StartStage.call_count, 2)
+    tracker.CompleteStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.StartStage.assert_not_called()
+    tracker.CompleteStage.assert_called_once_with('stage_one', None)
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.CompleteStage.assert_called_once_with('stage_two', None)
+    tracker.UpdateHeaderMessage.assert_any_call('Done.')
+
+  def testTwoConditionsFailure(self):
+    """Test showing failures right."""
+    tracker = unittest_mock.Mock()
+    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    # Condition one goes to True immediately.
+    # Condition two goes from Unknown to False, along with Ready
+    self.conditions_series = iter([
+        condition.Conditions([
+            _Cond('Ready', 'Unknown', 'Not yet', ''),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'Unknown', 'Not yet', ''),
+        ], ready_condition='Ready'),
+        condition.Conditions([
+            _Cond('Ready', 'False', 'Oops.', ''),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'False', 'Oops.', ''),
+        ], ready_condition='Ready')])
+    poller = serverless_operations.ConditionPoller(
+        self._ResourceGetter, tracker, stages)
+    tracker.StartStage.assert_any_call('stage_one')
+    tracker.StartStage.assert_any_call('stage_two')
+    self.assertEqual(tracker.StartStage.call_count, 2)
+    tracker.CompleteStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.StartStage.assert_not_called()
+    tracker.CompleteStage.assert_called_once_with('stage_one', None)
+    tracker.FailStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    with self.assertRaises(serverless_exceptions.DeploymentFailedError):
+      poller.Poll(None)
+    tracker.FailStage.assert_called_once()
+    tracker.UpdateHeaderMessage.assert_any_call('Oops.')
+
+  def testTwoConditionsSuccessWithDeps(self):
+    """Test when one stage is dependent on another to start."""
+    tracker = unittest_mock.Mock()
+    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    # Make sure condition two doesn't Start until condition One is marked True
+    self.conditions_series = iter([
+        condition.Conditions([
+            _Cond('Ready', 'Unknown', 'Not yet', ''),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'Unknown', 'Not yet', ''),
+        ], ready_condition='Ready'),
+        condition.Conditions([
+            _Cond('Ready', 'True', None, None),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'True', None, None),
+        ], ready_condition='Ready')])
+    poller = serverless_operations.ConditionPoller(
+        self._ResourceGetter, tracker, stages, dependencies={'two': {'one'}})
+    tracker.StartStage.assert_called_once_with('stage_one')
+    tracker.CompleteStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.StartStage.assert_called_once_with('stage_two')
+    tracker.CompleteStage.assert_called_once_with('stage_one', None)
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.CompleteStage.assert_called_once_with('stage_two', None)
+    tracker.UpdateHeaderMessage.assert_any_call('Done.')
+
+  def testDontStartTilUnblockedPrevTrue(self):
+    """One stage dependent on another to start, and True before that happens."""
+    tracker = unittest_mock.Mock()
+    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    # Condition one goes Unknown -> True -> True
+    # Condition two goes True -> Unknown -> True
+    # Because of the dependencies, two should not Start until the second poll.
+    self.conditions_series = iter([
+        condition.Conditions([
+            _Cond('Ready', 'Unknown', 'Not yet', ''),
+            _Cond('one', 'Unknown', 'Not yet', ''),
+            _Cond('two', 'True', None, None),
+        ], ready_condition='Ready'),
+        condition.Conditions([
+            _Cond('Ready', 'Unknown', 'Not yet.', None),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'Unknown', 'Working.', None),
+        ], ready_condition='Ready'),
+        condition.Conditions([
+            _Cond('Ready', 'True', None, None),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'True', None, None),
+        ], ready_condition='Ready')])
+    poller = serverless_operations.ConditionPoller(
+        self._ResourceGetter, tracker, stages, dependencies={'two': {'one'}})
+    tracker.StartStage.assert_called_once_with('stage_one')
+    tracker.CompleteStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.StartStage.assert_not_called()
+    tracker.CompleteStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.StartStage.assert_called_once_with('stage_two')
+    tracker.CompleteStage.assert_called_once_with('stage_one', None)
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.CompleteStage.assert_called_once_with('stage_two', None)
+    tracker.UpdateHeaderMessage.assert_any_call('Done.')
+
+  def testNotDoneTilReady(self):
+    """Update top line to "Done." only when we are Ready."""
+    tracker = unittest_mock.Mock()
+    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    # Ready spends the first round at Unknown while both conditions are True.
+    self.conditions_series = iter([
+        condition.Conditions([
+            _Cond('Ready', 'Unknown', 'Not yet.', None),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'True', None, None),
+        ], ready_condition='Ready'),
+        condition.Conditions([
+            _Cond('Ready', 'True', None, None),
+            _Cond('one', 'True', None, None),
+            _Cond('two', 'True', None, None),
+        ], ready_condition='Ready')])
+    poller = serverless_operations.ConditionPoller(
+        self._ResourceGetter, tracker, stages)
+    tracker.StartStage.assert_any_call('stage_one')
+    tracker.StartStage.assert_any_call('stage_two')
+    self.assertEqual(tracker.StartStage.call_count, 2)
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.CompleteStage.assert_any_call('stage_one', None)
+    tracker.CompleteStage.assert_any_call('stage_two', None)
+    self.assertEqual(tracker.CompleteStage.call_count, 2)
+    tracker.UpdateHeaderMessage.assert_called_once_with('Not yet.')
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.UpdateHeaderMessage.assert_called_once_with('Done.')
+
+
 class ServerlessConfigurationWaitTest(base.ServerlessBase):
   """Tests for polling and waiting for updating configuration."""
 
@@ -303,7 +497,75 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
           self._ServiceRef('foo'),
           [env_changes])
 
-  # TODO(b/117663680) Test when nonce doesn't work once
+  def testUpdateNoNonce(self):
+    """Test the flow for update when configuration has no nonce."""
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        revision_labels={serverless_operations.NONCE_LABEL: None},
+        latestCreatedRevisionName='last_revision.1',
+        env_vars={'key1': 'value1'})
+
+    self._ExpectBaseRevision(
+        polls=0,
+        name='last_revision.1',
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        env_vars=collections.OrderedDict(
+            [('key1', 'value1.2'), ('key2', 'value2')]),
+        latestCreatedRevisionName='last_revision.1')
+
+    env_changes = config_changes.EnvVarChanges(
+        env_vars_to_update=collections.OrderedDict([('key1', 'value1.2'),
+                                                    ('key2', 'value2')]))
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'),
+        [env_changes])
+
+  def testUpdateNoRevisionWithNonce(self):
+    """Test update flow when no revision found with nonce."""
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        latestCreatedRevisionName='last_revision.1',
+        env_vars={'key1': 'value1'})
+
+    self._ExpectBaseRevision(
+        polls=0,
+        name='last_revision.1',
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        env_vars=collections.OrderedDict(
+            [('key1', 'value1.2'), ('key2', 'value2')]),
+        latestCreatedRevisionName='last_revision.1')
+
+    env_changes = config_changes.EnvVarChanges(
+        env_vars_to_update=collections.OrderedDict([('key1', 'value1.2'),
+                                                    ('key2', 'value2')]))
+
+    with unittest_mock.patch.object(waiter, 'PollUntilDone', side_effect=[
+        retry.WaitException(unittest_mock.ANY,
+                            unittest_mock.ANY, unittest_mock.ANY)]):
+      self.serverless_client.ReleaseService(
+          self._ServiceRef('foo'),
+          [env_changes])
+
   # latestCreatedRevisionName is available on Service. Add (1, 2) to the params.
   @parameterized.parameters((1, 1), (2, 1))
   def testUpdateEnvVars(self, base_revision_polls, base_revision_results):
@@ -549,7 +811,9 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     for k, v in kwargs.items():
       obj = new_conf
       if hasattr(new_service.metadata, k):
-        obj = new_service  # It's a metadata attribute instead of a spec one.
+        obj = new_service  # k is a metadata attribute, not a spec attribute
+      elif hasattr(new_service.status, k):
+        obj = new_service.status  # k is a status attribute not a spec attribute
       if isinstance(v, dict):
         dict_like = getattr(obj, k)
         for kk, vv in v.items():
@@ -587,7 +851,10 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
       """
       if not msg:
         return False
-      for field in type(msg).all_fields():
+      # TODO(b/120510499): Disambiguate between identical nested field names.
+      # For now, set the field with lowest number that matches 'name'.
+      for i in range(1, len(type(msg).all_fields()) + 1):
+        field = type(msg).field_by_number(i)
         if field.name == name:
           setattr(msg, name, value)
           return True

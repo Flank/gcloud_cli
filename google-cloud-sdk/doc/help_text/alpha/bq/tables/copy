@@ -1,0 +1,77 @@
+NAME
+    gcloud alpha bq tables copy - copy one BigQuery table to another
+
+SYNOPSIS
+    gcloud alpha bq tables copy
+        (--destination=DESTINATION : --destination-dataset=DESTINATION_DATASET)
+        (--source=SOURCE : --source-dataset=SOURCE_DATASET) [--async]
+        [--job-id=JOB_ID] [--overwrite] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha bq tables copy Copies one BigQuery table to another.
+
+REQUIRED FLAGS
+     Table resource - The destination to copy to. The arguments in this group
+     can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument [--destination]
+     on the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
+
+       --destination=DESTINATION
+          ID of the table or fully qualified identifier for the table. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
+
+       --destination-dataset=DESTINATION_DATASET
+          The id of the BigQuery dataset.
+
+     Table resource - The source to copy from. The arguments in this group can
+     be used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: provide the argument [--source] on the command
+     line with a fully specified name; provide the argument [--project] on the
+     command line; set the property [core/project]. This must be specified.
+
+       --source=SOURCE
+          ID of the table or fully qualified identifier for the table. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
+
+       --source-dataset=SOURCE_DATASET
+          The id of the BigQuery dataset.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --job-id=JOB_ID
+        A unique job ID to use for the request. If not specified a unique job
+        id will be generated.
+
+     --overwrite
+        Overwrite if the resource already exists.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    The following copies table my-table to table my-other-table, in dataset
+    my-dataset overwriting destination if it exists:
+
+        $ gcloud alpha bq tables copy --source my-table \
+            --destination my-other-table --source-dataset my-dataset \
+            --overwrite
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

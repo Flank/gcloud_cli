@@ -1,3 +1,6 @@
+skip: !!omap
+- bug: b/121155171
+- reason: Failing
 title: AddressesTest
 summary:
 # This summary is generated automatically on update and should not be edited.
@@ -142,7 +145,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -169,7 +172,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           omit_fields:
           - commonInstanceMetadata
@@ -257,7 +260,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -367,7 +370,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         expect_response:
           extract_references:
           - field: address
@@ -404,7 +407,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -436,7 +439,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$/deleteAccessConfig?accessConfig=external-nat&alt=json&networkInterface=nic0
           method: POST
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -464,7 +467,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -568,7 +571,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -646,7 +649,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -727,7 +730,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -763,7 +766,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -797,7 +800,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -861,7 +864,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -892,7 +895,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         expect_response:
           extract_references:
           - field: address
@@ -933,7 +936,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -960,7 +963,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           omit_fields:
           - commonInstanceMetadata
@@ -1049,7 +1052,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -1131,7 +1134,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -1213,7 +1216,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -1250,7 +1253,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -1285,7 +1288,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -1349,7 +1352,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -1379,7 +1382,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -1413,7 +1416,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0

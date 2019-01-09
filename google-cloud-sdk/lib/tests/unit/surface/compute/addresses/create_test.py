@@ -647,216 +647,15 @@ class CreateWithIPVersionTest(test_base.BaseTest):
               region='us-central2'))],)
 
 
-class CreateWithSubnetAlphaTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def RunCreate(self, command):
-    self.Run('compute addresses create ' + command)
-
-  def testBasic(self):
-    self.RunCreate("""
-        address-1
-          --addresses 10.100.1.1
-          --region us-central2
-          --subnet default
-        """)
-
-    self.CheckRequests(
-        [(self.compute.addresses, 'Insert',
-          self.messages.ComputeAddressesInsertRequest(
-              address=self.messages.Address(
-                  address='10.100.1.1',
-                  name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
-                  purpose=self.messages.Address.PurposeValueValuesEnum.
-                  GCE_ENDPOINT,
-                  subnetwork='https://www.googleapis.com/compute/alpha/'
-                  'projects/my-project/regions/us-central2/'
-                  'subnetworks/default',
-              ),
-              project='my-project',
-              region='us-central2',
-          ))],)
-
-  def testNonDefaultSubnet(self):
-    self.RunCreate("""
-        address-1
-          --addresses 10.100.1.1
-          --region us-central2
-          --subnet fancy
-        """)
-
-    self.CheckRequests(
-        [(self.compute.addresses, 'Insert',
-          self.messages.ComputeAddressesInsertRequest(
-              address=self.messages.Address(
-                  address='10.100.1.1',
-                  name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
-                  purpose=self.messages.Address.PurposeValueValuesEnum.
-                  GCE_ENDPOINT,
-                  subnetwork='https://www.googleapis.com/compute/alpha/'
-                  'projects/my-project/regions/us-central2/'
-                  'subnetworks/fancy',
-              ),
-              project='my-project',
-              region='us-central2',
-          ))],)
-
-  # Works here, but will be rejected by the API.
-  def testDifferentRegionSubnet(self):
-    self.RunCreate("""
-        address-1
-          --addresses 10.100.1.1
-          --region us-central2
-          --subnet fancy
-          --subnet-region us-east1
-        """)
-
-    self.CheckRequests(
-        [(self.compute.addresses, 'Insert',
-          self.messages.ComputeAddressesInsertRequest(
-              address=self.messages.Address(
-                  address='10.100.1.1',
-                  name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
-                  purpose=self.messages.Address.PurposeValueValuesEnum.
-                  GCE_ENDPOINT,
-                  subnetwork='https://www.googleapis.com/compute/alpha/'
-                  'projects/my-project/regions/us-east1/'
-                  'subnetworks/fancy',
-              ),
-              project='my-project',
-              region='us-central2',
-          ))],)
-
-  def testGlobalAddress(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        '[--subnet] may not be specified for global addresses.'):
-      self.RunCreate("""
-          address-1
-            --addresses 10.100.1.1
-            --global
-            --subnet fancy
-          """)
-
-
-class CreateWithSubnetBetaTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def RunCreate(self, command):
-    self.Run('compute addresses create ' + command)
-
-  def testBasic(self):
-    self.RunCreate("""
-        address-1
-          --addresses 10.100.1.1
-          --region us-central2
-          --subnet default
-        """)
-
-    self.CheckRequests(
-        [(self.compute.addresses, 'Insert',
-          self.messages.ComputeAddressesInsertRequest(
-              address=self.messages.Address(
-                  address='10.100.1.1',
-                  name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum
-                  .INTERNAL,
-                  purpose=self.messages.Address.PurposeValueValuesEnum
-                  .GCE_ENDPOINT,
-                  subnetwork='https://www.googleapis.com/compute/beta/'
-                  'projects/my-project/regions/us-central2/'
-                  'subnetworks/default'),
-              project='my-project',
-              region='us-central2',
-          ))],)
-    self.AssertOutputEquals('')
-    self.AssertErrEquals('')
-
-  def testNonDefaultSubnet(self):
-    self.RunCreate("""
-        address-1
-          --addresses 10.100.1.1
-          --region us-central2
-          --subnet fancy
-        """)
-
-    self.CheckRequests(
-        [(self.compute.addresses, 'Insert',
-          self.messages.ComputeAddressesInsertRequest(
-              address=self.messages.Address(
-                  address='10.100.1.1',
-                  name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum
-                  .INTERNAL,
-                  purpose=self.messages.Address.PurposeValueValuesEnum
-                  .GCE_ENDPOINT,
-                  subnetwork='https://www.googleapis.com/compute/beta/'
-                  'projects/my-project/regions/us-central2/'
-                  'subnetworks/fancy'),
-              project='my-project',
-              region='us-central2',
-          ))],)
-    self.AssertOutputEquals('')
-    self.AssertErrEquals('')
-
-  # Works here, but will be rejected by the API.
-  def testDifferentRegionSubnet(self):
-    self.RunCreate("""
-        address-1
-          --addresses 10.100.1.1
-          --region us-central2
-          --subnet fancy
-          --subnet-region us-east1
-        """)
-
-    self.CheckRequests(
-        [(self.compute.addresses, 'Insert',
-          self.messages.ComputeAddressesInsertRequest(
-              address=self.messages.Address(
-                  address='10.100.1.1',
-                  name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum
-                  .INTERNAL,
-                  purpose=self.messages.Address.PurposeValueValuesEnum
-                  .GCE_ENDPOINT,
-                  subnetwork='https://www.googleapis.com/compute/beta/'
-                  'projects/my-project/regions/us-east1/'
-                  'subnetworks/fancy'),
-              project='my-project',
-              region='us-central2',
-          ))],)
-    self.AssertOutputEquals('')
-    self.AssertErrEquals('')
-
-  def testGlobalAddress(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        '[--subnet] may not be specified for global addresses.'):
-      self.RunCreate("""
-          address-1
-            --addresses 10.100.1.1
-            --global
-            --subnet fancy
-          """)
-    self.AssertOutputEquals('')
-    self.AssertErrEquals(
-        'ERROR: (gcloud.beta.compute.addresses.create) [--subnet] may not be '
-        'specified for global addresses.\n'
-    )
-
-
 class CreateWithSubnetTest(test_base.BaseTest):
 
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
+
   def RunCreate(self, command):
     self.Run('compute addresses create ' + command)
 
@@ -874,13 +673,17 @@ class CreateWithSubnetTest(test_base.BaseTest):
               address=self.messages.Address(
                   address='10.100.1.1',
                   name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
-                  subnetwork='https://www.googleapis.com/compute/v1/'
+                  addressType=self.messages.Address.AddressTypeValueValuesEnum
+                  .INTERNAL,
+                  purpose=self.messages.Address.PurposeValueValuesEnum
+                  .GCE_ENDPOINT,
+                  subnetwork='https://www.googleapis.com/compute/{}/'
                   'projects/my-project/regions/us-central2/'
-                  'subnetworks/default'),
+                  'subnetworks/default'.format(self.api_version),
+              ),
               project='my-project',
-              region='us-central2',))],)
+              region='us-central2',
+          ))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
@@ -898,13 +701,17 @@ class CreateWithSubnetTest(test_base.BaseTest):
               address=self.messages.Address(
                   address='10.100.1.1',
                   name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
-                  subnetwork='https://www.googleapis.com/compute/v1/'
+                  addressType=self.messages.Address.AddressTypeValueValuesEnum
+                  .INTERNAL,
+                  purpose=self.messages.Address.PurposeValueValuesEnum
+                  .GCE_ENDPOINT,
+                  subnetwork='https://www.googleapis.com/compute/{}/'
                   'projects/my-project/regions/us-central2/'
-                  'subnetworks/fancy'),
+                  'subnetworks/fancy'.format(self.api_version),
+              ),
               project='my-project',
-              region='us-central2',))],)
+              region='us-central2',
+          ))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
@@ -924,13 +731,17 @@ class CreateWithSubnetTest(test_base.BaseTest):
               address=self.messages.Address(
                   address='10.100.1.1',
                   name='address-1',
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
-                  subnetwork='https://www.googleapis.com/compute/v1/'
+                  addressType=self.messages.Address.AddressTypeValueValuesEnum
+                  .INTERNAL,
+                  purpose=self.messages.Address.PurposeValueValuesEnum
+                  .GCE_ENDPOINT,
+                  subnetwork='https://www.googleapis.com/compute/{}/'
                   'projects/my-project/regions/us-east1/'
-                  'subnetworks/fancy'),
+                  'subnetworks/fancy'.format(self.api_version),
+              ),
               project='my-project',
-              region='us-central2',))],)
+              region='us-central2',
+          ))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
@@ -943,138 +754,30 @@ class CreateWithSubnetTest(test_base.BaseTest):
             --global
             --subnet fancy
           """)
-    self.AssertOutputEquals('')
-    self.AssertErrEquals(
-        'ERROR: (gcloud.compute.addresses.create) [--subnet] may not be '
-        'specified for global addresses.\n')
 
 
-class GlobalPeeringRangesCreateAlphaTest(test_base.BaseTest):
+class CreateWithSubnetBetaTest(CreateWithSubnetTest):
 
-  def SetUp(self):
-    self.SelectApi('alpha')
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CreateWithSubnetAlphaTest(CreateWithSubnetBetaTest):
+
+  def PreSetUp(self):
+    self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testReserveRangeForPeering(self):
-    self.Run("""
-        compute addresses create range-1
-          --global
-          --addresses 10.100.1.0
-          --prefix-length 24
-          --network default
-          --purpose VPC_PEERING
-        """)
 
-    self.CheckRequests(
-        [(self.compute.globalAddresses, 'Insert',
-          self.messages.ComputeGlobalAddressesInsertRequest(
-              address=self.messages.Address(
-                  name='range-1',
-                  address='10.100.1.0',
-                  prefixLength=24,
-                  addressType=self.messages.Address.AddressTypeValueValuesEnum.
-                  INTERNAL,
-                  purpose=self.messages.Address.PurposeValueValuesEnum.
-                  VPC_PEERING,
-                  network='https://www.googleapis.com/compute/alpha/'
-                  'projects/my-project/global/networks/default'),
-              project='my-project'))],)
+class GlobalPeeringRangesCreateTest(test_base.BaseTest):
 
-  def testWithNetworkAndSubnetwork(self):
-    with self.assertRaises(calliope_exceptions.ConflictingArgumentsException):
-      self.Run("""
-          compute addresses create address-1
-            --global
-            --prefix-length 24
-            --network default
-            --subnet fancy
-            --purpose VPC_PEERING
-          """)
-
-  def testPurposeWithoutNetworkAndSubnetwork(self):
-    with self.assertRaises(calliope_exceptions.MinimumArgumentException):
-      self.Run("""
-          compute addresses create address-1
-            --global
-            --prefix-length 24
-            --purpose VPC_PEERING
-          """)
-
-  def testVpcPeeringWithSubnetwork(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
-      self.Run("""
-          compute addresses create address-1
-            --region us-central2
-            --subnet fancy
-            --purpose VPC_PEERING
-          """)
-
-  def testRegionalWithNetwork(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
-      self.Run("""
-          compute addresses create address-1
-            --region us-central2
-            --network default
-            --purpose GCE_ENDPOINT
-          """)
-
-  def testGceEndpointWithNetwork(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
-      self.Run("""
-          compute addresses create address-1
-            --global
-            --prefix-length 24
-            --network default
-            --purpose GCE_ENDPOINT
-          """)
-
-  def testWithoutPrefixLengthForRange(self):
-    with self.assertRaises(calliope_exceptions.RequiredArgumentException):
-      self.Run("""
-          compute addresses create address-1
-            --global
-            --network default
-            --purpose VPC_PEERING
-          """)
-
-  def testSubnetWithPrefixLength(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
-      self.Run("""
-          compute addresses create address-1
-            --region us-central2
-            --prefix-length 24
-            --subnet fancy
-            --purpose GCE_ENDPOINT
-          """)
-
-  def testPrefixLengthTooSmall(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --prefix-length: Value must be greater than or equal to 8'):
-      self.Run("""
-          compute addresses create address-1
-            --global
-            --prefix-length 7
-            --network default
-            --purpose VPC_PEERING
-          """)
-
-  def testPrefixLengthTooLarge(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --prefix-length: Value must be less than or equal to 30'):
-      self.Run("""
-          compute addresses create address-1
-            --global
-            --prefix-length 31
-            --network default
-            --purpose VPC_PEERING
-          """)
-
-
-class GlobalPeeringRangesCreateBetaTest(test_base.BaseTest):
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.api_version)
 
   def testReserveRangeForPeering(self):
     self.Run("""
@@ -1097,8 +800,9 @@ class GlobalPeeringRangesCreateBetaTest(test_base.BaseTest):
                   .INTERNAL,
                   purpose=self.messages.Address.PurposeValueValuesEnum
                   .VPC_PEERING,
-                  network='https://www.googleapis.com/compute/beta/'
-                  'projects/my-project/global/networks/default'),
+                  network='https://www.googleapis.com/compute/{}/'
+                  'projects/my-project/global/networks/default'.format(
+                      self.api_version)),
               project='my-project'))],)
 
   def testWithNetworkAndSubnetwork(self):
@@ -1189,6 +893,20 @@ class GlobalPeeringRangesCreateBetaTest(test_base.BaseTest):
             --network default
             --purpose VPC_PEERING
           """)
+
+
+class GlobalPeeringRangesCreateBetaTest(GlobalPeeringRangesCreateTest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class GlobalPeeringRangesCreateAlphaTest(GlobalPeeringRangesCreateBetaTest):
+
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

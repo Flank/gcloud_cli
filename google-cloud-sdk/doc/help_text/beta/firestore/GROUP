@@ -16,6 +16,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     indexes
+        (BETA) Manage indexes for Cloud Firestore.
+
      operations
         (BETA) Manage Long Running Operations for Cloud Firestore.
 

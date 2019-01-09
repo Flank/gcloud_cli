@@ -736,8 +736,8 @@ HTTPS. Besides these blocks, the following have access as well:\n
   `--enable-private-nodes` is specified.
   2) Google Compute Engine Public IPs if `--enable-private-nodes` is not
   specified.\n
-When disabled, public internet (0.0.0.0/0) is allowed to connect to Kubernetes
-master through HTTPS.
+Use `--no-enable-master-authorized-networks` to disable. When disabled, public
+internet (0.0.0.0/0) is allowed to connect to Kubernetes master through HTTPS.
 """,
       action='store_true')
   master_flag_group.add_argument(
@@ -1812,6 +1812,36 @@ Network egress metering is disabled if this flag is omitted, or when
       action='store_true',
       default=None,
       help=network_egress_help_text)
+
+
+def AddEnablePrivateIpv6AccessFlag(parser, hidden=False):
+  """Adds --enable-private-ipv6-access flag to the parser.
+
+  When enabled, this allows gRPC clients on this cluster's pods a fast
+  path to access Google hosted services (eg. Cloud Spanner,
+  Cloud Dataflow, Cloud Bigtable)
+  This is currently only available on Alpha clusters, and needs
+  '--enable-kubernetes-alpha' to be specified also.
+
+  Args:
+    parser: A given parser.
+    hidden: If true, suppress help text for added options.
+  """
+  parser.add_argument(
+      '--enable-private-ipv6-access',
+      default=None,
+      help="""\
+Enables private access to Google services over IPv6.
+
+When enabled, this allows gRPC clients on this cluster's pods a fast path to
+access Google hosted services (eg. Cloud Spanner, Cloud Dataflow, Cloud
+Bigtable).
+
+This is currently only available on Alpha clusters, specified by using
+--enable-kubernetes-alpha.
+      """,
+      hidden=hidden,
+      action='store_true')
 
 
 def AddVerticalPodAutoscalingFlag(parser, hidden=False):

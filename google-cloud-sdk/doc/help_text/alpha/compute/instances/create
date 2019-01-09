@@ -13,8 +13,8 @@ SYNOPSIS
         [--description=DESCRIPTION]
         [--disk=[auto-delete=AUTO-DELETE],[boot=BOOT],
           [device-name=DEVICE-NAME],[mode=MODE],[name=NAME],[scope=SCOPE]]
-        [--hostname=HOSTNAME] [--labels=[KEY=VALUE,...]]
-        [--local-nvdimm=[size=SIZE]]
+        [--enable-display-device] [--hostname=HOSTNAME]
+        [--labels=[KEY=VALUE,...]] [--local-nvdimm=[size=SIZE]]
         [--local-ssd=[device-name=DEVICE-NAME],
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
@@ -278,6 +278,10 @@ FLAGS
             the disk is interpreted as a regional disk in the same region as
             the instance. The default value for this is zonal.
 
+     --enable-display-device
+        Enable a display device for instances using a Windows image. Disabled
+        by default.
+
      --hostname=HOSTNAME
         Specify the hostname of the instance to be created. The specified
         homename must be RFC1035 compliant. If hostname is not specified, the
@@ -500,9 +504,13 @@ FLAGS
         --network.
 
      --tags=TAG,[TAG,...]
-        Specifies a list of tags to apply to the instances for identifying the
-        instances to which network firewall rules will apply. See gcloud
-        compute firewall-rules create(1) for more details.
+        Specifies a list of tags to apply to the instance. These tags allow
+        network firewall rules and routes to be applied to specified VM
+        instances. See gcloud compute firewall-rules create(1) for more
+        details.
+
+        To read more about configuring network tags, read this guide:
+        https://cloud.google.com/vpc/docs/add-remove-network-tags
 
         To list instances with their respective status and tags, run:
 
@@ -784,7 +792,7 @@ FLAGS
           A service account is an identity attached to the instance. Its access
           tokens can be accessed through the instance metadata server and are
           used to authenticate applications on the instance. The account can be
-          either an email address or an alias corresponding to a service
+          set using an email address corresponding to the required service
           account. You can explicitly specify the Compute Engine default
           service account using the 'default' alias.
 

@@ -7,7 +7,7 @@ SYNOPSIS
         (--action=ACTION | --allow=PROTOCOL[:PORT[-PORT]],[...])
         [--description=DESCRIPTION]
         [--destination-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
-        [--direction=DIRECTION] [--disabled]
+        [--direction=DIRECTION] [--disabled] [--enable-logging]
         [--network=NETWORK; default="default"] [--priority=PRIORITY]
         [--rules=PROTOCOL[:PORT[-PORT]],[...]]
         [--source-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
@@ -95,6 +95,10 @@ OPTIONAL FLAGS
             $ gcloud compute firewall-rules update MY-RULE --no-disabled
 
         Firewall rules are enabled by default.
+
+     --enable-logging
+        Enable logging for the firewall rule. Logs will be exported to
+        StackDriver. Firewall logging is disabled by default.
 
      --network=NETWORK; default="default"
         The network to which this rule is attached. If omitted, the rule is

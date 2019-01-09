@@ -11,7 +11,7 @@ gcloud beta compute images export \- export a Google Compute Engine image
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute images export\fR \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR) [\fB\-\-async\fR] [\fB\-\-export\-format\fR=\fIEXPORT_FORMAT\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute images export\fR \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR) [\fB\-\-async\fR] [\fB\-\-export\-format\fR=\fIEXPORT_FORMAT\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -97,6 +97,13 @@ and used.
 The name of the network in your project to use for the image export. The network
 must have access to Google Cloud Storage. If not specified, the network named
 \f5default\fR is used.
+
+.TP 2m
+\fB\-\-subnet\fR=\fISUBNET\fR
+Name of the subnetwork in your project to use for the image export. If the
+network resource is in legacy mode, do not provide this property. If the network
+is in auto subnet mode, providing the subnetwork is optional. If the network is
+in custom subnet mode, then this field should be specified.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="2h"

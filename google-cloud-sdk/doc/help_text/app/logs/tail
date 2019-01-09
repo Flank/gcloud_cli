@@ -47,7 +47,7 @@ EXAMPLES
 
     To show only the logs from the request log for Flex apps, run:
 
-        $ gcloud app logs tail --logs=nginx.requests
+        $ gcloud app logs tail --logs=nginx.request
 
 NOTES
     This variant is also available:

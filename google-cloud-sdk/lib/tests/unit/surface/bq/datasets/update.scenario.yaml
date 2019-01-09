@@ -1,0 +1,191 @@
+title: Update a BigQuery Dataset
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: base case
+  - command: bq datasets update my_dataset --description 'My New Dataset description'
+  - stderr: |
+      Updated dataset [my_dataset].
+  - stdout: |
+      access:
+      - role: WRITER
+        specialGroup: projectWriters
+      - role: OWNER
+        specialGroup: projectOwners
+      - role: OWNER
+        userByEmail: testUser@google.com
+      - role: READER
+        specialGroup: projectReaders
+      creationTime: '1543529001335'
+      datasetReference:
+        datasetId: my_dataset
+        projectId: cloud-sdk-integration-testing
+      description: My New Dataset description
+      etag: 6VQ7QwPBTNtNtIOn5sLftg==
+      id: cloud-sdk-integration-testing:my_dataset
+      kind: bigquery#dataset
+      lastModifiedTime: '1543529002451'
+      location: US
+      selfLink: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/my_dataset
+- execute:
+  - label: base case
+  - command: bq datasets update my_dataset --permissions-file perms.json
+  - stderr: |
+      Updated dataset [my_dataset].
+  - stdout: |
+      access:
+      - role: OWNER
+        userByEmail: testUser@google.com
+      - role: READER
+        specialGroup: projectReaders
+      creationTime: '1543524168236'
+      datasetReference:
+        datasetId: my_dataset
+        projectId: fake-project
+      etag: GMuAfxeRvDTcN+Q85sKnmw==
+      id: fake-project:my_dataset
+      kind: bigquery#dataset
+      lastModifiedTime: '1543524677082'
+      location: US
+      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset
+actions:
+- write_file:
+    path: perms.json
+    contents: |
+      {
+        "access": [
+          {
+            "role": "OWNER",
+            "userByEmail": "newUser@google.com"
+          },
+          {
+            "role": "READER",
+            "specialGroup": "projectReaders"
+          }
+        ]
+      }
+- execute_command:
+    label: base case
+    command: bq datasets update my_dataset --description 'My New Dataset description'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: My New Dataset description
+        return_response:
+          headers:
+            status: '200'
+          body:
+            kind: bigquery#dataset
+            etag: 6VQ7QwPBTNtNtIOn5sLftg==
+            id: cloud-sdk-integration-testing:my_dataset
+            selfLink: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/my_dataset
+            datasetReference:
+              datasetId: my_dataset
+              projectId: cloud-sdk-integration-testing
+            description: My New Dataset description
+            access:
+            - role: WRITER
+              specialGroup: projectWriters
+            - role: OWNER
+              specialGroup: projectOwners
+            - role: OWNER
+              userByEmail: testUser@google.com
+            - role: READER
+              specialGroup: projectReaders
+            creationTime: '1543529001335'
+            lastModifiedTime: '1543529002451'
+            location: US
+    - expect_stderr: |
+        Updated dataset [my_dataset].
+    - expect_stdout: |
+        access:
+        - role: WRITER
+          specialGroup: projectWriters
+        - role: OWNER
+          specialGroup: projectOwners
+        - role: OWNER
+          userByEmail: testUser@google.com
+        - role: READER
+          specialGroup: projectReaders
+        creationTime: '1543529001335'
+        datasetReference:
+          datasetId: my_dataset
+          projectId: cloud-sdk-integration-testing
+        description: My New Dataset description
+        etag: 6VQ7QwPBTNtNtIOn5sLftg==
+        id: cloud-sdk-integration-testing:my_dataset
+        kind: bigquery#dataset
+        lastModifiedTime: '1543529002451'
+        location: US
+        selfLink: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/my_dataset
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: base case
+    command: bq datasets update my_dataset --permissions-file perms.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              access:
+              - role: OWNER
+                userByEmail: newUser@google.com
+              - role: READER
+                specialGroup: projectReaders
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+             "kind": "bigquery#dataset",
+             "etag": "GMuAfxeRvDTcN+Q85sKnmw==",
+             "id": "fake-project:my_dataset",
+             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset",
+             "datasetReference": {
+              "datasetId": "my_dataset",
+              "projectId": "fake-project"
+             },
+             "access": [
+              {
+               "role": "OWNER",
+               "userByEmail": "testUser@google.com"
+              },
+              {
+                "role": "READER",
+                "specialGroup": "projectReaders"
+              }
+             ],
+             "creationTime": "1543524168236",
+             "lastModifiedTime": "1543524677082",
+             "location": "US"
+            }
+    - expect_stderr: |
+        Updated dataset [my_dataset].
+    - expect_stdout: |
+        access:
+        - role: OWNER
+          userByEmail: testUser@google.com
+        - role: READER
+          specialGroup: projectReaders
+        creationTime: '1543524168236'
+        datasetReference:
+          datasetId: my_dataset
+          projectId: fake-project
+        etag: GMuAfxeRvDTcN+Q85sKnmw==
+        id: fake-project:my_dataset
+        kind: bigquery#dataset
+        lastModifiedTime: '1543524677082'
+        location: US
+        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset
+    - expect_exit:
+        code: 0

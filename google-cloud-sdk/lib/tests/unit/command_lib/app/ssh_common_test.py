@@ -27,6 +27,8 @@ from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.app import instances_base
 
+import mock
+
 
 class KeyPopulateTest(instances_base.InstancesTestBase):
   """Tests ssh_common.PopulatePublicKey."""
@@ -39,6 +41,11 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
     self.StartObjectPatch(ssh, 'GetDefaultSshUsername', autospec=True,
                           return_value=self.user)
     self.StartObjectPatch(ssh.KnownHosts, 'DEFAULT_PATH', '/my/hosts')
+
+    mock_project = mock.MagicMock()
+    mock_project.CommonInstanceMetadata = {}
+    self.StartObjectPatch(ssh_common, '_GetComputeProject', autospec=True,
+                          return_value=mock_project)
     self.options = {
         'IdentitiesOnly': 'yes',
         'UserKnownHostsFile': '/my/hosts',
@@ -73,7 +80,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
     self._ExpectGetInstanceCall('default', 'v1', 'i2', debug_enabled=True)
     self._ExpectDebugInstanceCall('default', 'v1', 'i2', ssh_key=self.key_field)
     connection_details = ssh_common.PopulatePublicKey(
-        self.api_client, 'default', 'v1', 'i2', self.public_key)
+        self.api_client, 'default', 'v1', 'i2', self.public_key, self.track)
     self.assertEqual(connection_details, self.connection_details)
 
   def testPopulateKeyDebugOff(self):
@@ -83,7 +90,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
     self._ExpectDebugInstanceCall('default', 'v1', 'i2', ssh_key=self.key_field)
     self.WriteInput('y')
     connection_details = ssh_common.PopulatePublicKey(
-        self.api_client, 'default', 'v1', 'i2', self.public_key)
+        self.api_client, 'default', 'v1', 'i2', self.public_key, self.track)
     self.assertEqual(connection_details, self.connection_details)
     self.AssertErrContains(
         'This instance is serving live application traffic.')
@@ -94,7 +101,19 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
     self._ExpectGetInstanceCall('default', 'v1', 'i2', debug_enabled=False)
     with self.assertRaises(console_io.UnattendedPromptError):
       ssh_common.PopulatePublicKey(self.api_client, 'default', 'v1', 'i2',
-                                   self.public_key)
+                                   self.public_key, self.track)
+
+  def testPopulateKeyWithOsLoginUser(self):
+    """OS Login is enabled, so different username and no key tranferred."""
+    self.StartObjectPatch(ssh, 'CheckForOsloginAndGetUser', autospec=True,
+                          return_value=('me_oslogin', 'True'))
+    connection_details_expected = ssh_common.ConnectionDetails(
+        ssh.Remote('127.0.0.1', user='me_oslogin'), self.options)
+    self._ExpectGetVersionCall('default', 'v1')
+    self._ExpectGetInstanceCall('default', 'v1', 'i2', debug_enabled=True)
+    connection_details = ssh_common.PopulatePublicKey(
+        self.api_client, 'default', 'v1', 'i2', self.public_key, self.track)
+    self.assertEqual(connection_details, connection_details_expected)
 
   def testPopulateKeyMissingVersion(self):
     """The version doesn't exist."""
@@ -104,7 +123,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
         command_exceptions.MissingVersionError,
         'Version [default/v1] does not exist.'):
       ssh_common.PopulatePublicKey(self.api_client, 'default', 'v1', 'i2',
-                                   self.public_key)
+                                   self.public_key, self.track)
 
   def testPopulateKeyMissingInstance(self):
     """The instance doesn't exist."""
@@ -120,7 +139,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
         command_exceptions.MissingInstanceError,
         r'Instance \[.*i2\] does not exist.'):
       ssh_common.PopulatePublicKey(self.api_client, 'default', 'v1', 'i2',
-                                   self.public_key)
+                                   self.public_key, self.track)
 
   def testPopulateKeyManagedVMs(self):
     """Fail while trying Managed VMs instance."""
@@ -130,7 +149,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
         command_exceptions.InvalidInstanceTypeError,
         'Managed VMs instances do not support this operation'):
       ssh_common.PopulatePublicKey(self.api_client, 'default', 'v1', 'i2',
-                                   self.public_key)
+                                   self.public_key, self.track)
 
   def testPopulateKeyStandard(self):
     """Fail while trying standard instance."""
@@ -140,7 +159,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
         command_exceptions.InvalidInstanceTypeError,
         'Standard instances do not support this operation'):
       ssh_common.PopulatePublicKey(self.api_client, 'default', 'v1', 'i2',
-                                   self.public_key)
+                                   self.public_key, self.track)
 
 if __name__ == '__main__':
   test_case.main()

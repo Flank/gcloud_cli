@@ -112,6 +112,9 @@ GROUPS
      billing
         (ALPHA) Manage billing accounts and associate them with projects.
 
+     bq
+        (ALPHA) Interact with and manage resources in Google BigQuery.
+
      builds
         (ALPHA) Create and manage builds for Google Cloud Build.
 
@@ -193,6 +196,9 @@ GROUPS
 
      redis
         (ALPHA) Manage Cloud Memorystore Redis resources.
+
+     remote-build-execution
+        (ALPHA) Manage Remote Build Execution.
 
      resource-manager
         (ALPHA) Manage Cloud Resources.

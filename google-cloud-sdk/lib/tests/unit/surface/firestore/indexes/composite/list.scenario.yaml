@@ -1,0 +1,209 @@
+title: cloud firestore list test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      firestore indexes composite list --uri
+  - stdout: |
+      https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgITszIAK
+      https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgPi9lIEK
+      https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Things/indexes/CICAgPj-pYIK
+- execute:
+  - command: |
+      firestore indexes composite list
+  - stdout: |
+      +--------------+------------------+-------------+-------+---------------+------------+--------------+
+      |     NAME     | COLLECTION_GROUP | QUERY_SCOPE | STATE |  FIELD_PATHS  |   ORDER    | ARRAY_CONFIG |
+      +--------------+------------------+-------------+-------+---------------+------------+--------------+
+      | CICAgITszIAK | Events           | COLLECTION  | READY | asdf0.asdf1   | ASCENDING  |              |
+      |              |                  |             |       | asdf2         | DESCENDING |              |
+      |              |                  |             |       | asdf3         |            | CONTAINS     |
+      +--------------+------------------+-------------+-------+---------------+------------+--------------+
+      | CICAgPi9lIEK | Events           | COLLECTION  | READY | user_id       | ASCENDING  |              |
+      |              |                  |             |       | timestamp     | ASCENDING  |              |
+      +--------------+------------------+-------------+-------+---------------+------------+--------------+
+      | CICAgPj-pYIK | Things           | COLLECTION  | READY | thing1        | ASCENDING  |              |
+      |              |                  |             |       | thing1.thing2 | DESCENDING |              |
+      +--------------+------------------+-------------+-------+---------------+------------+--------------+
+actions:
+- execute_command:
+    command: |
+      firestore indexes composite list --uri
+    events:
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/-/indexes?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "indexes": [
+                {
+                  "name": "projects/fake-project/databases/(default)/collectionGroups/Events/indexes/CICAgITszIAK",
+                  "queryScope": "COLLECTION",
+                  "fields": [
+                    {
+                      "fieldPath": "asdf0.asdf1",
+                      "order": "ASCENDING"
+                    },
+                    {
+                      "fieldPath": "asdf2",
+                      "order": "DESCENDING"
+                    },
+                    {
+                      "fieldPath": "asdf3",
+                      "arrayConfig": "CONTAINS"
+                    },
+                    {
+                      "fieldPath": "__name__",
+                      "order": "ASCENDING"
+                    }
+                  ],
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/databases/(default)/collectionGroups/Events/indexes/CICAgPi9lIEK",
+                  "queryScope": "COLLECTION",
+                  "fields": [
+                    {
+                      "fieldPath": "user_id",
+                      "order": "ASCENDING"
+                    },
+                    {
+                      "fieldPath": "timestamp",
+                      "order": "ASCENDING"
+                    },
+                    {
+                      "fieldPath": "__name__",
+                      "order": "ASCENDING"
+                    }
+                  ],
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/databases/(default)/collectionGroups/Things/indexes/CICAgPj-pYIK",
+                  "queryScope": "COLLECTION",
+                  "fields": [
+                    {
+                      "fieldPath": "thing1",
+                      "order": "ASCENDING"
+                    },
+                    {
+                      "fieldPath": "thing1.thing2",
+                      "order": "DESCENDING"
+                    },
+                    {
+                      "fieldPath": "__name__",
+                      "order": "DESCENDING"
+                    }
+                  ],
+                  "state": "READY"
+                }
+              ]
+            }
+    - expect_stdout: |
+        https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgITszIAK
+        https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgPi9lIEK
+        https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Things/indexes/CICAgPj-pYIK
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      firestore indexes composite list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/-/indexes?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "indexes": [
+                {
+                  "name": "projects/fake-project/databases/(default)/collectionGroups/Events/indexes/CICAgITszIAK",
+                  "queryScope": "COLLECTION",
+                  "fields": [
+                    {
+                      "fieldPath": "asdf0.asdf1",
+                      "order": "ASCENDING"
+                    },
+                    {
+                      "fieldPath": "asdf2",
+                      "order": "DESCENDING"
+                    },
+                    {
+                      "fieldPath": "asdf3",
+                      "arrayConfig": "CONTAINS"
+                    },
+                    {
+                      "fieldPath": "__name__",
+                      "order": "ASCENDING"
+                    }
+                  ],
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/databases/(default)/collectionGroups/Events/indexes/CICAgPi9lIEK",
+                  "queryScope": "COLLECTION",
+                  "fields": [
+                    {
+                      "fieldPath": "user_id",
+                      "order": "ASCENDING"
+                    },
+                    {
+                      "fieldPath": "timestamp",
+                      "order": "ASCENDING"
+                    },
+                    {
+                      "fieldPath": "__name__",
+                      "order": "ASCENDING"
+                    }
+                  ],
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/databases/(default)/collectionGroups/Things/indexes/CICAgPj-pYIK",
+                  "queryScope": "COLLECTION",
+                  "fields": [
+                    {
+                      "fieldPath": "thing1",
+                      "order": "ASCENDING"
+                    },
+                    {
+                      "fieldPath": "thing1.thing2",
+                      "order": "DESCENDING"
+                    },
+                    {
+                      "fieldPath": "__name__",
+                      "order": "DESCENDING"
+                    }
+                  ],
+                  "state": "READY"
+                }
+              ]
+            }
+    - expect_stdout: |
+        +--------------+------------------+-------------+-------+---------------+------------+--------------+
+        |     NAME     | COLLECTION_GROUP | QUERY_SCOPE | STATE |  FIELD_PATHS  |   ORDER    | ARRAY_CONFIG |
+        +--------------+------------------+-------------+-------+---------------+------------+--------------+
+        | CICAgITszIAK | Events           | COLLECTION  | READY | asdf0.asdf1   | ASCENDING  |              |
+        |              |                  |             |       | asdf2         | DESCENDING |              |
+        |              |                  |             |       | asdf3         |            | CONTAINS     |
+        +--------------+------------------+-------------+-------+---------------+------------+--------------+
+        | CICAgPi9lIEK | Events           | COLLECTION  | READY | user_id       | ASCENDING  |              |
+        |              |                  |             |       | timestamp     | ASCENDING  |              |
+        +--------------+------------------+-------------+-------+---------------+------------+--------------+
+        | CICAgPj-pYIK | Things           | COLLECTION  | READY | thing1        | ASCENDING  |              |
+        |              |                  |             |       | thing1.thing2 | DESCENDING |              |
+        +--------------+------------------+-------------+-------+---------------+------------+--------------+
+    - expect_exit:
+        code: 0

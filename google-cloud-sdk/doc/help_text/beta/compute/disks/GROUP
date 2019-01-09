@@ -17,7 +17,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add IAM policy binding for a disk.
+        (BETA) Add IAM policy binding to a Google Compute Engine disk.
 
      add-labels
         (BETA) Add labels to Google Compute Engine persistent disks.
@@ -41,7 +41,7 @@ COMMANDS
         (BETA) Move a disk between zones.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding for a disk.
+        (BETA) Remove IAM policy binding of a Google Compute Engine disk.
 
      remove-labels
         (BETA) Remove labels from Google Compute Engine persistent disks.

@@ -59,7 +59,7 @@ EXAMPLES
 
     To create a high severity log entry, run:
 
-        $ gcloud logging write LOG_NAME "Urgent message" --severity=alert
+        $ gcloud logging write LOG_NAME "Urgent message" --severity=ALERT
 
     To create a structured log, run:
 

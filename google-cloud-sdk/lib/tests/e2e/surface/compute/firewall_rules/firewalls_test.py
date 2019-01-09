@@ -44,10 +44,14 @@ class FirewallsTest(e2e_test_base.BaseTest):
         e2e_utils.GetResourceNameGenerator(prefix='firewall-disabled'))
     self.firewall_name_enabled = next(
         e2e_utils.GetResourceNameGenerator(prefix='firewall-enabled'))
+    self.firewall_name_logging = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='gcloud-compute-test-firewall-logging'))
     self.firewall_names_used.append(self.firewall_name)
     self.firewall_names_used.append(self.egress_firewall_name)
     self.firewall_names_used.append(self.firewall_name_disabled)
     self.firewall_names_used.append(self.firewall_name_enabled)
+    self.firewall_names_used.append(self.firewall_name_logging)
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')
@@ -174,25 +178,6 @@ class FirewallsTest(e2e_test_base.BaseTest):
     self.AssertNewOutputContains("ports:\n  - '443'", reset=False)
     self.AssertNewOutputNotContains('disabled: false')
 
-
-class BetaFirewallsTest(e2e_test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.firewall_names_used = []
-    self.GetFirewallNames()
-
-  def GetFirewallNames(self):
-    self.firewall_name_logging = next(
-        e2e_utils.GetResourceNameGenerator(
-            prefix='gcloud-compute-test-firewall'))
-    self.firewall_names_used.append(self.firewall_name_logging)
-
-  def TearDown(self):
-    logging.info('Starting TearDown (will delete resources if test fails).')
-    for name in self.firewall_names_used:
-      self.CleanUpResource(name, 'firewall-rules', scope=e2e_test_base.GLOBAL)
-
   def testFirewallLogging(self):
     self._TestCreateLoggingFirewall()
 
@@ -215,10 +200,19 @@ class BetaFirewallsTest(e2e_test_base.BaseTest):
         'destinationRanges:\n- 10.128.1.0/24', reset=False)
     self.AssertNewOutputContains('direction: EGRESS', reset=False)
     self.AssertNewOutputContains('priority: 900', reset=False)
-    self.AssertNewOutputContains('enableLogging: true')
+    self.AssertNewOutputContains('logConfig:', reset=False)
+    self.AssertNewOutputContains('  enable: true')
 
 
-class AlphaFirewallsTest(e2e_test_base.BaseTest):
+class BetaFirewallsTest(FirewallsTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.firewall_names_used = []
+    self.GetFirewallNames()
+
+
+class AlphaFirewallsTest(FirewallsTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

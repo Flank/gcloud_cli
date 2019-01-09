@@ -87,6 +87,7 @@ class TpusTests(e2e_base.WithServiceAuth):
     self.assertIsNotNone(result)
     self.assertEqual(len(list(result)), 0)
 
+  @test_case.Filters.skip('Failing', 'b/121191362')
   def testWorkflow(self):
     """Test of Basic TPU CRUD Workflow."""
     with self._CreateTPU() as tpu_name:

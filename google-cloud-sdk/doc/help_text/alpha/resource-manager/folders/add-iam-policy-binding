@@ -50,7 +50,7 @@ EXAMPLES
     account 'test-proj1@example.domain.com', run:
 
         $ gcloud alpha resource-manager folders add-iam-policy-binding \
-            test-proj1@example.domain.com \
+            3589215982 \
             --member='serviceAccount:test-proj1@example.domain.com' \
             --role='roles/editor'
 

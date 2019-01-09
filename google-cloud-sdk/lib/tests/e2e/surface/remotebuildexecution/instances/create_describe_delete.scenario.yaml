@@ -1,0 +1,154 @@
+skip: !!omap
+- reason: Failing
+- bug: b/121099768
+title: Create, describe, then delete an instance.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      remote-build-execution instances create $$test-instance$$
+  - stderr: |
+      Create request issued for: [$$test-instance$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created instance [$$test-instance$$].
+- execute:
+  - command: |
+      remote-build-execution instances describe $$test-instance$$
+  - stdout: |
+      location: us-central1
+      name: projects/cloud-sdk-integration-testing/instances/$$test-instance$$
+      state: RUNNING
+- execute:
+  - command: |
+      remote-build-execution instances delete $$test-instance$$
+  - prompt:
+    - message: You are about to delete instance [$$test-instance$$]
+    - input: y
+  - stderr: |
+      Delete request issued for: [$$test-instance$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted instance [$$test-instance$$].
+actions:
+- generate_resource_id:
+    reference: test-instance
+    prefix: instance
+
+- execute_command:
+    command: |
+      remote-build-execution instances create $$test-instance$$
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              instance:
+                location: us-central1
+              instanceId: $$test-instance$$
+              parent: projects/cloud-sdk-integration-testing
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '211'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/operations/EAMaTnByb2plY3RzL2Nsb3VkLXNkay1pbnRlZ3JhdGlvbi10ZXN0aW5nL2luc3RhbmNlcy9pbnN0YW5jZS0yMDE4MTIxMS0xOTQxMTgtdW50bSIYSW5zdGFuY2VzLkNyZWF0ZUluc3RhbmNl
+    - expect_stderr: |
+        Create request issued for: [$$test-instance$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances/$$test-instance$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '146'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/$$test-instance$$
+            location: us-central1
+            state: RUNNING
+        repeatable: true
+    - expect_stderr: |
+        Created instance [$$test-instance$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      remote-build-execution instances describe $$test-instance$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances/$$test-instance$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '146'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/$$test-instance$$
+            location: us-central1
+            state: RUNNING
+    - expect_stdout: |
+        location: us-central1
+        name: projects/cloud-sdk-integration-testing/instances/$$test-instance$$
+        state: RUNNING
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      remote-build-execution instances delete $$test-instance$$
+    cleanup_for: test-instance
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete instance [$$test-instance$$]
+        user_input: y
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances/$$test-instance$$?alt=json
+          method: DELETE
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '305'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/operations/EAMaTnByb2plY3RzL2Nsb3VkLXNkay1pbnRlZ3JhdGlvbi10ZXN0aW5nL2luc3RhbmNlcy9pbnN0YW5jZS0yMDE4MTIxMS0xOTQxMTgtdW50bSIYSW5zdGFuY2VzLkRlbGV0ZUluc3RhbmNl
+            done: true
+            response:
+              '@type': type.googleapis.com/google.protobuf.Empty
+    - expect_stderr: |
+        Delete request issued for: [$$test-instance$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted instance [$$test-instance$$].
+    - expect_exit:
+        code: 0

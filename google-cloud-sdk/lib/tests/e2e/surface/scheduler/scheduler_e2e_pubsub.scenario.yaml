@@ -134,36 +134,21 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://appengine.googleapis.com/v1/apps/cloud-sdk-integration-testing?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             cache-control: private
-            content-length: '727'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: apps/cloud-sdk-integration-testing
-            id: cloud-sdk-integration-testing
-            dispatchRules:
-            - domain: '*'
-              path: /favicon.ico
-              service: default
-            - domain: simple-sample.appspot.com
-              path: /
-              service: default
-            authDomain: gmail.com
-            locationId: us-central
-            codeBucket: staging.cloud-sdk-integration-testing.appspot.com
-            defaultCookieExpiration: 1209600s
-            servingStatus: SERVING
-            defaultHostname: cloud-sdk-integration-testing.appspot.com
-            defaultBucket: cloud-sdk-integration-testing.appspot.com
-            gcrDomain: us.gcr.io
-            featureSettings:
-              splitHealthChecks: true
+            locations:
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1
+              locationId: us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
           uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs?alt=json
@@ -217,36 +202,21 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://appengine.googleapis.com/v1/apps/cloud-sdk-integration-testing?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             cache-control: private
-            content-length: '727'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: apps/cloud-sdk-integration-testing
-            id: cloud-sdk-integration-testing
-            dispatchRules:
-            - domain: '*'
-              path: /favicon.ico
-              service: default
-            - domain: simple-sample.appspot.com
-              path: /
-              service: default
-            authDomain: gmail.com
-            locationId: us-central
-            codeBucket: staging.cloud-sdk-integration-testing.appspot.com
-            defaultCookieExpiration: 1209600s
-            servingStatus: SERVING
-            defaultHostname: cloud-sdk-integration-testing.appspot.com
-            defaultBucket: cloud-sdk-integration-testing.appspot.com
-            gcrDomain: us.gcr.io
-            featureSettings:
-              splitHealthChecks: true
+            locations:
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1
+              locationId: us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
           uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$:run?alt=json
@@ -283,36 +253,21 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://appengine.googleapis.com/v1/apps/cloud-sdk-integration-testing?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             cache-control: private
-            content-length: '727'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: apps/cloud-sdk-integration-testing
-            id: cloud-sdk-integration-testing
-            dispatchRules:
-            - domain: '*'
-              path: /favicon.ico
-              service: default
-            - domain: simple-sample.appspot.com
-              path: /
-              service: default
-            authDomain: gmail.com
-            locationId: us-central
-            codeBucket: staging.cloud-sdk-integration-testing.appspot.com
-            defaultCookieExpiration: 1209600s
-            servingStatus: SERVING
-            defaultHostname: cloud-sdk-integration-testing.appspot.com
-            defaultBucket: cloud-sdk-integration-testing.appspot.com
-            gcrDomain: us.gcr.io
-            featureSettings:
-              splitHealthChecks: true
+            locations:
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1
+              locationId: us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
           uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$?alt=json
@@ -359,36 +314,21 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://appengine.googleapis.com/v1/apps/cloud-sdk-integration-testing?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             cache-control: private
-            content-length: '727'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: apps/cloud-sdk-integration-testing
-            id: cloud-sdk-integration-testing
-            dispatchRules:
-            - domain: '*'
-              path: /favicon.ico
-              service: default
-            - domain: simple-sample.appspot.com
-              path: /
-              service: default
-            authDomain: gmail.com
-            locationId: us-central
-            codeBucket: staging.cloud-sdk-integration-testing.appspot.com
-            defaultCookieExpiration: 1209600s
-            servingStatus: SERVING
-            defaultHostname: cloud-sdk-integration-testing.appspot.com
-            defaultBucket: cloud-sdk-integration-testing.appspot.com
-            gcrDomain: us.gcr.io
-            featureSettings:
-              splitHealthChecks: true
+            locations:
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1
+              locationId: us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
     - expect_prompt_continue:
         message: You are about to delete job [$$pubsub_job$$]
         user_input: y

@@ -79,6 +79,7 @@ class _EnvironmentsCreateTestBase(base.EnvironmentsUnitTest):
     self.OAUTH_SCOPES = ['https://www.googleapis.com/auth/scope1',
                          'https://www.googleapis.com/auth/scope2']
     self.TAGS = ['tag1', 'tag2']
+    self.PYTHON_VERSION = '2'
 
     self.running_op = self.MakeOperation(
         self.TEST_PROJECT,
@@ -516,11 +517,10 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
         config=config,
         response=self.running_op)
 
-    actual_op = self.RunEnvironments(
-        'create', '--project',
-        self.TEST_PROJECT, '--location', self.TEST_LOCATION,
-        '--network', self.NETWORK_SHORT_NAME,
-        '--async', self.TEST_ENVIRONMENT_ID)
+    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--network', self.NETWORK_SHORT_NAME,
+                                     '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
   def testSubnetworkExpansion(self):
@@ -539,12 +539,11 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
         config=config,
         response=self.running_op)
 
-    actual_op = self.RunEnvironments(
-        'create', '--project',
-        self.TEST_PROJECT, '--location', self.TEST_LOCATION,
-        '--network', self.NETWORK_SHORT_NAME,
-        '--subnetwork', self.SUBNETWORK_SHORT_NAME,
-        '--async', self.TEST_ENVIRONMENT_ID)
+    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--network', self.NETWORK_SHORT_NAME,
+                                     '--subnetwork', self.SUBNETWORK_SHORT_NAME,
+                                     '--async', self.TEST_ENVIRONMENT_ID)
     self.assertEqual(self.running_op, actual_op)
 
   def testUrlsReducedToRelativeNames(self):
@@ -625,6 +624,38 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
           '--disk-size', '{}KB'.format(disk_size_kb),
           '--async', self.TEST_ENVIRONMENT_ID)
 
+  def testPythonVersionInput(self):
+    """Tests operation with a supplied --python-version."""
+    self._SetTestMessages()
+    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
+    software_config = self.messages.SoftwareConfig(
+        pythonVersion=self.PYTHON_VERSION)
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config, softwareConfig=software_config)
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--python-version', self.PYTHON_VERSION,
+                                     '--async', self.TEST_ENVIRONMENT_ID)
+    self.assertEqual(self.running_op, actual_op)
+
+  def testPythonVersionInvalidInput(self):
+    """Tests error if supplied a --python-version that is not supported."""
+    self._SetTestMessages()
+    unsupported_version = '1'
+    with self.AssertRaisesExceptionRegexp(
+        cli_test_base.MockArgumentError,
+        'Invalid choice: \'{}\''.format(unsupported_version)):
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION,
+                           '--python-version', unsupported_version,
+                           '--async', self.TEST_ENVIRONMENT_ID)
+
 
 class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
 
@@ -634,7 +665,6 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
   def _SetTestMessages(self):
     # pylint: disable=invalid-name
     super(EnvironmentsCreateBetaTest, self)._SetTestMessages()
-    self.PYTHON_VERSION = '2'
     self.IMAGE_VERSION = 'composer-latest-airflow-7.8.9'
     self.AIRFLOW_VERSION = '7.8.9'
 
@@ -654,8 +684,7 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
         config=config,
         response=self.running_op)
 
-    actual_op = self.RunEnvironments('create',
-                                     '--project', self.TEST_PROJECT,
+    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
                                      '--location', self.TEST_LOCATION,
                                      '--image-version', self.IMAGE_VERSION,
                                      '--python-version', self.PYTHON_VERSION,
@@ -691,20 +720,6 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
     self.AssertErrMatches(
         r'^Create in progress for environment \[{}] with operation \[{}]'
         .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
-
-  def testPythonVersionInvalidInput(self):
-    """Tests error if supplied a --python-version that is not supported."""
-    self._SetTestMessages()
-    unsupported_version = '1'
-    with self.AssertRaisesExceptionRegexp(
-        cli_test_base.MockArgumentError,
-        'Invalid choice: \'{}\''.format(unsupported_version)):
-      self.RunEnvironments(
-          'create',
-          '--project', self.TEST_PROJECT,
-          '--location', self.TEST_LOCATION,
-          '--python-version', unsupported_version,
-          '--async', self.TEST_ENVIRONMENT_ID)
 
   def testImageVersionValidInput(self):
     """Tests error if supplied am --airflow-version that is not supported."""

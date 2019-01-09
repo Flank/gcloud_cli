@@ -437,9 +437,13 @@ FLAGS
         --network.
 
      --tags=TAG,[TAG,...]
-        Specifies a list of tags to apply to the instances for identifying the
-        instances to which network firewall rules will apply. See gcloud
-        compute firewall-rules create(1) for more details.
+        Specifies a list of tags to apply to the instance. These tags allow
+        network firewall rules and routes to be applied to specified VM
+        instances. See gcloud compute firewall-rules create(1) for more
+        details.
+
+        To read more about configuring network tags, read this guide:
+        https://cloud.google.com/vpc/docs/add-remove-network-tags
 
         To list instances with their respective status and tags, run:
 
@@ -615,7 +619,7 @@ FLAGS
           A service account is an identity attached to the instance. Its access
           tokens can be accessed through the instance metadata server and are
           used to authenticate applications on the instance. The account can be
-          either an email address or an alias corresponding to a service
+          set using an email address corresponding to the required service
           account. You can explicitly specify the Compute Engine default
           service account using the 'default' alias.
 

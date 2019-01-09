@@ -1,0 +1,49 @@
+NAME
+    gcloud alpha bq tables - interact with and manage Google BigQuery tables
+
+SYNOPSIS
+    gcloud alpha bq tables COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Interact with and manage Google BigQuery tables.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     copy
+        (ALPHA) Copy one BigQuery table to another.
+
+     create
+        (ALPHA) Create a new BigQuery table.
+
+     delete
+        (ALPHA) Delete a BigQuery table.
+
+     describe
+        (ALPHA) Describe a BigQuery table.
+
+     insert
+        (ALPHA) Insert records specified into an existing table.
+
+     list
+        (ALPHA) List all BigQuery tables and views in a dataset.
+
+     show-rows
+        (ALPHA) Display selected rows in a specified table or view.
+
+     update
+        (ALPHA) Update a new BigQuery table.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

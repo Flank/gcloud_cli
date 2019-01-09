@@ -1,0 +1,69 @@
+title: compute sole-tenancy node-groups remove-iam-policy-binding scenario test
+release_tracks: [BETA]
+
+actions:
+# remove binding without condition to a policy without condition
+- execute_command:
+    command: compute sole-tenancy node-groups remove-iam-policy-binding my-node-group --zone=ZONE --member=user:owner@gmail.com --role=roles/owner
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/fake-project/zones/ZONE/nodeGroups/projects%2Ffake-project%2Fzones%2FZONE%2FnodeGroups%2Fmy-node-group/getIamPolicy?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/owner",
+                  "members": [
+                    "user:owner@gmail.com",
+                    "user:newowner@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/fake-project/zones/ZONE/nodeGroups/projects%2Ffake-project%2Fzones%2FZONE%2FnodeGroups%2Fmy-node-group/setIamPolicy?alt=json
+          method: POST
+          body:
+            json:
+              policy:
+                bindings:
+                - role: 'roles/owner'
+                  members: ['user:newowner@gmail.com']
+                etag: 'etag'
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/owner",
+                  "members": [
+                    "user:newowner@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for node_group [my-node-group].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:newowner@gmail.com
+          role: roles/owner
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0

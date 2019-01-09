@@ -78,7 +78,7 @@ FLAGS
          behavior.
 
            --update-channel-labels=[KEY=VALUE,...]
-              A list of label KEY=VALUE pairs to update. If a label exists its
+              List of label KEY=VALUE pairs to update. If a label exists its
               value is modified, otherwise a new label is created.
 
               Keys must start with a lowercase character and contain only
@@ -87,8 +87,8 @@ FLAGS
            At most one of these may be specified:
 
              --clear-channel-labels
-                Removes all labels. If --update-channel-labels is also
-                specified then --clear-channel-labels is applied first.
+                Remove all labels. If --update-channel-labels is also specified
+                then --clear-channel-labels is applied first.
 
                 For example, to remove all labels:
 
@@ -100,13 +100,13 @@ FLAGS
                       --update-channel-labels foo=bar,baz=qux
 
              --remove-channel-labels=[KEY,...]
-                A list of label keys to remove. If a label does not exist it is
+                List of label keys to remove. If a label does not exist it is
                 silently ignored.
 
          User Labels
 
            --update-user-labels=[KEY=VALUE,...]
-              A list of label KEY=VALUE pairs to update. If a label exists its
+              List of label KEY=VALUE pairs to update. If a label exists its
               value is modified, otherwise a new label is created.
 
               Keys must start with a lowercase character and contain only
@@ -117,7 +117,7 @@ FLAGS
            At most one of these may be specified:
 
              --clear-user-labels
-                Removes all labels. If --update-user-labels is also specified
+                Remove all labels. If --update-user-labels is also specified
                 then --clear-user-labels is applied first.
 
                 For example, to remove all labels:
@@ -130,7 +130,7 @@ FLAGS
                       --update-user-labels foo=bar,baz=qux
 
              --remove-user-labels=[KEY,...]
-                A list of label keys to remove. If a label does not exist it is
+                List of label keys to remove. If a label does not exist it is
                 silently ignored.
 
 GCLOUD WIDE FLAGS

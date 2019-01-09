@@ -18,18 +18,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import cli_test_base
+from tests.lib import sdk_test_base
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
-
-import mock
 
 
-class NetworksListIpAddressesTest(test_base.BaseTest):
+class NetworksListIpAddressesTest(sdk_test_base.WithFakeAuth,
+                                  cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.SelectApi('alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.mock_client = mock.Client(
         core_apis.GetClientClass('compute', 'alpha'),
@@ -37,46 +37,47 @@ class NetworksListIpAddressesTest(test_base.BaseTest):
             'compute', 'alpha', no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
+    self.messages = self.mock_client.MESSAGES_MODULE
 
   def _GetInternalIpRangesForTest(self):
     return [
         self.messages.InternalIpAddress(
             cidr='10.128.0.0/20',
-            type=self.messages.InternalIpAddressType.SUBNETWORK,
+            type=self.messages.InternalIpAddress.TypeValueValuesEnum.SUBNETWORK,
             region='region-1',
             owner='subnet-1',
         ),
         self.messages.InternalIpAddress(
             cidr='10.130.0.0/20',
-            type=self.messages.InternalIpAddressType.SUBNETWORK,
+            type=self.messages.InternalIpAddress.TypeValueValuesEnum.SUBNETWORK,
             region='region-2',
             owner='subnet-2',
         ),
         self.messages.InternalIpAddress(
             cidr='10.240.0.0/16',
-            type=self.messages.InternalIpAddressType.RESERVED,
+            type=self.messages.InternalIpAddress.TypeValueValuesEnum.RESERVED,
             owner='range-1',
             purpose='VPC_PEERING',
         ),
     ]
 
-  def NetworksListIpAddressesTest(self):
+  def testNetworksListIpAddresses(self):
     self.mock_client.networks.ListIpAddresses.Expect(
         self.messages.ComputeNetworksListIpAddressesRequest(
             network='network-1',
-            networksListIpAddressesRequest=self.messages.
-            NetworksListIpAddressesRequest(),
             project='fake-project'),
         response=self.messages.IpAddressesList(
             items=self._GetInternalIpRangesForTest()))
 
     self.Run('compute networks list-ip-addresses network-1')
-    self.AssertOutputEquals("""\
+    self.AssertOutputEquals(
+        """\
         TYPE       IP_RANGE       REGION   OWNER    PURPOSE
         SUBNETWORK 10.128.0.0/20  region-1 subnet-1
         SUBNETWORK 10.130.0.0/20  region-2 subnet-2
-        RESERVED   10.240.0.0/16           range-1  VPC_PEERNIG
-        """)
+        RESERVED   10.240.0.0/16           range-1  VPC_PEERING
+        """,
+        normalize_space=True)
 
 
 if __name__ == '__main__':

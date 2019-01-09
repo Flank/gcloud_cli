@@ -35,6 +35,9 @@ COMMANDS
      describe
         Describe a Google Compute Engine interconnect.
 
+     get-diagnostics
+        Get diagnostics of a Google Compute Engine interconnect.
+
      list
         List Google Compute Engine interconnects.
 

@@ -676,13 +676,6 @@ class ImageImportTestBeta(ImageImportTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
-    self.regionalized = False
-
-
-class ImageImportTestAlpha(ImageImportTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.regionalized = True
 
   def SetUp(self):
@@ -794,6 +787,14 @@ class ImageImportTestAlpha(ImageImportTestBeta):
         --network {2} --subnet {3}
         """.format(
             self.image_name, self.source_disk, self.network, self.subnet))
+
+
+class ImageImportTestAlpha(ImageImportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.regionalized = True
+
 
 if __name__ == '__main__':
   test_case.main()

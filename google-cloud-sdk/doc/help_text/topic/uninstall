@@ -1,0 +1,25 @@
+NAME
+    gcloud topic uninstall - supplementary help for uninstalling Cloud SDK
+
+DESCRIPTION
+Uninstalling Google Cloud SDK
+
+    Note: For installations completed using an OS package (such as apt-get,
+    yum, etc.), uninstall Cloud SDK via the OS package manager.
+
+    To completely remove Cloud SDK, follow these instructions:
+
+      o Locate your installation directory by running:
+
+        $ gcloud info --format='value(installation.sdk_root)'
+
+      o Locate your user config directory (typically ~/.config/gcloud on
+        MacOS and Linux) by running:
+
+        $ gcloud info --format='value(config.paths.global_config_dir)'
+
+      o Delete both these directories.
+
+      o Additionally, remove lines sourcing completion.bash.inc and
+        paths.bash.inc in your .bashrc or equivalent shell init file, if you
+        added them during installation.

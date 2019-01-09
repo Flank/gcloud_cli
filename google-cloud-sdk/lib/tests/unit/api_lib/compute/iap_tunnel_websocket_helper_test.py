@@ -105,16 +105,16 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.assertFalse(self.helper._is_closed)
     self.assertTrue(self.helper.IsClosed())
 
-  @mock.patch.object(log, 'info', autospec=True)
-  def testSend(self, log_info_mock):
-    log_info_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
+  @mock.patch.object(log, 'debug', autospec=True)
+  def testSend(self, log_debug_mock):
+    log_debug_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
     log.SetVerbosity(logging.DEBUG)
     self.helper.Send(b'123')
     self.assertEqual(self.helper._websocket.send.call_count, 1)
     self.helper._websocket.send.assert_has_calls([mock.call(b'123', opcode=2)])
     self.assertFalse(self.helper.IsClosed())
-    self.assertEqual(log_info_mock.call_count, 1)
-    log_info_mock.assert_has_calls(
+    self.assertEqual(log_debug_mock.call_count, 1)
+    log_debug_mock.assert_has_calls(
         [mock.call(u'SEND data_len [%d] send_data[:20] %r', 3, b'123')])
 
     log.SetVerbosity(logging.WARNING)
@@ -123,7 +123,6 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.assertEqual(self.helper._websocket.send.call_count, 2)
     self.helper._websocket.send.assert_has_calls([mock.call(b'xyz', opcode=2)])
     self.assertTrue(self.helper.IsClosed())
-    self.assertEqual(log_info_mock.call_count, 1)
 
     self.helper._websocket.send.side_effect = (
         websocket.WebSocketConnectionClosedException)
@@ -131,32 +130,32 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
                       self.helper.Send, b'wer')
     self.assertEqual(self.helper._websocket.send.call_count, 3)
     self.helper._websocket.send.assert_has_calls([mock.call(b'wer', opcode=2)])
-    self.assertEqual(log_info_mock.call_count, 1)
 
     self.helper._websocket.send.side_effect = RuntimeError
     self.assertRaises(iap_tunnel_websocket_helper.WebSocketSendError,
                       self.helper.Send, b'qwf')
     self.assertEqual(self.helper._websocket.send.call_count, 4)
     self.helper._websocket.send.assert_has_calls([mock.call(b'qwf', opcode=2)])
-    self.assertEqual(log_info_mock.call_count, 1)
 
   @mock.patch.object(log, 'info', autospec=True)
-  def testSendClose(self, log_info_mock):
-    log_info_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
+  @mock.patch.object(log, 'debug', autospec=True)
+  def testSendClose(self, log_debug_mock, log_info_mock):
+    log_debug_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
     log.SetVerbosity(logging.DEBUG)
     self.helper.SendClose()
     self.assertEqual(self.helper._websocket.sock.send_close.call_count, 1)
     self.helper._websocket.sock.send_close.assert_has_calls([mock.call()])
     self.assertFalse(self.helper.IsClosed())
-    self.assertEqual(log_info_mock.call_count, 1)
-    log_info_mock.assert_has_calls([mock.call(u'CLOSE')])
+    self.assertEqual(log_debug_mock.call_count, 1)
+    self.assertEqual(log_info_mock.call_count, 0)
+    log_debug_mock.assert_has_calls([mock.call(u'CLOSE')])
 
     log.SetVerbosity(logging.WARNING)
     self.helper._websocket.sock.send_close.side_effect = RuntimeError
     self.helper.SendClose()
     self.assertEqual(self.helper._websocket.sock.send_close.call_count, 2)
     self.assertTrue(self.helper.IsClosed())
-    self.assertEqual(log_info_mock.call_count, 2)
+    self.assertEqual(log_info_mock.call_count, 1)
     log_info_mock.assert_has_calls(
         [mock.call(u'Error during WebSocket send of Close message.',
                    exc_info=True)])
@@ -166,7 +165,7 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.helper.SendClose()
     self.assertEqual(self.helper._websocket.sock.send_close.call_count, 3)
     self.helper._websocket.sock.send_close.assert_has_calls([mock.call()])
-    self.assertEqual(log_info_mock.call_count, 3)
+    self.assertEqual(log_info_mock.call_count, 2)
     log_info_mock.assert_has_calls(
         [mock.call(u'Unable to send WebSocket Close message [%s].', '')])
 
@@ -216,13 +215,15 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.assertTrue(self._close_received)
 
   @mock.patch.object(log, 'info', autospec=True)
-  def testOnData(self, log_info_mock):
+  @mock.patch.object(log, 'debug', autospec=True)
+  def testOnData(self, log_debug_mock, log_info_mock):
     log.SetVerbosity(logging.DEBUG)
-    log_info_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
+    log_debug_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
     self.helper._OnData(None, b'456', 2, True)
     self.assertListEqual(self._received_data, [b'456'])
-    self.assertEqual(log_info_mock.call_count, 1)
-    log_info_mock.assert_has_calls(
+    self.assertEqual(log_debug_mock.call_count, 1)
+    self.assertEqual(log_info_mock.call_count, 0)
+    log_debug_mock.assert_has_calls(
         [mock.call(u'RECV opcode [%r] data_len [%d] binary_data[:20] [%r]', 2,
                    3, b'456')])
     self.assertFalse(self.helper.IsClosed())
@@ -230,7 +231,8 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     log.SetVerbosity(logging.WARNING)
     self.assertRaises(iap_tunnel_websocket_helper.WebSocketInvalidOpcodeError,
                       self.helper._OnData, None, b'789', 1, None)
-    self.assertEqual(log_info_mock.call_count, 2)
+    self.assertEqual(log_debug_mock.call_count, 2)
+    self.assertEqual(log_info_mock.call_count, 1)
     self.assertEqual(log_info_mock.call_args[0][0],
                      'Error while processing Data message.')
     self.assertTrue(self.helper.IsClosed())
@@ -238,7 +240,8 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.helper._is_closed = False
     self.helper._OnData(None, b'abcd', 0, True)
     self.assertListEqual(self._received_data, [b'456', b'abcd'])
-    self.assertEqual(log_info_mock.call_count, 2)
+    self.assertEqual(log_debug_mock.call_count, 3)
+    self.assertEqual(log_info_mock.call_count, 1)
     self.assertFalse(self.helper.IsClosed())
 
   @mock.patch.object(log, 'info', autospec=True)
@@ -273,8 +276,6 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.assertEqual(log_info_mock.call_count, 1)
     self.assertEqual(log_info_mock.call_args[0][0],
                      'Error while receiving from WebSocket.')
-    # self.assertTrue(log_info_mock.call_args[0][0].startswith(
-    #     u'Error while receiving from WebSocket.\nTraceback '))
     self.assertTrue(self.helper.IsClosed())
 
 

@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha remote-build-execution worker-pools - manage Remote Build
+        Execution Worker Pools
+
+SYNOPSIS
+    gcloud alpha remote-build-execution worker-pools COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create, delete, list, view, and update worker pool configurations
+    for Remote Build Execution instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a worker pool in the specified instance.
+
+     delete
+        (ALPHA) Delete a worker pool from a specified instance.
+
+     describe
+        (ALPHA) Describe a worker pool.
+
+     list
+        (ALPHA) List worker pools in a project for a specified instance.
+
+     update
+        (ALPHA) Update a Remote Build Execution worker pool.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

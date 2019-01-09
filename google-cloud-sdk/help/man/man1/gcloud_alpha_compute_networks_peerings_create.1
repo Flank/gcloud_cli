@@ -11,7 +11,7 @@ gcloud alpha compute networks peerings create \- create a Google Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-auto\-create\-routes\fR] [\fB\-\-export\-custom\-routes\fR] [\fB\-\-import\-custom\-routes\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-async\fR] [\fB\-\-auto\-create\-routes\fR] [\fB\-\-export\-custom\-routes\fR] [\fB\-\-import\-custom\-routes\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -52,9 +52,18 @@ The name of the network to be peered with the current network.
 
 .RS 2m
 .TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
 \fB\-\-auto\-create\-routes\fR
-If set, will automatically create routes for the network peering. Note that a
-backend error will be returned if this is not set.
+(DEPRECATED) If set, will automatically create routes for the network peering.
+Flag auto\-create\-routes is deprecated. Peer network subnet routes are always
+created in a network when peered.
+
+Flag \-\-auto\-create\-routes is deprecated and will be removed in a future
+release.
 
 .TP 2m
 \fB\-\-export\-custom\-routes\fR

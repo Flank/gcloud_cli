@@ -1,0 +1,32 @@
+title: Delete a BigQuery table
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: bq tables delete projects/fake-project/datasets/my_dataset/tables/my_table
+  - prompt:
+    - message: You are about to delete table [my_table]
+    - input: y
+  - stderr: |
+      Deleted table [my_table].
+actions:
+- execute_command:
+    command: bq tables delete projects/fake-project/datasets/my_dataset/tables/my_table
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete table [my_table]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted table [my_table].
+    - expect_exit:
+        code: 0

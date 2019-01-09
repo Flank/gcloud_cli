@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute sole\-tenancy node\-groups remove\-iam\-policy\-binding \- remove an IAM policy binding from a node group
+gcloud beta compute sole\-tenancy node\-groups remove\-iam\-policy\-binding \- remove IAM policy binding of a Google Compute Engine node group
 
 
 
@@ -17,7 +17,7 @@ gcloud beta compute sole\-tenancy node\-groups remove\-iam\-policy\-binding \- r
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Remove an IAM policy binding from a node group.
+\fB(BETA)\fR Remove an IAM policy binding of a Google Compute Engine node group.
 
 
 
@@ -102,24 +102,14 @@ https://developers.google.com/compute/docs/reference/latest/
 
 .SH "EXAMPLES"
 
-The following command will remove an IAM policy binding for the role of
-\'roles/compute.admin' for the user 'test\-user@gmail.com' on node group with
-identifier 'my\-node\-group'
+To remove an IAM policy binding for the role of 'roles/compute.admin' for the
+user 'test\-user@gmail.com' with node group 'my\-node\-group' and zone 'ZONE',
+run:
 
 .RS 2m
 $ gcloud beta compute sole\-tenancy node\-groups \e
-    remove\-iam\-policy\-binding my\-node\-group \e
+    remove\-iam\-policy\-binding my\-node\-group \-\-zone='ZONE' \e
     \-\-member='user:test\-user@gmail.com' \-\-role='roles/compute.admin'
-.RE
-
-The following command will remove an IAM policy binding for the role of
-\'roles/compute.admin' from all authenticated users on node group
-\'my\-node\-group':
-
-.RS 2m
-$ gcloud beta compute sole\-tenancy node\-groups \e
-    remove\-iam\-policy\-binding my\-node\-group \e
-    \-\-member='allAuthenticatedUsers' \-\-role='roles/compute.admin'
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy

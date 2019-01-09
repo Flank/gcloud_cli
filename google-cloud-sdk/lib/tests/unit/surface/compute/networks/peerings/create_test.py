@@ -110,6 +110,24 @@ class PeeringsCreateAlphaTest(test_base.BaseTest):
 
   def testCreatePeeringWithCustomRoutesFlags(self):
     self.Run('compute networks peerings create peering-1 --network '
+             'network-1 --peer-network network-2 '
+             '--export-custom-routes --import-custom-routes')
+
+    self.CheckRequests(
+        [(self.compute_alpha.networks, 'AddPeering',
+          self.messages.ComputeNetworksAddPeeringRequest(
+              network='network-1',
+              networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
+                  networkPeering=self.messages.NetworkPeering(
+                      exchangeSubnetRoutes=True,
+                      name='peering-1',
+                      network='projects/my-project/global/networks/network-2',
+                      exportCustomRoutes=True,
+                      importCustomRoutes=True)),
+              project='my-project'))],)
+
+  def testCreatePeeringWithDeprecatedAutoCreateRoutes(self):
+    self.Run('compute networks peerings create peering-1 --network '
              'network-1 --peer-network network-2 --auto-create-routes '
              '--export-custom-routes --import-custom-routes')
 
@@ -118,12 +136,17 @@ class PeeringsCreateAlphaTest(test_base.BaseTest):
           self.messages.ComputeNetworksAddPeeringRequest(
               network='network-1',
               networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
-                  autoCreateRoutes=True,
-                  name='peering-1',
-                  peerNetwork='projects/my-project/global/networks/network-2',
-                  exportCustomRoutes=True,
-                  importCustomRoutes=True),
+                  networkPeering=self.messages.NetworkPeering(
+                      exchangeSubnetRoutes=True,
+                      name='peering-1',
+                      network='projects/my-project/global/networks/network-2',
+                      exportCustomRoutes=True,
+                      importCustomRoutes=True)),
               project='my-project'))],)
+
+    self.AssertErrContains(
+        'WARNING: Flag --auto-create-routes is deprecated and '
+        'will be removed in a future release.')
 
 
 if __name__ == '__main__':

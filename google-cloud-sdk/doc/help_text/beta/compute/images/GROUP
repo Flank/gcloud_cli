@@ -18,7 +18,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add IAM policy binding for an image.
+        (BETA) Add IAM policy binding to a Google Compute Engine image.
 
      add-labels
         (BETA) Add labels to Google Compute Engine images.
@@ -51,7 +51,7 @@ COMMANDS
         (BETA) List Google Compute Engine images.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding for an image.
+        (BETA) Remove IAM policy binding of a Google Compute Engine image.
 
      remove-labels
         (BETA) Remove labels from Google Compute Engine images.

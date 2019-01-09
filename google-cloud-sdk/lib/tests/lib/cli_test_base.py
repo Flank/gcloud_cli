@@ -25,7 +25,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import contextlib
+import csv
+import datetime
 import io
 import os
 import re
@@ -42,6 +45,7 @@ from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import yaml
 from googlecloudsdk.core.configurations import named_configs
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import retry
@@ -50,6 +54,15 @@ from tests.lib import test_case
 
 import six
 from six.moves import StringIO
+
+try:
+  # pytest is only necessary when running on Kokoro
+  import pytest  # pylint: disable=g-import-not-at-top
+except ImportError:
+  pytest = None
+
+# The environment can be mocked and not properly reset in a test.
+real_environ = os.environ
 
 
 class StopExecutionException(Exception):
@@ -123,6 +136,14 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
                   test_case.WithInput, WithCompletion):
   """A base class for tests that want to test gcloud commands."""
 
+  if pytest:
+
+    @pytest.fixture(autouse=True)
+    def start_timing(self, request):
+      self.current_test_path = '.'.join([
+          type(self).__module__, type(self).__name__, request.node.name])
+      self.current_test_start_time = datetime.datetime.now()
+
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
     # Allow large diffs
@@ -189,6 +210,45 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
     # Classes like ProgressTracker leave threads behind so as not to block the
     # user interraction.
     self.JoinAllThreads()
+
+    # Log data on the exact scheduling of the test.
+    test_time_dir = real_environ.get('TEST_TIME_DIR')
+    if test_time_dir:
+      process_id = str(os.getpid())
+      start_time = self.current_test_start_time
+      finish_time = datetime.datetime.now()
+      elapsed_time = finish_time - start_time
+
+      # Overwrite the <process_id>_finished file, so that at the end it contains
+      # when the worker finally finished.
+      open(os.path.join(test_time_dir, process_id + '_finished'), 'w').write(
+          '{} {}\n'.format(finish_time, process_id))
+
+      # Just append to the yaml file to avoid reading and writing the whole file
+      # repeatedly.
+      test_data_file = open(
+          os.path.join(test_time_dir, process_id + '_tests.yaml'), 'a')
+      data = {
+          self.current_test_path: collections.OrderedDict(
+              worker=process_id,
+              start=six.text_type(start_time),
+              end=six.text_type(finish_time),
+              elapsed=six.text_type(elapsed_time),
+          )
+      }
+      yaml.dump(data, test_data_file)
+
+      csv_row = [
+          self.current_test_path,
+          process_id,
+          six.text_type(start_time),
+          six.text_type(finish_time),
+          six.text_type(elapsed_time),
+      ]
+      csv_path = os.path.join(test_time_dir, process_id + '_tests.csv')
+      with open(csv_path, 'a') as csv_file:
+        # Set lineterminator to avoid extra newlines on Windows
+        csv.writer(csv_file, lineterminator='\n').writerow(csv_row)
 
   def _DestroyCLI(self):
     """Delete all attributes from the modules created by the CLI."""
@@ -478,7 +538,7 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
       with open(
           (os.environ[str('FILE_FOLDER')] + '/' + str(os.getpid()) + '.out'),
           'a+') as f:
-        f.write((' '.join(prefixed_command) + '%%').encode('utf-8'))
+        f.write((' '.join(prefixed_command) + '\n---\n').encode('utf-8'))
     return self.cli.Execute(prefixed_command)
 
   def _RunUntil(self, retry_function, retry_if_function, cmd, max_retrials,

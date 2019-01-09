@@ -19,8 +19,10 @@ class AcceleratorConfig(_messages.Message):
     acceleratorCount: The number of the guest accelerator cards exposed to
       this instance.
     acceleratorType: Full or partial URL of the accelerator type resource to
-      attach to this instance. If you are creating an instance template,
-      specify only the accelerator name.
+      attach to this instance. For example: projects/my-project/zones/us-
+      central1-c/acceleratorTypes/nvidia-tesla-p100 If you are creating an
+      instance template, specify only the accelerator name. See GPUs on
+      Compute Engine for a full list of accelerator types.
   """
 
   acceleratorCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1134,7 +1136,7 @@ class AttachedDisk(_messages.Message):
       system running within the instance. This name can be used to reference
       the device for mounting, resizing, and so on, from within the instance.
       If not specified, the server chooses a default device name to apply to
-      this disk, in the form persistent-disks-x, where x is a number assigned
+      this disk, in the form persistent-disk-x, where x is a number assigned
       by Google Compute Engine. This field is only applicable for persistent
       disks.
     diskEncryptionKey: Encrypts or decrypts a disk using a customer-supplied
@@ -9137,7 +9139,7 @@ class ComputeNodeGroupsSetNodeTemplateRequest(_messages.Message):
   r"""A ComputeNodeGroupsSetNodeTemplateRequest object.
 
   Fields:
-    nodeGroup: Name of the NodeGroup resource to delete.
+    nodeGroup: Name of the NodeGroup resource to update.
     nodeGroupsSetNodeTemplateRequest: A NodeGroupsSetNodeTemplateRequest
       resource to be passed as the request body.
     project: Project ID for this request.
@@ -21269,6 +21271,10 @@ class InterconnectLocation(_messages.Message):
 
   Enums:
     ContinentValueValuesEnum: [Output Only] Continent for this location.
+    StatusValueValuesEnum: [Output Only] The status of this
+      InterconnectLocation. If the status is AVAILABLE, new Interconnects may
+      be provisioned in this InterconnectLocation. Otherwise, no new
+      Interconnects may be provisioned.
 
   Fields:
     address: [Output Only] The postal address of the Point of Presence, each
@@ -21299,6 +21305,10 @@ class InterconnectLocation(_messages.Message):
       objects, that describe parameters pertaining to the relation between
       this InterconnectLocation and various Google Cloud regions.
     selfLink: [Output Only] Server-defined URL for the resource.
+    status: [Output Only] The status of this InterconnectLocation. If the
+      status is AVAILABLE, new Interconnects may be provisioned in this
+      InterconnectLocation. Otherwise, no new Interconnects may be
+      provisioned.
   """
 
   class ContinentValueValuesEnum(_messages.Enum):
@@ -21327,6 +21337,18 @@ class InterconnectLocation(_messages.Message):
     NORTH_AMERICA = 8
     SOUTH_AMERICA = 9
 
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""[Output Only] The status of this InterconnectLocation. If the status
+    is AVAILABLE, new Interconnects may be provisioned in this
+    InterconnectLocation. Otherwise, no new Interconnects may be provisioned.
+
+    Values:
+      AVAILABLE: <no description>
+      CLOSED: <no description>
+    """
+    AVAILABLE = 0
+    CLOSED = 1
+
   address = _messages.StringField(1)
   availabilityZone = _messages.StringField(2)
   city = _messages.StringField(3)
@@ -21341,6 +21363,7 @@ class InterconnectLocation(_messages.Message):
   peeringdbFacilityId = _messages.StringField(12)
   regionInfos = _messages.MessageField('InterconnectLocationRegionInfo', 13, repeated=True)
   selfLink = _messages.StringField(14)
+  status = _messages.EnumField('StatusValueValuesEnum', 15)
 
 
 class InterconnectLocationList(_messages.Message):
@@ -25442,6 +25465,8 @@ class Quota(_messages.Message):
   Fields:
     limit: [Output Only] Quota limit for this metric.
     metric: [Output Only] Name of the quota metric.
+    owner: [Output Only] Owning resource. This is the resource on which this
+      quota is applied.
     usage: [Output Only] Current usage of this metric.
   """
 
@@ -25583,7 +25608,8 @@ class Quota(_messages.Message):
 
   limit = _messages.FloatField(1)
   metric = _messages.EnumField('MetricValueValuesEnum', 2)
-  usage = _messages.FloatField(3)
+  owner = _messages.StringField(3)
+  usage = _messages.FloatField(4)
 
 
 class Reference(_messages.Message):
@@ -33274,7 +33300,7 @@ class XpnResourceId(_messages.Message):
 
   Fields:
     id: The ID of the service resource. In the case of projects, this field
-      matches the project ID (e.g., my-project), not the project number (e.g.,
+      supports project id (e.g., my-project-123) and project number (e.g.
       12345678).
     type: The type of the service resource.
   """

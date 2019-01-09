@@ -197,16 +197,54 @@ class EnvironmentsRunGATest(base.KubectlShellingUnitTest):
                          self.TEST_SUBCOMMAND, '--', *subcmd_args)
     fake_exec.Verify()
 
-  def MakeKubectlExecCallback(self, pod, subcmd_args=None):
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testSubcommandRun_DeleteDag(self, exec_mock, tmp_kubeconfig_mock):
+    test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
+        self.messages.Environment.StateValueValuesEnum.RUNNING)
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=test_env_object)
+
+    subcmd = 'delete_dag'
+    subcmd_args = []
+
+    fake_exec = kubectl_util.FakeExec()
+    exec_mock.side_effect = fake_exec
+
+    tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
+
+    fake_exec.AddCallback(
+        0, self.MakeGetPodsCallback([(self.TEST_POD, 'running')]))
+
+    # Ensure that the '--yes' argument is added to the list of 'delete_dag' args
+    # if it is not present.
+    fake_exec.AddCallback(
+        1,
+        self.MakeKubectlExecCallback(
+            self.TEST_POD, subcmd=subcmd, subcmd_args=subcmd_args + ['--yes']))
+
+    self.RunEnvironments('run', '--project', self.TEST_PROJECT, '--location',
+                         self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID, subcmd,
+                         '--', *subcmd_args)
+
+    fake_exec.Verify()
+
+  def MakeKubectlExecCallback(self,
+                              pod,
+                              subcmd=TEST_SUBCOMMAND,
+                              subcmd_args=None):
 
     def _KubectlExecCallback(args, **_):
       expected_args = [
           self.TEST_KUBECTL_PATH, 'exec', pod, '-tic', self.TEST_CONTAINER,
-          'airflow', self.TEST_SUBCOMMAND
+          'airflow', subcmd
       ]
       if subcmd_args:
         expected_args.extend(['--'] + subcmd_args)
-      self.assertEquals(expected_args, args)
+      self.assertEqual(expected_args, args)
       return 0
 
     return _KubectlExecCallback

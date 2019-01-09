@@ -93,15 +93,9 @@ EXAMPLES
 
         $ gcloud beta compute addresses list --global
 
-    To list all of the regional addresses in a project, run:
+    To list all of the addresses from the us-central1 region, run:
 
-        $ gcloud beta compute addresses list --regions
-
-    To list all of the addresses from the us-central1 and the europe-west1
-    regions, run:
-
-        $ gcloud beta compute addresses list \
-            --regions us-central1,europe-west1
+        $ gcloud beta compute addresses list --filter=region:us-central1
 
 NOTES
     This command is currently in BETA and may change without notice. These

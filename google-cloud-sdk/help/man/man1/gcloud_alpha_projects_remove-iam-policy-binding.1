@@ -144,8 +144,8 @@ run:
 
 .RS 2m
 $ gcloud alpha projects remove\-iam\-policy\-binding \e
-  example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
-  \-\-role='roles/editor'
+    example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor'
 .RE
 
 To remove an IAM policy binding for the role of 'roles/editor' from all
@@ -153,8 +153,8 @@ authenticated users on project 'example\-project\-id\-1', run:
 
 .RS 2m
 $ gcloud alpha projects remove\-iam\-policy\-binding \e
-  example\-project\-id\-1 \-\-member='allAuthenticatedUsers' \e
-  \-\-role='roles/editor'
+    example\-project\-id\-1 \-\-member='allAuthenticatedUsers' \e
+    \-\-role='roles/editor'
 .RE
 
 To remove an IAM policy binding with a condition of expression='request.time <
@@ -165,10 +165,10 @@ description='Expires at midnight on 2018\-12\-31' for the role of
 
 .RS 2m
 $ gcloud alpha projects remove\-iam\-policy\-binding \e
-  example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
-  \-\-role='roles/browser' \e
-  \-\-condition='expression=request.time <
-timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+    example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/browser' \e
+    \-\-condition='expression=request.time <
+ timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
 tion=Expires at midnight on 2018\-12\-31'
 .RE
 
@@ -178,8 +178,8 @@ identifier 'example\-project\-id\-1', run:
 
 .RS 2m
 $ gcloud alpha projects remove\-iam\-policy\-binding \e
-  example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
-  \-\-role='roles/browser' \-\-all
+    example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/browser' \-\-all
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy

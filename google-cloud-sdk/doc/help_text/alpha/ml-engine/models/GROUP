@@ -24,7 +24,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding to a model.
+        (ALPHA) Add IAM policy binding for a model.
 
      create
         (ALPHA) Create a new Cloud ML Engine model.
@@ -42,7 +42,7 @@ COMMANDS
         (ALPHA) List existing Cloud ML Engine models.
 
      remove-iam-policy-binding
-        (ALPHA) Remove a policy binding from a model.
+        (ALPHA) Remove IAM policy binding from a ML model.
 
      set-iam-policy
         (ALPHA) Set the IAM policy for a model.

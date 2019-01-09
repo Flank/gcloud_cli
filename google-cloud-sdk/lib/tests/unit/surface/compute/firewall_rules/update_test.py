@@ -519,6 +519,18 @@ class FirewallRulesUpdateTest(test_base.BaseTest):
     self.CheckFirewallRequest(
         destinationRanges=['0.0.0.0/0'], targetTags=['tgt'])
 
+  def testEnableLogging(self):
+    self.SetNextGetResult(
+        destinationRanges=['0.0.0.0/0'],
+        logConfig=self.messages.FirewallLogConfig(enable=False))
+
+    self.Run("""
+        compute firewall-rules update firewall-1 --enable-logging
+        """)
+    self.CheckFirewallRequest(
+        destinationRanges=['0.0.0.0/0'],
+        logConfig=self.messages.FirewallLogConfig(enable=True))
+
 
 class BetaFirewallRulesUpdateTest(FirewallRulesUpdateTest):
 
@@ -561,15 +573,6 @@ class BetaFirewallRulesUpdateTest(FirewallRulesUpdateTest):
                              project='my-project'))]
 
       self.CheckRequests(get_request, update_request)
-
-  def testEnableLogging(self):
-    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], enableLogging=False)
-
-    self.Run("""
-        compute firewall-rules update firewall-1 --enable-logging
-        """)
-    self.CheckFirewallRequest(
-        destinationRanges=['0.0.0.0/0'], enableLogging=True)
 
 
 class AlphaFirewallRulesUpdateTest(BetaFirewallRulesUpdateTest):

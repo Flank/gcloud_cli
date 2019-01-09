@@ -11,7 +11,7 @@ gcloud compute networks peerings create \- create a Google Compute Engine networ
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-auto\-create\-routes\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-async\fR] [\fB\-\-auto\-create\-routes\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -51,6 +51,11 @@ The name of the network to be peered with the current network.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
 .TP 2m
 \fB\-\-auto\-create\-routes\fR
 If set, will automatically create routes for the network peering. Note that a

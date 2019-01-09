@@ -91,9 +91,9 @@ for this API can be found at: https://cloud.google.com/resource\-manager
 
 .SH "EXAMPLES"
 
-The following command will remove an IAM policy binding for the role of
-\'roles/editor' for the user 'test\-user@gmail.com' on project with identifier
-\'example\-project\-id\-1':
+To remove an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on project with identifier 'example\-project\-id\-1',
+run:
 
 .RS 2m
 $ gcloud beta projects remove\-iam\-policy\-binding \e
@@ -101,9 +101,8 @@ $ gcloud beta projects remove\-iam\-policy\-binding \e
     \-\-role='roles/editor'
 .RE
 
-The following command will remove an IAM policy binding for the role of
-\'roles/editor' from all authenticated users on project
-\'example\-project\-id\-1':
+To remove an IAM policy binding for the role of 'roles/editor' from all
+authenticated users on project 'example\-project\-id\-1', run:
 
 .RS 2m
 $ gcloud beta projects remove\-iam\-policy\-binding \e

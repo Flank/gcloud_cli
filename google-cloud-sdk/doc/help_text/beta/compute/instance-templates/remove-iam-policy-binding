@@ -1,13 +1,14 @@
 NAME
     gcloud beta compute instance-templates remove-iam-policy-binding - remove
-        an IAM policy binding from an instance template
+        IAM policy binding of a Google Compute Engine instance template
 
 SYNOPSIS
     gcloud beta compute instance-templates remove-iam-policy-binding
         INSTANCE_TEMPLATE --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Remove an IAM policy binding from an instance template.
+    (BETA) Remove an IAM policy binding of a Google Compute Engine instance
+    template.
 
 POSITIONAL ARGUMENTS
      Instance template resource - The instance template for which to remove IAM
@@ -52,21 +53,12 @@ API REFERENCE
     https://developers.google.com/compute/docs/reference/latest/
 
 EXAMPLES
-    The following command will remove an IAM policy binding for the role of
-    'roles/compute.admin' for the user 'test-user@gmail.com' on instance
-    template with identifier 'my-template'
+    To remove an IAM policy binding for the role of 'roles/compute.admin' for
+    the user 'test-user@gmail.com' with instance template 'my-template', run:
 
         $ gcloud beta compute instance-templates remove-iam-policy-binding \
             my-template --member='user:test-user@gmail.com' \
-            --role='roles/compute.admin'
-
-    The following command will remove an IAM policy binding for the role of
-    'roles/compute.admin' from all authenticated users on instance template
-    'my-template':
-
-        $ gcloud beta compute instance-templates remove-iam-policy-binding \
-            my-template --member='allAuthenticatedUsers' \
-            --role='roles/compute.admin'
+            --role='roles/editor'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

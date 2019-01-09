@@ -146,18 +146,10 @@ To list all of the global addresses in a project, run:
 $ gcloud alpha compute addresses list \-\-global
 .RE
 
-To list all of the regional addresses in a project, run:
+To list all of the addresses from the \f5\fIus\-central1\fR\fR region, run:
 
 .RS 2m
-$ gcloud alpha compute addresses list \-\-regions
-.RE
-
-To list all of the addresses from the \f5\fIus\-central1\fR\fR and the
-\f5\fIeurope\-west1\fR\fR regions, run:
-
-.RS 2m
-$ gcloud alpha compute addresses list \e
-    \-\-regions us\-central1,europe\-west1
+$ gcloud alpha compute addresses list \-\-filter=region:us\-central1
 .RE
 
 

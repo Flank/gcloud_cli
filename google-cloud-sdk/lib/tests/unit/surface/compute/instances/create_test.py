@@ -1506,6 +1506,17 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
           ))],
     )
 
+  def testWithImageProjectButNoImage(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Must specify either \[--image\] or \[--image-family\] when '
+        r'specifying \[--image-project\] flag.'):
+      self.Run("""
+          compute instances create instance-1
+            --image-project some-other-project
+          """)
+
+    self.CheckRequests()
+
   def testWithNoImageAndBootDiskDeviceNameOverride(self):
     with self.AssertRaisesToolExceptionRegexp(
         r'\[--boot-disk-device-name\] can only be used when creating a new '
@@ -6845,15 +6856,24 @@ class InstancesCreateScopesDeprecationTestsGa(InstancesCreateTestsMixin,
     )
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class InstancesCreateAttachRegionalDisk(InstancesCreateTestsMixin,
-                                        parameterized.TestCase):
+class InstancesCreateAttachRegionalDiskGA(InstancesCreateTestsMixin):
 
-  def testRegionalDisk(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def SetUp(self):
+    SetUp(self, self.api_version)
+
+
+class InstancesCreateAttachRegionalDiskBeta(
+    InstancesCreateAttachRegionalDiskGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+  def testRegionalDisk(self):
     m = self.messages
 
     self.make_requests.side_effect = iter([
@@ -6932,6 +6952,14 @@ class InstancesCreateAttachRegionalDisk(InstancesCreateTestsMixin,
               zone='central2-a',
           ))],
     )
+
+
+class InstancesCreateAttachRegionalDiskAlpha(
+    InstancesCreateAttachRegionalDiskBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 
 class InstancesCreateWithAccelerator(InstancesCreateTestsMixin):
@@ -8803,17 +8831,36 @@ class InstancesCreateShieldedVMConfigBetaTest(
     self.track = calliope_base.ReleaseTrack.BETA
 
 
-class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
-                                          parameterized.TestCase):
+class InstancesCreateDiskFromSnapshotTestGA(InstancesCreateTestsMixin,
+                                            parameterized.TestCase):
   """Test creation of VM instances with create disk(s)."""
 
-  def SetUp(self):
-    SetUp(self, 'alpha')
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
-  # TODO(b/117336602) Stop using parameterized for track parameterization.
-  @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
-  def testCreateDiskWithAllProperties(self, track):
-    self.track = track
+  def SetUp(self):
+    SetUp(self, self.api_version)
+
+
+class InstancesCreateDiskFromSnapshotTestBeta(
+    InstancesCreateDiskFromSnapshotTestGA):
+  """Test creation of VM instances with create disk(s)."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class InstancesCreateDiskFromSnapshotTestAlpha(
+    InstancesCreateDiskFromSnapshotTestBeta):
+  """Test creation of VM instances with create disk(s)."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def testCreateDiskWithAllProperties(self):
     m = self.messages
 
     self.Run(
@@ -8870,11 +8917,8 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
             project='my-project',
             zone='central2-a',))],)
 
-  # TODO(b/117336602) Stop using parameterized for track parameterization.
-  @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
-  def testCreateDiskWithSnapshotProperty(self, track):
+  def testCreateDiskWithSnapshotProperty(self):
     msg = self.messages
-    self.track = track
     self.Run("""
         compute instances create hamlet
           --zone central2-a
@@ -8922,10 +8966,7 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
             project='my-project',
             zone='central2-a',))],)
 
-  # TODO(b/117336602) Stop using parameterized for track parameterization.
-  @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
-  def testCreateDiskSnapshotAndImagePropertyFails(self, track):
-    self.track = track
+  def testCreateDiskSnapshotAndImagePropertyFails(self):
     with self.AssertRaisesToolExceptionRegexp(
         r'Must specify exactly one of \[image\], \[image-family\] or '
         r'\[source-snapshot\] for a \[--create-disk\]. '
@@ -8935,19 +8976,15 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
             --create-disk image=foo,source-snapshot=my-snapshot
           """)
 
-  # TODO(b/117336602) Stop using parameterized for track parameterization.
   @parameterized.parameters([
-      (calliope_base.ReleaseTrack.ALPHA, '', 'my-backup'),
-      (calliope_base.ReleaseTrack.ALPHA,
-       ('https://www.googleapis.com/compute/'
+      ('', 'my-backup'),
+      (('https://www.googleapis.com/compute/'
         'alpha/projects/my-project/global/snapshots/'), 'my-backup')])
   def testCreateBootDiskWithSnapshotFlag(
       self,
-      track,
       snapshot_path,
       snapshot_name):
     m = self.messages
-    self.track = track
 
     self.make_requests.side_effect = iter([
         [
@@ -9008,10 +9045,7 @@ class InstancesCreateDiskFromSnapshotTest(InstancesCreateTestsMixin,
           ))],
     )
 
-  # TODO(b/117336602) Stop using parameterized for track parameterization.
-  @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA])
-  def testCreateBootDiskWithSnapshotAndImageFlagFails(self, track):
-    self.track = track
+  def testCreateBootDiskWithSnapshotAndImageFlagFails(self):
     with self.assertRaisesRegex(
         MockArgumentError,
         r'argument --image: At most one of --image \| --image-family \| '
@@ -9043,6 +9077,56 @@ class InstancesCreateFromMachineImage(InstancesCreateTestsMixin):
                 sourceMachineImage=(
                     'https://www.googleapis.com/compute/alpha/projects/'
                     'my-project/global/machineImages/machine-image-1')),
+            project='my-project',
+            zone='central2-a'))])
+
+
+class InstancesCreateWithDisplayDevice(InstancesCreateTestsMixin):
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateWithDisplayDevice(self):
+    m = self.messages
+    self.Run('compute instances create instance-1 '
+             '--zone central2-a '
+             '--enable-display-device')
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                deletionProtection=False,
+                disks=[
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=True,
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            sourceImage=self._default_image,),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                ],
+                displayDevice=m.DisplayDevice(enableDisplay=True),
+                machineType=self._default_machine_type,
+                metadata=m.Metadata(),
+                name='instance-1',
+                networkInterfaces=[m.NetworkInterface(
+                    accessConfigs=[m.AccessConfig(
+                        name='external-nat',
+                        type=self._one_to_one_nat)],
+                    network=self._default_network)],
+                serviceAccounts=[
+                    m.ServiceAccount(
+                        email='default',
+                        scopes=_DEFAULT_SCOPES
+                    ),
+                ],
+                scheduling=m.Scheduling(
+                    automaticRestart=True),
+            ),
             project='my-project',
             zone='central2-a'))])
 

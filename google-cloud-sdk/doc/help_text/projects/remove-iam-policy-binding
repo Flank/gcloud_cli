@@ -11,8 +11,11 @@ DESCRIPTION
     and the binding.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to remove IAM policy binding from.
+     Project resource - The project to remove the IAM policy binding from. This
+     represents a Cloud resource. This must be specified.
+
+       PROJECT_ID
+          ID of the project or fully qualified identifier for the project.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -37,6 +40,10 @@ GCLOUD WIDE FLAGS
     --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+API REFERENCE
+    This command uses the cloudresourcemanager/v1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/resource-manager
 
 EXAMPLES
     To remove an IAM policy binding for the role of 'roles/editor' for the user

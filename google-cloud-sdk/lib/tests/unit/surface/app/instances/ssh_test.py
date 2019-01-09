@@ -47,8 +47,8 @@ class InstancesSSHTest(ssh_base.InstancesSSHTestBase):
 
   def testSSHShortFlagsInBeta(self):
     """Test that short flags work in the beta version."""
-    self.Run('app instances ssh -s default -v v1 i2',
-             track=calliope_base.ReleaseTrack.BETA)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.Run('app instances ssh -s default -v v1 i2')
     self.ensure_keys_exist.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.Keys), overwrite=False)
     self._AssertPopulateCalled()

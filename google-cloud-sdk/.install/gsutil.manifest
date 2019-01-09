@@ -122,6 +122,7 @@ platform/gsutil/gslib/tests/test_cors.py
 platform/gsutil/gslib/tests/test_cp.py
 platform/gsutil/gslib/tests/test_creds_config.py
 platform/gsutil/gslib/tests/test_daisy_chain_wrapper.py
+platform/gsutil/gslib/tests/test_data/favicon.ico.gz
 platform/gsutil/gslib/tests/test_data/test.gif
 platform/gsutil/gslib/tests/test_data/test.json
 platform/gsutil/gslib/tests/test_data/test.mp3
@@ -588,6 +589,7 @@ platform/gsutil/third_party/boto/boto/gs/bucket.py
 platform/gsutil/third_party/boto/boto/gs/bucketlistresultset.py
 platform/gsutil/third_party/boto/boto/gs/connection.py
 platform/gsutil/third_party/boto/boto/gs/cors.py
+platform/gsutil/third_party/boto/boto/gs/encryptionconfig.py
 platform/gsutil/third_party/boto/boto/gs/key.py
 platform/gsutil/third_party/boto/boto/gs/lifecycle.py
 platform/gsutil/third_party/boto/boto/gs/resumable_upload_handler.py
@@ -781,6 +783,7 @@ platform/gsutil/third_party/boto/boto/vpc/vpngateway.py
 platform/gsutil/third_party/boto/pylintrc
 platform/gsutil/third_party/boto/requirements-docs.txt
 platform/gsutil/third_party/boto/requirements-py26.txt
+platform/gsutil/third_party/boto/requirements-py33.txt
 platform/gsutil/third_party/boto/requirements.txt
 platform/gsutil/third_party/boto/scripts/git-release-notes.py
 platform/gsutil/third_party/boto/scripts/rebuild-endpoints.py

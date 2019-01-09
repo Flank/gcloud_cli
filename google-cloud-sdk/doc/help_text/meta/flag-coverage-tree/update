@@ -1,0 +1,32 @@
+NAME
+    gcloud meta flag-coverage-tree update - generates the flag coverage tree
+
+SYNOPSIS
+    gcloud meta flag-coverage-tree update [COMMAND/GROUP ...]
+        --file-path=FILE_PATH [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    This command generates and writes the flag coverage tree to a file or
+    standard out depending on whether or not a file path is specified. This
+    tree is created specifically for the purpose of determining the flag
+    coverage of the surfaces in gcloud.
+
+POSITIONAL ARGUMENTS
+     [COMMAND/GROUP ...]
+        Restrict the listing to these dotted command paths. For example:
+        gcloud.alpha gcloud.beta.test
+
+REQUIRED FLAGS
+     --file-path=FILE_PATH
+        The file path to write the output tree into
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

@@ -19,7 +19,7 @@ DESCRIPTION
     on a project, use the $ gcloud projects commands.
 
 POSITIONAL ARGUMENTS
-     ServiceAccount resource - The Servive Account to which to add the IAM
+     ServiceAccount resource - The Service Account to which to add the IAM
      policy binding. This represents a Cloud resource. (NOTE) Some attributes
      are not given arguments in this group but can be set in other ways. To set
      the [project] attribute: provide the argument [service_account] on the

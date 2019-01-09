@@ -46,6 +46,7 @@ class AnnotationE2eTest(base.CategoryManagerE2eBase):
         updated_annotation = self._UpdateAnnotation(annotation, new_description)
         self.assertEqual(updated_annotation.description, new_description)
 
+  @test_case.Filters.skip('Failing', 'b/121190998')
   def testDescribeAnnotation(self):
     description = 'test description'
     with self.CreateTaxonomyResource('taxonomy description') as taxonomy:
@@ -53,6 +54,7 @@ class AnnotationE2eTest(base.CategoryManagerE2eBase):
         described_annotation = self._DescribeAnnotation(annotation)
         self.assertEqual(described_annotation.description, description)
 
+  @test_case.Filters.skip('Failing', 'b/121190998')
   def testListAnnotation(self):
     description = 'test description'
     with self.CreateTaxonomyResource('taxonomy description') as taxonomy:

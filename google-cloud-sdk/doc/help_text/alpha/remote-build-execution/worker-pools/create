@@ -1,0 +1,83 @@
+NAME
+    gcloud alpha remote-build-execution worker-pools create - create a worker
+        pool in the specified instance
+
+SYNOPSIS
+    gcloud alpha remote-build-execution worker-pools create
+        (WORKERPOOL : --instance=INSTANCE) --worker-count=WORKER_COUNT
+        [--async] [--disk-size=DISK_SIZE; default=200]
+        [--machine-type=MACHINE_TYPE; default="n1-standard-2"]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a worker pool in the specified instance.
+
+POSITIONAL ARGUMENTS
+     Workerpool resource - Arguments and flags specifying the worker pool you
+     want to create. The arguments in this group can be used to specify the
+     attributes of this resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [workerpool] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
+
+       WORKERPOOL
+          ID of the workerpool or fully qualified identifier for the
+          workerpool. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --instance=INSTANCE
+          Instance name.
+
+REQUIRED FLAGS
+     --worker-count=WORKER_COUNT
+        Number of workers that should be in the worker pool.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --disk-size=DISK_SIZE; default=200
+        Size of the disk, in Gb, for each worker. Defaults to 200Gb.
+
+     --machine-type=MACHINE_TYPE; default="n1-standard-2"
+        Type of VM to use for each worker. To get a list of valid machine
+        types, use the following command:
+
+        $ gcloud compute machine-types list
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the remotebuildexecution/v1alpha API. The full
+    documentation for this API can be found at:
+    https://cloud.google.com/remote-build-execution/docs/
+
+EXAMPLES
+    The following command creates a worker pool called 'pool1' in the instance
+    called 'default_instance' with 25 workers configured with default machine
+    type (n1-standard-2) and disk size (200Gb):
+
+        $ gcloud alpha remote-build-execution worker-pools create pool1 \
+            --instance=default_instance --worker-count=25
+
+    The following command creates a worker pool called 'heftypool' in the
+    instance called 'default_instance' with 5 workers configured with 64 cores
+    and 2000Gb disks:
+
+        $ gcloud alpha remote-build-execution worker-pools create \
+            heftypool --instance=default_instance --worker-count=5 \
+            --disk-size=2000 --machine-type=n1-standard-64
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

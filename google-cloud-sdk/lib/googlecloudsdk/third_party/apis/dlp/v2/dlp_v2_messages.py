@@ -1445,9 +1445,9 @@ class GooglePrivacyDlpV2CreateStoredInfoTypeRequest(_messages.Message):
 class GooglePrivacyDlpV2CryptoHashConfig(_messages.Message):
   r"""Pseudonymization method that generates surrogates via cryptographic
   hashing. Uses SHA-256. The key size must be either 32 or 64 bytes. Outputs a
-  32 byte digest as an uppercase hex string (for example,
-  41D1567F7F99F1DC2A5FAB886DEE5BEE). Currently, only string and integer values
-  can be hashed.
+  base64 encoded representation of the hashed output (for example,
+  L7k0BHmF1ha5U3NfGykjro4xWi1MPVQPjhMAZbSV9mM=). Currently, only string and
+  integer values can be hashed.
 
   Fields:
     cryptoKey: The key used by the hash function.
@@ -2170,8 +2170,13 @@ class GooglePrivacyDlpV2FileSet(_messages.Message):
     regexFileSet: The regex-filtered set of files to scan. Exactly one of
       `url` or `regex_file_set` must be set.
     url: The Cloud Storage url of the file(s) to scan, in the format
-      `gs://<bucket>/<path>`. Trailing wildcard in the path is allowed.
-      Exactly one of `url` or `regex_file_set` must be set.
+      `gs://<bucket>/<path>`. Trailing wildcard in the path is allowed.  If
+      the url ends in a trailing slash, the bucket or directory represented by
+      the url will be scanned non-recursively (content in sub-directories will
+      not be scanned). This means that `gs://mybucket/` is equivalent to
+      `gs://mybucket/*`, and `gs://mybucket/directory/` is equivalent to
+      `gs://mybucket/directory/*`.  Exactly one of `url` or `regex_file_set`
+      must be set.
   """
 
   regexFileSet = _messages.MessageField('GooglePrivacyDlpV2CloudStorageRegexFileSet', 1)

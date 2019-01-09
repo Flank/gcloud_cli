@@ -8,9 +8,10 @@ SYNOPSIS
           | --enable-autoscaling | --enable-binauthz
           | --enable-legacy-authorization | --enable-master-authorized-networks
           | --enable-network-policy | --enable-pod-security-policy
-          | --generate-password | --maintenance-window=MAINTENANCE_WINDOW
-          | --remove-labels=[KEY,...] | --security-profile=SECURITY_PROFILE
-          | --set-password | --start-credential-rotation | --start-ip-rotation
+          | --enable-vertical-pod-autoscaling | --generate-password
+          | --maintenance-window=MAINTENANCE_WINDOW | --remove-labels=[KEY,...]
+          | --security-profile=SECURITY_PROFILE | --set-password
+          | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
           | --update-labels=[KEY=VALUE,...] | --additional-zones=[ZONE,...]
           | --node-locations=ZONE,[ZONE,...]
@@ -89,8 +90,9 @@ REQUIRED FLAGS
               2) Google Compute Engine Public IPs if `--enable-private-nodes` is not
               specified.
 
-          When disabled, public internet (0.0.0.0/0) is allowed to connect to
-          Kubernetes master through HTTPS.
+          Use --no-enable-master-authorized-networks to disable. When disabled,
+          public internet (0.0.0.0/0) is allowed to connect to Kubernetes
+          master through HTTPS.
 
        --enable-network-policy
           Enable network policy enforcement for this cluster. If you are
@@ -104,6 +106,9 @@ REQUIRED FLAGS
           create and update authorization controls through the
           PodSecurityPolicy API objects. For more information, see
           https://cloud.google.com/kubernetes-engine/docs/how-to/pod-security-policies.
+
+       --enable-vertical-pod-autoscaling
+          Enables vertical pod autoscaling for a cluster.
 
        --generate-password
           Ask the server to generate a secure password and use that as the

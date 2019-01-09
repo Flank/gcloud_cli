@@ -11,7 +11,7 @@ gcloud alpha compute instances create \- create Google Compute Engine virtual ma
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-vm\-integrity\-monitoring\fR] [\fB\-\-shielded\-vm\-secure\-boot\fR] [\fB\-\-shielded\-vm\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-allocation\-affinity\fR=\fIALLOCATION_AFFINITY\fR;\ default="any"\ \fB\-\-allocation\-label\fR=[\fIkey\fR=\fIKEY\fR],[\fIvalue\fR=\fIVALUE\fR]] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-dns\fR\ |\ \fB\-\-no\-public\-dns\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-enable\-display\-device\fR] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-vm\-integrity\-monitoring\fR] [\fB\-\-shielded\-vm\-secure\-boot\fR] [\fB\-\-shielded\-vm\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-allocation\-affinity\fR=\fIALLOCATION_AFFINITY\fR;\ default="any"\ \fB\-\-allocation\-label\fR=[\fIkey\fR=\fIKEY\fR],[\fIvalue\fR=\fIVALUE\fR]] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-dns\fR\ |\ \fB\-\-no\-public\-dns\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -306,6 +306,11 @@ region as the instance. The default value for this is \f5\fIzonal\fR\fR.
 .RE
 .sp
 .TP 2m
+\fB\-\-enable\-display\-device\fR
+Enable a display device for instances using a Windows image. Disabled by
+default.
+
+.TP 2m
 \fB\-\-hostname\fR=\fIHOSTNAME\fR
 Specify the hostname of the instance to be created. The specified homename must
 be RFC1035 compliant. If hostname is not specified, the default hostname is
@@ -568,9 +573,12 @@ specified subnet must be a subnetwork of network specified by \-\-network.
 
 .TP 2m
 \fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]
-Specifies a list of tags to apply to the instances for identifying the instances
-to which network firewall rules will apply. See \fBgcloud compute
-firewall\-rules create\fR(1) for more details.
+Specifies a list of tags to apply to the instance. These tags allow network
+firewall rules and routes to be applied to specified VM instances. See \fBgcloud
+compute firewall\-rules create\fR(1) for more details.
+
+To read more about configuring network tags, read this guide:
+https://cloud.google.com/vpc/docs/add\-remove\-network\-tags
 
 To list instances with their respective status and tags, run:
 
@@ -985,9 +993,9 @@ At most one of these may be specified:
 \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
 A service account is an identity attached to the instance. Its access tokens can
 be accessed through the instance metadata server and are used to authenticate
-applications on the instance. The account can be either an email address or an
-alias corresponding to a service account. You can explicitly specify the Compute
-Engine default service account using the 'default' alias.
+applications on the instance. The account can be set using an email address
+corresponding to the required service account. You can explicitly specify the
+Compute Engine default service account using the 'default' alias.
 
 If not provided, the instance will get project's default service account.
 

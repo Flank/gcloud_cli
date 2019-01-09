@@ -1,0 +1,88 @@
+title: remote-build-execution instances create test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      remote-build-execution instances create new_instance
+  - stderr: |
+      Create request issued for: [new_instance]
+  - progress_tracker:
+    - message: Waiting for operation [create_operation_id]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created instance [new_instance].
+actions:
+- execute_command:
+    command: |
+      remote-build-execution instances create new_instance
+    events:
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/fake-project/instances?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              instance:
+                location: us-central1
+              instanceId: new_instance
+              parent: projects/fake-project
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/operations/create_operation_id",
+              "metadata": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_stderr: |
+        Create request issued for: [new_instance]
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/fake-project/operations/create_operation_id?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/operations/create_operation_id",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.Instance",
+                "name": "projects/fake-project/instances/new_instance",
+                "location": "us-central1",
+                "state": "RUNNING"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [create_operation_id]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/fake-project/instances/new_instance?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/instances/new_instance",
+              "location": "us-central1",
+              "state": "RUNNING"
+            }
+
+
+    - expect_stderr: |
+        Created instance [new_instance].
+    - expect_exit:
+        code: 0

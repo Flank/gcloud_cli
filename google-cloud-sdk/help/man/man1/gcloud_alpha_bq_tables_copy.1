@@ -1,0 +1,123 @@
+
+.TH "GCLOUD_ALPHA_BQ_TABLES_COPY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha bq tables copy \- copy one BigQuery table to another
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha bq tables copy\fR (\fB\-\-destination\fR=\fIDESTINATION\fR\ :\ \fB\-\-destination\-dataset\fR=\fIDESTINATION_DATASET\fR) (\fB\-\-source\fR=\fISOURCE\fR\ :\ \fB\-\-source\-dataset\fR=\fISOURCE_DATASET\fR) [\fB\-\-async\fR] [\fB\-\-job\-id\fR=\fIJOB_ID\fR] [\fB\-\-overwrite\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha bq tables copy\fR Copies one BigQuery table to
+another.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Table resource \- The destination to copy to. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [\-\-destination] on the command line with a
+fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+ID of the table or fully qualified identifier for the table. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-destination\-dataset\fR=\fIDESTINATION_DATASET\fR
+The id of the BigQuery dataset.
+
+.RE
+.sp
+.TP 2m
+
+Table resource \- The source to copy from. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [\-\-source] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+ID of the table or fully qualified identifier for the table. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-source\-dataset\fR=\fISOURCE_DATASET\fR
+The id of the BigQuery dataset.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-job\-id\fR=\fIJOB_ID\fR
+A unique job ID to use for the request. If not specified a unique job id will be
+generated.
+
+.TP 2m
+\fB\-\-overwrite\fR
+Overwrite if the resource already exists.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
+\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
+gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following copies table \f5my\-table\fR to table \f5my\-other\-table\fR, in
+dataset \f5my\-dataset\fR overwriting destination if it exists:
+
+.RS 2m
+$ gcloud alpha bq tables copy \-\-source my\-table \e
+    \-\-destination my\-other\-table \-\-source\-dataset my\-dataset \e
+    \-\-overwrite
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

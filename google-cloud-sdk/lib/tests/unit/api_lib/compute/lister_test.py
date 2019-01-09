@@ -728,6 +728,57 @@ class ParseZonalFlagsTests(cli_test_base.CliTestBase):
     self.assertIsNone(frontend.max_results)
     self.assertEqual(frontend.scope_set, lister.ZoneSet([zone1, zone2]))
 
+  def testComplexWithFilter(self):
+    resource_registry = resources.REGISTRY.Clone()
+    resource_registry.RegisterApiByName('compute', 'v1')
+
+    args = MockArgs(
+        filter='(zone :(my-zone-1 my-zone-2))',
+        page_size=None,
+        limit=None,
+        names=None,
+        regexp=None,
+        zones=None,
+    )
+
+    zone1 = resource_registry.Parse(
+        'https://www.googleapis.com/compute/v1/projects/'
+        'lister-project/zones/my-zone-1')
+
+    zone2 = resource_registry.Parse(
+        'https://www.googleapis.com/compute/v1/projects/'
+        'lister-project/zones/my-zone-2')
+
+    frontend = lister.ParseZonalFlags(args, resource_registry)
+
+    self.assertEqual(frontend.filter, None)
+    self.assertIsNone(frontend.max_results)
+    self.assertEqual(frontend.scope_set, lister.ZoneSet([zone1, zone2]))
+
+  def testComplexWithFilterWithORClause(self):
+    resource_registry = resources.REGISTRY.Clone()
+    resource_registry.RegisterApiByName('compute', 'v1')
+
+    project = resource_registry.Parse(
+        'https://www.googleapis.com/compute/v1/projects/lister-project')
+
+    args = MockArgs(
+        filter='(zone :(my-zone-1 my-zone-2) OR name:*)',
+        page_size=None,
+        limit=None,
+        names=None,
+        regexp=None,
+        zones=None,
+    )
+
+    frontend = lister.ParseZonalFlags(args, resource_registry)
+
+    self.assertEqual(frontend.filter, None)
+    self.assertIsNone(frontend.max_results)
+    self.assertEqual(frontend.scope_set,
+                     lister.AllScopes(
+                         projects=[project], zonal=True, regional=False))
+
 
 class ParseRegionalFlagsTests(cli_test_base.CliTestBase):
 

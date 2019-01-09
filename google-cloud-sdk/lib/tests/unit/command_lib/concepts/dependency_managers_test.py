@@ -23,7 +23,6 @@ from googlecloudsdk.command_lib.concepts import dependency_managers
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.command_lib.concepts import concepts_test_base
-from tests.lib.command_lib.concepts import test_concepts
 from tests.lib.core import core_completer_test_base
 
 
@@ -51,14 +50,10 @@ class DependencyManagerTest(concepts_test_base.ConceptArgsTestBase):
               'second_bar': 'b'})
 
     result = dependency_manager.ParseConcept(mock_namespace)
-
-    expected = test_concepts.Baz(
-        test_concepts.FooBar(foo='x', bar='y'),
-        test_concepts.FooBar(foo='a', bar='b'))
-    self.assertEqual(expected.first.foo, result.first.foo)
-    self.assertEqual(expected.first.bar, result.first.bar)
-    self.assertEqual(expected.second.foo, result.second.foo)
-    self.assertEqual(expected.second.bar, result.second.bar)
+    self.assertEqual('x', result.first.foo)
+    self.assertEqual('y', result.first.bar)
+    self.assertEqual('a', result.second.foo)
+    self.assertEqual('b', result.second.bar)
 
   def testRecursiveParsingWithFallthroughs(self):
     properties.VALUES.core.project.Set('ft')
@@ -71,13 +66,10 @@ class DependencyManagerTest(concepts_test_base.ConceptArgsTestBase):
 
     result = dependency_manager.ParseConcept(mock_namespace)
 
-    expected = test_concepts.Baz(
-        test_concepts.FooBar(foo='ft', bar='y'),
-        test_concepts.FooBar(foo='ft', bar='b'))
-    self.assertEqual(expected.first.foo, result.first.foo)
-    self.assertEqual(expected.first.bar, result.first.bar)
-    self.assertEqual(expected.second.foo, result.second.foo)
-    self.assertEqual(expected.second.bar, result.second.bar)
+    self.assertEqual('ft', result.first.foo)
+    self.assertEqual('y', result.first.bar)
+    self.assertEqual('ft', result.second.foo)
+    self.assertEqual('b', result.second.bar)
 
 
 class DependencyNodeTest(concepts_test_base.ConceptArgsTestBase):

@@ -392,7 +392,7 @@ class IntegerTest(ConceptParseViewBase):
         exception_regex=(r"Failed to parse \[--int\]. Invalid literal for "
                          r"int\(\) with base 10: 'unlimited'.")),
       T('Required', None, None, None,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=r'hinthinthint'),
       T('InvalidFromArg', 'xyz', None, None,
         exception=exceptions.ParseError,
@@ -458,7 +458,8 @@ class IntegerTest(ConceptParseViewBase):
       T('NoNameGivenPositional', None, True, 'INT'),
   )
   def testGetPresentationNone(self, name, positional, expected_name):
-    with self.assertRaisesRegex(ValueError, 'Concept name required.'):
+    with self.assertRaisesRegex(exceptions.InitializationError,
+                                'Concept name required.'):
       concepts.Integer(name, positional=positional, help_text='h')
 
 
@@ -556,7 +557,7 @@ class ScaledIntegerTest(ConceptParseViewBase):
                          r'\[kB,kiB,MB,MiB,GB,GiB,TB,TiB,PB,PiB\].')),
 
       T('Required', None, None, None,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=r'hinthinthint'),
       T('InvalidFromArg', 'xyz', None, None,
         exception=exceptions.ParseError,
@@ -666,7 +667,7 @@ class ScaledIntegerTest(ConceptParseViewBase):
                          r'\[kB,kiB,MB,MiB,GB,GiB,TB,TiB,PB,PiB\].')),
 
       T('Required', None, None, None,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=r'hinthinthint'),
       T('InvalidFromArg', 'xyz', None, None,
         exception=exceptions.ParseError,
@@ -781,7 +782,7 @@ class FloatTest(ConceptParseViewBase):
                          r'floating point number \[unlimited\]: Could not '
                          r"convert string to float: '?unlimited'?.")),
       T('Required', None, None, None,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=r'hinthinthint'),
       T('InvalidFromArg', 'xyz', None, None,
         exception=exceptions.ParseError,
@@ -823,7 +824,7 @@ class DayOfWeekTest(ConceptParseViewBase):
       T('ConvertFromArgs', 'Sunday', None, 'SUN'),
       T('ConvertFromFallthrough', None, 'Sunday', 'SUN'),
       T('Required', None, None, None,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=r'hinthinthint'),
       T('InvalidFromArg', 'xyz', None, None,
         exception=exceptions.ParseError,
@@ -902,7 +903,8 @@ class DayOfWeekTest(ConceptParseViewBase):
       T('NoNameGivenPositional', None, True, 'DAY'),
   )
   def testGetPresentationNone(self, name, positional, expected_name):
-    with self.assertRaisesRegex(ValueError, 'Concept name required.'):
+    with self.assertRaisesRegex(exceptions.InitializationError,
+                                'Concept name required.'):
       concepts.DayOfWeek(name, positional=positional, help_text='h')
 
 
@@ -973,7 +975,7 @@ class DurationTest(ConceptParseViewBase):
                          r"Failed to parse duration \[xyz\]: Duration unit "
                          r"'xyz' must be preceded by a number.")),
       T('Required', None, None, None,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=r'hinthinthint'),
       T('InvalidFromArg', 'xyz', None, None,
         exception=exceptions.ParseError,
@@ -1090,7 +1092,7 @@ class TimeStampTest(ConceptParseViewBase):
                          r'Failed to parse duration \[xyz\]: Unknown string '
                          'format.')),
       T('Required', None, None, None,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=r'hinthinthint'),
       T('InvalidFromArg', 'xyz', None, None,
         exception=exceptions.ParseError,
@@ -1225,7 +1227,7 @@ class SemVerTest(ConceptParseViewBase):
         exception_regex=(r'Invalid max endpoint \[xyz\] for \[--version\]. The '
                          r'value is not a valid SemVer string: \[xyz.0.0\].')),
       T('Required', None, None, None,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=r'hinthinthint'),
       T('InvalidFromArg', 'abc', None, None,
         exception=exceptions.ParseError,
@@ -1293,7 +1295,7 @@ class ListTest(ConceptParseArgsBase):
         min_endpoint=concepts.Endpoint(1),
         max_endpoint=concepts.Endpoint(1),
         required=True,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=('No value was provided for \\[--list\\]: Failed to '
                          'find attribute. The attribute can be set in the '
                          'following ways:')),
@@ -1358,7 +1360,7 @@ class ListTest(ConceptParseArgsBase):
         min_endpoint=concepts.Endpoint(1),
         max_endpoint=concepts.Endpoint(1),
         required=True,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=('No value was provided for \\[--sizes\\]: Failed to '
                          'find attribute. The attribute can be set in the '
                          'following ways:')),
@@ -1461,7 +1463,7 @@ class DictTest(ConceptParseArgsBase):
         min_endpoint=concepts.Endpoint(1),
         max_endpoint=concepts.Endpoint(1),
         required=True,
-        exception=exceptions.MissingRequiredArgumentException,
+        exception=exceptions.MissingRequiredArgumentError,
         exception_regex=('No value was provided for \\[--dict\\]: Failed to '
                          'find attribute. The attribute can be set in the '
                          'following ways:')),

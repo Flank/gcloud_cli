@@ -22,7 +22,8 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add an IAM policy binding to an instance template.
+        (BETA) Add IAM policy binding to a Google Compute Engine instance
+        template.
 
      create
         (BETA) Create a Compute Engine virtual machine instance template.
@@ -45,7 +46,8 @@ COMMANDS
         (BETA) List Google Compute Engine instance templates.
 
      remove-iam-policy-binding
-        (BETA) Remove an IAM policy binding from an instance template.
+        (BETA) Remove IAM policy binding of a Google Compute Engine instance
+        template.
 
      set-iam-policy
         (BETA) Set the IAM policy for a Google Compute Engine instance

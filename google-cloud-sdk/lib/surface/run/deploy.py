@@ -39,33 +39,18 @@ class Deploy(base.Command):
           Deploys container images to Google Cloud Run.
           """,
       'EXAMPLES': """\
-          To deploy an app to the service my-backend, navigate to the app's
-          source directory, and run:
+          To deploy a container to the service `my-backend` on Cloud Run:
 
-              $ {command} my-backend
-
-          To deploy a function named my_func, defined in ./index.js:
-
-              $ {command} my_func --function
-
-          To deploy a container, run:
-
-              $ {command} my-custom-app --image gcr.io/my/image
+              $ {command} my-backend --image gcr.io/my/image
 
           You may also omit the service name. Then a prompt will be displayed
           with a suggested default value:
 
-              $ {command}
+              $ {command} --image gcr.io/my/image
 
-          The first time you deploy, gcloud will ask for a destination region,
-          and will offer to save it as a default. To view the current default,
-          run:
+          To deploy to Cloud Run on Kubernetes Engine, you need to specify a cluster:
 
-              $ gcloud config get-value run/region
-
-          To override the default region, you may use the --region flag:
-
-              $ {command} --region us-east
+              $ {command} --image gcr.io/my/image --cluster my-cluster
           """,
   }
 
@@ -96,28 +81,35 @@ class Deploy(base.Command):
     conn_context = connection_context.GetConnectionContext(args)
     service_ref = flags.GetService(args)
     function_entrypoint = flags.GetFunction(args.function)
-    msg = ('Deploying {dep_type} to service [{{bold}}{{service}}{{reset}}]'
-           ' in {ns_label} [{{bold}}{{ns}}{{reset}}]')
+    msg = ('Deploying {dep_type} to {operator} '
+           'service [{{bold}}{service}{{reset}}]'
+           ' in {ns_label} [{{bold}}{ns}{{reset}}]')
 
     msg += conn_context.location_label
 
     if function_entrypoint:
-      pretty_print.Info(
-          msg.format(ns_label=conn_context.ns_label,
-                     dep_type='function [{bold}{function}{reset}]'),
+      dep_type = 'function [{{bold}}{}{{reset}}]'.format(function_entrypoint)
+      pretty_print.Info(msg.format(
+          operator=conn_context.operator,
+          ns_label=conn_context.ns_label,
+          dep_type=dep_type,
           function=function_entrypoint,
           service=service_ref.servicesId,
-          ns=service_ref.namespacesId)
+          ns=service_ref.namespacesId))
     elif source_ref.source_type is source_ref.SourceType.IMAGE:
       pretty_print.Info(msg.format(
-          ns_label=conn_context.ns_label, dep_type='container'),
-                        service=service_ref.servicesId,
-                        ns=service_ref.namespacesId)
+          operator=conn_context.operator,
+          ns_label=conn_context.ns_label,
+          dep_type='container',
+          service=service_ref.servicesId,
+          ns=service_ref.namespacesId))
     else:
       pretty_print.Info(msg.format(
-          ns_label=conn_context.ns_label, dep_type='app'),
-                        service=service_ref.servicesId,
-                        ns=service_ref.namespacesId)
+          operator=conn_context.operator,
+          ns_label=conn_context.ns_label,
+          dep_type='app',
+          service=service_ref.servicesId,
+          ns=service_ref.namespacesId))
 
     with serverless_operations.Connect(conn_context) as operations:
       if not (source_ref.source_type is source_ref.SourceType.IMAGE
@@ -133,8 +125,9 @@ class Deploy(base.Command):
       url = operations.GetServiceUrl(service_ref)
       conf = operations.GetConfiguration(service_ref)
 
-    msg = ('{{bold}}Service [{serv}] revision [{rev}] has been deployed'
-           ' and is serving traffic at{{reset}} {url}')
+    msg = (
+        'Service [{{bold}}{serv}{{reset}}] revision [{{bold}}{rev}{{reset}}] '
+        'has been deployed and is serving traffic at {{bold}}{url}{{reset}}')
     msg = msg.format(
         serv=service_ref.servicesId,
         rev=conf.status.latestReadyRevisionName,

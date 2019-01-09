@@ -20,16 +20,12 @@ gcloud beta compute instance\-groups managed set\-autohealing \- set autohealing
 \fB(BETA)\fR \fBgcloud beta compute instance\-groups managed set\-autohealing\fR
 updates the autohealing policy for an existing managed instance group.
 
-If \-\-http\-health\-check or \-\-https\-health\-check is specified, the
-resulting autohealing policy will be triggered by the health\-check i.e. the
-autohealing action (RECREATE) on an instance will be performed if the
-health\-check signals that the instance is UNHEALTHY. If neither
-\-\-http\-health\-check nor \-\-https\-health\-check is specified, the resulting
-autohealing policy will be triggered by instance's status i.e. the autohealing
-action (RECREATE) on an instance will be performed if the instance.status is not
-RUNNING. \-\-initial\-delay specifies the length of the period during which IGM
-will refrain from autohealing the instance even if the instance is reported as
-not RUNNING or UNHEALTHY. This value must be from range [0, 3600].
+If health check is specified, the resulting autohealing policy will be triggered
+by the health\-check signal i.e. the autohealing action (RECREATE) on an
+instance will be performed if the health\-check signals that the instance is
+UNHEALTHY. If no health check is specified, the resulting autohealing policy
+will be triggered by instance's status i.e. the autohealing action (RECREATE) on
+an instance will be performed if the instance.status is not RUNNING.
 
 
 
@@ -65,13 +61,17 @@ Name of the health check to operate on.
 
 .TP 2m
 \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR
-Specifies the HTTP health check object used for autohealing instances in this
-group.
+(DEPRECATED) Specifies the HTTP health check object used for autohealing
+instances in this group.
+
+HttpHealthCheck is deprecated. Use \-\-health\-check instead.
 
 .TP 2m
 \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR
-Specifies the HTTPS health check object used for autohealing instances in this
-group.
+(DEPRECATED) Specifies the HTTPS health check object used for autohealing
+instances in this group.
+
+HttpsHealthCheck is deprecated. Use \-\-health\-check instead.
 
 .RE
 .sp

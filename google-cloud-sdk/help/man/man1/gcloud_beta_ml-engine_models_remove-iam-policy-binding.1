@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta ml\-engine models remove\-iam\-policy\-binding \- remove a policy binding from a model
+gcloud beta ml\-engine models remove\-iam\-policy\-binding \- remove IAM policy binding from a ML model
 
 
 
@@ -17,10 +17,7 @@ gcloud beta ml\-engine models remove\-iam\-policy\-binding \- remove a policy bi
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Removes an IAM policy binding from the given model.
-
-See https://cloud.google.com/iam/docs/managing\-policies for details of policy
-role and member types.
+\fB(BETA)\fR Remove an IAM policy binding from a ML model.
 
 
 
@@ -28,10 +25,21 @@ role and member types.
 
 .RS 2m
 .TP 2m
+
+Model resource \- The model for which to remove IAM policy binding from. This
+represents a Cloud resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [model] on the command line with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
 \fIMODEL\fR
-Name of the model.
+ID of the model or fully qualified identifier for the model.
 
 
+.RE
 .RE
 .sp
 
@@ -77,16 +85,25 @@ gcloud help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBml/v1\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/ml/
+
+
+
 .SH "EXAMPLES"
 
-The following command will remove an IAM policy binding for the role of
-\'roles/editor' for the user 'test\-user@gmail.com' on the model \f5my_model\fR:
+To Remove an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' with model 'my_model', run:
 
 .RS 2m
 $ gcloud beta ml\-engine models remove\-iam\-policy\-binding my_model \e
-    \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/editor'
+    \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
 .RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
 
 
 

@@ -183,6 +183,15 @@ class KubeconfigTestGA(base.GATestBase, base.UnitTestBase):
     with open(env_path, 'r') as fp:
       self.assertEqual(fp.read(), _EMPTY_KUBECONFIG)
 
+  def testDefaultPath_MultiPathsInEnv(self):
+    env_path1 = os.path.join(file_utils.GetHomeDir(), 'one_kubeconfig')
+    os.environ['KUBECONFIG'] = env_path1
+    self.assertEqual(kconfig.Kubeconfig.DefaultPath(), env_path1)
+
+    env_path2 = os.path.join(file_utils.GetHomeDir(), 'another_kubeconfig')
+    os.environ['KUBECONFIG'] = os.pathsep.join([env_path2, env_path1])
+    self.assertEqual(kconfig.Kubeconfig.DefaultPath(), env_path2)
+
   @test_case.Filters.DoNotRunOnWindows
   def testDefaultPathNix(self):
     self.StartDictPatch('os.environ',

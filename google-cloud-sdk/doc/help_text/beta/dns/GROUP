@@ -35,6 +35,9 @@ GROUPS
      operations
         (BETA) Manage your Cloud DNS operations.
 
+     policies
+        (BETA) Manage your Cloud DNS policies.
+
      project-info
         (BETA) View Cloud DNS related information for a project.
 

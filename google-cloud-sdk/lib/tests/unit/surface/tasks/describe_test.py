@@ -60,7 +60,7 @@ class TasksDescribeTest(test_base.CloudTasksTestBase):
                                                             self.queue_id))
 
     self.assertEqual(expected, actual)
-    self.resolve_loc_mock.assert_called_once_with()
+    self.resolve_loc_mock.assert_called_once_with(parsers.ParseProject())
 
   def testDescribe_RelativeName(self):
     task_name = ('projects/other-project/locations/us-central1/queues/my-queue'

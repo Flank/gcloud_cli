@@ -264,8 +264,20 @@ project, you can use this property to specify the alternate project.
 
 .RS 2m
 .TP 2m
+\fBkaniko_cache_ttl\fR
+TTL, in hours, of cached layers when using Kaniko. If zero, layer caching is
+disabled.
+
+
+.TP 2m
 \fBtimeout\fR
 Timeout, in seconds, to wait for builds to complete.
+
+
+.TP 2m
+\fBuse_kaniko\fR
+If True, kaniko will be used to build images described by a Dockerfile, instead
+of \f5docker build\fR.
 
 
 .RE

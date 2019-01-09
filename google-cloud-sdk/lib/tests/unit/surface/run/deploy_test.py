@@ -48,6 +48,7 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
                                           return_value=self.env_changes)
 
   def _AssertSuccessMessage(self, serv):
+    self.AssertErrContains('to Cloud Run')
     self.AssertErrContains(
         'Service [{serv}] revision [{rev}] has been deployed '
         'and is serving traffic at {url}'.format(

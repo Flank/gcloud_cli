@@ -844,6 +844,7 @@ def ValidateCreateDiskFlags(args, enable_snapshots=False):
     image_value = disk.get('image')
     image_family_value = disk.get('image-family')
     source_snapshot = disk.get('source-snapshot')
+
     disk_source = set()
     if image_value:
       disk_source.add(image_value)
@@ -862,6 +863,14 @@ def ValidateCreateDiskFlags(args, enable_snapshots=False):
           'These fields are mutually exclusive.')
     if len(disk_source) > 1:
       raise exceptions.ToolException(source_error_message)
+
+
+def ValidateImageFlags(args):
+  """Validates the image flags."""
+  if args.image_project and not (args.image or args.image_family):
+    raise exceptions.ToolException(
+        'Must specify either [--image] or [--image-family] when specifying '
+        '[--image-project] flag.')
 
 
 def AddAddressArgs(parser,
@@ -1088,9 +1097,10 @@ def AddServiceAccountAndScopeArgs(parser, instance_exists,
   service_account_help = """\
   A service account is an identity attached to the instance. Its access tokens
   can be accessed through the instance metadata server and are used to
-  authenticate applications on the instance. The account can be either an email
-  address or an alias corresponding to a service account. You can explicitly
-  specify the Compute Engine default service account using the 'default' alias.
+  authenticate applications on the instance. The account can be set using an
+  email address corresponding to the required service account. You can
+  explicitly specify the Compute Engine default service account using the
+  'default' alias.
 
   If not provided, the instance will {0}.
   """.format(sa_exists if instance_exists else sa_not_exists)
@@ -1160,6 +1170,17 @@ def AddNetworkTierArgs(parser, instance=True, for_update=False):
       '--network-tier',
       type=lambda x: x.upper(),
       help=network_tier_help)
+
+
+def AddDisplayDeviceArg(parser, is_update=False):
+  """Adds public DNS arguments for instance or access configuration."""
+  display_help = 'Enable a display device for instances using a Windows image.'
+  if not is_update:
+    display_help += ' Disabled by default.'
+  parser.add_argument(
+      '--enable-display-device',
+      action=arg_parsers.StoreTrueFalseAction if is_update else 'store_true',
+      help=display_help)
 
 
 def AddPublicDnsArgs(parser, instance=True):
@@ -1313,10 +1334,12 @@ def AddTagsArgs(parser):
       type=arg_parsers.ArgList(min_length=1),
       metavar='TAG',
       help="""\
-      Specifies a list of tags to apply to the instances for
-      identifying the instances to which network firewall rules will
-      apply. See gcloud_compute_firewall-rules_create(1) for more
-      details.
+      Specifies a list of tags to apply to the instance. These tags allow
+      network firewall rules and routes to be applied to specified VM instances.
+      See gcloud_compute_firewall-rules_create(1) for more details.
+
+      To read more about configuring network tags, read this guide:
+      https://cloud.google.com/vpc/docs/add-remove-network-tags
 
       To list instances with their respective status and tags, run:
 

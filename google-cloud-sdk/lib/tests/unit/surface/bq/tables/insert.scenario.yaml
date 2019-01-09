@@ -1,0 +1,48 @@
+title: Insert rows into a BigQuery Table
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      bq tables insert projects/fake-project/datasets/my_dataset/tables/my_table --data data.json
+  - stdout: |
+      kind: bigquery#tableDataInsertAllResponse
+actions:
+- write_file:
+    path: data.json
+    contents: |
+      [
+        {"col1": "value1", "col2": false},
+        {"col1": "value2", "col2": true},
+        {"col1": "value3", "col2": false},
+        {"col1": "value4", "col2": true},
+        {"col1": "value5", "col2": false},
+      ]
+- execute_command:
+    command: |
+      bq tables insert projects/fake-project/datasets/my_dataset/tables/my_table --data data.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table/insertAll?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              rows:
+              - json: {}
+              - json: {}
+              - json: {}
+              - json: {}
+              - json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#tableDataInsertAllResponse"
+            }
+    - expect_stdout: |
+        kind: bigquery#tableDataInsertAllResponse
+    - expect_exit:
+        code: 0

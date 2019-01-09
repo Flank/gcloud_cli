@@ -44,9 +44,10 @@ class SchemaTests(sdk_test_base.WithOutputCapture,
   """Tests of schema actions."""
 
   def SetUp(self):
+    temp_file = self.Touch(self.root_path)
     self.scenario_context = schema.ScenarioContext(
-        None, None, None, calliope_base.ReleaseTrack.GA, None, None, None, None,
-        None)
+        None, temp_file, None, calliope_base.ReleaseTrack.GA, None, [], None,
+        None, None)
 
   def testSetPropertyAction(self):
     a = schema.SetPropertyAction.FromData(
@@ -188,6 +189,23 @@ class SchemaTests(sdk_test_base.WithOutputCapture,
     self.assertEqual(
         self.scenario_context.resource_ref_resolver._references,
         {'foo': 'a', 'bar': 'b', 'empty': ''})
+
+  def testExecuteBinary(self):
+    data = {
+        'execute_binary': {
+            'args': ['echo', 'foo'],
+        }
+    }
+    a = schema.ExecuteBinaryAction.FromData(data)
+    self.scenario_context.update_modes = [updates.Mode.RESULT]
+    a.Execute(self.scenario_context)
+    self.assertEqual(data, {
+        'execute_binary': {
+            'args': ['echo', 'foo'],
+            'expect_exit': {'code': 0},
+            'expect_stdout': 'foo\n'
+        }
+    })
 
 
 class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,

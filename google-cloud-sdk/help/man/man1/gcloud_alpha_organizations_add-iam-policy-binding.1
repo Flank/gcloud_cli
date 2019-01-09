@@ -11,7 +11,7 @@ gcloud alpha organizations add\-iam\-policy\-binding \- add IAM policy binding f
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha organizations add\-iam\-policy\-binding\fR \fIORGANIZATION_ID\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha organizations add\-iam\-policy\-binding\fR \fIORGANIZATION\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,10 +27,17 @@ and an optional condition.
 
 .RS 2m
 .TP 2m
-\fIORGANIZATION_ID\fR
-ID for the organization to which you want to add a binding
+
+Organization resource \- The organization to add the IAM policy binding. This
+represents a Cloud resource. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIORGANIZATION\fR
+ID of the organization or fully qualified identifier for the organization.
 
 
+.RE
 .RE
 .sp
 
@@ -119,6 +126,13 @@ gcloud help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBcloudresourcemanager/v1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/resource\-manager
+
+
+
 .SH "EXAMPLES"
 
 To add an IAM policy binding for the role of 'roles/editor' for the user
@@ -127,8 +141,8 @@ To add an IAM policy binding for the role of 'roles/editor' for the user
 
 .RS 2m
 $ gcloud alpha organizations add\-iam\-policy\-binding \e
-    example\-organization\-id\-1 \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/editor'
+  example\-organization\-id\-1 \-\-member='user:test\-user@gmail.com' \e
+  \-\-role='roles/editor'
 .RE
 
 To add an IAM policy binding for the role of 'roles/editor' to the service
@@ -136,9 +150,9 @@ account 'test\-proj1@example.domain.com', run:
 
 .RS 2m
 $ gcloud alpha organizations add\-iam\-policy\-binding \e
-    test\-proj1@example.domain.com \e
-    \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
-    \-\-role='roles/editor'
+  test\-proj1@example.domain.com \e
+  \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
+  \-\-role='roles/editor'
 .RE
 
 To add an IAM policy binding for the role of 'roles/editor' for all
@@ -147,10 +161,9 @@ authenticated users on an organization with identifier
 
 .RS 2m
 $ gcloud alpha organizations add\-iam\-policy\-binding \e
-    example\-organization\-id\-1 \-\-member='allAuthenticatedUsers' \e
-    \-\-role='roles/editor'
+  example\-organization\-id\-1 \-\-member='allAuthenticatedUsers' \e
+  \-\-role='roles/editor'
 .RE
-
 
 To add an IAM policy binding which expires at the end of the year 2018 for the
 role of 'roles/browser' and the user 'test\-user@gmail.com' on an organization
@@ -158,10 +171,10 @@ with identifier 'example\-organization\-id\-1', run:
 
 .RS 2m
 $ gcloud alpha organizations add\-iam\-policy\-binding \e
-    example\-organization\-id\-1 \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/browser' \e
-    \-\-condition='expression=request.time <
- timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+  example\-organization\-id\-1 \-\-member='user:test\-user@gmail.com' \e
+  \-\-role='roles/browser' \e
+  \-\-condition='expression=request.time <
+timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
 tion=Expires at midnight on 2018\-12\-31'
 .RE
 

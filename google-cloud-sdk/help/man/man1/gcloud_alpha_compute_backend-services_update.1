@@ -106,8 +106,8 @@ failover backend(s). Not compatible with the \-\-global flag.
 .TP 2m
 \fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]
 Specifies a list of health check objects for checking the health of the backend
-service. Health checks need not be for the same protocol as that of the backend
-service.
+service. Currently at most one health check can be specified. Health checks need
+not be for the same protocol as that of the backend service.
 
 .TP 2m
 \fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]
@@ -149,7 +149,9 @@ service, and that name must exist as a service on all instance groups that are a
 part of this backend service. The port number associated with the name may
 differ between instances. If you do not specify this flag, your instance groups
 must have a service named \f5\fIhttp\fR\fR configured. See also \f5gcloud
-compute instance\-groups set\-named\-ports \-\-help\fR.
+compute instance\-groups set\-named\-ports \-\-help\fR. The
+\f5\fIport\-name\fR\fR parameter cannot be set if the load\-balancing\-scheme is
+INTERNAL.
 
 .TP 2m
 \fB\-\-protocol\fR=\fIPROTOCOL\fR
@@ -159,7 +161,7 @@ If the load\-balancing\-scheme is \f5INTERNAL\fR, the protocol must be one of:
 \f5TCP\fR, \f5UDP\fR.
 
 If the load\-balancing\-scheme is \f5EXTERNAL\fR, the protocol must be one of:
-\f5HTTP\fR, \f5HTTPS\fR, \f5HTTP2\fR, \f5SSL\fR, \f5TCP\fR, \f5UDP\fR.
+\f5HTTP\fR, \f5HTTPS\fR, \f5HTTP2\fR, \f5SSL\fR, \f5TCP\fR.
 
 .TP 2m
 \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
@@ -167,7 +169,8 @@ The security policy that will be set for this backend service.
 
 .TP 2m
 \fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR
-The type of session affinity to use. \fISESSION_AFFINITY\fR must be one of:
+The type of TCP session affinity to use. Not supported for UDP.
+\fISESSION_AFFINITY\fR must be one of:
 
 .RS 2m
 .TP 2m

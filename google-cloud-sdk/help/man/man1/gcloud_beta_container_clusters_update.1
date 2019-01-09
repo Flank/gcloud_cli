@@ -11,7 +11,7 @@ gcloud beta container clusters update \- update cluster settings for an existing
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ [\fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ :\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ [\fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ :\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -97,8 +97,9 @@ through HTTPS. Besides these blocks, the following have access as well:
 specified.
 .RE
 
-When disabled, public internet (0.0.0.0/0) is allowed to connect to Kubernetes
-master through HTTPS.
+Use \f5\-\-no\-enable\-master\-authorized\-networks\fR to disable. When
+disabled, public internet (0.0.0.0/0) is allowed to connect to Kubernetes master
+through HTTPS.
 
 .TP 2m
 \fB\-\-enable\-network\-policy\fR
@@ -113,6 +114,10 @@ security policy admission controller adds fine\-grained pod create and update
 authorization controls through the PodSecurityPolicy API objects. For more
 information, see
 https://cloud.google.com/kubernetes\-engine/docs/how\-to/pod\-security\-policies.
+
+.TP 2m
+\fB\-\-enable\-vertical\-pod\-autoscaling\fR
+Enables vertical pod autoscaling for a cluster.
 
 .TP 2m
 \fB\-\-generate\-password\fR

@@ -32,44 +32,11 @@ def _TransformAddressRange(resource):
   return address
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
 class List(base.ListCommand):
   """List addresses."""
 
   @staticmethod
   def Args(parser):
-    parser.display_info.AddFormat("""\
-        table(
-          name,
-          region.basename(),
-          address,
-          status
-        )""")
-    lister.AddMultiScopeListerFlags(parser, regional=True, global_=True)
-    parser.display_info.AddCacheUpdater(flags.AddressesCompleter)
-
-  def Run(self, args):
-    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    client = holder.client
-
-    request_data = lister.ParseMultiScopeFlags(args, holder.resources)
-
-    list_implementation = lister.MultiScopeLister(
-        client,
-        regional_service=client.apitools_client.addresses,
-        global_service=client.apitools_client.globalAddresses,
-        aggregation_service=client.apitools_client.addresses)
-
-    return lister.Invoke(request_data, list_implementation)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
-class ListBeta(List):
-  """List addresses."""
-
-  @staticmethod
-  def Args(parser):
-    """Override."""
     parser.display_info.AddFormat("""\
         table(
           name,
@@ -84,6 +51,20 @@ class ListBeta(List):
     lister.AddMultiScopeListerFlags(parser, regional=True, global_=True)
     parser.display_info.AddCacheUpdater(flags.AddressesCompleter)
     parser.display_info.AddTransforms({'address_range': _TransformAddressRange})
+
+  def Run(self, args):
+    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
+    client = holder.client
+
+    request_data = lister.ParseMultiScopeFlags(args, holder.resources)
+
+    list_implementation = lister.MultiScopeLister(
+        client,
+        regional_service=client.apitools_client.addresses,
+        global_service=client.apitools_client.globalAddresses,
+        aggregation_service=client.apitools_client.addresses)
+
+    return lister.Invoke(request_data, list_implementation)
 
 
 List.detailed_help = {
@@ -110,14 +91,8 @@ List.detailed_help = {
 
           $ {command} --global
 
-        To list all of the regional addresses in a project, run:
+        To list all of the addresses from the ``us-central1'' region, run:
 
-          $ {command} --regions
-
-        To list all of the addresses from the ``us-central1'' and the
-        ``europe-west1'' regions, run:
-
-          $ {command} --regions us-central1,europe-west1
+          $ {command} --filter=region:us-central1
         """,
-
 }

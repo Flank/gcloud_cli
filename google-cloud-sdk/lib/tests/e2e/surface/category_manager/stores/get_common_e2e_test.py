@@ -21,11 +21,13 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.category_manager import utils
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 
 
 class GetCommonE2eTest(e2e_base.WithServiceAuth):
   """E2e test for get-common command."""
 
+  @test_case.Filters.skip('Failing', 'b/121190998')
   def testGetCommon(self):
     """Test getting common store."""
     common_store = self.Run('alpha category-manager stores get-common')

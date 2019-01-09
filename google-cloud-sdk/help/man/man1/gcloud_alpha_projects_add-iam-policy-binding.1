@@ -141,8 +141,8 @@ run:
 
 .RS 2m
 $ gcloud alpha projects add\-iam\-policy\-binding \e
-  example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
-  \-\-role='roles/editor'
+    example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor'
 .RE
 
 To add an IAM policy binding for the role of 'roles/editor' to the service
@@ -150,9 +150,9 @@ account 'test\-proj1@example.domain.com', run:
 
 .RS 2m
 $ gcloud alpha projects add\-iam\-policy\-binding \e
-  test\-proj1@example.domain.com \e
-  \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
-  \-\-role='roles/editor'
+    test\-proj1@example.domain.com \e
+    \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
+    \-\-role='roles/editor'
 .RE
 
 To add an IAM policy binding for the role of 'roles/editor' for all
@@ -160,8 +160,8 @@ authenticated users on a project with identifier 'example\-project\-id\-1', run:
 
 .RS 2m
 $ gcloud alpha projects add\-iam\-policy\-binding \e
-  example\-project\-id\-1 \-\-member='allAuthenticatedUsers' \e
-  \-\-role='roles/editor'
+    example\-project\-id\-1 \-\-member='allAuthenticatedUsers' \e
+    \-\-role='roles/editor'
 .RE
 
 To add an IAM policy binding which expires at the end of the year 2018 for the
@@ -170,10 +170,10 @@ identifier 'example\-project\-id\-1', run:
 
 .RS 2m
 $ gcloud alpha projects add\-iam\-policy\-binding \e
-  example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
-  \-\-role='roles/browser' \e
-  \-\-condition='expression=request.time <
-timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+    example\-project\-id\-1 \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/browser' \e
+    \-\-condition='expression=request.time <
+ timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
 tion=Expires at midnight on 2018\-12\-31'
 .RE
 

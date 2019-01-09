@@ -27,6 +27,7 @@ import sys
 
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
@@ -137,6 +138,8 @@ class Scenario(object):
         yield DefineReferenceAction.FromData(a)
       elif 'execute_command_until' in a:
         yield ExecuteCommandUntilAction.FromData(a)
+      elif 'execute_binary' in a:
+        yield ExecuteBinaryAction.FromData(a)
       elif 'execute_command' in a:
         yield CommandExecutionAction.FromData(a)
       else:
@@ -253,17 +256,20 @@ class GenerateResourceIdAction(Action):
   def FromData(cls, data):
     action_data = data['generate_resource_id']
     return cls(action_data['reference'], action_data['prefix'],
-               action_data.get('requires_cleanup', True))
+               action_data.get('requires_cleanup', True),
+               action_data.get('delimiter', '-'))
 
-  def __init__(self, reference, prefix, requires_cleanup):
+  def __init__(self, reference, prefix, requires_cleanup, delimiter):
     self._reference = reference
     self._prefix = prefix
     self._requires_cleanup = requires_cleanup
+    self.delimiter = delimiter
 
   def Execute(self, scenario_context):
     scenario_context.resource_ref_resolver.AddGeneratedResourceId(
         self._reference,
-        next(e2e_utils.GetResourceNameGenerator(prefix=self._prefix)),
+        next(e2e_utils.GetResourceNameGenerator(prefix=self._prefix,
+                                                delimiter=self.delimiter)),
         requires_cleanup=self._requires_cleanup)
 
 
@@ -364,6 +370,54 @@ class ExecuteCommandUntilAction(Action):
     retrier = retry.Retryer(max_retrials=self._retries,
                             max_wait_ms=self._timeout*1000)
     retrier.RetryOnResult(_Run, should_retry_if=_ShouldRetry)
+
+
+class ExecuteBinaryAction(Action):
+  """Action that runs a non-gcloud binary."""
+
+  @classmethod
+  def FromData(cls, data):
+    """Build the object from spec data."""
+    command_execution_data = data.get('execute_binary')
+    return cls(
+        command_execution_data['args'],
+        command_execution_data.get('timeout', 60),
+        command_execution_data.get('stdin'),
+        command_execution_data,
+    )
+
+  def __init__(self, args, timeout, stdin, original_data):
+    self._args = args
+    self._timeout = timeout
+    self._stdin = stdin
+    self._original_data = original_data
+
+  def Execute(self, scenario_context):
+    original_data = scenario_context.resource_ref_resolver.Resolve(
+        self._original_data)
+    original_data.setdefault('expect_exit', {})
+    exit_event = events.ExitEvent.FromData(original_data)
+    stdout_event = events.StdoutEvent.FromData(original_data)
+    stderr_event = events.StderrEvent.FromData(original_data)
+
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+    return_code = execution_utils.Exec(
+        self._args, no_exit=True, in_str=self._stdin, out_func=stdout.write,
+        err_func=stderr.write)
+
+    action_location = updates.Context(
+        self._original_data, None, None).Location()
+    try:
+      with assertions.FailureCollector(
+          scenario_context.update_modes, spec_name=scenario_context.spec_name,
+          action_location=action_location) as failures:
+        failures.AddAll(exit_event.HandleReturnCode(return_code))
+        failures.AddAll(stdout_event.Handle(stdout.getvalue()))
+        failures.AddAll(stderr_event.Handle(stderr.getvalue()))
+    finally:
+      if scenario_context.update_modes:
+        scenario_context.RewriteScenario()
 
 
 class CommandExecutionAction(Action):

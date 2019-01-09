@@ -146,6 +146,13 @@ def _WordScore(index, normalized_command_word,
       extra *= 2
     score += extra
 
+  # Prefer matching on surface words.
+  if index == 0 and canonical_command_length > 1:
+    score += 30
+  # Also prefer matching on group words.
+  elif index > 0 and canonical_command_length > index + 1:
+    score += 15
+
   return score
 
 
@@ -208,11 +215,14 @@ def GetCommandSuggestions(command_words):
     command_words: List of input command words.
 
   Returns:
-    [command]: List, where command is a canonical command string with 'gcloud'
-      prepended. Only commands whose scores have a ratio of at least MIN_RATIO
-      against the top score are returned. At most MAX_SUGGESTIONS command
-      strings are returned. If many commands from the same group are being
-      suggested, then the common groups are suggested instead.
+    ([command], int): Tuple, where the first element in a list of canonical
+      command strings with 'gcloud' prepended. Only commands whose scores have a
+      ratio of at least MIN_RATIO against the top score are returned. At most
+      MAX_SUGGESTIONS command strings are returned. If many commands from the
+      same group are being suggested, then the common groups are suggested
+      instead. The second element is the number of total suggestions made
+      (i.e. the number of scored commands containing command_words) before they
+      are pruned.
   """
   suggested_commands = []
   try:
@@ -221,7 +231,7 @@ def GetCommandSuggestions(command_words):
     # Don't crash error reports on static completion misconfiguration.
     scored_commands = None
   if not scored_commands:
-    return suggested_commands
+    return suggested_commands, 0
 
   # Scores are greater than zero and sorted highest to lowest.
   top_score = float(scored_commands[0][1])
@@ -254,4 +264,4 @@ def GetCommandSuggestions(command_words):
           break
       suggested_commands = sorted(suggested_groups)
 
-  return suggested_commands
+  return suggested_commands, len(scored_commands)

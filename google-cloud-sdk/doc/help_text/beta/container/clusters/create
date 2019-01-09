@@ -16,8 +16,8 @@ SYNOPSIS
         [--no-enable-cloud-monitoring] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
         [--enable-network-policy] [--enable-pod-security-policy]
-        [--enable-stackdriver-kubernetes] [--image-type=IMAGE_TYPE]
-        [--issue-client-certificate]
+        [--enable-stackdriver-kubernetes] [--enable-vertical-pod-autoscaling]
+        [--image-type=IMAGE_TYPE] [--issue-client-certificate]
         [--istio-config=[auth=MTLS_PERMISSIVE,...]] [--labels=[KEY=VALUE,...]]
         [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
@@ -249,6 +249,9 @@ FLAGS
 
      --enable-stackdriver-kubernetes
         Enable Stackdriver Kubernetes monitoring and logging.
+
+     --enable-vertical-pod-autoscaling
+        Enables vertical pod autoscaling for a cluster.
 
      --image-type=IMAGE_TYPE
         The image type to use for the cluster. Defaults to server-specified.
@@ -657,8 +660,9 @@ FLAGS
               2) Google Compute Engine Public IPs if `--enable-private-nodes` is not
               specified.
 
-          When disabled, public internet (0.0.0.0/0) is allowed to connect to
-          Kubernetes master through HTTPS.
+          Use --no-enable-master-authorized-networks to disable. When disabled,
+          public internet (0.0.0.0/0) is allowed to connect to Kubernetes
+          master through HTTPS.
 
        --master-authorized-networks=NETWORK,[NETWORK,...]
           The list of CIDR blocks (up to 20) that are allowed to connect to

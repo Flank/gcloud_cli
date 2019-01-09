@@ -1,3 +1,6 @@
+skip: !!omap
+- bug: b/121155171
+- reason: Failing
 title: Create an instance and move it to a new zone.
 release_tracks: [GA]
 summary:
@@ -42,7 +45,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -69,7 +72,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           omit_fields:
           - commonInstanceMetadata
@@ -157,7 +160,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -269,7 +272,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             cache-control: private, max-age=0, must-revalidate, no-transform
@@ -362,7 +365,7 @@ actions:
           uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0

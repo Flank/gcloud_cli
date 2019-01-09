@@ -72,7 +72,8 @@ arg\-files\fR for more information and examples.
 .TP 2m
 \fB\-\-app\fR=\fIAPP\fR
 The path to the application binary file. The path may be in the local filesystem
-or in Google Cloud Storage using gs:// notation.
+or in Google Cloud Storage using gs:// notation. Android App Bundles are
+specified as .aab, all other files are assumed to be APKs.
 
 .TP 2m
 \fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]
@@ -525,6 +526,13 @@ $ gcloud alpha firebase test android run \-\-app APP_APK \e
     \-\-test TEST_APK \-\-device model=Nexus4,version=19 \e
     \-\-device model=Nexus4,version=21 \e
     \-\-device model=NexusLowRes,version=25
+.RE
+
+To invoke a robo test on an Android App Bundle, pass the .aab file using the
+\-\-app flag.
+
+.RS 2m
+$ gcloud alpha firebase test android run \-\-app bundle.aab
 .RE
 
 You may also use the legacy dimension flags (deprecated) to specify which

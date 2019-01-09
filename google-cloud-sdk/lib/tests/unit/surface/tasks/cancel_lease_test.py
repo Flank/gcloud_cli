@@ -64,7 +64,7 @@ class TasksCancelLeaseTest(test_base.CloudTasksAlphaTestBase):
             self.task_id, self.queue_id, self.schedule_time))
 
     self.assertEqual(expected, actual)
-    self.resolve_loc_mock.assert_called_once_with()
+    self.resolve_loc_mock.assert_called_once_with(parsers.ParseProject())
 
   def testCancelLease_RelativeName(self):
     task_name = ('projects/other-project/locations/us-central1/queues/my-queue'

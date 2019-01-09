@@ -174,24 +174,21 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
 class UpdateTestBaseClass(sdk_test_base.WithFakeAuth,
                           cli_test_base.CliTestBase, waiter_test_base.Base):
 
-  def ApiVersion(self):
-    return 'v1'
-
-  def ReleaseTrack(self):
-    return calliope_base.ReleaseTrack.GA
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.track = self.ReleaseTrack()
-    self.client_class = core_apis.GetClientClass('compute', self.ApiVersion())
-    self.messages = core_apis.GetMessagesModule('compute', self.ApiVersion())
+    self.client_class = core_apis.GetClientClass('compute', self.api_version)
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', self.ApiVersion())
+    self.resources.RegisterApiByName('compute', self.api_version)
 
   def Client(self):
     return api_mock.Client(
         self.client_class,
         real_client=core_apis.GetClientInstance(
-            'compute', self.ApiVersion(), no_http=True))
+            'compute', self.api_version, no_http=True))
 
   def _GetOperationRef(self, name, zone):
     return self.resources.Parse(
@@ -289,29 +286,23 @@ class SetMinCpuPlatformTest(UpdateTestBaseClass):
 
 class SetMinCpuPlatformTestBeta(SetMinCpuPlatformTest):
 
-  def ApiVersion(self):
-    return 'beta'
-
-  def ReleaseTrack(self):
-    return calliope_base.ReleaseTrack.BETA
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class SetMinCpuPlatformTestAlpha(SetMinCpuPlatformTestBeta):
 
-  def ApiVersion(self):
-    return 'alpha'
-
-  def ReleaseTrack(self):
-    return calliope_base.ReleaseTrack.ALPHA
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 class DeletionProtectionTest(UpdateTestBaseClass, parameterized.TestCase):
 
-  def ApiVersion(self):
-    return 'v1'
-
-  def ReleaseTrack(self):
-    return calliope_base.ReleaseTrack.GA
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
   def ExpectSetDeletionProtection(self, client, deletion_protection):
     messages = self.messages
@@ -365,11 +356,9 @@ class DeletionProtectionTest(UpdateTestBaseClass, parameterized.TestCase):
 class InstancesSetShieldedVMConfigAlphaTest(UpdateTestBaseClass,
                                             parameterized.TestCase):
 
-  def ApiVersion(self):
-    return 'alpha'
-
-  def ReleaseTrack(self):
-    return calliope_base.ReleaseTrack.ALPHA
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def ExpectShieldedVMConfig(self, client, shielded_vm_config):
     messages = self.messages
@@ -452,21 +441,17 @@ class InstancesSetShieldedVMConfigAlphaTest(UpdateTestBaseClass,
 class InstancesSetShieldedVMConfigBetaTest(
     InstancesSetShieldedVMConfigAlphaTest):
 
-  def ApiVersion(self):
-    return 'beta'
-
-  def ReleaseTrack(self):
-    return calliope_base.ReleaseTrack.BETA
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class InstancesSetShieldedVMIntegrityPolicyAlphaTest(UpdateTestBaseClass,
                                                      parameterized.TestCase):
 
-  def ApiVersion(self):
-    return 'alpha'
-
-  def ReleaseTrack(self):
-    return calliope_base.ReleaseTrack.ALPHA
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def ExpectShieldedVMIntegrityPolicy(self, client,
                                       shielded_vm_integrity_policy):
@@ -526,11 +511,55 @@ class InstancesSetShieldedVMIntegrityPolicyAlphaTest(UpdateTestBaseClass,
 class InstancesSetShieldedVMIntegrityPolicyBetaTest(
     InstancesSetShieldedVMIntegrityPolicyAlphaTest):
 
-  def ApiVersion(self):
-    return 'beta'
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
 
-  def ReleaseTrack(self):
-    return calliope_base.ReleaseTrack.BETA
+
+class DisplayDeviceTest(UpdateTestBaseClass, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def ExpectUpdateDisplayDevice(self, client, enable_display):
+    messages = self.messages
+    client.instances.UpdateDisplayDevice.Expect(
+        messages.ComputeInstancesUpdateDisplayDeviceRequest(
+            displayDevice=messages.DisplayDevice(enableDisplay=enable_display),
+            project=self.Project(),
+            zone='central2-a',
+            instance='instance-1'),
+        self._GetOperationMessage(
+            self._GetOperationRef('operation-X', 'central2-a'),
+            messages.Operation.StatusValueValuesEnum.PENDING))
+
+  @parameterized.named_parameters(
+      ('SetTrue', '--enable-display-device', True),
+      ('SetFalse', '--no-enable-display-device', False))
+  def testUpdateDisplayDevice(self, flag, enable_display):
+    with self.Client() as client:
+      self.ExpectUpdateDisplayDevice(client, enable_display)
+
+      client.zoneOperations.Get.Expect(
+          self.messages.ComputeZoneOperationsGetRequest(
+              operation='operation-X',
+              zone='central2-a',
+              project=self.Project()),
+          self._GetOperationMessage(
+              self._GetOperationRef('operation-X', 'central2-a'),
+              self.messages.Operation.StatusValueValuesEnum.DONE,
+              self._GetInstanceRef('instance-1', 'central2-a')))
+      client.instances.Get.Expect(
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-1', project='fake-project', zone='central2-a'),
+          self.messages.Instance(name='instance-1'))
+
+      self.Run('compute instances update instance-1 '
+               '--zone central2-a {}'.format(flag))
+    self.AssertOutputEquals('')
+    self.AssertErrContains(
+        'Updating display device of instance [instance-1]')
 
 
 if __name__ == '__main__':

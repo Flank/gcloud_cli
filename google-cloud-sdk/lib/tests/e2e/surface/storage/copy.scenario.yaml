@@ -1,0 +1,1752 @@
+title: Test basic bucket operations
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: storage buckets create $$bucket$$ --format none
+  - stderr: |
+      Created bucket [$$bucket$$].
+- execute:
+  - command: storage copy test_data/c/c.txt gs://$$bucket$$/ --num-threads=0
+  - progress_bar:
+    - message: Copying Files
+  - stderr: |2
+
+      Copied [1] file.
+- execute:
+  - command: storage list gs://$$bucket$$/c.txt --format 'text(path)'
+  - stdout: |
+      ---
+      path: gs://$$bucket$$/c.txt
+- execute:
+  - command: storage copy test_data/c/c.txt gs://$$bucket$$/another_c.txt --num-threads=0
+  - progress_bar:
+    - message: Copying Files
+  - stderr: |2
+
+      Copied [1] file.
+- execute:
+  - command: storage list gs://$$bucket$$/another_c.txt --format 'text(path)'
+  - stdout: |
+      ---
+      path: gs://$$bucket$$/another_c.txt
+- execute:
+  - command: storage copy test_data gs://$$bucket$$/ --num-threads=0
+  - error: '1: Source path matches directories but --recursive was not specified.'
+- execute:
+  - command: storage copy test_data gs://$$bucket$$/ --recursive --num-threads=0
+  - progress_bar:
+    - message: Copying Files
+  - stderr: |2
+
+      Copied [10] files.
+- execute:
+  - command: storage list gs://$$bucket$$/** --format 'text(path)'
+  - stdout: |
+      ---
+      path: gs://$$bucket$$/another_c.txt
+      ---
+      path: gs://$$bucket$$/c.txt
+      ---
+      path: gs://$$bucket$$/test_data/a.txt
+      ---
+      path: gs://$$bucket$$/test_data/a/a.txt
+      ---
+      path: gs://$$bucket$$/test_data/aa/a.txt
+      ---
+      path: gs://$$bucket$$/test_data/aa/b.txt
+      ---
+      path: gs://$$bucket$$/test_data/b.txt
+      ---
+      path: gs://$$bucket$$/test_data/b/a.txt
+      ---
+      path: gs://$$bucket$$/test_data/b/b.txt
+      ---
+      path: gs://$$bucket$$/test_data/c/a.txt
+      ---
+      path: gs://$$bucket$$/test_data/c/b.txt
+      ---
+      path: gs://$$bucket$$/test_data/c/c.txt
+- execute:
+  - command: storage delete gs://$$bucket$$ --recursive --num-threads=0
+  - stderr: |
+      WARNING: Deleting a bucket is irreversible and makes that bucket name available for others to claim.
+  - prompt:
+    - message: |-
+        This command will delete the following buckets:
+          $$bucket$$
+    - input: y
+  - prompt:
+    - message: |-
+        You are about to delete the following:
+          gs://$$bucket$$
+          gs://$$bucket$$/another_c.txt
+          gs://$$bucket$$/c.txt
+          gs://$$bucket$$/test_data/a.txt
+          gs://$$bucket$$/test_data/a/a.txt
+          gs://$$bucket$$/test_data/aa/a.txt
+          gs://$$bucket$$/test_data/aa/b.txt
+          gs://$$bucket$$/test_data/b.txt
+          gs://$$bucket$$/test_data/b/a.txt
+          gs://$$bucket$$/test_data/b/b.txt
+          gs://$$bucket$$/test_data/c/a.txt
+          gs://$$bucket$$/test_data/c/b.txt
+          gs://$$bucket$$/test_data/c/c.txt
+    - input: y
+  - progress_bar:
+    - message: Deleting Files
+  - stderr: |2
+
+      Deleted [12] files.
+  - stderr: |
+      Deleted bucket [gs://$$bucket$$].
+actions:
+
+- write_file:
+    path: test_data/a/a.txt
+    contents: a/a.txt contents
+- write_file:
+    path: test_data/aa/a.txt
+    contents: aa/a.txt contents
+- write_file:
+    path: test_data/aa/b.txt
+    contents: aa/b.txt contents
+- write_file:
+    path: test_data/b/a.txt
+    contents: b/a.txt contents
+- write_file:
+    path: test_data/b/b.txt
+    contents: b/b.txt contents
+- write_file:
+    path: test_data/c/a.txt
+    contents: c/a.txt contents
+- write_file:
+    path: test_data/c/b.txt
+    contents: c/b.txt contents
+- write_file:
+    path: test_data/c/c.txt
+    contents: c/c.txt contents
+- write_file:
+    path: test_data/a.txt
+    contents: a.txt contents
+- write_file:
+    path: test_data/b.txt
+    contents: b.txt contents
+
+- generate_resource_id:
+    reference: bucket
+    prefix: storage-bucket
+- execute_command:
+    command: storage buckets create $$bucket$$ --format none
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created bucket [$$bucket$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    # Copy a single file to a directory.
+    command: storage copy test_data/c/c.txt gs://$$bucket$$/ --num-threads=0
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '31'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UqVtdu6a74IIMxMDoDD-hV45tLFKU7v1Gf4RGi7zDjjFpxMbScK_d47KVel59KKKnI3F3786qCNDfGSKQD7fYHzBDfccw
+          body:
+            kind: storage#objects
+    - expect_progress_bar:
+        message: Copying Files
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=c.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "16"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                c/c.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '780'
+            content-type: application/json; charset=UTF-8
+            etag: CM6sjZr2p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UqrUkN2pbphYAeK2cPSw7szisWH5RA3S0ZA4Q5RW3VGB_-NVzyn6SmjtvIQ0vbMl2EcRlXxK3qk6mmdUAB4GldtNb88oQ
+          body:
+            kind: storage#object
+            id: $$bucket$$/c.txt/1545086085322318
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+            name: c.txt
+            bucket: $$bucket$$
+            generation: '1545086085322318'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:45.322Z'
+            updated: '2018-12-17T22:34:45.322Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:45.322Z'
+            size: '16'
+            md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/c.txt?generation=1545086085322318&alt=media
+            crc32c: lM1yKQ==
+            etag: CM6sjZr2p98CEAE=
+    - expect_stderr: |2
+
+        Copied [1] file.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: storage list gs://$$bucket$$/c.txt --format 'text(path)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '865'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UqqRRaQBqu3F4KbuQZjG6ZT5PM_EdrcuQ39kvwoM2vL40inD7Bp5K1Z0YZ2XRiV-n9qC_UmolSCHoVMKcw6EyGzGCwaOQ
+          body:
+            kind: storage#objects
+            items:
+            - kind: storage#object
+              id: $$bucket$$/c.txt/1545086085322318
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              name: c.txt
+              bucket: $$bucket$$
+              generation: '1545086085322318'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:45.322Z'
+              updated: '2018-12-17T22:34:45.322Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:45.322Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/c.txt?generation=1545086085322318&alt=media
+              crc32c: lM1yKQ==
+              etag: CM6sjZr2p98CEAE=
+    - expect_stdout: |
+        ---
+        path: gs://$$bucket$$/c.txt
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    # Copy a single file to a file
+    command: storage copy test_data/c/c.txt gs://$$bucket$$/another_c.txt --num-threads=0
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '865'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UrkkJqtHjiucIwrqO08CvJPzOVeSfc_Y8AOaQmpowLrwLkLl35RncSggAWQFJ3u6_ff7HV7nRDr36Bk4e90mfKUkqKqpg
+          body:
+            kind: storage#objects
+            items:
+            - kind: storage#object
+              id: $$bucket$$/c.txt/1545086085322318
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              name: c.txt
+              bucket: $$bucket$$
+              generation: '1545086085322318'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:45.322Z'
+              updated: '2018-12-17T22:34:45.322Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:45.322Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/c.txt?generation=1545086085322318&alt=media
+              crc32c: lM1yKQ==
+              etag: CM6sjZr2p98CEAE=
+    - expect_progress_bar:
+        message: Copying Files
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=another_c.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "16"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                c/c.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '812'
+            content-type: application/json; charset=UTF-8
+            etag: COee6Zr2p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UoFgoj8e81-rmAdnpUVPGXW1KhgxoCEZKGv2lD0Gja74a5kFB5GIPVh6jz9SPX9TPJuYEvReRk-XTZoXjmu0he_OCYeKA
+          body:
+            kind: storage#object
+            id: $$bucket$$/another_c.txt/1545086086827879
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+            name: another_c.txt
+            bucket: $$bucket$$
+            generation: '1545086086827879'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:46.827Z'
+            updated: '2018-12-17T22:34:46.827Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:46.827Z'
+            size: '16'
+            md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/another_c.txt?generation=1545086086827879&alt=media
+            crc32c: lM1yKQ==
+            etag: COee6Zr2p98CEAE=
+    - expect_stderr: |2
+
+        Copied [1] file.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: storage list gs://$$bucket$$/another_c.txt --format 'text(path)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1716'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UpeoT2tHPoWxHaPQriwMcCZVO1ER93dimvJNzDzvZpota0aTDzAtEqVQyI3QlNxyoVCdMB8Pp9-LtKSOPt6mfG-6Sk76g
+          body:
+            kind: storage#objects
+            items:
+            - kind: storage#object
+              id: $$bucket$$/another_c.txt/1545086086827879
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+              name: another_c.txt
+              bucket: $$bucket$$
+              generation: '1545086086827879'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:46.827Z'
+              updated: '2018-12-17T22:34:46.827Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:46.827Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/another_c.txt?generation=1545086086827879&alt=media
+              crc32c: lM1yKQ==
+              etag: COee6Zr2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/c.txt/1545086085322318
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              name: c.txt
+              bucket: $$bucket$$
+              generation: '1545086085322318'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:45.322Z'
+              updated: '2018-12-17T22:34:45.322Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:45.322Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/c.txt?generation=1545086085322318&alt=media
+              crc32c: lM1yKQ==
+              etag: CM6sjZr2p98CEAE=
+    - expect_stdout: |
+        ---
+        path: gs://$$bucket$$/another_c.txt
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    # Copy a full directory, forget --recursive
+    command: storage copy test_data gs://$$bucket$$/ --num-threads=0
+    events:
+    - expect_exit:
+        code: 1
+        message: Source path matches directories but --recursive was not specified.
+
+- execute_command:
+    # Copy a full directory, forget --recursive
+    command: storage copy test_data gs://$$bucket$$/ --recursive --num-threads=0
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '1716'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UoHE7uTh7U2cuwecDtkmSbdOQepmhH5c8qYSOvBXvWXEBkA60quwUBUez8GrCgYliTYsury6Kj54AxRV8bDuIMXdKnfkA
+          body:
+            kind: storage#objects
+            items:
+            - kind: storage#object
+              id: $$bucket$$/another_c.txt/1545086086827879
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+              name: another_c.txt
+              bucket: $$bucket$$
+              generation: '1545086086827879'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:46.827Z'
+              updated: '2018-12-17T22:34:46.827Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:46.827Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/another_c.txt?generation=1545086086827879&alt=media
+              crc32c: lM1yKQ==
+              etag: COee6Zr2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/c.txt/1545086085322318
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              name: c.txt
+              bucket: $$bucket$$
+              generation: '1545086085322318'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:45.322Z'
+              updated: '2018-12-17T22:34:45.322Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:45.322Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/c.txt?generation=1545086085322318&alt=media
+              crc32c: lM1yKQ==
+              etag: CM6sjZr2p98CEAE=
+    - expect_progress_bar:
+        message: Copying Files
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fa.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "14"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                a.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '824'
+            content-type: application/json; charset=UTF-8
+            etag: CKfqwpv2p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Urmk45p7mfD3U24s9y9EzSdnHfZQvhbdSVppwkIOkVnjo7_XmwdTgBbfNnbNNrVkdjX_bfjRvvD2EHXmmRcy_7k7uy0MA
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/a.txt/1545086088295719
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt
+            name: test_data/a.txt
+            bucket: $$bucket$$
+            generation: '1545086088295719'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:48.295Z'
+            updated: '2018-12-17T22:34:48.295Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:48.295Z'
+            size: '14'
+            md5Hash: JjNwdnoj+lk0gCNJZMq1RA==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt?generation=1545086088295719&alt=media
+            crc32c: p/7cTg==
+            etag: CKfqwpv2p98CEAE=
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fb.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "14"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                b.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '824'
+            content-type: application/json; charset=UTF-8
+            etag: CPLo5Jv2p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UrYcH5333uENgRSxyyMKuHJ62pWnTh1zrZ8yTlvDbz-4HY97I8_A8656r6Uw7w-ovmpV-_Sasx_lqruZJLToGmQY4yx2g
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/b.txt/1545086088852594
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt
+            name: test_data/b.txt
+            bucket: $$bucket$$
+            generation: '1545086088852594'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:48.852Z'
+            updated: '2018-12-17T22:34:48.852Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:48.852Z'
+            size: '14'
+            md5Hash: oZ3hz3jEF9fHzeTJKbvbeA==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt?generation=1545086088852594&alt=media
+            crc32c: W/cjhA==
+            etag: CPLo5Jv2p98CEAE=
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fa%2Fa.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "16"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                a/a.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '836'
+            content-type: application/json; charset=UTF-8
+            etag: CMvah5z2p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UrKbHF_PdaD8wNG9tplMnqwlJ-nx1YE8YE1qxQTIxxicwAnBLvRe1VC_Ba3fdqC3xIpYfmiPlg_4CSRhWTSyZmiJ7K3Kg
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/a/a.txt/1545086089424203
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt
+            name: test_data/a/a.txt
+            bucket: $$bucket$$
+            generation: '1545086089424203'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:49.423Z'
+            updated: '2018-12-17T22:34:49.423Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:49.423Z'
+            size: '16'
+            md5Hash: FP4kncYRihV5vIKlk5nl3g==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt?generation=1545086089424203&alt=media
+            crc32c: 3Te1qA==
+            etag: CMvah5z2p98CEAE=
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Faa%2Fa.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "17"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                aa/a.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '840'
+            content-type: application/json; charset=UTF-8
+            etag: COj+pZz2p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UqTpYtLYcLM6Qx3aGCxel1PDW6q6-0l-_RzMF8uTumdoP_w9SXzOabnxodOh35TyO1H1WN73JdaYTmYCAoiv6SWBua3Ww
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/aa/a.txt/1545086089920360
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt
+            name: test_data/aa/a.txt
+            bucket: $$bucket$$
+            generation: '1545086089920360'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:49.920Z'
+            updated: '2018-12-17T22:34:49.920Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:49.920Z'
+            size: '17'
+            md5Hash: hDGQQxY2mn5FN0KsR21y5A==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt?generation=1545086089920360&alt=media
+            crc32c: effPiA==
+            etag: COj+pZz2p98CEAE=
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Faa%2Fb.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "17"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                aa/b.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '840'
+            content-type: application/json; charset=UTF-8
+            etag: COzuypz2p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UoCPYtTqyWW5bQLtWu4ezISZ_5q4t0tQg2jXwG3i9ledoffHewxMapUaQTQRYG3AwQ8FPmrpcr-9yFb5u8QkUSEuCesow
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/aa/b.txt/1545086090524524
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt
+            name: test_data/aa/b.txt
+            bucket: $$bucket$$
+            generation: '1545086090524524'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:50.524Z'
+            updated: '2018-12-17T22:34:50.524Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:50.524Z'
+            size: '17'
+            md5Hash: gW7U7huw0aXy5UJte0kJMA==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt?generation=1545086090524524&alt=media
+            crc32c: hf4wQg==
+            etag: COzuypz2p98CEAE=
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fb%2Fa.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "16"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                b/a.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '836'
+            content-type: application/json; charset=UTF-8
+            etag: CMqr75z2p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UrwlsodgEjSNH_JNGVUTsuk6RitwHRoYD9TKYjyIwmME3SPLxhOAK8HMxH6E3O4fjt4IxNTsHcivM74dBAwqgbDyEnvag
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/b/a.txt/1545086091122122
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt
+            name: test_data/b/a.txt
+            bucket: $$bucket$$
+            generation: '1545086091122122'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:51.121Z'
+            updated: '2018-12-17T22:34:51.121Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:51.121Z'
+            size: '16'
+            md5Hash: CaatqZNROUiGsbtCQYu6Cg==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt?generation=1545086091122122&alt=media
+            crc32c: zs/VWw==
+            etag: CMqr75z2p98CEAE=
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fb%2Fb.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "16"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                b/b.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '836'
+            content-type: application/json; charset=UTF-8
+            etag: CM62lJ32p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UotD4iAU3jIn6nG6ktH9L8VEUX3LKzaD90Fwou0LmCeSpOGQcpIXUurp4QZTBr6BX9klPAM0v6zXsnnhTKgTi10B2g35w
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/b/b.txt/1545086091729742
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt
+            name: test_data/b/b.txt
+            bucket: $$bucket$$
+            generation: '1545086091729742'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:51.727Z'
+            updated: '2018-12-17T22:34:51.727Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:51.727Z'
+            size: '16'
+            md5Hash: Br9oGG6uDKBzctvRX4qooA==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt?generation=1545086091729742&alt=media
+            crc32c: MsYqkQ==
+            etag: CM62lJ32p98CEAE=
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fc%2Fa.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "16"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                c/a.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '836'
+            content-type: application/json; charset=UTF-8
+            etag: CKassp32p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Urqpbmr4cZPxz69N4YmFbka3kRXM_eKk59fpReEg9FoyiPqKeno3QjI-1bAzDb8yLjs1Xk3AvK8xCP1r6-k77zVfkuIbQ
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/c/a.txt/1545086092219942
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt
+            name: test_data/c/a.txt
+            bucket: $$bucket$$
+            generation: '1545086092219942'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:52.219Z'
+            updated: '2018-12-17T22:34:52.219Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:52.219Z'
+            size: '16'
+            md5Hash: w4EWJNX9TKRSia3PlWuDjA==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt?generation=1545086092219942&alt=media
+            crc32c: PMPYpQ==
+            etag: CKassp32p98CEAE=
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fc%2Fb.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "16"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                c/b.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '836'
+            content-type: application/json; charset=UTF-8
+            etag: CMO40Z32p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UptKVT-7Won3rvwjxzw1a-CaCAOy9dspXrcldLuMYiozWphuG_Dt4s6M3o20RVf35OlWwsdvtpDLIDngP-HjlMHHfS-NQ
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/c/b.txt/1545086092729411
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt
+            name: test_data/c/b.txt
+            bucket: $$bucket$$
+            generation: '1545086092729411'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:52.729Z'
+            updated: '2018-12-17T22:34:52.729Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:52.729Z'
+            size: '16'
+            md5Hash: zb6ZKjEQBFIHVmAm5wZAkA==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt?generation=1545086092729411&alt=media
+            crc32c: wMonbw==
+            etag: CMO40Z32p98CEAE=
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fc%2Fc.txt&uploadType=multipart
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: |
+                --===============\d+==
+                Content-Type: application/json
+                MIME-Version: 1.0
+
+                {"size": "16"}
+                --===============\d+==
+                Content-Type: text/plain
+                MIME-Version: 1.0
+                Content-Transfer-Encoding: binary
+
+                c/c.txt contents
+                --===============\d+==--
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '836'
+            content-type: application/json; charset=UTF-8
+            etag: CIDR7532p98CEAE=
+            pragma: no-cache
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_single_post_uploads
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UofIPv6vMgtgc2oKYY5lbQOdYPGGFfltXuVTwtaJUu4ScGsrmoXguU-edTOnySMG5t-1ZnQsQ3fPGa7pNRpQBgnfaBx5Q
+          body:
+            kind: storage#object
+            id: $$bucket$$/test_data/c/c.txt/1545086093224064
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt
+            name: test_data/c/c.txt
+            bucket: $$bucket$$
+            generation: '1545086093224064'
+            metageneration: '1'
+            contentType: text/plain
+            timeCreated: '2018-12-17T22:34:53.223Z'
+            updated: '2018-12-17T22:34:53.223Z'
+            storageClass: STANDARD
+            timeStorageClassUpdated: '2018-12-17T22:34:53.223Z'
+            size: '16'
+            md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+            mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt?generation=1545086093224064&alt=media
+            crc32c: lM1yKQ==
+            etag: CIDR7532p98CEAE=
+    - expect_stderr: |2
+
+        Copied [10] files.
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: storage list gs://$$bucket$$/** --format 'text(path)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '10450'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Urgl5uH8TFivnWGxiXVR4qhQSwR53O7K2aC1-9PKfasyjWKmoAhaqqoG775Ekva-ZXwK-lVGDEC2_R1j2jG2-I_NN4GjQ
+          body:
+            kind: storage#objects
+            items:
+            - kind: storage#object
+              id: $$bucket$$/another_c.txt/1545086086827879
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+              name: another_c.txt
+              bucket: $$bucket$$
+              generation: '1545086086827879'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:46.827Z'
+              updated: '2018-12-17T22:34:46.827Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:46.827Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/another_c.txt?generation=1545086086827879&alt=media
+              crc32c: lM1yKQ==
+              etag: COee6Zr2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/c.txt/1545086085322318
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              name: c.txt
+              bucket: $$bucket$$
+              generation: '1545086085322318'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:45.322Z'
+              updated: '2018-12-17T22:34:45.322Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:45.322Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/c.txt?generation=1545086085322318&alt=media
+              crc32c: lM1yKQ==
+              etag: CM6sjZr2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/a.txt/1545086088295719
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt
+              name: test_data/a.txt
+              bucket: $$bucket$$
+              generation: '1545086088295719'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:48.295Z'
+              updated: '2018-12-17T22:34:48.295Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:48.295Z'
+              size: '14'
+              md5Hash: JjNwdnoj+lk0gCNJZMq1RA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt?generation=1545086088295719&alt=media
+              crc32c: p/7cTg==
+              etag: CKfqwpv2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/a/a.txt/1545086089424203
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt
+              name: test_data/a/a.txt
+              bucket: $$bucket$$
+              generation: '1545086089424203'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:49.423Z'
+              updated: '2018-12-17T22:34:49.423Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:49.423Z'
+              size: '16'
+              md5Hash: FP4kncYRihV5vIKlk5nl3g==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt?generation=1545086089424203&alt=media
+              crc32c: 3Te1qA==
+              etag: CMvah5z2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/aa/a.txt/1545086089920360
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt
+              name: test_data/aa/a.txt
+              bucket: $$bucket$$
+              generation: '1545086089920360'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:49.920Z'
+              updated: '2018-12-17T22:34:49.920Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:49.920Z'
+              size: '17'
+              md5Hash: hDGQQxY2mn5FN0KsR21y5A==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt?generation=1545086089920360&alt=media
+              crc32c: effPiA==
+              etag: COj+pZz2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/aa/b.txt/1545086090524524
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt
+              name: test_data/aa/b.txt
+              bucket: $$bucket$$
+              generation: '1545086090524524'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:50.524Z'
+              updated: '2018-12-17T22:34:50.524Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:50.524Z'
+              size: '17'
+              md5Hash: gW7U7huw0aXy5UJte0kJMA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt?generation=1545086090524524&alt=media
+              crc32c: hf4wQg==
+              etag: COzuypz2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/b.txt/1545086088852594
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt
+              name: test_data/b.txt
+              bucket: $$bucket$$
+              generation: '1545086088852594'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:48.852Z'
+              updated: '2018-12-17T22:34:48.852Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:48.852Z'
+              size: '14'
+              md5Hash: oZ3hz3jEF9fHzeTJKbvbeA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt?generation=1545086088852594&alt=media
+              crc32c: W/cjhA==
+              etag: CPLo5Jv2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/b/a.txt/1545086091122122
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt
+              name: test_data/b/a.txt
+              bucket: $$bucket$$
+              generation: '1545086091122122'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:51.121Z'
+              updated: '2018-12-17T22:34:51.121Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:51.121Z'
+              size: '16'
+              md5Hash: CaatqZNROUiGsbtCQYu6Cg==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt?generation=1545086091122122&alt=media
+              crc32c: zs/VWw==
+              etag: CMqr75z2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/b/b.txt/1545086091729742
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt
+              name: test_data/b/b.txt
+              bucket: $$bucket$$
+              generation: '1545086091729742'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:51.727Z'
+              updated: '2018-12-17T22:34:51.727Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:51.727Z'
+              size: '16'
+              md5Hash: Br9oGG6uDKBzctvRX4qooA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt?generation=1545086091729742&alt=media
+              crc32c: MsYqkQ==
+              etag: CM62lJ32p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/c/a.txt/1545086092219942
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt
+              name: test_data/c/a.txt
+              bucket: $$bucket$$
+              generation: '1545086092219942'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:52.219Z'
+              updated: '2018-12-17T22:34:52.219Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:52.219Z'
+              size: '16'
+              md5Hash: w4EWJNX9TKRSia3PlWuDjA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt?generation=1545086092219942&alt=media
+              crc32c: PMPYpQ==
+              etag: CKassp32p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/c/b.txt/1545086092729411
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt
+              name: test_data/c/b.txt
+              bucket: $$bucket$$
+              generation: '1545086092729411'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:52.729Z'
+              updated: '2018-12-17T22:34:52.729Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:52.729Z'
+              size: '16'
+              md5Hash: zb6ZKjEQBFIHVmAm5wZAkA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt?generation=1545086092729411&alt=media
+              crc32c: wMonbw==
+              etag: CMO40Z32p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/c/c.txt/1545086093224064
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt
+              name: test_data/c/c.txt
+              bucket: $$bucket$$
+              generation: '1545086093224064'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:53.223Z'
+              updated: '2018-12-17T22:34:53.223Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:53.223Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt?generation=1545086093224064&alt=media
+              crc32c: lM1yKQ==
+              etag: CIDR7532p98CEAE=
+    - expect_stdout: |
+        ---
+        path: gs://$$bucket$$/another_c.txt
+        ---
+        path: gs://$$bucket$$/c.txt
+        ---
+        path: gs://$$bucket$$/test_data/a.txt
+        ---
+        path: gs://$$bucket$$/test_data/a/a.txt
+        ---
+        path: gs://$$bucket$$/test_data/aa/a.txt
+        ---
+        path: gs://$$bucket$$/test_data/aa/b.txt
+        ---
+        path: gs://$$bucket$$/test_data/b.txt
+        ---
+        path: gs://$$bucket$$/test_data/b/a.txt
+        ---
+        path: gs://$$bucket$$/test_data/b/b.txt
+        ---
+        path: gs://$$bucket$$/test_data/c/a.txt
+        ---
+        path: gs://$$bucket$$/test_data/c/b.txt
+        ---
+        path: gs://$$bucket$$/test_data/c/c.txt
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: storage delete gs://$$bucket$$ --recursive --num-threads=0
+    cleanup_for: bucket
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '10450'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Urd8IB6fzUmUBkvBE0xR_E8QyYLFILY7up-gnE02vtYdvNV4DGbNEhXtubCdIgLhKEd-e3XsoJOrRMDSleTk-wFS-ks_Q
+          body:
+            kind: storage#objects
+            items:
+            - kind: storage#object
+              id: $$bucket$$/another_c.txt/1545086086827879
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+              name: another_c.txt
+              bucket: $$bucket$$
+              generation: '1545086086827879'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:46.827Z'
+              updated: '2018-12-17T22:34:46.827Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:46.827Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/another_c.txt?generation=1545086086827879&alt=media
+              crc32c: lM1yKQ==
+              etag: COee6Zr2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/c.txt/1545086085322318
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              name: c.txt
+              bucket: $$bucket$$
+              generation: '1545086085322318'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:45.322Z'
+              updated: '2018-12-17T22:34:45.322Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:45.322Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/c.txt?generation=1545086085322318&alt=media
+              crc32c: lM1yKQ==
+              etag: CM6sjZr2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/a.txt/1545086088295719
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt
+              name: test_data/a.txt
+              bucket: $$bucket$$
+              generation: '1545086088295719'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:48.295Z'
+              updated: '2018-12-17T22:34:48.295Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:48.295Z'
+              size: '14'
+              md5Hash: JjNwdnoj+lk0gCNJZMq1RA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt?generation=1545086088295719&alt=media
+              crc32c: p/7cTg==
+              etag: CKfqwpv2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/a/a.txt/1545086089424203
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt
+              name: test_data/a/a.txt
+              bucket: $$bucket$$
+              generation: '1545086089424203'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:49.423Z'
+              updated: '2018-12-17T22:34:49.423Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:49.423Z'
+              size: '16'
+              md5Hash: FP4kncYRihV5vIKlk5nl3g==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt?generation=1545086089424203&alt=media
+              crc32c: 3Te1qA==
+              etag: CMvah5z2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/aa/a.txt/1545086089920360
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt
+              name: test_data/aa/a.txt
+              bucket: $$bucket$$
+              generation: '1545086089920360'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:49.920Z'
+              updated: '2018-12-17T22:34:49.920Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:49.920Z'
+              size: '17'
+              md5Hash: hDGQQxY2mn5FN0KsR21y5A==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt?generation=1545086089920360&alt=media
+              crc32c: effPiA==
+              etag: COj+pZz2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/aa/b.txt/1545086090524524
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt
+              name: test_data/aa/b.txt
+              bucket: $$bucket$$
+              generation: '1545086090524524'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:50.524Z'
+              updated: '2018-12-17T22:34:50.524Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:50.524Z'
+              size: '17'
+              md5Hash: gW7U7huw0aXy5UJte0kJMA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt?generation=1545086090524524&alt=media
+              crc32c: hf4wQg==
+              etag: COzuypz2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/b.txt/1545086088852594
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt
+              name: test_data/b.txt
+              bucket: $$bucket$$
+              generation: '1545086088852594'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:48.852Z'
+              updated: '2018-12-17T22:34:48.852Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:48.852Z'
+              size: '14'
+              md5Hash: oZ3hz3jEF9fHzeTJKbvbeA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt?generation=1545086088852594&alt=media
+              crc32c: W/cjhA==
+              etag: CPLo5Jv2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/b/a.txt/1545086091122122
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt
+              name: test_data/b/a.txt
+              bucket: $$bucket$$
+              generation: '1545086091122122'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:51.121Z'
+              updated: '2018-12-17T22:34:51.121Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:51.121Z'
+              size: '16'
+              md5Hash: CaatqZNROUiGsbtCQYu6Cg==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt?generation=1545086091122122&alt=media
+              crc32c: zs/VWw==
+              etag: CMqr75z2p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/b/b.txt/1545086091729742
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt
+              name: test_data/b/b.txt
+              bucket: $$bucket$$
+              generation: '1545086091729742'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:51.727Z'
+              updated: '2018-12-17T22:34:51.727Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:51.727Z'
+              size: '16'
+              md5Hash: Br9oGG6uDKBzctvRX4qooA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt?generation=1545086091729742&alt=media
+              crc32c: MsYqkQ==
+              etag: CM62lJ32p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/c/a.txt/1545086092219942
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt
+              name: test_data/c/a.txt
+              bucket: $$bucket$$
+              generation: '1545086092219942'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:52.219Z'
+              updated: '2018-12-17T22:34:52.219Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:52.219Z'
+              size: '16'
+              md5Hash: w4EWJNX9TKRSia3PlWuDjA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt?generation=1545086092219942&alt=media
+              crc32c: PMPYpQ==
+              etag: CKassp32p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/c/b.txt/1545086092729411
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt
+              name: test_data/c/b.txt
+              bucket: $$bucket$$
+              generation: '1545086092729411'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:52.729Z'
+              updated: '2018-12-17T22:34:52.729Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:52.729Z'
+              size: '16'
+              md5Hash: zb6ZKjEQBFIHVmAm5wZAkA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt?generation=1545086092729411&alt=media
+              crc32c: wMonbw==
+              etag: CMO40Z32p98CEAE=
+            - kind: storage#object
+              id: $$bucket$$/test_data/c/c.txt/1545086093224064
+              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt
+              name: test_data/c/c.txt
+              bucket: $$bucket$$
+              generation: '1545086093224064'
+              metageneration: '1'
+              contentType: text/plain
+              timeCreated: '2018-12-17T22:34:53.223Z'
+              updated: '2018-12-17T22:34:53.223Z'
+              storageClass: STANDARD
+              timeStorageClassUpdated: '2018-12-17T22:34:53.223Z'
+              size: '16'
+              md5Hash: rRCEo+QDC0OMiG8j+ucmzA==
+              mediaLink: https://www.googleapis.com/download/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt?generation=1545086093224064&alt=media
+              crc32c: lM1yKQ==
+              etag: CIDR7532p98CEAE=
+    - expect_stderr: |
+        WARNING: Deleting a bucket is irreversible and makes that bucket name available for others to claim.
+    - expect_prompt_continue:
+        message: |-
+          This command will delete the following buckets:
+            $$bucket$$
+        user_input: y
+    - expect_prompt_continue:
+        message: |-
+          You are about to delete the following:
+            gs://$$bucket$$
+            gs://$$bucket$$/another_c.txt
+            gs://$$bucket$$/c.txt
+            gs://$$bucket$$/test_data/a.txt
+            gs://$$bucket$$/test_data/a/a.txt
+            gs://$$bucket$$/test_data/aa/a.txt
+            gs://$$bucket$$/test_data/aa/b.txt
+            gs://$$bucket$$/test_data/b.txt
+            gs://$$bucket$$/test_data/b/a.txt
+            gs://$$bucket$$/test_data/b/b.txt
+            gs://$$bucket$$/test_data/c/a.txt
+            gs://$$bucket$$/test_data/c/b.txt
+            gs://$$bucket$$/test_data/c/c.txt
+        user_input: y
+    - expect_progress_bar:
+        message: Deleting Files
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Urv1V9knhT0ACYAcLkPqiwn8JDuvLDhckeRAMiBPDZZiUVHAXXn_JEwEScORRGCPSmdsBbeZamkEqY4wC-g8dFDIRaogA
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UoYeTFjvSk3Z3XzEnNmLQF0TRsorB02sv1nR0aRVzFeK4ew7ClMRkOB7in74Iz1L9dvc-MARbZks_VHYMote4fAZyYFlA
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Uo7poVO2T3ySkjN816AHvd57VJgjV8qMiZbrDm-XJo5-Ll59Ej-n4hHUnW_5ZdIkKZ6kliOwVGry1FWmvJMdJpidqwdHg
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UqU6ZZbc4fQIWD6JPhZd70uUTuo3G4FwMocA0cxjpWDVGl_uDXE60R_VGfBo7hiXyKazWkR6zdPgrdMQUQ9iuTBtpyG-w
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UrUOLDy4w5DXuebENOoZVYngONyd2ovRzqqzUA4_WAmxJFPyTj2TQhhK7DZNH72AnpLLdKl8fsX3vqIveN0AfnoXTxnmg
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UrE9euquk4G_NruIkyr9RdzZIuvUlI6eh5XnXdH1H469mnbchBlxsEAArSrJwUGJObK7aU3idQqUBNan5RCsBKjaShKiw
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UoSGQgOeKyB_CCFxYiUuAiSpLiN9Cg6GIrtaEFtDww8uGIUOz007bgBQL9KQ6Hy2GX8MbQTwnWfWvHG9Q4o30KR3D7sJw
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Urapendsd71-SMqWL0To3LxB3mcfixZgyJ6XBbJqsPwwz4j3Xb7qulwF1-nKRjy4qljFevzT6sC4KKFgz-2nlYMYkp4Lw
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UrhsLsA9omkOXg0r2MLS6Za9o_jjJ1e47dXLUZzBtK-jrJuzCKZmqKg0kF29ewCPY5RB5TuEyUZwuR5MR8iQWmrBbnAUw
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UpS8qNIlDfU6Hh_fR4jVVQZkdkD_gNTZs5uJ69MjAczB7gbAMHmV0JD40326DRyvG-9i1yJXJTan-w2xWV352Zfa5P71g
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UrKvEslV146xBiJpPgasxeT6by0XNA6L95BHB8CyxTSjIYl9voUiyGVKpAUPg19V9bOT3vcUW8w-Kx3nNgK3SaLpzIHLw
+          body: ''
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UqctP_yNO0du-CbLChQbiZZbhuiGrHZXwWZxMZCRxsGbkdmA1uySj45hUNkyIGjYbB-XxcJJWd6v2LPvZvN8YX6-27Ojg
+          body: ''
+    - expect_stderr: |2
+
+        Deleted [12] files.
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '0'
+            content-type: application/json
+            pragma: no-cache
+            status: '204'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2UpEpgYNQXuR9Gp4XYKgyjerhOg0hig97KV6et9fE3CuALa1rUmUlItGFFYuxWVSDLC5OwS7q6wW1K3Jl86W4j8YMhKeMg
+          body: ''
+    - expect_stderr: |
+        Deleted bucket [gs://$$bucket$$].
+    - expect_exit:
+        code: 0

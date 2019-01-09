@@ -35,7 +35,7 @@ class RevisionsListTest(base.ServerlessSurfaceBase):
       r.metadata.creationTimestamp = '2018/01/01 00:{}0:00Z'.format(i)
       r.labels['serving.knative.dev/service'] = 'foo'
       r.labels['serving.knative.dev/configuration'] = 'foo'
-      r.labels[revision.AUTHOR_LABEL] = 'some{}@google.com'.format(i)
+      r.annotations[revision.AUTHOR_ANNOTATION] = 'some{}@google.com'.format(i)
       r.status.conditions = [self.serverless_messages.RevisionCondition(
           type='Ready',
           status='Unknown' if i%2 else 'True')]

@@ -11,7 +11,7 @@ gcloud compute firewall\-rules create \- create a Google Compute Engine firewall
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute firewall\-rules create\fR \fINAME\fR (\fB\-\-action\fR=\fIACTION\fR\ |\ \fB\-\-allow\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-disabled\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]] [\fB\-\-source\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute firewall\-rules create\fR \fINAME\fR (\fB\-\-action\fR=\fIACTION\fR\ |\ \fB\-\-allow\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-disabled\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]] [\fB\-\-source\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -130,6 +130,11 @@ $ gcloud compute firewall\-rules update MY\-RULE \-\-no\-disabled
 .RE
 
 Firewall rules are enabled by default.
+
+.TP 2m
+\fB\-\-enable\-logging\fR
+Enable logging for the firewall rule. Logs will be exported to StackDriver.
+Firewall logging is disabled by default.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR; default="default"

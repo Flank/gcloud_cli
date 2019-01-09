@@ -1,0 +1,79 @@
+title: compute instances add-iam-policy-binding scenario test
+release_tracks: [BETA]
+
+actions:
+# add binding without condition to a policy without condition
+- execute_command:
+    command: compute instances add-iam-policy-binding my-instance --zone=ZONE --member=user:test@gmail.com --role=roles/non-primitive
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/fake-project/zones/ZONE/instances/projects%2Ffake-project%2Fzones%2FZONE%2Finstances%2Fmy-instance/getIamPolicy?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/another-non-primitive",
+                  "members": [
+                    "user:owner@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/beta/projects/fake-project/zones/ZONE/instances/projects%2Ffake-project%2Fzones%2FZONE%2Finstances%2Fmy-instance/setIamPolicy?alt=json
+          method: POST
+          body:
+            json:
+              policy:
+                bindings:
+                - role: 'roles/another-non-primitive'
+                  members: ['user:owner@gmail.com']
+                - role: 'roles/non-primitive'
+                  members: ['user:test@gmail.com']
+                etag: 'etag'
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/another-non-primitive",
+                  "members": [
+                    "user:owner@gmail.com"
+                  ]
+                },
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:test@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for instance [my-instance].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:owner@gmail.com
+          role: roles/another-non-primitive
+        - members:
+          - user:test@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0

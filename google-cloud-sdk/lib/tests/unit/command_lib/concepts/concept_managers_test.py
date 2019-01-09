@@ -39,8 +39,7 @@ class ConceptManagerTest(concepts_test_base.ConceptArgsTestBase):
     manager = concept_managers.ConceptManager()
     manager.AddConcept(self.string_concept)
     # The presentation name of two top level concepts can't be equivalent.
-    manager.AddConcept(test_concepts.FooBarArg(name='c',
-                                               help_text='help'))
+    manager.AddConcept(test_concepts.MakeDoubleFooBar('c', 'Will not work!'))
     with self.assertRaisesRegex(ValueError, 'c'):
       manager.AddToParser(self.parser)
 
@@ -70,9 +69,12 @@ class ConceptManagerTest(concepts_test_base.ConceptArgsTestBase):
                    choices=None)],
         any_order=True)
     parser.add_argument_group.assert_has_calls(
-        [mock.call('help This is a concept with two group concepts inside it!'),
-         mock.call('the first foobar This is a foobar concept.'),
-         mock.call('the second foobar This is a foobar concept.')],
+        [mock.call('Group concept help.',
+                   hidden=False, mutex=False, required=False),
+         mock.call('The first foobar.',
+                   hidden=False, mutex=False, required=False),
+         mock.call('The second foobar.',
+                   hidden=False, mutex=False, required=False)],
         any_order=True)
 
   def testFinalParse(self):

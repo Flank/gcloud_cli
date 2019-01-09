@@ -1,0 +1,745 @@
+title: Copy one a BigQuery Table to another.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Copy normal.
+  - command: |-
+      bq tables copy --source my_table --destination my_table_2
+      --source-dataset mydataset --job-id gcloud-bq-test
+  - stderr: |
+      Created Job [fake-project:US.gcloud-bq-test] Copying mydataset:my_table to mydataset:my_table_2.
+  - stdout: |
+      configuration:
+        copy:
+          destinationTable:
+            datasetId: mydataset
+            projectId: fake-project
+            tableId: my_table_2
+          sourceTable:
+            datasetId: mydataset
+            projectId: fake-project
+            tableId: my_table
+        jobType: COPY
+      etag: '"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8"'
+      id: fake-project:US.gcloud-bq-test
+      jobReference:
+        jobId: gcloud-bq-test
+        location: US
+        projectId: fake-project
+      kind: bigquery#job
+      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+      statistics:
+        creationTime: '1545436678290'
+        startTime: '1545436678436'
+      status:
+        state: RUNNING
+      user_email: user@google.com
+- execute:
+  - label: Copy with destination dataset fall through
+  - command: |-
+      bq tables copy --source my_table --destination my_table_2
+      --destination-dataset mydataset --job-id gcloud-bq-test
+  - stderr: |
+      Created Job [fake-project:US.gcloud-bq-test] Copying mydataset:my_table to mydataset:my_table_2.
+  - stdout: |
+      configuration:
+        copy:
+          destinationTable:
+            datasetId: mydataset
+            projectId: fake-project
+            tableId: my_table_2
+          sourceTable:
+            datasetId: mydataset
+            projectId: fake-project
+            tableId: my_table
+        jobType: COPY
+      etag: '"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8"'
+      id: fake-project:US.gcloud-bq-test
+      jobReference:
+        jobId: gcloud-bq-test
+        location: US
+        projectId: fake-project
+      kind: bigquery#job
+      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+      statistics:
+        creationTime: '1545436678290'
+        startTime: '1545436678436'
+      status:
+        state: RUNNING
+      user_email: user@google.com
+- execute:
+  - label: Copy with different destination and source dataset.
+  - command: |-
+      bq tables copy --source my_table --source-dataset myotherdataset --destination my_table_2
+      --destination-dataset mydataset --job-id gcloud-bq-test
+  - stderr: |
+      Created Job [fake-project:US.gcloud-bq-test] Copying myotherdataset:my_table to mydataset:my_table_2.
+  - stdout: |
+      configuration:
+        copy:
+          destinationTable:
+            datasetId: mydataset
+            projectId: fake-project
+            tableId: my_table_2
+          sourceTable:
+            datasetId: myotherdataset
+            projectId: fake-project
+            tableId: my_table
+        jobType: COPY
+      etag: '"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8"'
+      id: fake-project:US.gcloud-bq-test
+      jobReference:
+        jobId: gcloud-bq-test
+        location: US
+        projectId: fake-project
+      kind: bigquery#job
+      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+      statistics:
+        creationTime: '1545436678290'
+        startTime: '1545436678436'
+      status:
+        state: RUNNING
+      user_email: user@google.com
+- execute:
+  - label: Copy with overwrite.
+  - command: |-
+      bq tables copy --source projects/fake-project/datasets/mydataset/tables/my_table
+      --destination projects/fake-project/datasets/mydataset/tables/my_table_2 --overwrite
+      --job-id gcloud-bq-test
+  - stderr: |
+      Created Job [fake-project:US.gcloud-bq-test] Copying mydataset:my_table to mydataset:my_table_2.
+  - stdout: |
+      configuration:
+        copy:
+          destinationTable:
+            datasetId: mydataset
+            projectId: fake-project
+            tableId: my_table_2
+          sourceTable:
+            datasetId: mydataset
+            projectId: fake-project
+            tableId: my_table
+        jobType: COPY
+      etag: '"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8"'
+      id: fake-project:US.gcloud-bq-test
+      jobReference:
+        jobId: gcloud-bq-test
+        location: US
+        projectId: fake-project
+      kind: bigquery#job
+      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+      statistics:
+        creationTime: '1545436678290'
+        startTime: '1545436678436'
+      status:
+        state: RUNNING
+      user_email: user@google.com
+- execute:
+  - label: Copy async
+  - command: |-
+      bq tables copy --source projects/fake-project/datasets/mydataset/tables/my_table
+      --destination projects/fake-project/datasets/mydataset/tables/my_table_2 --async
+      --job-id gcloud-bq-test
+  - progress_tracker:
+    - message: Copying mydataset:my_table to mydataset:my_table_2.
+    - status: SUCCESS
+  - stderr: |
+      Copied mydataset:my_table to mydataset:my_table_2.
+  - stdout: |
+      creationTime: '1545436678483'
+      etag: ZCHgCFBXQ1YyfYn9svDbUQ==
+      id: fake-project:mydataset.my_table_2
+      kind: bigquery#table
+      lastModifiedTime: '1545436678483'
+      location: US
+      numBytes: '0'
+      numLongTermBytes: '0'
+      numRows: '0'
+      schema:
+        fields:
+        - mode: REQUIRED
+          name: field1
+          type: STRING
+        - mode: NULLABLE
+          name: field2
+          type: FLOAT
+        - mode: NULLABLE
+          name: field3
+          type: BOOLEAN
+      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2
+      tableReference:
+        datasetId: mydataset
+        projectId: fake-project
+        tableId: my_table_2
+      type: TABLE
+actions:
+- execute_command:
+    label: Copy normal.
+    command: |-
+      bq tables copy --source my_table --destination my_table_2
+      --source-dataset mydataset --job-id gcloud-bq-test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              configuration:
+                copy:
+                  destinationTable:
+                    datasetId: mydataset
+                    projectId: fake-project
+                    tableId: my_table_2
+                  sourceTable:
+                    datasetId: mydataset
+                    projectId: fake-project
+                    tableId: my_table
+              jobReference:
+                jobId: gcloud-bq-test
+                projectId: fake-project
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+             "kind": "bigquery#job",
+             "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
+             "id": "fake-project:US.gcloud-bq-test",
+             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "jobReference": {
+              "projectId": "fake-project",
+              "jobId": "gcloud-bq-test",
+              "location": "US"
+             },
+             "configuration": {
+              "jobType": "COPY",
+              "copy": {
+               "sourceTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table"
+               },
+               "destinationTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table_2"
+               }
+              }
+             },
+             "status": {
+              "state": "RUNNING"
+             },
+             "statistics": {
+              "creationTime": "1545436678290",
+              "startTime": "1545436678436"
+             },
+             "user_email": "user@google.com"
+            }
+    - expect_stderr: |
+        Created Job [fake-project:US.gcloud-bq-test] Copying mydataset:my_table to mydataset:my_table_2.
+    - expect_stdout: |
+        configuration:
+          copy:
+            destinationTable:
+              datasetId: mydataset
+              projectId: fake-project
+              tableId: my_table_2
+            sourceTable:
+              datasetId: mydataset
+              projectId: fake-project
+              tableId: my_table
+          jobType: COPY
+        etag: '"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8"'
+        id: fake-project:US.gcloud-bq-test
+        jobReference:
+          jobId: gcloud-bq-test
+          location: US
+          projectId: fake-project
+        kind: bigquery#job
+        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+        statistics:
+          creationTime: '1545436678290'
+          startTime: '1545436678436'
+        status:
+          state: RUNNING
+        user_email: user@google.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Copy with destination dataset fall through
+    command: |-
+      bq tables copy --source my_table --destination my_table_2
+      --destination-dataset mydataset --job-id gcloud-bq-test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              configuration:
+                copy:
+                  destinationTable:
+                    datasetId: mydataset
+                    projectId: fake-project
+                    tableId: my_table_2
+                  sourceTable:
+                    datasetId: mydataset
+                    projectId: fake-project
+                    tableId: my_table
+              jobReference:
+                jobId: gcloud-bq-test
+                projectId: fake-project
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+             "kind": "bigquery#job",
+             "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
+             "id": "fake-project:US.gcloud-bq-test",
+             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "jobReference": {
+              "projectId": "fake-project",
+              "jobId": "gcloud-bq-test",
+              "location": "US"
+             },
+             "configuration": {
+              "jobType": "COPY",
+              "copy": {
+               "sourceTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table"
+               },
+               "destinationTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table_2"
+               }
+              }
+             },
+             "status": {
+              "state": "RUNNING"
+             },
+             "statistics": {
+              "creationTime": "1545436678290",
+              "startTime": "1545436678436"
+             },
+             "user_email": "user@google.com"
+            }
+    - expect_stderr: |
+        Created Job [fake-project:US.gcloud-bq-test] Copying mydataset:my_table to mydataset:my_table_2.
+    - expect_stdout: |
+        configuration:
+          copy:
+            destinationTable:
+              datasetId: mydataset
+              projectId: fake-project
+              tableId: my_table_2
+            sourceTable:
+              datasetId: mydataset
+              projectId: fake-project
+              tableId: my_table
+          jobType: COPY
+        etag: '"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8"'
+        id: fake-project:US.gcloud-bq-test
+        jobReference:
+          jobId: gcloud-bq-test
+          location: US
+          projectId: fake-project
+        kind: bigquery#job
+        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+        statistics:
+          creationTime: '1545436678290'
+          startTime: '1545436678436'
+        status:
+          state: RUNNING
+        user_email: user@google.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Copy with different destination and source dataset.
+    command: |-
+      bq tables copy --source my_table --source-dataset myotherdataset --destination my_table_2
+      --destination-dataset mydataset --job-id gcloud-bq-test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              configuration:
+                copy:
+                  destinationTable:
+                    datasetId: mydataset
+                    projectId: fake-project
+                    tableId: my_table_2
+                  sourceTable:
+                    datasetId: myotherdataset
+                    projectId: fake-project
+                    tableId: my_table
+              jobReference:
+                jobId: gcloud-bq-test
+                projectId: fake-project
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+             "kind": "bigquery#job",
+             "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
+             "id": "fake-project:US.gcloud-bq-test",
+             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "jobReference": {
+              "projectId": "fake-project",
+              "jobId": "gcloud-bq-test",
+              "location": "US"
+             },
+             "configuration": {
+              "jobType": "COPY",
+              "copy": {
+               "sourceTable": {
+                "projectId": "fake-project",
+                "datasetId": "myotherdataset",
+                "tableId": "my_table"
+               },
+               "destinationTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table_2"
+               }
+              }
+             },
+             "status": {
+              "state": "RUNNING"
+             },
+             "statistics": {
+              "creationTime": "1545436678290",
+              "startTime": "1545436678436"
+             },
+             "user_email": "user@google.com"
+            }
+
+    - expect_stderr: |
+        Created Job [fake-project:US.gcloud-bq-test] Copying myotherdataset:my_table to mydataset:my_table_2.
+    - expect_stdout: |
+        configuration:
+          copy:
+            destinationTable:
+              datasetId: mydataset
+              projectId: fake-project
+              tableId: my_table_2
+            sourceTable:
+              datasetId: myotherdataset
+              projectId: fake-project
+              tableId: my_table
+          jobType: COPY
+        etag: '"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8"'
+        id: fake-project:US.gcloud-bq-test
+        jobReference:
+          jobId: gcloud-bq-test
+          location: US
+          projectId: fake-project
+        kind: bigquery#job
+        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+        statistics:
+          creationTime: '1545436678290'
+          startTime: '1545436678436'
+        status:
+          state: RUNNING
+        user_email: user@google.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Copy with overwrite.
+    command: |-
+      bq tables copy --source projects/fake-project/datasets/mydataset/tables/my_table
+      --destination projects/fake-project/datasets/mydataset/tables/my_table_2 --overwrite
+      --job-id gcloud-bq-test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              configuration:
+                copy:
+                  destinationTable:
+                    datasetId: mydataset
+                    projectId: fake-project
+                    tableId: my_table_2
+                  sourceTable:
+                    datasetId: mydataset
+                    projectId: fake-project
+                    tableId: my_table
+                  writeDisposition: WRITE_TRUNCATE
+              jobReference:
+                jobId: gcloud-bq-test
+                projectId: fake-project
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+             "kind": "bigquery#job",
+             "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
+             "id": "fake-project:US.gcloud-bq-test",
+             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "jobReference": {
+              "projectId": "fake-project",
+              "jobId": "gcloud-bq-test",
+              "location": "US"
+             },
+             "configuration": {
+              "jobType": "COPY",
+              "copy": {
+               "sourceTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table"
+               },
+               "destinationTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table_2"
+               }
+              }
+             },
+             "status": {
+              "state": "RUNNING"
+             },
+             "statistics": {
+              "creationTime": "1545436678290",
+              "startTime": "1545436678436"
+             },
+             "user_email": "user@google.com"
+            }
+    - expect_stderr: |
+        Created Job [fake-project:US.gcloud-bq-test] Copying mydataset:my_table to mydataset:my_table_2.
+    - expect_stdout: |
+        configuration:
+          copy:
+            destinationTable:
+              datasetId: mydataset
+              projectId: fake-project
+              tableId: my_table_2
+            sourceTable:
+              datasetId: mydataset
+              projectId: fake-project
+              tableId: my_table
+          jobType: COPY
+        etag: '"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8"'
+        id: fake-project:US.gcloud-bq-test
+        jobReference:
+          jobId: gcloud-bq-test
+          location: US
+          projectId: fake-project
+        kind: bigquery#job
+        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+        statistics:
+          creationTime: '1545436678290'
+          startTime: '1545436678436'
+        status:
+          state: RUNNING
+        user_email: user@google.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Copy async
+    command: |-
+      bq tables copy --source projects/fake-project/datasets/mydataset/tables/my_table
+      --destination projects/fake-project/datasets/mydataset/tables/my_table_2 --async
+      --job-id gcloud-bq-test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              configuration:
+                copy:
+                  destinationTable:
+                    datasetId: mydataset
+                    projectId: fake-project
+                    tableId: my_table_2
+                  sourceTable:
+                    datasetId: mydataset
+                    projectId: fake-project
+                    tableId: my_table
+              jobReference:
+                jobId: gcloud-bq-test
+                projectId: fake-project
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+             "kind": "bigquery#job",
+             "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
+             "id": "fake-project:US.gcloud-bq-test",
+             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "jobReference": {
+              "projectId": "fake-project",
+              "jobId": "gcloud-bq-test",
+              "location": "US"
+             },
+             "configuration": {
+              "jobType": "COPY",
+              "copy": {
+               "sourceTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table"
+               },
+               "destinationTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table_2"
+               }
+              }
+             },
+             "status": {
+              "state": "RUNNING"
+             },
+             "statistics": {
+              "creationTime": "1545436678290",
+              "startTime": "1545436678436"
+             },
+             "user_email": "user@google.com"
+            }
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+             "kind": "bigquery#job",
+             "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
+             "id": "fake-project:US.gcloud-bq-test",
+             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "jobReference": {
+              "projectId": "fake-project",
+              "jobId": "gcloud-bq-test",
+              "location": "US"
+             },
+             "configuration": {
+              "jobType": "COPY",
+              "copy": {
+               "sourceTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table"
+               },
+               "destinationTable": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table_2"
+               }
+              }
+             },
+             "status": {
+              "state": "DONE"
+             },
+             "statistics": {
+              "creationTime": "1545436678290",
+              "startTime": "1545436678436"
+             },
+             "user_email": "user@google.com"
+            }
+    - expect_progress_tracker:
+        message: Copying mydataset:my_table to mydataset:my_table_2.
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#table",
+              "etag": "ZCHgCFBXQ1YyfYn9svDbUQ==",
+              "id": "fake-project:mydataset.my_table_2",
+              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2",
+              "tableReference": {
+                "projectId": "fake-project",
+                "datasetId": "mydataset",
+                "tableId": "my_table_2"
+              },
+              "schema": {
+                "fields": [
+                  {
+                    "name": "field1",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                  },
+                  {
+                    "name": "field2",
+                    "type": "FLOAT",
+                    "mode": "NULLABLE"
+                  },
+                  {
+                    "name": "field3",
+                    "type": "BOOLEAN",
+                    "mode": "NULLABLE"
+                  }
+                ]
+              },
+              "numBytes": "0",
+              "numLongTermBytes": "0",
+              "numRows": "0",
+              "creationTime": "1545436678483",
+              "lastModifiedTime": "1545436678483",
+              "type": "TABLE",
+              "location": "US"
+            }
+    - expect_stderr: |
+        Copied mydataset:my_table to mydataset:my_table_2.
+    - expect_stdout: |
+        creationTime: '1545436678483'
+        etag: ZCHgCFBXQ1YyfYn9svDbUQ==
+        id: fake-project:mydataset.my_table_2
+        kind: bigquery#table
+        lastModifiedTime: '1545436678483'
+        location: US
+        numBytes: '0'
+        numLongTermBytes: '0'
+        numRows: '0'
+        schema:
+          fields:
+          - mode: REQUIRED
+            name: field1
+            type: STRING
+          - mode: NULLABLE
+            name: field2
+            type: FLOAT
+          - mode: NULLABLE
+            name: field3
+            type: BOOLEAN
+        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2
+        tableReference:
+          datasetId: mydataset
+          projectId: fake-project
+          tableId: my_table_2
+        type: TABLE
+    - expect_exit:
+        code: 0

@@ -11,7 +11,7 @@ gcloud endpoints operations describe \- describes an operation resource for a gi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud endpoints operations describe\fR \fIOPERATION\fR [\fB\-\-full\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud endpoints operations describe\fR \fIOPERATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -19,10 +19,6 @@ gcloud endpoints operations describe \- describes an operation resource for a gi
 
 This command will return information about an operation given the name of that
 operation.
-
-The amount of information inside an operation can be very large, so by default,
-only a summary is returned. If you want the entire operation resource, you can
-include the \f5\-\-full\fR flag.
 
 Note that the \f5operations/\fR prefix of the operation name is optional and may
 be omitted.
@@ -35,18 +31,6 @@ be omitted.
 .TP 2m
 \fIOPERATION\fR
 The name of the operation to describe.
-
-
-.RE
-.sp
-
-.SH "FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-full\fR
-Print the entire operation resource, which could be large. By default, a summary
-will be printed instead.
 
 
 .RE
@@ -68,13 +52,6 @@ To describe an operation resource named
 
 .RS 2m
 $ gcloud endpoints operations describe serviceConfigs.my\-service.1
-.RE
-
-To get the full operation resource, run:
-
-.RS 2m
-$ gcloud endpoints operations describe serviceConfigs.my\-service.1 \e
-    \-\-full
 .RE
 
 

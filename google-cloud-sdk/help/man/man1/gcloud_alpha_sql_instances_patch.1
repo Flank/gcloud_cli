@@ -145,7 +145,11 @@ type is desired, and the \-\-tier flag must be omitted.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
-Network in the current project that the instance will be part of.
+Network in the current project that the instance will be part of. To specify
+using a network with a shared VPC, use the full URL of the network. For an
+example host project, 'testproject', and shared network, 'testsharednetwork',
+this would be of the
+form:\f5\-\-network\fR=\f5projects/testproject/global/networks/testsharednetwork\fR
 
 .TP 2m
 \fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR, \fB\-p\fR \fIPRICING_PLAN\fR
@@ -192,7 +196,7 @@ will be restarted.
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to update. If a label exists its value is
+List of label KEY=VALUE pairs to update. If a label exists its value is
 modified, otherwise a new label is created.
 
 Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
@@ -265,7 +269,7 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-clear\-labels\fR
-Removes all labels. If \f5\-\-update\-labels\fR is also specified then
+Remove all labels. If \f5\-\-update\-labels\fR is also specified then
 \f5\-\-clear\-labels\fR is applied first.
 
 For example, to remove all labels:
@@ -283,8 +287,7 @@ $ gcloud alpha sql instances patch \-\-clear\-labels \e
 
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
-A list of label keys to remove. If a label does not exist it is silently
-ignored.
+List of label keys to remove. If a label does not exist it is silently ignored.
 
 .RE
 .sp

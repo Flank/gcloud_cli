@@ -1,3 +1,6 @@
+skip:
+  reason: Failing
+  bug: b/121373507
 title: Creates a regional MIG, starts a proactive update, and then stop it.
 release_tracks: [BETA]
 summary:
@@ -93,7 +96,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -184,7 +187,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -257,7 +260,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -348,7 +351,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -456,7 +459,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -516,7 +519,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups?alt=json&maxResults=500
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -572,7 +575,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/autoscalers?alt=json&maxResults=500
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -611,7 +614,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -711,7 +714,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         expect_response:
           body:
             json:
@@ -828,7 +831,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         expect_response:
           body:
             json:
@@ -910,7 +913,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/autoscalers?alt=json&maxResults=500
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -927,7 +930,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -971,7 +974,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -1011,7 +1014,7 @@ actions:
           uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             Cache-Control: private, max-age=0

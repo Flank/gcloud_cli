@@ -1,0 +1,34 @@
+NAME
+    gcloud alpha bq jobs - interact with and manage jobs in Google BigQuery
+
+SYNOPSIS
+    gcloud alpha bq jobs COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Interact with and manage jobs in Google BigQuery.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        (ALPHA) Cancel a BigQuery job.
+
+     describe
+        (ALPHA) Describe a BigQuery job.
+
+     list
+        (ALPHA) List all BigQuery jobs in a project.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

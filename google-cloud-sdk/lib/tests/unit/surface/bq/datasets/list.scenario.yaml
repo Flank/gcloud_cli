@@ -1,0 +1,77 @@
+title: List all BigQuery Datasets
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: bq datasets list --all
+  - stdout: |
+      ID                                                      LOCATION
+      fake-project:_0836ae2b80a29b30a0484b8301a4cb74d68a651f  US
+      fake-project:_1850c16801407bf63c8550f765af6b3fd8e9d801  US
+      fake-project:testdata                                   US
+      fake-project:testdata                                   US
+
+actions:
+- execute_command:
+    command: bq datasets list --all
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets?all=True&alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "bigquery#datasetList",
+              "etag": "\"6M3sY2P57RlRag1RA5x-vVNSeSo/FuqKNlYs4TB5pyIDOspikdqYnQ0\"",
+              "datasets": [
+              {
+                "kind": "bigquery#dataset",
+                "id": "fake-project:_0836ae2b80a29b30a0484b8301a4cb74d68a651f",
+                "datasetReference": {
+                  "datasetId": "_0836ae2b80a29b30a0484b8301a4cb74d68a651f",
+                  "projectId": "fake-project"
+                },
+                "location": "US"
+              },
+              {
+                "kind": "bigquery#dataset",
+                "id": "fake-project:_1850c16801407bf63c8550f765af6b3fd8e9d801",
+                "datasetReference": {
+                  "datasetId": "_1850c16801407bf63c8550f765af6b3fd8e9d801",
+                  "projectId": "fake-project"
+                },
+                "location": "US"
+              },
+              {
+                "kind": "bigquery#dataset",
+                "id": "fake-project:testdata",
+                "datasetReference": {
+                  "datasetId": "testdata",
+                  "projectId": "fake-project"
+                },
+                "location": "US"
+              },
+              {
+                "kind": "bigquery#dataset",
+                "id": "fake-project:testdata",
+                "datasetReference": {
+                  "datasetId": "testdata2",
+                  "projectId": "fake-project"
+                },
+                "location": "US"
+              }
+              ]
+            }
+    - expect_stdout: |
+        ID                                                      LOCATION
+        fake-project:_0836ae2b80a29b30a0484b8301a4cb74d68a651f  US
+        fake-project:_1850c16801407bf63c8550f765af6b3fd8e9d801  US
+        fake-project:testdata                                   US
+        fake-project:testdata                                   US
+    - expect_exit:
+        code: 0

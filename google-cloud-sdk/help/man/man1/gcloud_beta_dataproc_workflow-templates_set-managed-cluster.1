@@ -335,9 +335,12 @@ The Google Cloud IAM service account to be authenticated as.
 
 .TP 2m
 \fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]
-Specifies a list of tags to apply to the instances for identifying the instances
-to which network firewall rules will apply. See \fBgcloud compute
-firewall\-rules create\fR(1) for more details.
+Specifies a list of tags to apply to the instance. These tags allow network
+firewall rules and routes to be applied to specified VM instances. See \fBgcloud
+compute firewall\-rules create\fR(1) for more details.
+
+To read more about configuring network tags, read this guide:
+https://cloud.google.com/vpc/docs/add\-remove\-network\-tags
 
 To list instances with their respective status and tags, run:
 

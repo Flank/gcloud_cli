@@ -19,10 +19,37 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import base_classes
+from googlecloudsdk.api_lib.compute import batch_helper
+from googlecloudsdk.api_lib.compute import utils
+from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.networks.peerings import flags
+from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+
+
+def _MakeRequests(client, requests, is_async):
+  """Helper for making asynchronous or synchronous peering creation requests."""
+  if is_async:
+    responses, errors = batch_helper.MakeRequests(
+        requests=requests,
+        http=client.apitools_client.http,
+        batch_url=client.batch_url)
+    if not errors:
+      for operation in responses:
+        log.status.write('Creating network peering for [{0}]\n'.format(
+            operation.targetLink))
+        log.status.write('Monitor its progress at [{0}]\n'.format(
+            operation.selfLink))
+    else:
+      utils.RaiseToolException(errors)
+  else:
+    # We want to run through the generator that MakeRequests returns in order
+    # to actually make the requests.
+    responses = client.MakeRequests(requests)
+
+  return responses
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
@@ -30,17 +57,15 @@ class Create(base.Command):
   """Create a Google Compute Engine network peering."""
 
   @staticmethod
-  def Args(parser):
+  def ArgsCommon(parser):
 
-    parser.add_argument(
-        'name',
-        help='The name of the peering.')
+    parser.add_argument('name', help='The name of the peering.')
 
     parser.add_argument(
         '--network',
         required=True,
         help='The name of the network in the current project to be peered '
-             'with the peer network.')
+        'with the peer network.')
 
     parser.add_argument(
         '--peer-network',
@@ -51,16 +76,21 @@ class Create(base.Command):
         '--peer-project',
         required=False,
         help='The name of the project for the peer network.  If not specified, '
-             'defaults to current project.')
+        'defaults to current project.')
 
+    base.ASYNC_FLAG.AddToParser(parser)
+
+  @staticmethod
+  def Args(parser):
+    Create.ArgsCommon(parser)
     parser.add_argument(
         '--auto-create-routes',
         action='store_true',
         default=False,
         required=False,
         help='If set, will automatically create routes for the network '
-             'peering.  Note that a backend error will be returned if this is '
-             'not set.')
+        'peering.  Note that a backend error will be returned if this is '
+        'not set.')
 
   def Run(self, args):
     """Issues the request necessary for adding the peering."""
@@ -83,8 +113,8 @@ class Create(base.Command):
             peerNetwork=peer_network_ref.RelativeName()),
         project=properties.VALUES.core.project.GetOrFail())
 
-    return client.MakeRequests([(client.apitools_client.networks, 'AddPeering',
-                                 request)])
+    requests = [(client.apitools_client.networks, 'AddPeering', request)]
+    return _MakeRequests(client, requests, args.async)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -93,9 +123,23 @@ class CreateAlpha(Create):
 
   @staticmethod
   def Args(parser):
-    super(CreateAlpha, CreateAlpha).Args(parser)
+    super(CreateAlpha, CreateAlpha).ArgsCommon(parser)
     flags.AddImportCustomRoutesFlag(parser)
     flags.AddExportCustomRoutesFlag(parser)
+
+    action = actions.DeprecationAction(
+        'auto-create-routes',
+        warn='Flag --auto-create-routes is deprecated and will '
+        'be removed in a future release.',
+        action='store_true')
+    parser.add_argument(
+        '--auto-create-routes',
+        action=action,
+        default=False,
+        required=False,
+        help='If set, will automatically create routes for the '
+        'network peering. Flag auto-create-routes is deprecated. Peer network '
+        'subnet routes are always created in a network when peered.')
 
   def Run(self, args):
     """Issues the request necessary for adding the peering."""
@@ -113,12 +157,13 @@ class CreateAlpha(Create):
     request = client.messages.ComputeNetworksAddPeeringRequest(
         network=args.network,
         networksAddPeeringRequest=client.messages.NetworksAddPeeringRequest(
-            autoCreateRoutes=args.auto_create_routes,
-            name=args.name,
-            peerNetwork=peer_network_ref.RelativeName(),
-            exportCustomRoutes=args.export_custom_routes,
-            importCustomRoutes=args.import_custom_routes),
+            networkPeering=client.messages.NetworkPeering(
+                name=args.name,
+                network=peer_network_ref.RelativeName(),
+                exportCustomRoutes=args.export_custom_routes,
+                importCustomRoutes=args.import_custom_routes,
+                exchangeSubnetRoutes=True)),
         project=properties.VALUES.core.project.GetOrFail())
 
-    return client.MakeRequests([(client.apitools_client.networks, 'AddPeering',
-                                 request)])
+    requests = [(client.apitools_client.networks, 'AddPeering', request)]
+    return _MakeRequests(client, requests, args.async)

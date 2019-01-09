@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud compute addresses create [NAME ...] [--description=DESCRIPTION]
-        [--network-tier=NETWORK_TIER] [--subnet=SUBNET]
+        [--network=NETWORK] [--network-tier=NETWORK_TIER]
+        [--prefix-length=PREFIX_LENGTH] [--purpose=PURPOSE] [--subnet=SUBNET]
         [--addresses=ADDRESS,[ADDRESS,...] | --ip-version=IP_VERSION]
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
@@ -12,7 +13,7 @@ DESCRIPTION
     addresses. Once an IP address is reserved, it will be associated with the
     project until it is released using 'gcloud compute addresses delete'.
     Ephemeral IP addresses that are in use by resources in the project can be
-    reserved using the --addresses flag.
+    reserved using the '--addresses' flag.
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -22,9 +23,27 @@ FLAGS
      --description=DESCRIPTION
         An optional textual description for the addresses.
 
+     --network=NETWORK
+        If specified, the network resource in which the address(es) should be
+        reserved.
+
+        This is only available for global internal address, which represents an
+        internal IP range reservation from within the network.
+
      --network-tier=NETWORK_TIER
         The network tier to assign to the reserved IP addresses. NETWORK_TIER
         must be one of: PREMIUM, STANDARD. The default value is PREMIUM.
+
+     --prefix-length=PREFIX_LENGTH
+        The prefix length of the IP range. It must be a value between 8 and 30
+        inclusive. If not present, it means the address field is a single IP
+        address.
+
+        This field is not applicable to external addresses.
+
+     --purpose=PURPOSE
+        The purpose of the address resource. This field is not applicable to
+        external addresses. PURPOSE must be one of: VPC_PEERING, GCE_ENDPOINT.
 
      --subnet=SUBNET
         If specified, the subnet name in which the address(es) should be
@@ -73,24 +92,39 @@ GCLOUD WIDE FLAGS
     details.
 
 EXAMPLES
-    To reserve three IP addresses in the us-central1 region, run:
+    To reserve three IP addresses in the 'us-central1' region, run:
 
         $ gcloud compute addresses create ADDRESS-1 ADDRESS-2 ADDRESS-3 \
             --region us-central1
 
     To reserve ephemeral IP addresses 162.222.181.198 and 23.251.146.189 which
-    are being used by virtual machine instances in the us-central1 region, run:
+    are being used by virtual machine instances in the 'us-central1' region,
+    run:
 
         $ gcloud compute addresses create \
             --addresses 162.222.181.198,23.251.146.189 --region us-central1
 
     In the above invocation, the two addresses will be assigned random names.
 
-    To reserve an IP address from the subnet default in the us-central1 region,
-    run:
+    To reserve an IP address from the subnet 'default' in the 'us-central1'
+    region, run:
 
         $ gcloud compute addresses create SUBNET-ADDRESS-1 \
             --region us-central1 --subnet default
+
+    To reserve an IP range 10.110.0.0/16 from the network 'default' for
+    VPC_PEERING, run:
+
+        $ gcloud compute addresses create IP-RANGE-1 --global \
+            --addresses 10.110.0.0 --prefix-length 16
+        --purpose VPC_PEERING --network default
+
+    To reserve any IP range with prefix length 16 from the network 'default'
+    for VPC_PEERING, run:
+
+        $ gcloud compute addresses create IP-RANGE-1 --global \
+            --prefix-length 16 --purpose VPC_PEERING
+        --network default
 
 NOTES
     These variants are also available:
